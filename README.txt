@@ -1,0 +1,1 @@
+iOS Shortcut Version: Drag and drop into iOS Shortcuts app.
