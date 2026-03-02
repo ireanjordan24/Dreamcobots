@@ -29,9 +29,19 @@ To deploy bots or static content:
 ### `bots`
 - Contains all bot scripts such as the `government-contract-grant-bot`.
 - `config.json` needs to be configured with required API keys and bot settings.
+- See [`bots/README.md`](bots/README.md) for full documentation.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
+- `stress_test.py` — load / stress tests that validate every bot can handle repeated invocations.
+
+### `debug.py`
+- Top-level debugging and diagnostic utility.
+- Validates environment, loads configuration, tests bot interfaces, and runs a stress test.
+- Run with: `python debug.py`
+
+### `replit.md`
+- Step-by-step guide for running the project on [Replit](https://replit.com).
 
 ---
 ## How to Run Bots Locally
@@ -41,9 +51,21 @@ To deploy bots or static content:
    ```
 2. Run the bot script. For example:
    ```bash
-   python bot.py
+   python government_contract_grant_bot.py
    ```
-3. Make sure necessary APIs and configurations are set before running.
+3. Make sure necessary APIs and configurations are set in `bots/config.json` before running.
+
+---
+## Debugging
+Run the debug utility from the repository root to validate your setup:
+```bash
+python debug.py
+```
+
+Run the stress tests to verify all bots handle repeated calls correctly:
+```bash
+python examples/stress_test.py
+```
 
 ---
 ## GitHub Pages Instructions
