@@ -1,1 +1,12 @@
-{}
+{
+  "api_keys": {
+    "openai": "",
+    "government_contracts_api": ""
+  },
+  "bots": {
+    "government-contract-grant-bot": {
+      "enabled": true,
+      "log_level": "INFO"
+    }
+  }
+}
