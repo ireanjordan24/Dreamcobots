@@ -1,1 +1,23 @@
-{}
+{
+  "platform": "Dreamcobots",
+  "version": "2.0.0",
+  "dashboard_port": 8080,
+  "revenue_share_percent": 50,
+  "bots": {
+    "government-contract-grant-bot": {"enabled": true, "priority": "high"},
+    "hustle-bot": {"enabled": true, "priority": "high"},
+    "referral-bot": {"enabled": true, "priority": "high"},
+    "buddy-bot": {"enabled": true, "priority": "critical"},
+    "entrepreneur-bot": {"enabled": true, "priority": "medium"},
+    "medical-bot": {"enabled": true, "priority": "medium"},
+    "legal-bot": {"enabled": true, "priority": "medium"},
+    "finance-bot": {"enabled": true, "priority": "medium"},
+    "real-estate-bot": {"enabled": true, "priority": "medium"},
+    "ecommerce-bot": {"enabled": true, "priority": "medium"},
+    "marketing-bot": {"enabled": true, "priority": "medium"},
+    "education-bot": {"enabled": true, "priority": "medium"},
+    "cybersecurity-bot": {"enabled": true, "priority": "medium"},
+    "hr-bot": {"enabled": true, "priority": "medium"},
+    "farewell-bot": {"enabled": true, "priority": "medium"}
+  }
+}
