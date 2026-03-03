@@ -1,1 +1,17 @@
-{}
+{
+  "bot_name": "GovernmentContractGrantBot",
+  "log_level": "INFO",
+  "api_key": "",
+  "contracts": {
+    "search_keywords": ["federal contract", "government grant", "RFP", "SBIR"],
+    "max_results": 100
+  },
+  "grants": {
+    "search_keywords": ["small business grant", "innovation grant", "federal grant"],
+    "max_results": 50
+  },
+  "notifications": {
+    "enabled": false,
+    "email": ""
+  }
+}
