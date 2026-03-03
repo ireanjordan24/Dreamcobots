@@ -174,7 +174,8 @@ async function fetchBots() {
         document.getElementById('active-bots').textContent = running;
         document.getElementById('total-bots').textContent = 'of ' + bots.length + ' registered';
         document.getElementById('bots-count').textContent = running + ' running / ' + bots.length + ' total';
-        document.getElementById('bots-count-rev').textContent = bots.length;
+        const botsCountRev = document.getElementById('bots-count-rev');
+        if (botsCountRev) botsCountRev.textContent = bots.length;
     } catch (err) {
         console.warn('Bots fetch failed:', err);
     }
