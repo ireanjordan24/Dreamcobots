@@ -1,0 +1,7 @@
+psutil
+flask
+flask-socketio
+requests
+python-dotenv
+schedule
+colorama
