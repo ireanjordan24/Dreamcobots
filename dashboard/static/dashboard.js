@@ -132,7 +132,7 @@ function buildBotCard(bot) {
     const revenue = formatCurrency(bot.revenue || 0);
     const desc = bot.description || 'AI Bot';
     const shortDesc = desc.length > 80 ? desc.substring(0, 77) + '...' : desc;
-    const safeName = bot.name.replace(/'/g, "\\'");
+    const encodedName = encodeURIComponent(bot.name);
 
     return `
     <div class="${cardClass}">
@@ -143,10 +143,10 @@ function buildBotCard(bot) {
         <div class="bot-description">${shortDesc}</div>
         <div class="bot-revenue">${revenue}</div>
         <div class="bot-actions">
-            <button class="btn btn-start" onclick="startBot('${safeName}')" ${isRunning ? 'disabled style="opacity:0.4"' : ''}>
+            <button class="btn btn-start" onclick="startBot(decodeURIComponent('${encodedName}'))" ${isRunning ? 'disabled style="opacity:0.4"' : ''}>
                 ▶ Start
             </button>
-            <button class="btn btn-stop" onclick="stopBot('${safeName}')" ${!isRunning ? 'disabled style="opacity:0.4"' : ''}>
+            <button class="btn btn-stop" onclick="stopBot(decodeURIComponent('${encodedName}'))" ${!isRunning ? 'disabled style="opacity:0.4"' : ''}>
                 ■ Stop
             </button>
         </div>
