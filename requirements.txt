@@ -1,0 +1,30 @@
+# DreamCObots – Python dependencies
+# The core framework runs on Python standard library only.
+# Install optional packages below to unlock enhanced features.
+
+# ── Core (no external dependencies required for basic operation) ─────────────
+# Python >= 3.8 required
+
+# ── Optional: Enhanced NLP (drop-in upgrade for NLPEngine) ───────────────────
+# Uncomment to enable transformer-based intent detection and sentiment analysis:
+# transformers>=4.30.0
+# torch>=2.0.0
+# sentence-transformers>=2.2.0
+
+# ── Optional: Database persistence for AdaptiveLearning & DatasetManager ─────
+# Uncomment to persist bot state across restarts:
+# sqlalchemy>=2.0.0
+# alembic>=1.11.0
+
+# ── Optional: Payment processing (replace stub in DatasetManager/Monetization) 
+# Uncomment to enable real payments:
+# stripe>=5.0.0
+
+# ── Optional: API server (expose bots as REST endpoints) ──────────────────────
+# Uncomment for HTTP API deployment:
+# fastapi>=0.100.0
+# uvicorn>=0.23.0
+# pydantic>=2.0.0
+
+# ── Development & testing ─────────────────────────────────────────────────────
+pytest>=7.4.0
