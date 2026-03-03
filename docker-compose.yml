@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  dataforge:
+    build: .
+    environment:
+      - PYTHONPATH=/app
+      - POSTGRES_DB=dataforge
+      - POSTGRES_USER=dataforge
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dataforge_pass}
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://dataforge:${POSTGRES_PASSWORD:-dataforge_pass}@postgres:5432/dataforge
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dataforge
+      POSTGRES_USER: dataforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dataforge_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
