@@ -464,7 +464,7 @@ API_REGISTRY = {
         "free_tier": True,
     },
     "climacell": {
-        "class": "ClimacelConnector",
+        "class": "ClimacellConnector",
         "module": "bots.dataforge.apis.connectors.climacell_connector",
         "category": "Weather & Climate",
         "description": "Climacell/Tomorrow.io weather intelligence",

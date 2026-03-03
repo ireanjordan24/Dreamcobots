@@ -71,7 +71,7 @@ CONNECTOR_MODULE_MAP = {
     "visual_crossing": ("bots.dataforge.apis.connectors.visual_crossing_connector", "VisualCrossingConnector"),
     "storm_glass": ("bots.dataforge.apis.connectors.storm_glass_connector", "StormGlassConnector"),
     "airvisual": ("bots.dataforge.apis.connectors.airvisual_connector", "AirVisualConnector"),
-    "climacell": ("bots.dataforge.apis.connectors.climacell_connector", "ClimacelConnector"),
+    "climacell": ("bots.dataforge.apis.connectors.climacell_connector", "ClimacellConnector"),
     "newsapi": ("bots.dataforge.apis.connectors.newsapi_connector", "NewsAPIConnector"),
     "gnews": ("bots.dataforge.apis.connectors.gnews_connector", "GNewsConnector"),
     "currents": ("bots.dataforge.apis.connectors.currents_connector", "CurrentsConnector"),

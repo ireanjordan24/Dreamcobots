@@ -5,8 +5,8 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class ClimacelConnector:
-    """ClimacelConnector for DataForge AI."""
+class ClimacellConnector:
+    """ClimacellConnector for DataForge AI."""
 
     BASE_URL = "https://data.tomorrow.io/v4"
 

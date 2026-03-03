@@ -42,6 +42,7 @@ class MozillaCommonVoiceConnector:
         Args:
             audio_path: Path to the audio file.
             sentence: The sentence spoken in the clip.
+            language: BCP-47 language code for the clip (default: 'en').
 
         Returns:
             API response dict or error dict.
