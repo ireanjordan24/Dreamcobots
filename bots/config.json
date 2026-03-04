@@ -1,1 +1,10 @@
-{}
+{
+  "government_contract_grant_bot": {
+    "contract_keywords": ["technology", "robotics", "automation"],
+    "grant_keywords": ["innovation", "robotics", "small business"]
+  },
+  "referral_bot": {
+    "commission_rate": 0.10
+  },
+  "hustle_bot": {}
+}
