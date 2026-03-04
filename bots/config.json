@@ -1,1 +1,406 @@
-{}
+{
+  "bots": [
+    {
+      "module": "government_contract_grant_bot",
+      "class": "GovernmentContractGrantBot",
+      "category": "Government",
+      "directory": "bots/government-contract-grant-bot"
+    },
+    {
+      "module": "administrative_support_bot",
+      "class": "AdministrativeSupportBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "architecture_engineering_bot",
+      "class": "ArchitectureEngineeringBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "arts_media_bot",
+      "class": "ArtsMediaBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "building_maintenance_bot",
+      "class": "BuildingMaintenanceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "business_financial_bot",
+      "class": "BusinessFinancialBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "community_service_bot",
+      "class": "CommunityServiceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "computer_math_bot",
+      "class": "ComputerMathBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "construction_extraction_bot",
+      "class": "ConstructionExtractionBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "education_library_bot",
+      "class": "EducationLibraryBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "farming_fishing_forestry_bot",
+      "class": "FarmingFishingForestryBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "food_service_bot",
+      "class": "FoodServiceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "healthcare_practitioner_bot",
+      "class": "HealthcarePractitionerBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "healthcare_support_bot",
+      "class": "HealthcareSupportBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "installation_maintenance_bot",
+      "class": "InstallationMaintenanceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "legal_bot",
+      "class": "LegalBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "management_bot",
+      "class": "ManagementBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "military_bot",
+      "class": "MilitaryBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "personal_care_bot",
+      "class": "PersonalCareBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "production_bot",
+      "class": "ProductionBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "protective_service_bot",
+      "class": "ProtectiveServiceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "sales_bot",
+      "class": "SalesBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "science_bot",
+      "class": "ScienceBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "transportation_bot",
+      "class": "TransportationBot",
+      "category": "OOH Major Occupational Group",
+      "directory": "Occupational_bots"
+    },
+    {
+      "module": "books_app_bot",
+      "class": "BooksAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "business_app_bot",
+      "class": "BusinessAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "education_app_bot",
+      "class": "EducationAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "entertainment_app_bot",
+      "class": "EntertainmentAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "finance_app_bot",
+      "class": "FinanceAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "food_drink_app_bot",
+      "class": "FoodDrinkAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "games_app_bot",
+      "class": "GamesAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "health_fitness_app_bot",
+      "class": "HealthFitnessAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "kids_family_app_bot",
+      "class": "KidsFamilyAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "lifestyle_app_bot",
+      "class": "LifestyleAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "medical_app_bot",
+      "class": "MedicalAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "music_app_bot",
+      "class": "MusicAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "navigation_app_bot",
+      "class": "NavigationAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "news_app_bot",
+      "class": "NewsAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "photo_video_app_bot",
+      "class": "PhotoVideoAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "productivity_app_bot",
+      "class": "ProductivityAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "reference_app_bot",
+      "class": "ReferenceAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "shopping_app_bot",
+      "class": "ShoppingAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "social_networking_app_bot",
+      "class": "SocialNetworkingAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "sports_app_bot",
+      "class": "SportsAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "travel_app_bot",
+      "class": "TravelAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "utilities_app_bot",
+      "class": "UtilitiesAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "weather_app_bot",
+      "class": "WeatherAppBot",
+      "category": "Mobile App Category",
+      "directory": "App_bots"
+    },
+    {
+      "module": "accommodation_food_bot",
+      "class": "AccommodationFoodBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "administrative_support_industry_bot",
+      "class": "AdministrativeSupportIndustryBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "agriculture_bot",
+      "class": "AgricultureBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "arts_entertainment_bot",
+      "class": "ArtsEntertainmentBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "construction_bot",
+      "class": "ConstructionBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "educational_services_bot",
+      "class": "EducationalServicesBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "finance_insurance_bot",
+      "class": "FinanceInsuranceBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "health_care_bot",
+      "class": "HealthCareBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "information_bot",
+      "class": "InformationBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "management_companies_bot",
+      "class": "ManagementCompaniesBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "manufacturing_bot",
+      "class": "ManufacturingBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "mining_bot",
+      "class": "MiningBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "other_services_bot",
+      "class": "OtherServicesBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "professional_services_bot",
+      "class": "ProfessionalServicesBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "public_administration_bot",
+      "class": "PublicAdministrationBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "real_estate_leasing_bot",
+      "class": "RealEstateLeasingBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "retail_trade_bot",
+      "class": "RetailTradeBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "transportation_warehousing_bot",
+      "class": "TransportationWarehousingBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "utilities_bot",
+      "class": "UtilitiesBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    },
+    {
+      "module": "wholesale_trade_bot",
+      "class": "WholesaleTradeBot",
+      "category": "Business Category / Industry Classification",
+      "directory": "Business_bots"
+    }
+  ]
+}

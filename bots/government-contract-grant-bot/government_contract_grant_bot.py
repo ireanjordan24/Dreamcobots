@@ -1,8 +1,14 @@
 # Government Contract & Grant Bot
 
-class GovernmentContractGrantBot:
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', 'BuddyAI'))
+from base_bot import BaseBot
+
+
+class GovernmentContractGrantBot(BaseBot):
     def __init__(self):
-        pass
+        super().__init__()
+        self.description = "Government Contract and Grant Bot"
 
     def start(self):
         print("Government Contract & Grant Bot is starting...")
