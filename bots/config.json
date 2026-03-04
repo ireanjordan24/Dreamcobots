@@ -1,1 +1,23 @@
-{}
+{
+  "api_keys": {
+    "movie_db": "",
+    "weather": ""
+  },
+  "http_server": {
+    "host": "0.0.0.0",
+    "port": 8080
+  },
+  "websocket_server": {
+    "host": "0.0.0.0",
+    "port": 8765
+  },
+  "bluetooth": {
+    "simulate": true,
+    "discovery_duration_seconds": 5,
+    "max_devices": 10
+  },
+  "bots": {
+    "default_status": "paused",
+    "auto_register": true
+  }
+}
