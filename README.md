@@ -27,8 +27,19 @@ To deploy bots or static content:
 ---
 ## Folder Explanation
 ### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
+- Contains all bot scripts such as the `government-contract-grant-bot` and `saas-selling-bot`.
 - `config.json` needs to be configured with required API keys and bot settings.
+
+#### `bots/saas-selling-bot`
+The ultimate autonomous SaaS selling bot featuring:
+- **200+ free SaaS tools** across Analytics, Marketing, Development, Collaboration, Finance, and AI
+- **REST API** for searching, filtering, and managing tools
+- **AI-powered recommendations** and chatbot (OpenAI GPT integration)
+- **Affiliate link tracking** and revenue dashboard
+- **Stripe subscription payments** (Free / Pro / Enterprise plans)
+- **Responsive professional UI** served from `frontend/`
+
+See [`bots/saas-selling-bot/README.md`](bots/saas-selling-bot/README.md) for full documentation.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
