@@ -1,0 +1,4 @@
+saas_tools.db
+__pycache__/
+*.pyc
+*.pyo
