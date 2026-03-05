@@ -26,12 +26,68 @@ To deploy bots or static content:
 
 ---
 ## Folder Explanation
+### `BuddyAI`
+- Central hub for the DreamCobots ecosystem.
+- **`buddy_bot.py`** – `BuddyBot` class: bot registration, shared knowledge base, task queue, and event dispatch.
+- **`auth.py`** – `AuthModule`: token-based authentication and permission checking.
+- **`event_bus.py`** – `EventBus`: lightweight publish/subscribe messaging between bots.
+
 ### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
+- Contains all bot scripts such as the `government-contract-grant-bot` and the new `dreamcobot`.
+- **`dreamcobot/dreamcobot.py`** – `DreamCobot`: user-facing bot that integrates with `BuddyBot`.
 - `config.json` needs to be configured with required API keys and bot settings.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
+
+### `tests`
+- Unit and integration tests for the BuddyAI framework and DreamCobot integration.
+
+---
+## DreamCobot ↔ BuddyBot Integration
+
+### Overview
+DreamCobot connects to the `BuddyBot` hub at startup and leverages its shared services:
+
+| Feature | BuddyAI module |
+|---|---|
+| Authentication & authorization | `BuddyAI.auth.AuthModule` |
+| Bot-to-bot messaging | `BuddyAI.event_bus.EventBus` |
+| Shared knowledge base | `BuddyBot.set/get_knowledge()` |
+| Shared task queue | `BuddyBot.push/pop_task()` |
+
+### Quick Start
+```python
+from BuddyAI.buddy_bot import BuddyBot
+from bots.dreamcobot.dreamcobot import DreamCobot
+
+# 1. Create the hub
+buddy = BuddyBot(name="MyHub")
+
+# 2. Connect DreamCobot
+dream = DreamCobot.create_and_start(buddy)
+
+# 3. Handle a user message (broadcasts a 'user.message' event)
+print(dream.handle_user_message("Hello, DreamCobot!"))
+
+# 4. Share data via the knowledge base
+dream.store_knowledge("onboarding_step", 1)
+print(dream.retrieve_knowledge("onboarding_step"))   # 1
+
+# 5. Push a task into the shared queue
+dream.assign_task({"type": "goal_setting", "user": "Alex"})
+task = dream.process_next_task()
+print(task)   # {'type': 'goal_setting', 'user': 'Alex'}
+
+# 6. Shut down cleanly
+dream.stop()
+```
+
+### Adding More Bots
+Every additional bot follows the same pattern:
+1. Call `buddy.register_bot(bot_id, permissions=[...])` to register and receive a token.
+2. Subscribe to events with `buddy.subscribe_event(event, handler)`.
+3. Use `buddy.push_task / pop_task` and `buddy.set/get_knowledge` for collaboration.
 
 ---
 ## How to Run Bots Locally
@@ -44,6 +100,13 @@ To deploy bots or static content:
    python bot.py
    ```
 3. Make sure necessary APIs and configurations are set before running.
+
+---
+## Running Tests
+```bash
+pip install -r requirements.txt
+pytest tests/ -v
+```
 
 ---
 ## GitHub Pages Instructions
