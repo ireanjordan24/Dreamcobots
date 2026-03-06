@@ -1,0 +1,7 @@
+# Core dependencies for Buddy SaaS bot
+pytest>=7.0
+pytest-cov>=4.0
+
+# Speech recognition (optional – required for voice commands)
+# SpeechRecognition>=3.10
+# pyaudio>=0.2.13
