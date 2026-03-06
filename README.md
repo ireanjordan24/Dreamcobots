@@ -25,9 +25,48 @@ To deploy bots or static content:
 3. Add and customize workflows to automate bot tasks (see GitHub Actions).
 
 ---
+## AI Model Editions — Free & Paid Tiers
+
+All AI model integrations support three subscription tiers:
+
+| Tier       | Price/month | Requests/month | Models | Support            |
+|------------|-------------|----------------|--------|--------------------|
+| **Free**   | $0.00       | 500            | 9      | Community          |
+| **Pro**    | $49.00      | 10,000         | 18     | Email (48 h SLA)   |
+| **Enterprise** | $299.00 | Unlimited      | 20     | Dedicated 24/7     |
+
+### Free Edition
+- GPT-3.5 Turbo, BERT Base, T5 Small *(NLP)*
+- YOLOv5, ResNet-50 *(Computer Vision)*
+- DALL-E 2, Stable Diffusion 1.4 *(Generative AI)*
+- Prophet, XGBoost *(Data Analytics)*
+
+### Pro Edition ($49/month)
+Everything in Free, **plus**:
+- GPT-4, BERT Large, T5-XL *(NLP)*
+- YOLOv8, ResNet-152 *(Computer Vision)*
+- DALL-E 3, Stable Diffusion XL *(Generative AI)*
+- AutoML, LightGBM *(Data Analytics)*
+- Batch processing, fine-tuning, analytics dashboard
+
+### Enterprise Edition ($299/month)
+Everything in Pro, **plus**:
+- CLIP, GPT-4 Vision *(multimodal)*
+- Custom models, SLA guarantee, dedicated support, white-label
+
+To switch tiers, set `DREAMCOBOTS_TIER=FREE|PRO|ENTERPRISE` in your environment
+or pass `tier=Tier.PRO` when constructing `AIModelsIntegration` / `Chatbot`.
+
+See full documentation in:
+- [`bots/ai-models-integration/README.md`](bots/ai-models-integration/README.md)
+- [`bots/ai_chatbot/README.md`](bots/ai_chatbot/README.md)
+
+---
 ## Folder Explanation
 ### `bots`
 - Contains all bot scripts such as the `government-contract-grant-bot`.
+- `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
+- `bots/ai_chatbot/` — tier-aware AI chatbot built on top of the model integration.
 - `config.json` needs to be configured with required API keys and bot settings.
 
 ### `examples`
