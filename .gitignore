@@ -1,0 +1,13 @@
+# Python byte-compiled / optimised / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# pytest / benchmark artefacts
+.pytest_cache/
+benchmark-results.json
