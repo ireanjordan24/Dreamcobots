@@ -1,0 +1,1 @@
+"""bots/legal-bot/__init__.py — package marker."""

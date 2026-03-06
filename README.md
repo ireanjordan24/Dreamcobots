@@ -1,54 +1,155 @@
-# DreamCObots Repository
+# DreamCobots
 
-Welcome to the DreamCObots project! This repository outlines our groundbreaking mission to develop and deploy 3000 collaborative robots (cobots) designed for transforming industries worldwide. Explore our documentation, system details, and user guides to understand every aspect of this ambitious endeavor.
-
----
-## Installation Instructions
-1. Clone this repository to your local machine:
-   ```bash
-   git clone https://github.com/ireanjordan24/Dreamcobots.git
-   ```
-2. Navigate to the directory:
-   ```bash
-   cd Dreamcobots
-   ```
-3. Install dependencies (if any bot scripts depend on a specific package manager, such as `pip` for Python):
-   ```bash
-   pip install -r requirements.txt
-   ```
+> **Autonomous AI Bot Platform** — a production-ready ecosystem of specialised bots
+> that collect, process, and monetise data while automating high-value business workflows.
 
 ---
-## Deployment Steps
-To deploy bots or static content:
-1. Push changes to the `deployment-setup` branch.
-2. Enable **GitHub Pages** in repository settings for frontend hosting.
-3. Add and customize workflows to automate bot tasks (see GitHub Actions).
+
+## Project Overview
+
+DreamCobots is a modular Python platform that orchestrates a fleet of 16 autonomous
+AI bots, each targeting a distinct vertical: finance, legal, healthcare, real estate,
+government contracting, e-commerce, and more. At the centre of the platform sits
+**DataForge**, a data-intelligence engine that ingests structured outputs from every
+bot, generates high-quality synthetic training datasets, enforces regulatory compliance
+(GDPR, CCPA, HIPAA), and publishes curated datasets to leading AI/ML marketplaces.
+
+**Key numbers:**
+- 16 specialised bots (15 vertical bots + DataForge)
+- 100+ API integrations
+- 231 passing unit/integration tests
+- Regulatory compliance built-in (GDPR · CCPA · HIPAA)
 
 ---
-## Folder Explanation
-### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
-- `config.json` needs to be configured with required API keys and bot settings.
 
-### `examples`
-- Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
+## Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                        DreamCobots Platform                       │
+│                                                                    │
+│  ┌────────────┐  ┌─────────┐  ┌──────────┐  ┌────────────────┐  │
+│  │FinanceBot  │  │LegalBot │  │MedicalBot│  │  14 more bots  │  │
+│  └─────┬──────┘  └────┬────┘  └────┬─────┘  └───────┬────────┘  │
+│        └──────────────┴────────────┴────────────────┘            │
+│                               │                                    │
+│                  ┌────────────▼───────────┐                       │
+│                  │      Orchestrator       │                       │
+│                  │  (thread-safe routing)  │                       │
+│                  └────────────┬───────────┘                       │
+│                               │                                    │
+│                  ┌────────────▼───────────┐                       │
+│                  │       DataForge Bot     │                       │
+│                  │  Dataset Gen · Comply   │                       │
+│                  │  Marketplace · Publish  │                       │
+│                  └────────────────────────┘                       │
+└──────────────────────────────────────────────────────────────────┘
+         │                 │                  │
+   HuggingFace          Kaggle        AWS / Direct API
+```
 
 ---
-## How to Run Bots Locally
-1. Navigate to the bot directory. For example:
-   ```bash
-   cd bots/government-contract-grant-bot
-   ```
-2. Run the bot script. For example:
-   ```bash
-   python bot.py
-   ```
-3. Make sure necessary APIs and configurations are set before running.
+
+## Bot Ecosystem
+
+| # | Bot | Directory | Specialisation |
+|---|-----|-----------|---------------|
+| 1 | **DataForge** | `bots/dataforge/` | Data generation, compliance & marketplace |
+| 2 | **Finance Bot** | `bots/finance-bot/` | Market data, portfolio analysis |
+| 3 | **Legal Bot** | `bots/legal-bot/` | Contract analysis, regulatory research |
+| 4 | **Medical Bot** | `bots/medical-bot/` | Healthcare data, clinical summaries |
+| 5 | **Real Estate Bot** | `bots/real-estate-bot/` | Property listings, market trends |
+| 6 | **Government Contract & Grant Bot** | `bots/government-contract-grant-bot/` | Federal contracts & grants |
+| 7 | **E-commerce Bot** | `bots/ecommerce-bot/` | Product data, pricing optimisation |
+| 8 | **Marketing Bot** | `bots/marketing-bot/` | Campaign analytics, audience segmentation |
+| 9 | **HR Bot** | `bots/hr-bot/` | Talent acquisition, HR analytics |
+| 10 | **Education Bot** | `bots/education-bot/` | Learning content, skill gap analysis |
+| 11 | **Entrepreneur Bot** | `bots/entrepreneur-bot/` | Business intelligence, opportunity scoring |
+| 12 | **Hustle Bot** | `bots/hustle-bot/` | Gig economy, side-income automation |
+| 13 | **Cybersecurity Bot** | `bots/cybersecurity-bot/` | Threat intelligence, vulnerability data |
+| 14 | **Referral Bot** | `bots/referral-bot/` | Referral tracking, growth automation |
+| 15 | **Buddy Bot** | `bots/buddy-bot/` | User engagement, conversational AI |
+| 16 | **Farewell Bot** | `bots/farewell-bot/` | Churn analysis, offboarding workflows |
 
 ---
-## GitHub Pages Instructions
-1. Navigate to **Settings > Pages**.
-2. Select the `deployment-setup` branch and root directory as the publishing source.
-3. Save your settings to host the frontend.
+
+## Quick Start
+
+### Docker (recommended)
+
+```bash
+# 1. Copy environment template
+cp .env.example .env
+# Edit .env with your actual API keys
+
+# 2. Build and run
+docker compose up --build
+```
+
+The platform is available on **port 8000**.
+
+### Local Development
+
+```bash
+# 1. Clone
+git clone https://github.com/ireanjordan24/Dreamcobots.git
+cd Dreamcobots
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Configure environment
+cp .env.example .env  # fill in your keys
+
+# 4. Run
+python main.py run
+
+# 5. Check status
+python main.py status
+```
+
+### Run Tests
+
+```bash
+python -m pytest tests/ -v
+```
 
 ---
+
+## API Documentation
+
+| Guide | Location |
+|-------|----------|
+| DataForge overview | [`bots/dataforge/docs/README.md`](bots/dataforge/docs/README.md) |
+| API integration (100+ APIs) | [`bots/dataforge/docs/API_GUIDE.md`](bots/dataforge/docs/API_GUIDE.md) |
+| Legal & compliance | [`bots/dataforge/docs/LEGAL_COMPLIANCE.md`](bots/dataforge/docs/LEGAL_COMPLIANCE.md) |
+| User data selling guide | [`bots/dataforge/docs/USER_SELLING_GUIDE.md`](bots/dataforge/docs/USER_SELLING_GUIDE.md) |
+
+---
+
+## Repository Structure
+
+```
+Dreamcobots/
+├── main.py                  # CLI entry point
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── core/                    # Orchestrator, watchdog, resource monitor
+├── bots/                    # All bot implementations
+│   ├── dataforge/           # DataForge engine
+│   └── <vertical-bot>/      # One directory per bot
+├── framework/               # Shared framework utilities
+├── stress_test/             # Load testing & debug tools
+├── dashboard/               # Metrics & reporting dashboard
+├── compliance/              # Top-level compliance checker
+├── marketplace/             # Marketplace manager
+└── tests/                   # 231 passing tests
+```
+
+---
+
+## License
+
+Proprietary — All rights reserved. © DreamCobots.
