@@ -1,0 +1,14 @@
+# Core dependencies for the 211 Resource & Eligibility Checker Bot
+# All standard library modules (urllib, json, re, uuid, time) are used
+# directly and require no installation.
+#
+# Optional / deployment dependencies:
+# Uncomment as needed for your deployment environment.
+
+# Web framework (for embedding the bot in an HTTP API)
+# flask>=3.0.0
+# fastapi>=0.110.0
+# uvicorn>=0.29.0
+
+# Testing
+pytest>=7.4.0
