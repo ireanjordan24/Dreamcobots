@@ -1,54 +1,128 @@
-# DreamCObots Repository
+# DreamCobots Repository
 
-Welcome to the DreamCObots project! This repository outlines our groundbreaking mission to develop and deploy 3000 collaborative robots (cobots) designed for transforming industries worldwide. Explore our documentation, system details, and user guides to understand every aspect of this ambitious endeavor.
+Welcome to **DreamCobots** — a versatile, user-friendly platform for automation and income generation. This repository contains a growing collection of collaborative bots (cobots) designed to automate tasks, generate income, and empower users across multiple industries.
 
 ---
-## Installation Instructions
-1. Clone this repository to your local machine:
+
+## 🚀 Why DreamCobots?
+
+- **Non-Technical Friendly**: Each bot ships with detailed setup guides and Docker support — no coding required to get started.
+- **Platform Integrations**: All bots support Zapier, N8n, and other SaaS workflows out of the box.
+- **Income Generation**: Bots are designed not just for automation, but to actively generate revenue streams.
+- **Self-Marketing**: Built-in marketing capabilities help bots promote themselves across platforms.
+- **Open & Extensible**: Standardized templates make it easy to add new bots and customize existing ones.
+
+---
+
+## 🤖 Bot Categories
+
+### Active Bots (`bots/`)
+
+| Bot | Description | Docs |
+|-----|-------------|------|
+| [Government Contract Automation Bot](bots/government-contract-grant-bot/) | Automates SAM.gov contract searches and proposal generation | [README](bots/government-contract-grant-bot/README.md) |
+| [211 Resource Eligibility Bot](bots/211-resource-eligibility-bot/) | Helps users find local social services and check eligibility | [README](bots/211-resource-eligibility-bot/README.md) |
+| [Selenium Job Application Bot](bots/selenium-job-application-bot/) | Automates job searching and applications on multiple platforms | [README](bots/selenium-job-application-bot/README.md) |
+| [AI Side Hustle Bots](bots/ai-side-hustle-bots/) | AI-powered tools to identify and monetize side hustles | [README](bots/ai-side-hustle-bots/README.md) |
+
+### Legacy Bot Templates
+
+| Category | Description |
+|----------|-------------|
+| `App_bots/` | App-focused automation bots |
+| `Business_bots/` | Business process automation |
+| `Fiverr_bots/` | Freelancing platform automation |
+| `Marketing_bots/` | Marketing and outreach automation |
+| `Occupational_bots/` | Occupation-specific automation |
+| `Real_Estate_bots/` | Real estate listing and analysis bots |
+
+---
+
+## 📦 Installation
+
+1. Clone this repository:
    ```bash
    git clone https://github.com/ireanjordan24/Dreamcobots.git
-   ```
-2. Navigate to the directory:
-   ```bash
    cd Dreamcobots
    ```
-3. Install dependencies (if any bot scripts depend on a specific package manager, such as `pip` for Python):
+
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
 ---
-## Deployment Steps
-To deploy bots or static content:
-1. Push changes to the `deployment-setup` branch.
-2. Enable **GitHub Pages** in repository settings for frontend hosting.
-3. Add and customize workflows to automate bot tasks (see GitHub Actions).
+
+## 🏃 Quick Start
+
+Navigate to a bot directory and run it:
+
+```bash
+# Government Contract Automation Bot
+cd bots/government-contract-grant-bot
+python government_contract_grant_bot.py
+
+# 211 Resource Eligibility Bot
+cd bots/211-resource-eligibility-bot
+python bot.py
+
+# Selenium Job Application Bot
+cd bots/selenium-job-application-bot
+python bot.py
+
+# AI Side Hustle Bots
+cd bots/ai-side-hustle-bots
+python bot.py
+```
+
+### Run with Docker
+
+Each bot includes a `Dockerfile` for containerized deployment:
+
+```bash
+cd bots/<bot-name>
+docker build -t dreamcobots-<bot-name> .
+docker run dreamcobots-<bot-name>
+```
 
 ---
-## Folder Explanation
-### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
-- `config.json` needs to be configured with required API keys and bot settings.
 
-### `examples`
-- Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
+## ⚙️ Configuration
 
----
-## How to Run Bots Locally
-1. Navigate to the bot directory. For example:
-   ```bash
-   cd bots/government-contract-grant-bot
-   ```
-2. Run the bot script. For example:
-   ```bash
-   python bot.py
-   ```
-3. Make sure necessary APIs and configurations are set before running.
+Each bot uses `config.json` or environment variables for settings. Copy the example config and fill in your API keys:
+
+```bash
+cp bots/config.json bots/<bot-name>/config.json
+# Edit config.json with your API keys and preferences
+```
 
 ---
-## GitHub Pages Instructions
-1. Navigate to **Settings > Pages**.
-2. Select the `deployment-setup` branch and root directory as the publishing source.
-3. Save your settings to host the frontend.
+
+## 🔗 Integrations
+
+All bots support integration with:
+
+- **Zapier** — Connect to 5,000+ apps without code
+- **N8n** — Self-hosted workflow automation
+- **Make.com (Integromat)** — Visual automation builder
+- **GitHub Actions** — CI/CD and scheduled automation
+
+See [MARKETING.md](MARKETING.md) for integration guides and marketing strategies.
+
+---
+
+## 🚢 Deployment
+
+- **Docker**: Each bot has a `Dockerfile` — see individual bot READMEs.
+- **GitHub Actions**: CI/CD workflows in `.github/workflows/`.
+- **GitHub Pages**: Push to `deployment-setup` branch and enable Pages in repository settings.
+
+---
+
+## 📚 Documentation
+
+- [MARKETING.md](MARKETING.md) — Marketing guide, competitive advantages, platform integration
+- [bots/README.md](bots/README.md) — Overview of all active bots
+- Individual bot READMEs contain full setup, usage, and deployment instructions.
 
 ---
