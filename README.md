@@ -25,9 +25,36 @@ To deploy bots or static content:
 3. Add and customize workflows to automate bot tasks (see GitHub Actions).
 
 ---
+## AI Chatbot – Tiered Platform
+
+The `bots/ai_chatbot/` package provides a production-ready, tiered AI chatbot
+system with KimiK integration, partner-recruitment tools, and a marketing
+documentation manager.
+
+### Tiers
+
+| Tier             | Price       | Highlights |
+|------------------|-------------|------------|
+| **Free**         | $0          | Core chat, FAQ, onboarding (50 msg/day) |
+| **Intermediate** | $29.99/mo   | Analytics dashboard, integrations, email campaigns |
+| **Premium**      | $99.99/mo   | KimiK AI, partner recruitment, AI ecosystem directory, marketing docs, white-label |
+
+### Quick Start
+
+```python
+from bots.ai_chatbot import AIChatbot, Tier
+
+bot = AIChatbot(user_id="user_001", tier=Tier.PREMIUM, model="kimi-k")
+print(bot.chat("Find our best AI ecosystem partners."))
+```
+
+See [`bots/ai_chatbot/README.md`](bots/ai_chatbot/README.md) for full documentation.
+
+---
 ## Folder Explanation
 ### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
+- `ai_chatbot/` – Tiered AI chatbot with KimiK, analytics, marketplace, and marketing doc manager.
+- `government-contract-grant-bot/` – Government contract and grant processing bot.
 - `config.json` needs to be configured with required API keys and bot settings.
 
 ### `examples`
