@@ -29,6 +29,9 @@ To deploy bots or static content:
 ### `bots`
 - Contains all bot scripts such as the `government-contract-grant-bot`.
 - `config.json` needs to be configured with required API keys and bot settings.
+- **`ai-models-integration`** — Integrates all major AI models (NLP, Computer Vision,
+  Generative AI, Data Analytics). See `bots/ai-models-integration/README.md` for full
+  documentation and usage scenarios.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
