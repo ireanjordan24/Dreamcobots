@@ -21,7 +21,6 @@ from bots.shopify_automation_bot.tiers import get_shopify_automation_tier_info
 | Orders per month         | 100                 | 10,000                                   | Unlimited                                     |
 | Inventory sync           | Basic (10 items)    | Full (100 items)                         | Bulk (1,000 items)                            |
 | Automated actions        | Confirmation only   | Confirmation + inventory + fulfillment   | Full suite + workflow + CRM                   |
-| Inventory sync           | ❌                  | ✅                                       | ✅ (bulk)                                     |
 | Custom workflows         | ❌                  | ✅                                       | ✅                                            |
 | API access               | ❌                  | ❌                                       | ✅                                            |
 | Bulk operations          | ❌                  | ❌                                       | ✅                                            |

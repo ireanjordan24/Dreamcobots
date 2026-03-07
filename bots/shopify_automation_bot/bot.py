@@ -92,7 +92,13 @@ class ShopifyAutomationBot:
             status = "basic_sync_complete"
 
         elif self.tier == Tier.PRO:
+            store_limit = 3
             if store_id not in self._stores:
+                if len(self._stores) >= store_limit:
+                    raise ShopifyAutomationBotTierError(
+                        f"Store limit of {store_limit} reached on the Pro tier. "
+                        "Please upgrade to Enterprise to connect unlimited stores."
+                    )
                 self._stores.append(store_id)
             synced_items = 100
             status = "full_sync_complete"
