@@ -133,6 +133,53 @@ FEATURE_SLA_GUARANTEE = "sla_guarantee"
 FEATURE_DEDICATED_SUPPORT = "dedicated_support"
 FEATURE_WHITE_LABEL = "white_label"
 
+# ---------------------------------------------------------------------------
+# Discount Dominator feature flags (settings 401–600)
+# ---------------------------------------------------------------------------
+
+# Advanced Analytics (401–450)
+FEATURE_DD_REALTIME_ANALYTICS = "dd_realtime_analytics"
+FEATURE_DD_COMPETITOR_MONITORING = "dd_competitor_monitoring"
+FEATURE_DD_DEMAND_FORECASTING = "dd_demand_forecasting"
+FEATURE_DD_ANOMALY_DETECTION = "dd_anomaly_detection"
+FEATURE_DD_CROSS_BOT_DATA_SHARING = "dd_cross_bot_data_sharing"
+FEATURE_DD_ANALYTICS_API = "dd_analytics_api"
+
+# In-Store Tactical Controls (451–500)
+FEATURE_DD_INSTORE_DISPLAY_OPTIMISATION = "dd_instore_display_optimisation"
+FEATURE_DD_FLASH_SALE_AUTOMATION = "dd_flash_sale_automation"
+FEATURE_DD_POS_INTEGRATION = "dd_pos_integration"
+FEATURE_DD_BOPIS = "dd_bopis"
+FEATURE_DD_PRICE_MATCH_AUTOMATION = "dd_price_match_automation"
+
+# Online Platform Optimization (501–550)
+FEATURE_DD_DYNAMIC_PRICING = "dd_dynamic_pricing"
+FEATURE_DD_CROSS_PLATFORM_SYNDICATION = "dd_cross_platform_syndication"
+FEATURE_DD_CART_RECOVERY = "dd_cart_recovery"
+FEATURE_DD_RECOMMENDATION_ENGINE = "dd_recommendation_engine"
+FEATURE_DD_FRAUD_SCORING = "dd_fraud_scoring"
+FEATURE_DD_DYNAMIC_COUPON_GENERATION = "dd_dynamic_coupon_generation"
+
+# Enterprise-Grade Features (551–580)
+FEATURE_DD_MULTI_LOCATION = "dd_multi_location"
+FEATURE_DD_SSO = "dd_sso"
+FEATURE_DD_RBAC = "dd_rbac"
+FEATURE_DD_AUTO_SCALING = "dd_auto_scaling"
+FEATURE_DD_ERP_INTEGRATION = "dd_erp_integration"
+FEATURE_DD_CRM_INTEGRATION = "dd_crm_integration"
+FEATURE_DD_WMS_INTEGRATION = "dd_wms_integration"
+FEATURE_DD_OMS_INTEGRATION = "dd_oms_integration"
+FEATURE_DD_ADVANCED_FRAUD_DETECTION = "dd_advanced_fraud_detection"
+
+# Behavioral Settings (581–600)
+FEATURE_DD_PURCHASE_TRACKING = "dd_purchase_tracking"
+FEATURE_DD_ABANDONED_CART_RECOVERY = "dd_abandoned_cart_recovery"
+FEATURE_DD_LOYALTY_PROGRAMME = "dd_loyalty_programme"
+FEATURE_DD_CHURN_PREDICTION = "dd_churn_prediction"
+FEATURE_DD_NEXT_BEST_ACTION = "dd_next_best_action"
+FEATURE_DD_SOCIAL_PROOF = "dd_social_proof"
+FEATURE_DD_URGENCY_SCARCITY = "dd_urgency_scarcity"
+
 FREE_FEATURES = [
     FEATURE_BASIC_INFERENCE,
     FEATURE_API_ACCESS,
@@ -143,6 +190,15 @@ PRO_FEATURES = FREE_FEATURES + [
     FEATURE_FINE_TUNING,
     FEATURE_ANALYTICS_DASHBOARD,
     FEATURE_PRIORITY_QUEUE,
+    # Discount Dominator — Pro tier
+    FEATURE_DD_REALTIME_ANALYTICS,
+    FEATURE_DD_COMPETITOR_MONITORING,
+    FEATURE_DD_DYNAMIC_PRICING,
+    FEATURE_DD_CART_RECOVERY,
+    FEATURE_DD_RECOMMENDATION_ENGINE,
+    FEATURE_DD_PURCHASE_TRACKING,
+    FEATURE_DD_ABANDONED_CART_RECOVERY,
+    FEATURE_DD_LOYALTY_PROGRAMME,
 ]
 
 ENTERPRISE_FEATURES = PRO_FEATURES + [
@@ -150,6 +206,32 @@ ENTERPRISE_FEATURES = PRO_FEATURES + [
     FEATURE_SLA_GUARANTEE,
     FEATURE_DEDICATED_SUPPORT,
     FEATURE_WHITE_LABEL,
+    # Discount Dominator — Enterprise tier
+    FEATURE_DD_DEMAND_FORECASTING,
+    FEATURE_DD_ANOMALY_DETECTION,
+    FEATURE_DD_CROSS_BOT_DATA_SHARING,
+    FEATURE_DD_ANALYTICS_API,
+    FEATURE_DD_INSTORE_DISPLAY_OPTIMISATION,
+    FEATURE_DD_FLASH_SALE_AUTOMATION,
+    FEATURE_DD_POS_INTEGRATION,
+    FEATURE_DD_BOPIS,
+    FEATURE_DD_PRICE_MATCH_AUTOMATION,
+    FEATURE_DD_CROSS_PLATFORM_SYNDICATION,
+    FEATURE_DD_FRAUD_SCORING,
+    FEATURE_DD_DYNAMIC_COUPON_GENERATION,
+    FEATURE_DD_MULTI_LOCATION,
+    FEATURE_DD_SSO,
+    FEATURE_DD_RBAC,
+    FEATURE_DD_AUTO_SCALING,
+    FEATURE_DD_ERP_INTEGRATION,
+    FEATURE_DD_CRM_INTEGRATION,
+    FEATURE_DD_WMS_INTEGRATION,
+    FEATURE_DD_OMS_INTEGRATION,
+    FEATURE_DD_ADVANCED_FRAUD_DETECTION,
+    FEATURE_DD_CHURN_PREDICTION,
+    FEATURE_DD_NEXT_BEST_ACTION,
+    FEATURE_DD_SOCIAL_PROOF,
+    FEATURE_DD_URGENCY_SCARCITY,
 ]
 
 # ---------------------------------------------------------------------------
