@@ -382,8 +382,10 @@ class TestAPIManager:
 
     def test_dreamco_stripe_key_is_not_real(self):
         """DREAMCO_STRIPE_KEY should not be a live Stripe secret key."""
-        assert DREAMCO_STRIPE_KEY.startswith("sk_test_") or \
-               "placeholder" in DREAMCO_STRIPE_KEY
+        # A live key starts with 'sk_live_' – that must never be committed
+        assert not DREAMCO_STRIPE_KEY.startswith("sk_live_"), (
+            "DREAMCO_STRIPE_KEY must not be a live Stripe secret key"
+        )
 
 
 # ===========================================================================

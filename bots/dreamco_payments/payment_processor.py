@@ -76,7 +76,7 @@ class PaymentProcessor:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
+        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def _validate_currency(self, currency: str) -> None:
         if currency.upper() not in SUPPORTED_CURRENCIES:

@@ -65,7 +65,7 @@ class APIManager:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
+        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @staticmethod
     def _generate_raw_key() -> str:
