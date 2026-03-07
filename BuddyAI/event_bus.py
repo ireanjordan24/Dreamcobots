@@ -71,7 +71,7 @@ class EventBus:
                 "event_type": event_type,
                 "payload": payload,
                 "handlers_invoked": count,
-                "timestamp": datetime.datetime.utcnow().isoformat(),
+                "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             })
         return count
 
