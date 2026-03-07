@@ -2,7 +2,8 @@
 Tier configuration for the Dreamcobots AI Chatbot.
 
 Mirrors the broader platform tiers so that chatbot clients benefit from the
-same free / pro / enterprise structure used across all AI model integrations.
+same free / pro / enterprise structure used across all AI model integrations,
+including the Discount Dominator settings (401–600).
 """
 
 import sys
@@ -26,6 +27,23 @@ from tiers import (   # re-export for convenience
     FEATURE_SLA_GUARANTEE,
     FEATURE_DEDICATED_SUPPORT,
     FEATURE_WHITE_LABEL,
+    # Discount Dominator feature flags
+    FEATURE_DD_REALTIME_ANALYTICS,
+    FEATURE_DD_COMPETITOR_MONITORING,
+    FEATURE_DD_DEMAND_FORECASTING,
+    FEATURE_DD_ANOMALY_DETECTION,
+    FEATURE_DD_CROSS_BOT_DATA_SHARING,
+    FEATURE_DD_ANALYTICS_API,
+    FEATURE_DD_DYNAMIC_PRICING,
+    FEATURE_DD_CART_RECOVERY,
+    FEATURE_DD_RECOMMENDATION_ENGINE,
+    FEATURE_DD_PURCHASE_TRACKING,
+    FEATURE_DD_ABANDONED_CART_RECOVERY,
+    FEATURE_DD_LOYALTY_PROGRAMME,
+    FEATURE_DD_CHURN_PREDICTION,
+    FEATURE_DD_NEXT_BEST_ACTION,
+    FEATURE_DD_SOCIAL_PROOF,
+    FEATURE_DD_URGENCY_SCARCITY,
     NLP_GPT35,
     NLP_GPT4,
     NLP_BERT_BASE,
@@ -45,6 +63,11 @@ CHATBOT_EXTRA_FEATURES: dict[str, list[str]] = {
         "Markdown-formatted responses",
         "Code highlighting",
         "File attachments (PDF, TXT)",
+        # Discount Dominator — Pro
+        "Real-time analytics insights in chat",
+        "Competitor price alerts",
+        "Cart recovery chat prompts",
+        "Product recommendation responses",
     ],
     Tier.ENTERPRISE.value: [
         "Unlimited conversation history",
@@ -52,6 +75,13 @@ CHATBOT_EXTRA_FEATURES: dict[str, list[str]] = {
         "Custom system prompts",
         "SAML/SSO integration",
         "Audit logging",
+        # Discount Dominator — Enterprise
+        "Demand forecasting chat queries",
+        "Anomaly detection alerts via chat",
+        "Cross-bot data sharing in conversations",
+        "Churn prediction insights",
+        "Next-best-action recommendations",
+        "Retail intelligence network queries",
     ],
 }
 
@@ -76,3 +106,4 @@ def get_chatbot_tier_info(tier: Tier) -> dict:
         "available_models": CHATBOT_MODELS[tier.value],
         "support_level": cfg.support_level,
     }
+
