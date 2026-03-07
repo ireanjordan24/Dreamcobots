@@ -26,7 +26,7 @@ from bots.business_automation.business_automation_bot import (
 )
 
 
-class TestBATimerInfo:
+class TestBATierInfo:
     def test_tier_info_keys(self):
         info = get_ba_tier_info(Tier.FREE)
         for key in ("tier", "name", "price_usd_monthly", "requests_per_month",

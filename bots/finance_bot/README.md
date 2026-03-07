@@ -6,7 +6,7 @@ Tier-aware personal and business finance assistant for the Dreamcobots platform.
 
 ## Overview
 
-The Finance Bot helps individuals and businesses track budgets, analyse
+The Finance Bot helps individuals and businesses track budgets, analyze
 investments, estimate taxes, and generate compliance-ready financial reports —
 all through a conversational interface.
 

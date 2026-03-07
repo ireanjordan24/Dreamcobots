@@ -94,7 +94,7 @@ buddy = BuddyBot()
 buddy.register_bot("finance", FinanceBot(tier=Tier.PRO))
 buddy.register_bot("marketing", MarketingBot(tier=Tier.PRO))
 
-print(buddy.chat("finance", "Analyse my Q3 cash flow")["message"])
+print(buddy.chat("finance", "Analyze my Q3 cash flow")["message"])
 print(buddy.chat("marketing", "Write an email for our product launch")["message"])
 ```
 
