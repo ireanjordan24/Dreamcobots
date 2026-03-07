@@ -64,7 +64,7 @@ class HealthWellnessBot:
         weight_kg : float
             Weight in kilograms.
         height_m : float
-            Height in metres.
+            Height in meters.
 
         Returns
         -------

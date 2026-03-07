@@ -236,7 +236,7 @@ class SecurityTechBot:
             "total_findings": len(all_findings),
             "severity_breakdown": severity_counts,
             "executive_summary": (
-                f"[Mock] Analysed {len(scan_results)} scan(s) with "
+                f"[Mock] Analyzed {len(scan_results)} scan(s) with "
                 f"{len(all_findings)} total finding(s)."
             ),
             "recommendations": [

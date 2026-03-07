@@ -95,12 +95,12 @@ class GovernmentContractGrantBot:
 
     def check_grant_eligibility(self, org_profile: dict) -> dict:
         """
-        Check whether an organisation profile is eligible for grants.
+        Check whether an organization profile is eligible for grants.
 
         Parameters
         ----------
         org_profile : dict
-            Organisation details (e.g., type, size, sector, location).
+            Organization details (e.g., type, size, sector, location).
 
         Returns
         -------
@@ -147,7 +147,7 @@ class GovernmentContractGrantBot:
         grant_id : str
             The grant to apply for.
         org_profile : dict
-            Organisation details for the application.
+            Organization details for the application.
 
         Returns
         -------
@@ -163,7 +163,7 @@ class GovernmentContractGrantBot:
         return {
             "grant_id": grant_id,
             "draft": f"[Mock draft application for grant {grant_id}]",
-            "org_name": org_profile.get("name", "Unknown Organisation"),
+            "org_name": org_profile.get("name", "Unknown Organization"),
             "tier": self.tier.value,
             "requests_used": self._request_count,
             "requests_remaining": self._requests_remaining(),
