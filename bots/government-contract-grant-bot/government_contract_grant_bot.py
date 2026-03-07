@@ -119,7 +119,7 @@ class GovernmentContractGrantBot:
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             eligible_grants.append({
                 "grant_id": "GR-002",
-                "title": "Technology Modernisation Grant",
+                "title": "Technology Modernization Grant",
                 "amount_usd": 250_000,
                 "eligibility": "Eligible — advanced matching",
             })
