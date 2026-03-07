@@ -197,7 +197,7 @@ class AccountManager:
 
     def detect_fraud(self, transaction_data: dict) -> dict:
         """
-        Analyse transaction data and return a risk assessment.
+        Analyze transaction data and return a risk assessment.
 
         Requires GROWTH or ENTERPRISE tier.
 
