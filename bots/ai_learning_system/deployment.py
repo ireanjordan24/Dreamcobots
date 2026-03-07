@@ -145,7 +145,7 @@ class DeploymentOrchestrator:
             If the current tier does not support deployment.
         """
         self._check_tier()
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         deployment = Deployment(
             id=str(uuid.uuid4()),
             strategy_id=strategy.id,
@@ -194,7 +194,7 @@ class DeploymentOrchestrator:
         """
         self._check_tier()
         deployment = self._get(deployment_id)
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         deployment.strategy_id = new_strategy.id
         deployment.status = DeploymentStatus.DEPLOYED
         deployment.version = _make_version(new_strategy.generation)
@@ -232,7 +232,8 @@ class DeploymentOrchestrator:
         self._check_tier()
         deployment = self._get(deployment_id)
         deployment.status = DeploymentStatus.ROLLED_BACK
-        deployment.metrics["rolled_back_at"] = datetime.datetime.utcnow().isoformat()
+        rolled_back_at = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat()
+        deployment.metrics["rolled_back_at"] = rolled_back_at
         return deployment
 
     def get_deployments(self) -> List[Deployment]:

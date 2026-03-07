@@ -102,7 +102,7 @@ _DEFAULT_CONFIDENCE = 0.70
 def _classify_tags(tags: List[str], title: str) -> tuple:
     """Return (LearningMethodType, confidence) for a set of tags and title."""
     text_tokens = set(tags)
-    # also tokenise the title
+    # also tokenize the title
     for word in title.lower().replace("-", "_").split():
         text_tokens.add(word)
 
@@ -153,7 +153,7 @@ class LearningMethodClassifier:
         self._check_tier()
 
         method_type, confidence = _classify_tags(record.tags, record.title)
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
         classified = ClassifiedMethod(
             id=str(uuid.uuid4()),

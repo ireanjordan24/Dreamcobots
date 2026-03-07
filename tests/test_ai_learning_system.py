@@ -87,6 +87,11 @@ from bots.ai_learning_system.ai_learning_system import (
 )
 
 
+def _utc_now_naive() -> datetime.datetime:
+    """Return a naive UTC datetime (no tzinfo) for use in test assertions."""
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+
 # ===========================================================================
 # Tier tests
 # ===========================================================================
@@ -344,7 +349,7 @@ def _make_record(tags, title="Test Record", source=DataSourceType.ARXIV):
         tags=tags,
         language="English",
         novelty_score=0.75,
-        ingested_at=datetime.datetime.utcnow(),
+        ingested_at=_utc_now_naive(),
         metadata={"country": "USA", "lab_name": "OpenAI"},
     )
 
@@ -455,7 +460,7 @@ def _make_method(method_type=LearningMethodType.SUPERVISED, novelty=0.8):
         novelty_score=novelty,
         confidence=0.85,
         tags=["supervised_learning"],
-        classified_at=datetime.datetime.utcnow(),
+        classified_at=_utc_now_naive(),
         source_record_id="src-id",
     )
 
@@ -557,7 +562,7 @@ def _make_test_results_and_methods(n=5):
             novelty_score=0.5 + i * 0.05,
             confidence=0.8,
             tags=["supervised_learning"],
-            classified_at=datetime.datetime.utcnow(),
+            classified_at=_utc_now_naive(),
         )
         methods.append(m)
         r = SandboxTestResult(
@@ -569,8 +574,8 @@ def _make_test_results_and_methods(n=5):
             resource_consumption=50.0 - i * 3,
             runtime_seconds=20.0,
             container_id=f"container-{i}",
-            started_at=datetime.datetime.utcnow(),
-            completed_at=datetime.datetime.utcnow(),
+            started_at=_utc_now_naive(),
+            completed_at=_utc_now_naive(),
         )
         test_results.append(r)
     return test_results, methods
@@ -670,7 +675,7 @@ def _make_rankings(n=5):
             convergence_score=0.8 - i * 0.05,
             efficiency_score=0.7 - i * 0.05,
             test_count=2,
-            computed_at=datetime.datetime.utcnow(),
+            computed_at=_utc_now_naive(),
         )
         for i in range(n)
     ]
@@ -773,7 +778,7 @@ def _make_strategy(generation=0):
         accuracy=0.88,
         convergence_rate=0.75,
         resource_consumption=42.0,
-        created_at=datetime.datetime.utcnow(),
+        created_at=_utc_now_naive(),
     )
 
 
@@ -981,7 +986,7 @@ class TestScheduler:
     def test_job_next_run_in_future(self):
         sched = self._scheduler()
         job = sched.schedule_job("daily-ingest", ScheduleFrequency.DAILY)
-        assert job.next_run > datetime.datetime.utcnow()
+        assert job.next_run > _utc_now_naive()
 
     def test_run_job_updates_status(self):
         sched = self._scheduler()
@@ -1016,7 +1021,7 @@ class TestScheduler:
         sched = self._scheduler()
         job = sched.schedule_job("past-job", ScheduleFrequency.DAILY)
         # Force next_run into the past
-        job.next_run = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+        job.next_run = _utc_now_naive() - datetime.timedelta(hours=1)
         due = sched.get_due_jobs()
         assert job in due
 
@@ -1028,7 +1033,7 @@ class TestScheduler:
 
     def test_weekly_next_run_about_7_days(self):
         sched = self._scheduler()
-        before = datetime.datetime.utcnow()
+        before = _utc_now_naive()
         job = sched.schedule_job("weekly-job", ScheduleFrequency.WEEKLY)
         diff = (job.next_run - before).total_seconds()
         assert 6.9 * 86400 < diff < 7.1 * 86400

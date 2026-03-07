@@ -1,7 +1,7 @@
 """
 Data ingestion layer for the DreamCo Global AI Learning System.
 
-Supports scraping and normalising records from arXiv, GitHub, Kaggle, and AI Labs.
+Supports scraping and normalizing records from arXiv, GitHub, Kaggle, and AI Labs.
 """
 
 from enum import Enum
@@ -245,7 +245,7 @@ class DataIngestionLayer:
         templates = _MOCK_TEMPLATES[source]
         lab_names = _LAB_NAMES[source]
         count = min(max_results, len(templates))
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
         new_records: List[IngestedRecord] = []
         query_lower = query.lower()

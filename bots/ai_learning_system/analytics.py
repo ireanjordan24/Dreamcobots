@@ -1,7 +1,7 @@
 """
 Performance analytics layer for the DreamCo Global AI Learning System.
 
-Normalises sandbox test metrics and computes global and regional rankings
+Normalizes sandbox test metrics and computes global and regional rankings
 for all tested AI/ML methods.
 """
 
@@ -174,7 +174,7 @@ class PerformanceAnalyticsLayer:
             for a, c, e in zip(norm_acc, norm_conv, norm_eff)
         ]
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         entries = []
         for i, mid in enumerate(method_ids):
             m = method_map.get(mid)

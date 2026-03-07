@@ -202,7 +202,7 @@ class GovernanceLayer:
     ) -> None:
         entry = AuditLogEntry(
             id=str(uuid.uuid4()),
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
             actor=actor,
             role=role,
             action=action,

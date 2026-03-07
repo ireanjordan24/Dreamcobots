@@ -119,7 +119,7 @@ class AutomationScheduler:
             If the current tier does not support the scheduler.
         """
         self._check_tier()
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         next_run = now + _FREQUENCY_DELTAS[frequency]
         job = ScheduledJob(
             id=str(uuid.uuid4()),
@@ -157,7 +157,7 @@ class AutomationScheduler:
         """
         self._check_tier()
         job = self._get(job_id)
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         job.status = JobStatus.COMPLETED
         job.last_run = now
         job.next_run = now + _FREQUENCY_DELTAS[job.frequency]
@@ -178,7 +178,7 @@ class AutomationScheduler:
         Parameters
         ----------
         as_of : datetime.datetime | None
-            Reference time. Defaults to ``datetime.datetime.utcnow()``.
+            Reference time. Defaults to ``datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)``.
 
         Returns
         -------
@@ -186,7 +186,7 @@ class AutomationScheduler:
             Jobs that are due to run.
         """
         if as_of is None:
-            as_of = datetime.datetime.utcnow()
+            as_of = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         return [
             j for j in self._jobs.values()
             if j.next_run <= as_of and j.status != JobStatus.RUNNING

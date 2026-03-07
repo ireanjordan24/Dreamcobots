@@ -1,7 +1,7 @@
 """
 Sandbox testing layer for the DreamCo Global AI Learning System.
 
-Simulates containerised execution of classified AI/ML methods and collects
+Simulates containerized execution of classified AI/ML methods and collects
 performance metrics (accuracy, convergence rate, resource consumption).
 """
 
@@ -131,7 +131,7 @@ class SandboxTestingLayer:
         self._check_tier()
         self._check_container_limit()
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         container_id = f"dreamco-sandbox-{uuid.uuid4().hex[:12]}"
         self._active_containers += 1
 

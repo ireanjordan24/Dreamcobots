@@ -155,7 +155,7 @@ class HybridEvolutionEngine:
             metrics = _mutate(metrics, generation)
 
         fitness = _fitness(metrics)
-        method_types = list({r.method_title.split(":")[0].strip() for r in selected})
+        method_types = list({r.method_title for r in selected})
 
         strategy = HybridStrategy(
             id=str(uuid.uuid4()),
@@ -167,7 +167,7 @@ class HybridEvolutionEngine:
             accuracy=round(min(1.0, metrics["accuracy"]), 4),
             convergence_rate=round(min(1.0, metrics["convergence"]), 4),
             resource_consumption=round(max(0.0, metrics["resource"]), 2),
-            created_at=datetime.datetime.utcnow(),
+            created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
             metadata={
                 "top_n_selected": len(selected),
                 "genetic_algo": self.config.has_feature(FEATURE_GENETIC_ALGO),
@@ -224,7 +224,7 @@ class HybridEvolutionEngine:
                 accuracy=round(min(1.0, metrics["accuracy"]), 4),
                 convergence_rate=round(min(1.0, metrics["convergence"]), 4),
                 resource_consumption=round(max(0.0, metrics["resource"]), 2),
-                created_at=datetime.datetime.utcnow(),
+                created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
                 metadata={
                     "evolved_from": current.id,
                     "genetic_algo": self.config.has_feature(FEATURE_GENETIC_ALGO),
