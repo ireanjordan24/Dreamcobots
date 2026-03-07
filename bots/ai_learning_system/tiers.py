@@ -3,7 +3,7 @@ Tier definitions for the DreamCo Global AI Learning System.
 
 Tiers:
   - FREE:       $0/month, 100 ingestion jobs, basic features.
-  - PRO:        $199/month, 5 000 ingestion jobs, sandbox, hybrid engine.
+  - PRO:        $199/month, 5,000 ingestion jobs, sandbox, hybrid engine.
   - ENTERPRISE: $999/month, unlimited jobs, Kubernetes, genetic algorithms.
 """
 
