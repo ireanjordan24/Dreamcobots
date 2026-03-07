@@ -27,7 +27,7 @@ class FraudDetectionBot:
         self.tier = tier
         self.config = get_tier_config(tier)
         self._request_count: int = 0
-        self._transactions: list = []
+        self._transactions: list[dict] = []
 
     def _check_request_limit(self) -> None:
         limit = self.config.requests_per_month

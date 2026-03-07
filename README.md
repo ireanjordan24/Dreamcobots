@@ -1,6 +1,6 @@
 # DreamCObots Repository
 
-Welcome to the DreamCObots project! This repository outlines our groundbreaking mission to develop and deploy 3000 collaborative robots (cobots) designed for transforming industries worldwide. Explore our documentation, system details, and user guides to understand every aspect of this ambitious endeavor.
+Welcome to the DreamCObots project! This repository is the **DreamCo AI Bot App Store** — a comprehensive platform for deploying AI-powered bots across industries. Our mission is to develop and deploy collaborative AI bots designed to transform businesses worldwide.
 
 ---
 ## Installation Instructions
@@ -55,19 +55,79 @@ Everything in Pro, **plus**:
 - Custom models, SLA guarantee, dedicated support, white-label
 
 To switch tiers, set `DREAMCOBOTS_TIER=FREE|PRO|ENTERPRISE` in your environment
-or pass `tier=Tier.PRO` when constructing `AIModelsIntegration` / `Chatbot`.
+or pass `tier=Tier.PRO` when constructing any bot class.
 
 See full documentation in:
 - [`bots/ai-models-integration/README.md`](bots/ai-models-integration/README.md)
 - [`bots/ai_chatbot/README.md`](bots/ai_chatbot/README.md)
 
 ---
+## 🤖 Bot Marketplace — 10 High-Priority Bots
+
+The DreamCo Bot App Store launches with 10 fully standardized, tier-aware bots covering the most profitable AI automation niches. Each bot integrates with the BuddyAI system and supports SaaS recurring subscriptions.
+
+| Bot | Directory | Key Features | Starting Price |
+|-----|-----------|--------------|---------------|
+| **Customer Support AI Bot** | `bots/customer_support_bot/` | Ticket routing, sentiment analysis, CRM integration | Free |
+| **Lead Generation Bot** | `bots/lead_generation_bot/` | AI lead scoring, email sequences, CRM sync | Free |
+| **AI Writing/Marketing Bot** | `bots/ai_writing_bot/` | Content generation, SEO optimization, templates | Free |
+| **Real Estate Deal Finder Bot** | `bots/real_estate_bot/` | Property search, ROI calculator, MLS integration | Free |
+| **Stock Trading Bot** | `bots/stock_trading_bot/` | Trading signals, backtesting, algorithmic strategies | Free |
+| **Shopify Automation Bot** | `bots/shopify_automation_bot/` | Order processing, inventory sync, workflow automation | Free |
+| **CRM Automation Bot** | `bots/crm_automation_bot/` | Contact management, pipeline automation, AI insights | Free |
+| **Social Media Growth Bot** | `bots/social_media_bot/` | Post scheduling, engagement analytics, hashtag AI | Free |
+| **Coding Assistant Bot** | `bots/coding_assistant_bot/` | Code completion, review, unit test generation | Free |
+| **Fraud Detection Bot** | `bots/fraud_detection_bot/` | Transaction analysis, ML risk scoring, compliance reports | Free |
+
+### Quick Start — Any Bot
+
+```python
+from bots.customer_support_bot.bot import CustomerSupportBot
+from bots.ai_writing_bot.bot import AIWritingBot
+# Import path uses the bots/ package directly
+import sys, os
+sys.path.insert(0, 'bots/ai-models-integration')
+from tiers import Tier
+
+# All bots follow the same tier-aware interface
+bot = CustomerSupportBot(tier=Tier.PRO)
+result = bot.handle_ticket({"message": "My order is late!", "category": "shipping"})
+print(result["response"])
+
+writer = AIWritingBot(tier=Tier.ENTERPRISE)
+content = writer.generate_content({"topic": "AI trends", "type": "blog post"})
+print(content["content"])
+```
+
+### BuddyAI Integration
+
+Every bot exposes a `get_stats()` method with `"buddy_integration": True`, enabling seamless connection to the BuddyAI orchestration system:
+
+```python
+stats = bot.get_stats()
+# {"tier": "pro", "requests_used": 42, "requests_remaining": "9958", "buddy_integration": True}
+```
+
+---
 ## Folder Explanation
 ### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
+- Contains all bot scripts and packages.
 - `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
 - `bots/ai_chatbot/` — tier-aware AI chatbot built on top of the model integration.
+- `bots/customer_support_bot/` — Customer Support AI Bot.
+- `bots/lead_generation_bot/` — Lead Generation Bot.
+- `bots/ai_writing_bot/` — AI Writing/Marketing Bot.
+- `bots/real_estate_bot/` — Real Estate Deal Finder Bot.
+- `bots/stock_trading_bot/` — Stock Trading Bot.
+- `bots/shopify_automation_bot/` — Shopify Automation Bot.
+- `bots/crm_automation_bot/` — CRM Automation Bot.
+- `bots/social_media_bot/` — Social Media Growth Bot.
+- `bots/coding_assistant_bot/` — Coding Assistant Bot.
+- `bots/fraud_detection_bot/` — Fraud Detection Bot.
 - `config.json` needs to be configured with required API keys and bot settings.
+
+### `BuddyAI`
+- Contains the central AI orchestration layer that connects all bots.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
@@ -76,13 +136,23 @@ See full documentation in:
 ## How to Run Bots Locally
 1. Navigate to the bot directory. For example:
    ```bash
-   cd bots/government-contract-grant-bot
+   cd bots/customer_support_bot
    ```
 2. Run the bot script. For example:
    ```bash
    python bot.py
    ```
 3. Make sure necessary APIs and configurations are set before running.
+
+---
+## Running Tests
+
+```bash
+pip install -r requirements.txt
+pytest tests/ -v
+```
+
+All 10 marketplace bots have comprehensive test coverage in `tests/`.
 
 ---
 ## GitHub Pages Instructions

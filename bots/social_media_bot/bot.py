@@ -33,8 +33,8 @@ class SocialMediaBot:
         self.tier = tier
         self.config = get_tier_config(tier)
         self._request_count: int = 0
-        self._accounts: list = []
-        self._posts: list = []
+        self._accounts: list[str] = []
+        self._posts: list[dict] = []
         self._posts_this_month: int = 0
 
     def _check_request_limit(self) -> None:

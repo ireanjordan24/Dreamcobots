@@ -34,7 +34,7 @@ class AIWritingBot:
         self.config = get_tier_config(tier)
         self._request_count: int = 0
         self._words_used: int = 0
-        self._templates: list = []
+        self._templates: list[dict] = []
 
     def _check_request_limit(self) -> None:
         limit = self.config.requests_per_month
