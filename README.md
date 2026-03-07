@@ -62,27 +62,111 @@ See full documentation in:
 - [`bots/ai_chatbot/README.md`](bots/ai_chatbot/README.md)
 
 ---
-## Folder Explanation
-### `bots`
-- Contains all bot scripts such as the `government-contract-grant-bot`.
-- `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
-- `bots/ai_chatbot/` — tier-aware AI chatbot built on top of the model integration.
-- `config.json` needs to be configured with required API keys and bot settings.
+## Sector Bots
 
-### `examples`
-- Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
+Each sector bot is tier-aware (FREE / PRO / ENTERPRISE) and integrates with
+BuddyAI for unified orchestration.
+
+| Bot | Directory | README |
+|-----|-----------|--------|
+| AI Chatbot | `bots/ai_chatbot/` | [README](bots/ai_chatbot/README.md) |
+| AI Models Integration | `bots/ai-models-integration/` | [README](bots/ai-models-integration/README.md) |
+| Business Automation | `bots/business_automation/` | [README](bots/business_automation/README.md) |
+| Finance Bot | `bots/finance_bot/` | [README](bots/finance_bot/README.md) |
+| Marketing Bot | `bots/marketing_bot/` | [README](bots/marketing_bot/README.md) |
+| Real Estate Bot | `bots/real_estate_bot/` | [README](bots/real_estate_bot/README.md) |
+| Creator Economy Bot | `bots/creator_economy/` | [README](bots/creator_economy/README.md) |
+| Lawsuit Finder Bot | `bots/lawsuit_finder_bot/` | [README](bots/lawsuit_finder_bot/README.md) |
+| Government Contract & Grant Bot | `bots/government-contract-grant-bot/` | [README](bots/government-contract-grant-bot/README.md) |
+
+---
+## BuddyAI — Central Dialogue Hub
+
+All sector bots integrate with **BuddyAI**, the central orchestration layer:
+
+```python
+from BuddyAI import BuddyBot
+from bots.finance_bot import FinanceBot
+from bots.marketing_bot import MarketingBot
+from bots.ai_chatbot.tiers import Tier
+
+buddy = BuddyBot()
+buddy.register_bot("finance", FinanceBot(tier=Tier.PRO))
+buddy.register_bot("marketing", MarketingBot(tier=Tier.PRO))
+
+print(buddy.chat("finance", "Analyze my Q3 cash flow")["message"])
+print(buddy.chat("marketing", "Write an email for our product launch")["message"])
+```
+
+See full documentation in [`BuddyAI/README.md`](BuddyAI/README.md).
+
+---
+## Folder Explanation
+
+### `BuddyAI/`
+Central dialogue integration layer.  Provides `BuddyBot` (bot registry & router)
+and `EventBus` (pub/sub event system).  See [`BuddyAI/README.md`](BuddyAI/README.md).
+
+### `bots/`
+All sector bot packages, each with a standardised structure:
+```
+bots/<sector>/
+├── <sector>_bot.py   # Main tier-aware bot class
+├── tiers.py          # Sector-specific tier configuration
+├── __init__.py
+└── README.md
+```
+
+- `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
+- `bots/ai_chatbot/` — tier-aware AI chatbot.
+- `bots/business_automation/` — workflow & task automation.
+- `bots/finance_bot/` — personal & business finance assistant.
+- `bots/marketing_bot/` — digital marketing & campaign automation.
+- `bots/real_estate_bot/` — property search & investment analysis.
+- `bots/creator_economy/` — creator monetisation & brand deals.
+- `bots/lawsuit_finder_bot/` — legal case research & lawsuit discovery.
+- `bots/government-contract-grant-bot/` — government contracts & grant finder.
+- `config.json` — configure API keys and bot settings.
+
+### `tests/`
+Pytest test suites for all bots.  Run the full suite with:
+```bash
+python -m pytest tests/ -v
+```
+
+### `examples/`
+Example use cases for different bots like `Referral Bot` and `Hustle Bot`.
 
 ---
 ## How to Run Bots Locally
-1. Navigate to the bot directory. For example:
-   ```bash
-   cd bots/government-contract-grant-bot
-   ```
-2. Run the bot script. For example:
-   ```bash
-   python bot.py
-   ```
-3. Make sure necessary APIs and configurations are set before running.
+
+```python
+# Import any sector bot and start chatting
+from bots.business_automation import BusinessAutomationBot
+from bots.ai_chatbot.tiers import Tier
+
+bot = BusinessAutomationBot(tier=Tier.PRO)
+result = bot.chat("Schedule a team meeting for Monday 9 AM")
+print(result["message"])
+```
+
+---
+## Running Tests
+
+```bash
+# Full test suite
+python -m pytest tests/ -v
+
+# Single bot
+python -m pytest tests/test_business_automation.py -v
+python -m pytest tests/test_finance_bot.py -v
+python -m pytest tests/test_marketing_bot.py -v
+python -m pytest tests/test_real_estate_bot.py -v
+python -m pytest tests/test_creator_economy.py -v
+python -m pytest tests/test_lawsuit_finder_bot.py -v
+python -m pytest tests/test_government_contract_grant_bot.py -v
+python -m pytest tests/test_buddy_bot.py -v
+```
 
 ---
 ## GitHub Pages Instructions
