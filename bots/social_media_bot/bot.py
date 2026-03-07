@@ -86,10 +86,7 @@ class SocialMediaBot:
         scheduled_time = post.get("scheduled_time", datetime.now().isoformat())
 
         if self.tier == Tier.FREE:
-            allowed_platforms = ["twitter", "facebook", "instagram", "linkedin", "tiktok"]
-            if platform.lower() not in allowed_platforms:
-                platform = platform
-            # FREE tier: only 1 platform (accept what's given, but flag if it's a list)
+            # FREE tier: only 1 platform (raise an error if a list is passed)
             if isinstance(platform, list) and len(platform) > 1:
                 raise SocialMediaBotTierError(
                     "Multi-platform posting is not available on the Free tier. "
