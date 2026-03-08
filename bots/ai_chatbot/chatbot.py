@@ -1,6 +1,9 @@
 """
 Dreamcobots AI Chatbot — tier-aware conversational interface.
 
+Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
+
 Usage
 -----
     from chatbot import Chatbot, Tier
@@ -13,6 +16,7 @@ Usage
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.ai_chatbot.tiers import (
@@ -21,6 +25,7 @@ from bots.ai_chatbot.tiers import (
     get_chatbot_tier_info,
 )
 from models.registry import get_model_info
+from framework import GlobalAISourcesFlow
 
 
 class ChatbotTierError(Exception):
@@ -50,6 +55,7 @@ class Chatbot:
         self._history: list[dict] = []
         self._request_count: int = 0
         self._available_models: list[str] = CHATBOT_MODELS[tier.value]
+        self.flow = GlobalAISourcesFlow(bot_name="AIChatbot")
 
         if default_model is not None:
             if default_model not in self._available_models:
