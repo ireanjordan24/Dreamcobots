@@ -1,13 +1,369 @@
-# CI/CD workflow for the Dreamcobots repository.
-# Enhancements:
-#   1. Parallelised test jobs per bot category
+# CI/CD workflow for the DreamCobots repository.
+#
+# Features:
+#   1. Parallelised test jobs per bot category for fast feedback
 #   2. Pip dependency caching to speed up installs
-#   3. Dedicated bot responsiveness benchmark job
-#   4. Conversational data pre-loading before each test job
-#   5. Incremental testing – jobs are skipped when their module is unchanged
-#   6. Performance-degradation alert after benchmarks complete
+#   3. Framework compliance check (Global AI Sources Flow)
+#   4. Incremental testing – jobs skipped when modules are unchanged
+#   5. Full integration test job that runs all 1 800+ tests together
 
 name: CI for Dreamcobots
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Restrict GITHUB_TOKEN to the minimum permissions required by all jobs.
+permissions:
+  contents: read
+
+jobs:
+
+  # -------------------------------------------------------------------------
+  # Detect which modules changed (incremental testing)
+  # -------------------------------------------------------------------------
+  detect-changes:
+    name: Detect changed modules
+    runs-on: ubuntu-latest
+    outputs:
+      bots_core:          ${{ steps.detect.outputs.bots_core }}
+      buddy_ai:           ${{ steps.detect.outputs.buddy_ai }}
+      framework:          ${{ steps.detect.outputs.framework }}
+      global_learning:    ${{ steps.detect.outputs.global_learning }}
+      category_bots:      ${{ steps.detect.outputs.category_bots }}
+      tests:              ${{ steps.detect.outputs.tests }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed modules
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "all")
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "all")
+          fi
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          check() {
+            if [ "$CHANGED" = "all" ]; then echo "true"
+            elif echo "$CHANGED" | grep -qE "^$1"; then echo "true"
+            else echo "false"
+            fi
+          }
+
+          echo "bots_core=$(check bots/)"                      >> "$GITHUB_OUTPUT"
+          echo "buddy_ai=$(check BuddyAI/)"                    >> "$GITHUB_OUTPUT"
+          echo "framework=$(check framework/)"                  >> "$GITHUB_OUTPUT"
+          echo "global_learning=$(check global_learning_system/)" >> "$GITHUB_OUTPUT"
+          echo "category_bots=$(check App_bots/|Business_bots/|Marketing_bots/|Fiverr_bots/|Occupational_bots/|Real_Estate_bots/)" >> "$GITHUB_OUTPUT"
+          echo "tests=$(check tests/)"                          >> "$GITHUB_OUTPUT"
+
+  # -------------------------------------------------------------------------
+  # Core bots: AI models, chatbot, government bot, ai learning system
+  # -------------------------------------------------------------------------
+  test-core-bots:
+    name: Test – Core Bots (AI models, chatbot, gov-contract)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv schedule jinja2
+      - name: Run core bot tests
+        run: |
+          python -m pytest tests/test_ai_chatbot.py tests/test_ai_models_integration.py \
+            tests/test_ai_learning_system.py tests/test_government_contract_grant_bot.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # BuddyAI orchestration layer
+  # -------------------------------------------------------------------------
+  test-buddy-ai:
+    name: Test – BuddyAI Orchestration
+    needs: detect-changes
+    if: needs.detect-changes.outputs.buddy_ai == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run BuddyAI tests
+        run: python -m pytest tests/test_buddy_bot.py -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Global AI Sources Framework + compliance checker
+  # -------------------------------------------------------------------------
+  test-framework:
+    name: Test – Global AI Sources Framework
+    needs: detect-changes
+    if: needs.detect-changes.outputs.framework == 'true' || needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run framework tests
+        run: python -m pytest tests/test_global_ai_sources_flow.py -v --tb=short
+      - name: Framework compliance check
+        run: python tools/check_bot_framework.py
+
+  # -------------------------------------------------------------------------
+  # Global Learning System microservices
+  # -------------------------------------------------------------------------
+  test-global-learning:
+    name: Test – Global Learning System
+    needs: detect-changes
+    if: needs.detect-changes.outputs.global_learning == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run Global Learning System tests
+        run: python -m pytest tests/test_global_learning_system.py -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Payments & financial bots
+  # -------------------------------------------------------------------------
+  test-payments-bots:
+    name: Test – Payments & Financial Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run payments & financial bot tests
+        run: |
+          python -m pytest \
+            tests/test_dreamco_payments.py \
+            tests/test_finance_bot.py \
+            tests/test_mining_bot.py \
+            tests/test_stock_trading_bot.py \
+            tests/test_affiliate_bot.py \
+            tests/test_money_finder_bot.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Retail & commerce bots
+  # -------------------------------------------------------------------------
+  test-retail-bots:
+    name: Test – Retail & Commerce Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run retail & commerce bot tests
+        run: |
+          python -m pytest \
+            tests/test_discount_dominator.py \
+            tests/test_shopify_automation_bot.py \
+            tests/test_crm_automation_bot.py \
+            tests/test_lead_generation_bot.py \
+            tests/test_real_estate_bot.py \
+            tests/test_car_flipping_bot.py \
+            tests/test_deal_finder_bot.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Customer-facing & social bots
+  # -------------------------------------------------------------------------
+  test-customer-bots:
+    name: Test – Customer & Social Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run customer & social bot tests
+        run: |
+          python -m pytest \
+            tests/test_customer_support_bot.py \
+            tests/test_social_media_bot.py \
+            tests/test_ai_writing_bot.py \
+            tests/test_coding_assistant_bot.py \
+            tests/test_fraud_detection_bot.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Sector & lifestyle bots
+  # -------------------------------------------------------------------------
+  test-sector-bots:
+    name: Test – Sector & Lifestyle Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run sector & lifestyle bot tests
+        run: |
+          python -m pytest \
+            tests/test_automation_bot.py \
+            tests/test_business_automation.py \
+            tests/test_education_bot.py \
+            tests/test_health_wellness_bot.py \
+            tests/test_lifestyle_bot.py \
+            tests/test_revenue_growth_bot.py \
+            tests/test_security_tech_bot.py \
+            tests/test_211_bot.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Creator & marketplace bots
+  # -------------------------------------------------------------------------
+  test-creator-bots:
+    name: Test – Creator & Marketplace Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv
+      - name: Run creator & marketplace bot tests
+        run: |
+          python -m pytest \
+            tests/test_creator_empire.py \
+            tests/test_creator_economy.py \
+            tests/test_marketing_bot.py \
+            tests/test_lawsuit_finder_bot.py \
+            tests/test_app_builder_bot.py \
+            tests/test_software_bot.py \
+            tests/test_control_center.py \
+            -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Full integration test suite (all 1800+ tests)
+  # -------------------------------------------------------------------------
+  test-full-suite:
+    name: Full Integration Test Suite
+    needs:
+      - test-core-bots
+      - test-buddy-ai
+      - test-framework
+      - test-global-learning
+      - test-payments-bots
+      - test-retail-bots
+      - test-customer-bots
+      - test-sector-bots
+      - test-creator-bots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: pip install pytest requests python-dotenv schedule jinja2
+      - name: Run full test suite
+        run: python -m pytest tests/ -v --tb=short -q
+      - name: Framework compliance check
+        run: python tools/check_bot_framework.py
 
 on:
   push:
