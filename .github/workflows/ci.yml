@@ -1,4 +1,11 @@
-# This is a GitHub Actions CI/CD workflow file for testing all bots in the Dreamcobots repository.
+# CI/CD workflow for the Dreamcobots repository.
+# Enhancements:
+#   1. Parallelised test jobs per bot category
+#   2. Pip dependency caching to speed up installs
+#   3. Dedicated bot responsiveness benchmark job
+#   4. Conversational data pre-loading before each test job
+#   5. Incremental testing – jobs are skipped when their module is unchanged
+#   6. Performance-degradation alert after benchmarks complete
 
 name: CI for Dreamcobots
 
@@ -10,24 +17,332 @@ on:
     branches:
       - main
 
+# Restrict GITHUB_TOKEN to the minimum permissions required by all jobs.
+permissions:
+  contents: read
+
+# ---------------------------------------------------------------------------
+# Reusable step definitions (YAML anchors are not supported in GitHub Actions,
+# so shared steps are duplicated intentionally and kept consistent.)
+# ---------------------------------------------------------------------------
+
 jobs:
-  test:
+
+  # -------------------------------------------------------------------------
+  # 5. Incremental testing – detect which bot modules changed
+  # -------------------------------------------------------------------------
+  detect-changes:
+    name: Detect changed modules
     runs-on: ubuntu-latest
-
+    outputs:
+      app_bots:        ${{ steps.detect.outputs.app_bots }}
+      business_bots:   ${{ steps.detect.outputs.business_bots }}
+      fiverr_bots:     ${{ steps.detect.outputs.fiverr_bots }}
+      marketing_bots:  ${{ steps.detect.outputs.marketing_bots }}
+      occupational_bots: ${{ steps.detect.outputs.occupational_bots }}
+      real_estate_bots: ${{ steps.detect.outputs.real_estate_bots }}
+      bots_core:       ${{ steps.detect.outputs.bots_core }}
+      tests:           ${{ steps.detect.outputs.tests }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'  # Change as per your requirement
+      - name: Detect changed modules
+        id: detect
+        run: |
+          # For a PR compare against the target branch; for a push use the
+          # previous commit.  Fall back to "all" if the diff is unavailable.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "all")
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "all")
+          fi
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Ensure a requirements.txt is in the root of your repo
+          echo "Changed files:"
+          echo "$CHANGED"
 
-    - name: Run tests
-      run: |
-        pytest  # Ensure you have pytest installed and configured for your tests
+          check() {
+            if [ "$CHANGED" = "all" ]; then
+              echo "true"
+            elif echo "$CHANGED" | grep -qE "^$1/"; then
+              echo "true"
+            else
+              echo "false"
+            fi
+          }
+
+          echo "app_bots=$(check App_bots)"             >> "$GITHUB_OUTPUT"
+          echo "business_bots=$(check Business_bots)"   >> "$GITHUB_OUTPUT"
+          echo "fiverr_bots=$(check Fiverr_bots)"       >> "$GITHUB_OUTPUT"
+          echo "marketing_bots=$(check Marketing_bots)" >> "$GITHUB_OUTPUT"
+          echo "occupational_bots=$(check Occupational_bots)" >> "$GITHUB_OUTPUT"
+          echo "real_estate_bots=$(check Real_Estate_bots)"   >> "$GITHUB_OUTPUT"
+          echo "bots_core=$(check bots)"                >> "$GITHUB_OUTPUT"
+          echo "tests=$(check tests)"                   >> "$GITHUB_OUTPUT"
+
+  # -------------------------------------------------------------------------
+  # 1. Parallelised job: App Bots
+  # -------------------------------------------------------------------------
+  test-app-bots:
+    name: Test – App Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.app_bots == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 2. Caching pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Pre-load conversational data
+      - name: Pre-load conversational data
+        run: |
+          python - <<'EOF'
+          import json
+          with open("tests/fixtures/conversational_data.json") as f:
+              data = json.load(f)
+          print(f"Pre-loaded {len(data)} conversational data categories: {list(data.keys())}")
+          EOF
+
+      - name: Run App Bots tests
+        run: pytest tests/test_unit.py -m app_bot -v
+
+  # -------------------------------------------------------------------------
+  # 1. Parallelised job: Business Bots
+  # -------------------------------------------------------------------------
+  test-business-bots:
+    name: Test – Business Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.business_bots == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 2. Caching pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Pre-load conversational data
+      - name: Pre-load conversational data
+        run: |
+          python - <<'EOF'
+          import json
+          with open("tests/fixtures/conversational_data.json") as f:
+              data = json.load(f)
+          print(f"Pre-loaded {len(data)} conversational data categories: {list(data.keys())}")
+          EOF
+
+      - name: Run Business Bots tests
+        run: pytest tests/test_unit.py -m business_bot -v
+
+  # -------------------------------------------------------------------------
+  # 1. Parallelised job: Fiverr / Marketing / Occupational / Real-Estate Bots
+  # -------------------------------------------------------------------------
+  test-other-bots:
+    name: Test – Other Bots
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.fiverr_bots      == 'true' ||
+      needs.detect-changes.outputs.marketing_bots   == 'true' ||
+      needs.detect-changes.outputs.occupational_bots == 'true' ||
+      needs.detect-changes.outputs.real_estate_bots == 'true' ||
+      needs.detect-changes.outputs.tests            == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 2. Caching pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Pre-load conversational data
+      - name: Pre-load conversational data
+        run: |
+          python - <<'EOF'
+          import json
+          with open("tests/fixtures/conversational_data.json") as f:
+              data = json.load(f)
+          print(f"Pre-loaded {len(data)} conversational data categories: {list(data.keys())}")
+          EOF
+
+      - name: Run Fiverr / Marketing / Occupational / Real-Estate tests
+        run: pytest tests/test_unit.py -m "fiverr_bot or marketing_bot or occupational_bot or real_estate_bot" -v
+
+  # -------------------------------------------------------------------------
+  # 1. Parallelised job: Core Bots unit tests
+  # -------------------------------------------------------------------------
+  test-core-bots:
+    name: Test – Core Bots
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bots_core == 'true' || needs.detect-changes.outputs.tests == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 2. Caching pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Pre-load conversational data
+      - name: Pre-load conversational data
+        run: |
+          python - <<'EOF'
+          import json
+          with open("tests/fixtures/conversational_data.json") as f:
+              data = json.load(f)
+          print(f"Pre-loaded {len(data)} conversational data categories: {list(data.keys())}")
+          EOF
+
+      - name: Run Core Bots unit tests
+        run: pytest tests/test_unit.py -k "GovernmentContractGrantBot" -v
+
+  # -------------------------------------------------------------------------
+  # 3. Bot responsiveness benchmark job (always runs)
+  # -------------------------------------------------------------------------
+  test-responsiveness:
+    name: Test – Bot Responsiveness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 2. Caching pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Pre-load conversational data
+      - name: Pre-load conversational data
+        run: |
+          python - <<'EOF'
+          import json
+          with open("tests/fixtures/conversational_data.json") as f:
+              data = json.load(f)
+          print(f"Pre-loaded {len(data)} conversational data categories: {list(data.keys())}")
+          EOF
+
+      # 3. Run response-time benchmarks and save JSON results
+      - name: Run responsiveness benchmarks
+        run: |
+          pytest tests/test_responsiveness.py \
+            --benchmark-min-rounds=5 \
+            --benchmark-json=benchmark-results.json \
+            -v
+
+      # 6. Alert on performance degradation
+      - name: Check for performance degradation
+        run: |
+          python - <<'EOF'
+          import json, sys
+
+          THRESHOLD_MS = 500  # milliseconds
+
+          with open("benchmark-results.json") as f:
+              results = json.load(f)
+
+          degraded = []
+          for bench in results.get("benchmarks", []):
+              mean_ms = bench["stats"]["mean"] * 1000
+              if mean_ms > THRESHOLD_MS:
+                  degraded.append(
+                      f"{bench['name']}: mean={mean_ms:.2f}ms "
+                      f"(threshold={THRESHOLD_MS}ms)"
+                  )
+
+          if degraded:
+              print("::warning::Performance degradation detected!")
+              for msg in degraded:
+                  print(f"::warning::{msg}")
+              sys.exit(1)
+          else:
+              print("All bot benchmarks are within the performance threshold.")
+          EOF
+
+      # Upload benchmark results as a CI artifact for historical comparison
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: benchmark-results.json

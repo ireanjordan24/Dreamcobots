@@ -10,6 +10,10 @@ AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
 sys.path.insert(0, REPO_ROOT)
+# Clear any cached tiers/registry modules to prevent cross-test pollution
+for _key in [k for k in list(sys.modules.keys())
+             if k in ('tiers', 'registry') or k.endswith('.tiers') or k.endswith('.registry')]:
+    del sys.modules[_key]
 
 import pytest
 from tiers import Tier, NLP_GPT35, NLP_GPT4, NLP_BERT_BASE, NLP_BERT_LARGE
