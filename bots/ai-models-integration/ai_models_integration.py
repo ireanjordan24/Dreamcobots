@@ -1,6 +1,9 @@
 """
 AI Models Integration — main entry point.
 
+Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
+
 Usage
 -----
     from ai_models_integration import AIModelsIntegration, Tier
@@ -19,6 +22,7 @@ Usage
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from tiers import (
     Tier,
@@ -34,6 +38,7 @@ from models.registry import (
     list_models_for_tier,
     list_models_by_category,
 )
+from framework import GlobalAISourcesFlow
 
 
 class TierAccessError(Exception):
@@ -58,6 +63,7 @@ class AIModelsIntegration:
         self.tier: Tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._request_count: int = 0
+        self.flow = GlobalAISourcesFlow(bot_name="AIModelsIntegration")
 
     # ------------------------------------------------------------------
     # Core inference

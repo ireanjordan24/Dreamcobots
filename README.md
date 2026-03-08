@@ -2,6 +2,31 @@
 
 Welcome to the DreamCObots project! This repository outlines our groundbreaking mission to develop and deploy 3000 collaborative robots (cobots) designed for transforming industries worldwide. Explore our documentation, system details, and user guides to understand every aspect of this ambitious endeavor.
 
+> **Contributors:** All bots must follow the **GLOBAL AI SOURCES FLOW** mandatory architecture.
+> See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
+
+---
+## GLOBAL AI SOURCES FLOW — Mandatory Architecture
+
+Every DreamCo bot must implement the eight-stage pipeline defined in
+`framework/global_ai_sources_flow.py`:
+
+```
+GLOBAL AI SOURCES → Data Ingestion → Learning Classifier → Sandbox Test Lab
+  → Performance Analytics → Hybrid Evolution Engine → Deployment Engine
+  → Profit & Market Intelligence → Governance + Security
+```
+
+See [`framework/global_ai_sources_flow.py`](framework/global_ai_sources_flow.py)
+and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full specification and
+contribution requirements.
+
+To check that all bots in the repository comply with the framework, run:
+
+```bash
+python tools/check_bot_framework.py
+```
+
 ---
 ## Installation Instructions
 1. Clone this repository to your local machine:
@@ -63,6 +88,14 @@ See full documentation in:
 
 ---
 ## Folder Explanation
+### `framework`
+- Contains the mandatory **GLOBAL AI SOURCES FLOW** pipeline module
+  (`global_ai_sources_flow.py`) that every bot must import and use.
+
+### `tools`
+- `check_bot_framework.py` — static analysis script to verify all bot files
+  reference the framework.
+
 ### `bots`
 - Contains all bot scripts such as the `government-contract-grant-bot`.
 - `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
