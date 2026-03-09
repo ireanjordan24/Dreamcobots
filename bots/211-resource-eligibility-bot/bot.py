@@ -21,6 +21,7 @@ Usage
     profile = UserProfile(income_level="very_low", housing_status="homeless")
     plan = bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 

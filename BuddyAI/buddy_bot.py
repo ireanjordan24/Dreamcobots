@@ -21,8 +21,8 @@ from tiers import Tier, get_tier_config, get_upgrade_path
 from BuddyAI.event_bus import EventBus
 
 
-class BuddyBotError(Exception):
-    """Raised for BuddyBot operational errors."""
+class BuddyBotError(KeyError):
+    """Raised for BuddyBot operational errors. Extends KeyError for compatibility."""
 
 
 class BuddyBot:
@@ -46,6 +46,7 @@ class BuddyBot:
         if name in self._registered_bots:
             raise BuddyBotError(f"A bot named '{name}' is already registered.")
         self._registered_bots[name] = bot_instance
+        self._event_bus.publish("bot_registered", {"name": name})
         self._event_bus.publish("bot.registered", {"name": name})
 
     def unregister_bot(self, name: str) -> None:
@@ -67,7 +68,9 @@ class BuddyBot:
 
     def route_message(self, bot_name: str, message: str, **kwargs) -> dict:
         """
-        Route a message to a registered bot's process() method.
+        Route a message to a registered bot.
+
+        Tries the bot's ``chat()`` method first; falls back to ``process()``.
 
         Parameters
         ----------
@@ -76,25 +79,52 @@ class BuddyBot:
         message : str
             Message to route.
         **kwargs
-            Additional keyword arguments forwarded to the bot's process().
+            Additional keyword arguments forwarded to the bot's method.
 
         Returns
         -------
         dict
-            Result from the bot's process() call.
+            Result from the bot's chat() or process() call.
         """
         bot = self.get_bot(bot_name)
-        if not hasattr(bot, "process"):
+        if hasattr(bot, "chat"):
+            result = bot.chat(message, **kwargs)
+        elif hasattr(bot, "process"):
+            result = bot.process(message, **kwargs)
+        else:
             raise BuddyBotError(
-                f"Bot '{bot_name}' does not implement a process() method."
+                f"Bot '{bot_name}' does not implement a chat() or process() method."
             )
-        result = bot.process(message, **kwargs)
         self._event_bus.publish("message.routed", {
             "bot_name": bot_name,
             "message": message,
             "result": result,
         })
         return result
+
+    def broadcast(self, message: str, **kwargs) -> dict:
+        """
+        Send a message to all registered bots.
+
+        Parameters
+        ----------
+        message : str
+            Message to broadcast.
+        **kwargs
+            Additional keyword arguments forwarded to each bot's method.
+
+        Returns
+        -------
+        dict
+            Mapping of bot_name -> result for each registered bot.
+        """
+        results = {}
+        for name in self._registered_bots:
+            try:
+                results[name] = self.route_message(name, message, **kwargs)
+            except BuddyBotError:
+                results[name] = {"error": f"Bot '{name}' could not process message"}
+        return results
 
     @property
     def event_bus(self) -> EventBus:

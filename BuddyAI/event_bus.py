@@ -76,9 +76,18 @@ class EventBus:
         return count
 
     def get_event_log(self) -> list[dict]:
-        """Return a copy of the event log."""
+        """Return a copy of the full event log."""
         with self._lock:
             return list(self._event_log)
+
+    def get_events(self, event_type: str) -> list[Any]:
+        """Return list of payloads published for the given event_type."""
+        with self._lock:
+            return [
+                entry["payload"]
+                for entry in self._event_log
+                if entry["event_type"] == event_type
+            ]
 
     def clear_log(self) -> None:
         """Clear the event log."""
