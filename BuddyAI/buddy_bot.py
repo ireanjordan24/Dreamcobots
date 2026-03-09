@@ -1,133 +1,179 @@
 """
-BuddyAI — Buddy Bot
+BuddyAI BuddyBot — central orchestrator for the Dreamcobots bot platform.
 
-Orchestrator bot that registers, routes messages to, and broadcasts across
-all DreamCo ecosystem bots.  Any bot that exposes a ``chat(message)`` method
-can be registered.
+Usage
+-----
+    from BuddyAI.buddy_bot import BuddyBot
+    from bots.ai_chatbot.chatbot import Chatbot
+    from tiers import Tier
+
+    hub = BuddyBot(tier=Tier.PRO)
+    hub.register_bot("chatbot", Chatbot(tier=Tier.PRO))
+    result = hub.route_message("chatbot", "Hello!")
+    print(result)
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'bots', 'ai-models-integration'))
+
+from tiers import Tier, get_tier_config, get_upgrade_path
 from BuddyAI.event_bus import EventBus
+
+
+class BuddyBotError(KeyError):
+    """Raised for BuddyBot operational errors. Extends KeyError for compatibility."""
 
 
 class BuddyBot:
     """
-    Central orchestrator for the DreamCo bot ecosystem.
+    Central orchestrator that manages bot registrations and routes messages.
 
-    Registered bots must expose a ``chat(message: str) -> dict`` method.
-    BuddyBot routes messages to individual bots or broadcasts to all of them.
-
-    Attributes
+    Parameters
     ----------
-    event_bus : EventBus
-        Shared event bus for inter-bot communication.
+    tier : Tier
+        Subscription tier for the BuddyBot hub itself.
     """
 
-    def __init__(self) -> None:
-        self.event_bus: EventBus = EventBus()
-        self._bots: dict[str, object] = {}
-
-    # ------------------------------------------------------------------
-    # Bot registry
-    # ------------------------------------------------------------------
+    def __init__(self, tier: Tier = Tier.FREE):
+        self.tier = tier
+        self.config = get_tier_config(tier)
+        self._event_bus = EventBus()
+        self._registered_bots: dict[str, object] = {}
 
     def register_bot(self, name: str, bot_instance: object) -> None:
-        """
-        Register a bot under *name*.
-
-        Parameters
-        ----------
-        name : str
-            Unique identifier for the bot (e.g. 'dreamco_payments').
-        bot_instance : object
-            Bot instance exposing a ``chat()`` method.
-        """
-        self._bots[name] = bot_instance
-        self.event_bus.publish("bot_registered", {"name": name})
+        """Register a bot under the given name."""
+        if name in self._registered_bots:
+            raise BuddyBotError(f"A bot named '{name}' is already registered.")
+        self._registered_bots[name] = bot_instance
+        self._event_bus.publish("bot_registered", {"name": name})
+        self._event_bus.publish("bot.registered", {"name": name})
 
     def unregister_bot(self, name: str) -> None:
-        """
-        Remove a previously registered bot.
+        """Remove a registered bot."""
+        if name not in self._registered_bots:
+            raise BuddyBotError(f"No bot named '{name}' is registered.")
+        del self._registered_bots[name]
+        self._event_bus.publish("bot.unregistered", {"name": name})
 
-        Parameters
-        ----------
-        name : str
-            Name of the bot to remove.
-        """
-        if name in self._bots:
-            del self._bots[name]
-            self.event_bus.publish("bot_unregistered", {"name": name})
+    def get_bot(self, name: str) -> object:
+        """Retrieve a registered bot by name."""
+        if name not in self._registered_bots:
+            raise BuddyBotError(f"No bot named '{name}' is registered.")
+        return self._registered_bots[name]
 
-    def list_bots(self) -> list:
-        """
-        Return the names of all registered bots.
+    def list_bots(self) -> list[str]:
+        """Return sorted list of registered bot names."""
+        return sorted(self._registered_bots.keys())
 
-        Returns
-        -------
-        list[str]
-            Sorted list of registered bot names.
+    def route_message(self, bot_name: str, message: str, **kwargs) -> dict:
         """
-        return sorted(self._bots.keys())
+        Route a message to a registered bot.
 
-    # ------------------------------------------------------------------
-    # Message routing
-    # ------------------------------------------------------------------
-
-    def route_message(self, bot_name: str, message: str) -> dict:
-        """
-        Route *message* to a specific registered bot.
+        Tries the bot's ``chat()`` method first; falls back to ``process()``.
 
         Parameters
         ----------
         bot_name : str
-            Target bot name.
+            Name of the registered bot.
         message : str
-            Message to send.
+            Message to route.
+        **kwargs
+            Additional keyword arguments forwarded to the bot's method.
 
         Returns
         -------
         dict
-            Response from the target bot's ``chat()`` method.
-
-        Raises
-        ------
-        KeyError
-            If *bot_name* is not registered.
-        AttributeError
-            If the registered bot does not expose a ``chat()`` method.
+            Result from the bot's chat() or process() call.
         """
-        if bot_name not in self._bots:
-            raise KeyError(f"Bot '{bot_name}' is not registered.")
-
-        bot = self._bots[bot_name]
-        if not callable(getattr(bot, "chat", None)):
-            raise AttributeError(
-                f"Bot '{bot_name}' does not expose a chat() method."
+        bot = self.get_bot(bot_name)
+        if hasattr(bot, "chat"):
+            result = bot.chat(message, **kwargs)
+        elif hasattr(bot, "process"):
+            result = bot.process(message, **kwargs)
+        else:
+            raise BuddyBotError(
+                f"Bot '{bot_name}' does not implement a chat() or process() method."
             )
+        self._event_bus.publish("message.routed", {
+            "bot_name": bot_name,
+            "message": message,
+            "result": result,
+        })
+        return result
 
-        response = bot.chat(message)
-        self.event_bus.publish(
-            "message_routed", {"bot_name": bot_name, "message": message}
-        )
-        return response
-
-    def broadcast(self, message: str) -> dict:
+    def broadcast(self, message: str, **kwargs) -> dict:
         """
-        Send *message* to all registered bots that expose ``chat()``.
+        Send a message to all registered bots.
 
         Parameters
         ----------
         message : str
             Message to broadcast.
+        **kwargs
+            Additional keyword arguments forwarded to each bot's method.
 
         Returns
         -------
         dict
-            Mapping of bot_name -> response dict from each bot's ``chat()``.
+            Mapping of bot_name -> result for each registered bot.
         """
-        results: dict[str, dict] = {}
-        for name, bot in self._bots.items():
-            if callable(getattr(bot, "chat", None)):
-                results[name] = bot.chat(message)
-
-        self.event_bus.publish("broadcast_sent", {"message": message})
+        results = {}
+        for name in self._registered_bots:
+            try:
+                results[name] = self.route_message(name, message, **kwargs)
+            except BuddyBotError:
+                results[name] = {"error": f"Bot '{name}' could not process message"}
         return results
+
+    @property
+    def event_bus(self) -> EventBus:
+        """Return the internal EventBus instance."""
+        return self._event_bus
+
+    def describe_tier(self) -> str:
+        """Print and return a description of the current BuddyBot tier."""
+        limit = (
+            "Unlimited"
+            if self.config.requests_per_month is None
+            else f"{self.config.requests_per_month:,}"
+        )
+        lines = [
+            f"=== {self.config.name} BuddyBot Tier ===",
+            f"Price   : ${self.config.price_usd_monthly:.2f}/month",
+            f"Requests: {limit}/month",
+            f"Support : {self.config.support_level}",
+            "",
+            "Platform features:",
+        ]
+        for feat in self.config.features:
+            lines.append(f"  ✓ {feat.replace('_', ' ').title()}")
+        lines.append(f"\nRegistered bots: {len(self._registered_bots)}")
+        output = "\n".join(lines)
+        print(output)
+        return output
+
+    def show_upgrade_path(self) -> str:
+        """Print details about the next available tier upgrade."""
+        next_cfg = get_upgrade_path(self.tier)
+        if next_cfg is None:
+            msg = f"You are already on the top-tier plan ({self.config.name})."
+            print(msg)
+            return msg
+        lines = [
+            f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
+            f"New price: ${next_cfg.price_usd_monthly:.2f}/month",
+            "",
+            "New platform features:",
+        ]
+        current_feats = set(self.config.features)
+        for feat in next_cfg.features:
+            if feat not in current_feats:
+                lines.append(f"  + {feat.replace('_', ' ').title()}")
+        lines.append(
+            f"\nTo upgrade, set tier=Tier.{next_cfg.tier.name} when "
+            "constructing BuddyBot or contact support."
+        )
+        output = "\n".join(lines)
+        print(output)
+        return output

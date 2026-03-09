@@ -1,4 +1,5 @@
 """Control Center — central orchestration dashboard for all Dreamcobots."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import sys, os
 from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))

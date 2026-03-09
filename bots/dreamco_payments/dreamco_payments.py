@@ -13,6 +13,7 @@ Usage
     result = bot.process_payment(49.99, "USD", "card_visa_4242", "cust_001")
     print(result)
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from bots.dreamco_payments.tiers import Tier, get_tier_config, get_upgrade_path
 from bots.dreamco_payments.payment_processor import PaymentProcessor

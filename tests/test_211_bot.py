@@ -808,3 +808,7 @@ class TestResourceManagement:
         results = self.bot.search_resources(lat=40.7128, lon=-74.0060, category="food")
         ids = [res.resource_id for res in results]
         assert "custom_food_001" in ids
+
+# Clear bot-specific tiers module from cache to prevent cross-test pollution.
+import sys as _sys
+_sys.modules.pop('tiers', None)
