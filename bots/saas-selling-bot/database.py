@@ -3,6 +3,7 @@ Database module for the SaaS Selling Bot.
 Manages a SQLite database of 200 free SaaS tools with categories,
 pricing, descriptions, API details, and affiliate links.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import sqlite3
 import json

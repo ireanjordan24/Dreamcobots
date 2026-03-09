@@ -1,4 +1,5 @@
 """API Manager for DataForge AI - lazy-loads all 100 API connectors."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import importlib
 import logging
 

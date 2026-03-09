@@ -3,6 +3,7 @@ Payment gateway integration for the SaaS Selling Bot.
 Handles subscription creation, webhook processing, and revenue recording.
 Supports Stripe as the primary payment provider.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import os
 import json

@@ -9,6 +9,7 @@ Usage:
     python bot.py --init-db     # Only initialise / reseed the database
     python bot.py --demo        # Run a quick demo in the terminal
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import argparse
 import os

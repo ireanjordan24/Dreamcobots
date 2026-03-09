@@ -16,6 +16,7 @@ Endpoints:
   POST /api/webhook/stripe     – Stripe webhook handler
   GET  /                       – Serve the frontend
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import os
 import json

@@ -1,4 +1,5 @@
 """User Marketplace: allows users to contribute and monetize their data."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import uuid
 from datetime import datetime

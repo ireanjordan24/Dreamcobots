@@ -1,4 +1,5 @@
 """License generator for DataForge AI datasets."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 from datetime import datetime
 

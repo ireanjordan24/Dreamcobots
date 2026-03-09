@@ -12,6 +12,7 @@ Analytics depth is gated by tier:
   - PRO:        advanced (revenue + energy + ROI)
   - ENTERPRISE: full (all metrics + trend analysis)
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 

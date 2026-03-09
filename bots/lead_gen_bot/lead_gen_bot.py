@@ -1,4 +1,5 @@
 """LeadGenBot: automates lead scraping, outreach, and CSV export."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import csv
 import io
 import logging

@@ -10,6 +10,7 @@ Detects and reports:
 Alerts are generated as structured dicts and optionally routed to registered
 callback handlers.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 

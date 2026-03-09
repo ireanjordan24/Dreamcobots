@@ -1,4 +1,5 @@
 """AirVisual air quality data connector for DataForge AI."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
 

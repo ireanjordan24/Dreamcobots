@@ -9,6 +9,7 @@ Supports three primary strategies:
 The AdaptiveStrategyEngine selects the highest-profitability strategy and coin
 in real-time based on provided market data.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 

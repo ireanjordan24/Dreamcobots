@@ -11,6 +11,7 @@ Provides:
 All checks are performed locally (no external API calls), using simulated
 heuristics suitable for demonstration and unit-testing.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 

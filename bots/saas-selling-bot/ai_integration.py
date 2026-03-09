@@ -3,6 +3,7 @@ AI Integration module for the SaaS Selling Bot.
 Provides personalised recommendations and chatbot capabilities
 using OpenAI's GPT models (with a graceful fallback when no API key is configured).
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import os
 import json

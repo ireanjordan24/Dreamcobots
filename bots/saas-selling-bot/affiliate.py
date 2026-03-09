@@ -3,6 +3,7 @@ Affiliate link tracking and revenue recording for the SaaS Selling Bot.
 Tracks clicks on affiliate links, records conversions, and provides
 revenue analytics.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import uuid
 from database import (
