@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Optional
+from framework import GlobalAISourcesFlow
 
 
 class FormulaCategory(Enum):
@@ -200,7 +201,6 @@ class FormulaVault:
         # Guard expression against non-arithmetic content.
         # Allow: digits, variable names, arithmetic operators, whitespace, parens, dot, star-star.
         import re as _re
-from framework import GlobalAISourcesFlow
         if not _re.fullmatch(r"[A-Za-z0-9_\s\+\-\*\/\(\)\.\%]+", f.expression):
             raise ValueError(f"Formula expression contains unsafe characters: {f.expression!r}")
 

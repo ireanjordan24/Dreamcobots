@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class LearningDomain(Enum):
@@ -218,7 +219,6 @@ class LearningMatrix:
 
     def _tip(self) -> str:
         import random
-from framework import GlobalAISourcesFlow
         return random.choice(self.BIG_BRO_TIPS)
 
     def _get_learner(self, learner_id: str) -> LearnerProfile:
