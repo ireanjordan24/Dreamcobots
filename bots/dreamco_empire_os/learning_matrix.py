@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class LearningDomain(Enum):
@@ -115,6 +116,7 @@ class LearningMatrix:
     ]
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="LearningMatrix")
         self._lessons: dict[str, Lesson] = {}
         self._learners: dict[str, LearnerProfile] = {}
         self._load_builtins()

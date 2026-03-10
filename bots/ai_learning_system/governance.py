@@ -12,6 +12,7 @@ import datetime
 import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_GOVERNANCE
+from framework import GlobalAISourcesFlow
 
 
 class AccessRole(Enum):
@@ -90,6 +91,7 @@ class GovernanceLayer:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="GovernanceLayer")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._audit_log: List[AuditLogEntry] = []

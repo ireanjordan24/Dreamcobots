@@ -13,6 +13,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SANDBOX
 from .classifier import ClassifiedMethod
+from framework import GlobalAISourcesFlow
 
 
 class SandboxStatus(Enum):
@@ -100,6 +101,7 @@ class SandboxTestingLayer:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="SandboxTestingLayer")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._results: List[SandboxTestResult] = []

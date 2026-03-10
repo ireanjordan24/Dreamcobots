@@ -12,6 +12,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_HYBRID_ENGINE, FEATURE_GENETIC_ALGO
 from .analytics import MethodRanking
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -109,6 +110,7 @@ class HybridEvolutionEngine:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="HybridEvolutionEngine")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._strategies: List[HybridStrategy] = []

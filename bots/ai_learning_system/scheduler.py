@@ -12,6 +12,7 @@ import datetime
 import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SCHEDULER
+from framework import GlobalAISourcesFlow
 
 
 class ScheduleFrequency(Enum):
@@ -86,6 +87,7 @@ class AutomationScheduler:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="AutomationScheduler")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._jobs: dict = {}  # id -> ScheduledJob

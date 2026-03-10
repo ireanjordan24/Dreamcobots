@@ -21,6 +21,7 @@ from bots.dreamco_payments.tiers import (
     get_tier_config,
     FEATURE_API_KEY_MANAGEMENT,
 )
+from framework import GlobalAISourcesFlow
 
 
 class APITierError(Exception):
@@ -45,6 +46,7 @@ class APIManager:
     """
 
     def __init__(self, tier: Tier = Tier.STARTER) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="APIManager")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         # key_id -> metadata record

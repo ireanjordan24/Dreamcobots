@@ -13,6 +13,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_CLASSIFIER
 from .ingestion import IngestedRecord
+from framework import GlobalAISourcesFlow
 
 
 class LearningMethodType(Enum):
@@ -124,6 +125,7 @@ class LearningMethodClassifier:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="LearningMethodClassifier")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._classified: List[ClassifiedMethod] = []

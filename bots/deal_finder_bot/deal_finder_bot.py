@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.deal_finder_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow
 
 
 class DealFinderBotTierError(Exception):
@@ -74,6 +75,7 @@ class DealFinderBot:
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
+        self.flow = GlobalAISourcesFlow(bot_name="DealFinderBot")
         self.tier = tier
         self.config = get_tier_config(tier)
         self._scanned_items: list = []

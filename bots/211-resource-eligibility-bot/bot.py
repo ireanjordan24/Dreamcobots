@@ -89,6 +89,7 @@ class InvalidLocationError(Exception):
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -606,6 +607,7 @@ class ResourceBot:
     """
 
     def __init__(self, tier: Tier = Tier.FREE):
+        self.flow = GlobalAISourcesFlow(bot_name="ResourceBot")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         # Internal resource registry — populated from data sources

@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class ListingCategory(Enum):
@@ -54,6 +55,7 @@ class Marketplace:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="Marketplace")
         self._listings: dict[str, MarketplaceListing] = {}
         self._purchase_log: list = []
         self._total_revenue_usd: float = 0.0

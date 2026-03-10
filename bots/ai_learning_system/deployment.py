@@ -13,6 +13,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_DEPLOYMENT
 from .hybrid_engine import HybridStrategy
+from framework import GlobalAISourcesFlow
 
 
 class DeploymentStatus(Enum):
@@ -110,6 +111,7 @@ class DeploymentOrchestrator:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="DeploymentOrchestrator")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._deployments: dict = {}  # id -> Deployment

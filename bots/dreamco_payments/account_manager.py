@@ -23,6 +23,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_REAL_ESTATE_AUTOMATION,
     FEATURE_AUTO_DEALER_AUTOMATION,
 )
+from framework import GlobalAISourcesFlow
 
 
 class AccountTierError(Exception):
@@ -72,6 +73,7 @@ class AccountManager:
     """
 
     def __init__(self, tier: Tier = Tier.STARTER) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="AccountManager")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._users: dict[str, dict] = {}

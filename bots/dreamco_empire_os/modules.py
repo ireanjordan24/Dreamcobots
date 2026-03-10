@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 # ==========================================================================
@@ -33,6 +34,7 @@ class Divisions:
     """Organise empire bots and operations into named divisions."""
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="Divisions")
         self._divisions: dict[str, dict] = {}
 
     def create_division(self, name: str, purpose: str, bot_names: Optional[list] = None) -> dict:

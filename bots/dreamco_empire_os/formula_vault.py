@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Optional
+from framework import GlobalAISourcesFlow
 
 
 class FormulaCategory(Enum):
@@ -120,6 +121,7 @@ class FormulaVault:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="FormulaVault")
         self._formulas: dict[str, Formula] = {}
         self._execution_log: list = []
         self._load_builtins()

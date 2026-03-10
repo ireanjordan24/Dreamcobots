@@ -22,6 +22,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_RECURRING_BILLING,
     FEATURE_REFUNDS,
 )
+from framework import GlobalAISourcesFlow
 
 
 class PaymentTierError(Exception):
@@ -53,6 +54,7 @@ class PaymentProcessor:
     """
 
     def __init__(self, tier: Tier = Tier.STARTER) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="PaymentProcessor")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._transactions: dict[str, dict] = {}
