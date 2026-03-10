@@ -507,6 +507,10 @@ class TestAIModelsIntegrationFramework:
         self._inserted_paths = [ai_models_dir, os.path.join(ai_models_dir, "models")]
         for p in self._inserted_paths:
             sys.path.insert(0, p)
+        # Clear cached tiers/integration modules to prevent cross-test sys.path pollution
+        for _mod in list(sys.modules.keys()):
+            if _mod in ('tiers', 'ai_models_integration', 'registry') or _mod.startswith('models.'):
+                del sys.modules[_mod]
         from ai_models_integration import AIModelsIntegration
         self.BotClass = AIModelsIntegration
 
@@ -534,6 +538,10 @@ class TestAIChatbotFramework:
         self._inserted_paths = [ai_models_dir, os.path.join(ai_models_dir, "models")]
         for p in self._inserted_paths:
             sys.path.insert(0, p)
+        # Clear cached tiers/chatbot modules to prevent cross-test sys.path pollution
+        for _mod in list(sys.modules.keys()):
+            if _mod in ('tiers', 'chatbot', 'ai_models_integration', 'registry') or _mod.startswith('models.') or _mod.startswith('bots.ai_chatbot'):
+                del sys.modules[_mod]
         from bots.ai_chatbot.chatbot import Chatbot
         self.BotClass = Chatbot
 

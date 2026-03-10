@@ -3,6 +3,8 @@ DreamCo Empire OS — Empire HQ Module
 
 Central command hub showing real-time overview of the entire empire:
 active bots, revenue, achievements, leaderboard position, and empire health.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

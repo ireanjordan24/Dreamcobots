@@ -3,6 +3,8 @@ DreamCo Empire OS — Formula Vault Module
 
 Stores, retrieves, and executes reusable computational formulas for
 financial calculations, automation workflows, and coding solutions.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

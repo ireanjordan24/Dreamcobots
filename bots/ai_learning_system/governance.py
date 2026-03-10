@@ -3,6 +3,8 @@ Governance and security layer for the DreamCo Global AI Learning System.
 
 Implements role-based access control (RBAC) and immutable audit logging
 for all system actions.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by ai_learning_system.py.
 """
 
 from enum import Enum

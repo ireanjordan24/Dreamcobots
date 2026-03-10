@@ -15,6 +15,8 @@ Implements the remaining Empire OS buttons as lightweight modules:
   - Connections      — API and integration registry
   - Time Capsule     — data archival and historical insights
   - Autonomy Control — empire-wide bot autonomy management
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

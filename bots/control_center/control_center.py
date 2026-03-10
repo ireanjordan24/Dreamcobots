@@ -3,12 +3,14 @@ import sys, os
 from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config
+from framework import GlobalAISourcesFlow
 
 
 class ControlCenter:
     """Central control center for registering, monitoring, and orchestrating all bots."""
 
     def __init__(self):
+        self.flow = GlobalAISourcesFlow(bot_name="ControlCenter")
         self._bots: dict = {}
         self._income_log: list = []
         self._run_log: list = []

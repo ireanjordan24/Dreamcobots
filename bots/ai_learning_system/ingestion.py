@@ -2,6 +2,8 @@
 Data ingestion layer for the DreamCo Global AI Learning System.
 
 Supports scraping and normalizing records from arXiv, GitHub, Kaggle, and AI Labs.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by ai_learning_system.py.
 """
 
 from enum import Enum

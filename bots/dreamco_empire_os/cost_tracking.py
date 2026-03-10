@@ -3,6 +3,8 @@ DreamCo Empire OS — Cost Tracking Module
 
 Monitors all operational costs across bots, divisions, and infrastructure.
 Generates cost-per-bot reports, budget alerts, and ROI breakdowns.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

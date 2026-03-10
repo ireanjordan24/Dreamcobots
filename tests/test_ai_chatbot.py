@@ -11,6 +11,11 @@ sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
 sys.path.insert(0, REPO_ROOT)
 
+# Clear cached tiers/chatbot modules to prevent cross-test sys.path pollution
+for _mod in list(sys.modules.keys()):
+    if _mod in ('tiers', 'chatbot', 'ai_models_integration') or _mod.startswith('bots.ai_chatbot'):
+        del sys.modules[_mod]
+
 import pytest
 from tiers import Tier, NLP_GPT35, NLP_GPT4, NLP_BERT_BASE, NLP_BERT_LARGE
 from bots.ai_chatbot.tiers import (

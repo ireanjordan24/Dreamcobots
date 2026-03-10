@@ -33,6 +33,7 @@ import os
 # ---------------------------------------------------------------------------
 _BOT_DIR = os.path.dirname(__file__)
 sys.path.insert(0, _BOT_DIR)
+sys.path.insert(0, os.path.join(_BOT_DIR, '..', '..'))  # for framework
 
 from tiers import (
     Tier,
@@ -89,6 +90,7 @@ class InvalidLocationError(Exception):
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -606,6 +608,7 @@ class ResourceBot:
     """
 
     def __init__(self, tier: Tier = Tier.FREE):
+        self.flow = GlobalAISourcesFlow(bot_name="ResourceBot")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         # Internal resource registry — populated from data sources

@@ -4,6 +4,8 @@ DreamCo Empire OS — Deal Analyzer Module
 Analyzes business opportunities, partnerships, and ventures.
 Scores deals on ROI potential, risk level, market timing, and fit
 with the DreamCo empire strategy.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

@@ -14,6 +14,8 @@ Discount Dominator setting groups:
 STARTER  : view settings only
 GROWTH   : view + update settings, basic export
 ENTERPRISE: all features including advanced export formats
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by dreamco_payments.py.
 """
 
 import datetime
