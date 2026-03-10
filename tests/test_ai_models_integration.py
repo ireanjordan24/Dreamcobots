@@ -15,7 +15,9 @@ sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
 
 # Clear cached tiers module to prevent cross-test pollution
 for _mod in list(sys.modules.keys()):
-    if _mod == 'tiers' or _mod.startswith('tiers.'):
+    if _mod in ('tiers', 'registry', 'ai_models_integration') or \
+       _mod.startswith('tiers.') or _mod.startswith('models.') or \
+       _mod.startswith('bots.ai_chatbot'):
         del sys.modules[_mod]
 
 import pytest
