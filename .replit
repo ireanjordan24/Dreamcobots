@@ -1,0 +1,9 @@
+run = "python bots/government-contract-grant-bot/bot.py"
+language = "python3"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "python bots/government-contract-grant-bot/bot.py"]
+deploymentTarget = "cloudrun"
