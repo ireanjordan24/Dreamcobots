@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Software Bot — tier-aware software idea generation and revenue estimation."""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))

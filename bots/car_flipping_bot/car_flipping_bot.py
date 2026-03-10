@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Car Flipping Bot — tier-aware car deal finder and flip profit estimator."""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))

@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Control Center — central orchestration dashboard for all Dreamcobots."""
 import sys, os
 from datetime import datetime, timezone

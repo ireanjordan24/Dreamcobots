@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """App Builder Bot — tier-aware application project creation and scaffolding."""
 import sys, os
 import uuid
