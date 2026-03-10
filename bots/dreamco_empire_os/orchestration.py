@@ -4,6 +4,8 @@ DreamCo Empire OS — Orchestration Module
 Manages multiple AI bots working together in synchronised autonomous
 pipelines. Defines workflows, execution order, dependencies, and
 real-time visualisation of inter-bot data flow.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

@@ -8,6 +8,8 @@ Business types:
   - "standard"     — General merchant
   - "real_estate"  — Real-estate flipping automation hints
   - "auto_dealer"  — Car-flipping automation hints
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by dreamco_payments.py.
 """
 
 import uuid

@@ -3,6 +3,8 @@ DreamCo Empire OS — Revenue Tracker Module
 
 Real-time revenue dashboard: tracks gross/net revenue, bot performance
 contributions, projections, and MRR/ARR metrics.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

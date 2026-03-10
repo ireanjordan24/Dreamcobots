@@ -6,6 +6,8 @@ billing, refunds, and transaction history.  All operations are mocked; no
 real money or external APIs are involved.
 
 Supported currencies: USD, EUR, GBP, CAD, AUD, JPY, MXN
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by dreamco_payments.py.
 """
 
 import uuid

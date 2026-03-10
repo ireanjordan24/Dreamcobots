@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.app_builder_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow
 
 
 class AppBuilderBotTierError(Exception):
@@ -48,6 +49,7 @@ class AppBuilderBot:
     HOURS_PER_FEATURE = {"web": 4, "mobile": 6, "desktop": 5, "api": 3, "fullstack": 8}
 
     def __init__(self, tier: Tier = Tier.FREE):
+        self.flow = GlobalAISourcesFlow(bot_name="AppBuilderBot")
         self.tier = tier
         self.config = get_tier_config(tier)
         self._projects: dict = {}

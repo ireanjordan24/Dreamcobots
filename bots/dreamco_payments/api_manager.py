@@ -6,6 +6,8 @@ The DREAMCO_STRIPE_KEY is loaded from the environment (placeholder only —
 no real Stripe credentials are stored or transmitted).
 
 Key generation uses hashlib.sha256; no external crypto libraries required.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by dreamco_payments.py.
 """
 
 import hashlib

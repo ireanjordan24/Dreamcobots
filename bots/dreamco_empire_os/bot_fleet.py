@@ -4,6 +4,8 @@ DreamCo Empire OS — Bot Fleet Module
 Manages the full collection of DreamCo bots: registration, activation,
 speed control, stats, profitability tracking, and autonomy toggles.
 Designed to handle 877+ bots in the Full Auto configuration.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

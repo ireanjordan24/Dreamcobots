@@ -13,6 +13,11 @@ AI_MODELS_DIR = os.path.join(
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
 
+# Clear cached tiers/integration modules to prevent cross-test sys.path pollution
+for _mod in list(sys.modules.keys()):
+    if _mod in ('tiers', 'ai_models_integration', 'registry') or _mod.startswith('models.'):
+        del sys.modules[_mod]
+
 import pytest
 from tiers import (
     Tier, TierConfig, TIER_CATALOGUE, get_tier_config, get_upgrade_path,

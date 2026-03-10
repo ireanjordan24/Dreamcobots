@@ -3,6 +3,8 @@ DreamCo Empire OS — Marketplace Module
 
 Hub for browsing, purchasing, and deploying new bots, tools,
 and integrations within the DreamCo ecosystem.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

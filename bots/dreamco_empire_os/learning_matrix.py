@@ -3,6 +3,8 @@ DreamCo Empire OS — Learning Matrix Module
 
 AI-powered hub for self-improvement resources, Big Bro mentorship lessons,
 personal growth tracking, and skill progression across empire-relevant domains.
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by empire_os.py.
 """
 
 from __future__ import annotations

@@ -3,6 +3,8 @@ Hybrid evolution engine for the DreamCo Global AI Learning System.
 
 Combines top-ranked methods into hybrid AI strategies using a simulated
 genetic algorithm (selection → crossover → mutation → fitness evaluation).
+
+GLOBAL AI SOURCES FLOW: this module is part of the pipeline orchestrated by ai_learning_system.py.
 """
 
 from dataclasses import dataclass, field
