@@ -48,6 +48,7 @@ supporting 877+ bots in Full Auto mode.
 
 ```python
 from bots.dreamco_empire_os import DreamCoEmpireOS, Tier
+from bots.dreamco_empire_os.deal_analyzer import DealType, RiskLevel
 
 # Create empire on PRO tier
 empire = DreamCoEmpireOS(tier=Tier.PRO, operator_name="DreamCo Boss")
@@ -68,10 +69,13 @@ empire.revenue_tracker.record_revenue("Lead Scraper", 180.0, category="lead_gen"
 empire.deal_analyzer.add_deal(
     deal_id="deal_001",
     name="SaaS Partnership",
-    deal_type=empire.deal_analyzer.add_deal.__module__,  # use DealType.PARTNERSHIP
+    deal_type=DealType.PARTNERSHIP,
     upfront_cost_usd=5000,
     projected_monthly_revenue_usd=2000,
+    risk_level=RiskLevel.LOW,
 )
+result = empire.deal_analyzer.analyze_deal("deal_001")
+print(result["verdict"])
 
 # Get empire dashboard
 print(empire.dashboard())

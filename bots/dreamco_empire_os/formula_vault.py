@@ -196,6 +196,12 @@ class FormulaVault:
                 raise TypeError(f"Variable '{k}' must be numeric, got {type(v).__name__}.")
             safe_inputs[k] = v
 
+        # Guard expression against non-arithmetic content.
+        # Allow: digits, variable names, arithmetic operators, whitespace, parens, dot, star-star.
+        import re as _re
+        if not _re.fullmatch(r"[A-Za-z0-9_\s\+\-\*\/\(\)\.\%]+", f.expression):
+            raise ValueError(f"Formula expression contains unsafe characters: {f.expression!r}")
+
         result = eval(f.expression, {"__builtins__": {}}, safe_inputs)  # noqa: S307
 
         f.use_count += 1

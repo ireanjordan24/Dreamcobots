@@ -189,11 +189,16 @@ class TestHustleSimulator:
         assert len(history) == 2
 
     def test_aggressive_speed_increases_profit(self):
+        import random as _random
+        # Use a fixed seed so the revenue/profit values are deterministic
+        _random.seed(42)
         self.dashboard.set_bot_speed(BotSpeed.MODERATE)
-        moderate_revenues = [self.dashboard.hustle_simulator()["revenue_usd"] for _ in range(10)]
+        moderate_revenue = self.dashboard.hustle_simulator()["revenue_usd"]
+        _random.seed(42)
         self.dashboard.set_bot_speed(BotSpeed.AGGRESSIVE)
-        aggressive_revenues = [self.dashboard.hustle_simulator()["revenue_usd"] for _ in range(10)]
-        assert sum(aggressive_revenues) >= sum(moderate_revenues) * 0.9  # allow small variance
+        aggressive_revenue = self.dashboard.hustle_simulator()["revenue_usd"]
+        # Same base random value; aggressive (1.3×) must beat moderate (1.0×)
+        assert aggressive_revenue > moderate_revenue
 
 
 # ===========================================================================

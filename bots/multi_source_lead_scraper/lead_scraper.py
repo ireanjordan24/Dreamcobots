@@ -122,10 +122,13 @@ def _simulate_scrape(source: LeadSource, count: int) -> list[dict]:
         name = random.choice(_SAMPLE_NAMES)
         company = random.choice(_SAMPLE_COMPANIES)
         industry = random.choice(_SAMPLE_INDUSTRIES)
-        first, last = name.split()
+        parts = name.split()
+        first = parts[0] if parts else "user"
+        last = parts[-1] if len(parts) > 1 else f"{i}"
+        safe_company = "".join(c for c in company.lower() if c.isalnum())
         leads.append({
             "name": name,
-            "email": f"{first.lower()}.{last.lower()}@{company.lower().replace(' ', '').replace('.', '')}.com",
+            "email": f"{first.lower()}.{last.lower()}@{safe_company}.com",
             "phone": f"+1-{random.randint(200, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
             "company": company,
             "industry": industry,
