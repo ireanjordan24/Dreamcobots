@@ -3,6 +3,7 @@ Data ingestion layer for the DreamCo Global AI Learning System.
 
 Supports scraping and normalizing records from arXiv, GitHub, Kaggle, and AI Labs.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from enum import Enum
 from dataclasses import dataclass, field

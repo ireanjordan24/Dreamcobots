@@ -4,6 +4,7 @@ Automation scheduler for the DreamCo Global AI Learning System.
 Manages recurring jobs that drive continuous ingestion, re-classification,
 re-ranking, and strategy evolution in the background.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from enum import Enum
 from dataclasses import dataclass, field

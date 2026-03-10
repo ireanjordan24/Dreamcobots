@@ -1,4 +1,5 @@
 """Car Flipping Bot — tier-aware car deal finder and flip profit estimator."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path

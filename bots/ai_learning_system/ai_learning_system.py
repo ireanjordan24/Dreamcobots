@@ -13,6 +13,7 @@ Usage
     result = system.run_full_pipeline(query="transformer")
     print(result["summary"])
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from typing import List, Optional
 

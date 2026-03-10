@@ -7,6 +7,7 @@ no real Stripe credentials are stored or transmitted).
 
 Key generation uses hashlib.sha256; no external crypto libraries required.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import hashlib
 import hmac

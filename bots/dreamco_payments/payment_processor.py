@@ -7,6 +7,7 @@ real money or external APIs are involved.
 
 Supported currencies: USD, EUR, GBP, CAD, AUD, JPY, MXN
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import uuid
 import datetime
