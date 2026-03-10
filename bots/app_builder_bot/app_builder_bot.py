@@ -1,4 +1,5 @@
 """App Builder Bot — tier-aware application project creation and scaffolding."""
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import sys, os
 import uuid
 from datetime import datetime, timezone

@@ -9,6 +9,7 @@ Business types:
   - "real_estate"  — Real-estate flipping automation hints
   - "auto_dealer"  — Car-flipping automation hints
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import uuid
 import datetime
