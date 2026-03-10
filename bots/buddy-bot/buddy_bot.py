@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Buddy Bot - Central AI assistant that orchestrates all DreamCobots bots."""
 import sys
 import os

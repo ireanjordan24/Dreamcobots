@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 # Computer Vision Models Bot
 # Integrates major Computer Vision AI models:
 #   - OpenAI GPT-4 Vision (image understanding and captioning)

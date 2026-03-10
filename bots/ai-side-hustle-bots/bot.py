@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """
 AI Side Hustle Bot
 AI-powered tools to help users identify, launch, and monetize side hustles.

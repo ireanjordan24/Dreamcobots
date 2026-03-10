@@ -8,7 +8,7 @@ from .buddy_bot import BuddyBot
 from .config import load_config
 from .event_bus import EventBus
 from .income_tracker import IncomeTracker
-from .dashboard import Dashboard
+from .income_dashboard import Dashboard
 from .content_automation import ContentAutomation
 from .market_analysis import MarketAnalysis
 from .ml_optimizer import IncomePredictor, OptimizationEngine

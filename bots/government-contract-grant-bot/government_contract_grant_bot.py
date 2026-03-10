@@ -46,18 +46,24 @@ class GovernmentContractGrantBot:
         Subscription tier controlling feature availability and request limits.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = Tier.FREE, config=None):
         self.tier = tier
         self.config = get_tier_config(tier)
         self._request_count: int = 0
         self.flow = GlobalAISourcesFlow(bot_name="GovernmentContractGrantBot")
+        # Results store for backward compatibility
+        self.results = {
+            "contracts_found": [],
+            "grants_found": [],
+            "summary": "",
+        }
 
     # ------------------------------------------------------------------
     # Core API
     # ------------------------------------------------------------------
 
-    def search_contracts(self, query: str, filters: dict | None = None) -> dict:
-        """Search government contracts matching the given query."""
+    def search_contracts(self, query: str = "", keywords: list | None = None, filters: dict | None = None) -> dict:
+        """Search government contracts matching the given query or keywords."""
         self._check_request_limit()
         if filters and self.tier == Tier.FREE:
             raise GovBotTierError(
@@ -67,13 +73,17 @@ class GovernmentContractGrantBot:
         mock_results = [
             {
                 "contract_id": f"GOV-{i:04d}",
-                "title": f"Mock contract matching '{query}' #{i}",
+                "title": f"Mock contract matching '{query or 'general'}' #{i}",
                 "agency": "Department of Mock Affairs",
-                "value_usd": (i + 1) * 50_000,
+                "value_usd": (i + 1) * 100_000,
                 "deadline": "2025-12-31",
+                "keywords": keywords or ["general"],
             }
             for i in range(1, 4 if self.tier == Tier.FREE else 11)
         ]
+        if keywords:
+            mock_results = [r for r in mock_results if any(k in r["keywords"] for k in keywords)]
+        self.results["contracts_found"] = mock_results
         return {
             "query": query,
             "filters": filters,
@@ -82,6 +92,73 @@ class GovernmentContractGrantBot:
             "requests_used": self._request_count,
             "requests_remaining": self._requests_remaining(),
         }
+
+    def search_grants(self, query: str = "", keywords: list | None = None, filters: dict | None = None) -> dict:
+        """Search government grants matching the given query or keywords."""
+        self._check_request_limit()
+        self._request_count += 1
+        mock_results = [
+            {
+                "grant_id": f"GRANT-{i:04d}",
+                "title": f"Mock grant matching '{query or 'general'}' #{i}",
+                "agency": "Department of Innovation",
+                "amount_usd": (i + 1) * 50_000,
+                "deadline": "2025-12-31",
+                "keywords": keywords or ["innovation"],
+            }
+            for i in range(1, 4 if self.tier == Tier.FREE else 11)
+        ]
+        if keywords:
+            mock_results = [r for r in mock_results if any(k in r["keywords"] for k in keywords)]
+        self.results["grants_found"] = mock_results
+        return {
+            "query": query,
+            "filters": filters,
+            "results": mock_results,
+            "tier": self.tier.value,
+            "requests_used": self._request_count,
+            "requests_remaining": self._requests_remaining(),
+        }
+
+    def _score_opportunity(self, value: int) -> int:
+        """Score an opportunity (1-10) based on its value."""
+        if value >= 1_000_000:
+            return 10
+        elif value >= 500_000:
+            return 8
+        elif value >= 150_000:
+            return 6
+        elif value >= 50_000:
+            return 4
+        else:
+            return 2
+
+    def process_contracts(self) -> None:
+        """Score and enrich contracts in results."""
+        print("Processing contracts...")
+        for contract in self.results["contracts_found"]:
+            contract["score"] = self._score_opportunity(contract.get("value_usd", 50000))
+
+    def process_grants(self) -> None:
+        """Score and enrich grants in results."""
+        print("Processing grants...")
+        for grant in self.results["grants_found"]:
+            grant["score"] = self._score_opportunity(grant.get("amount_usd", 25000))
+
+    def generate_report(self) -> dict:
+        """Generate a summary report of contracts and grants found."""
+        import datetime
+        contracts = self.results["contracts_found"]
+        grants = self.results["grants_found"]
+        summary = f"Contracts found: {len(contracts)}, Grants found: {len(grants)}"
+        self.results["summary"] = summary
+        report = {
+            "summary": summary,
+            "contracts": contracts,
+            "grants": grants,
+            "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        }
+        return report
 
     def check_grant_eligibility(self, org_profile: dict) -> dict:
         """Check whether an organization profile is eligible for grants."""
@@ -204,20 +281,21 @@ class GovernmentContractGrantBot:
         return output
 
     def run(self) -> dict:
-        """Run the full GlobalAISourcesFlow pipeline."""
-        return self.flow.run_pipeline()
+        """Run the full GlobalAISourcesFlow pipeline and return report."""
+        self.search_contracts()
+        self.search_grants()
+        self.process_contracts()
+        self.process_grants()
+        report = self.generate_report()
+        # Also run the framework pipeline
+        pipeline_result = self.flow.run_pipeline()
+        report["pipeline_complete"] = pipeline_result.get("pipeline_complete", True)
+        report["pipeline_result"] = pipeline_result
+        return report
 
     def start(self):
         """Start the Government Contract & Grant Bot."""
         print("Government Contract & Grant Bot is starting...")
-
-    def process_contracts(self):
-        """Process contracts."""
-        print("Processing contracts...")
-
-    def process_grants(self):
-        """Process grants."""
-        print("Processing grants...")
 
     # ------------------------------------------------------------------
     # Internal helpers

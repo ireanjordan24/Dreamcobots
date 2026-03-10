@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """HR Bot - Job descriptions, resume screening, interview questions, and HR compliance."""
 import sys
 import os

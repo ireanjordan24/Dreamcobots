@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """FiverrBot: automates SEO content gig generation and delivery."""
 import io
 import logging

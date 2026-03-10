@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """
 Simple keyword-based NLP engine for FAQ responses.
 Falls back to OpenAI API when OPENAI_API_KEY is set (optional, free-tier upgrade).

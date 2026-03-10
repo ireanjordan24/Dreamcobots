@@ -35,11 +35,112 @@ class BuddyBot:
         Subscription tier for the BuddyBot hub itself.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = Tier.FREE, enable_scheduler: bool = True):
         self.tier = tier
         self.config = get_tier_config(tier)
         self._event_bus = EventBus()
         self._registered_bots: dict[str, object] = {}
+        self._running: bool = False
+        self._todos: list[str] = []
+
+        # Task engine integration (from add-buddy-saas-bot)
+        try:
+            from BuddyAI.task_engine import TaskEngine
+            from BuddyAI.library_manager import LibraryManager
+            from BuddyAI.benchmarks import Benchmarks
+            self.task_engine = TaskEngine()
+            self.library_manager = LibraryManager()
+            self.benchmarks = Benchmarks()
+        except ImportError:
+            self.task_engine = None
+            self.library_manager = None
+            self.benchmarks = None
+
+    def start(self) -> None:
+        """Start the BuddyBot and load plugins."""
+        self._running = True
+        if self.task_engine is not None:
+            self._load_plugins()
+        self._event_bus.publish("buddy.started", {"version": "1.0.0"})
+
+    def stop(self) -> None:
+        """Stop the BuddyBot."""
+        self._running = False
+
+    def _load_plugins(self) -> None:
+        """Load all built-in plugins and register their capabilities."""
+        try:
+            from BuddyAI.plugins import productivity, data_entry, api_integrator
+            productivity.register(self.task_engine)
+            data_entry.register(self.task_engine)
+            api_integrator.register(self.task_engine)
+        except ImportError:
+            pass
+        if self.task_engine:
+            self.task_engine.register_capability(
+                "install_library", lambda p: self.install_capability(p.get("package", ""))
+            )
+
+    def chat(self, text: str) -> dict:
+        """Handle a text message and return a response dict."""
+        self._event_bus.publish("buddy.input.text", {"text": text})
+        if self.task_engine is not None:
+            result = self.task_engine.process_text(text)
+        else:
+            result = self._simple_chat(text)
+        self._event_bus.publish("buddy.output", result)
+        return result
+
+    def _simple_chat(self, text: str) -> dict:
+        """Fallback simple chat handler."""
+        if not text or not text.strip():
+            return {"success": False, "message": "Empty input received."}
+        text_lower = text.lower()
+        if "help" in text_lower:
+            return {"success": True, "message": "I can help with todos, status, and bot routing. Try 'add todo <item>'."}
+        if "add todo" in text_lower:
+            item = text_lower.replace("add todo", "").strip()
+            self._todos.append(item)
+            return {"success": True, "message": f"Added todo: {item}"}
+        if "list" in text_lower and "todo" in text_lower:
+            return {"success": True, "message": "Todos: " + ", ".join(self._todos), "items": self._todos[:]}
+        return {"success": False, "message": f"Unknown command: {text}"}
+
+    def benchmark_task(self, task: str, iterations: int = 5) -> dict:
+        """Benchmark a task by running it multiple times."""
+        import time
+        times = []
+        for _ in range(iterations):
+            start = time.time()
+            self.chat(task)
+            times.append(time.time() - start)
+        avg = sum(times) / len(times)
+        return {
+            "success": True,
+            "message": f"Benchmarked '{task}' over {iterations} iterations. Avg: {avg:.4f}s",
+            "benchmark": {
+                "task": task,
+                "iterations": iterations,
+                "avg_time_s": avg,
+                "min_time_s": min(times),
+                "max_time_s": max(times),
+            }
+        }
+
+    def install_capability(self, package: str) -> dict:
+        """Install a new capability (blocked for security)."""
+        BLOCKED = {"os", "sys", "subprocess", "shutil", "socket"}
+        if not package:
+            return {"success": False, "message": "No package specified."}
+        if package in BLOCKED:
+            return {"success": False, "message": f"Package '{package}' is blocked for security reasons."}
+        if self.library_manager is not None:
+            try:
+                self.library_manager.install_library(package)
+                return {"success": True, "message": f"Package '{package}' installed."}
+            except Exception as e:
+                return {"success": False, "message": str(e)}
+        return {"success": False, "message": "Library manager not available."}
 
     def register_bot(self, name: str, bot_instance: object) -> None:
         """Register a bot under the given name."""

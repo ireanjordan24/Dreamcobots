@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Legal Bot - Contract generation, document drafting, and compliance guidance."""
 import sys
 import os

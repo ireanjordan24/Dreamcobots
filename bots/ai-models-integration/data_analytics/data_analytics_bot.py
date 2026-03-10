@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 # Data Analytics AI Models Bot
 # Integrates major Data Analytics AI platforms:
 #   - Google AutoML / Vertex AI (automated ML pipelines)

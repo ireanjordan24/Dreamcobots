@@ -11,6 +11,11 @@ import pytest
 BOT_DIR = os.path.join(os.path.dirname(__file__), "..", "bots", "saas-selling-bot")
 sys.path.insert(0, os.path.abspath(BOT_DIR))
 
+# Clear any cached 'bot' module to ensure we import the saas-selling-bot version
+for mod_name in list(sys.modules.keys()):
+    if mod_name in ('bot', 'database', 'nlp'):
+        del sys.modules[mod_name]
+
 # Use an in-memory database for tests
 os.environ["SAAS_BOT_DB"] = ":memory:"
 

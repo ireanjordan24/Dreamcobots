@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Farewell Bot - Compassionate funeral planning, memorial services, and grief support."""
 import sys
 import os

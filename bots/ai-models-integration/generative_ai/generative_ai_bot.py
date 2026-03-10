@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 # Generative AI Models Bot
 # Integrates major Generative AI models:
 #   - OpenAI DALL-E 3 (text-to-image generation)

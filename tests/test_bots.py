@@ -37,20 +37,28 @@ class TestGovernmentContractGrantBot(unittest.TestCase):
         self.bot.start()  # should not raise
 
     def test_search_contracts_returns_list(self):
-        contracts = self.bot.search_contracts()
+        result = self.bot.search_contracts()
+        self.assertIsInstance(result, dict)
+        self.assertIn("results", result)
+        contracts = result["results"]
         self.assertIsInstance(contracts, list)
 
     def test_search_grants_returns_list(self):
-        grants = self.bot.search_grants()
+        result = self.bot.search_grants()
+        self.assertIsInstance(result, dict)
+        self.assertIn("results", result)
+        grants = result["results"]
         self.assertIsInstance(grants, list)
 
     def test_search_contracts_keyword_filter(self):
-        contracts = self.bot.search_contracts(keywords=["robotics"])
+        result = self.bot.search_contracts(keywords=["robotics"])
+        contracts = result["results"]
         for c in contracts:
             self.assertIn("robotics", c["keywords"])
 
     def test_search_grants_keyword_filter(self):
-        grants = self.bot.search_grants(keywords=["innovation"])
+        result = self.bot.search_grants(keywords=["innovation"])
+        grants = result["results"]
         for g in grants:
             self.assertIn("innovation", g["keywords"])
 
@@ -93,10 +101,10 @@ class TestGovernmentContractGrantBot(unittest.TestCase):
             "contract_keywords": ["robotics"],
             "grant_keywords": ["innovation"],
         })
-        contracts = bot.search_contracts()
-        grants = bot.search_grants()
-        self.assertIsInstance(contracts, list)
-        self.assertIsInstance(grants, list)
+        result_c = bot.search_contracts()
+        result_g = bot.search_grants()
+        self.assertIsInstance(result_c, dict)
+        self.assertIsInstance(result_g, dict)
 
 
 # ===========================================================================

@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """
 API client for the 211 Resource and Eligibility Checker Bot.
 

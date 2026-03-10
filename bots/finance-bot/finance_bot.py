@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Finance Bot - Budgeting, portfolio analysis, cash flow forecasting, and tax optimization."""
 import sys
 import os

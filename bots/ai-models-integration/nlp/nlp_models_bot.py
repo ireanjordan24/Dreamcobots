@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 # NLP Models Bot
 # Integrates major Natural Language Processing AI models:
 #   - OpenAI GPT-4 (text completion, chat, summarization)

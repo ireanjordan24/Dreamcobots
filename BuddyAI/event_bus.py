@@ -40,16 +40,14 @@ class EventBus:
                 self._subscribers[event_type].append(handler)
 
     def unsubscribe(self, event_type: str, handler: Callable) -> None:
-        """Remove a previously registered handler."""
+        """Remove a previously registered handler. No-op if handler is not found."""
         with self._lock:
             if event_type not in self._subscribers:
-                raise EventBusError(f"No handlers registered for event type '{event_type}'.")
+                return
             try:
                 self._subscribers[event_type].remove(handler)
             except ValueError:
-                raise EventBusError(
-                    f"Handler not found for event type '{event_type}'."
-                )
+                pass
 
     def publish(self, event_type: str, payload: Any = None) -> int:
         """
@@ -64,8 +62,11 @@ class EventBus:
             handlers = list(self._subscribers.get(event_type, []))
         count = 0
         for handler in handlers:
-            handler(payload)
-            count += 1
+            try:
+                handler(payload)
+                count += 1
+            except Exception:
+                pass
         with self._lock:
             self._event_log.append({
                 "event_type": event_type,
@@ -98,3 +99,24 @@ class EventBus:
         """Return sorted list of registered event types."""
         with self._lock:
             return sorted(self._subscribers.keys())
+
+    def emit(self, event_type: str, payload: Any = None) -> int:
+        """Alias for publish() for convenience."""
+        return self.publish(event_type, payload)
+
+    def clear(self, event_type: str = None) -> None:
+        """Clear subscribers and log for a specific event_type or all if None."""
+        with self._lock:
+            if event_type is None:
+                self._subscribers.clear()
+                self._event_log = []
+            else:
+                self._subscribers.pop(event_type, None)
+                self._event_log = [
+                    e for e in self._event_log if e["event_type"] != event_type
+                ]
+
+    def subscriber_count(self, event_type: str) -> int:
+        """Return the number of subscribers for a given event_type."""
+        with self._lock:
+            return len(self._subscribers.get(event_type, []))

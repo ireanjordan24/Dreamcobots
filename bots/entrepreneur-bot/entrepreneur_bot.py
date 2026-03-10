@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Entrepreneur Bot - Business planning, market research, and startup guidance."""
 import sys
 import os

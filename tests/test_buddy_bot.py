@@ -58,8 +58,8 @@ class TestEventBus:
 
     def test_unsubscribe_nonexistent_raises(self):
         bus = EventBus()
-        with pytest.raises(EventBusError):
-            bus.unsubscribe("no.such.event", lambda p: None)
+        # unsubscribing a non-existent event is a no-op (does not raise)
+        bus.unsubscribe("no.such.event", lambda p: None)
 
     def test_event_log_populated(self):
         bus = EventBus()

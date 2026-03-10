@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Cybersecurity Bot - Security audits, vulnerability assessments, and compliance checks."""
 import sys
 import os

@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """Real Estate Bot - Property valuation, investment analysis, and market insights."""
 import sys
 import os

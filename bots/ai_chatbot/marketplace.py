@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """
 marketplace.py – SaaS sales preparation, subscription management, and
 marketing documentation manager for the Dreamcobots AI Chatbot platform.

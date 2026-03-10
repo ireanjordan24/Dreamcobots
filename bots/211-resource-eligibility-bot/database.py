@@ -1,3 +1,4 @@
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 """
 Temporary session database for the 211 Resource and Eligibility Checker Bot.
 
