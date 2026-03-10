@@ -11,49 +11,122 @@ Usage
     hub.register_bot("chatbot", Chatbot(tier=Tier.PRO))
     result = hub.route_message("chatbot", "Hello!")
     print(result)
+
+    # Or with hub ID (collaborative integration mode):
+    hub = BuddyBot("MyHub")
+    token = hub.register_bot("mybot")   # returns auth token
+    hub.authenticate("mybot", token)    # verify token
 """
 
 import sys
 import os
+import collections
+from typing import Any, Optional
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'bots', 'ai-models-integration'))
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 from BuddyAI.event_bus import EventBus
+from BuddyAI.auth import AuthModule, AuthError
 
 
 class BuddyBotError(KeyError):
     """Raised for BuddyBot operational errors. Extends KeyError for compatibility."""
 
 
+class SectorBotProtocol:
+    """Protocol for sector bots that can be registered with BuddyBot."""
+    def chat(self, message: str, **kwargs) -> dict: ...
+    def process(self, message: str, **kwargs) -> dict: ...
+
+
 class BuddyBot:
     """
     Central orchestrator that manages bot registrations and routes messages.
 
+    Supports two registration modes:
+
+    1. **Instance mode** (legacy): ``register_bot(name, bot_instance)``
+       — stores the bot instance and enables ``route_message``.
+    2. **Auth mode**: ``register_bot(name)``
+       — issues an auth token and returns it.  Use :meth:`authenticate` to
+       verify tokens from registered bots.
+
     Parameters
     ----------
-    tier : Tier
-        Subscription tier for the BuddyBot hub itself.
+    hub_id_or_tier : str or Tier, optional
+        When a :class:`str`, treated as the hub identifier.
+        When a :class:`~tiers.Tier`, treated as the subscription tier.
+        Defaults to ``Tier.FREE`` when omitted.
+    tier : Tier, optional
+        Subscription tier, only used when *hub_id_or_tier* is a string.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE):
-        self.tier = tier
-        self.config = get_tier_config(tier)
+    def __init__(self, hub_id_or_tier=None, tier: Tier = Tier.FREE):
+        if isinstance(hub_id_or_tier, str):
+            self.hub_id: str = hub_id_or_tier
+            self.tier: Tier = tier
+        elif isinstance(hub_id_or_tier, Tier):
+            self.hub_id = "BuddyBot"
+            self.tier = hub_id_or_tier
+        else:
+            self.hub_id = "BuddyBot"
+            self.tier = Tier.FREE
+
+        self.config = get_tier_config(self.tier)
         self._event_bus = EventBus()
         self._registered_bots: dict[str, object] = {}
+        self._auth = AuthModule()
+        # Knowledge base: shared key-value store
+        self._knowledge: dict[str, Any] = {}
+        # Task queue (FIFO)
+        self._task_queue: collections.deque = collections.deque()
 
-    def register_bot(self, name: str, bot_instance: object) -> None:
-        """Register a bot under the given name."""
+    # ------------------------------------------------------------------
+    # Bot registration
+    # ------------------------------------------------------------------
+
+    def register_bot(self, name: str, bot_instance: object = None) -> Optional[str]:
+        """Register a bot under the given name.
+
+        Parameters
+        ----------
+        name:
+            Unique identifier for the bot.
+        bot_instance:
+            The bot object to register.  When *None*, the bot is registered
+            in **auth mode** and an authentication token is returned.
+
+        Returns
+        -------
+        str or None
+            Authentication token in auth mode; ``None`` in instance mode.
+        """
         if name in self._registered_bots:
             raise BuddyBotError(f"A bot named '{name}' is already registered.")
-        self._registered_bots[name] = bot_instance
-        self._event_bus.publish("bot_registered", {"name": name})
-        self._event_bus.publish("bot.registered", {"name": name})
+        if bot_instance is not None:
+            self._registered_bots[name] = bot_instance
+            self._event_bus.publish("bot_registered", {"name": name})
+            self._event_bus.publish("bot.registered", {"name": name})
+            return None
+        else:
+            # Auth mode: issue a token via AuthModule
+            token = self._auth.register_bot(name)
+            self._registered_bots[name] = {"_auth_bot": True}
+            self._event_bus.publish("bot_registered", {"name": name})
+            self._event_bus.publish("bot.registered", {"name": name})
+            return token
 
     def unregister_bot(self, name: str) -> None:
         """Remove a registered bot."""
         if name not in self._registered_bots:
             raise BuddyBotError(f"No bot named '{name}' is registered.")
         del self._registered_bots[name]
+        # Also remove from auth module if present
+        try:
+            self._auth.unregister_bot(name)
+        except Exception:
+            pass
         self._event_bus.publish("bot.unregistered", {"name": name})
 
     def get_bot(self, name: str) -> object:
@@ -65,6 +138,33 @@ class BuddyBot:
     def list_bots(self) -> list[str]:
         """Return sorted list of registered bot names."""
         return sorted(self._registered_bots.keys())
+
+    def connected_bots(self) -> list[str]:
+        """Return sorted list of connected bot names (alias for :meth:`list_bots`)."""
+        return self.list_bots()
+
+    # ------------------------------------------------------------------
+    # Authentication
+    # ------------------------------------------------------------------
+
+    def authenticate(self, bot_id: str, token: str) -> bool:
+        """Verify that *token* is valid for *bot_id*.
+
+        Returns
+        -------
+        bool
+            ``True`` if the token is valid.
+
+        Raises
+        ------
+        AuthError
+            If the token is invalid or the bot is not registered.
+        """
+        return self._auth.verify_token(bot_id, token)
+
+    # ------------------------------------------------------------------
+    # Message routing
+    # ------------------------------------------------------------------
 
     def route_message(self, bot_name: str, message: str, **kwargs) -> dict:
         """
@@ -126,10 +226,81 @@ class BuddyBot:
                 results[name] = {"error": f"Bot '{name}' could not process message"}
         return results
 
+    # ------------------------------------------------------------------
+    # Knowledge base
+    # ------------------------------------------------------------------
+
+    def set_knowledge(self, key: str, value: Any) -> None:
+        """Store *value* in the shared knowledge base under *key*."""
+        self._knowledge[key] = value
+
+    def get_knowledge(self, key: str, default: Any = None) -> Any:
+        """Retrieve a value from the shared knowledge base.
+
+        Returns *default* if *key* is not found.
+        """
+        return self._knowledge.get(key, default)
+
+    def delete_knowledge(self, key: str) -> None:
+        """Remove *key* from the shared knowledge base (noop if absent)."""
+        self._knowledge.pop(key, None)
+
+    def knowledge_keys(self) -> list[str]:
+        """Return sorted list of keys in the shared knowledge base."""
+        return sorted(self._knowledge.keys())
+
+    # ------------------------------------------------------------------
+    # Task queue
+    # ------------------------------------------------------------------
+
+    def push_task(self, task: dict) -> None:
+        """Enqueue *task* (must be a dict).
+
+        Raises
+        ------
+        BuddyBotError
+            If *task* is not a dict.
+        """
+        if not isinstance(task, dict):
+            raise BuddyBotError("Tasks must be dicts.")
+        self._task_queue.append(task)
+
+    def pop_task(self) -> Optional[dict]:
+        """Dequeue and return the oldest task, or ``None`` if the queue is empty."""
+        if not self._task_queue:
+            return None
+        return self._task_queue.popleft()
+
+    def pending_tasks(self) -> int:
+        """Return the number of tasks currently in the queue."""
+        return len(self._task_queue)
+
+    # ------------------------------------------------------------------
+    # Event helpers
+    # ------------------------------------------------------------------
+
+    def subscribe_event(self, event_type: str, handler) -> None:
+        """Subscribe *handler* to *event_type* on the internal event bus."""
+        self._event_bus.subscribe(event_type, handler)
+
+    def publish_event(self, event_type: str, payload: Any = None) -> int:
+        """Publish *payload* to *event_type* on the internal event bus.
+
+        Returns
+        -------
+        int
+            Number of handlers invoked.
+        """
+        return self._event_bus.publish(event_type, payload)
+
     @property
     def event_bus(self) -> EventBus:
         """Return the internal EventBus instance."""
         return self._event_bus
+
+    # ------------------------------------------------------------------
+    # Tier helpers
+    # ------------------------------------------------------------------
 
     def describe_tier(self) -> str:
         """Print and return a description of the current BuddyBot tier."""
