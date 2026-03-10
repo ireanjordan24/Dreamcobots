@@ -4,6 +4,7 @@ Sandbox testing layer for the DreamCo Global AI Learning System.
 Simulates containerized execution of classified AI/ML methods and collects
 performance metrics (accuracy, convergence rate, resource consumption).
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from enum import Enum
 from dataclasses import dataclass, field

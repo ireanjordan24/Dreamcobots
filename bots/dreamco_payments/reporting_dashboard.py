@@ -15,6 +15,7 @@ STARTER  : view settings only
 GROWTH   : view + update settings, basic export
 ENTERPRISE: all features including advanced export formats
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import datetime
 import json
