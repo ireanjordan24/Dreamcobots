@@ -4,6 +4,7 @@ Learning method classifier for the DreamCo Global AI Learning System.
 Performs keyword-based classification of ingested records into one of the
 canonical AI/ML learning method types.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from enum import Enum
 from dataclasses import dataclass, field

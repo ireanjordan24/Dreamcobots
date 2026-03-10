@@ -4,6 +4,7 @@ Performance analytics layer for the DreamCo Global AI Learning System.
 Normalizes sandbox test metrics and computes global and regional rankings
 for all tested AI/ML methods.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from dataclasses import dataclass, field
 from typing import List, Optional

@@ -4,6 +4,7 @@ Deployment orchestration for the DreamCo Global AI Learning System.
 Simulates Kubernetes rolling updates and rollbacks for deploying hybrid
 AI strategies to DreamCo bot applications.
 """
+# Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from enum import Enum
 from dataclasses import dataclass, field
