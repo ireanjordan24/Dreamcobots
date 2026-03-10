@@ -6,7 +6,7 @@ import logging
 import re
 from typing import Dict, List, Optional
 
-from core.bot_base import BotBase
+from core.bot_base import AbstractBotBase as BotBase
 from core.crash_guard import crash_guard, safe_run
 from core.dream_core import DreamCore
 from core.monetization_hooks import MonetizationHooks

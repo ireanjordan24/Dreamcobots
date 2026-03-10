@@ -142,3 +142,26 @@ class EventBus:
         """
         with self._lock:
             return len(self._subscribers.get(event_type, []))
+
+    def subscriber_count(self, event_type: str) -> int:
+        """Return the number of subscribers for *event_type* (alias for :meth:`handler_count`)."""
+        return self.handler_count(event_type)
+
+    def emit(self, event_type: str, payload: Any = None) -> int:
+        """Alias for :meth:`publish`."""
+        return self.publish(event_type, payload)
+
+    def clear(self, event_type: str = None) -> None:
+        """Clear handlers for *event_type*, or all handlers when *event_type* is ``None``.
+
+        Parameters
+        ----------
+        event_type : str, optional
+            When provided, remove all handlers for this event type only.
+            When ``None``, remove all handlers for all event types.
+        """
+        with self._lock:
+            if event_type is None:
+                self._subscribers.clear()
+            else:
+                self._subscribers.pop(event_type, None)

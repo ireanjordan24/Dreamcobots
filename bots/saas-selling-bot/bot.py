@@ -18,6 +18,9 @@ import sys
 import database as db
 from database import SAAS_TOOLS
 
+# Expose Flask app at module level for testing
+from app import app  # noqa: F401 – used by test clients
+
 
 def run_demo():
     """Print a quick demo of the bot's capabilities."""
