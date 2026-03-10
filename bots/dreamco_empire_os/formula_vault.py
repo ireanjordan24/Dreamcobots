@@ -120,6 +120,7 @@ class FormulaVault:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="FormulaVault")
         self._formulas: dict[str, Formula] = {}
         self._execution_log: list = []
         self._load_builtins()
@@ -199,6 +200,7 @@ class FormulaVault:
         # Guard expression against non-arithmetic content.
         # Allow: digits, variable names, arithmetic operators, whitespace, parens, dot, star-star.
         import re as _re
+from framework import GlobalAISourcesFlow
         if not _re.fullmatch(r"[A-Za-z0-9_\s\+\-\*\/\(\)\.\%]+", f.expression):
             raise ValueError(f"Formula expression contains unsafe characters: {f.expression!r}")
 

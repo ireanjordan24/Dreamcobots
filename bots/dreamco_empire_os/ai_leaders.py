@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class LeaderRole(Enum):
@@ -54,6 +55,7 @@ class AILeaders:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="AILeaders")
         self._leaders: dict[str, AILeader] = {}
         self._decision_log: list = []
 

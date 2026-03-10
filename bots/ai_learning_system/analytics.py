@@ -13,6 +13,7 @@ import uuid
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_ANALYTICS
 from .sandbox import SandboxTestResult, SandboxStatus
 from .classifier import ClassifiedMethod
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -88,6 +89,7 @@ class PerformanceAnalyticsLayer:
     """
 
     def __init__(self, tier: Tier) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="PerformanceAnalyticsLayer")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self._rankings: List[MethodRanking] = []

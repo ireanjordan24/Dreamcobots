@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class CostCategory(Enum):
@@ -42,6 +43,7 @@ class CostTracking:
     """
 
     def __init__(self, monthly_budget_usd: float = 0.0) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="CostTracking")
         self._entries: list[CostEntry] = []
         self._monthly_budget_usd = monthly_budget_usd
         self._counter: int = 0

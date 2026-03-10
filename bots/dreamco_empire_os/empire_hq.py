@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -38,6 +39,7 @@ class EmpireHQ:
     ]
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="EmpireHQ")
         self._stats: dict[str, EmpireStat] = {}
         self._alerts: list[str] = []
         self._created_at: str = datetime.now(timezone.utc).isoformat()

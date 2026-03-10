@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class PipelineStatus(Enum):
@@ -66,6 +67,7 @@ class Orchestration:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="Orchestration")
         self._pipelines: dict[str, Pipeline] = {}
         self._run_log: list = []
 

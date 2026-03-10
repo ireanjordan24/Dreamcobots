@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 class BotSpeed(Enum):
@@ -59,6 +60,7 @@ class BotFleet:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="BotFleet")
         self._fleet: dict[str, BotEntry] = {}
 
     # ------------------------------------------------------------------

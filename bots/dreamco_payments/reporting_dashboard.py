@@ -28,6 +28,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_ADVANCED_REPORTING,
     FEATURE_DISCOUNT_DOMINATOR,
 )
+from framework import GlobalAISourcesFlow
 
 
 class DashboardTierError(Exception):
@@ -134,6 +135,7 @@ class ReportingDashboard:
     """
 
     def __init__(self, tier: Tier = Tier.STARTER) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="ReportingDashboard")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         # Local copy of settings so updates are instance-scoped

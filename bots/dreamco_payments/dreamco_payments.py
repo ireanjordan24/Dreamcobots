@@ -19,6 +19,7 @@ from bots.dreamco_payments.payment_processor import PaymentProcessor
 from bots.dreamco_payments.api_manager import APIManager
 from bots.dreamco_payments.account_manager import AccountManager
 from bots.dreamco_payments.reporting_dashboard import ReportingDashboard
+from framework import GlobalAISourcesFlow
 
 
 class DreamcoPaymentsBot:
@@ -36,6 +37,7 @@ class DreamcoPaymentsBot:
     """
 
     def __init__(self, tier: Tier = Tier.STARTER) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="DreamcoPaymentsBot")
         self.tier = tier
         self.config = get_tier_config(tier)
         self._payment_processor = PaymentProcessor(tier)

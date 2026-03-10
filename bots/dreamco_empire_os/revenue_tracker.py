@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
+from framework import GlobalAISourcesFlow
 
 
 @dataclass
@@ -32,6 +33,7 @@ class RevenueTracker:
     """
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="RevenueTracker")
         self._entries: list[RevenueEntry] = []
         self._costs: list[dict] = []
         self._counter: int = 0

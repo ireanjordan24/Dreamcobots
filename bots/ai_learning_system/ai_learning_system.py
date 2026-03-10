@@ -31,6 +31,7 @@ from .hybrid_engine import HybridEvolutionEngine, HybridStrategy
 from .deployment import DeploymentOrchestrator, BotApplication, Deployment
 from .governance import GovernanceLayer
 from .scheduler import AutomationScheduler, ScheduleFrequency
+from framework import GlobalAISourcesFlow
 
 
 class AILearningSystemTierError(Exception):
@@ -51,6 +52,7 @@ class AILearningSystem:
     """
 
     def __init__(self, tier: Tier = Tier.FREE) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="AILearningSystem")
         self.tier = tier
         self.config: TierConfig = get_tier_config(tier)
         self.ingestion = DataIngestionLayer(tier)

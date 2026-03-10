@@ -115,6 +115,7 @@ class LearningMatrix:
     ]
 
     def __init__(self) -> None:
+        self.flow = GlobalAISourcesFlow(bot_name="LearningMatrix")
         self._lessons: dict[str, Lesson] = {}
         self._learners: dict[str, LearnerProfile] = {}
         self._load_builtins()
@@ -217,6 +218,7 @@ class LearningMatrix:
 
     def _tip(self) -> str:
         import random
+from framework import GlobalAISourcesFlow
         return random.choice(self.BIG_BRO_TIPS)
 
     def _get_learner(self, learner_id: str) -> LearnerProfile:
