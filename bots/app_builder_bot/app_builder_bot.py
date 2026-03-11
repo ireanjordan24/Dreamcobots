@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.app_builder_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AppBuilderBotTierError(Exception):

@@ -21,6 +21,7 @@ from bots.dreamco_payments.tiers import (
     get_tier_config,
     FEATURE_API_KEY_MANAGEMENT,
 )
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class APITierError(Exception):

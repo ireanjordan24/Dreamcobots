@@ -23,6 +23,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_REAL_ESTATE_AUTOMATION,
     FEATURE_AUTO_DEALER_AUTOMATION,
 )
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AccountTierError(Exception):

@@ -12,6 +12,7 @@ import datetime
 import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_GOVERNANCE
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AccessRole(Enum):

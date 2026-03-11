@@ -22,6 +22,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_RECURRING_BILLING,
     FEATURE_REFUNDS,
 )
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class PaymentTierError(Exception):
