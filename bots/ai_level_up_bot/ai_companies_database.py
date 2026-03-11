@@ -2,7 +2,9 @@
 AI Companies Database — Global AI Tools Registry
 
 Provides a searchable, filterable registry of global AI tools and companies.
-Designed to house 500–1 000 entries spanning all major AI categories and regions.
+Seeded with 30+ representative entries across all major categories; additional
+tools can be added at runtime via AICompanyDatabase.add_tool() to grow the
+registry toward 500–1 000 entries.
 
 Categories
 ----------

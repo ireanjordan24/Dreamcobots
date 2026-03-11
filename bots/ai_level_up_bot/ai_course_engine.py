@@ -3,7 +3,7 @@ AI Course Engine — DreamCo AI University
 
 Provides the 10-level AI University curriculum structure for the DreamCo
 AI Level-Up Bot.  Each level contains a set of modules covering theory,
-practical labs, simulations, and assessments.
+practical labs, simulations, and readings.
 
 Level structure
 ---------------

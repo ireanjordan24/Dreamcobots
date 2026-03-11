@@ -428,9 +428,6 @@ class AILevelUpBot:
                 return self._response(f"Your agents: {names}")
             return self._response("No agents yet. Create one with create_agent()!")
 
-        if "balance" in msg:
-            return self._response(f"Token balance: ${self.marketplace.balance_usd:.4f}")
-
         return self._response(
             f"Welcome to {self.bot_name}! I can help with: "
             "AI tools, token pricing, course levels, skill tree, and AI agents. "
