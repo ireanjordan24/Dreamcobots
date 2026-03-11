@@ -243,6 +243,7 @@ class TestAICompaniesDatabase:
         companies = self.db.get_by_category("European AI Leaders")
         names = [c.company_name for c in companies]
         assert "Aleph Alpha" in names
+        assert "Silo AI" in names
 
     def test_get_by_category_science_healthcare(self):
         companies = self.db.get_by_category("AI for Science & Healthcare")
