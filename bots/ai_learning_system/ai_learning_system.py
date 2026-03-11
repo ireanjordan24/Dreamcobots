@@ -31,6 +31,7 @@ from .hybrid_engine import HybridEvolutionEngine, HybridStrategy
 from .deployment import DeploymentOrchestrator, BotApplication, Deployment
 from .governance import GovernanceLayer
 from .scheduler import AutomationScheduler, ScheduleFrequency
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AILearningSystemTierError(Exception):

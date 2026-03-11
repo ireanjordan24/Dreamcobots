@@ -19,6 +19,7 @@ from bots.dreamco_payments.payment_processor import PaymentProcessor
 from bots.dreamco_payments.api_manager import APIManager
 from bots.dreamco_payments.account_manager import AccountManager
 from bots.dreamco_payments.reporting_dashboard import ReportingDashboard
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class DreamcoPaymentsBot:

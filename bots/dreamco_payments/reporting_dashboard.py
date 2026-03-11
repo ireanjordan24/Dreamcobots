@@ -28,6 +28,7 @@ from bots.dreamco_payments.tiers import (
     FEATURE_ADVANCED_REPORTING,
     FEATURE_DISCOUNT_DOMINATOR,
 )
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class DashboardTierError(Exception):

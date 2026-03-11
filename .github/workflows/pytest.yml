@@ -22,8 +22,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
+        pip install -r requirements.txt
+        pip install pytest-benchmark fastapi httpx flask flask-cors
 
     - name: Run tests
       run: |
-        pytest  # You may want to specify test directories or options
+        python -m pytest tests/ -q

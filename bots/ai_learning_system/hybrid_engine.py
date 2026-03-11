@@ -12,6 +12,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_HYBRID_ENGINE, FEATURE_GENETIC_ALGO
 from .analytics import MethodRanking
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 @dataclass

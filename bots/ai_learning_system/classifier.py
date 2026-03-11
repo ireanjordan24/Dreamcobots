@@ -13,6 +13,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_CLASSIFIER
 from .ingestion import IngestedRecord
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class LearningMethodType(Enum):

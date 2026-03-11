@@ -89,6 +89,7 @@ class InvalidLocationError(Exception):
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 @dataclass

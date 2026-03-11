@@ -13,6 +13,7 @@ import uuid
 
 from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SANDBOX
 from .classifier import ClassifiedMethod
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class SandboxStatus(Enum):
