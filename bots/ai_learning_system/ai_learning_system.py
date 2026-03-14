@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """
 DreamCo Global AI Learning System — main orchestrator.
 
