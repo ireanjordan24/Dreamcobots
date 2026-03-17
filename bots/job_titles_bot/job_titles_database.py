@@ -1,7 +1,7 @@
 """
 Job Titles Database — Comprehensive dataset of job titles by industry.
 
-Covers 1 000+ known job titles across 25+ industries, each entry carrying:
+Covers 1,000+ known job titles across 25+ industries, each entry carrying:
   - title          : official job title
   - industry       : top-level industry category
   - responsibilities: list of core responsibilities (used for bot capability mapping)

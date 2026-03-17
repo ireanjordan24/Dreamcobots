@@ -96,10 +96,10 @@ class CostJustificationEngine:
     """
 
     # Annual discount applied to yearly subscriptions
-    ANNUAL_DISCOUNT: float = 0.20    # 20 % off
+    ANNUAL_DISCOUNT: float = 0.20    # 20% off
 
     # Token markup (clients bear the cost via token consumption)
-    TOKEN_MARKUP: float = 1.15       # 15 % markup on token purchases
+    TOKEN_MARKUP: float = 1.15       # 15% markup on token purchases
 
     def __init__(
         self,

@@ -32,7 +32,7 @@ BOT_FEATURES: dict[str, list[str]] = {
         "Community support",
     ],
     Tier.PRO.value: [
-        "Full 1 000+ job titles",
+        "Full 1,000+ job titles",
         "25+ industry categories",
         "Custom bot generation per job role",
         "Hire human or AI worker matching",
