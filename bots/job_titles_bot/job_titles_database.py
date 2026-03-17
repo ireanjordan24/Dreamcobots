@@ -46,7 +46,8 @@ class JobTitle:
 
 
 # ---------------------------------------------------------------------------
-# Comprehensive job title seed data — 200+ titles across 20+ industries
+# Comprehensive job title seed data — 70+ titles across 20+ industries
+# (database is designed to scale to thousands of entries)
 # ---------------------------------------------------------------------------
 
 _JOB_TITLES: List[JobTitle] = [

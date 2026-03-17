@@ -256,7 +256,7 @@ class TestJobBotGenerator:
         assert isinstance(d, dict)
         for key in ("name", "job_title", "industry", "category", "automation_tasks",
                     "ai_models_required", "estimated_monthly_cost_usd", "payment_options",
-                    "capabilities", "training_datasets", "scalable"):
+                    "capabilities", "training_datasets", "scalable",):
             assert key in d
 
     def test_generate_bulk(self):
@@ -535,10 +535,10 @@ class TestJobTitlesBotPro:
 
     def test_search_returns_more_than_10_if_available(self):
         # Pro tier should not cap at 10
+        db = JobTitleDatabase()
+        expected_count = len(db.search("e"))
         results = self.bot.search_job_titles("e")
-        assert len(results) > 10 or len(results) == len(
-            JobTitleDatabase().search("e")
-        )
+        assert len(results) > 10 or len(results) == expected_count
 
     def test_generate_ai_worker_bot_returns_dict(self):
         result = self.bot.generate_ai_worker_bot("Software Engineer")
