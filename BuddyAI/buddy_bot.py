@@ -4,9 +4,26 @@ BuddyAI — Buddy Bot
 Orchestrator bot that registers, routes messages to, and broadcasts across
 all DreamCo ecosystem bots.  Any bot that exposes a ``chat(message)`` method
 can be registered.
+
+Buddy Bot rules
+---------------
+1. Every message routed to a bot deducts tokens from the requesting user's
+   billing account (when a BillingSystem is attached).
+2. Free-tier users get a daily token allowance; paid subscribers get higher
+   limits or unlimited tokens.
+3. Consumption is tracked per user and per bot so the platform remains
+   cost-neutral — all AI model costs are attributed to clients.
+4. Community contributions are encouraged via event notifications.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
+
 from BuddyAI.event_bus import EventBus
+
+if TYPE_CHECKING:
+    from bots.token_billing.billing_system import BillingSystem
 
 
 class BuddyBot:
@@ -20,11 +37,18 @@ class BuddyBot:
     ----------
     event_bus : EventBus
         Shared event bus for inter-bot communication.
+    billing : BillingSystem or None
+        Optional billing system for token consumption tracking.
+    default_token_cost : int
+        Default token cost per routed message when billing is enabled.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, billing: Optional["BillingSystem"] = None, default_token_cost: int = 1) -> None:
         self.event_bus: EventBus = EventBus()
         self._bots: dict[str, object] = {}
+        self.billing: Optional["BillingSystem"] = billing
+        self.default_token_cost: int = default_token_cost
+        self._consumption: dict[str, dict] = {}
 
     # ------------------------------------------------------------------
     # Bot registry
@@ -131,3 +155,75 @@ class BuddyBot:
 
         self.event_bus.publish("broadcast_sent", {"message": message})
         return results
+
+    # ------------------------------------------------------------------
+    # Subscription & consumption tracking (Buddy Bot rules)
+    # ------------------------------------------------------------------
+
+    def track_usage(
+        self,
+        user_id: str,
+        bot_name: str,
+        tokens_used: int,
+        description: str = "AI model usage",
+    ) -> dict:
+        """Record token consumption for *user_id* from *bot_name*.
+
+        If a BillingSystem is attached the tokens are deducted from the user's
+        balance.  Consumption is always recorded in the local registry regardless.
+
+        Parameters
+        ----------
+        user_id : str
+            The user being charged.
+        bot_name : str
+            The bot that performed the work.
+        tokens_used : int
+            Number of tokens consumed.
+        description : str
+            Human-readable description of the usage event.
+
+        Returns
+        -------
+        dict
+            Updated consumption summary for *user_id*.
+        """
+        if user_id not in self._consumption:
+            self._consumption[user_id] = {"total_tokens": 0, "by_bot": {}}
+        record = self._consumption[user_id]
+        record["total_tokens"] += tokens_used
+        record["by_bot"][bot_name] = record["by_bot"].get(bot_name, 0) + tokens_used
+
+        if self.billing is not None:
+            self.billing.deduct_tokens(user_id, tokens_used, description)
+
+        self.event_bus.publish(
+            "usage_tracked",
+            {
+                "user_id": user_id,
+                "bot_name": bot_name,
+                "tokens_used": tokens_used,
+                "description": description,
+            },
+        )
+        return self.get_consumption_report(user_id)
+
+    def get_consumption_report(self, user_id: str) -> dict:
+        """Return a consumption summary for *user_id*.
+
+        Returns
+        -------
+        dict
+            Keys: ``user_id``, ``total_tokens``, ``by_bot``, ``balance``
+            (only present when billing is attached).
+        """
+        report: dict = {
+            "user_id": user_id,
+            **self._consumption.get(user_id, {"total_tokens": 0, "by_bot": {}}),
+        }
+        if self.billing is not None:
+            try:
+                report["balance"] = self.billing.get_balance(user_id)
+            except KeyError:
+                pass
+        return report

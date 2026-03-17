@@ -50,6 +50,9 @@ EXCLUDED_FILES: frozenset[str] = frozenset(
         "__init__.py",
         "tiers.py",
         "registry.py",
+        "billing_system.py",
+        "token_manager.py",
+        "subscription_manager.py",
     }
 )
 
