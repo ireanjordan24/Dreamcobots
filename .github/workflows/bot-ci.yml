@@ -1,0 +1,47 @@
+name: Bot CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt flake8
+
+      - name: Smoke test — Government Contract Grant Bot
+        run: |
+          python -c "import sys; sys.path.insert(0, 'bots/government-contract-grant-bot'); import government_contract_grant_bot; print('government_contract_grant_bot: OK')"
+
+      - name: Smoke test — 211 Resource Eligibility Bot
+        run: |
+          python -c "import sys; sys.path.insert(0, 'bots/211-resource-eligibility-bot'); import bot; print('211-resource-eligibility-bot: OK')"
+
+      - name: Smoke test — Selenium Job Application Bot
+        run: |
+          python -c "import sys; sys.path.insert(0, 'bots/selenium-job-application-bot'); import bot; print('selenium-job-application-bot: OK')"
+
+      - name: Smoke test — AI Side Hustle Bot
+        run: |
+          python -c "import sys; sys.path.insert(0, 'bots/ai-side-hustle-bots'); import bot; print('ai-side-hustle-bot: OK')"
+
+      - name: Lint with flake8
+        run: |
+          flake8 bots/ --count --max-line-length=120 --ignore=E501,W503,E241,E302,E401,E402,E741,F401,F541,F841,W292 --statistics --exit-zero
