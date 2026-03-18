@@ -144,6 +144,29 @@ See full documentation in:
 - `bots/ai_chatbot/` — tier-aware AI chatbot built on top of the model integration.
 - `config.json` needs to be configured with required API keys and bot settings.
 
+### `automation-tools`
+- **Workplace Audit Tool** — 5S methodology audit with scoring and recommendations.
+- **Color Palette Generator** — Brand and design palette generation with scheme support.
+- **Smart Meeting Scheduler** — Conflict detection and intelligent meeting scheduling.
+
+### `education-tools`
+- **Recipe Scaling Tool** — Scale recipes for any serving size with unit conversion.
+
+### `healthcare-tools`
+- **Mental Health Screening Bot** — PHQ-2, PHQ-9, and GAD-7 evidence-based screening.
+- **Drug Discovery Pipeline AI** — Lipinski Rule-of-Five, ADMET prediction, docking scores.
+
+### `analytics-elites`
+- **Loyalty Program Impact Simulator** — Model ROI, CLV uplift, and churn reduction.
+- **Predictive Engagement Tool** — Score customer engagement and predict churn risk.
+- **Algorithmic Trading Bot** — SMA crossover, RSI signals, and backtesting engine.
+
+### `real-estate-tools`
+- **Real Estate Cashflow Simulator** — Cashflow, cap rate, CoC return, and portfolio analysis.
+
+### `compliance-tools`
+- Coming soon.
+
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.
 

@@ -42,6 +42,12 @@ BOT_DIRS: tuple[str, ...] = (
     "Occupational_bots",
     "Real_Estate_bots",
     "Fiverr_bots",
+    "automation-tools",
+    "education-tools",
+    "healthcare-tools",
+    "analytics-elites",
+    "real-estate-tools",
+    "compliance-tools",
 )
 
 # Files that are not bot implementations and should be skipped.
