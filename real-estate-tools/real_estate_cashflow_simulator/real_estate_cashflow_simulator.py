@@ -45,7 +45,11 @@ class RealEstateCashflowSimulator:
         n_payments = term * 12
 
         if monthly_rate > 0:
-            mortgage = loan_amount * (monthly_rate * (1 + monthly_rate) ** n_payments) /                        ((1 + monthly_rate) ** n_payments - 1)
+            mortgage = (
+                loan_amount
+                * (monthly_rate * (1 + monthly_rate) ** n_payments)
+                / ((1 + monthly_rate) ** n_payments - 1)
+            )
         else:
             mortgage = loan_amount / n_payments
 
@@ -85,7 +89,12 @@ class RealEstateCashflowSimulator:
         loan = price * (1 - down_pct)
         monthly_rate = rate / 12
         n_payments = term * 12
-        payment = loan * (monthly_rate * (1 + monthly_rate) ** n_payments) /                   ((1 + monthly_rate) ** n_payments - 1) if monthly_rate else loan / n_payments
+        payment = (
+            loan
+            * (monthly_rate * (1 + monthly_rate) ** n_payments)
+            / ((1 + monthly_rate) ** n_payments - 1)
+            if monthly_rate else loan / n_payments
+        )
 
         schedule = []
         balance = loan
