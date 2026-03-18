@@ -11,10 +11,10 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
 _tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
+from datetime import datetime, timedelta
+
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
-
-from datetime import datetime, timedelta
 
 
 class SmartMeetingScheduler:
