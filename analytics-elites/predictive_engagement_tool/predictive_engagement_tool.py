@@ -2,12 +2,17 @@
 """Predictive Engagement Tool - score and predict customer engagement and churn risk."""
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import importlib.util
+_TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
-try:
-    from tiers import TIERS
-except ImportError:
-    from analytics_elites.predictive_engagement_tool.tiers import TIERS
+# Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
+_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_mod = importlib.util.module_from_spec(_tiers_spec)
+_tiers_spec.loader.exec_module(_tiers_mod)
+TIERS = _tiers_mod.TIERS
 
 
 class PredictiveEngagementTool:
