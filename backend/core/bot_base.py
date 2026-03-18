@@ -139,7 +139,8 @@ class BotBase:
     capabilities are available out-of-the-box.
     """
 
-    def __init__(self, bot_name: str = "UnnamedBot"):
+    def __init__(self, bot_name: str = "UnnamedBot", bot_id: str = None):
+        self.bot_id = bot_id or bot_name.lower().replace(" ", "-")
         self.bot_name = bot_name
         self._state = "stopped"
         self._started_at = None
