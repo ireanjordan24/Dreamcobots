@@ -54,10 +54,10 @@ COIN_LIMITS = {
 MINING_COIN_LIMITS = {
     Tier.FREE: ["BTC"],
     Tier.PRO: [
-        "BTC", "ETH", "LTC", "DOGE", "XMR",
+        "BTC", "LTC", "DOGE", "XMR",
         "RVN", "ERG", "FLUX", "KAS", "ZEC",
-        "VTC", "GRIN", "BEAM", "FIRO", "RTM",
-        "CFX", "NEOX", "NEOXA", "ALPH", "IRON",
+        "VTC", "GRIN", "BEAM", "FIRO",
+        "CFX", "ALPH", "AR", "FIL",
     ],
     Tier.ENTERPRISE: None,  # all coins
 }

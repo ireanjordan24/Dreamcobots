@@ -1,5 +1,5 @@
 """
-Cryptocurrency Database — static reference data for 250+ coins.
+Cryptocurrency Database — static reference data for 66+ coins.
 
 Each entry contains:
   symbol          : ticker symbol

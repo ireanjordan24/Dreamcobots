@@ -1,6 +1,6 @@
 # 🪙 Crypto Bot — Dreamcobots Cryptocurrency Management System
 
-A tier-aware cryptocurrency management bot that lets users **mine**, **buy**, **sell**, and **track** cryptocurrencies for profit. Supports 250+ global coins with real-time or simulated price data, a full portfolio tracker, mining simulation, and per-coin prospectus pages.
+A tier-aware cryptocurrency management bot that lets users **mine**, **buy**, **sell**, and **track** cryptocurrencies for profit. Supports 66+ global coins with real-time or simulated price data, a full portfolio tracker, mining simulation, and per-coin prospectus pages.
 
 ---
 
@@ -109,7 +109,7 @@ automatically falls back to simulated prices if the request fails.
 
 ---
 
-## Supported Coins (250+)
+## Supported Coins (66+)
 
 Coins span all major categories:
 
