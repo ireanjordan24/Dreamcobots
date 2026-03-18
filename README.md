@@ -1,9 +1,51 @@
-# DreamCObots Repository
+# DreamCobots Repository
 
-Welcome to the DreamCObots project! This repository outlines our groundbreaking mission to develop and deploy 3000 collaborative robots (cobots) designed for transforming industries worldwide. Explore our documentation, system details, and user guides to understand every aspect of this ambitious endeavor.
+Welcome to **DreamCobots** — a versatile, user-friendly platform for automation and income generation. This repository contains a growing collection of collaborative bots (cobots) designed to automate tasks, generate income, and empower users across multiple industries.
 
 > **Contributors:** All bots must follow the **GLOBAL AI SOURCES FLOW** mandatory architecture.
 > See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
+
+---
+## 🚀 Why DreamCobots?
+
+- **Non-Technical Friendly**: Each bot ships with detailed setup guides and Docker support — no coding required to get started.
+- **Platform Integrations**: All bots support Zapier, N8n, and other SaaS workflows out of the box.
+- **Income Generation**: Bots are designed not just for automation, but to actively generate revenue streams.
+- **Self-Marketing**: Built-in marketing capabilities help bots promote themselves across platforms.
+- **Open & Extensible**: Standardized templates make it easy to add new bots and customize existing ones.
+
+---
+## 🤖 Specialized Bot Categories (`bots/`)
+
+| Bot | Description | Docs |
+|-----|-------------|------|
+| [Government Contract Automation Bot](bots/government-contract-grant-bot/) | Automates SAM.gov contract searches and proposal generation | [README](bots/government-contract-grant-bot/README.md) |
+| [211 Resource Eligibility Bot](bots/211-resource-eligibility-bot/) | Helps users find local social services and check eligibility | [README](bots/211-resource-eligibility-bot/README.md) |
+| [Selenium Job Application Bot](bots/selenium-job-application-bot/) | Automates job searching and applications across Indeed, LinkedIn, Glassdoor | [README](bots/selenium-job-application-bot/README.md) |
+| [AI Side Hustle Bots](bots/ai-side-hustle-bots/) | AI-powered tools to identify, launch, and monetize side hustles | [README](bots/ai-side-hustle-bots/README.md) |
+
+### Quick Start (any bot)
+
+```bash
+# Clone the repo
+git clone https://github.com/ireanjordan24/Dreamcobots.git
+cd Dreamcobots
+
+# Install deps for a specific bot
+pip install -r bots/selenium-job-application-bot/requirements.txt
+
+# Run it
+python bots/selenium-job-application-bot/bot.py
+```
+
+### Docker
+
+```bash
+docker build -t selenium-job-bot bots/selenium-job-application-bot/
+docker run --rm selenium-job-bot
+```
+
+See [MARKETING.md](MARKETING.md) for promotion strategies and platform integration guides (Zapier, N8n, Make.com).
 
 ---
 ## GLOBAL AI SOURCES FLOW — Mandatory Architecture
@@ -101,6 +143,29 @@ See full documentation in:
 - `bots/ai-models-integration/` — tiered AI model integration (free/pro/enterprise).
 - `bots/ai_chatbot/` — tier-aware AI chatbot built on top of the model integration.
 - `config.json` needs to be configured with required API keys and bot settings.
+
+### `automation-tools`
+- **Workplace Audit Tool** — 5S methodology audit with scoring and recommendations.
+- **Color Palette Generator** — Brand and design palette generation with scheme support.
+- **Smart Meeting Scheduler** — Conflict detection and intelligent meeting scheduling.
+
+### `education-tools`
+- **Recipe Scaling Tool** — Scale recipes for any serving size with unit conversion.
+
+### `healthcare-tools`
+- **Mental Health Screening Bot** — PHQ-2, PHQ-9, and GAD-7 evidence-based screening.
+- **Drug Discovery Pipeline AI** — Lipinski Rule-of-Five, ADMET prediction, docking scores.
+
+### `analytics-elites`
+- **Loyalty Program Impact Simulator** — Model ROI, CLV uplift, and churn reduction.
+- **Predictive Engagement Tool** — Score customer engagement and predict churn risk.
+- **Algorithmic Trading Bot** — SMA crossover, RSI signals, and backtesting engine.
+
+### `real-estate-tools`
+- **Real Estate Cashflow Simulator** — Cashflow, cap rate, CoC return, and portfolio analysis.
+
+### `compliance-tools`
+- Coming soon.
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.

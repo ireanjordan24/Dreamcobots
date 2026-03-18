@@ -42,6 +42,12 @@ BOT_DIRS: tuple[str, ...] = (
     "Occupational_bots",
     "Real_Estate_bots",
     "Fiverr_bots",
+    "automation-tools",
+    "education-tools",
+    "healthcare-tools",
+    "analytics-elites",
+    "real-estate-tools",
+    "compliance-tools",
 )
 
 # Files that are not bot implementations and should be skipped.
@@ -50,6 +56,9 @@ EXCLUDED_FILES: frozenset[str] = frozenset(
         "__init__.py",
         "tiers.py",
         "registry.py",
+        "billing_system.py",
+        "token_manager.py",
+        "subscription_manager.py",
     }
 )
 

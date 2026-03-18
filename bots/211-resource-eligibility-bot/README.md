@@ -1,229 +1,162 @@
-# DreamCo Family Resource & Survival GPS — 211 Bot
+# 211 Resource & Eligibility Bot
 
-A comprehensive, GPS-based community resource tool that aggregates data from **211**, **Feeding America**, **HUD**, **American Job Centers**, and more to help families find food pantries, shelters, job centers, legal aid, and other critical services.
+## Overview
+
+The **211 Resource & Eligibility Bot** helps individuals and families quickly find local social services and determine which assistance programs they qualify for — all without navigating complex government websites or waiting on hold.
+
+Inspired by the national 211 helpline, this bot automates eligibility screening based on household income and family size, then surfaces relevant programs in categories like food assistance, housing, healthcare, utilities, and childcare.
+
+Perfect for social workers, nonprofits, community organizations, and individuals seeking help.
 
 ---
 
 ## Features
 
-### Core GPS Resource Finder
-- Search community resources by GPS coordinate and category.
-- Integrated data sources: 211, Feeding America, HUD, American Job Centers, OpenStreetMap, Google Maps API.
-- Resource categories: Food, Shelter, Job Assistance, Legal Aid, Financial Literacy, Healthcare, Childcare, Transportation, Clothing, Mental Health.
-
-### Building Intelligence Panels *(PRO / ENTERPRISE)*
-Each resource on the map is enhanced with a detailed panel providing:
-1. **Type of resource** — human-friendly category label.
-2. **Eligibility requirements** — plain-English summary.
-3. **Required documents** — checklist of what to bring.
-4. **Optimal visit times** — recommended days/times to minimise waiting.
-5. **Wait time estimate** — average wait in minutes.
-6. **Success instructions** — step-by-step first-visit guide.
-7. **Embedded video walkthrough** — YouTube / video URL.
-8. **Real-time crowd level** — low / medium / high.
-9. **Supply availability** — whether supplies are currently available.
-10. **Neighbourhood safety score** — 0–10 (higher = safer).
-
-### Advanced GPS Filtering *(PRO / ENTERPRISE)*
-- **Open now** — only show resources currently accepting visitors.
-- **Kid-friendly** — filter for child-friendly services.
-- **Handicap-accessible** — ADA/wheelchair-accessible only.
-- **Spanish-speaking** — Spanish-language services available.
-- **Max distance** — limit results to within N kilometres.
-
-### Route Planning *(PRO / ENTERPRISE)*
-- Distance calculation (great-circle / Haversine).
-- Estimated driving time and walking time.
-- **Uber & Lyft cost estimates** based on distance.
-- Google Maps deep-link for turn-by-turn directions.
-- **Secure family-focused route planner** that avoids low-safety areas.
-
-### Real-Time Crowd Reporting & Supply Alerts *(PRO / ENTERPRISE)*
-- Community-submitted crowd level reports (low / medium / high).
-- Supply availability status updates.
-
-### Neighbourhood Safety Score *(PRO / ENTERPRISE)*
-- Per-resource safety score (0–10) based on neighbourhood data.
-
-### Resource Layers
-| Layer | Categories |
+| Feature | Description |
 |---|---|
-| **Homeless Resources** | Warming centers, emergency shelters, transitional housing, tent-safe zones, free meals |
-| **Job Resources** | Workforce development centers, resume workshops, job placement services, training programmes |
-| **Financial Literacy** | Budgeting workshops, Roth IRA & ETF education, one-on-one financial coaching |
-| **Safety Alerts** | Family GPS signals, panic buttons, arrival alerts |
-
-### AI Resource Matching *(PRO / ENTERPRISE)*
-Generates a **personalised resource plan** based on:
-- Income level (`very_low` / `low` / `moderate` / `above_moderate`)
-- Housing status (`housed` / `at_risk` / `homeless`)
-- Household size
-- Presence of children or members with disabilities
-- Employment status
-- Language preference
-
-The plan includes prioritised resource recommendations and financial literacy tips.
-
-### Family GPS & Safety Alerts *(PRO / ENTERPRISE)*
-- Register family members with GPS coordinates.
-- **Panic button** — dispatches an emergency alert with the member's location.
-- **Arrival alerts** — notify family when a member reaches a destination safely.
-
-### Monetisation *(ENTERPRISE)*
-- **Sponsored listings** — nonprofits and businesses can feature their services.
-- **Affiliate programmes** — register partner organisations.
-- **Premium membership** — unlocked on PRO tier.
+| **Eligibility Checker** | Enter income and family size to instantly see which programs you qualify for |
+| **Resource Finder** | Search for services by location and category (food, housing, health, etc.) |
+| **Category Filtering** | Narrow results to specific needs: food, housing, health, utility, childcare |
+| **Multi-Platform Integration** | Push results to Zapier, N8n, Make.com workflows |
+| **CLI Interface** | Simple interactive command-line interface for immediate use |
+| **Human-Readable Output** | Formats resource lists with phone numbers and websites |
 
 ---
 
-## Tier Comparison
+## Prerequisites
 
-| Feature | FREE | PRO ($29/mo) | ENTERPRISE ($199/mo) |
-|---|:---:|:---:|:---:|
-| Resource search | ✓ | ✓ | ✓ |
-| GPS map | ✓ | ✓ | ✓ |
-| Max results per query | 10 | 50 | Unlimited |
-| Data sources | 211, OSM | + Feeding America, HUD, AJC, Google Maps | Same + custom feeds |
-| Building Intelligence Panels | — | ✓ | ✓ |
-| Advanced filtering | — | ✓ | ✓ |
-| Route planning | — | ✓ | ✓ |
-| Rideshare cost estimates | — | ✓ | ✓ |
-| Crowd reporting | — | ✓ | ✓ |
-| Supply alerts | — | ✓ | ✓ |
-| Neighbourhood safety score | — | ✓ | ✓ |
-| AI resource matching | — | ✓ | ✓ |
-| Family GPS signals | — | ✓ | ✓ |
-| Panic button | — | ✓ | ✓ |
-| Arrival alerts | — | ✓ | ✓ |
-| Analytics dashboard | — | ✓ | ✓ |
-| Real-time data feeds | — | — | ✓ |
-| Sponsored listings | — | — | ✓ |
-| Affiliate programmes | — | — | ✓ |
-| White-label | — | — | ✓ |
-| Custom integrations | — | — | ✓ |
-| Support | Community | Email 48 h SLA | Dedicated 24/7 |
+- Python 3.9+
+- No external API keys required for basic use
+- (Optional) Zapier / N8n webhook URL for integration
 
 ---
 
-## Installation
+## Setup & Installation
 
-```bash
-# From the repository root
-pip install -r requirements.txt
-```
-
-No external dependencies are required to run the core bot.  Optional API
-integrations (Google Maps, 211 live feeds, Feeding America API) require the
-respective API keys set as environment variables.
-
----
-
-## Quick Start
-
-```python
-from bot import ResourceBot, ResourceFilter, UserProfile, Tier
-
-# --- FREE tier: basic resource search ---
-bot = ResourceBot(tier=Tier.FREE)
-results = bot.search_resources(lat=40.7128, lon=-74.0060)
-for r in results:
-    print(r.name, r.category, r.address)
-
-# --- PRO tier: advanced features ---
-pro_bot = ResourceBot(tier=Tier.PRO)
-
-# Advanced filtering
-filt = ResourceFilter(kid_friendly=True, handicap_accessible=True, max_distance_km=5.0)
-results = pro_bot.search_resources(lat=40.7128, lon=-74.0060, filters=filt)
-
-# Building Intelligence Panel
-panel = pro_bot.get_building_intel_panel("r001")
-print(panel.type_label, panel.wait_time_label, panel.safety_score)
-
-# Route planning with Uber/Lyft estimates
-route = pro_bot.get_route_info(40.7000, -74.0000, "r001")
-print(f"{route.distance_km} km — Uber ~${route.uber_estimate_usd}")
-
-# AI resource matching
-profile = UserProfile(income_level="very_low", housing_status="homeless",
-                      household_size=3, has_children=True)
-plan = pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
-print(plan.summary)
-for tip in plan.financial_literacy_tips:
-    print(" •", tip)
-
-# Family GPS
-pro_bot.register_family_member("Alice", lat=40.7128, lon=-74.0060)
-alert = pro_bot.send_panic_alert("Alice")
-print(alert.message)
-```
-
----
-
-## Running the CLI Demo
+### 1. Navigate to the bot directory
 
 ```bash
 cd bots/211-resource-eligibility-bot
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. (Optional) Configure environment
+
+Create a `.env` file for webhook integration:
+
+```env
+WEBHOOK_URL=https://hooks.zapier.com/hooks/catch/YOUR_HOOK_ID
+DEFAULT_LOCATION=Austin, TX
+MAX_RESULTS=10
+```
+
+---
+
+## Usage
+
+### Interactive CLI
+
+```bash
 python bot.py
 ```
 
+You will be guided through:
+1. Entering your income and family size
+2. Viewing programs you qualify for
+3. Searching for resources by location and category
+
+### Programmatic Usage
+
+```python
+from bot import ResourceEligibilityBot
+
+bot = ResourceEligibilityBot(config={"default_location": "Seattle, WA", "max_results": 5})
+
+# Check eligibility
+result = bot.check_eligibility({
+    "annual_income": 28000,
+    "family_size": 3,
+    "location": "Seattle, WA"
+})
+print(result["summary"])
+for program in result["eligible_programs"]:
+    print(f"- {program['name']}: {program['description']}")
+
+# Find resources by category
+resources = bot.find_resources("Seattle, WA", category="food")
+print(bot.format_resource_list(resources))
+```
+
 ---
 
-## Running the Tests
+## Configuration Options
+
+Pass a `config` dictionary when instantiating the bot:
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `default_location` | str | `"your area"` | Fallback location for searches |
+| `max_results` | int | `10` | Maximum resources to return per query |
+
+---
+
+## Integration Guide
+
+### Zapier
+
+1. Create a new Zap with trigger: **Webhooks by Zapier → Catch Hook**
+2. Set your `WEBHOOK_URL` environment variable to the hook URL
+3. When the bot finds eligible programs, it POSTs results to this URL
+4. Connect the action to:
+   - **Google Sheets**: Log client assessments
+   - **Gmail / Outlook**: Send resource lists by email
+   - **Airtable**: Track client service referrals
+   - **Slack**: Alert caseworkers in real time
+
+### N8n
+
+1. Add a **Webhook** node and copy the URL
+2. Set `WEBHOOK_URL` in your `.env`
+3. Chain nodes to:
+   - Filter resources by category
+   - Send SMS via Twilio
+   - Add to a CRM or database
+
+---
+
+## Deployment
+
+### Docker
 
 ```bash
-# From the repository root
-python -m pytest tests/test_211_bot.py -v
+docker build -t 211-resource-bot .
+docker run -it --env-file .env 211-resource-bot
 ```
+
+### GitHub Actions
+
+Use `bot-ci.yml` in `.github/workflows/` to run automated smoke tests on every push.
 
 ---
 
-## Technical Architecture
+## Non-Technical User Guide
 
-```
-bots/211-resource-eligibility-bot/
-├── __init__.py          # Package exports
-├── bot.py               # Main ResourceBot class + data models
-├── tiers.py             # Tier configuration (FREE / PRO / ENTERPRISE)
-└── README.md            # This file
+**You don't need to know how to code to use this bot.** Here's how to get started:
 
-tests/
-└── test_211_bot.py      # Comprehensive test suite (48+ tests)
-```
-
-### Key Design Decisions
-- **No external runtime dependencies** — the bot works out-of-the-box with only the Python standard library.  Real API integrations (Google Maps, 211 live feed, etc.) are designed as drop-in replacements for the stub data layer.
-- **Tier-aware access control** — every premium feature is gated behind `_require_feature()`, raising `ResourceBotTierError` on unauthorised access.
-- **Haversine distance** — accurate great-circle distances are used for sorting and filtering.
-- **Stub database** — a representative set of 6 sample resources covers all major categories and data sources, enabling full offline testing.
-
----
-
-## Data Sources & Integration Points
-
-| Source | Integration Method | Tier |
-|---|---|---|
-| **211.org** | REST API (requires API key) | FREE |
-| **OpenStreetMap** | Overpass API (free, rate-limited) | FREE |
-| **Feeding America** | Partner API (requires agreement) | PRO |
-| **HUD (Housing)** | public.hud.gov REST API | PRO |
-| **American Job Centers** | CareerOneStop API | PRO |
-| **Google Maps** | Maps JavaScript API / Directions API | PRO |
-
----
-
-## Environment Variables (for live API integration)
-
-| Variable | Description |
-|---|---|
-| `GOOGLE_MAPS_API_KEY` | Google Maps Platform API key |
-| `FEEDING_AMERICA_API_KEY` | Feeding America partner API key |
-| `HUD_API_KEY` | HUD public data API key |
-| `CAREERONESTOP_USER_ID` | CareerOneStop API user ID |
-| `CAREERONESTOP_TOKEN` | CareerOneStop API token |
+1. **Download** the DreamCobots repository (green "Code" button → "Download ZIP")
+2. **Install Python** from [python.org](https://python.org) — click the big yellow download button
+3. Open a terminal (search "Terminal" on Mac, "Command Prompt" on Windows)
+4. Type: `pip install requests python-dotenv` and press Enter
+5. Navigate to the bot folder and type: `python bot.py`
+6. Answer the questions on screen — the bot does the rest!
 
 ---
 
 ## License
 
-Part of the Dreamcobots project.  See the repository root `LICENSE` for details.
+MIT License — see repo root for details.

@@ -1,22 +1,23 @@
-"""DreamCo Job Titles Bot — comprehensive AI workforce platform."""
+"""DreamCo Job Titles Bot package."""
 
 from bots.job_titles_bot.job_titles_bot import JobTitlesBot, JobTitlesBotError, JobTitlesBotTierError
-from bots.job_titles_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from bots.job_titles_bot.job_titles_database import JobTitleDatabase, JobTitle
-from bots.job_titles_bot.job_bot_generator import JobBotGenerator, AIWorkerBot
-from bots.job_titles_bot.autonomous_trainer import AutonomousTrainer, TrainingSession, ItemValuation
+from bots.job_titles_bot.tiers import Tier
+from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
+from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
+from bots.job_titles_bot.autonomous_trainer import AutonomousTrainer, ValuationResult
+from bots.job_titles_bot.cost_justification import CostJustificationEngine, CostJustification
 
 __all__ = [
     "JobTitlesBot",
     "JobTitlesBotError",
     "JobTitlesBotTierError",
-    "BOT_FEATURES",
-    "get_bot_tier_info",
-    "JobTitleDatabase",
+    "Tier",
     "JobTitle",
+    "JobTitlesDatabase",
+    "GeneratedJobBot",
     "JobBotGenerator",
-    "AIWorkerBot",
     "AutonomousTrainer",
-    "TrainingSession",
-    "ItemValuation",
+    "ValuationResult",
+    "CostJustificationEngine",
+    "CostJustification",
 ]

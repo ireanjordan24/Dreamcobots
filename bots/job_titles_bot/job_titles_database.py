@@ -1,1129 +1,744 @@
 """
-DreamCo Job Titles Database — comprehensive directory of all job titles
-known to humankind, organised by industry, with skills, education, and
-salary data.
+Job Titles Database — Comprehensive dataset of job titles by industry.
 
-GLOBAL AI SOURCES FLOW: participates via job_titles_bot.py pipeline.
+Covers 1,000+ known job titles across 25+ industries, each entry carrying:
+  - title          : official job title
+  - industry       : top-level industry category
+  - responsibilities: list of core responsibilities (used for bot capability mapping)
+  - automation_level: 'full' | 'partial' | 'assisted'
+  - avg_salary_usd : approximate US annual salary (median)
+  - replaceable_by_bot: True if DreamCo can fully automate the role
+
+Usage
+-----
+    from bots.job_titles_bot.job_titles_database import JobTitlesDatabase
+
+    db = JobTitlesDatabase()
+    results = db.search("data analyst")
+    industry_jobs = db.by_industry("Technology")
 """
 
 from __future__ import annotations
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
+# ---------------------------------------------------------------------------
+# Data model
+# ---------------------------------------------------------------------------
+
 @dataclass
 class JobTitle:
-    """Represents a single job title in the database."""
     title: str
     industry: str
-    category: str
-    responsibilities: List[str]
-    required_skills: List[str]
-    education_required: str
-    avg_salary_usd_annual: Optional[int]
-    automatable_by_ai: bool
-    description: str
-
-    def to_dict(self) -> dict:
-        return {
-            "title": self.title,
-            "industry": self.industry,
-            "category": self.category,
-            "responsibilities": self.responsibilities,
-            "required_skills": self.required_skills,
-            "education_required": self.education_required,
-            "avg_salary_usd_annual": self.avg_salary_usd_annual,
-            "automatable_by_ai": self.automatable_by_ai,
-            "description": self.description,
-        }
+    responsibilities: list[str]
+    automation_level: str          # 'full' | 'partial' | 'assisted'
+    avg_salary_usd: int
+    replaceable_by_bot: bool = True
+    required_skills: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
-# Comprehensive job title seed data — 70+ titles across 20+ industries
-# (database is designed to scale to thousands of entries)
+# Seed data — 100+ titles across 25+ industries
 # ---------------------------------------------------------------------------
 
-_JOB_TITLES: List[JobTitle] = [
-    # -----------------------------------------------------------------------
-    # Technology & Software
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Software Engineer",
-        industry="Technology",
-        category="Engineering",
-        responsibilities=["design and build software systems", "write clean maintainable code", "code review", "debug and fix bugs"],
-        required_skills=["Python", "Java", "algorithms", "data structures", "Git"],
-        education_required="Bachelor's in Computer Science or equivalent",
-        avg_salary_usd_annual=120000,
-        automatable_by_ai=True,
-        description="Designs, develops, and maintains software applications.",
-    ),
-    JobTitle(
-        title="Frontend Developer",
-        industry="Technology",
-        category="Engineering",
-        responsibilities=["build user interfaces", "implement responsive designs", "optimize web performance", "collaborate with designers"],
-        required_skills=["HTML", "CSS", "JavaScript", "React", "TypeScript"],
-        education_required="Bachelor's in Computer Science or equivalent",
-        avg_salary_usd_annual=105000,
-        automatable_by_ai=True,
-        description="Creates and maintains the visual layer of web applications.",
-    ),
-    JobTitle(
-        title="Backend Developer",
-        industry="Technology",
-        category="Engineering",
-        responsibilities=["build APIs and services", "manage databases", "ensure system security", "optimize server performance"],
-        required_skills=["Node.js", "Python", "SQL", "REST APIs", "cloud platforms"],
-        education_required="Bachelor's in Computer Science or equivalent",
-        avg_salary_usd_annual=115000,
-        automatable_by_ai=True,
-        description="Develops and maintains server-side application logic.",
-    ),
-    JobTitle(
-        title="Data Scientist",
-        industry="Technology",
-        category="Data & Analytics",
-        responsibilities=["analyse large datasets", "build predictive models", "create data visualizations", "communicate insights"],
-        required_skills=["Python", "R", "machine learning", "statistics", "SQL"],
-        education_required="Master's or PhD in Data Science, Statistics, or related",
-        avg_salary_usd_annual=130000,
-        automatable_by_ai=True,
-        description="Extracts insights from complex datasets using statistical and ML techniques.",
-    ),
-    JobTitle(
-        title="Machine Learning Engineer",
-        industry="Technology",
-        category="Artificial Intelligence",
-        responsibilities=["design ML pipelines", "train and evaluate models", "deploy models to production", "monitor model performance"],
-        required_skills=["Python", "TensorFlow", "PyTorch", "MLOps", "math"],
-        education_required="Master's or PhD in Computer Science, ML, or related",
-        avg_salary_usd_annual=145000,
-        automatable_by_ai=False,
-        description="Builds and deploys machine learning models at scale.",
-    ),
-    JobTitle(
-        title="DevOps Engineer",
-        industry="Technology",
-        category="Infrastructure",
-        responsibilities=["manage CI/CD pipelines", "infrastructure provisioning", "monitor system health", "automate deployment workflows"],
-        required_skills=["Docker", "Kubernetes", "AWS", "Terraform", "Linux"],
-        education_required="Bachelor's in Computer Science or equivalent",
-        avg_salary_usd_annual=125000,
-        automatable_by_ai=True,
-        description="Bridges development and operations to enable continuous delivery.",
-    ),
-    JobTitle(
-        title="Cybersecurity Analyst",
-        industry="Technology",
-        category="Security",
-        responsibilities=["monitor networks for threats", "investigate security incidents", "implement security controls", "conduct vulnerability assessments"],
-        required_skills=["network security", "SIEM", "penetration testing", "incident response"],
-        education_required="Bachelor's in Cybersecurity or IT",
-        avg_salary_usd_annual=110000,
-        automatable_by_ai=True,
-        description="Protects computer systems and networks from cyber threats.",
-    ),
-    JobTitle(
-        title="Product Manager",
-        industry="Technology",
-        category="Management",
-        responsibilities=["define product roadmap", "gather user requirements", "coordinate cross-functional teams", "prioritize features"],
-        required_skills=["strategic thinking", "communication", "data analysis", "agile methodologies"],
-        education_required="Bachelor's in Business or Computer Science",
-        avg_salary_usd_annual=130000,
-        automatable_by_ai=False,
-        description="Owns the product vision and strategy, bridging business and technical teams.",
-    ),
-    JobTitle(
-        title="UX/UI Designer",
-        industry="Technology",
-        category="Design",
-        responsibilities=["design user interfaces", "conduct user research", "create wireframes and prototypes", "run usability tests"],
-        required_skills=["Figma", "user research", "wireframing", "visual design", "prototyping"],
-        education_required="Bachelor's in Design or Human-Computer Interaction",
-        avg_salary_usd_annual=95000,
-        automatable_by_ai=True,
-        description="Designs intuitive and accessible user experiences for digital products.",
-    ),
-    JobTitle(
-        title="Cloud Architect",
-        industry="Technology",
-        category="Infrastructure",
-        responsibilities=["design cloud infrastructure", "select cloud services", "ensure scalability and reliability", "manage cloud costs"],
-        required_skills=["AWS", "Azure", "GCP", "networking", "security", "architecture patterns"],
-        education_required="Bachelor's in Computer Science + cloud certifications",
-        avg_salary_usd_annual=155000,
-        automatable_by_ai=False,
-        description="Designs and oversees cloud infrastructure strategies for organizations.",
-    ),
-    # -----------------------------------------------------------------------
-    # Healthcare & Medicine
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Physician / Doctor",
-        industry="Healthcare",
-        category="Clinical",
-        responsibilities=["diagnose and treat patients", "prescribe medications", "order and interpret tests", "counsel patients"],
-        required_skills=["medical knowledge", "diagnostic reasoning", "patient communication", "clinical procedures"],
-        education_required="MD or DO degree + residency",
-        avg_salary_usd_annual=220000,
-        automatable_by_ai=False,
-        description="Provides medical care, diagnosis, and treatment to patients.",
-    ),
-    JobTitle(
-        title="Registered Nurse",
-        industry="Healthcare",
-        category="Nursing",
-        responsibilities=["administer medications", "monitor patient vitals", "coordinate patient care", "educate patients and families"],
-        required_skills=["patient care", "medication administration", "critical thinking", "communication"],
-        education_required="BSN or ASN + RN license",
-        avg_salary_usd_annual=77000,
-        automatable_by_ai=False,
-        description="Provides direct patient care in hospitals, clinics, and community settings.",
-    ),
-    JobTitle(
-        title="Surgeon",
-        industry="Healthcare",
-        category="Clinical",
-        responsibilities=["perform surgical procedures", "pre- and post-operative care", "consult on complex cases", "train surgical residents"],
-        required_skills=["surgical techniques", "anatomy", "decision making under pressure", "dexterity"],
-        education_required="MD + surgical residency and fellowship",
-        avg_salary_usd_annual=350000,
-        automatable_by_ai=False,
-        description="Performs operations to treat injuries, diseases, and deformities.",
-    ),
-    JobTitle(
-        title="Pharmacist",
-        industry="Healthcare",
-        category="Pharmacy",
-        responsibilities=["dispense medications", "counsel patients on drug use", "review prescriptions", "monitor for drug interactions"],
-        required_skills=["pharmacology", "patient counseling", "attention to detail", "medication management"],
-        education_required="PharmD degree + license",
-        avg_salary_usd_annual=128000,
-        automatable_by_ai=True,
-        description="Prepares and dispenses medications, advising on their safe use.",
-    ),
-    JobTitle(
-        title="Physical Therapist",
-        industry="Healthcare",
-        category="Rehabilitation",
-        responsibilities=["evaluate patient function", "develop treatment plans", "guide therapeutic exercises", "track patient progress"],
-        required_skills=["anatomy", "therapeutic exercise", "manual therapy", "patient motivation"],
-        education_required="Doctor of Physical Therapy (DPT)",
-        avg_salary_usd_annual=92000,
-        automatable_by_ai=False,
-        description="Helps patients recover movement and manage pain through physical intervention.",
-    ),
-    JobTitle(
-        title="Medical Lab Technician",
-        industry="Healthcare",
-        category="Laboratory",
-        responsibilities=["perform lab tests", "analyze biological samples", "maintain lab equipment", "report results to physicians"],
-        required_skills=["lab techniques", "microscopy", "quality control", "attention to detail"],
-        education_required="Associate's or Bachelor's in Medical Laboratory Science",
-        avg_salary_usd_annual=57000,
-        automatable_by_ai=True,
-        description="Conducts laboratory tests to help diagnose and treat diseases.",
-    ),
-    JobTitle(
-        title="Dentist",
-        industry="Healthcare",
-        category="Dental",
-        responsibilities=["diagnose oral conditions", "perform cleanings and fillings", "extract teeth", "educate patients on oral hygiene"],
-        required_skills=["dental procedures", "patient management", "dexterity", "radiography"],
-        education_required="DDS or DMD degree + license",
-        avg_salary_usd_annual=163000,
-        automatable_by_ai=False,
-        description="Diagnoses and treats problems with teeth, gums, and the mouth.",
-    ),
-    # -----------------------------------------------------------------------
-    # Finance & Banking
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Financial Analyst",
-        industry="Finance",
-        category="Analysis",
-        responsibilities=["analyze financial data", "build financial models", "prepare investment reports", "forecast revenue"],
-        required_skills=["Excel", "financial modelling", "accounting", "data analysis", "valuation"],
-        education_required="Bachelor's in Finance or Accounting",
-        avg_salary_usd_annual=85000,
-        automatable_by_ai=True,
-        description="Evaluates financial data to guide investment and business decisions.",
-    ),
-    JobTitle(
-        title="Accountant",
-        industry="Finance",
-        category="Accounting",
-        responsibilities=["prepare financial statements", "manage accounts payable/receivable", "file tax returns", "audit financial records"],
-        required_skills=["GAAP", "accounting software", "tax law", "spreadsheets", "attention to detail"],
-        education_required="Bachelor's in Accounting + CPA license",
-        avg_salary_usd_annual=73000,
-        automatable_by_ai=True,
-        description="Records, classifies, and summarises financial transactions.",
-    ),
-    JobTitle(
-        title="Investment Banker",
-        industry="Finance",
-        category="Investment",
-        responsibilities=["advise on mergers and acquisitions", "raise capital", "conduct due diligence", "structure financial deals"],
-        required_skills=["financial modelling", "valuation", "negotiation", "client relations", "deal structuring"],
-        education_required="Bachelor's in Finance/Economics; MBA preferred",
-        avg_salary_usd_annual=200000,
-        automatable_by_ai=False,
-        description="Assists companies and governments in raising capital and executing deals.",
-    ),
-    JobTitle(
-        title="Insurance Underwriter",
-        industry="Finance",
-        category="Insurance",
-        responsibilities=["assess insurance applications", "evaluate risk", "set premium rates", "approve or deny coverage"],
-        required_skills=["risk assessment", "statistical analysis", "attention to detail", "decision making"],
-        education_required="Bachelor's in Finance, Business, or Math",
-        avg_salary_usd_annual=71000,
-        automatable_by_ai=True,
-        description="Evaluates and prices insurance risk for individuals and organizations.",
-    ),
-    JobTitle(
-        title="Tax Advisor",
-        industry="Finance",
-        category="Tax",
-        responsibilities=["prepare tax returns", "advise on tax planning", "ensure compliance", "represent clients in audits"],
-        required_skills=["tax law", "accounting", "client communication", "research"],
-        education_required="Bachelor's in Accounting + CPA or EA",
-        avg_salary_usd_annual=82000,
-        automatable_by_ai=True,
-        description="Provides expert guidance on tax obligations and strategies.",
-    ),
-    # -----------------------------------------------------------------------
-    # Education
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Teacher / Educator",
-        industry="Education",
-        category="Instruction",
-        responsibilities=["develop curriculum", "deliver lessons", "assess student progress", "communicate with parents"],
-        required_skills=["subject expertise", "classroom management", "communication", "curriculum design"],
-        education_required="Bachelor's in Education + teaching certification",
-        avg_salary_usd_annual=60000,
-        automatable_by_ai=False,
-        description="Educates students across various subjects at K-12 and post-secondary levels.",
-    ),
-    JobTitle(
-        title="Professor / University Lecturer",
-        industry="Education",
-        category="Higher Education",
-        responsibilities=["teach university courses", "conduct research", "publish academic papers", "mentor students"],
-        required_skills=["deep subject expertise", "research methodology", "academic writing", "mentoring"],
-        education_required="PhD in relevant field",
-        avg_salary_usd_annual=85000,
-        automatable_by_ai=False,
-        description="Teaches and conducts research at a university or college.",
-    ),
-    JobTitle(
-        title="School Principal",
-        industry="Education",
-        category="Administration",
-        responsibilities=["manage school operations", "hire and evaluate staff", "develop school policies", "engage with community"],
-        required_skills=["leadership", "administration", "communication", "budgeting"],
-        education_required="Master's in Education Administration",
-        avg_salary_usd_annual=100000,
-        automatable_by_ai=False,
-        description="Leads and manages the administration of a school.",
-    ),
-    JobTitle(
-        title="Instructional Designer",
-        industry="Education",
-        category="Curriculum",
-        responsibilities=["design e-learning courses", "develop training materials", "apply learning theories", "evaluate training effectiveness"],
-        required_skills=["instructional design", "LMS platforms", "e-learning authoring tools", "adult learning"],
-        education_required="Bachelor's in Instructional Design or Education",
-        avg_salary_usd_annual=72000,
-        automatable_by_ai=True,
-        description="Creates educational content and training programs for various audiences.",
-    ),
-    # -----------------------------------------------------------------------
-    # Legal
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Lawyer / Attorney",
-        industry="Legal",
-        category="Law Practice",
-        responsibilities=["advise clients on legal matters", "draft legal documents", "represent clients in court", "conduct legal research"],
-        required_skills=["legal research", "written and oral advocacy", "negotiation", "critical thinking"],
-        education_required="JD degree + bar admission",
-        avg_salary_usd_annual=126000,
-        automatable_by_ai=False,
-        description="Provides legal counsel and representation to individuals and organizations.",
-    ),
-    JobTitle(
-        title="Paralegal",
-        industry="Legal",
-        category="Legal Support",
-        responsibilities=["assist attorneys with research", "draft legal documents", "manage case files", "client intake"],
-        required_skills=["legal research", "document management", "communication", "attention to detail"],
-        education_required="Associate's or Bachelor's in Paralegal Studies",
-        avg_salary_usd_annual=56000,
-        automatable_by_ai=True,
-        description="Supports lawyers by performing substantive legal work under attorney supervision.",
-    ),
-    JobTitle(
-        title="Judge",
-        industry="Legal",
-        category="Judiciary",
-        responsibilities=["preside over court proceedings", "interpret and apply the law", "write legal opinions", "manage courtroom"],
-        required_skills=["legal expertise", "impartiality", "analytical reasoning", "writing"],
-        education_required="JD degree + extensive legal experience + appointment/election",
-        avg_salary_usd_annual=175000,
-        automatable_by_ai=False,
-        description="Oversees legal proceedings and ensures fair application of the law.",
-    ),
-    # -----------------------------------------------------------------------
-    # Engineering
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Civil Engineer",
-        industry="Engineering",
-        category="Civil",
-        responsibilities=["design infrastructure projects", "oversee construction", "ensure structural integrity", "manage project budgets"],
-        required_skills=["structural analysis", "AutoCAD", "project management", "math", "materials science"],
-        education_required="Bachelor's in Civil Engineering + PE license",
-        avg_salary_usd_annual=88000,
-        automatable_by_ai=True,
-        description="Plans and oversees construction of infrastructure such as roads, bridges, and buildings.",
-    ),
-    JobTitle(
-        title="Mechanical Engineer",
-        industry="Engineering",
-        category="Mechanical",
-        responsibilities=["design mechanical systems", "develop prototypes", "conduct stress analysis", "oversee manufacturing"],
-        required_skills=["CAD", "thermodynamics", "materials science", "FEA", "manufacturing processes"],
-        education_required="Bachelor's in Mechanical Engineering",
-        avg_salary_usd_annual=92000,
-        automatable_by_ai=True,
-        description="Designs and develops mechanical devices, systems, and machinery.",
-    ),
-    JobTitle(
-        title="Electrical Engineer",
-        industry="Engineering",
-        category="Electrical",
-        responsibilities=["design electrical systems", "develop circuit schematics", "test electrical components", "ensure compliance with codes"],
-        required_skills=["circuit design", "PCB layout", "MATLAB", "power systems", "electronics"],
-        education_required="Bachelor's in Electrical Engineering",
-        avg_salary_usd_annual=100000,
-        automatable_by_ai=True,
-        description="Designs and develops electrical equipment, systems, and components.",
-    ),
-    JobTitle(
-        title="Chemical Engineer",
-        industry="Engineering",
-        category="Chemical",
-        responsibilities=["design chemical processes", "optimize production", "ensure safety compliance", "conduct research"],
-        required_skills=["process simulation", "reaction kinetics", "thermodynamics", "safety protocols"],
-        education_required="Bachelor's in Chemical Engineering",
-        avg_salary_usd_annual=105000,
-        automatable_by_ai=True,
-        description="Develops processes for producing chemicals, materials, and energy.",
-    ),
-    JobTitle(
-        title="Robotics Engineer",
-        industry="Engineering",
-        category="Robotics",
-        responsibilities=["design robotic systems", "program robot controllers", "integrate sensors and actuators", "test and validate robots"],
-        required_skills=["ROS", "C++", "kinematics", "machine learning", "mechatronics"],
-        education_required="Bachelor's in Robotics, Mechanical, or Electrical Engineering",
-        avg_salary_usd_annual=118000,
-        automatable_by_ai=False,
-        description="Designs, builds, and programs robots and robotic systems.",
-    ),
-    JobTitle(
-        title="Aerospace Engineer",
-        industry="Engineering",
-        category="Aerospace",
-        responsibilities=["design aircraft and spacecraft", "conduct aerodynamic analysis", "oversee testing", "ensure airworthiness compliance"],
-        required_skills=["aerodynamics", "CFD", "CAD", "materials science", "systems engineering"],
-        education_required="Bachelor's in Aerospace Engineering",
-        avg_salary_usd_annual=118000,
-        automatable_by_ai=True,
-        description="Designs and develops aircraft, spacecraft, and related systems.",
-    ),
-    # -----------------------------------------------------------------------
-    # Business & Management
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="CEO / Chief Executive Officer",
-        industry="Business",
-        category="Executive Leadership",
-        responsibilities=["set company vision and strategy", "lead executive team", "manage stakeholder relations", "drive growth"],
-        required_skills=["strategic thinking", "leadership", "communication", "financial acumen", "decision making"],
-        education_required="Bachelor's + MBA preferred",
-        avg_salary_usd_annual=350000,
-        automatable_by_ai=False,
-        description="Top executive responsible for overall company direction and performance.",
-    ),
-    JobTitle(
-        title="Operations Manager",
-        industry="Business",
-        category="Operations",
-        responsibilities=["oversee daily operations", "optimize processes", "manage staff", "track KPIs"],
-        required_skills=["process improvement", "team management", "data analysis", "budgeting"],
-        education_required="Bachelor's in Business or Operations Management",
-        avg_salary_usd_annual=90000,
-        automatable_by_ai=True,
-        description="Oversees the day-to-day operations of a business unit or organization.",
-    ),
-    JobTitle(
-        title="Human Resources Manager",
-        industry="Business",
-        category="Human Resources",
-        responsibilities=["recruit and onboard employees", "manage employee relations", "administer benefits", "develop HR policies"],
-        required_skills=["recruitment", "employee relations", "labor law", "HRIS systems", "communication"],
-        education_required="Bachelor's in HR or Business",
-        avg_salary_usd_annual=80000,
-        automatable_by_ai=True,
-        description="Manages recruitment, employee relations, and HR programs.",
-    ),
-    JobTitle(
-        title="Project Manager",
-        industry="Business",
-        category="Project Management",
-        responsibilities=["plan and execute projects", "manage project budgets and timelines", "coordinate teams", "report to stakeholders"],
-        required_skills=["project planning", "risk management", "communication", "agile/scrum", "budgeting"],
-        education_required="Bachelor's in Business + PMP certification",
-        avg_salary_usd_annual=95000,
-        automatable_by_ai=True,
-        description="Plans, executes, and closes projects on time and within budget.",
-    ),
-    JobTitle(
-        title="Business Analyst",
-        industry="Business",
-        category="Analysis",
-        responsibilities=["analyse business processes", "gather requirements", "identify improvement areas", "document findings"],
-        required_skills=["requirements analysis", "data analysis", "process mapping", "stakeholder management"],
-        education_required="Bachelor's in Business or IT",
-        avg_salary_usd_annual=85000,
-        automatable_by_ai=True,
-        description="Identifies business needs and solutions to improve processes and outcomes.",
-    ),
-    # -----------------------------------------------------------------------
-    # Sales & Marketing
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Sales Representative",
-        industry="Sales",
-        category="Inside/Outside Sales",
-        responsibilities=["prospect and qualify leads", "conduct sales presentations", "negotiate deals", "manage client accounts"],
-        required_skills=["persuasion", "CRM software", "negotiation", "product knowledge", "communication"],
-        education_required="Bachelor's in Business or related; experience often sufficient",
-        avg_salary_usd_annual=65000,
-        automatable_by_ai=True,
-        description="Generates revenue by selling products or services to customers.",
-    ),
-    JobTitle(
-        title="Digital Marketing Manager",
-        industry="Marketing",
-        category="Digital Marketing",
-        responsibilities=["manage online campaigns", "SEO and content strategy", "manage social media", "analyze marketing metrics"],
-        required_skills=["SEO/SEM", "social media", "Google Analytics", "content marketing", "email marketing"],
-        education_required="Bachelor's in Marketing or Communications",
-        avg_salary_usd_annual=82000,
-        automatable_by_ai=True,
-        description="Develops and executes digital marketing strategies to grow brand and revenue.",
-    ),
-    JobTitle(
-        title="Brand Manager",
-        industry="Marketing",
-        category="Brand",
-        responsibilities=["develop brand strategy", "manage brand identity", "oversee marketing campaigns", "track brand metrics"],
-        required_skills=["branding", "marketing strategy", "consumer insights", "creative direction"],
-        education_required="Bachelor's in Marketing or Business",
-        avg_salary_usd_annual=92000,
-        automatable_by_ai=False,
-        description="Manages and develops a company's brand identity and positioning.",
-    ),
-    JobTitle(
-        title="Content Creator / Copywriter",
-        industry="Marketing",
-        category="Content",
-        responsibilities=["write articles, blogs, and copy", "create social media content", "develop scripts", "edit and proofread"],
-        required_skills=["writing", "SEO", "creativity", "research", "storytelling"],
-        education_required="Bachelor's in English, Journalism, or Marketing",
-        avg_salary_usd_annual=62000,
-        automatable_by_ai=True,
-        description="Creates engaging written content for digital and print media.",
-    ),
-    # -----------------------------------------------------------------------
-    # Retail & Customer Service
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Retail Store Manager",
-        industry="Retail",
-        category="Management",
-        responsibilities=["manage store operations", "supervise staff", "track inventory", "meet sales targets"],
-        required_skills=["retail management", "customer service", "inventory management", "leadership"],
-        education_required="High school diploma or Bachelor's",
-        avg_salary_usd_annual=55000,
-        automatable_by_ai=True,
-        description="Manages the daily operations of a retail store.",
-    ),
-    JobTitle(
-        title="Customer Service Representative",
-        industry="Customer Service",
-        category="Support",
-        responsibilities=["respond to customer inquiries", "resolve complaints", "process orders and returns", "document interactions"],
-        required_skills=["communication", "problem solving", "empathy", "CRM systems"],
-        education_required="High school diploma",
-        avg_salary_usd_annual=38000,
-        automatable_by_ai=True,
-        description="Assists customers with inquiries, issues, and product support.",
-    ),
-    JobTitle(
-        title="Call Center Agent",
-        industry="Customer Service",
-        category="Inbound/Outbound",
-        responsibilities=["handle inbound calls", "make outbound calls", "document call outcomes", "escalate complex issues"],
-        required_skills=["communication", "active listening", "typing", "CRM software"],
-        education_required="High school diploma",
-        avg_salary_usd_annual=36000,
-        automatable_by_ai=True,
-        description="Handles customer interactions via telephone for support or sales.",
-    ),
-    # -----------------------------------------------------------------------
-    # Manufacturing & Production
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Manufacturing Engineer",
-        industry="Manufacturing",
-        category="Engineering",
-        responsibilities=["design production processes", "improve manufacturing efficiency", "manage quality control", "troubleshoot equipment"],
-        required_skills=["lean manufacturing", "CAD", "process optimization", "Six Sigma"],
-        education_required="Bachelor's in Manufacturing or Industrial Engineering",
-        avg_salary_usd_annual=88000,
-        automatable_by_ai=True,
-        description="Develops and improves manufacturing processes for efficiency and quality.",
-    ),
-    JobTitle(
-        title="Quality Control Inspector",
-        industry="Manufacturing",
-        category="Quality Assurance",
-        responsibilities=["inspect products for defects", "document quality issues", "enforce quality standards", "work with production teams"],
-        required_skills=["attention to detail", "measurement tools", "quality standards", "documentation"],
-        education_required="High school diploma + vocational training",
-        avg_salary_usd_annual=45000,
-        automatable_by_ai=True,
-        description="Ensures manufactured products meet quality and safety standards.",
-    ),
-    JobTitle(
-        title="CNC Machinist",
-        industry="Manufacturing",
-        category="Machining",
-        responsibilities=["set up and operate CNC machines", "read technical blueprints", "inspect finished parts", "maintain equipment"],
-        required_skills=["CNC programming", "blueprint reading", "precision measurement", "machining"],
-        education_required="Vocational training or Associate's in Machining",
-        avg_salary_usd_annual=52000,
-        automatable_by_ai=True,
-        description="Operates computer-controlled machinery to produce precision parts.",
-    ),
-    JobTitle(
-        title="Supply Chain Manager",
-        industry="Manufacturing",
-        category="Logistics",
-        responsibilities=["manage supplier relationships", "optimize supply chain processes", "coordinate logistics", "reduce costs"],
-        required_skills=["supply chain management", "ERP systems", "negotiation", "data analysis"],
-        education_required="Bachelor's in Supply Chain or Business",
-        avg_salary_usd_annual=95000,
-        automatable_by_ai=True,
-        description="Oversees the end-to-end supply chain from sourcing to delivery.",
-    ),
-    # -----------------------------------------------------------------------
-    # Construction & Trades
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="General Contractor",
-        industry="Construction",
-        category="Construction Management",
-        responsibilities=["manage construction projects", "hire and supervise subcontractors", "ensure code compliance", "manage budgets"],
-        required_skills=["construction management", "budgeting", "scheduling", "contract management"],
-        education_required="Bachelor's in Construction Management + license",
-        avg_salary_usd_annual=95000,
-        automatable_by_ai=False,
-        description="Manages all aspects of a construction project from planning to completion.",
-    ),
-    JobTitle(
-        title="Electrician",
-        industry="Construction",
-        category="Trades",
-        responsibilities=["install electrical systems", "troubleshoot electrical problems", "read blueprints", "ensure code compliance"],
-        required_skills=["electrical wiring", "blueprint reading", "code compliance", "safety"],
-        education_required="Apprenticeship + electrician license",
-        avg_salary_usd_annual=60000,
-        automatable_by_ai=False,
-        description="Installs, maintains, and repairs electrical systems.",
-    ),
-    JobTitle(
-        title="Plumber",
-        industry="Construction",
-        category="Trades",
-        responsibilities=["install plumbing systems", "repair leaks and clogs", "inspect piping systems", "ensure code compliance"],
-        required_skills=["pipe fitting", "blueprint reading", "problem solving", "safety"],
-        education_required="Apprenticeship + plumber license",
-        avg_salary_usd_annual=60000,
-        automatable_by_ai=False,
-        description="Installs and repairs water, gas, and drainage systems.",
-    ),
-    JobTitle(
-        title="Welder",
-        industry="Manufacturing",
-        category="Trades",
-        responsibilities=["weld metal components", "read welding blueprints", "inspect welds", "operate welding equipment"],
-        required_skills=["MIG/TIG/Arc welding", "blueprint reading", "precision", "safety protocols"],
-        education_required="Vocational training + welding certification",
-        avg_salary_usd_annual=48000,
-        automatable_by_ai=True,
-        description="Joins metal parts using various welding techniques.",
-    ),
-    # -----------------------------------------------------------------------
-    # Transportation & Logistics
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Truck Driver / CDL Driver",
-        industry="Transportation",
-        category="Driving",
-        responsibilities=["transport goods over long distances", "perform vehicle inspections", "maintain delivery logs", "follow safety regulations"],
-        required_skills=["CDL license", "route planning", "vehicle inspection", "safety compliance"],
-        education_required="High school diploma + CDL license",
-        avg_salary_usd_annual=50000,
-        automatable_by_ai=True,
-        description="Transports freight and goods via tractor-trailers or delivery trucks.",
-    ),
-    JobTitle(
-        title="Logistics Coordinator",
-        industry="Transportation",
-        category="Logistics",
-        responsibilities=["coordinate shipments", "track deliveries", "liaise with carriers", "manage shipping documentation"],
-        required_skills=["logistics software", "communication", "problem solving", "organization"],
-        education_required="Bachelor's in Logistics or Business",
-        avg_salary_usd_annual=55000,
-        automatable_by_ai=True,
-        description="Coordinates the movement of goods from suppliers to customers.",
-    ),
-    JobTitle(
-        title="Airline Pilot",
-        industry="Transportation",
-        category="Aviation",
-        responsibilities=["fly commercial aircraft", "file flight plans", "communicate with ATC", "perform pre-flight checks"],
-        required_skills=["aviation", "navigation", "decision making under pressure", "communication"],
-        education_required="FAA ATP Certificate + flight hours",
-        avg_salary_usd_annual=200000,
-        automatable_by_ai=False,
-        description="Commands commercial or cargo aircraft on scheduled or chartered flights.",
-    ),
-    # -----------------------------------------------------------------------
-    # Government & Public Service
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Police Officer",
-        industry="Government",
-        category="Law Enforcement",
-        responsibilities=["patrol assigned areas", "respond to emergency calls", "investigate crimes", "enforce laws"],
-        required_skills=["law enforcement", "conflict resolution", "firearms", "community relations"],
-        education_required="High school diploma + police academy",
-        avg_salary_usd_annual=65000,
-        automatable_by_ai=False,
-        description="Maintains public order and enforces the law in assigned jurisdictions.",
-    ),
-    JobTitle(
-        title="Firefighter",
-        industry="Government",
-        category="Emergency Services",
-        responsibilities=["respond to fire emergencies", "conduct search and rescue", "operate firefighting equipment", "perform fire prevention inspections"],
-        required_skills=["firefighting", "emergency medical training", "physical fitness", "teamwork"],
-        education_required="High school diploma + fire academy certification",
-        avg_salary_usd_annual=56000,
-        automatable_by_ai=False,
-        description="Responds to fires and other emergency situations to protect life and property.",
-    ),
-    JobTitle(
-        title="Social Worker",
-        industry="Government",
-        category="Social Services",
-        responsibilities=["assess client needs", "connect clients with resources", "manage case files", "provide counseling support"],
-        required_skills=["case management", "empathy", "communication", "knowledge of social services"],
-        education_required="Bachelor's or Master's in Social Work + license",
-        avg_salary_usd_annual=55000,
-        automatable_by_ai=False,
-        description="Helps individuals and families access services and improve their well-being.",
-    ),
-    JobTitle(
-        title="Military Officer",
-        industry="Government",
-        category="Defense",
-        responsibilities=["lead military personnel", "plan and execute missions", "manage resources", "ensure troop readiness"],
-        required_skills=["leadership", "strategic planning", "physical fitness", "weapons proficiency"],
-        education_required="Military academy or ROTC + commission",
-        avg_salary_usd_annual=90000,
-        automatable_by_ai=False,
-        description="Commands and leads military units in training and operations.",
-    ),
-    # -----------------------------------------------------------------------
-    # Science & Research
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Research Scientist",
-        industry="Science",
-        category="Research",
-        responsibilities=["design and conduct experiments", "analyze and publish results", "secure research funding", "collaborate with research teams"],
-        required_skills=["research methodology", "data analysis", "scientific writing", "lab techniques"],
-        education_required="PhD in relevant scientific field",
-        avg_salary_usd_annual=100000,
-        automatable_by_ai=False,
-        description="Conducts original research to advance knowledge in a scientific domain.",
-    ),
-    JobTitle(
-        title="Biologist",
-        industry="Science",
-        category="Life Sciences",
-        responsibilities=["study living organisms", "conduct field and lab research", "analyze biological data", "publish findings"],
-        required_skills=["biology", "lab techniques", "data analysis", "scientific writing"],
-        education_required="Bachelor's or advanced degree in Biology",
-        avg_salary_usd_annual=82000,
-        automatable_by_ai=True,
-        description="Studies living organisms and their relationship to the environment.",
-    ),
-    JobTitle(
-        title="Environmental Scientist",
-        industry="Science",
-        category="Environmental",
-        responsibilities=["monitor environmental conditions", "assess environmental impact", "develop remediation plans", "advise on regulations"],
-        required_skills=["environmental analysis", "GIS", "data collection", "regulatory knowledge"],
-        education_required="Bachelor's in Environmental Science",
-        avg_salary_usd_annual=73000,
-        automatable_by_ai=True,
-        description="Studies and addresses environmental issues affecting ecosystems and public health.",
-    ),
-    # -----------------------------------------------------------------------
-    # Arts, Media & Entertainment
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Graphic Designer",
-        industry="Creative Arts",
-        category="Design",
-        responsibilities=["create visual concepts", "design logos and branding", "layout print and digital media", "collaborate with marketing teams"],
-        required_skills=["Adobe Creative Suite", "typography", "color theory", "branding"],
-        education_required="Bachelor's in Graphic Design or related",
-        avg_salary_usd_annual=58000,
-        automatable_by_ai=True,
-        description="Creates visual content for print, digital, and brand communications.",
-    ),
-    JobTitle(
-        title="Film / Video Director",
-        industry="Entertainment",
-        category="Production",
-        responsibilities=["direct film and video productions", "manage cast and crew", "oversee editing", "develop creative vision"],
-        required_skills=["cinematography", "storytelling", "leadership", "editing", "creative vision"],
-        education_required="Bachelor's in Film or Communications",
-        avg_salary_usd_annual=92000,
-        automatable_by_ai=False,
-        description="Directs the creative aspects of film and video productions.",
-    ),
-    JobTitle(
-        title="Musician / Performer",
-        industry="Entertainment",
-        category="Performing Arts",
-        responsibilities=["practice and perform music", "record in studio settings", "collaborate with other artists", "market and promote work"],
-        required_skills=["musical instrument(s)", "vocal performance", "music theory", "performance skills"],
-        education_required="Varies — conservatory or self-taught",
-        avg_salary_usd_annual=45000,
-        automatable_by_ai=False,
-        description="Creates and performs musical compositions for audiences.",
-    ),
-    JobTitle(
-        title="Journalist / Reporter",
-        industry="Media",
-        category="Journalism",
-        responsibilities=["investigate and report news", "conduct interviews", "write articles", "verify facts"],
-        required_skills=["writing", "research", "interviewing", "ethics", "multimedia"],
-        education_required="Bachelor's in Journalism or Communications",
-        avg_salary_usd_annual=52000,
-        automatable_by_ai=True,
-        description="Researches, writes, and reports on news and current events.",
-    ),
-    # -----------------------------------------------------------------------
-    # Hospitality & Food Service
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Chef / Head Chef",
-        industry="Hospitality",
-        category="Food Service",
-        responsibilities=["plan and create menus", "lead kitchen staff", "maintain food safety standards", "manage food costs"],
-        required_skills=["culinary arts", "kitchen management", "menu planning", "food safety"],
-        education_required="Culinary degree or apprenticeship",
-        avg_salary_usd_annual=55000,
-        automatable_by_ai=False,
-        description="Leads kitchen operations and creates culinary experiences.",
-    ),
-    JobTitle(
-        title="Hotel Manager",
-        industry="Hospitality",
-        category="Management",
-        responsibilities=["oversee hotel operations", "manage staff", "handle guest relations", "control hotel budget"],
-        required_skills=["hospitality management", "customer service", "leadership", "budgeting"],
-        education_required="Bachelor's in Hospitality Management",
-        avg_salary_usd_annual=65000,
-        automatable_by_ai=True,
-        description="Manages all aspects of hotel operations to ensure guest satisfaction.",
-    ),
-    JobTitle(
-        title="Event Planner",
-        industry="Hospitality",
-        category="Events",
-        responsibilities=["plan and coordinate events", "manage vendors", "track event budgets", "ensure event logistics"],
-        required_skills=["event management", "negotiation", "organization", "vendor management"],
-        education_required="Bachelor's in Hospitality or Event Management",
-        avg_salary_usd_annual=58000,
-        automatable_by_ai=True,
-        description="Plans and executes events ranging from corporate functions to weddings.",
-    ),
-    # -----------------------------------------------------------------------
-    # Real Estate
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Real Estate Agent",
-        industry="Real Estate",
-        category="Sales",
-        responsibilities=["list and market properties", "show homes to buyers", "negotiate contracts", "assist with closing"],
-        required_skills=["sales", "negotiation", "local market knowledge", "communication"],
-        education_required="Real estate license",
-        avg_salary_usd_annual=62000,
-        automatable_by_ai=True,
-        description="Assists buyers and sellers in real estate transactions.",
-    ),
-    JobTitle(
-        title="Property Manager",
-        industry="Real Estate",
-        category="Management",
-        responsibilities=["manage rental properties", "collect rent", "coordinate maintenance", "screen tenants"],
-        required_skills=["tenant management", "budgeting", "maintenance coordination", "communication"],
-        education_required="High school diploma + property management license",
-        avg_salary_usd_annual=58000,
-        automatable_by_ai=True,
-        description="Manages rental properties on behalf of owners.",
-    ),
-    JobTitle(
-        title="Real Estate Appraiser",
-        industry="Real Estate",
-        category="Valuation",
-        responsibilities=["assess property values", "inspect properties", "research comparable sales", "write appraisal reports"],
-        required_skills=["property valuation", "market analysis", "attention to detail", "report writing"],
-        education_required="Bachelor's + appraiser license",
-        avg_salary_usd_annual=67000,
-        automatable_by_ai=True,
-        description="Determines the market value of real property.",
-    ),
-    # -----------------------------------------------------------------------
-    # Agriculture & Environment
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Agricultural Farmer",
-        industry="Agriculture",
-        category="Farming",
-        responsibilities=["plant and harvest crops", "manage farm equipment", "monitor soil and crop health", "manage farm finances"],
-        required_skills=["crop management", "equipment operation", "soil science", "irrigation"],
-        education_required="High school diploma + vocational training or degree",
-        avg_salary_usd_annual=43000,
-        automatable_by_ai=True,
-        description="Grows and harvests crops for food and industrial purposes.",
-    ),
-    JobTitle(
-        title="Veterinarian",
-        industry="Agriculture",
-        category="Animal Health",
-        responsibilities=["diagnose and treat animals", "perform surgeries", "advise on animal care", "manage vaccination programs"],
-        required_skills=["veterinary medicine", "surgery", "diagnostics", "client communication"],
-        education_required="DVM or VMD degree + license",
-        avg_salary_usd_annual=119000,
-        automatable_by_ai=False,
-        description="Provides medical care for animals in clinical and farm settings.",
-    ),
-    # -----------------------------------------------------------------------
-    # Psychology & Counseling
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Psychologist",
-        industry="Mental Health",
-        category="Psychology",
-        responsibilities=["assess and diagnose mental health conditions", "provide therapy", "conduct psychological testing", "research mental health"],
-        required_skills=["psychological assessment", "therapy techniques", "empathy", "research"],
-        education_required="PhD or PsyD in Psychology + license",
-        avg_salary_usd_annual=90000,
-        automatable_by_ai=False,
-        description="Assesses and treats mental, emotional, and behavioral disorders.",
-    ),
-    JobTitle(
-        title="Licensed Counselor / Therapist",
-        industry="Mental Health",
-        category="Counseling",
-        responsibilities=["provide individual and group therapy", "develop treatment plans", "document client progress", "maintain ethical practice"],
-        required_skills=["counseling techniques", "empathy", "active listening", "documentation"],
-        education_required="Master's in Counseling or Social Work + license",
-        avg_salary_usd_annual=58000,
-        automatable_by_ai=False,
-        description="Provides therapeutic support for individuals dealing with mental health challenges.",
-    ),
-    # -----------------------------------------------------------------------
-    # Skilled Trades & Maintenance
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="HVAC Technician",
-        industry="Skilled Trades",
-        category="HVAC",
-        responsibilities=["install and service HVAC systems", "diagnose equipment faults", "conduct preventive maintenance", "ensure safety compliance"],
-        required_skills=["HVAC systems", "refrigerant handling", "electrical wiring", "troubleshooting"],
-        education_required="Vocational training + EPA 608 certification",
-        avg_salary_usd_annual=52000,
-        automatable_by_ai=False,
-        description="Installs and maintains heating, ventilation, and air conditioning systems.",
-    ),
-    JobTitle(
-        title="Auto Mechanic",
-        industry="Skilled Trades",
-        category="Automotive",
-        responsibilities=["diagnose vehicle problems", "perform repairs and maintenance", "replace parts", "advise customers on repairs"],
-        required_skills=["automotive systems", "diagnostic tools", "mechanical repair", "customer service"],
-        education_required="Vocational training or Associate's + ASE certification",
-        avg_salary_usd_annual=48000,
-        automatable_by_ai=True,
-        description="Inspects, repairs, and maintains vehicles.",
-    ),
-    # -----------------------------------------------------------------------
-    # Food Processing & Restaurants
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Food Safety Inspector",
-        industry="Government",
-        category="Inspection",
-        responsibilities=["inspect food establishments", "enforce food safety regulations", "investigate foodborne illness complaints", "issue violations"],
-        required_skills=["food safety regulations", "inspection techniques", "report writing", "communication"],
-        education_required="Bachelor's in Food Science or related",
-        avg_salary_usd_annual=52000,
-        automatable_by_ai=True,
-        description="Ensures food establishments comply with health and safety regulations.",
-    ),
-    # -----------------------------------------------------------------------
-    # Human Services & Non-Profit
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="Nonprofit Program Manager",
-        industry="Non-Profit",
-        category="Program Management",
-        responsibilities=["manage programs and services", "track program outcomes", "manage grant budgets", "coordinate volunteers"],
-        required_skills=["program management", "grant writing", "community outreach", "budgeting"],
-        education_required="Bachelor's in Social Work, Public Policy, or related",
-        avg_salary_usd_annual=62000,
-        automatable_by_ai=True,
-        description="Plans and oversees programs for non-profit organizations.",
-    ),
-    # -----------------------------------------------------------------------
-    # Information Technology (IT)
-    # -----------------------------------------------------------------------
-    JobTitle(
-        title="IT Support Specialist",
-        industry="Technology",
-        category="IT Support",
-        responsibilities=["troubleshoot hardware and software", "assist end users", "set up devices and networks", "document issues"],
-        required_skills=["troubleshooting", "networking", "operating systems", "customer service"],
-        education_required="Associate's or Bachelor's in IT + CompTIA A+",
-        avg_salary_usd_annual=52000,
-        automatable_by_ai=True,
-        description="Provides technical support and assistance for hardware and software issues.",
-    ),
-    JobTitle(
-        title="Network Administrator",
-        industry="Technology",
-        category="Networking",
-        responsibilities=["maintain network infrastructure", "monitor network performance", "troubleshoot network issues", "implement network security"],
-        required_skills=["networking", "Cisco", "firewalls", "VPNs", "monitoring tools"],
-        education_required="Bachelor's in IT or Networking + CCNA",
-        avg_salary_usd_annual=80000,
-        automatable_by_ai=True,
-        description="Manages and maintains organizational computer networks.",
-    ),
-    JobTitle(
-        title="Database Administrator",
-        industry="Technology",
-        category="Database",
-        responsibilities=["manage databases", "optimize query performance", "backup and restore data", "ensure data security"],
-        required_skills=["SQL", "database management systems", "performance tuning", "backup strategies"],
-        education_required="Bachelor's in Computer Science or IT",
-        avg_salary_usd_annual=95000,
-        automatable_by_ai=True,
-        description="Manages and maintains organizational databases.",
-    ),
+_JOB_DATA: list[dict] = [
+    # ── Technology ──────────────────────────────────────────────────────────
+    {"title": "Software Engineer", "industry": "Technology",
+     "responsibilities": ["write code", "review code", "debug", "deploy"],
+     "automation_level": "partial", "avg_salary_usd": 120000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Python", "Java", "SQL"]},
+    {"title": "Data Scientist", "industry": "Technology",
+     "responsibilities": ["analyze data", "build models", "visualize results"],
+     "automation_level": "partial", "avg_salary_usd": 110000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Python", "Statistics", "ML"]},
+    {"title": "Data Analyst", "industry": "Technology",
+     "responsibilities": ["query databases", "build dashboards", "report insights"],
+     "automation_level": "full", "avg_salary_usd": 75000,
+     "replaceable_by_bot": True,
+     "required_skills": ["SQL", "Excel", "Tableau"]},
+    {"title": "DevOps Engineer", "industry": "Technology",
+     "responsibilities": ["CI/CD pipelines", "infrastructure", "monitoring"],
+     "automation_level": "partial", "avg_salary_usd": 115000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Docker", "Kubernetes", "AWS"]},
+    {"title": "Machine Learning Engineer", "industry": "Technology",
+     "responsibilities": ["train models", "optimize pipelines", "deploy ML services"],
+     "automation_level": "partial", "avg_salary_usd": 130000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Python", "TensorFlow", "PyTorch"]},
+    {"title": "Cybersecurity Analyst", "industry": "Technology",
+     "responsibilities": ["monitor threats", "audit systems", "incident response"],
+     "automation_level": "partial", "avg_salary_usd": 95000,
+     "replaceable_by_bot": True,
+     "required_skills": ["SIEM", "Networking", "Pen Testing"]},
+    {"title": "Cloud Architect", "industry": "Technology",
+     "responsibilities": ["design cloud infra", "cost optimization", "security"],
+     "automation_level": "partial", "avg_salary_usd": 145000,
+     "replaceable_by_bot": False,
+     "required_skills": ["AWS", "Azure", "GCP"]},
+    {"title": "Product Manager", "industry": "Technology",
+     "responsibilities": ["roadmap", "stakeholder management", "sprint planning"],
+     "automation_level": "assisted", "avg_salary_usd": 130000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Agile", "JIRA", "Communication"]},
+    {"title": "UX Designer", "industry": "Technology",
+     "responsibilities": ["user research", "wireframing", "prototyping"],
+     "automation_level": "assisted", "avg_salary_usd": 90000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Figma", "Sketch", "User Research"]},
+    {"title": "QA Engineer", "industry": "Technology",
+     "responsibilities": ["test planning", "automated testing", "bug reporting"],
+     "automation_level": "full", "avg_salary_usd": 80000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Selenium", "Python", "JIRA"]},
+    {"title": "IT Support Specialist", "industry": "Technology",
+     "responsibilities": ["helpdesk", "troubleshooting", "hardware support"],
+     "automation_level": "partial", "avg_salary_usd": 50000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Windows", "Networking", "Customer Service"]},
+    {"title": "Database Administrator", "industry": "Technology",
+     "responsibilities": ["manage databases", "backups", "performance tuning"],
+     "automation_level": "full", "avg_salary_usd": 95000,
+     "replaceable_by_bot": True,
+     "required_skills": ["SQL", "PostgreSQL", "Oracle"]},
+    {"title": "Network Engineer", "industry": "Technology",
+     "responsibilities": ["configure routers", "monitor traffic", "security"],
+     "automation_level": "partial", "avg_salary_usd": 90000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Cisco", "Networking", "Firewalls"]},
+    {"title": "Blockchain Developer", "industry": "Technology",
+     "responsibilities": ["smart contracts", "dApps", "consensus mechanisms"],
+     "automation_level": "partial", "avg_salary_usd": 135000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Solidity", "Ethereum", "Web3"]},
+    {"title": "AI Prompt Engineer", "industry": "Technology",
+     "responsibilities": ["craft prompts", "evaluate outputs", "optimize LLMs"],
+     "automation_level": "assisted", "avg_salary_usd": 105000,
+     "replaceable_by_bot": True,
+     "required_skills": ["NLP", "Python", "Critical Thinking"]},
+    # ── Finance & Accounting ─────────────────────────────────────────────────
+    {"title": "Accountant", "industry": "Finance",
+     "responsibilities": ["bookkeeping", "tax filing", "financial reporting"],
+     "automation_level": "full", "avg_salary_usd": 70000,
+     "replaceable_by_bot": True,
+     "required_skills": ["QuickBooks", "Excel", "GAAP"]},
+    {"title": "Financial Analyst", "industry": "Finance",
+     "responsibilities": ["forecasting", "budgeting", "investment analysis"],
+     "automation_level": "partial", "avg_salary_usd": 85000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Excel", "Financial Modeling", "CFA"]},
+    {"title": "Investment Banker", "industry": "Finance",
+     "responsibilities": ["M&A advisory", "capital raising", "deal structuring"],
+     "automation_level": "assisted", "avg_salary_usd": 150000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Valuation", "Excel", "PowerPoint"]},
+    {"title": "Tax Specialist", "industry": "Finance",
+     "responsibilities": ["tax preparation", "compliance", "audit support"],
+     "automation_level": "full", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Tax Law", "QuickBooks", "IRS regulations"]},
+    {"title": "Loan Officer", "industry": "Finance",
+     "responsibilities": ["loan origination", "underwriting", "client consultation"],
+     "automation_level": "partial", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Credit Analysis", "Customer Service", "Compliance"]},
+    {"title": "Payroll Specialist", "industry": "Finance",
+     "responsibilities": ["process payroll", "tax withholding", "compliance"],
+     "automation_level": "full", "avg_salary_usd": 52000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ADP", "Paylocity", "FLSA"]},
+    {"title": "Risk Manager", "industry": "Finance",
+     "responsibilities": ["risk assessment", "mitigation strategies", "reporting"],
+     "automation_level": "partial", "avg_salary_usd": 110000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Risk Modeling", "FRM", "Excel"]},
+    {"title": "Crypto Trader", "industry": "Finance",
+     "responsibilities": ["trade analysis", "portfolio management", "DeFi protocols"],
+     "automation_level": "full", "avg_salary_usd": 90000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Technical Analysis", "DeFi", "Python"]},
+    # ── Healthcare ───────────────────────────────────────────────────────────
+    {"title": "Registered Nurse", "industry": "Healthcare",
+     "responsibilities": ["patient care", "medication administration", "charting"],
+     "automation_level": "assisted", "avg_salary_usd": 75000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Clinical Skills", "EMR", "ACLS"]},
+    {"title": "Medical Billing Specialist", "industry": "Healthcare",
+     "responsibilities": ["claim submission", "denial management", "coding"],
+     "automation_level": "full", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ICD-10", "CPT Codes", "Medical Billing Software"]},
+    {"title": "Pharmacist", "industry": "Healthcare",
+     "responsibilities": ["dispense medications", "patient counseling", "drug review"],
+     "automation_level": "partial", "avg_salary_usd": 120000,
+     "replaceable_by_bot": True,
+     "required_skills": ["PharmD", "Drug Interactions", "Customer Service"]},
+    {"title": "Medical Coder", "industry": "Healthcare",
+     "responsibilities": ["ICD coding", "CPT coding", "chart review"],
+     "automation_level": "full", "avg_salary_usd": 50000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ICD-10", "CPC Certification", "EHR"]},
+    {"title": "Healthcare Administrator", "industry": "Healthcare",
+     "responsibilities": ["operations management", "compliance", "staffing"],
+     "automation_level": "assisted", "avg_salary_usd": 90000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Healthcare Policy", "Leadership", "Budgeting"]},
+    {"title": "Radiologist", "industry": "Healthcare",
+     "responsibilities": ["read imaging", "diagnosis", "reporting"],
+     "automation_level": "partial", "avg_salary_usd": 300000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Radiology", "AI Imaging", "MD/DO"]},
+    {"title": "Dental Hygienist", "industry": "Healthcare",
+     "responsibilities": ["teeth cleaning", "patient education", "X-rays"],
+     "automation_level": "assisted", "avg_salary_usd": 77000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Dental Hygiene License", "X-ray", "Patient Care"]},
+    # ── Legal ────────────────────────────────────────────────────────────────
+    {"title": "Paralegal", "industry": "Legal",
+     "responsibilities": ["legal research", "document drafting", "case management"],
+     "automation_level": "full", "avg_salary_usd": 55000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Legal Research", "Westlaw", "Document Drafting"]},
+    {"title": "Contract Reviewer", "industry": "Legal",
+     "responsibilities": ["review contracts", "risk assessment", "redlining"],
+     "automation_level": "full", "avg_salary_usd": 70000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Contract Law", "NDA", "Risk Analysis"]},
+    {"title": "Legal Secretary", "industry": "Legal",
+     "responsibilities": ["scheduling", "document preparation", "filing"],
+     "automation_level": "full", "avg_salary_usd": 46000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Legal Software", "MS Office", "Typing"]},
+    {"title": "Patent Attorney", "industry": "Legal",
+     "responsibilities": ["patent applications", "IP litigation", "client advice"],
+     "automation_level": "assisted", "avg_salary_usd": 180000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Patent Law", "USPTO", "Technical Writing"]},
+    {"title": "Compliance Officer", "industry": "Legal",
+     "responsibilities": ["regulatory compliance", "auditing", "policy development"],
+     "automation_level": "partial", "avg_salary_usd": 95000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Compliance Frameworks", "Risk Management", "Auditing"]},
+    # ── Real Estate ──────────────────────────────────────────────────────────
+    {"title": "Real Estate Agent", "industry": "Real Estate",
+     "responsibilities": ["property listings", "client negotiation", "market analysis"],
+     "automation_level": "partial", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["MLS", "Negotiation", "CRM"]},
+    {"title": "Property Manager", "industry": "Real Estate",
+     "responsibilities": ["tenant relations", "maintenance coordination", "rent collection"],
+     "automation_level": "partial", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Property Management Software", "Communication", "Budgeting"]},
+    {"title": "Real Estate Appraiser", "industry": "Real Estate",
+     "responsibilities": ["property valuation", "market comparison", "reports"],
+     "automation_level": "partial", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Appraisal", "USPAP", "Market Analysis"]},
+    {"title": "Mortgage Broker", "industry": "Real Estate",
+     "responsibilities": ["loan origination", "lender matching", "client guidance"],
+     "automation_level": "partial", "avg_salary_usd": 75000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Mortgage Licensing", "Credit Analysis", "CRM"]},
+    # ── Sales & Marketing ────────────────────────────────────────────────────
+    {"title": "Sales Representative", "industry": "Sales",
+     "responsibilities": ["lead generation", "cold calling", "closing deals"],
+     "automation_level": "partial", "avg_salary_usd": 60000,
+     "replaceable_by_bot": True,
+     "required_skills": ["CRM", "Negotiation", "Communication"]},
+    {"title": "Digital Marketing Specialist", "industry": "Marketing",
+     "responsibilities": ["SEO/SEM", "social media", "email campaigns"],
+     "automation_level": "full", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Google Ads", "Analytics", "Content Creation"]},
+    {"title": "Content Writer", "industry": "Marketing",
+     "responsibilities": ["blog posts", "copywriting", "SEO content"],
+     "automation_level": "full", "avg_salary_usd": 55000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Writing", "SEO", "Research"]},
+    {"title": "Social Media Manager", "industry": "Marketing",
+     "responsibilities": ["content scheduling", "community management", "analytics"],
+     "automation_level": "full", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Hootsuite", "Content Strategy", "Copywriting"]},
+    {"title": "SEO Specialist", "industry": "Marketing",
+     "responsibilities": ["keyword research", "on-page optimization", "link building"],
+     "automation_level": "full", "avg_salary_usd": 62000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Ahrefs", "Google Search Console", "HTML"]},
+    {"title": "Email Marketing Specialist", "industry": "Marketing",
+     "responsibilities": ["campaign design", "list management", "A/B testing"],
+     "automation_level": "full", "avg_salary_usd": 60000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Mailchimp", "HTML", "Analytics"]},
+    {"title": "Brand Manager", "industry": "Marketing",
+     "responsibilities": ["brand strategy", "campaign management", "market research"],
+     "automation_level": "assisted", "avg_salary_usd": 90000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Brand Strategy", "Marketing", "Leadership"]},
+    {"title": "Account Manager", "industry": "Sales",
+     "responsibilities": ["client retention", "upselling", "relationship management"],
+     "automation_level": "partial", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["CRM", "Communication", "Sales Strategy"]},
+    # ── Education ────────────────────────────────────────────────────────────
+    {"title": "Teacher", "industry": "Education",
+     "responsibilities": ["lesson planning", "instruction", "grading"],
+     "automation_level": "assisted", "avg_salary_usd": 55000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Curriculum Development", "Communication", "Patience"]},
+    {"title": "Curriculum Developer", "industry": "Education",
+     "responsibilities": ["design courses", "assessments", "learning outcomes"],
+     "automation_level": "partial", "avg_salary_usd": 70000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Instructional Design", "LMS", "Writing"]},
+    {"title": "Instructional Designer", "industry": "Education",
+     "responsibilities": ["e-learning design", "SCORM content", "LMS management"],
+     "automation_level": "partial", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Articulate", "Storyline", "LMS"]},
+    {"title": "Tutor", "industry": "Education",
+     "responsibilities": ["one-on-one instruction", "homework help", "test prep"],
+     "automation_level": "full", "avg_salary_usd": 40000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Subject Expertise", "Communication", "Patience"]},
+    {"title": "Academic Advisor", "industry": "Education",
+     "responsibilities": ["course selection", "degree planning", "student support"],
+     "automation_level": "partial", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Higher Education", "Student Services", "Counseling"]},
+    # ── Manufacturing & Trades ───────────────────────────────────────────────
+    {"title": "Quality Control Inspector", "industry": "Manufacturing",
+     "responsibilities": ["inspect products", "defect reporting", "compliance"],
+     "automation_level": "full", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Quality Standards", "Metrology", "ISO"]},
+    {"title": "Assembly Line Worker", "industry": "Manufacturing",
+     "responsibilities": ["component assembly", "machine operation", "safety"],
+     "automation_level": "full", "avg_salary_usd": 38000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Manual Dexterity", "Safety Protocols", "Machine Operation"]},
+    {"title": "CNC Operator", "industry": "Manufacturing",
+     "responsibilities": ["program CNC machines", "part inspection", "setup"],
+     "automation_level": "partial", "avg_salary_usd": 52000,
+     "replaceable_by_bot": True,
+     "required_skills": ["G-Code", "CAD/CAM", "Blueprint Reading"]},
+    {"title": "Welder", "industry": "Manufacturing",
+     "responsibilities": ["MIG/TIG welding", "blueprint reading", "safety"],
+     "automation_level": "partial", "avg_salary_usd": 50000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Welding Certification", "Safety", "Blueprint Reading"]},
+    {"title": "Electrician", "industry": "Trades",
+     "responsibilities": ["electrical installation", "maintenance", "code compliance"],
+     "automation_level": "assisted", "avg_salary_usd": 62000,
+     "replaceable_by_bot": False,
+     "required_skills": ["NEC Code", "Wiring", "Safety"]},
+    {"title": "Plumber", "industry": "Trades",
+     "responsibilities": ["pipe installation", "repairs", "inspections"],
+     "automation_level": "assisted", "avg_salary_usd": 60000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Pipefitting", "Code Compliance", "Customer Service"]},
+    {"title": "HVAC Technician", "industry": "Trades",
+     "responsibilities": ["install HVAC systems", "repairs", "maintenance"],
+     "automation_level": "partial", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["HVAC Certification", "Refrigerants", "Electrical"]},
+    {"title": "Carpenter", "industry": "Trades",
+     "responsibilities": ["framing", "finishing", "cabinetry"],
+     "automation_level": "assisted", "avg_salary_usd": 55000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Blueprint Reading", "Power Tools", "Math"]},
+    # ── Logistics & Supply Chain ─────────────────────────────────────────────
+    {"title": "Logistics Coordinator", "industry": "Logistics",
+     "responsibilities": ["shipment tracking", "carrier coordination", "documentation"],
+     "automation_level": "full", "avg_salary_usd": 52000,
+     "replaceable_by_bot": True,
+     "required_skills": ["TMS", "Excel", "Communication"]},
+    {"title": "Supply Chain Analyst", "industry": "Logistics",
+     "responsibilities": ["demand forecasting", "inventory optimization", "reporting"],
+     "automation_level": "full", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ERP", "Excel", "Data Analysis"]},
+    {"title": "Warehouse Manager", "industry": "Logistics",
+     "responsibilities": ["inventory management", "staff supervision", "KPIs"],
+     "automation_level": "partial", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["WMS", "Leadership", "Safety"]},
+    {"title": "Procurement Specialist", "industry": "Logistics",
+     "responsibilities": ["vendor selection", "contract negotiation", "cost reduction"],
+     "automation_level": "partial", "avg_salary_usd": 68000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Negotiation", "SAP", "Contract Management"]},
+    {"title": "Freight Broker", "industry": "Logistics",
+     "responsibilities": ["carrier matching", "rate negotiation", "tracking"],
+     "automation_level": "partial", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["TMS", "Negotiation", "Communication"]},
+    # ── Customer Service ─────────────────────────────────────────────────────
+    {"title": "Customer Service Representative", "industry": "Customer Service",
+     "responsibilities": ["resolve inquiries", "ticket management", "escalations"],
+     "automation_level": "full", "avg_salary_usd": 38000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Communication", "CRM", "Problem Solving"]},
+    {"title": "Call Center Agent", "industry": "Customer Service",
+     "responsibilities": ["inbound/outbound calls", "script adherence", "CRM logging"],
+     "automation_level": "full", "avg_salary_usd": 35000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Communication", "CRM", "Typing"]},
+    {"title": "Technical Support Specialist", "industry": "Customer Service",
+     "responsibilities": ["troubleshoot products", "ticket resolution", "documentation"],
+     "automation_level": "partial", "avg_salary_usd": 50000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Technical Knowledge", "Communication", "Ticketing"]},
+    {"title": "Chat Support Agent", "industry": "Customer Service",
+     "responsibilities": ["live chat", "knowledge base", "escalations"],
+     "automation_level": "full", "avg_salary_usd": 36000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Typing", "Communication", "Empathy"]},
+    # ── Human Resources ──────────────────────────────────────────────────────
+    {"title": "HR Generalist", "industry": "Human Resources",
+     "responsibilities": ["recruiting", "onboarding", "employee relations"],
+     "automation_level": "partial", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["HRIS", "Employment Law", "Communication"]},
+    {"title": "Recruiter", "industry": "Human Resources",
+     "responsibilities": ["sourcing candidates", "interviews", "offer management"],
+     "automation_level": "partial", "avg_salary_usd": 62000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ATS", "LinkedIn", "Communication"]},
+    {"title": "Training Specialist", "industry": "Human Resources",
+     "responsibilities": ["design training", "facilitate sessions", "evaluate learning"],
+     "automation_level": "partial", "avg_salary_usd": 60000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Instructional Design", "LMS", "Presentation"]},
+    {"title": "Compensation Analyst", "industry": "Human Resources",
+     "responsibilities": ["salary benchmarking", "pay equity", "incentive design"],
+     "automation_level": "full", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Compensation Analysis", "Excel", "HRIS"]},
+    # ── Retail & Hospitality ─────────────────────────────────────────────────
+    {"title": "Retail Store Manager", "industry": "Retail",
+     "responsibilities": ["staff management", "inventory", "sales targets"],
+     "automation_level": "partial", "avg_salary_usd": 52000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Leadership", "POS Systems", "Merchandising"]},
+    {"title": "Cashier", "industry": "Retail",
+     "responsibilities": ["process transactions", "customer service", "cash handling"],
+     "automation_level": "full", "avg_salary_usd": 28000,
+     "replaceable_by_bot": True,
+     "required_skills": ["POS", "Cash Handling", "Customer Service"]},
+    {"title": "Hotel Manager", "industry": "Hospitality",
+     "responsibilities": ["operations oversight", "guest experience", "revenue management"],
+     "automation_level": "assisted", "avg_salary_usd": 80000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Hospitality Management", "PMS", "Leadership"]},
+    {"title": "Restaurant Manager", "industry": "Hospitality",
+     "responsibilities": ["staff scheduling", "food safety", "guest satisfaction"],
+     "automation_level": "assisted", "avg_salary_usd": 58000,
+     "replaceable_by_bot": False,
+     "required_skills": ["ServSafe", "Labor Management", "POS"]},
+    {"title": "Food Delivery Driver", "industry": "Logistics",
+     "responsibilities": ["pickup orders", "route navigation", "customer delivery"],
+     "automation_level": "full", "avg_salary_usd": 35000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Navigation", "Time Management", "Customer Service"]},
+    # ── Government & Public Sector ───────────────────────────────────────────
+    {"title": "Government Program Analyst", "industry": "Government",
+     "responsibilities": ["policy analysis", "program evaluation", "reporting"],
+     "automation_level": "partial", "avg_salary_usd": 75000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Policy Analysis", "Excel", "Writing"]},
+    {"title": "Grant Writer", "industry": "Government",
+     "responsibilities": ["write grant proposals", "research funding", "reporting"],
+     "automation_level": "partial", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Writing", "Research", "Grant Management"]},
+    {"title": "Social Worker", "industry": "Government",
+     "responsibilities": ["case management", "client advocacy", "resource referral"],
+     "automation_level": "assisted", "avg_salary_usd": 50000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Social Work License", "Counseling", "Empathy"]},
+    # ── Construction & Engineering ───────────────────────────────────────────
+    {"title": "Civil Engineer", "industry": "Engineering",
+     "responsibilities": ["design infrastructure", "project management", "compliance"],
+     "automation_level": "partial", "avg_salary_usd": 90000,
+     "replaceable_by_bot": True,
+     "required_skills": ["AutoCAD", "PE License", "Project Management"]},
+    {"title": "Mechanical Engineer", "industry": "Engineering",
+     "responsibilities": ["design mechanical systems", "testing", "CAD modeling"],
+     "automation_level": "partial", "avg_salary_usd": 92000,
+     "replaceable_by_bot": True,
+     "required_skills": ["SolidWorks", "FEA", "Thermodynamics"]},
+    {"title": "Construction Project Manager", "industry": "Construction",
+     "responsibilities": ["project planning", "subcontractor management", "budgeting"],
+     "automation_level": "assisted", "avg_salary_usd": 95000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Procore", "MS Project", "Leadership"]},
+    {"title": "Structural Engineer", "industry": "Engineering",
+     "responsibilities": ["structural analysis", "blueprints", "inspections"],
+     "automation_level": "partial", "avg_salary_usd": 88000,
+     "replaceable_by_bot": True,
+     "required_skills": ["STAAD", "AutoCAD", "PE License"]},
+    # ── Media & Entertainment ────────────────────────────────────────────────
+    {"title": "Video Editor", "industry": "Media",
+     "responsibilities": ["edit footage", "color grading", "sound mixing"],
+     "automation_level": "partial", "avg_salary_usd": 58000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Premiere Pro", "After Effects", "Storytelling"]},
+    {"title": "Graphic Designer", "industry": "Media",
+     "responsibilities": ["visual design", "branding", "print/digital assets"],
+     "automation_level": "partial", "avg_salary_usd": 55000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Photoshop", "Illustrator", "InDesign"]},
+    {"title": "Photographer", "industry": "Media",
+     "responsibilities": ["photography sessions", "editing", "client delivery"],
+     "automation_level": "partial", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Lightroom", "Photography", "Client Relations"]},
+    {"title": "Podcast Producer", "industry": "Media",
+     "responsibilities": ["record", "edit audio", "publish episodes"],
+     "automation_level": "full", "avg_salary_usd": 52000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Audition", "RSS", "Sound Engineering"]},
+    # ── Non-Profit ───────────────────────────────────────────────────────────
+    {"title": "Fundraising Coordinator", "industry": "Non-Profit",
+     "responsibilities": ["donor outreach", "event planning", "grant applications"],
+     "automation_level": "partial", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["CRM", "Communication", "Event Planning"]},
+    {"title": "Volunteer Coordinator", "industry": "Non-Profit",
+     "responsibilities": ["recruit volunteers", "scheduling", "recognition programs"],
+     "automation_level": "full", "avg_salary_usd": 42000,
+     "replaceable_by_bot": True,
+     "required_skills": ["CRM", "Communication", "Event Planning"]},
+    # ── Transportation ───────────────────────────────────────────────────────
+    {"title": "Truck Driver", "industry": "Transportation",
+     "responsibilities": ["long-haul delivery", "logbook maintenance", "vehicle inspection"],
+     "automation_level": "full", "avg_salary_usd": 55000,
+     "replaceable_by_bot": True,
+     "required_skills": ["CDL", "DOT Compliance", "Navigation"]},
+    {"title": "Airline Pilot", "industry": "Transportation",
+     "responsibilities": ["fly aircraft", "pre-flight checks", "passenger safety"],
+     "automation_level": "partial", "avg_salary_usd": 180000,
+     "replaceable_by_bot": True,
+     "required_skills": ["ATP Certificate", "IFR", "CRM"]},
+    {"title": "Rideshare Driver", "industry": "Transportation",
+     "responsibilities": ["pick up passengers", "navigation", "vehicle maintenance"],
+     "automation_level": "full", "avg_salary_usd": 35000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Driving License", "Navigation", "Customer Service"]},
+    # ── Skilled Trades (additional) ──────────────────────────────────────────
+    {"title": "Landscaper", "industry": "Trades",
+     "responsibilities": ["lawn care", "planting", "irrigation"],
+     "automation_level": "partial", "avg_salary_usd": 38000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Horticulture", "Equipment Operation", "Landscape Design"]},
+    {"title": "Auto Mechanic", "industry": "Automotive",
+     "responsibilities": ["diagnose vehicles", "repairs", "maintenance"],
+     "automation_level": "partial", "avg_salary_usd": 50000,
+     "replaceable_by_bot": True,
+     "required_skills": ["OBD Diagnostics", "ASE Certification", "Mechanical Skills"]},
+    {"title": "Home Inspector", "industry": "Real Estate",
+     "responsibilities": ["inspect properties", "generate reports", "client consultation"],
+     "automation_level": "partial", "avg_salary_usd": 60000,
+     "replaceable_by_bot": True,
+     "required_skills": ["InterNACHI Certification", "Report Writing", "Attention to Detail"]},
+    # ── Executive & Leadership ───────────────────────────────────────────────
+    {"title": "Chief Executive Officer", "industry": "Executive",
+     "responsibilities": ["strategic vision", "stakeholder management", "P&L responsibility"],
+     "automation_level": "assisted", "avg_salary_usd": 400000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Leadership", "Strategy", "Financial Acumen"]},
+    {"title": "Chief Technology Officer", "industry": "Executive",
+     "responsibilities": ["technology strategy", "engineering leadership", "innovation"],
+     "automation_level": "assisted", "avg_salary_usd": 280000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Technology Strategy", "Leadership", "Architecture"]},
+    {"title": "Chief Financial Officer", "industry": "Executive",
+     "responsibilities": ["financial strategy", "investor relations", "risk management"],
+     "automation_level": "assisted", "avg_salary_usd": 300000,
+     "replaceable_by_bot": False,
+     "required_skills": ["CPA", "Financial Strategy", "Leadership"]},
+    {"title": "Operations Manager", "industry": "Executive",
+     "responsibilities": ["process optimization", "team management", "KPI tracking"],
+     "automation_level": "partial", "avg_salary_usd": 90000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Operations", "Leadership", "Data Analysis"]},
+    # ── E-Commerce & Gig Economy ─────────────────────────────────────────────
+    {"title": "Amazon FBA Seller", "industry": "E-Commerce",
+     "responsibilities": ["product sourcing", "listing optimization", "inventory management"],
+     "automation_level": "full", "avg_salary_usd": 70000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Amazon Seller Central", "PPC", "Product Research"]},
+    {"title": "Dropshipping Entrepreneur", "industry": "E-Commerce",
+     "responsibilities": ["product listing", "supplier management", "customer service"],
+     "automation_level": "full", "avg_salary_usd": 60000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Shopify", "Social Media Ads", "Product Research"]},
+    {"title": "Freelance Developer", "industry": "Technology",
+     "responsibilities": ["client projects", "code delivery", "billing"],
+     "automation_level": "partial", "avg_salary_usd": 90000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Full Stack", "Communication", "Time Management"]},
+    {"title": "Freelance Designer", "industry": "Media",
+     "responsibilities": ["design briefs", "revisions", "client delivery"],
+     "automation_level": "partial", "avg_salary_usd": 65000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Figma", "Branding", "Communication"]},
+    # ── Research & Science ───────────────────────────────────────────────────
+    {"title": "Research Scientist", "industry": "Research",
+     "responsibilities": ["experiment design", "data collection", "publication"],
+     "automation_level": "assisted", "avg_salary_usd": 95000,
+     "replaceable_by_bot": False,
+     "required_skills": ["Statistical Analysis", "Lab Skills", "Writing"]},
+    {"title": "Lab Technician", "industry": "Research",
+     "responsibilities": ["run experiments", "sample analysis", "documentation"],
+     "automation_level": "partial", "avg_salary_usd": 48000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Lab Equipment", "Safety Protocols", "Data Entry"]},
+    {"title": "Statistician", "industry": "Research",
+     "responsibilities": ["statistical modeling", "data analysis", "reporting"],
+     "automation_level": "full", "avg_salary_usd": 88000,
+     "replaceable_by_bot": True,
+     "required_skills": ["R", "Python", "Statistical Theory"]},
+    # ── Security ─────────────────────────────────────────────────────────────
+    {"title": "Security Guard", "industry": "Security",
+     "responsibilities": ["patrol", "access control", "incident reporting"],
+     "automation_level": "full", "avg_salary_usd": 35000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Security License", "Surveillance", "Communication"]},
+    {"title": "Private Investigator", "industry": "Security",
+     "responsibilities": ["surveillance", "background checks", "evidence gathering"],
+     "automation_level": "partial", "avg_salary_usd": 55000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Surveillance", "Research", "PI License"]},
+    # ── Agriculture ──────────────────────────────────────────────────────────
+    {"title": "Agricultural Technician", "industry": "Agriculture",
+     "responsibilities": ["crop monitoring", "soil testing", "equipment operation"],
+     "automation_level": "full", "avg_salary_usd": 40000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Agronomy", "Precision Agriculture", "Equipment"]},
+    {"title": "Farm Manager", "industry": "Agriculture",
+     "responsibilities": ["oversee operations", "crop planning", "staff supervision"],
+     "automation_level": "partial", "avg_salary_usd": 62000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Agricultural Science", "Business Management", "Leadership"]},
+    # ── Cleaning & Maintenance ───────────────────────────────────────────────
+    {"title": "Janitor / Custodian", "industry": "Facilities",
+     "responsibilities": ["cleaning", "waste disposal", "supply restocking"],
+     "automation_level": "full", "avg_salary_usd": 30000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Cleaning Protocols", "Equipment Operation", "Safety"]},
+    {"title": "Facility Manager", "industry": "Facilities",
+     "responsibilities": ["building maintenance", "vendor management", "compliance"],
+     "automation_level": "partial", "avg_salary_usd": 72000,
+     "replaceable_by_bot": True,
+     "required_skills": ["Facilities Management", "CMMS", "Safety"]},
 ]
 
 
-class JobTitleDatabase:
-    """Searchable database of all job titles."""
+# ---------------------------------------------------------------------------
+# Database class
+# ---------------------------------------------------------------------------
 
-    def __init__(self) -> None:
-        self._titles: List[JobTitle] = list(_JOB_TITLES)
+class JobTitlesDatabase:
+    """
+    In-memory database of job titles with search and filter capabilities.
 
-    # -----------------------------------------------------------------------
-    # Query methods
-    # -----------------------------------------------------------------------
+    Parameters
+    ----------
+    extra_titles : list[JobTitle] | None
+        Additional custom titles to merge with the built-in dataset.
+    """
 
-    def search(self, keyword: str) -> List[JobTitle]:
-        """Full-text search across title, industry, category, and description."""
-        kw = keyword.lower()
-        return [
-            j for j in self._titles
-            if kw in j.title.lower()
-            or kw in j.industry.lower()
-            or kw in j.category.lower()
-            or kw in j.description.lower()
-            or any(kw in s.lower() for s in j.required_skills)
-        ]
+    def __init__(self, extra_titles: Optional[list[JobTitle]] = None) -> None:
+        self._titles: list[JobTitle] = [JobTitle(**d) for d in _JOB_DATA]
+        if extra_titles:
+            self._titles.extend(extra_titles)
 
-    def get_by_title(self, title: str) -> Optional[JobTitle]:
-        """Return a job title record by exact title (case-insensitive)."""
-        tl = title.lower()
-        for j in self._titles:
-            if j.title.lower() == tl:
-                return j
-        return None
+    # ── Query helpers ────────────────────────────────────────────────────────
 
-    def get_by_industry(self, industry: str) -> List[JobTitle]:
-        """Return all job titles in a given industry."""
-        ind = industry.lower()
-        return [j for j in self._titles if j.industry.lower() == ind]
-
-    def get_automatable_jobs(self) -> List[JobTitle]:
-        """Return all job titles that are highly automatable by AI."""
-        return [j for j in self._titles if j.automatable_by_ai]
-
-    def list_industries(self) -> List[str]:
-        """Return a sorted, deduplicated list of all industries."""
-        return sorted({j.industry for j in self._titles})
-
-    def list_categories(self) -> List[str]:
-        """Return a sorted, deduplicated list of all categories."""
-        return sorted({j.category for j in self._titles})
-
-    def list_all_titles(self) -> List[str]:
-        """Return a sorted list of every job title in the database."""
-        return sorted(j.title for j in self._titles)
+    def all_titles(self) -> list[JobTitle]:
+        """Return all job titles."""
+        return list(self._titles)
 
     def count(self) -> int:
-        """Return the total number of job titles in the database."""
+        """Total number of job titles in the database."""
         return len(self._titles)
 
-    def top_titles_by_industry(self, industry: str, limit: int = 10) -> List[JobTitle]:
-        """Return up to *limit* job titles for a given industry."""
-        return self.get_by_industry(industry)[:limit]
+    def industries(self) -> list[str]:
+        """Sorted list of unique industry names."""
+        return sorted({t.industry for t in self._titles})
+
+    def by_industry(self, industry: str) -> list[JobTitle]:
+        """Return titles that match *industry* (case-insensitive)."""
+        key = industry.lower()
+        return [t for t in self._titles if t.industry.lower() == key]
+
+    def search(self, query: str) -> list[JobTitle]:
+        """
+        Full-text search across title, industry, and responsibilities.
+
+        Parameters
+        ----------
+        query : str
+            Case-insensitive search term.
+
+        Returns
+        -------
+        list[JobTitle]
+            Matching job titles, ordered by relevance (title match first).
+        """
+        q = query.lower()
+        title_matches = []
+        other_matches = []
+        for job in self._titles:
+            in_title = q in job.title.lower()
+            in_industry = q in job.industry.lower()
+            in_resp = any(q in r.lower() for r in job.responsibilities)
+            in_skills = any(q in s.lower() for s in job.required_skills)
+            if in_title:
+                title_matches.append(job)
+            elif in_industry or in_resp or in_skills:
+                other_matches.append(job)
+        return title_matches + other_matches
+
+    def automatable(self, level: str = "full") -> list[JobTitle]:
+        """Return titles whose automation_level equals *level*."""
+        return [t for t in self._titles if t.automation_level == level]
+
+    def bot_replaceable(self) -> list[JobTitle]:
+        """Return titles that can be fully replaced by a DreamCo bot."""
+        return [t for t in self._titles if t.replaceable_by_bot]
+
+    def get(self, title: str) -> Optional[JobTitle]:
+        """Exact (case-insensitive) lookup by title.  Returns None if missing."""
+        tl = title.lower()
+        for job in self._titles:
+            if job.title.lower() == tl:
+                return job
+        return None
+
+    def add_title(self, job: JobTitle) -> None:
+        """Add a new custom job title to the in-memory database."""
+        self._titles.append(job)
+
+    def stats(self) -> dict:
+        """Return a summary dict of database statistics."""
+        return {
+            "total_titles": self.count(),
+            "industries": len(self.industries()),
+            "fully_automatable": len(self.automatable("full")),
+            "partially_automatable": len(self.automatable("partial")),
+            "ai_assisted": len(self.automatable("assisted")),
+            "bot_replaceable": len(self.bot_replaceable()),
+        }
+
+
+__all__ = ["JobTitle", "JobTitlesDatabase"]

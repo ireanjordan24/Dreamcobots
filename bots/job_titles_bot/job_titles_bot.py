@@ -1,343 +1,382 @@
 """
-DreamCo Job Titles Bot — comprehensive AI workforce platform.
+DreamCo Job Titles Bot — Main Entry Point
 
-Combines:
-* JobTitleDatabase  — searchable directory of all job titles
-* JobBotGenerator   — creates AI worker bot specs for any job
-* AutonomousTrainer — trains bots on job skills, face/object recognition,
-                      and item valuation
+Composes all Job Titles sub-systems into a single tier-aware platform:
 
-Tiers
+  • Job Titles Database  — 100+ job titles across 25+ industries
+  • Job Bot Generator    — create and manage job-specific automation bots
+  • Autonomous Trainer   — train humans & AI (face/object recognition, valuation)
+  • Cost Justification   — explain costs autonomously and present payment options
+
+Architecture:
+    DreamCoBots
+    │
+    ├── buddybot
+    │
+    ├── job_titles_bot
+    │     ├── job_titles_database
+    │     ├── job_bot_generator
+    │     ├── autonomous_trainer
+    │     └── cost_justification
+    │
+    └── (other bots)
+
+Usage
 -----
-FREE       — keyword search + 10 titles per industry
-PRO        — full database + AI bot generation + hiring marketplace
-ENTERPRISE — autonomous training + scalable Buddy Bot upgrades + API
+    from bots.job_titles_bot import JobTitlesBot, Tier
 
-GLOBAL AI SOURCES FLOW: uses GlobalAISourcesFlow pipeline.
+    bot = JobTitlesBot(tier=Tier.PRO)
+    results = bot.search_jobs("data analyst")
+    for job in results:
+        print(job.title, job.industry)
+
+    # Generate a dedicated bot for any job
+    job_bot = bot.generate_bot("Accountant")
+    print(job_bot.chat("What can you do?"))
+
+    # Valuate an item
+    result = bot.valuate_item("1955 double-die penny", condition="excellent")
+    print(result.estimated_value_usd)
+
+    # Get cost justification
+    report = bot.justify_cost("PRO upgrade", monthly_usd=49.0, savings_usd=200.0)
+    print(bot.format_cost_report(report))
 """
 
 from __future__ import annotations
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-
-from typing import List, Optional, Dict, Any
-
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.job_titles_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from bots.job_titles_bot.job_titles_database import JobTitleDatabase, JobTitle
-from bots.job_titles_bot.job_bot_generator import JobBotGenerator, AIWorkerBot
-from bots.job_titles_bot.autonomous_trainer import AutonomousTrainer, TrainingSession, ItemValuation
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from bots.job_titles_bot.tiers import Tier, get_bot_tier_info, get_tier_config, get_upgrade_path
+from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
+from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
+from bots.job_titles_bot.autonomous_trainer import (
+    AutonomousTrainer,
+    FaceRecord,
+    ObjectRecord,
+    ValuationResult,
+    TrainingSession,
+)
+from bots.job_titles_bot.cost_justification import (
+    CostJustificationEngine,
+    CostItem,
+    CostJustification,
+)
 
 
 class JobTitlesBotError(Exception):
-    """Raised for general bot errors."""
+    """Base error for JobTitlesBot."""
 
 
 class JobTitlesBotTierError(JobTitlesBotError):
-    """Raised when a feature requires a higher tier."""
+    """Raised when a feature is gated behind a higher tier."""
+
+
+# Free-tier browse limit
+_FREE_BROWSE_LIMIT = 50
 
 
 class JobTitlesBot:
     """
-    DreamCo AI workforce platform — look up any job title, hire humans or AI
-    bots, generate AI worker bots, and train them autonomously.
+    Tier-aware bot for job title search, workforce automation, training,
+    and autonomous cost justification.
+
+    Parameters
+    ----------
+    tier : Tier
+        Subscription tier (FREE, PRO, or ENTERPRISE).
+    token_balance : int
+        Initial DreamCo token balance for the account.
     """
 
-    # Maximum job titles returned per search on the free tier
-    FREE_SEARCH_LIMIT = 10
-
-    def __init__(self, tier: Tier = Tier.FREE) -> None:
+    def __init__(self, tier: Tier = Tier.FREE, token_balance: int = 0) -> None:
         self.tier = tier
         self.config = get_tier_config(tier)
-        self._db = JobTitleDatabase()
+
+        self._db = JobTitlesDatabase()
         self._generator = JobBotGenerator()
         self._trainer = AutonomousTrainer()
+        self._cost_engine = CostJustificationEngine(token_balance=token_balance)
 
-    # -----------------------------------------------------------------------
-    # Tier helpers
-    # -----------------------------------------------------------------------
+    # ── Tier info ────────────────────────────────────────────────────────────
 
-    def get_tier_info(self) -> dict:
-        """Return information about the current subscription tier."""
-        return get_bot_tier_info(self.tier)
+    def describe_tier(self) -> str:
+        """Return a human-readable description of the current tier."""
+        info = get_bot_tier_info(self.tier)
+        lines = [
+            f"Job Titles Bot — {info['name']} Tier",
+            f"Price : ${info['price_usd_monthly']:.2f}/month",
+            "Features:",
+        ]
+        for f in info["features"]:
+            lines.append(f"  • {f}")
+        return "\n".join(lines)
 
-    def get_upgrade_suggestion(self) -> Optional[dict]:
-        """Return the next upgrade tier info, or None if already at Enterprise."""
-        next_tier_cfg = get_upgrade_path(self.tier)
-        if next_tier_cfg is None:
-            return None
-        return {
-            "upgrade_to": next_tier_cfg.name,
-            "price_usd_monthly": next_tier_cfg.price_usd_monthly,
-            "unlock_features": BOT_FEATURES[next_tier_cfg.tier.value],
-        }
+    def get_upgrade_path(self) -> dict:
+        """Return the upgrade options for the current tier."""
+        return get_upgrade_path(self.tier)
 
-    def _require_tier(self, minimum: Tier) -> None:
-        tier_order = list(Tier)
-        if tier_order.index(self.tier) < tier_order.index(minimum):
-            suggestion = self.get_upgrade_suggestion()
-            msg = (
-                f"This feature requires the {minimum.value.upper()} tier or higher. "
-                f"You are currently on the {self.tier.value.upper()} tier."
-            )
-            if suggestion:
-                msg += (
-                    f" Upgrade to {suggestion['upgrade_to']} for "
-                    f"${suggestion['price_usd_monthly']}/month to unlock: "
-                    + ", ".join(suggestion["unlock_features"][:3]) + " and more."
-                )
-            raise JobTitlesBotTierError(msg)
+    # ── Job search ───────────────────────────────────────────────────────────
 
-    # -----------------------------------------------------------------------
-    # Job title lookup (available on all tiers)
-    # -----------------------------------------------------------------------
-
-    def search_job_titles(self, keyword: str) -> List[dict]:
+    def search_jobs(self, query: str) -> list[JobTitle]:
         """
-        Search job titles by keyword.
+        Search for job titles matching *query*.
 
-        FREE tier  : returns up to 10 results.
-        PRO+       : returns all matching results.
+        Free tier is limited to 50 results; PRO/ENTERPRISE are unlimited.
         """
-        results = self._db.search(keyword)
+        results = self._db.search(query)
         if self.tier == Tier.FREE:
-            results = results[: self.FREE_SEARCH_LIMIT]
-        return [j.to_dict() for j in results]
-
-    def get_job_title(self, title: str) -> Optional[dict]:
-        """Return full details for a job title (all tiers)."""
-        job = self._db.get_by_title(title)
-        return job.to_dict() if job else None
-
-    def browse_industry(self, industry: str) -> List[dict]:
-        """
-        Browse job titles by industry.
-
-        FREE tier  : up to 10 titles.
-        PRO+       : all titles in the industry.
-        """
-        if self.tier == Tier.FREE:
-            results = self._db.top_titles_by_industry(industry, limit=self.FREE_SEARCH_LIMIT)
-        else:
-            results = self._db.get_by_industry(industry)
-        return [j.to_dict() for j in results]
-
-    def list_industries(self) -> List[str]:
-        """Return all available industries (all tiers)."""
-        return self._db.list_industries()
-
-    def list_all_job_titles(self) -> List[str]:
-        """Return every job title in the database (PRO+ only)."""
-        self._require_tier(Tier.PRO)
-        return self._db.list_all_titles()
-
-    def database_stats(self) -> dict:
-        """Return statistics about the job title database (all tiers)."""
-        return {
-            "total_titles": self._db.count(),
-            "industries": len(self._db.list_industries()),
-            "automatable_by_ai": len(self._db.get_automatable_jobs()),
-        }
-
-    # -----------------------------------------------------------------------
-    # AI worker bot generation (PRO+)
-    # -----------------------------------------------------------------------
-
-    def generate_ai_worker_bot(self, job_title: str) -> dict:
-        """
-        Generate an AI worker bot specification for a given job title.
-
-        Returns the bot specification including cost explanation and
-        payment options. Requires PRO tier or higher.
-        """
-        self._require_tier(Tier.PRO)
-        job = self._db.get_by_title(job_title)
-        if job is None:
-            raise JobTitlesBotError(f"Job title '{job_title}' not found in the database.")
-        bot = self._generator.generate(job)
-        result = bot.to_dict()
-        result["cost_explanation"] = bot.explain_cost()
-        return result
-
-    def generate_bulk_ai_bots(self, job_titles: List[str]) -> List[dict]:
-        """
-        Generate AI worker bots for multiple job titles at once.
-
-        Requires ENTERPRISE tier.
-        """
-        self._require_tier(Tier.ENTERPRISE)
-        results = []
-        for title in job_titles:
-            job = self._db.get_by_title(title)
-            if job is None:
-                continue
-            bot = self._generator.generate(job)
-            result = bot.to_dict()
-            result["cost_explanation"] = bot.explain_cost()
-            results.append(result)
+            return results[:_FREE_BROWSE_LIMIT]
         return results
 
-    # -----------------------------------------------------------------------
-    # Hiring marketplace (PRO+)
-    # -----------------------------------------------------------------------
+    def browse_industry(self, industry: str) -> list[JobTitle]:
+        """Return all job titles in *industry*."""
+        results = self._db.by_industry(industry)
+        if self.tier == Tier.FREE:
+            return results[:_FREE_BROWSE_LIMIT]
+        return results
 
-    def hire_worker(self, job_title: str, worker_type: str = "ai") -> dict:
+    def list_industries(self) -> list[str]:
+        """Return all available industry names."""
+        industries = self._db.industries()
+        if self.tier == Tier.FREE:
+            return industries[:3]
+        return industries
+
+    def database_stats(self) -> dict:
+        """Return statistics about the job titles database."""
+        return self._db.stats()
+
+    def get_job(self, title: str) -> JobTitle | None:
+        """Look up a specific job title (exact match, case-insensitive)."""
+        return self._db.get(title)
+
+    def list_automatable_jobs(self, level: str = "full") -> list[JobTitle]:
         """
-        Return a hiring package for a given job title.
+        Return jobs that can be automated at *level* ('full', 'partial', 'assisted').
+        Requires PRO or ENTERPRISE tier.
+        """
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError(
+                "Automation filtering requires PRO or ENTERPRISE tier. "
+                f"Upgrade: {get_upgrade_path(self.tier)}"
+            )
+        return self._db.automatable(level)
+
+    def list_bot_replaceable(self) -> list[JobTitle]:
+        """Return all jobs that can be fully replaced by a DreamCo bot."""
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError(
+                "Bot-replaceable job list requires PRO or ENTERPRISE tier."
+            )
+        return self._db.bot_replaceable()
+
+    # ── Bot generation ───────────────────────────────────────────────────────
+
+    def generate_bot(self, job_title: str) -> GeneratedJobBot:
+        """
+        Generate (or retrieve) a dedicated automation bot for *job_title*.
+        Requires PRO or ENTERPRISE tier.
+        """
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError(
+                "Bot generation requires PRO or ENTERPRISE tier."
+            )
+        job = self._db.get(job_title)
+        if job is None:
+            raise JobTitlesBotError(f"Job title '{job_title}' not found in the database.")
+        return self._generator.generate(job)
+
+    def generate_all_bots(self) -> list[GeneratedJobBot]:
+        """Generate bots for every job title in the database. ENTERPRISE only."""
+        if self.tier != Tier.ENTERPRISE:
+            raise JobTitlesBotTierError("generate_all_bots requires ENTERPRISE tier.")
+        return self._generator.generate_all(self._db.all_titles())
+
+    def propagate_buddy_upgrade(self, new_version: str, extra_capabilities: list[str] | None = None) -> int:
+        """
+        Propagate a Buddy Bot upgrade to ALL generated job bots.
+        Returns the number of bots upgraded.
+        ENTERPRISE only.
+        """
+        if self.tier != Tier.ENTERPRISE:
+            raise JobTitlesBotTierError("Buddy Bot propagation requires ENTERPRISE tier.")
+        count = self._generator.propagate_upgrade(new_version, extra_capabilities)
+        self._trainer.upgrade_module(new_version)
+        return count
+
+    # ── Training ─────────────────────────────────────────────────────────────
+
+    def train(self, trainee: str, skill: str, duration_seconds: int = 60) -> TrainingSession:
+        """
+        Run a training session for *trainee* on *skill*.
+        Requires PRO or ENTERPRISE tier.
+        """
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError("Training requires PRO or ENTERPRISE tier.")
+        return self._trainer.run_training_session(trainee, skill, duration_seconds)
+
+    def register_face(self, label: str, raw_encoding: bytes) -> FaceRecord:
+        """Register a face for recognition. ENTERPRISE only."""
+        if self.tier != Tier.ENTERPRISE:
+            raise JobTitlesBotTierError("Face recognition requires ENTERPRISE tier.")
+        return self._trainer.register_face(label, raw_encoding)
+
+    def identify_face(self, raw_encoding: bytes) -> FaceRecord | None:
+        """Identify a face from raw encoding. ENTERPRISE only."""
+        if self.tier != Tier.ENTERPRISE:
+            raise JobTitlesBotTierError("Face identification requires ENTERPRISE tier.")
+        return self._trainer.identify_face(raw_encoding)
+
+    def register_object(
+        self, category: str, description: str, visual_keywords: list[str], value_usd: float = 0.0
+    ) -> ObjectRecord:
+        """Register an object for recognition. ENTERPRISE only."""
+        if self.tier != Tier.ENTERPRISE:
+            raise JobTitlesBotTierError("Object registration requires ENTERPRISE tier.")
+        return self._trainer.register_object(category, description, visual_keywords, value_usd)
+
+    def recognize_object(self, description: str) -> list[ObjectRecord]:
+        """Recognize an object from a text description. Requires PRO or ENTERPRISE."""
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError("Object recognition requires PRO or ENTERPRISE tier.")
+        return self._trainer.recognize_object(description)
+
+    def valuate_item(self, item_description: str, condition: str = "good") -> ValuationResult:
+        """
+        Estimate the market value of a physical item.
+        Requires PRO or ENTERPRISE tier.
+        """
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError("Item valuation requires PRO or ENTERPRISE tier.")
+        return self._trainer.valuate_item(item_description, condition)
+
+    def trainer_stats(self) -> dict:
+        """Return trainer activity statistics. Requires PRO or ENTERPRISE."""
+        if self.tier == Tier.FREE:
+            raise JobTitlesBotTierError("Trainer stats require PRO or ENTERPRISE tier.")
+        return self._trainer.stats()
+
+    # ── Cost justification ───────────────────────────────────────────────────
+
+    def justify_cost(
+        self,
+        feature_name: str,
+        monthly_usd: float,
+        savings_usd: float,
+        line_items: list[CostItem] | None = None,
+    ) -> CostJustification:
+        """
+        Build an autonomous cost justification report.
 
         Parameters
         ----------
-        job_title : str
-            The job title to hire for.
-        worker_type : str
-            One of 'human', 'ai', or 'robot'.
-
-        Requires PRO tier.
+        feature_name : str
+            The feature or upgrade being considered.
+        monthly_usd : float
+            Monthly cost in USD.
+        savings_usd : float
+            Estimated monthly savings / revenue generated.
+        line_items : list[CostItem] | None
+            Optional detailed line-item breakdown.
         """
-        self._require_tier(Tier.PRO)
-        job = self._db.get_by_title(job_title)
-        if job is None:
-            raise JobTitlesBotError(f"Job title '{job_title}' not found.")
+        return self._cost_engine.justify(feature_name, monthly_usd, savings_usd, line_items)
 
-        worker_type = worker_type.lower()
-        valid_types = {"human", "ai", "robot"}
-        if worker_type not in valid_types:
-            raise JobTitlesBotError(f"worker_type must be one of {valid_types}.")
+    def format_cost_report(self, justification: CostJustification) -> str:
+        """Return a formatted text version of *justification*."""
+        return self._cost_engine.format_report(justification)
 
-        base = {
-            "job_title": job_title,
-            "industry": job.industry,
-            "worker_type": worker_type,
-            "required_skills": job.required_skills,
-            "education_required": job.education_required,
-        }
+    def add_tokens(self, amount: int) -> int:
+        """Add tokens to the account balance."""
+        return self._cost_engine.add_tokens(amount)
 
-        if worker_type == "human":
-            base.update({
-                "estimated_salary_usd_annual": job.avg_salary_usd_annual,
-                "hiring_channels": ["LinkedIn", "Indeed", "Glassdoor", "ZipRecruiter", "DreamCo Marketplace"],
-                "onboarding_time": "2-4 weeks",
-                "note": "Post to DreamCo Marketplace to reach pre-screened candidates.",
-            })
-        elif worker_type == "ai":
-            bot = self._generator.generate(job)
-            base.update({
-                "ai_bot_name": bot.name,
-                "monthly_cost_usd": bot.estimated_monthly_cost_usd,
-                "payment_options": bot.payment_options,
-                "capabilities": bot.capabilities,
-                "deployment_time": "Immediate",
-                "cost_explanation": bot.explain_cost(),
-            })
-        else:  # robot
-            base.update({
-                "robot_contract_type": "DreamCo Robot Workforce Contract",
-                "contact": "robotcontracts@dreamco.ai",
-                "estimated_monthly_cost_usd": (job.avg_salary_usd_annual or 50000) / 12 * 0.6,
-                "available_manufacturers": ["Boston Dynamics", "ABB Robotics", "FANUC", "Universal Robots", "Tesla Optimus"],
-                "contract_note": "DreamCo negotiates robot manufacturing contracts to deploy physical robots for your workforce.",
-            })
+    def deduct_tokens(self, amount: int) -> dict:
+        """Deduct tokens from the account balance."""
+        return self._cost_engine.deduct_tokens(amount)
 
-        return base
+    @property
+    def token_balance(self) -> int:
+        """Current DreamCo token balance."""
+        return self._cost_engine.token_balance
 
-    # -----------------------------------------------------------------------
-    # Autonomous training (ENTERPRISE)
-    # -----------------------------------------------------------------------
+    # ── BuddyAI chat interface ───────────────────────────────────────────────
 
-    def train_bot_on_job(
-        self,
-        bot_name: str,
-        job_title: str,
-        examples: int = 100,
-    ) -> dict:
+    def chat(self, message: str) -> dict:
         """
-        Autonomously train a bot on all skills for a given job title.
+        Respond to a natural-language message.  Compatible with BuddyBot.
 
-        Requires ENTERPRISE tier.
+        Parameters
+        ----------
+        message : str
+            User or orchestrator message.
+
+        Returns
+        -------
+        dict
+            Response payload.
         """
-        self._require_tier(Tier.ENTERPRISE)
-        job = self._db.get_by_title(job_title)
-        if job is None:
-            raise JobTitlesBotError(f"Job title '{job_title}' not found.")
+        msg = message.lower()
 
-        sessions = []
-        for skill in job.required_skills:
-            session = self._trainer.train_job_skill(
-                bot_name=bot_name,
-                skill_name=skill,
-                domain=job.industry,
-                examples=examples,
+        if "tier" in msg or "upgrade" in msg or "plan" in msg:
+            reply = self.describe_tier()
+        elif "search" in msg or "find job" in msg or "look up" in msg:
+            query = message.split(":")[-1].strip() if ":" in message else message
+            results = self._db.search(query)[:5]
+            reply = (
+                f"Found {len(results)} job(s) matching '{query}': "
+                + ", ".join(j.title for j in results)
+            ) if results else f"No jobs found matching '{query}'."
+        elif "valuate" in msg or "value" in msg or "worth" in msg or "antique" in msg or "coin" in msg:
+            reply = (
+                "Item valuation is available on PRO and ENTERPRISE tiers. "
+                "Send: valuate_item('<description>', condition='good') or upgrade your plan."
             )
-            sessions.append(session.to_dict())
+        elif "cost" in msg or "price" in msg or "pay" in msg:
+            justification = self._cost_engine.justify(
+                "Job Titles Bot PRO", 49.0, 200.0
+            )
+            reply = self._cost_engine.format_report(justification)
+        elif "train" in msg:
+            reply = (
+                "Training is available on PRO and ENTERPRISE tiers. "
+                "I can train humans and AI for any job role, face recognition, "
+                "and item valuation."
+            )
+        elif "robot" in msg or "hire" in msg or "employee" in msg:
+            reply = (
+                "DreamCo provides bots for every known job title. "
+                "Use search_jobs() to find a role and generate_bot() to deploy "
+                "an automation bot. Human hiring is also available via our marketplace."
+            )
+        elif "stats" in msg or "database" in msg:
+            stats = self._db.stats()
+            reply = (
+                f"Database: {stats['total_titles']} titles across {stats['industries']} industries. "
+                f"{stats['fully_automatable']} fully automatable, "
+                f"{stats['bot_replaceable']} bot-replaceable."
+            )
+        else:
+            reply = (
+                "Welcome to DreamCo Job Titles Bot! I can help you: "
+                "search job titles, generate automation bots for any role, "
+                "train humans/AI, valuate items (antiques, coins, currency), "
+                "and justify costs autonomously. What would you like to do?"
+            )
 
         return {
-            "bot_name": bot_name,
-            "job_title": job_title,
-            "skills_trained": job.required_skills,
-            "sessions": sessions,
-            "buddy_bot_upgrade": "All registered Buddy Bots have been upgraded with these skills.",
+            "bot_name": "job_titles_bot",
+            "tier": self.tier.value,
+            "reply": reply,
         }
 
-    def train_face_recognition(self, bot_name: str, num_faces: int = 50) -> dict:
-        """
-        Train a bot to recognize human faces. Requires ENTERPRISE tier.
-        """
-        self._require_tier(Tier.ENTERPRISE)
-        session = self._trainer.train_face_recognition(bot_name, num_faces)
-        return session.to_dict()
+    def register_with_buddy(self, buddy_bot_instance) -> None:
+        """Register this bot with a BuddyBot orchestrator instance."""
+        buddy_bot_instance.register_bot("job_titles_bot", self)
 
-    def train_object_recognition(
-        self,
-        bot_name: str,
-        object_classes: List[str],
-        examples_per_class: int = 100,
-    ) -> dict:
-        """
-        Train a bot to identify objects. Requires ENTERPRISE tier.
-        """
-        self._require_tier(Tier.ENTERPRISE)
-        session = self._trainer.train_object_recognition(bot_name, object_classes, examples_per_class)
-        return session.to_dict()
 
-    def valuate_item(self, item_name: str) -> dict:
-        """
-        Estimate the value of an item (antique, coin, collectible, etc.).
-
-        Available to all tiers — Buddy Bot always knows how to valuate.
-        """
-        valuation = self._trainer.valuate_item(item_name)
-        return valuation.to_dict()
-
-    # -----------------------------------------------------------------------
-    # Buddy Bot management (ENTERPRISE)
-    # -----------------------------------------------------------------------
-
-    def register_buddy_bot(self, bot_id: str) -> None:
-        """Register a Buddy Bot to receive automatic skill upgrades. ENTERPRISE only."""
-        self._require_tier(Tier.ENTERPRISE)
-        self._trainer.register_buddy_bot(bot_id)
-
-    def list_buddy_bots(self) -> List[str]:
-        """List all registered Buddy Bots. ENTERPRISE only."""
-        self._require_tier(Tier.ENTERPRISE)
-        return self._trainer.list_buddy_bots()
-
-    def get_buddy_bot_skills(self, bot_id: str) -> List[str]:
-        """Return all skills a registered Buddy Bot has been trained on. ENTERPRISE only."""
-        self._require_tier(Tier.ENTERPRISE)
-        return self._trainer.get_bot_skills(bot_id)
-
-    # -----------------------------------------------------------------------
-    # Automatable jobs listing (PRO+)
-    # -----------------------------------------------------------------------
-
-    def list_automatable_jobs(self) -> List[dict]:
-        """
-        Return all job titles that can be automated by AI.
-        Requires PRO tier.
-        """
-        self._require_tier(Tier.PRO)
-        return [j.to_dict() for j in self._db.get_automatable_jobs()]
+__all__ = [
+    "JobTitlesBot",
+    "JobTitlesBotError",
+    "JobTitlesBotTierError",
+    "Tier",
+]

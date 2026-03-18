@@ -1,183 +1,239 @@
 """
-DreamCo Job Bot Generator — creates AI worker bot specifications for any job title.
+Job Bot Generator — Creates and manages job-specific bot templates.
 
-Given a job title from the database, generates a fully-specified AI worker bot
-that can automate the core tasks of that role.
-
-GLOBAL AI SOURCES FLOW: participates via job_titles_bot.py pipeline.
+Each generated bot is a lightweight object that inherits the core
+DreamCo automation pipeline and is pre-configured for a specific job role.
+Bots expose a ``chat()`` method so they can be registered with BuddyBot.
 """
 
 from __future__ import annotations
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 from bots.job_titles_bot.job_titles_database import JobTitle
 
 
+# ---------------------------------------------------------------------------
+# Generated bot data class
+# ---------------------------------------------------------------------------
+
 @dataclass
-class AIWorkerBot:
-    """Specification for an AI worker bot generated for a specific job title."""
-    name: str
+class GeneratedJobBot:
+    """
+    A lightweight bot object generated for a specific job role.
+
+    Attributes
+    ----------
+    job_title : str
+        The job title this bot is configured for.
+    industry : str
+        Industry category.
+    capabilities : list[str]
+        Actions this bot can perform autonomously.
+    automation_level : str
+        'full' | 'partial' | 'assisted'
+    is_active : bool
+        Whether the bot is currently deployed.
+    version : str
+        Bot template version (bumped on every Buddy Bot upgrade).
+    """
+
     job_title: str
     industry: str
-    category: str
-    automation_tasks: List[str]
-    ai_models_required: List[str]
-    estimated_monthly_cost_usd: float
-    cost_justification: str
-    payment_options: Dict[str, Any]
-    capabilities: List[str]
-    training_datasets: List[str]
-    scalable: bool = True
+    capabilities: list[str]
+    automation_level: str
+    is_active: bool = True
+    version: str = "1.0.0"
+    metadata: dict = field(default_factory=dict)
 
-    def to_dict(self) -> dict:
+    # ------------------------------------------------------------------
+    # BuddyAI-compatible interface
+    # ------------------------------------------------------------------
+
+    def chat(self, message: str) -> dict:
+        """
+        Respond to a chat message as this job bot.
+
+        Parameters
+        ----------
+        message : str
+            Incoming text from a user or orchestrator.
+
+        Returns
+        -------
+        dict
+            Response payload including bot identity and reply text.
+        """
+        msg = message.lower()
+        if "capabilities" in msg or "what can you do" in msg:
+            reply = (
+                f"I am the {self.job_title} bot. "
+                f"I can: {', '.join(self.capabilities)}."
+            )
+        elif "status" in msg:
+            reply = f"{self.job_title} bot is {'active' if self.is_active else 'inactive'} (v{self.version})."
+        elif "automate" in msg or "replace" in msg:
+            reply = (
+                f"This role has {self.automation_level} automation coverage. "
+                "DreamCo bots can handle the repetitive portions so humans focus on high-value work."
+            )
+        elif "upgrade" in msg:
+            reply = f"Upgrade request received. Current version: {self.version}. Buddy Bot will propagate the latest features automatically."
+        else:
+            reply = (
+                f"Hello! I am the DreamCo {self.job_title} bot for the {self.industry} industry. "
+                f"Ask me about capabilities, automation, hiring, or upgrades."
+            )
         return {
-            "name": self.name,
+            "bot_name": f"job_bot_{self.job_title.lower().replace(' ', '_')}",
             "job_title": self.job_title,
             "industry": self.industry,
-            "category": self.category,
-            "automation_tasks": self.automation_tasks,
-            "ai_models_required": self.ai_models_required,
-            "estimated_monthly_cost_usd": self.estimated_monthly_cost_usd,
-            "cost_justification": self.cost_justification,
-            "payment_options": self.payment_options,
-            "capabilities": self.capabilities,
-            "training_datasets": self.training_datasets,
-            "scalable": self.scalable,
+            "reply": reply,
+            "version": self.version,
         }
 
-    def explain_cost(self) -> str:
-        """Return a human-friendly explanation of costs and why they are worth it."""
-        lines = [
-            f"💰 Estimated monthly cost: ${self.estimated_monthly_cost_usd:.2f}",
-            f"✅ Why it's worth it: {self.cost_justification}",
-            "",
-            "💳 Payment options:",
-        ]
-        for method, detail in self.payment_options.items():
-            lines.append(f"  • {method}: {detail}")
-        lines += [
-            "",
-            "🤖 This AI worker bot can:",
-        ]
-        for cap in self.capabilities:
-            lines.append(f"  • {cap}")
-        return "\n".join(lines)
+    def describe(self) -> dict:
+        """Return a full description dict for marketplace/UI display."""
+        return {
+            "job_title": self.job_title,
+            "industry": self.industry,
+            "capabilities": self.capabilities,
+            "automation_level": self.automation_level,
+            "is_active": self.is_active,
+            "version": self.version,
+            **self.metadata,
+        }
+
+    def upgrade(self, new_version: str, additional_capabilities: Optional[list[str]] = None) -> None:
+        """
+        Upgrade this bot to *new_version*, optionally adding capabilities.
+        Called automatically by Buddy Bot when global features are improved.
+        """
+        self.version = new_version
+        if additional_capabilities:
+            for cap in additional_capabilities:
+                if cap not in self.capabilities:
+                    self.capabilities.append(cap)
 
 
-# Default payment options available to all clients
-_DEFAULT_PAYMENT_OPTIONS: Dict[str, str] = {
-    "Free Tier": "Access via token credits — limited capacity, no charge",
-    "Tokens": "Pay-as-you-go: purchase token bundles starting at $5",
-    "Monthly Subscription": "Flat monthly rate for unlimited access ($49–$299/mo)",
-    "Yearly Subscription": "Save 20% with an annual plan ($470–$2870/yr)",
-}
-
-# AI model recommendations by task type
-_TASK_MODEL_MAP: Dict[str, List[str]] = {
-    "natural language processing": ["GPT-4", "Claude 3", "Gemini Pro"],
-    "document processing": ["GPT-4", "Document AI", "Textract"],
-    "data analysis": ["GPT-4 Code Interpreter", "AutoML", "XGBoost"],
-    "image recognition": ["GPT-4 Vision", "CLIP", "YOLOv8"],
-    "face recognition": ["DeepFace", "AWS Rekognition", "Azure Face API"],
-    "object recognition": ["YOLOv8", "CLIP", "GPT-4 Vision"],
-    "voice/audio processing": ["Whisper", "ElevenLabs", "AssemblyAI"],
-    "automation": ["GPT-4 Agents", "LangChain", "AutoGPT"],
-    "code generation": ["GitHub Copilot", "GPT-4", "Codex"],
-    "scheduling": ["GPT-4", "LangChain Agents", "Zapier AI"],
-    "customer interaction": ["GPT-4", "Claude 3", "Dialogflow"],
-    "financial modelling": ["GPT-4 Code Interpreter", "FinGPT", "AutoML"],
-}
-
-
-def _infer_ai_models(responsibilities: List[str], required_skills: List[str]) -> List[str]:
-    """Infer the best AI models for a given set of responsibilities and skills."""
-    text = " ".join(responsibilities + required_skills).lower()
-    models: set = set()
-    for task_type, model_list in _TASK_MODEL_MAP.items():
-        # Match any word from the task type key
-        if any(word in text for word in task_type.split("/")):
-            models.update(model_list)
-    if not models:
-        # Default to general-purpose LLM for any remaining job
-        models = {"GPT-4", "Claude 3"}
-    return sorted(models)
-
-
-def _estimate_cost(num_tasks: int, avg_salary: Optional[int]) -> float:
-    """Estimate monthly running cost for an AI worker bot."""
-    base_cost = 49.0  # base platform fee
-    per_task_cost = num_tasks * 2.0  # $2 per task type per month
-    return round(base_cost + per_task_cost, 2)
-
-
-def _build_cost_justification(job: JobTitle, monthly_cost: float) -> str:
-    annual_savings = (job.avg_salary_usd_annual or 50000) - (monthly_cost * 12)
-    if annual_savings > 0:
-        return (
-            f"Replacing or augmenting a human {job.title} (avg ${job.avg_salary_usd_annual:,}/yr) "
-            f"with this AI bot saves approximately ${annual_savings:,.0f} per year in labor costs "
-            f"while operating 24/7 without breaks or benefits."
-        )
-    return (
-        f"Augmenting human {job.title} work with AI reduces error rates, "
-        f"increases throughput, and frees humans for higher-value creative tasks."
-    )
-
-
-class JobBotGeneratorError(Exception):
-    """Raised when bot generation fails."""
-
+# ---------------------------------------------------------------------------
+# Generator
+# ---------------------------------------------------------------------------
 
 class JobBotGenerator:
-    """Generates AI worker bot specifications for any job title."""
+    """
+    Factory that creates ``GeneratedJobBot`` instances from ``JobTitle`` entries.
 
-    def generate(self, job: JobTitle) -> AIWorkerBot:
-        """Generate an AI worker bot specification for the given job title."""
-        ai_models = _infer_ai_models(job.responsibilities, job.required_skills)
-        monthly_cost = _estimate_cost(len(job.responsibilities), job.avg_salary_usd_annual)
-        cost_justification = _build_cost_justification(job, monthly_cost)
+    Usage
+    -----
+        from bots.job_titles_bot.job_bot_generator import JobBotGenerator
+        from bots.job_titles_bot.job_titles_database import JobTitlesDatabase
 
-        # Build automation tasks from responsibilities
-        automation_tasks = [f"Automate: {r}" for r in job.responsibilities]
+        db  = JobTitlesDatabase()
+        gen = JobBotGenerator()
+        bot = gen.generate(db.get("Data Analyst"))
+    """
 
-        # Build capabilities list
-        capabilities = [
-            f"Perform '{r}' autonomously" for r in job.responsibilities
-        ] + [
-            f"Apply skill: {s}" for s in job.required_skills
-        ]
+    # Default template version applied to all freshly generated bots
+    CURRENT_VERSION: str = "1.0.0"
 
-        # Training datasets needed
-        training_datasets = [
-            f"{job.industry} industry documents and workflows",
-            f"{job.title} task examples and outcomes",
-            f"{job.category} domain knowledge corpus",
-        ]
+    def __init__(self) -> None:
+        self._registry: dict[str, GeneratedJobBot] = {}
 
-        bot_name = f"{job.title.title().replace(' ', '')}AIBot"
+    # ── Core generation ──────────────────────────────────────────────────────
 
-        return AIWorkerBot(
-            name=bot_name,
+    def generate(self, job: JobTitle) -> GeneratedJobBot:
+        """
+        Create a new bot for *job*.  Re-returns the cached instance if the
+        same title has already been generated.
+        """
+        key = job.title.lower()
+        if key in self._registry:
+            return self._registry[key]
+
+        capabilities = self._build_capabilities(job)
+        bot = GeneratedJobBot(
             job_title=job.title,
             industry=job.industry,
-            category=job.category,
-            automation_tasks=automation_tasks,
-            ai_models_required=ai_models,
-            estimated_monthly_cost_usd=monthly_cost,
-            cost_justification=cost_justification,
-            payment_options=dict(_DEFAULT_PAYMENT_OPTIONS),
             capabilities=capabilities,
-            training_datasets=training_datasets,
-            scalable=True,
+            automation_level=job.automation_level,
+            version=self.CURRENT_VERSION,
+            metadata={
+                "avg_salary_usd": job.avg_salary_usd,
+                "required_skills": list(job.required_skills),
+                "replaceable_by_bot": job.replaceable_by_bot,
+            },
         )
+        self._registry[key] = bot
+        return bot
 
-    def generate_bulk(self, jobs: List[JobTitle]) -> List[AIWorkerBot]:
-        """Generate AI worker bots for multiple job titles at once."""
-        return [self.generate(job) for job in jobs]
+    def generate_all(self, jobs: list[JobTitle]) -> list[GeneratedJobBot]:
+        """Generate bots for a list of job titles."""
+        return [self.generate(j) for j in jobs]
+
+    # ── Registry helpers ─────────────────────────────────────────────────────
+
+    def get(self, title: str) -> Optional[GeneratedJobBot]:
+        """Look up a previously generated bot by job title (case-insensitive)."""
+        return self._registry.get(title.lower())
+
+    def list_generated(self) -> list[str]:
+        """Return sorted list of generated bot titles."""
+        return sorted(self._registry.keys())
+
+    def count(self) -> int:
+        """Number of generated bots in the registry."""
+        return len(self._registry)
+
+    # ── Bulk upgrades ────────────────────────────────────────────────────────
+
+    def propagate_upgrade(
+        self,
+        new_version: str,
+        additional_capabilities: Optional[list[str]] = None,
+    ) -> int:
+        """
+        Propagate a version upgrade across ALL registered bots.
+        Called by Buddy Bot when global AI features are improved.
+
+        Returns
+        -------
+        int
+            Number of bots upgraded.
+        """
+        for bot in self._registry.values():
+            bot.upgrade(new_version, additional_capabilities)
+        return len(self._registry)
+
+    # ── Internal helpers ─────────────────────────────────────────────────────
+
+    @staticmethod
+    def _build_capabilities(job: JobTitle) -> list[str]:
+        """
+        Build an initial capability list from the job's responsibilities
+        plus universal DreamCo bot capabilities.
+        """
+        capabilities = list(job.responsibilities)
+        # Append universal DreamCo capabilities
+        universal = [
+            "autonomous task scheduling",
+            "cost justification reporting",
+            "token billing integration",
+            "Buddy Bot upgrade propagation",
+        ]
+        for cap in universal:
+            if cap not in capabilities:
+                capabilities.append(cap)
+        # Add automation-level-specific capabilities
+        if job.automation_level == "full":
+            capabilities.append("24/7 unmanned operation")
+        elif job.automation_level == "partial":
+            capabilities.append("human-in-the-loop handoff")
+        else:  # assisted
+            capabilities.append("AI recommendation engine")
+        return capabilities
+
+
+__all__ = ["GeneratedJobBot", "JobBotGenerator"]
