@@ -2,6 +2,8 @@
 Lead Engine for the Buddy Core System.
 
 Simulates lead scraping, scoring, and monetisation — no real network calls.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations

@@ -3,6 +3,8 @@ Feedback Loop for the Buddy Core System.
 
 Tracks performance metrics and revenue, suggests optimisations, and runs
 full feedback cycles — all in-memory with no external dependencies.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations

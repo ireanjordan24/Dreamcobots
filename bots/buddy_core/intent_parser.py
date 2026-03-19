@@ -3,6 +3,8 @@ Intent Parser for the Buddy Core System.
 
 Detects user intent and industry from natural-language text using
 keyword-based matching.  No external NLP dependencies required.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations

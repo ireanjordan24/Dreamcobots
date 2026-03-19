@@ -3,6 +3,8 @@ Tool Database for the Buddy Core System.
 
 Pre-built catalogue of 15+ API/library tools that can be auto-injected
 into generated bots based on industry and purpose.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations

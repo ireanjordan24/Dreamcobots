@@ -3,6 +3,8 @@ Bot Generator for the Buddy Core System.
 
 Provides Bot-on-Demand: parse intent → inject tools → generate template code
 → build → deploy.  All operations are in-memory; no real deployments occur.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations

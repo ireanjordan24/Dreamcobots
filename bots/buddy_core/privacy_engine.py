@@ -3,6 +3,9 @@ Privacy Engine for the Buddy Core System.
 
 Provides permission management, activity logging, an encrypted data vault
 (simulated AES-256 via base64 + XOR), and safety guardrails for sensitive
+actions.
+
+Part of the Buddy Core System — adheres to the GLOBAL AI SOURCES FLOW framework.
 actions — all in-memory with no external dependencies.
 """
 
