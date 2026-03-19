@@ -194,7 +194,10 @@ class DragDropBuilder:
                 "Bot is missing a TRIGGER component. "
                 "Every bot needs at least one trigger."
             )
-        if ComponentType.OUTPUT.value not in types_present and ComponentType.ACTION.value not in types_present:
+
+        has_action = ComponentType.ACTION.value in types_present
+        has_output = ComponentType.OUTPUT.value in types_present
+        if not has_action and not has_output:
             issues.append(
                 "Bot should have at least one ACTION or OUTPUT component."
             )

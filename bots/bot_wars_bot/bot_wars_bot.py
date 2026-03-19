@@ -52,6 +52,7 @@ from bots.bot_wars_bot.competition_engine import CompetitionEngine, CompetitionE
 from bots.bot_wars_bot.challenge_manager import ChallengeManager, ChallengeManagerError
 from bots.bot_wars_bot.drag_drop_builder import DragDropBuilder, DragDropBuilderError
 
+from typing import Optional
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -103,7 +104,7 @@ class BotWarsBot:
         self._require_tier(Tier.PRO)
         return self.competition_engine.create_competition(name, category, description, prize_usd)
 
-    def list_competitions(self, category: str = None) -> list:
+    def list_competitions(self, category: Optional[str] = None) -> list:
         """List all competitions (FREE+)."""
         return self.competition_engine.list_competitions(category)
 
@@ -158,7 +159,7 @@ class BotWarsBot:
         self,
         challenge_id: str,
         user_id: str,
-        team_name: str = None,
+        team_name: Optional[str] = None,
     ) -> dict:
         """Join a challenge (PRO+)."""
         self._require_tier(Tier.PRO)
