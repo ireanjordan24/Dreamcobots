@@ -4,6 +4,8 @@ Open Claw Bot — Strategy Engine
 Analyses market and operational data to generate Open Claw strategies for
 bots and clients.  Strategies are ranked by expected ROI, risk score,
 and alignment with client goals.
+
+GLOBAL AI SOURCES FLOW: participates via open_claw_bot.py pipeline.
 """
 
 from __future__ import annotations

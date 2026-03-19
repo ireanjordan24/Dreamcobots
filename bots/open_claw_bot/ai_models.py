@@ -10,6 +10,8 @@ Supported model families:
   - Signal Generator — rule-based + ML signal fusion
   - Ensemble Ranker  — gradient-boosted strategy ranking
   - NLP Advisor      — natural-language strategy recommendation
+
+GLOBAL AI SOURCES FLOW: participates via open_claw_bot.py pipeline.
 """
 
 from __future__ import annotations

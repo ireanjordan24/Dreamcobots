@@ -4,6 +4,8 @@ Buddy OS — Device Manager
 Manages universal device compatibility across:
   TVs, gaming consoles, phones, tablets, computers (Windows/Linux/macOS),
   Apple ecosystem, Google/Android ecosystem, and smart-home devices.
+
+GLOBAL AI SOURCES FLOW: participates via buddy_os.py pipeline.
 """
 
 from __future__ import annotations
