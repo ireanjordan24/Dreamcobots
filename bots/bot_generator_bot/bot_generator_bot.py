@@ -263,3 +263,14 @@ class BotGeneratorBot:
     def process(self, payload: dict) -> dict:
         """GLOBAL AI SOURCES FLOW framework entry point."""
         return self.chat(payload.get("command", ""))
+
+    def run(self) -> str:
+        """Execute one Bot Generator cycle and report status."""
+        summary = self.get_summary()
+        generated = summary.get("bots_generated_this_month", 0)
+        limit = summary.get("monthly_limit")
+        limit_str = str(limit) if limit is not None else "Unlimited"
+        return (
+            f"Bot Generator Bot: {generated} bot(s) generated this month "
+            f"(limit: {limit_str}, tier: {self.tier.value})"
+        )

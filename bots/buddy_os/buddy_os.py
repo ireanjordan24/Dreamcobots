@@ -371,6 +371,16 @@ class BuddyOS:
     # BuddyAI registration helper
     # ------------------------------------------------------------------
 
+    def run(self) -> str:
+        """Execute one Buddy OS system cycle."""
+        status = self.system_status()
+        device_count = len(status.get("connected_devices", []))
+        boot_steps = len(self.get_boot_log())
+        return (
+            f"Buddy OS: {device_count} connected device(s), "
+            f"{boot_steps} boot step(s) completed"
+        )
+
     def register_with_buddy(self, buddy_bot_instance) -> None:
         """Register this BuddyOS instance with a BuddyAI orchestrator."""
         buddy_bot_instance.register_bot("buddy_os", self)

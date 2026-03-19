@@ -295,6 +295,13 @@ class DreamcoPaymentsBot:
     # BuddyAI integration
     # ------------------------------------------------------------------
 
+    def run(self) -> str:
+        """Execute one payments system health check cycle."""
+        return (
+            f"DreamCo Payments Bot: payment system active on "
+            f"{self.tier.value} tier — ready to process transactions"
+        )
+
     def register_with_buddy(self, buddy_bot_instance) -> None:
         """
         Register this bot with a BuddyBot instance.

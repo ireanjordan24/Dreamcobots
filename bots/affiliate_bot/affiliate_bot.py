@@ -170,6 +170,16 @@ class AffiliateBot:
             }
         return report
 
+    def run(self) -> str:
+        """Execute one affiliate marketing automation cycle."""
+        report = self.generate_report()
+        revenue = report.get("estimated_monthly_revenue_usd", 0)
+        niches = report.get("tracked_niches", [])
+        return (
+            f"Affiliate Bot: tracked {len(niches)} niche(s), "
+            f"est. monthly revenue ${revenue:.2f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

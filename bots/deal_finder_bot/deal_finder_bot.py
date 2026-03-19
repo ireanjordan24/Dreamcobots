@@ -165,6 +165,16 @@ class DealFinderBot:
         annotated = [self._annotate_item(item) for item in self._scanned_items]
         return sorted(annotated, key=lambda x: x["estimated_profit"], reverse=True)[:limit]
 
+    def run(self) -> str:
+        """Scan marketplaces and surface the top deals."""
+        best = self.get_best_deals(limit=3)
+        count = len(best)
+        best_profit = best[0]["estimated_profit"] if best else 0
+        return (
+            f"Deal Finder Bot: found {count} top deal(s), "
+            f"best est. profit ${best_profit:.2f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

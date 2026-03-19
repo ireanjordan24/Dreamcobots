@@ -373,6 +373,16 @@ class JobTitlesBot:
         """Register this bot with a BuddyBot orchestrator instance."""
         buddy_bot_instance.register_bot("job_titles_bot", self)
 
+    def run(self) -> str:
+        """Execute one Job Titles Bot cycle."""
+        stats = self.database_stats()
+        total_titles = stats.get("total_titles", 0)
+        industries = len(self.list_industries())
+        return (
+            f"Job Titles Bot: {total_titles} job title(s) across "
+            f"{industries} industry(ies) available on {self.tier.value} tier"
+        )
+
 
 __all__ = [
     "JobTitlesBot",

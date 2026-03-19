@@ -142,6 +142,16 @@ class AppBuilderBot:
             "tier": self.tier.value,
         }
 
+    def run(self) -> str:
+        """Report active project capacity for the current tier."""
+        active = self._active_project_count()
+        limit = self.PROJECT_LIMITS[self.tier]
+        limit_str = str(limit) if limit is not None else "Unlimited"
+        return (
+            f"App Builder Bot: {active} active project(s), "
+            f"tier limit {limit_str} — ready to build"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [
