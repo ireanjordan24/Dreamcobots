@@ -1,0 +1,35 @@
+{
+  "name": "dreamco-leadgenbot",
+  "version": "1.0.0",
+  "description": "DreamCo LeadGenBot — AI-powered lead generation and monetization platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.0",
+    "stripe": "^14.21.0",
+    "node-fetch": "^3.3.2",
+    "cheerio": "^1.0.0-rc.12",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "lead-generation",
+    "ai",
+    "dreamco",
+    "saas",
+    "automation"
+  ],
+  "author": "DreamCo",
+  "license": "MIT"
+}
