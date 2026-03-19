@@ -10,6 +10,9 @@ Modules:
   - SmartDeviceHub   — IFTTT/smart-home integrations
   - NvidiaToolsHub   — NVIDIA AI/GPU tools (Isaac, Omniverse, CUDA, Jetson)
   - StarlinkManager  — Starlink satellite internet management & resale
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations

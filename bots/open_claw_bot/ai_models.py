@@ -10,6 +10,9 @@ Supported model families:
   - Signal Generator — rule-based + ML signal fusion
   - Ensemble Ranker  — gradient-boosted strategy ranking
   - NLP Advisor      — natural-language strategy recommendation
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations

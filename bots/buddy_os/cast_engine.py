@@ -9,6 +9,9 @@ Enables sending and casting content to external screens via:
 
 Each protocol is represented as a CastProtocol.  The engine discovers
 receivers, establishes a cast session, and controls playback.
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations
