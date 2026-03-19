@@ -9,6 +9,8 @@ Enables sending and casting content to external screens via:
 
 Each protocol is represented as a CastProtocol.  The engine discovers
 receivers, establishes a cast session, and controls playback.
+
+GLOBAL AI SOURCES FLOW: participates via buddy_os.py pipeline.
 """
 
 from __future__ import annotations
