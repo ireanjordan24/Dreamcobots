@@ -94,7 +94,7 @@ class TaskDelegationAI:
         required = task.required_skills
         matched = required & agent.skills
         skill_score = len(matched) / max(len(required), 1)
-        # Capacity headroom
+        # Capacity headroom; use 0.1 as minimum divisor to avoid division by zero
         available = max(agent.capacity - agent.current_load, 0.0)
         capacity_score = min(available / max(task.estimated_hours, 0.1), 1.0)
         # Success rate

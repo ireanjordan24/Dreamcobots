@@ -50,7 +50,15 @@ class CostReductionEngine:
     def analyze_costs(self, dept_id: str, cost_data: CostData) -> dict:
         """Store and analyze department cost data."""
         self._cost_data[dept_id] = cost_data
-        top_category = max(cost_data.categories, key=cost_data.categories.get, default="N/A")
+        if not cost_data.categories:
+            return {
+                "dept_id": dept_id,
+                "monthly_spend": cost_data.monthly_spend,
+                "top_cost_driver": "N/A",
+                "top_driver_spend": 0.0,
+                "categories_analyzed": 0,
+            }
+        top_category = max(cost_data.categories, key=cost_data.categories.get)
         analysis = {
             "dept_id": dept_id,
             "monthly_spend": cost_data.monthly_spend,

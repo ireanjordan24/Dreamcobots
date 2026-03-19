@@ -75,7 +75,7 @@ class ResilienceScorer:
             modes.append({"mode": "slow_recovery", "risk": "medium", "mttr_hours": metrics.mttr_hours})
         if metrics.redundancy_score < 5.0:
             modes.append({"mode": "insufficient_redundancy", "risk": "high", "score": metrics.redundancy_score})
-        if metrics.mtbf_hours < 168:
+        if metrics.mtbf_hours < 168:  # 168 hours = 1 week
             modes.append({"mode": "frequent_failures", "risk": "high", "mtbf_hours": metrics.mtbf_hours})
         return modes
 

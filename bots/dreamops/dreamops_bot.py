@@ -180,6 +180,7 @@ class DreamOpsBot:
     def score_resilience(self, system_id: str, metrics: ResilienceMetrics):
         """Score system resilience. Requires ENTERPRISE."""
         self._require_enterprise("resilience_scorer")
+        self._resilience_scorer.score_system(system_id, metrics)
         return self._resilience_scorer.generate_resilience_report(system_id)
 
     # ------------------------------------------------------------------

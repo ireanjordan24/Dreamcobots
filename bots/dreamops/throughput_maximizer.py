@@ -77,7 +77,7 @@ class ThroughputMaximizer:
             if stage.capacity < avg_capacity * 0.6:
                 c_type = "capacity"
                 impact = round((1 - stage.capacity / avg_capacity) * 10, 2)
-            elif stage.cycle_time > 120:
+            elif stage.cycle_time > 120:  # 120 seconds = 2 minutes
                 c_type = "cycle_time"
                 impact = round(min(stage.cycle_time / 120.0, 10.0), 2)
             elif stage.current_load / max(stage.capacity, 1e-9) > 0.9:
