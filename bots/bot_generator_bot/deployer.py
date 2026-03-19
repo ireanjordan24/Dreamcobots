@@ -12,9 +12,13 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 from __future__ import annotations
 
 import os
+import sys
 import json
 from datetime import datetime, timezone
 from typing import Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 
 class BotDeployer:
