@@ -129,6 +129,85 @@ See full documentation in:
 - [`bots/ai_chatbot/README.md`](bots/ai_chatbot/README.md)
 
 ---
+## 📊 DreamCo Bots Data Sheet
+
+The `data/` directory contains a fully organised, interactive catalogue of
+**DreamCo enterprise bots** that can be opened directly in Microsoft Excel,
+Google Sheets, or LibreOffice Calc.
+
+### Files
+
+| File | Description |
+|------|-------------|
+| [`data/dreamco_bots_data.xlsx`](data/dreamco_bots_data.xlsx) | Excel workbook with AutoFilter, frozen header, colour-coded ROI priority, and a Summary sheet |
+| [`data/dreamco_bots_data.csv`](data/dreamco_bots_data.csv) | Plain CSV — Git-friendly and importable into any tool |
+| [`data/generate_bots_data.py`](data/generate_bots_data.py) | Python script that regenerates both files from the master catalog |
+
+### Columns
+
+| Column | Description |
+|--------|-------------|
+| **Bot Name** | Full name of the DreamCo bot |
+| **Slug** | URL-friendly identifier used for deployment |
+| **Price (USD/mo)** | Monthly subscription price in USD |
+| **Industry** | Industry vertical (e.g. Finance, Health, Cybersecurity) |
+| **Function** | Primary function (e.g. Analytics, Automation, Forecasting) |
+| **ROI Priority** | Expected return-on-investment tier: **High** / **Medium** / **Low** |
+| **Description** | Short description of what the bot does |
+
+### Industries covered
+
+Finance · Sales & Marketing · Operations · Analytics · Cybersecurity ·
+Compliance & Legal · Health · Real Estate · Agriculture · Technology ·
+E-Commerce · Crypto & DeFi · Education · Human Resources · Consumer
+
+### Filtering & Sorting
+
+**Excel / LibreOffice Calc**
+
+1. Open `data/dreamco_bots_data.xlsx`.
+2. Click any header cell and use the **▼ dropdown arrows** (AutoFilter is
+   already enabled) to filter by Industry, Function, ROI Priority, or Price.
+3. To sort by price, click the **Price (USD/mo)** dropdown → *Sort Smallest to
+   Largest* or *Sort Largest to Smallest*.
+4. Use **Data → Filter** to create multi-column filters (e.g. Finance + High ROI).
+
+**Google Sheets**
+
+1. Upload `data/dreamco_bots_data.csv` to Google Drive and open it.
+2. Select the header row, then **Data → Create a filter**.
+3. Use the filter dropdowns on each column to narrow the view.
+
+**Command line (Python)**
+
+```python
+import csv
+from pathlib import Path
+
+with open("data/dreamco_bots_data.csv", newline="") as f:
+    rows = list(csv.DictReader(f))
+
+# Filter: High-ROI Finance bots
+high_roi_finance = [
+    r for r in rows
+    if r["Industry"] == "Finance" and r["ROI Priority"] == "High"
+]
+for bot in high_roi_finance:
+    print(bot["Bot Name"], "—", bot["Price (USD/mo)"])
+```
+
+### Regenerating the files
+
+If you add new bots to the catalog inside `data/generate_bots_data.py`, run:
+
+```bash
+pip install openpyxl   # one-time setup
+python data/generate_bots_data.py
+```
+
+Both `dreamco_bots_data.xlsx` and `dreamco_bots_data.csv` will be updated.
+
+---
 ## Folder Explanation
 ### `framework`
 - Contains the mandatory **GLOBAL AI SOURCES FLOW** pipeline module
