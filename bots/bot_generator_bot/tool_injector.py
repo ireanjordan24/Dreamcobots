@@ -5,6 +5,9 @@ Adds appropriate scraping and processing tool stubs into a bot DNA
 dictionary based on the detected industry and goal.  Each tool entry
 contains a ``name``, ``description``, and ``stub`` — a minimal Python
 code snippet that the template engine can inline into the generated bot.
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations

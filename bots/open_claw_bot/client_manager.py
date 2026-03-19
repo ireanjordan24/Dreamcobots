@@ -4,6 +4,9 @@ Open Claw Bot — Client Manager
 Manages client profiles and their customised strategy configurations.
 Each client can have individual risk preferences, goals, and strategy rules
 that are injected into the strategy engine at generation time.
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations

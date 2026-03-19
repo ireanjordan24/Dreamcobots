@@ -4,6 +4,9 @@ Bot Generator Bot — Parser Module
 Detects the user-specified industry and goal from natural-language input,
 mapping it to a structured BotIntent that drives the rest of the generation
 pipeline (tool injection → template engine → deployer).
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations
