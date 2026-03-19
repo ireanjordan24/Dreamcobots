@@ -9,9 +9,13 @@ ecosystem.  Supports dry-run mode (returns plan without writing files).
 from __future__ import annotations
 
 import os
+import sys
 import json
 from datetime import datetime, timezone
 from typing import Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 
 class BotDeployer:

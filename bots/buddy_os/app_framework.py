@@ -14,14 +14,14 @@ Modules:
 
 from __future__ import annotations
 
+import os
+import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
-# ===========================================================================
-# App Registry
-# ===========================================================================
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 class AppCategory(Enum):
     PRODUCTIVITY = "productivity"

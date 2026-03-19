@@ -8,9 +8,14 @@ pipeline (tool injection → template engine → deployer).
 
 from __future__ import annotations
 
+import os
+import sys
 import re
 from dataclasses import dataclass, field
 from typing import Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Industry / keyword mapping
