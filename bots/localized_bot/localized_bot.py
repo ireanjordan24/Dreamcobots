@@ -122,9 +122,9 @@ class LocalizedBot:
         """
         Adapt *content* for *target_region_id*.
 
+        Basic content adaptation is available on all tiers (FREE+).
         Industry-specific adaptation requires PRO or higher.
         """
-        self._require_feature(FEATURE_BASIC_TRANSLATION, "Pro")
         if industry is not None:
             self._require_feature(FEATURE_INDUSTRY_ADAPTION, "Pro")
         return self._localization.adapt_content(content, target_region_id, industry)
@@ -133,9 +133,8 @@ class LocalizedBot:
         """
         Translate *text* to *target_language*.
 
-        Full translation (higher confidence) requires PRO or higher.
+        Basic translation is available on all tiers (FREE+).
         """
-        self._require_feature(FEATURE_BASIC_TRANSLATION, "Pro")
         return self._localization.translate_message(text, target_language)
 
     def list_regions(self) -> list:
@@ -143,8 +142,7 @@ class LocalizedBot:
         return self._region_db.list_regions()
 
     def get_cultural_tips(self, region_id: str) -> list[str]:
-        """Return cultural tips for *region_id*."""
-        self._require_feature(FEATURE_BASIC_TRANSLATION, "Pro")
+        """Return cultural tips for *region_id*. Available on all tiers (FREE+)."""
         return self._localization.get_cultural_tips(region_id)
 
     def register_regional_bot(
