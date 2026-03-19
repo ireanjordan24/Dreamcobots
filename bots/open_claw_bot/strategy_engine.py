@@ -13,6 +13,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401
+
 
 class StrategyType(Enum):
     AGGRESSIVE = "aggressive"
