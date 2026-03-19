@@ -112,6 +112,16 @@ class CarFlippingBot:
         annotated = [self._annotate_car(car) for car in sample]
         return sorted(annotated, key=lambda x: x["flip_profit_est"], reverse=True)[:limit]
 
+    def run(self) -> str:
+        """Scan for car flip opportunities and return top results."""
+        opportunities = self.get_best_opportunities(limit=3)
+        count = len(opportunities)
+        best_profit = opportunities[0]["flip_profit_est"] if opportunities else 0
+        return (
+            f"Car Flipping Bot: found {count} flip opportunity(ies), "
+            f"best est. profit ${best_profit:.0f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

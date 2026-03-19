@@ -130,6 +130,16 @@ class MiningBot:
             "tier": self.tier.value,
         }
 
+    def run(self) -> str:
+        """Execute one mining cycle and return a profitability summary."""
+        profitability = self.track_profitability()
+        coin = profitability.get("current_coin", "N/A")
+        daily = profitability.get("daily_revenue_usd", 0)
+        return (
+            f"Mining Bot: mining {coin}, "
+            f"est. daily revenue ${daily:.2f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

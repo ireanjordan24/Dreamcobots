@@ -452,6 +452,16 @@ class OpenClawBot:
             "data": {},
         }
 
+    def run(self) -> str:
+        """Execute one trading intelligence cycle."""
+        db = self.dashboard()
+        clients = db.get("clients", {}).get("total", 0)
+        strategies = db.get("strategies", {}).get("total_generated", 0)
+        return (
+            f"Open Claw Bot: {clients} client(s), "
+            f"{strategies} strategy(ies) generated"
+        )
+
     # ------------------------------------------------------------------
     # BuddyAI registration helper
     # ------------------------------------------------------------------

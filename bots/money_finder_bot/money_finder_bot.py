@@ -139,6 +139,16 @@ class MoneyFinderBot:
             report["automated_recovery"] = True
         return report
 
+    def run(self) -> str:
+        """Scan for unclaimed funds and cashback opportunities."""
+        report = self.generate_recovery_report("DreamCo User")
+        total = report.get("total_recovery_potential_usd", 0)
+        unclaimed = report.get("unclaimed_funds_count", 0)
+        return (
+            f"Money Finder Bot: {unclaimed} unclaimed fund source(s), "
+            f"est. recovery potential ${total:.2f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

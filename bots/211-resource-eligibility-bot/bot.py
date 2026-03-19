@@ -1279,6 +1279,18 @@ class ResourceBot:
             f"No resource found with ID '{resource_id}'."
         )
 
+    # ------------------------------------------------------------------
+    # Automation interface
+    # ------------------------------------------------------------------
+
+    def run(self) -> str:
+        """Execute one 211 resource eligibility search cycle."""
+        resources = self.search_resources(lat=40.7128, lon=-74.0060)
+        return (
+            f"211 Resource Bot: {len(resources)} resource(s) found near "
+            f"default coordinates (tier: {self.tier.value})"
+        )
+
 
 # ---------------------------------------------------------------------------
 # CLI entry point

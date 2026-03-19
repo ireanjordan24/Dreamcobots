@@ -388,6 +388,16 @@ class CryptoBot:
     # Tier info
     # ------------------------------------------------------------------
 
+    def run(self) -> str:
+        """Execute one crypto monitoring cycle."""
+        tracked = self.get_tracked_coins()
+        portfolio = self.portfolio_summary()
+        total_value = portfolio.get("total_value_usd", 0)
+        return (
+            f"Crypto Bot: tracking {len(tracked)} coin(s), "
+            f"portfolio value ${total_value:.2f}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

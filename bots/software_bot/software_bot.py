@@ -218,6 +218,14 @@ class SoftwareBot:
             "tier": self.tier.value,
         }
 
+    def run(self) -> str:
+        """List available app categories and report tier capabilities."""
+        categories = self.list_app_categories()
+        return (
+            f"Software Bot: {len(categories)} app category(ies) available "
+            f"on {self.tier.value} tier — {', '.join(categories[:3])}"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

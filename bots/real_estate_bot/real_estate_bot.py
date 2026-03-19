@@ -182,6 +182,16 @@ class RealEstateBot:
             }
         return result
 
+    def run(self) -> str:
+        """Scan for real estate deals and report market trends."""
+        deals = self.search_deals(location="Atlanta", budget=250_000)
+        trends = self.get_market_trends(location="Atlanta")
+        avg_roi = trends.get("average_roi_pct", 0)
+        return (
+            f"Real Estate Bot: {len(deals)} deal(s) found in Atlanta, "
+            f"avg ROI {avg_roi:.1f}%"
+        )
+
     def describe_tier(self) -> str:
         info = get_bot_tier_info(self.tier)
         lines = [

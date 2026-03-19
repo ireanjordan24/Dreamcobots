@@ -521,6 +521,16 @@ class BigBroAI:
     # Internal
     # ------------------------------------------------------------------
 
+    def run(self) -> str:
+        """Execute one Big Bro AI mentorship cycle."""
+        intro = self.introduce()
+        report = self.factory_report()
+        bots_built = report.get("total_bots_built", 0)
+        return (
+            f"Big Bro AI: online — {bots_built} bot(s) built; "
+            f"{intro[:60].rstrip()}..."
+        )
+
     def _require_feature(self, feature: str) -> None:
         if not self.config.has_feature(feature):
             raise BigBroTierError(
