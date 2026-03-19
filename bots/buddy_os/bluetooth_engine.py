@@ -9,6 +9,9 @@ Supports:
   - CoreBluetooth (Apple iOS/macOS)
   - Android Bluetooth API
   - Windows Bluetooth API
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations

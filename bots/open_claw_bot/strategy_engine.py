@@ -4,6 +4,9 @@ Open Claw Bot — Strategy Engine
 Analyses market and operational data to generate Open Claw strategies for
 bots and clients.  Strategies are ranked by expected ROI, risk score,
 and alignment with client goals.
+
+Adheres to the Dreamcobots GlobalAISourcesFlow framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
 from __future__ import annotations
