@@ -130,15 +130,22 @@ class ControlPanel:
 
     def get_control_matrix(self) -> str:
         """Return a formatted string showing the bot-to-platform control mapping."""
-        lines = [
-            "╔══════════════════════════════════════════════╗",
-            "║     DreamCobots Control Matrix               ║",
-            "╠══════════════════════════════════════════════╣",
-        ]
-        for name, status in self.get_platform_status().items():
+        statuses = self.get_platform_status()
+        # Compute column widths from actual data to avoid truncation/misalignment.
+        name_w = max((len(n) for n in statuses), default=self.PLATFORM_NAME_WIDTH)
+        name_w = max(name_w, self.PLATFORM_NAME_WIDTH)
+        type_w = max((len(s["type"]) for s in statuses.values()), default=10)
+        # icon (2) + 2 spaces + name + 1 space + brackets + type + 2 spaces = inner width
+        inner = 2 + 2 + name_w + 1 + 1 + type_w + 1 + 2  # "✅  {name:<name_w} [{type}]  "
+        border = "═" * (inner + 2)
+        title = "DreamCobots Control Matrix"
+        title_line = f"║ {title:^{inner}} ║"
+        lines = [f"╔{border}╗", title_line, f"╠{border}╣"]
+        for name, status in statuses.items():
             active_icon = "✅" if status["is_active"] else "⬜"
-            lines.append(f"║  {active_icon}  {name:<{self.PLATFORM_NAME_WIDTH}} [{status['type']}]  ║")
-        lines.append("╚══════════════════════════════════════════════╝")
+            row = f"{active_icon}  {name:<{name_w}} [{status['type']:<{type_w}}]"
+            lines.append(f"║ {row} ║")
+        lines.append(f"╚{border}╝")
         return "\n".join(lines)
 
     def ping_all_platforms(self) -> dict:

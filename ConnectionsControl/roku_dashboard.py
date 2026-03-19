@@ -55,23 +55,36 @@ class RokuDashboard:
         self._push_log.append(payload)
         return payload
 
+    # Total inner width of the box (between the │ borders), excluding the leading space.
+    _BOX_INNER = 37
+
+    def _pad(self, content: str) -> str:
+        """Right-pad *content* to fill the box inner width exactly."""
+        return content.ljust(self._BOX_INNER)
+
     def render_kpi_screen(self, metrics: KPIMetrics) -> str:
         """Render a formatted KPI string suitable for TV display."""
         bar = "█" * int(metrics.uptime / 10) + "░" * (10 - int(metrics.uptime / 10))
         w = self.VALUE_COLUMN_WIDTH
         uw = self.UPTIME_COLUMN_WIDTH
-        return (
-            "┌─────────────────────────────────────┐\n"
-            "│      DreamCobots Operations TV       │\n"
-            "├─────────────────────────────────────┤\n"
-            f"│  Revenue     : ${metrics.revenue:>{w},.2f}       │\n"
-            f"│  Active Bots : {metrics.active_bots:>{w}}       │\n"
-            f"│  Alerts      : {metrics.alerts:>{w}}       │\n"
-            f"│  Throughput  : {metrics.throughput:>{w}.1f} t/hr  │\n"
-            f"│  Uptime      : {metrics.uptime:>{uw}.2f}%       │\n"
-            f"│  [{bar}]       │\n"
-            "└─────────────────────────────────────┘"
-        )
+        border = "─" * self._BOX_INNER
+        rows = [
+            f"  Revenue     : ${metrics.revenue:>{w},.2f}",
+            f"  Active Bots : {metrics.active_bots:>{w}}",
+            f"  Alerts      : {metrics.alerts:>{w}}",
+            f"  Throughput  : {metrics.throughput:>{w}.1f} t/hr",
+            f"  Uptime      : {metrics.uptime:>{uw}.2f}%",
+            f"  [{bar}]",
+        ]
+        lines = [
+            f"┌{border}┐",
+            f"│{'DreamCobots Operations TV':^{self._BOX_INNER}}│",
+            f"├{border}┤",
+        ]
+        for row in rows:
+            lines.append(f"│{self._pad(row)}│")
+        lines.append(f"└{border}┘")
+        return "\n".join(lines)
 
     def get_display_config(self) -> dict:
         """Return the current display configuration."""
