@@ -9,6 +9,8 @@ Covers all modules:
   5. InfluencerBot main class (integration)
 """
 
+from __future__ import annotations
+
 import sys
 import os
 
