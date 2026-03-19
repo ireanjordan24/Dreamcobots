@@ -4,8 +4,6 @@ Bot Generator Bot — Deployer Module
 Writes the generated bot source code to the filesystem under the
 ``bots/`` directory and registers it for use within the Dreamcobots
 ecosystem.  Supports dry-run mode (returns plan without writing files).
-
-GLOBAL AI SOURCES FLOW: participates via bot_generator_bot.py pipeline.
 """
 
 from __future__ import annotations
@@ -14,6 +12,8 @@ import os
 import json
 from datetime import datetime, timezone
 from typing import Optional
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class BotDeployer:
