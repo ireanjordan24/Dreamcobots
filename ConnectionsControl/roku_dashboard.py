@@ -27,6 +27,9 @@ class KPIMetrics:
 class RokuDashboard:
     """Roku TV dashboard for KPI visualization (mock — no network calls)."""
 
+    VALUE_COLUMN_WIDTH = 10   # right-aligned numeric value field width
+    UPTIME_COLUMN_WIDTH = 9   # uptime field is one char narrower (holds the %)
+
     def __init__(self) -> None:
         self._device_ip: Optional[str] = None
         self._display_config: Dict = {
@@ -55,15 +58,17 @@ class RokuDashboard:
     def render_kpi_screen(self, metrics: KPIMetrics) -> str:
         """Render a formatted KPI string suitable for TV display."""
         bar = "█" * int(metrics.uptime / 10) + "░" * (10 - int(metrics.uptime / 10))
+        w = self.VALUE_COLUMN_WIDTH
+        uw = self.UPTIME_COLUMN_WIDTH
         return (
             "┌─────────────────────────────────────┐\n"
             "│      DreamCobots Operations TV       │\n"
             "├─────────────────────────────────────┤\n"
-            f"│  Revenue     : ${metrics.revenue:>10,.2f}       │\n"
-            f"│  Active Bots : {metrics.active_bots:>10}       │\n"
-            f"│  Alerts      : {metrics.alerts:>10}       │\n"
-            f"│  Throughput  : {metrics.throughput:>10.1f} t/hr  │\n"
-            f"│  Uptime      : {metrics.uptime:>9.2f}%       │\n"
+            f"│  Revenue     : ${metrics.revenue:>{w},.2f}       │\n"
+            f"│  Active Bots : {metrics.active_bots:>{w}}       │\n"
+            f"│  Alerts      : {metrics.alerts:>{w}}       │\n"
+            f"│  Throughput  : {metrics.throughput:>{w}.1f} t/hr  │\n"
+            f"│  Uptime      : {metrics.uptime:>{uw}.2f}%       │\n"
             f"│  [{bar}]       │\n"
             "└─────────────────────────────────────┘"
         )

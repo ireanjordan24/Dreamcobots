@@ -35,6 +35,8 @@ class Platform:
 class ControlPanel:
     """Unified control interface aggregating all platform integrations."""
 
+    PLATFORM_NAME_WIDTH = 20   # column width for platform name in control matrix
+
     def __init__(self) -> None:
         self._kill_switch = KillSwitch()
         self._platforms: Dict[str, Platform] = {}
@@ -135,7 +137,7 @@ class ControlPanel:
         ]
         for name, status in self.get_platform_status().items():
             active_icon = "✅" if status["is_active"] else "⬜"
-            lines.append(f"║  {active_icon}  {name:<20} [{status['type']}]  ║")
+            lines.append(f"║  {active_icon}  {name:<{self.PLATFORM_NAME_WIDTH}} [{status['type']}]  ║")
         lines.append("╚══════════════════════════════════════════════╝")
         return "\n".join(lines)
 
