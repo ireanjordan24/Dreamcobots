@@ -352,10 +352,10 @@ class TestNanotechDiseaseDetector:
         assert isinstance(result, dict)
         assert "recommended_treatments" in result
 
-    def test_recommend_treatment_enterprise_personalised(self):
+    def test_recommend_treatment_enterprise_personalized(self):
         d = NanotechDiseaseDetector(Tier.ENTERPRISE)
         result = d.recommend_treatment({"patient_id": "p1", "age": 70, "conditions": ["hypertension"]}, "cardiovascular")
-        assert result.get("personalised") is True
+        assert result.get("personalized") is True
         assert result.get("genomic_adjusted") is True
 
 
@@ -450,14 +450,14 @@ class TestPrecisionMedicineEngine:
         eng = PrecisionMedicineEngine(Tier.ENTERPRISE)
         eng.create_patient_profile(self._sample_patient())
         result = eng.generate_treatment_plan("pt1", "diabetes")
-        for key in ("patient_id", "condition", "treatment_plan", "personalised"):
+        for key in ("patient_id", "condition", "treatment_plan", "personalized"):
             assert key in result
 
-    def test_enterprise_treatment_plan_personalised(self):
+    def test_enterprise_treatment_plan_personalized(self):
         eng = PrecisionMedicineEngine(Tier.ENTERPRISE)
         eng.create_patient_profile(self._sample_patient())
         result = eng.generate_treatment_plan("pt1", "cardiovascular")
-        assert result["personalised"] is True
+        assert result["personalized"] is True
 
     def test_free_drug_efficacy_raises(self):
         eng = PrecisionMedicineEngine(Tier.FREE)
@@ -551,7 +551,7 @@ class TestBiomedicalBotEnterprise:
         # Must have a patient profile first via the medicine engine
         bot.medicine.create_patient_profile({"patient_id": "p1", "age": 40, "weight_kg": 70, "height_cm": 170})
         result = bot.get_treatment_plan("p1", "diabetes")
-        assert result["personalised"] is True
+        assert result["personalized"] is True
 
     def test_enterprise_dashboard_has_ml(self):
         bot = BiomedicalBot(Tier.ENTERPRISE)

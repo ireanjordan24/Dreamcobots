@@ -102,7 +102,7 @@ class NanotechDiseaseDetector:
         result = {
             "analysis_type": "disease_marker_screening",
             "tier": self.tier.value,
-            "markers_analysed": len(sample_data),
+            "markers_analyzed": len(sample_data),
             "diseases_screened": list(DISEASE_MARKERS.keys()),
             "findings": findings,
             "flagged_diseases": list(set(flagged_diseases)),
@@ -149,7 +149,7 @@ class NanotechDiseaseDetector:
         }
 
     def recommend_treatment(self, patient_data: dict, diagnosis: str) -> dict:
-        """Generate a personalised treatment recommendation.
+        """Generate a personalized treatment recommendation.
 
         patient_data: {patient_id, age, weight_kg, conditions, ...}
         diagnosis: primary diagnosis string
@@ -179,7 +179,7 @@ class NanotechDiseaseDetector:
         }
 
         if self.tier == Tier.ENTERPRISE:
-            result["personalised"] = True
+            result["personalized"] = True
             result["genomic_adjusted"] = True
             result["precision_score"] = 0.94
             if age > 65:
@@ -225,7 +225,7 @@ class PrecisionMedicineEngine:
             )
 
     def create_patient_profile(self, patient_data: dict) -> dict:
-        """Build a personalised medicine profile for a patient.
+        """Build a personalized medicine profile for a patient.
 
         patient_data: {patient_id, age, sex, weight_kg, conditions, medications, variants, ...}
         """
@@ -294,7 +294,7 @@ class PrecisionMedicineEngine:
         return result
 
     def generate_treatment_plan(self, patient_id: str, condition: str) -> dict:
-        """Generate a full personalised treatment plan."""
+        """Generate a full personalized treatment plan."""
         self._require_enterprise("Full treatment plan generation")
 
         profile = self._profiles.get(patient_id, {"patient_id": patient_id})
@@ -334,7 +334,7 @@ class PrecisionMedicineEngine:
             "patient_id": patient_id,
             "condition": condition,
             "treatment_plan": plan,
-            "personalised": True,
+            "personalized": True,
             "genomic_variants_considered": variants,
             "comorbidities_considered": conditions,
             "tier": self.tier.value,
