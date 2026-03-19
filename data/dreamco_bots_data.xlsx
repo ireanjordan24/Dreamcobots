@@ -1,0 +1,8 @@
+Bot Name,Slug,Industry,Function,Price,ROI Priority,Description
+"Super Bot","super_bot","Finance","Financial advising","99.99","High","A bot that helps in personal finance management."
+"Health Bot","health_bot","Healthcare","Health monitoring","49.99","Medium","A bot that monitors health metrics and provides insights."
+"Edu Bot","edu_bot","Education","Tutoring service","19.99","Low","A bot that helps students with their studies through AI tutoring.",
+"Market Bot","market_bot","Finance","Market analysis","29.99","High","A bot that analyzes market trends to provide investment insights.",
+"Travel Bot","travel_bot","Travel","Travel planning","34.99","Medium","A bot that assists in planning your travel itinerary efficiently.",
+"Chat Bot","chat_bot","Customer Service","Customer support","9.99","Low","A bot that provides customer service through chat interfaces.",
+"Data Bot","data_bot","Data Science","Data processing","79.99","High","A bot that processes large datasets for analytics."
