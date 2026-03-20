@@ -1,0 +1,48 @@
+name: Auto Recovery CI Mechanism
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main  # or the default branch you use
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Tests
+        run: |
+          # Commands to run tests
+          ./run-tests.sh
+
+      - name: Diagnose Issues
+        id: diagnose
+        run: |
+          # Logic to diagnose common issues
+          if [ $? -ne 0 ]; then
+              echo "Tests failed, attempting to fix..."
+              # Example commands to automatically fix issues
+              ./auto-fixer.sh
+              echo "Fixed common issues."
+          else
+              echo "All tests passed."
+          fi
+
+  check-status:
+    runs-on: ubuntu-latest
+    needs: diagnose
+    steps:
+      - name: Check for any issues
+        run: |
+          # Logic to check if additional checks are required
+          ./check-requirements.sh
+          if [ $? -eq 0 ]; then
+              echo "Requirements met, proceed."
+          else
+              echo "Rechecking all workflows..."
+              # Logic to rerun workflows or notify
+          fi
