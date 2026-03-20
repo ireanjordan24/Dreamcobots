@@ -10,6 +10,10 @@ BOT_DIR = os.path.join(REPO_ROOT, 'bots', '211-resource-eligibility-bot')
 sys.path.insert(0, BOT_DIR)
 sys.path.insert(0, REPO_ROOT)
 
+# Clear cached modules to prevent cross-test sys.modules pollution
+for _mod in ('tiers', 'bot'):
+    sys.modules.pop(_mod, None)
+
 import pytest
 
 from tiers import (
