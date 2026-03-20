@@ -15,6 +15,7 @@ Usage
 
 import sys
 import os
+from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -49,7 +50,7 @@ class Chatbot:
         on the given tier.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE, default_model: str | None = None):
+    def __init__(self, tier: Tier = Tier.FREE, default_model: Optional[str] = None):
         self.tier = tier
         self.config = get_tier_config(tier)
         self._history: list[dict] = []
@@ -71,7 +72,7 @@ class Chatbot:
     # Core chat interface
     # ------------------------------------------------------------------
 
-    def chat(self, message: str, model: str | None = None) -> dict:
+    def chat(self, message: str, model: Optional[str] = None) -> dict:
         """
         Send a message and receive a response.
 
