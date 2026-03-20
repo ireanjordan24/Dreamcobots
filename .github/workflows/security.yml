@@ -1,0 +1,58 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"  # Weekly on Mondays at 06:00 UTC
+
+jobs:
+  bandit:
+    name: Bandit — Static Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bandit
+        run: pip install bandit[toml]
+
+      - name: Run bandit scan
+        run: |
+          bandit -r bots/ framework/ tools/ ui/ \
+            --severity-level medium \
+            --confidence-level medium \
+            --skip B101,B311 \
+            --exit-zero \
+            -f txt
+
+  safety:
+    name: Safety — Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Check dependencies for known vulnerabilities
+        run: |
+          pip install -r requirements.txt
+          safety check --full-report --continue-on-error
