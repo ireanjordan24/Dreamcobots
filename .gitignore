@@ -6,3 +6,4 @@ __pycache__/
 dist/
 build/
 .env
+ci_recovery.log

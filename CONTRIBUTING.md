@@ -229,3 +229,70 @@ and `Fiverr_bots/` and report any file that lacks a reference to
 5. Open a PR against the `main` branch with a clear description of the bot's
    purpose and how it implements the GLOBAL AI SOURCES FLOW.
 6. A maintainer will review the PR for framework compliance before merging.
+
+---
+
+## Auto-Recovery Mechanism
+
+The CI pipeline includes an **auto-recovery step** that runs automatically
+whenever tests fail.  It is implemented in `tools/auto_recovery.py`.
+
+### What it does
+
+| Check | Auto-fix? | On failure |
+|---|---|---|
+| Python version ≥ 3.8 | No | Logs manual action required |
+| Dependency health (`pip check`) | **Yes** — re-runs `pip install -r requirements.txt` | Logs failure if pip install also fails |
+| Bot framework compliance | No | Lists non-compliant files and links to CONTRIBUTING.md |
+| Uncommitted changes | No | Warning only (not a blocking failure) |
+
+### How it integrates with CI
+
+The `.github/workflows/ci.yml` workflow adds three steps after the normal
+test run, each guarded by `if: failure()`:
+
+1. **Auto-recovery** — runs `tools/auto_recovery.py` to diagnose and fix what
+   it can.
+2. **Upload recovery log** — attaches `ci_recovery.log` as a workflow artifact
+   so every recovery attempt is auditable.
+3. **Re-run tests** — re-runs the full pytest suite after recovery to confirm
+   whether the automatic fix resolved the failures.
+
+### Running locally
+
+```bash
+# Diagnose and attempt automatic fixes
+python tools/auto_recovery.py
+
+# Point at a non-default requirements file
+python tools/auto_recovery.py --requirements path/to/requirements.txt
+
+# Send results to a webhook (e.g. Slack incoming webhook)
+python tools/auto_recovery.py --webhook-url https://hooks.slack.com/services/...
+
+# Write the recovery log to a custom path
+python tools/auto_recovery.py --log-file /tmp/my_recovery.log
+```
+
+### Recovery log format
+
+Each run appends one JSON line to `ci_recovery.log`:
+
+```json
+{
+  "timestamp": "2024-01-01T12:00:00+00:00",
+  "python": "3.10.12",
+  "results": [
+    {
+      "check": "dependencies",
+      "status": "ok",
+      "detail": "Dependency issues detected and resolved via pip install -r requirements.txt.",
+      "fix_applied": true,
+      "manual_action": null
+    }
+  ]
+}
+```
+
+`ci_recovery.log` is listed in `.gitignore` and is never committed to the
+repository; it is only uploaded as a CI artifact.
