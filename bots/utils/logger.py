@@ -18,6 +18,8 @@ Usage::
     log.error("API call failed", endpoint="/v1/chat", status_code=429)
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os
