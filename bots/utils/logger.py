@@ -23,7 +23,7 @@ import logging
 import os
 import sys
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 
 # ── Custom JSON formatter ─────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ class BotLogger:
         variable, falling back to ``"INFO"``.
     """
 
-    def __init__(self, bot_name: str, level: str | None = None) -> None:
+    def __init__(self, bot_name: str, level: Optional[str] = None) -> None:
         self.bot_name = bot_name
         effective_level = (
             level
@@ -107,7 +107,7 @@ class BotLogger:
 
 # ── Module-level convenience factory ─────────────────────────────────────────
 
-def get_logger(bot_name: str, level: str | None = None) -> BotLogger:
+def get_logger(bot_name: str, level: Optional[str] = None) -> BotLogger:
     """Return a :class:`BotLogger` for *bot_name*.
 
     Parameters

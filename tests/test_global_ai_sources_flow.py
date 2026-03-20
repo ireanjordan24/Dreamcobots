@@ -11,6 +11,7 @@ Validates:
 
 import sys
 import os
+from typing import List, Optional
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -562,7 +563,7 @@ class TestAIChatbotFramework:
 class TestCheckBotFrameworkTool:
     """Validate the tools/check_bot_framework.py static analysis script."""
 
-    def _run_checker(self, extra_args: list[str] | None = None) -> int:
+    def _run_checker(self, extra_args: Optional[List[str]] = None) -> int:
         """Import and run the checker's main() function; return exit code."""
         checker_path = os.path.join(REPO_ROOT, "tools")
         sys.path.insert(0, checker_path)

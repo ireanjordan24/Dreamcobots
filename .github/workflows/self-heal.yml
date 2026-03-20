@@ -1,0 +1,187 @@
+name: Self-Heal
+
+# Triggers on workflow run completions, PRs, issues, and pushes to main.
+# Automatically detects and reports failures, then comments on the relevant
+# PR or issue with remediation guidance.
+
+on:
+  workflow_run:
+    workflows: ["CI", "Python Tests"]
+    types: [completed]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  issues:
+    types: [opened]
+  push:
+    branches: [main]
+
+jobs:
+  # ── Detect and report CI failures ────────────────────────────────────────
+  report-failure:
+    name: Report CI Failure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: >
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run framework compliance check
+        id: compliance
+        run: |
+          python tools/check_bot_framework.py
+          echo "compliance_ok=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Report failure on failed PR
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.payload.workflow_run.id;
+            const runUrl = context.payload.workflow_run.html_url;
+            const conclusion = context.payload.workflow_run.conclusion;
+
+            // Find the PR associated with this workflow run
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+
+            const headSha = context.payload.workflow_run.head_sha;
+            const matchingPR = prs.data.find(pr => pr.head.sha === headSha);
+
+            if (matchingPR) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: matchingPR.number,
+                body: [
+                  `## ⚠️ CI Self-Heal Alert`,
+                  ``,
+                  `The **${context.payload.workflow_run.name}** workflow [run #${runId}](${runUrl}) has **${conclusion}**.`,
+                  ``,
+                  `### Common fixes`,
+                  `- Replace \`X | None\` type hints with \`Optional[X]\` from \`typing\` for Python 3.9 compatibility (pipe-union requires Python 3.10+).`,
+                  `- Ensure all bot files include the \`# GLOBAL AI SOURCES FLOW\` comment.`,
+                  `- Run \`python tools/check_bot_framework.py\` locally to catch compliance issues.`,
+                  `- Run \`python -m pytest tests/ -q --tb=short\` to reproduce failures locally.`,
+                ].join('\n'),
+              });
+            }
+
+  # ── Lint and auto-check on every PR ──────────────────────────────────────
+  pr-health-check:
+    name: PR Health Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check for Python 3.9-incompatible type hints
+        id: typehints
+        run: |
+          # Search for pipe-union type annotations in function signatures
+          HITS=$(grep -rn --include="*.py" \
+            -E "def [a-zA-Z_]+\([^)]*: [a-zA-Z\[\]_]+ \| " \
+            bots/ tests/ 2>/dev/null | \
+            grep -v "from __future__ import annotations" || true)
+
+          # Filter to files that don't have __future__ annotations
+          BAD_FILES=""
+          while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              FILE=$(echo "$line" | cut -d: -f1)
+              if ! grep -q "from __future__ import annotations" "$FILE" 2>/dev/null; then
+                BAD_FILES="$BAD_FILES\n$line"
+              fi
+            fi
+          done <<< "$HITS"
+
+          if [ -n "$BAD_FILES" ]; then
+            echo "::warning::Found Python 3.9-incompatible pipe-union type hints:"
+            echo -e "$BAD_FILES"
+          fi
+
+      - name: Run framework compliance check
+        run: python tools/check_bot_framework.py
+
+      - name: Run test suite
+        run: python -m pytest tests/ -q --tb=short
+
+  # ── Auto-comment on new issues mentioning CI or type errors ──────────────
+  issue-triage:
+    name: Issue Triage
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Auto-comment on CI/type-hint issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = (context.payload.issue.body || '').toLowerCase();
+            const title = (context.payload.issue.title || '').toLowerCase();
+            const keywords = ['exit code 2', 'typeerror', 'type hint', 'pipe operator',
+                              'ci fail', 'pipeline fail', 'unsupported operand'];
+
+            const isRelevant = keywords.some(k => body.includes(k) || title.includes(k));
+            if (!isRelevant) return;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: [
+                `## 🤖 Self-Heal Bot — Automated Triage`,
+                ``,
+                `This issue appears to be related to a CI/type-hint failure. Here are common remediation steps:`,
+                ``,
+                `### Type Hint Compatibility (Python < 3.10)`,
+                `Replace the pipe union operator with \`Optional\` from \`typing\`:`,
+                `\`\`\`python`,
+                `# ❌ Python 3.10+ only`,
+                `def foo(x: str | None = None): ...`,
+                ``,
+                `# ✅ Python 3.6+ compatible`,
+                `from typing import Optional`,
+                `def foo(x: Optional[str] = None): ...`,
+                `\`\`\``,
+                ``,
+                `### Quick checks`,
+                `\`\`\`bash`,
+                `python tools/check_bot_framework.py`,
+                `python -m pytest tests/ -q --tb=short`,
+                `\`\`\``,
+              ].join('\n'),
+            });
