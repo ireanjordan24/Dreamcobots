@@ -45,22 +45,26 @@ from bots.sales_bot.sales_bot import (
 class TestFrameworkCompliance:
     def test_sms_bot_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "sales_bot", "sms_bot.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_followup_bot_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "sales_bot", "followup_bot.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_conversion_tracker_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "sales_bot", "conversion_tracker.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_sales_bot_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "sales_bot", "sales_bot.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
 

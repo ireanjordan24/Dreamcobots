@@ -50,22 +50,26 @@ from bots.ai_brain.ai_brain import AIBrain, AIBrainError, AIBrainTierError
 class TestFrameworkCompliance:
     def test_decision_engine_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "ai_brain", "decision_engine.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_state_manager_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "ai_brain", "state_manager.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_metrics_tracker_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "ai_brain", "metrics_tracker.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_ai_brain_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "ai_brain", "ai_brain.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
 
@@ -208,7 +212,9 @@ class TestDecisionEngine:
 
 class TestStateManager:
     def _tmp_path(self):
-        return tempfile.mktemp(suffix=".json")
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        return path
 
     def test_save_and_load_state_functions(self):
         path = self._tmp_path()
@@ -416,7 +422,8 @@ class TestAIBrain:
         assert "tier" in result
 
     def test_pro_tier_has_state(self):
-        path = tempfile.mktemp(suffix=".json")
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
         brain = AIBrain(tier=Tier.PRO, state_path=path)
         brain.think(override_metrics={"revenue": 500, "leads": 30})
         state = brain.get_state()
@@ -449,13 +456,15 @@ class TestAIBrain:
         assert result["decision"] == DECISION_OPTIMIZE
 
     def test_enterprise_bot_creation_recommendation(self):
-        path = tempfile.mktemp(suffix=".json")
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
         brain = AIBrain(tier=Tier.ENTERPRISE, state_path=path)
         result = brain.think(override_metrics={"revenue": 2000, "leads": 50})
         assert result["bot_to_create"] == "scaling_bot"
 
     def test_enterprise_recovery_bot_recommendation(self):
-        path = tempfile.mktemp(suffix=".json")
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
         brain = AIBrain(tier=Tier.ENTERPRISE, state_path=path)
         result = brain.think(override_metrics={"revenue": 50, "leads": 25})
         assert result["bot_to_create"] == "recovery_bot"

@@ -63,22 +63,26 @@ from bots.auto_bot_factory.auto_bot_factory import (
 class TestFrameworkCompliance:
     def test_auto_bot_factory_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "auto_bot_factory.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_competitor_analyzer_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "competitor_analyzer.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_strategy_framework_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "strategy_framework.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_safety_controller_has_framework_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "safety_controller.py")
-        text = open(path).read()
+        with open(path) as f:
+            text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
 
