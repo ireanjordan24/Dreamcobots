@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'  # Specify the version of Python to use
 
@@ -24,6 +24,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Check bot framework compliance
+      run: python tools/check_bot_framework.py
+
     - name: Run tests
       run: |
-        python -m pytest tests/ -q
+        python -m pytest tests/ -q --tb=short

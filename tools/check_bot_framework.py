@@ -59,6 +59,9 @@ EXCLUDED_FILES: frozenset[str] = frozenset(
         "billing_system.py",
         "token_manager.py",
         "subscription_manager.py",
+        # Shared utility modules — not bot implementations
+        "logger.py",
+        "error_handler.py",
     }
 )
 
