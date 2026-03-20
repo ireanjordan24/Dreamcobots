@@ -207,6 +207,26 @@ class BotGeneratorBot:
     # Convenience helpers
     # ------------------------------------------------------------------
 
+    def create_bot(self, name: str) -> dict:
+        """Create a new bot using *name* as both the description and identifier.
+
+        This is a convenience wrapper around :meth:`generate` used by the
+        :class:`~bots.ai_learning_system.learning_loop.LearningLoop` to
+        create optimised replacement bots.
+
+        Parameters
+        ----------
+        name : str
+            Human-readable bot name / description forwarded to
+            :meth:`generate`.
+
+        Returns
+        -------
+        dict
+            The full generation result from :meth:`generate`.
+        """
+        return self.generate(name)
+
     def list_available_tools(self) -> list:
         """Return all tools available for injection."""
         return self._injector.list_available_tools()
@@ -229,6 +249,32 @@ class BotGeneratorBot:
             "deployed_bots": self._deployer.list_deployed_bots(),
             "features": self._config.features,
         }
+
+    # ------------------------------------------------------------------
+    # Bot testing
+    # ------------------------------------------------------------------
+
+    def test_bot(self, name: str) -> str:
+        """Dynamically import and run a bot to validate it before deployment.
+
+        Parameters
+        ----------
+        name : str
+            The bot module name (relative to the ``bots`` package), e.g.
+            ``"my_new_bot"`` will import ``bots.my_new_bot.my_new_bot``.
+
+        Returns
+        -------
+        str
+            The return value of the bot's ``run()`` method, or a failure
+            message if import or execution raised an exception.
+        """
+        try:
+            module = __import__(f"bots.{name}.{name}", fromlist=["Bot"])
+            bot = module.Bot()
+            return bot.run()
+        except Exception as e:  # noqa: BLE001
+            return f"Failed: {e}"
 
     # ------------------------------------------------------------------
     # BuddyAI chat interface
