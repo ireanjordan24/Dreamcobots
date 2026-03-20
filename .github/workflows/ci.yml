@@ -35,5 +35,27 @@ jobs:
         run: python tools/check_bot_framework.py
 
       - name: Run tests with pytest
+        id: run_tests
+        run: |
+          python -m pytest tests/ -q --tb=short
+
+      # ── Auto-recovery: runs only when a previous step fails ──────────────
+      - name: Auto-recovery — diagnose and fix common CI issues
+        if: failure()
+        run: |
+          python tools/auto_recovery.py \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --log-file "$GITHUB_WORKSPACE/ci_recovery.log"
+
+      - name: Upload recovery log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-recovery-log-py${{ matrix.python-version }}
+          path: ci_recovery.log
+          if-no-files-found: ignore
+
+      - name: Re-run tests after auto-recovery
+        if: failure() && steps.run_tests.outcome == 'failure'
         run: |
           python -m pytest tests/ -q --tb=short
