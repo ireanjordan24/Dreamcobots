@@ -6,11 +6,13 @@ import os
 import sys
 import pytest
 
-# Ensure tools/ is on sys.path so tests can import check_bot_framework
-# directly without relying on a prior test having inserted the path.
-_TOOLS_DIR = os.path.join(os.path.dirname(__file__), "..", "tools")
-if _TOOLS_DIR not in sys.path:
-    sys.path.insert(0, _TOOLS_DIR)
+# Ensure repo root and tools/ are on sys.path for all tests.
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_TOOLS_DIR = os.path.join(_REPO_ROOT, "tools")
+
+for _p in (_REPO_ROOT, _TOOLS_DIR):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 
 @pytest.fixture(autouse=True)
