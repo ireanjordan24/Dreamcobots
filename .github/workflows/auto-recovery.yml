@@ -5,44 +5,37 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches:
-      - main  # or the default branch you use
+      - main
 
 jobs:
-  diagnose:
+  test-and-recover:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check bot framework compliance
+        run: python tools/check_bot_framework.py
 
       - name: Run Tests
         run: |
-          # Commands to run tests
-          ./run-tests.sh
+          python -m pytest tests/ -q --tb=short
 
-      - name: Diagnose Issues
-        id: diagnose
+      - name: Report status
+        if: always()
         run: |
-          # Logic to diagnose common issues
-          if [ $? -ne 0 ]; then
-              echo "Tests failed, attempting to fix..."
-              # Example commands to automatically fix issues
-              ./auto-fixer.sh
-              echo "Fixed common issues."
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ All tests passed — branch is merge-ready."
           else
-              echo "All tests passed."
-          fi
-
-  check-status:
-    runs-on: ubuntu-latest
-    needs: diagnose
-    steps:
-      - name: Check for any issues
-        run: |
-          # Logic to check if additional checks are required
-          ./check-requirements.sh
-          if [ $? -eq 0 ]; then
-              echo "Requirements met, proceed."
-          else
-              echo "Rechecking all workflows..."
-              # Logic to rerun workflows or notify
+            echo "❌ Tests or checks failed — review the output above to diagnose."
           fi
