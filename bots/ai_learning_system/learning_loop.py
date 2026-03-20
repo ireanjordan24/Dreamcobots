@@ -2,7 +2,7 @@
 Learning Loop — Self-Improvement Trigger
 
 Evaluates the performance of every registered bot during each cycle, flags
-underperforming bots based on metrics, and automatically creates optimised
+underperforming bots based on metrics, and automatically creates optimized
 replacements for weak bots.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
@@ -72,8 +72,10 @@ class LearningLoop:
     def track_performance(self) -> dict[str, int]:
         """Assign a performance score to every registered bot.
 
-        Scores are random integers in [DEFAULT_SCORE_MIN, DEFAULT_SCORE_MAX]
-        — replace this with real metrics when available.
+        Scores are random integers in [DEFAULT_SCORE_MIN, DEFAULT_SCORE_MAX].
+        # TODO: Replace random scores with real bot performance metrics
+        # (e.g. from the bot performance database at
+        # bots/ai_learning_system/database.py) when available.
 
         Returns
         -------
@@ -96,16 +98,16 @@ class LearningLoop:
     # ------------------------------------------------------------------
 
     def optimize(self) -> list[str]:
-        """Run one optimisation cycle.
+        """Run one optimization cycle.
 
         1. Tracks performance for all bots.
         2. Flags bots below :attr:`underperform_threshold`.
-        3. Creates an optimised replacement via :attr:`generator`.
+        3. Creates an optimized replacement via :attr:`generator`.
 
         Returns
         -------
         list[str]
-            Names of all optimised (replacement) bots that were created.
+            Names of all optimized (replacement) bots that were created.
         """
         print("🧠 Optimizing system...")
         self.track_performance()

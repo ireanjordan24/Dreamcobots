@@ -41,24 +41,38 @@ class TestDevOpsBotRun:
 
     def test_run_calls_git_add(self):
         bot = DevOpsBot()
-        with mock.patch("os.system") as mock_sys:
+        with mock.patch("os.system", return_value=0) as mock_sys:
             bot.run()
         calls = [str(c) for c in mock_sys.call_args_list]
         assert any("git add" in c for c in calls)
 
     def test_run_calls_git_commit(self):
         bot = DevOpsBot()
-        with mock.patch("os.system") as mock_sys:
+        with mock.patch("os.system", return_value=0) as mock_sys:
             bot.run()
         calls = [str(c) for c in mock_sys.call_args_list]
         assert any("git commit" in c for c in calls)
 
-    def test_run_calls_git_push(self):
+    def test_run_calls_git_push_on_success(self):
         bot = DevOpsBot()
-        with mock.patch("os.system") as mock_sys:
+        with mock.patch("os.system", return_value=0) as mock_sys:
             bot.run()
         calls = [str(c) for c in mock_sys.call_args_list]
         assert any("git push" in c for c in calls)
+
+    def test_run_reports_nothing_to_commit_on_commit_failure(self):
+        bot = DevOpsBot()
+        # commit returns non-zero → nothing to commit
+        with mock.patch("os.system", side_effect=[0, 1]):
+            result = bot.run()
+        assert "Nothing to commit" in result or "commit failed" in result
+
+    def test_run_reports_push_failed_on_push_error(self):
+        bot = DevOpsBot()
+        # git add OK (0), commit OK (0), push fails (1)
+        with mock.patch("os.system", side_effect=[0, 0, 1]):
+            result = bot.run()
+        assert "Push failed" in result or "push" in result.lower()
 
     def test_process_returns_dict(self):
         bot = DevOpsBot()

@@ -34,8 +34,12 @@ class DevOpsBot:
             Status message describing the result of the operation.
         """
         os.system("git add .")
-        os.system('git commit -m "🤖 Auto-update from DreamCo"')
-        os.system("git push")
+        commit_rc = os.system('git commit -m "🤖 Auto-update from DreamCo"')
+        if commit_rc != 0:
+            return "⚠️ Nothing to commit or commit failed"
+        push_rc = os.system("git push")
+        if push_rc != 0:
+            return "❌ Push failed — check remote configuration"
         return "🚀 Changes pushed to GitHub"
 
     def process(self, payload: dict | None = None) -> dict:

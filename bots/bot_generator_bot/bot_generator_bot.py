@@ -91,6 +91,7 @@ class BotGeneratorBot:
     # Tier enforcement
     # ------------------------------------------------------------------
 
+
     def _require(self, feature: str) -> None:
         if not self._config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
@@ -212,7 +213,7 @@ class BotGeneratorBot:
 
         This is a convenience wrapper around :meth:`generate` used by the
         :class:`~bots.ai_learning_system.learning_loop.LearningLoop` to
-        create optimised replacement bots.
+        create optimized replacement bots.
 
         Parameters
         ----------
