@@ -296,7 +296,8 @@ class ControlCenter:
             ``{"bot": name, "onboarding_status": "ok"|"error", ...}``
         """
         self.register_bot(name, bot_instance)
-        self._bots[name]["tier_assigned"] = tier.value
+        tier_value = tier.value if isinstance(tier, Tier) else str(tier)
+        self._bots[name]["tier_assigned"] = tier_value
 
         # Attempt a quick smoke-test
         onboarding_status = "ok"

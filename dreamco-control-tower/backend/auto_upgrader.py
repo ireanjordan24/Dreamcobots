@@ -19,6 +19,7 @@ from __future__ import annotations
 import subprocess
 import sys
 import os
+import re
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
@@ -29,6 +30,25 @@ from repo_manager import RepoManager
 
 _PR_TITLE = "🤖 Auto-upgrade from DreamCo Control Tower"
 _PR_BRANCH = "auto-update"
+
+# Branch names may only contain alphanumerics, hyphens, underscores, slashes, and dots.
+_SAFE_BRANCH_RE = re.compile(r"^[a-zA-Z0-9._/-]{1,255}$")
+
+
+def _validate_branch(branch: str) -> str:
+    """Return *branch* if it is safe, otherwise raise ``ValueError``."""
+    if not _SAFE_BRANCH_RE.match(branch):
+        raise ValueError(f"Unsafe branch name rejected: {branch!r}")
+    return branch
+
+
+def _validate_repo_path(repo_path: str, repo_root: str) -> str:
+    """Return the resolved *repo_path* if it is under *repo_root*, else raise ``ValueError``."""
+    resolved = os.path.realpath(repo_path)
+    root_resolved = os.path.realpath(repo_root)
+    if not resolved.startswith(root_resolved + os.sep) and resolved != root_resolved:
+        raise ValueError(f"Repo path '{resolved}' is outside the repo root '{root_resolved}'.")
+    return resolved
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +136,17 @@ class AutoUpgrader:
             "repoPath": repo_path,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+
+        # Validate inputs before touching the filesystem
+        try:
+            repo_path = _validate_repo_path(repo_path, self._repo_root)
+            branch = _validate_branch(branch)
+        except ValueError as exc:
+            self._bm.set_status(name, STATUS_ACTIVE)
+            result["status"] = "error"
+            result["detail"] = str(exc)
+            self._upgrade_log.append(result)
+            return result
 
         # 1. Pull
         pull_result = self._pull(repo_path, branch)

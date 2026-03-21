@@ -118,8 +118,8 @@ print(rt.get_summary())
 
 | Layer     | Recommended                        |
 |-----------|------------------------------------|
-| Backend   | Node.js + Express **or** Python + Flask on AWS Lambda / Heroku |
-| Frontend  | React + Tailwind on Vercel / Netlify |
+| Backend   | Python + Flask / FastAPI on AWS Lambda or Heroku |
+| Frontend  | React + Tailwind on Vercel / Netlify (connects to the Python REST API) |
 | Database  | JSON files (starter) → MongoDB (scale to 1 000+ bots) |
 | Secrets   | Environment variables / AWS Secrets Manager |
 

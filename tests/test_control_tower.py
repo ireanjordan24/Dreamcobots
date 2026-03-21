@@ -375,6 +375,18 @@ class TestAutoUpgraderInit:
         assert upgrader.get_upgrade_log() == []
 
 
+class TestAutoUpgraderValidation:
+    def test_invalid_branch_returns_error(self, tmp_path):
+        bm, _ = _make_bot_manager()
+        bm.register_bot("bot_a", "Repo", "bots/a")
+        rm, _ = _make_repo_manager([{"name": "Repo", "owner": "user", "branch": "main"}])
+        mock_runner = MagicMock(return_value=MagicMock(returncode=0, stdout="ok", stderr=""))
+        upgrader = AutoUpgrader(bm, rm, repo_root=str(tmp_path), run_tests=False, runner=mock_runner)
+        result = upgrader.upgrade_bot("bot_a", branch="main; rm -rf /")
+        assert result["status"] == "error"
+        assert "branch" in result["detail"].lower() or "unsafe" in result["detail"].lower()
+
+
 class TestAutoUpgraderUpgradeBot:
     def test_upgrade_unknown_bot_returns_error(self):
         upgrader, _, _ = _make_upgrader()
