@@ -1,0 +1,17 @@
+{
+  "name": "dreamco-control-tower",
+  "version": "1.0.0",
+  "description": "DreamCo Control Tower — Centralized dashboard and automation for the entire DreamCo bot ecosystem",
+  "scripts": {
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
