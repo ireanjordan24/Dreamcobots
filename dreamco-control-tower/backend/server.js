@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Octokit } from "@octokit/rest";
+import rateLimit from 'express-rate-limit';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,6 +13,22 @@ app.use(express.json());
 
 const BOTS_FILE = path.join(__dirname, '..', 'config', 'bots.json');
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+// Rate limiter for write endpoints (heartbeat writes to bots.json)
+const heartbeatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,             // max 30 heartbeat updates per bot per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for webhook endpoint
+const webhookLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * Read and parse bots.json on every call to ensure data freshness.
@@ -60,7 +77,7 @@ app.get('/api/get-bots', (req, res) => {
 // POST /api/bot-heartbeat
 // Updates the lastHeartbeat timestamp for the named bot.
 // ---------------------------------------------------------------------------
-app.post('/api/bot-heartbeat', (req, res) => {
+app.post('/api/bot-heartbeat', heartbeatLimiter, (req, res) => {
   const { botName } = req.body;
   if (!botName) {
     return res.status(400).json({ error: 'botName is required.' });
@@ -83,7 +100,7 @@ app.post('/api/bot-heartbeat', (req, res) => {
 // POST /api/github-webhook
 // Receives GitHub webhook events and triggers automation accordingly.
 // ---------------------------------------------------------------------------
-app.post('/api/github-webhook', (req, res) => {
+app.post('/api/github-webhook', webhookLimiter, (req, res) => {
   const event = req.headers['x-github-event'];
   const payload = req.body;
   console.log(`GitHub Event: ${event}`);
