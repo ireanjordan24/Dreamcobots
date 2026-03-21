@@ -1,0 +1,67 @@
+[
+  {
+    "name": "LeadGenerationBot",
+    "repoName": "Dreamcobots",
+    "repoPath": "./bots/multi_source_lead_scraper",
+    "branch": "main",
+    "owner": "ireanjordan24",
+    "status": "active",
+    "tier": "pro",
+    "heartbeatUrl": null,
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "openIssues": 0
+  },
+  {
+    "name": "RealEstateBot",
+    "repoName": "Dreamcobots",
+    "repoPath": "./bots/real_estate_bot",
+    "branch": "main",
+    "owner": "ireanjordan24",
+    "status": "active",
+    "tier": "pro",
+    "heartbeatUrl": null,
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "openIssues": 0
+  },
+  {
+    "name": "SalesBot",
+    "repoName": "Dreamcobots",
+    "repoPath": "./bots/ai_chatbot",
+    "branch": "main",
+    "owner": "ireanjordan24",
+    "status": "active",
+    "tier": "enterprise",
+    "heartbeatUrl": null,
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "openIssues": 0
+  },
+  {
+    "name": "AffiliateBot",
+    "repoName": "Dreamcobots",
+    "repoPath": "./bots/affiliate_bot",
+    "branch": "main",
+    "owner": "ireanjordan24",
+    "status": "active",
+    "tier": "pro",
+    "heartbeatUrl": null,
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "openIssues": 0
+  },
+  {
+    "name": "CryptoBot",
+    "repoName": "Dreamcobots",
+    "repoPath": "./bots/crypto_bot",
+    "branch": "main",
+    "owner": "ireanjordan24",
+    "status": "active",
+    "tier": "enterprise",
+    "heartbeatUrl": null,
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "openIssues": 0
+  }
+]
