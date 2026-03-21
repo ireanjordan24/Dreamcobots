@@ -1,0 +1,57 @@
+[
+  {
+    "name": "AffiliateBot",
+    "repoName": "affiliate-bot",
+    "repoPath": "./bots/affiliate_bot",
+    "status": "active",
+    "tier": "PRO",
+    "lastHeartbeat": null,
+    "lastUpdate": null,
+    "pendingPRs": 0,
+    "description": "Automated affiliate marketing and revenue tracking bot"
+  },
+  {
+    "name": "SalesBot",
+    "repoName": "sales-bot",
+    "repoPath": "./bots/sales_bot",
+    "status": "active",
+    "tier": "PRO",
+    "lastHeartbeat": null,
+    "lastUpdate": null,
+    "pendingPRs": 0,
+    "description": "Lead follow-up and conversion tracking bot"
+  },
+  {
+    "name": "CryptoBot",
+    "repoName": "crypto-bot",
+    "repoPath": "./bots/crypto_bot",
+    "status": "idle",
+    "tier": "ENTERPRISE",
+    "lastHeartbeat": null,
+    "lastUpdate": null,
+    "pendingPRs": 1,
+    "description": "Cryptocurrency portfolio management and mining bot"
+  },
+  {
+    "name": "DealFinderBot",
+    "repoName": "deal-finder-bot",
+    "repoPath": "./bots/deal_finder_bot",
+    "status": "active",
+    "tier": "FREE",
+    "lastHeartbeat": null,
+    "lastUpdate": null,
+    "pendingPRs": 0,
+    "description": "Automated deal discovery and price comparison bot"
+  },
+  {
+    "name": "DevOpsBot",
+    "repoName": "devops-bot",
+    "repoPath": "./bots/devops_bot",
+    "status": "active",
+    "tier": "ENTERPRISE",
+    "lastHeartbeat": null,
+    "lastUpdate": null,
+    "pendingPRs": 2,
+    "description": "Automated Git operations, CI/CD management, and repo maintenance"
+  }
+]
