@@ -1,0 +1,12 @@
+{
+  "name": "dreamcobots",
+  "version": "1.0.0",
+  "description": "DreamCo Buddy Bots – autonomous bot system with Control Tower",
+  "scripts": {
+    "test": "echo \"No Node.js tests configured\" && exit 0",
+    "start": "node index.js"
+  },
+  "keywords": ["bots", "automation", "dreamco"],
+  "author": "DreamCo",
+  "license": "MIT"
+}
