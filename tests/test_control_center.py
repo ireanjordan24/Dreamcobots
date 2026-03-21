@@ -174,3 +174,174 @@ class TestGetMonitoringDashboard:
         cc.add_income_entry("affiliate", 200.0)
         dashboard = cc.get_monitoring_dashboard()
         assert dashboard["income_summary"]["total_income_usd"] == 200.0
+
+
+class TestHeartbeatMonitoring:
+    def test_record_heartbeat_returns_dict(self):
+        cc = ControlCenter()
+        result = cc.record_heartbeat("mining")
+        assert isinstance(result, dict)
+
+    def test_record_heartbeat_has_required_keys(self):
+        cc = ControlCenter()
+        result = cc.record_heartbeat("affiliate")
+        assert "bot" in result
+        assert "status" in result
+        assert "timestamp" in result
+
+    def test_record_heartbeat_default_status_is_active(self):
+        cc = ControlCenter()
+        result = cc.record_heartbeat("mining")
+        assert result["status"] == "active"
+
+    def test_record_heartbeat_custom_status(self):
+        cc = ControlCenter()
+        result = cc.record_heartbeat("mining", status="updating")
+        assert result["status"] == "updating"
+
+    def test_record_heartbeat_updates_registered_bot_status(self):
+        from tiers import Tier
+        from bots.mining_bot.mining_bot import MiningBot
+        cc = ControlCenter()
+        cc.register_bot("mining", MiningBot(tier=Tier.FREE))
+        cc.record_heartbeat("mining", status="active")
+        status = cc.get_status()
+        assert status["bots"]["mining"]["status"] == "active"
+
+    def test_get_heartbeat_status_returns_dict(self):
+        cc = ControlCenter()
+        cc.record_heartbeat("mining")
+        result = cc.get_heartbeat_status()
+        assert isinstance(result, dict)
+        assert "mining" in result
+
+    def test_get_heartbeat_status_includes_stale_flag(self):
+        cc = ControlCenter()
+        cc.record_heartbeat("mining")
+        status = cc.get_heartbeat_status()
+        assert "stale" in status["mining"]
+
+    def test_fresh_heartbeat_is_not_stale(self):
+        cc = ControlCenter()
+        cc.record_heartbeat("mining")
+        status = cc.get_heartbeat_status()
+        assert status["mining"]["stale"] is False
+
+    def test_get_stale_bots_returns_list(self):
+        cc = ControlCenter()
+        result = cc.get_stale_bots()
+        assert isinstance(result, list)
+
+    def test_get_stale_bots_empty_when_all_fresh(self):
+        cc = ControlCenter()
+        cc.record_heartbeat("mining")
+        cc.record_heartbeat("affiliate")
+        stale = cc.get_stale_bots()
+        assert stale == []
+
+    def test_heartbeat_status_includes_age_seconds(self):
+        cc = ControlCenter()
+        cc.record_heartbeat("mining")
+        status = cc.get_heartbeat_status()
+        assert "age_seconds" in status["mining"]
+        assert status["mining"]["age_seconds"] >= 0
+
+
+class TestGitHubWebhookHandling:
+    def test_handle_github_event_returns_dict(self):
+        cc = ControlCenter()
+        result = cc.handle_github_event("push", {"ref": "refs/heads/main", "commits": []})
+        assert isinstance(result, dict)
+
+    def test_handle_push_event(self):
+        cc = ControlCenter()
+        result = cc.handle_github_event("push", {"ref": "refs/heads/main", "commits": [{}, {}]})
+        assert result["event"] == "push"
+        assert result["commit_count"] == 2
+        assert result["ref"] == "refs/heads/main"
+
+    def test_handle_pull_request_open(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "opened",
+            "pull_request": {"number": 42, "title": "Fix bug", "merged": False},
+        }
+        result = cc.handle_github_event("pull_request", payload)
+        assert result["event"] == "pull_request"
+        assert result["pr_number"] == 42
+        assert result["pr_title"] == "Fix bug"
+        assert result["merged"] is False
+
+    def test_handle_pull_request_merged(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "closed",
+            "pull_request": {"number": 10, "title": "Merge feature", "merged": True},
+        }
+        result = cc.handle_github_event("pull_request", payload)
+        assert result["merged"] is True
+
+    def test_handle_issues_bug_labeled(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "labeled",
+            "issue": {"number": 5},
+            "label": {"name": "bug"},
+        }
+        result = cc.handle_github_event("issues", payload)
+        assert result["bug_labeled"] is True
+        assert result["issue_number"] == 5
+
+    def test_handle_issues_non_bug_label(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "labeled",
+            "issue": {"number": 7},
+            "label": {"name": "enhancement"},
+        }
+        result = cc.handle_github_event("issues", payload)
+        assert result["bug_labeled"] is False
+
+    def test_handle_workflow_run_failure(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "completed",
+            "workflow_run": {"name": "CI", "conclusion": "failure"},
+        }
+        result = cc.handle_github_event("workflow_run", payload)
+        assert result["failed"] is True
+        assert result["workflow_name"] == "CI"
+
+    def test_handle_workflow_run_success(self):
+        cc = ControlCenter()
+        payload = {
+            "action": "completed",
+            "workflow_run": {"name": "CI", "conclusion": "success"},
+        }
+        result = cc.handle_github_event("workflow_run", payload)
+        assert result["failed"] is False
+
+    def test_webhook_log_accumulates(self):
+        cc = ControlCenter()
+        cc.handle_github_event("push", {"ref": "main", "commits": []})
+        cc.handle_github_event("push", {"ref": "main", "commits": []})
+        log = cc.get_webhook_log()
+        assert len(log) == 2
+
+    def test_get_webhook_log_returns_list(self):
+        cc = ControlCenter()
+        result = cc.get_webhook_log()
+        assert isinstance(result, list)
+
+    def test_get_webhook_log_respects_limit(self):
+        cc = ControlCenter()
+        for i in range(25):
+            cc.handle_github_event("push", {"ref": "main", "commits": []})
+        log = cc.get_webhook_log(limit=10)
+        assert len(log) == 10
+
+    def test_handle_unknown_event(self):
+        cc = ControlCenter()
+        result = cc.handle_github_event("unknown_event", {"action": "foo"})
+        assert result["event"] == "unknown_event"
+        assert "handled_at" in result
