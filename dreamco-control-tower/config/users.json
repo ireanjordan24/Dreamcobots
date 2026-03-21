@@ -1,0 +1,10 @@
+[
+  {
+    "id": "admin-001",
+    "username": "ireanjordan24",
+    "role": "admin",
+    "email": "",
+    "createdAt": "2025-01-01T00:00:00Z",
+    "permissions": ["read", "write", "deploy", "upgrade", "admin"]
+  }
+]

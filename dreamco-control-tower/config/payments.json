@@ -1,0 +1,22 @@
+{
+  "stripe": {
+    "enabled": false,
+    "publicKey": "",
+    "webhookSecret": ""
+  },
+  "paypal": {
+    "enabled": false,
+    "clientId": "",
+    "mode": "sandbox"
+  },
+  "square": {
+    "enabled": false,
+    "applicationId": "",
+    "locationId": ""
+  },
+  "tiers": {
+    "free":       { "price": 0,   "botsPerMonth": 3,   "label": "Free" },
+    "pro":        { "price": 99,  "botsPerMonth": 50,  "label": "Pro" },
+    "enterprise": { "price": 299, "botsPerMonth": -1,  "label": "Enterprise (unlimited)" }
+  }
+}
