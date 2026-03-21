@@ -25,6 +25,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -40,6 +41,16 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Rate limiting — protect all API and static routes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15 minutes
+  max: 200,                    // max requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests — please try again later." },
+});
+app.use(limiter);
 
 // Serve the React frontend from ../frontend
 app.use(express.static(join(__dirname, "../frontend")));

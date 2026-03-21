@@ -31,7 +31,7 @@ async function ghFetch(path, token) {
   const resp = await fetch(`https://api.github.com${path}`, { headers });
   if (!resp.ok) {
     const text = await resp.text().catch(() => "");
-    throw new Error(`GitHub API ${resp.status}: ${text.slice(0, 200)}`);
+    throw new Error(`GitHub API ${resp.status} for path ${path}: ${text.slice(0, 300)}`);
   }
   return resp.json();
 }

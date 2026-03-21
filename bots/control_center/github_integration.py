@@ -26,7 +26,8 @@ class GitHubIntegration:
     """GitHub API and git operations wrapper for the DreamCo Control Tower."""
 
     def __init__(self, token: Optional[str] = None, owner: str = "ireanjordan24") -> None:
-        # Use the provided token explicitly; only fall back to env if token is None (not empty string)
+        # Distinguish between None (not provided → fall back to env) and "" (explicitly
+        # empty → treat as "no token" to allow safe testing without a live credential).
         self._token = token if token is not None else os.environ.get("GITHUB_TOKEN", "")
         self._owner = owner
         self._event_log: list[dict] = []

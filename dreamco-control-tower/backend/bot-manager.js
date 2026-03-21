@@ -46,13 +46,13 @@ export function pullLatest(repoPath) {
     return { success: true, output: output.trim() };
   } catch (err) {
     const output = err.stdout?.trim() || err.message;
-    console.warn(`⚠️  Conflict in ${repoPath} — auto-resolving with --theirs`);
+    console.error(`❌ Conflict in ${repoPath} — auto-resolving with strategy '-X theirs' (local changes will be overwritten)`);
     try {
       const mergeOut = execSync(
         `git -C "${repoPath}" merge -X theirs origin/main`,
         { encoding: "utf-8", stdio: "pipe" }
       );
-      return { success: true, output: mergeOut.trim(), autoMerged: true };
+      return { success: true, output: mergeOut.trim(), autoMerged: true, strategy: "theirs" };
     } catch (mergeErr) {
       return {
         success: false,

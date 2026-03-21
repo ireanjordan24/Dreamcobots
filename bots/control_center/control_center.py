@@ -161,7 +161,7 @@ class ControlCenter:
         return {
             "bot_name": bot_name,
             "repo_name": repo_name,
-            "tier": tier,
+            "tier": entry["config"].get("tier", tier),  # sourced from registry entry
             "status": "registered",
             "entry": entry,
             "timestamp": datetime.now(timezone.utc).isoformat(),

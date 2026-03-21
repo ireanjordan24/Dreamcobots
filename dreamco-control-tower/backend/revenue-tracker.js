@@ -22,8 +22,8 @@ export async function getStripeRevenue(secretKey, limit = 100) {
   try {
     const Stripe = (await import("stripe")).default;
     const stripe = new Stripe(secretKey);
-    const charges = await stripe.paymentIntents.list({ limit });
-    const entries = charges.data.map((p) => ({
+    const paymentIntents = await stripe.paymentIntents.list({ limit });
+    const entries = paymentIntents.data.map((p) => ({
       id: p.id,
       amount_usd: p.amount / 100,
       currency: p.currency,
