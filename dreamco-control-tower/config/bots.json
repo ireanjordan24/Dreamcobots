@@ -1,0 +1,74 @@
+[
+  {
+    "name": "real_estate_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/real_estate_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "pro",
+    "niche": "real_estate",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  },
+  {
+    "name": "sales_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/sales_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "pro",
+    "niche": "sales",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  },
+  {
+    "name": "affiliate_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/affiliate_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "enterprise",
+    "niche": "affiliate",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  },
+  {
+    "name": "fiverr_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/fiverr_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "pro",
+    "niche": "fiverr",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  },
+  {
+    "name": "crypto_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/crypto_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "enterprise",
+    "niche": "crypto",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  },
+  {
+    "name": "mining_bot",
+    "repo": "Dreamcobots",
+    "repoPath": "../bots/mining_bot",
+    "branch": "main",
+    "status": "active",
+    "tier": "pro",
+    "niche": "mining",
+    "lastHeartbeat": null,
+    "lastPR": null,
+    "lastCommit": null
+  }
+]
