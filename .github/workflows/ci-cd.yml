@@ -13,25 +13,50 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Check for merge conflict markers
+        run: |
+          echo "Scanning for unresolved merge conflict markers..."
+          if grep -rn --include="*.py" -E -l "^<<<<<<<|^>>>>>>>|^=======$" . 2>/dev/null | grep -v ".git"; then
+            echo "❌ Unresolved merge conflicts detected in the files listed above."
+            exit 1
+          else
+            echo "✅ No merge conflict markers found."
+          fi
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          node-version: '14'
+          python-version: "3.11"
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run tests
-        run: npm test
+      - name: Check bot framework compliance
+        run: python tools/check_bot_framework.py
+
+      - name: Run tests with pytest
+        run: |
+          python -m pytest tests/ -q --tb=short
+
+      - name: Report test status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ All tests passed."
+          else
+            echo "❌ Tests or checks failed — review the output above for details."
+          fi
 
   deploy:
     runs-on: ubuntu-latest
     needs: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Deploy to Production
         run: |
@@ -50,8 +75,9 @@ jobs:
   error_handling:
     if: failure()
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - name: Notify of Failure
         run: |
-          echo "Notifying developers of failure"
+          echo "❌ CI pipeline failed — review test output and resolve failures before merging."
           # Add notification service commands here (e.g., Slack, email).
