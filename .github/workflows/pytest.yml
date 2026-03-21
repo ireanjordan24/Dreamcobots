@@ -14,10 +14,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Check for merge conflict markers
+      run: |
+        echo "Scanning for unresolved merge conflict markers..."
+        if grep -rn --include="*.py" -E -l "^<<<<<<<|^>>>>>>>|^=======$" . 2>/dev/null | grep -v ".git"; then
+          echo "❌ Unresolved merge conflicts detected in the files listed above."
+          exit 1
+        else
+          echo "✅ No merge conflict markers found."
+        fi
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'  # Specify the version of Python to use
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -30,3 +40,12 @@ jobs:
     - name: Run tests
       run: |
         python -m pytest tests/ -q --tb=short
+
+    - name: Report test status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "✅ All tests passed."
+        else
+          echo "❌ Tests or checks failed — review the output above for details."
+        fi

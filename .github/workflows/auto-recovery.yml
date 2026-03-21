@@ -14,6 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check for merge conflict markers
+        run: |
+          echo "Scanning for unresolved merge conflict markers..."
+          if grep -rn --include="*.py" -E -l "^<<<<<<<|^>>>>>>>|^=======$" . 2>/dev/null | grep -v ".git"; then
+            echo "❌ Unresolved merge conflicts detected in the files listed above."
+            exit 1
+          else
+            echo "✅ No merge conflict markers found."
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

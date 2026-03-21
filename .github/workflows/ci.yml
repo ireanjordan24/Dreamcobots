@@ -21,6 +21,16 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Check for merge conflict markers
+        run: |
+          echo "Scanning for unresolved merge conflict markers..."
+          if grep -rn --include="*.py" -E -l "^<<<<<<<|^>>>>>>>|^=======$" . 2>/dev/null | grep -v ".git"; then
+            echo "❌ Unresolved merge conflicts detected in the files listed above."
+            exit 1
+          else
+            echo "✅ No merge conflict markers found."
+          fi
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -37,3 +47,12 @@ jobs:
       - name: Run tests with pytest
         run: |
           python -m pytest tests/ -q --tb=short
+
+      - name: Report test status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ All tests passed for Python ${{ matrix.python-version }}."
+          else
+            echo "❌ Tests or checks failed for Python ${{ matrix.python-version }} — review the output above."
+          fi
