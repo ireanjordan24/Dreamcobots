@@ -15,7 +15,7 @@ class HomeFlippingAnalyzerBot:
 
     PROPERTY_LIMITS = {Tier.FREE: 1, Tier.PRO: 5, Tier.ENTERPRISE: None}
 
-    # ~20 sample flip properties across major markets
+    # Sample/mock flip property database for demonstration purposes
     FLIP_DATABASE = {
         "FLP001": {
             "address": "412 Maple St, Memphis TN",

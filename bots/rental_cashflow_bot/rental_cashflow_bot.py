@@ -565,7 +565,9 @@ class RentalCashflowBot:
             annual_cf = (current_monthly_rent * 0.95 - cf["total_expenses_monthly_usd"] +
                          cf["monthly_mortgage_usd"] * (1 - 0.35)) * 12  # simplified
             cumulative_cashflow += annual_cf
-            equity = current_value - cf["loan_amount_usd"] * ((1 - (1.0 / (1 + (prop.get("mortgage_rate_pct", 6.75) / 100 / 12)) ** (year * 12))))
+            monthly_rate = prop.get("mortgage_rate_pct", 6.75) / 100 / 12
+            amortization_factor = 1 - (1.0 / (1 + monthly_rate) ** (year * 12))
+            equity = current_value - cf["loan_amount_usd"] * amortization_factor
             yearly.append({
                 "year": year,
                 "property_value_usd": round(current_value, 0),

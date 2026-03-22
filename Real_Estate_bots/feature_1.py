@@ -9,16 +9,11 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'bots', 'ai-models-integration'))
 
+from tiers import Tier
 from bots.home_flipping_analyzer.home_flipping_analyzer import HomeFlippingAnalyzerBot
 from bots.rental_cashflow_bot.rental_cashflow_bot import RentalCashflowBot
-
-try:
-    from bots.ai_models_integration.tiers import Tier  # noqa: F401
-except ImportError:
-    import sys, os as _os
-    sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), '..', 'bots', 'ai-models-integration'))
-    from tiers import Tier
 
 
 class PropertyListingAggregator:

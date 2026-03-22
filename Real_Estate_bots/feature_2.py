@@ -41,9 +41,9 @@ class ViewingScheduler:
         """
         # Validate no double-booking
         for appt in self._appointments.values():
-            if appt["address"] == address and appt["date"] == date and appt["time"] == time_slot:
-                if appt["status"] == "confirmed":
-                    raise ValueError(f"Slot {date} {time_slot} at {address} is already booked.")
+            if (appt["address"] == address and appt["date"] == date
+                    and appt["time"] == time_slot and appt["status"] == "confirmed"):
+                raise ValueError(f"Slot {date} {time_slot} at {address} is already booked.")
 
         aid = self._make_id()
         record = {

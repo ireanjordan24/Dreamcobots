@@ -360,6 +360,14 @@ class ForeclosureFinderBot:
         },
     ]
 
+    # Cost constants for lien payoff estimation
+    _COST_PER_LIEN_USD = 8500
+    _TAX_DELINQUENCY_COST_USD = 12000
+    # Cost constants for title clearance estimation
+    _TITLE_CLEARANCE_COST_PER_LIEN_USD = 1200
+    _TITLE_TAX_DELINQUENCY_COST_USD = 8000
+    _TITLE_HOA_DELINQUENCY_COST_USD = 3500
+
     def __init__(self, tier: Tier = Tier.FREE):
         self.tier = tier
         self.config = get_tier_config(tier)
@@ -489,7 +497,8 @@ class ForeclosureFinderBot:
                 "tax_delinquent": prop["tax_delinquent"],
                 "hoa_delinquent": prop["hoa_delinquent"],
                 "days_delinquent": prop["days_delinquent"],
-                "estimated_lien_payoff_usd": prop["liens_count"] * 8500 + (12000 if prop["tax_delinquent"] else 0),
+                "estimated_lien_payoff_usd": (prop["liens_count"] * self._COST_PER_LIEN_USD
+                                               + (self._TAX_DELINQUENCY_COST_USD if prop["tax_delinquent"] else 0)),
             }
             result["net_profit_after_liens_usd"] = round(
                 potential_profit - result["lien_summary"]["estimated_lien_payoff_usd"], 0
@@ -569,7 +578,11 @@ class ForeclosureFinderBot:
             risks.append("Pre-1960 construction — potential asbestos, outdated wiring")
 
         overall_risk = self._assess_risk_level(prop)
-        estimated_title_clearance_cost = liens_count * 1200 + (8000 if tax_del else 0) + (3500 if hoa_del else 0)
+        estimated_title_clearance_cost = (
+            liens_count * self._TITLE_CLEARANCE_COST_PER_LIEN_USD
+            + (self._TITLE_TAX_DELINQUENCY_COST_USD if tax_del else 0)
+            + (self._TITLE_HOA_DELINQUENCY_COST_USD if hoa_del else 0)
+        )
 
         return {
             "property_id": property_id,
