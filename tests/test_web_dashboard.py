@@ -327,3 +327,180 @@ class TestApiHistory:
             )
         data = json.loads(client.get("/api/history/h_bot?limit=2").data)
         assert len(data["history"]) <= 2
+
+
+# ===========================================================================
+# 11. /api/bots/catalog
+# ===========================================================================
+
+class TestBotCatalog:
+    def test_catalog_returns_200(self, client):
+        resp = client.get("/api/bots/catalog")
+        assert resp.status_code == 200
+
+    def test_catalog_has_catalog_key(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        assert "catalog" in data
+
+    def test_catalog_has_total_key(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        assert "total" in data
+
+    def test_catalog_contains_lead_generator(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        names = [b["name"] for b in data["catalog"]]
+        assert "multi_source_lead_scraper" in names
+
+    def test_catalog_contains_real_estate_bot(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        names = [b["name"] for b in data["catalog"]]
+        assert "real_estate_bot" in names
+
+    def test_catalog_contains_stripe_payment_bot(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        names = [b["name"] for b in data["catalog"]]
+        assert "stripe_payment_bot" in names
+
+    def test_catalog_bots_have_required_fields(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        for bot in data["catalog"]:
+            for field in ("name", "display_name", "description", "revenue_model", "category", "is_live"):
+                assert field in bot, f"Bot '{bot.get('name')}' missing field '{field}'"
+
+    def test_catalog_not_live_by_default(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        # No bots are registered on a fresh client, so none should be live
+        for bot in data["catalog"]:
+            assert bot["is_live"] is False
+
+    def test_catalog_bot_becomes_live_after_go_live(self, client):
+        client.post(
+            "/api/bots/multi_source_lead_scraper/go_live",
+            data=json.dumps({"tier": "pro"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/catalog").data)
+        lead_gen = next(b for b in data["catalog"] if b["name"] == "multi_source_lead_scraper")
+        assert lead_gen["is_live"] is True
+
+    def test_catalog_total_matches_list_length(self, client):
+        data = json.loads(client.get("/api/bots/catalog").data)
+        assert data["total"] == len(data["catalog"])
+
+
+# ===========================================================================
+# 12. /api/bots/<name>/go_live
+# ===========================================================================
+
+class TestGoLive:
+    def test_go_live_returns_201(self, client):
+        resp = client.post(
+            "/api/bots/lead_generator/go_live",
+            data=json.dumps({"tier": "pro"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 201
+
+    def test_go_live_response_has_status_live(self, client):
+        resp = client.post(
+            "/api/bots/my_revenue_bot/go_live",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert data["status"] == "live"
+
+    def test_go_live_response_has_bot_name(self, client):
+        resp = client.post(
+            "/api/bots/test_bot/go_live",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert data["bot_name"] == "test_bot"
+
+    def test_go_live_response_has_deployed_at(self, client):
+        resp = client.post(
+            "/api/bots/time_bot/go_live",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert "deployed_at" in data
+
+    def test_go_live_response_has_message(self, client):
+        resp = client.post(
+            "/api/bots/msg_bot/go_live",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert "message" in data
+
+    def test_go_live_registers_bot(self, client):
+        client.post(
+            "/api/bots/registered_bot/go_live",
+            data=json.dumps({"tier": "pro"}),
+            content_type="application/json",
+        )
+        status_data = json.loads(client.get("/api/status").data)
+        assert status_data["registered_bots"] >= 1
+
+    def test_go_live_records_run_in_history(self, client):
+        client.post(
+            "/api/bots/history_bot/go_live",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        history = json.loads(client.get("/api/history/history_bot").data)
+        assert len(history["history"]) >= 1
+
+    def test_go_live_idempotent_second_call(self, client):
+        for _ in range(2):
+            resp = client.post(
+                "/api/bots/idempotent_bot/go_live",
+                data=json.dumps({}),
+                content_type="application/json",
+            )
+            assert resp.status_code == 201
+
+    def test_go_live_uses_specified_tier(self, client):
+        resp = client.post(
+            "/api/bots/tier_bot/go_live",
+            data=json.dumps({"tier": "enterprise"}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert data["tier"] == "enterprise"
+
+    def test_go_live_lead_generator(self, client):
+        resp = client.post(
+            "/api/bots/multi_source_lead_scraper/go_live",
+            data=json.dumps({"tier": "pro"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 201
+
+    def test_go_live_real_estate_bot(self, client):
+        resp = client.post(
+            "/api/bots/real_estate_bot/go_live",
+            data=json.dumps({"tier": "enterprise"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 201
+
+    def test_go_live_stripe_payment_bot(self, client):
+        resp = client.post(
+            "/api/bots/stripe_payment_bot/go_live",
+            data=json.dumps({"tier": "growth"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 201
+
+    def test_dashboard_html_contains_go_live_section(self, client):
+        resp = client.get("/")
+        assert b"Go Live" in resp.data
+
+    def test_dashboard_html_contains_bot_catalog(self, client):
+        resp = client.get("/")
+        assert b"bot-catalog" in resp.data
