@@ -156,11 +156,10 @@ class TemplateEngine:
         scraping_tools = [t["name"] for t in resolved_tools if t.get("category") == "scraping"]
         if scraping_tools:
             first_scraper = scraping_tools[0]
+            lines.append(f"        # Primary tool: {first_scraper}")
+            call_line = _scraper_call(first_scraper)
             lines += [
-                f"        # Primary tool: {first_scraper}",
-                f"        raw = scrape_{first_scraper}(query=self.INDUSTRY, location='United States', count=count)"
-                if first_scraper in ("google_maps",)
-                else f"        raw = []  # TODO: call {first_scraper} here",
+                call_line,
                 "        self.leads.extend(raw)",
                 "        return raw",
             ]
@@ -207,3 +206,23 @@ class TemplateEngine:
 def _to_class_name(slug: str) -> str:
     """Convert a snake_case slug to a PascalCase class name."""
     return "".join(word.title() for word in re.split(r"[_\-\s]+", slug))
+
+
+# Mapping of tool name → the generated collect_leads call line.
+_SCRAPER_CALL_MAP: dict = {
+    "google_maps":    "        raw = scrape_google_maps(query=self.INDUSTRY, location='United States', count=count)",
+    "zillow_scraper": "        raw = scrape_zillow(location='United States', listing_type='for_sale', count=count)",
+    "yelp_scraper":   "        raw = scrape_yelp(term=self.INDUSTRY, location='United States', limit=count)",
+    "linkedin_scraper": "        raw = scrape_linkedin(search_query=self.INDUSTRY, count=count)",
+    "mls_api":        "        raw = query_mls(zip_code='00000', status='Active')  # replace zip_code with target area",
+    "twitter_scraper": "        raw = search_twitter(query=self.INDUSTRY, count=count)",
+    "google_places":  "        raw = [get_place_details('ChIJN1t_tDeuEmsRUsoyG83frY4')]  # replace place_id with your target",
+}
+
+
+def _scraper_call(tool_name: str) -> str:
+    """Return a collect_leads call line for *tool_name*."""
+    return _SCRAPER_CALL_MAP.get(
+        tool_name,
+        f"        raw = []  # {tool_name}: override collect_leads() with your implementation",
+    )
