@@ -106,8 +106,11 @@ class PropertyListingAggregatorBot:
             results = results[:limit]
 
         if self._config["ai_scoring"]:
-            for prop in results:
-                prop["ai_deal_score"] = self._score_deal(prop)
+            results = [
+                {**prop, "ai_deal_score": self._score_deal(prop),
+                 "estimated_roi_pct": self._calculate_roi(prop)}
+                for prop in results
+            ]
 
         self._search_count += 1
         return results
