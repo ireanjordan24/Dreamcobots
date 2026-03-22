@@ -1,0 +1,10 @@
+{
+  "name": "dreamcobots",
+  "version": "1.0.0",
+  "description": "Dreamcobots - Autonomous Money-Making Bot Ecosystem",
+  "scripts": {
+    "test": "echo 'No Node.js tests - see Python tests in tests/' && exit 0"
+  },
+  "keywords": ["bots", "ai", "automation"],
+  "license": "MIT"
+}
