@@ -5,6 +5,7 @@ Provides a real-time web UI to:
   - Monitor bot activity, performance logs, and revenue.
   - Enable manual bot creation, management, and overrides.
   - Visualize system behavior via REST endpoints consumed by a browser.
+  - Launch high-revenue bots live via Go Live buttons.
 
 Usage
 -----
@@ -19,6 +20,8 @@ Endpoints
   GET  /api/status                — System-wide status JSON
   GET  /api/bots                  — Registered bot list with KPI scores
   POST /api/bots/register         — Register a new bot { "name": "...", "tier": "..." }
+  POST /api/bots/<name>/go_live   — Deploy / activate a bot instance
+  GET  /api/bots/catalog          — Full bot catalog with Go Live status
   GET  /api/revenue               — Revenue summary JSON
   GET  /api/leaderboard           — Bot leaderboard (top by composite KPI)
   GET  /api/underperformers       — Bots with composite score < threshold
@@ -28,6 +31,7 @@ Endpoints
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 try:
@@ -38,6 +42,104 @@ except ImportError:  # pragma: no cover
 
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
+
+
+# ---------------------------------------------------------------------------
+# Bot catalog — all high-revenue bots available for Go Live deployment
+# ---------------------------------------------------------------------------
+
+_BOT_CATALOG: list[dict] = [
+    {
+        "name": "multi_source_lead_scraper",
+        "display_name": "Lead Generator Bot",
+        "emoji": "🎯",
+        "description": "Scrapes qualified leads from Google, LinkedIn, Twitter, Reddit & Yelp. AI-scored, CRM-exportable.",
+        "revenue_model": "$29–$299/mo subscription",
+        "category": "Sales & Marketing",
+        "priority": 1,
+    },
+    {
+        "name": "real_estate_bot",
+        "display_name": "Real Estate Finder Bot",
+        "emoji": "🏠",
+        "description": "Finds investment properties, calculates cap rates, cash flow, and ROI across 10 US cities.",
+        "revenue_model": "$29–$299/mo subscription",
+        "category": "Real Estate",
+        "priority": 2,
+    },
+    {
+        "name": "ai_side_hustle_bot",
+        "display_name": "AI Hustle Generator",
+        "emoji": "💰",
+        "description": "Identifies, launches, and monetizes side hustles with AI-powered content, income calculators & marketing plans.",
+        "revenue_model": "$29–$99/mo subscription",
+        "category": "Entrepreneurship",
+        "priority": 3,
+    },
+    {
+        "name": "stripe_payment_bot",
+        "display_name": "Stripe Payment Bot",
+        "emoji": "💳",
+        "description": "Full Stripe integration: checkouts, subscriptions, invoices, webhooks, fraud detection & Connect.",
+        "revenue_model": "2.2–2.9% transaction fee + $29–$299/mo",
+        "category": "Payments",
+        "priority": 4,
+    },
+    {
+        "name": "fiverr_bot",
+        "display_name": "Fiverr Automation Bot",
+        "emoji": "🎨",
+        "description": "Automates Fiverr gig creation, order management, client communication, and upselling.",
+        "revenue_model": "$29–$99/mo subscription",
+        "category": "Freelance",
+        "priority": 5,
+    },
+    {
+        "name": "crypto_bot",
+        "display_name": "Crypto Trading Bot",
+        "emoji": "₿",
+        "description": "Algorithmic crypto portfolio management, price alerts, and auto-trading strategies.",
+        "revenue_model": "$29–$299/mo subscription",
+        "category": "Finance",
+        "priority": 6,
+    },
+    {
+        "name": "open_claw_bot",
+        "display_name": "Client Acquisition Bot",
+        "emoji": "🤝",
+        "description": "Automates client outreach, proposal generation, and deal closing across multiple channels.",
+        "revenue_model": "$99–$299/mo subscription",
+        "category": "Sales",
+        "priority": 7,
+    },
+    {
+        "name": "affiliate_bot",
+        "display_name": "Affiliate Marketing Bot",
+        "emoji": "🔗",
+        "description": "Manages affiliate programs, tracks commissions, and automates partner payouts.",
+        "revenue_model": "$29–$99/mo + commission share",
+        "category": "Marketing",
+        "priority": 8,
+    },
+    {
+        "name": "ai_chatbot",
+        "display_name": "AI Customer Support Bot",
+        "emoji": "💬",
+        "description": "GPT-powered customer support with tier-based conversation limits and CRM integration.",
+        "revenue_model": "$29–$299/mo subscription",
+        "category": "Customer Service",
+        "priority": 9,
+    },
+    {
+        "name": "deal_finder_bot",
+        "display_name": "Deal Finder Bot",
+        "emoji": "🔍",
+        "description": "Scans marketplaces for arbitrage opportunities and profit-generating deals.",
+        "revenue_model": "$29–$99/mo subscription",
+        "category": "E-Commerce",
+        "priority": 10,
+    },
+]
 
 
 # ---------------------------------------------------------------------------
@@ -83,11 +185,96 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
       font-size: 0.7rem;
       font-weight: 600;
     }
-    .badge-ok   { background: #0d3320; color: #00d4aa; }
-    .badge-err  { background: #3d1010; color: #ff6b6b; }
-    .badge-idle { background: #1a2a1a; color: #888; }
+    .badge-ok     { background: #0d3320; color: #00d4aa; }
+    .badge-live   { background: #0a3a10; color: #22cc44; }
+    .badge-err    { background: #3d1010; color: #ff6b6b; }
+    .badge-idle   { background: #1a2a1a; color: #888; }
     footer { text-align: center; color: #444; padding: 20px; font-size: 0.75rem; }
     #refresh-note { text-align: right; color: #555; font-size: 0.72rem; padding: 0 24px 4px; }
+
+    /* Bot catalog cards */
+    .bot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 0 24px 24px;
+    }
+    .bot-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+    .bot-card:hover { border-color: #00d4aa; }
+    .bot-card.live { border-color: #22cc44; }
+    .bot-card .bot-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bot-card .bot-desc { font-size: 0.78rem; color: #888; line-height: 1.4; }
+    .bot-card .bot-revenue {
+      font-size: 0.75rem;
+      color: #00d4aa;
+      font-weight: 600;
+    }
+    .bot-card .bot-category {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .go-live-btn {
+      margin-top: 4px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #00d4aa, #0090ff);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: opacity 0.15s, transform 0.1s;
+      align-self: flex-start;
+    }
+    .go-live-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .go-live-btn:active { transform: translateY(0); }
+    .go-live-btn:disabled {
+      background: #0a3a10;
+      color: #22cc44;
+      cursor: default;
+      opacity: 1;
+    }
+    .go-live-btn.loading { opacity: 0.6; cursor: wait; }
+    .live-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #22cc44;
+      border-radius: 50%;
+      margin-left: 6px;
+      box-shadow: 0 0 6px #22cc44;
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    .section-header {
+      padding: 4px 24px 12px;
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 <body>
@@ -103,6 +290,12 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
     <div class="card"><h2>Total Revenue</h2><div class="value" id="total-revenue">—</div><div class="sub">USD</div></div>
     <div class="card"><h2>Avg Composite KPI</h2><div class="value" id="avg-kpi">—</div><div class="sub">0–100 scale</div></div>
     <div class="card"><h2>Underperformers</h2><div class="value" id="underperformers">—</div><div class="sub">score &lt; 30</div></div>
+  </div>
+
+  <!-- ── HIGH-REVENUE BOT CATALOG ── -->
+  <p class="section-header">🚀 High-Revenue Bots — Go Live</p>
+  <div class="bot-grid" id="bot-catalog">
+    <div class="card" style="color:#555">Loading bot catalog…</div>
   </div>
 
   <div style="padding: 0 24px 24px;">
@@ -138,6 +331,68 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
   <footer>DreamCo Empire OS — Powered by the GLOBAL AI SOURCES FLOW framework</footer>
 
   <script>
+    // Track which bots are live in this session
+    const liveBots = new Set();
+
+    async function goLive(botName, btn) {
+      btn.classList.add('loading');
+      btn.disabled = true;
+      btn.textContent = '⏳ Deploying…';
+      try {
+        const res = await fetch(`/api/bots/${encodeURIComponent(botName)}/go_live`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: 'pro' }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          liveBots.add(botName);
+          btn.textContent = '✅ Live';
+          btn.classList.remove('loading');
+          btn.closest('.bot-card').classList.add('live');
+          const ind = document.createElement('span');
+          ind.className = 'live-indicator';
+          btn.after(ind);
+        } else {
+          btn.textContent = '⚠ Error';
+          btn.classList.remove('loading');
+          btn.disabled = false;
+        }
+      } catch (e) {
+        btn.textContent = '⚠ Error';
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    async function loadCatalog() {
+      try {
+        const data = await fetch('/api/bots/catalog').then(r => r.json());
+        const grid = document.getElementById('bot-catalog');
+        grid.innerHTML = '';
+        (data.catalog || []).forEach(bot => {
+          const isLive = liveBots.has(bot.name) || bot.is_live;
+          const card = document.createElement('div');
+          card.className = 'bot-card' + (isLive ? ' live' : '');
+          card.innerHTML = `
+            <div class="bot-title">${bot.emoji || '🤖'} ${bot.display_name}</div>
+            <div class="bot-category">${bot.category}</div>
+            <div class="bot-desc">${bot.description}</div>
+            <div class="bot-revenue">💰 ${bot.revenue_model}</div>
+            <button
+              class="go-live-btn"
+              onclick="goLive('${bot.name}', this)"
+              ${isLive ? "disabled" : ""}
+            >${isLive ? '✅ Live' : '🚀 Go Live'}</button>
+            ${isLive ? '<span class="live-indicator"></span>' : ''}
+          `;
+          grid.appendChild(card);
+        });
+      } catch (e) {
+        console.error('Catalog load error:', e);
+      }
+    }
+
     async function loadAll() {
       try {
         const [status, leader, revenue] = await Promise.all([
@@ -188,6 +443,7 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
       }
     }
 
+    loadCatalog();
     loadAll();
     setInterval(loadAll, 15000);
   </script>
@@ -266,6 +522,17 @@ def create_app(
             bots.append(entry)
         return jsonify({"bots": bots, "total": len(bots)})
 
+    @app.route("/api/bots/catalog")
+    def api_bots_catalog() -> Response:
+        """Return the full high-revenue bot catalog with Go Live status."""
+        registered = set(cc.get_status().get("bots", {}).keys())
+        catalog = []
+        for bot in _BOT_CATALOG:
+            entry = dict(bot)
+            entry["is_live"] = bot["name"] in registered
+            catalog.append(entry)
+        return jsonify({"catalog": catalog, "total": len(catalog)})
+
     @app.route("/api/bots/register", methods=["POST"])
     def api_register_bot() -> Response:
         data = request.get_json(silent=True) or {}
@@ -284,6 +551,63 @@ def create_app(
 
         cc.register_bot(name, _Stub(data.get("tier", "free")))
         return jsonify({"registered": name, "status": "ok"}), 201
+
+    @app.route("/api/bots/<bot_name>/go_live", methods=["POST"])
+    def api_go_live(bot_name: str) -> Response:
+        """
+        Activate / deploy a bot instance.
+
+        Registers the bot with the ControlCenter if not already registered,
+        records an initial run, and returns the deployment record.
+
+        Request JSON (optional)
+        -----------------------
+        tier : str
+            Desired subscription tier (``free``, ``pro``, ``enterprise``).
+            Defaults to ``pro``.
+
+        Returns
+        -------
+        201
+            Deployment record with status, timestamp, and bot metadata.
+        400
+            If ``bot_name`` is blank.
+        """
+        bot_name = bot_name.strip()
+        if not bot_name:
+            return jsonify({"error": "bot_name is required."}), 400
+
+        data = request.get_json(silent=True) or {}
+        tier_str = data.get("tier", "pro")
+
+        class _LiveStub:
+            """Minimal live bot stub."""
+            def __init__(self, t: str):
+                from bots.ai_learning_system.tiers import Tier as LSTier
+                try:
+                    self.tier = LSTier(t)
+                except ValueError:
+                    self.tier = LSTier.FREE
+
+        # Register (idempotent — no-op if already present)
+        cc.register_bot(bot_name, _LiveStub(tier_str))
+
+        # Record the go-live run event
+        perf_db.record_run(
+            bot_name=bot_name,
+            kpis={"revenue_usd": 0.0, "tasks_completed": 0},
+            status="ok",
+            notes=f"Go Live deployment — tier: {tier_str}",
+        )
+
+        deployment = {
+            "bot_name": bot_name,
+            "status": "live",
+            "tier": tier_str,
+            "deployed_at": datetime.now(timezone.utc).isoformat(),
+            "message": f"Bot '{bot_name}' is now live on the {tier_str} tier.",
+        }
+        return jsonify(deployment), 201
 
     # ---------------------------------------------------------------
     # Revenue
@@ -345,4 +669,4 @@ def create_app(
     return app
 
 
-__all__ = ["create_app"]
+__all__ = ["create_app", "_BOT_CATALOG"]
