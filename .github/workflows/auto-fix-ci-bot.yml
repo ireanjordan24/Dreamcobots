@@ -1,0 +1,188 @@
+name: DreamCo Auto-Fix CI Bot
+
+# Triggered when any monitored workflow completes with a failure.
+# The bot analyzes the failure logs, applies a targeted fix, commits it,
+# and re-triggers the failed workflow — fully autonomous production-grade CI repair.
+
+on:
+  workflow_run:
+    workflows:
+      - "CI/CD Workflow"
+      - "Auto Recovery CI Mechanism"
+      - "CI"
+      - "Bot CI"
+      - "Python Tests"
+    types:
+      - completed
+
+jobs:
+  auto-fix:
+    # Only run when the triggering workflow actually failed.
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # needed to commit and push fixes
+      actions: write    # needed to re-trigger workflows
+
+    env:
+      # Prefer a repo-scoped PAT (GH_TOKEN) for write operations; fall back to
+      # the built-in GITHUB_TOKEN for read-only operations such as log fetching.
+      GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+    steps:
+      # ------------------------------------------------------------------ #
+      # 1. Checkout the repository so fixes can be committed                #
+      # ------------------------------------------------------------------ #
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------ #
+      # 2. Set up Python for the bot diagnostics layer                      #
+      # ------------------------------------------------------------------ #
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ------------------------------------------------------------------ #
+      # 3. Fetch the logs from the failed workflow run                      #
+      # ------------------------------------------------------------------ #
+      - name: Fetch workflow run logs
+        run: |
+          echo "🔍 Fetching logs for run ID: ${{ github.event.workflow_run.id }}"
+          gh run view ${{ github.event.workflow_run.id }} --log > logs.txt 2>&1 || true
+          echo "--- Last 100 log lines ---"
+          tail -100 logs.txt
+
+      # ------------------------------------------------------------------ #
+      # 4. Analyze logs and determine the fix type (via environment var)    #
+      # ------------------------------------------------------------------ #
+      - name: Analyze logs and set FIX env var
+        run: |
+          python - <<'EOF'
+          import os
+          import sys
+          sys.path.insert(0, "bots/ci_auto_fix_bot")
+          from ci_auto_fix_bot import CIAutoFixBot
+
+          with open("logs.txt", "r", encoding="utf-8", errors="replace") as f:
+              log_content = f.read()
+
+          bot = CIAutoFixBot()
+          fix_type = bot.analyze_logs(log_content)
+          diagnosis = bot.detect_failure_type(log_content)
+
+          # Write to GITHUB_ENV so subsequent steps can read $FIX and $FIX_DESC
+          with open(os.environ["GITHUB_ENV"], "a") as env_file:
+              env_file.write(f"FIX={fix_type}\n")
+              env_file.write(f"FIX_DESC={diagnosis['description']}\n")
+              if diagnosis["requires_escalation"]:
+                  env_file.write("ESCALATE=true\n")
+
+          print(f"✅ Detected fix type: {fix_type}")
+          print(f"📋 Description: {diagnosis['description']}")
+          EOF
+
+      # ------------------------------------------------------------------ #
+      # 5. Apply the targeted fix based on $FIX                            #
+      # ------------------------------------------------------------------ #
+      - name: Apply fix — install-deps (npm cache + reinstall)
+        if: env.FIX == 'install-deps'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          npm cache clean --force
+          npm install
+
+      - name: Apply fix — missing-module (reinstall npm deps)
+        if: env.FIX == 'missing-module'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          npm install
+
+      - name: Apply fix — permissions (safe directory + chmod)
+        if: env.FIX == 'permissions'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          git config --global --add safe.directory '*'
+          chmod -R 755 . || true
+
+      - name: Apply fix — path (inspect build paths)
+        if: env.FIX == 'path'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          ls -la
+
+      - name: Apply fix — pip-install (upgrade pip + reinstall requirements)
+        if: env.FIX == 'pip-install'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Escalate — unknown error (human review required)
+        if: env.ESCALATE == 'true'
+        run: |
+          echo "::warning::🚨 Unknown CI failure in '${{ github.event.workflow_run.name }}' (Run #${{ github.event.workflow_run.id }}). Manual review required."
+          echo "🔗 View run: ${{ github.event.workflow_run.html_url }}"
+
+      # ------------------------------------------------------------------ #
+      # 6. Log the applied fix for documentation                           #
+      # ------------------------------------------------------------------ #
+      - name: Log applied fix
+        if: always()
+        env:
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: |
+          python - <<'EOF'
+          import os
+          import sys
+          sys.path.insert(0, "bots/ci_auto_fix_bot")
+          from ci_auto_fix_bot import CIAutoFixBot, FixType
+
+          fix_env = os.environ.get("FIX", "unknown")
+          try:
+              fix_type = FixType(fix_env)
+          except ValueError:
+              fix_type = FixType.UNKNOWN
+
+          bot = CIAutoFixBot(log_dir="logs/ci-fixes")
+          entry = bot.log_fix(
+              fix_type,
+              run_id=os.environ.get("WORKFLOW_RUN_ID", ""),
+              workflow_name=os.environ.get("WORKFLOW_NAME", ""),
+          )
+          print(f"📝 Fix logged: {entry}")
+          EOF
+
+      # ------------------------------------------------------------------ #
+      # 7. Commit the fix back to the repository                           #
+      # ------------------------------------------------------------------ #
+      - name: Commit fix
+        if: env.FIX != 'unknown'
+        run: |
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add .
+          git diff --cached --quiet || git commit -m "🤖 Auto-fix applied: $FIX — $FIX_DESC"
+          git push || echo "No changes to push"
+
+      # ------------------------------------------------------------------ #
+      # 8. Re-trigger the failed workflow for verification                  #
+      # ------------------------------------------------------------------ #
+      - name: Re-trigger failed workflow
+        if: env.FIX != 'unknown'
+        run: |
+          echo "🔄 Re-triggering workflow: '${{ github.event.workflow_run.name }}'"
+          gh workflow run "${{ github.event.workflow_run.name }}" \
+            --ref "${{ github.event.workflow_run.head_branch }}" \
+            || echo "⚠️  Could not re-trigger workflow — check GH_TOKEN permissions"
