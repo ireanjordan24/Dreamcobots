@@ -9,50 +9,112 @@ on:
       - main
 
 jobs:
-  test:
+  validate-and-lint:
+    name: Validate & Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Read Node.js version from .nvmrc
+        id: nvmrc
+        run: echo "node_version=$(cat .nvmrc | xargs)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ steps.nvmrc.outputs.node_version }}
+          cache: 'npm'
+
+      - name: Validate package.json (syntax check)
+        run: npm run validate
+
+      - name: Install dependencies (clean install)
+        run: npm ci
+
+      - name: Lint JavaScript files
+        run: npm run lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: validate-and-lint
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Node.js version from .nvmrc
+        id: nvmrc
+        run: echo "node_version=$(cat .nvmrc | xargs)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.nvmrc.outputs.node_version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Node.js version from .nvmrc
+        id: nvmrc
+        run: echo "node_version=$(cat .nvmrc | xargs)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.nvmrc.outputs.node_version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: npm run build
+
+  diagnose-on-failure:
+    name: Diagnose Failure
+    runs-on: ubuntu-latest
+    needs: [validate-and-lint, test, build]
+    if: failure()
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Node.js version from .nvmrc
+        id: nvmrc
+        run: echo "node_version=$(cat .nvmrc | xargs)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.nvmrc.outputs.node_version }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci --prefer-offline || npm install
 
-      - name: Run tests
-        run: npm test
+      - name: Run diagnostics
+        run: npm run diagnose
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Deploy to Production
-        run: |
-          echo "Deploying to Production"
-          # Add your deployment commands here. E.g., using SSH, FTP, or cloud provider.
-
-  monitor:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Monitor Application
-        run: |
-          echo "Monitoring Application"
-          # Add your monitoring commands or alert configurations here.
-
-  error_handling:
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify of Failure
-        run: |
-          echo "Notifying developers of failure"
-          # Add notification service commands here (e.g., Slack, email).
+      - name: Run apply-fix checks
+        run: npm run apply-fix || true
