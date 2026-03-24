@@ -7,6 +7,7 @@ Covers all Stripe payment flows for real estate and car flipping bots.
 
 import sys
 import os
+from urllib.parse import urlparse
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -87,7 +88,7 @@ class TestRealEstateListingFeeCheckout:
             "agent@test.com", "123 Main St", "https://s.co", "https://c.co"
         )
         assert "checkout_url" in result
-        assert "stripe.com" in result["checkout_url"]
+        assert urlparse(result["checkout_url"]).netloc == "checkout.stripe.com"
 
     def test_amount_matches_schedule(self):
         result = self.payments.create_listing_fee_checkout(
@@ -186,7 +187,7 @@ class TestRealEstatePaymentLink:
         payments = RealEstateStripePayments()
         result = payments.create_listing_payment_link()
         assert "url" in result
-        assert "stripe.com" in result["url"]
+        assert urlparse(result["url"]).netloc == "buy.stripe.com"
 
     def test_listing_link_correct_amount(self):
         payments = RealEstateStripePayments()
@@ -376,7 +377,7 @@ class TestCarFlippingPaymentLinks:
         payments = CarFlippingStripePayments()
         result = payments.create_valuation_payment_link()
         assert "url" in result
-        assert "stripe.com" in result["url"]
+        assert urlparse(result["url"]).netloc == "buy.stripe.com"
 
     def test_listing_payment_link(self):
         payments = CarFlippingStripePayments()

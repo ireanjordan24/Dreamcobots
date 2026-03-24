@@ -85,6 +85,7 @@ TIER_CATALOGUE: dict[str, TierConfig] = {
         name="Basic",
         tier=Tier.BASIC,
         price_usd_monthly=29.0,
+        # Replace with real Stripe Price IDs from Dashboard > Products > Prices
         stripe_monthly_price_id="price_basic_monthly_placeholder",
         stripe_annual_price_id="price_basic_annual_placeholder",
         max_users=5,
@@ -95,6 +96,7 @@ TIER_CATALOGUE: dict[str, TierConfig] = {
         name="Professional",
         tier=Tier.PROFESSIONAL,
         price_usd_monthly=99.0,
+        # Replace with real Stripe Price IDs from Dashboard > Products > Prices
         stripe_monthly_price_id="price_professional_monthly_placeholder",
         stripe_annual_price_id="price_professional_annual_placeholder",
         max_users=25,
@@ -105,6 +107,7 @@ TIER_CATALOGUE: dict[str, TierConfig] = {
         name="Enterprise",
         tier=Tier.ENTERPRISE,
         price_usd_monthly=299.0,
+        # Replace with real Stripe Price IDs from Dashboard > Products > Prices
         stripe_monthly_price_id="price_enterprise_monthly_placeholder",
         stripe_annual_price_id="price_enterprise_annual_placeholder",
         max_users=None,

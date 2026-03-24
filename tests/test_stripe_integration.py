@@ -7,6 +7,7 @@ Covers StripeClient (mock mode) and StripeWebhookHandler.
 import json
 import sys
 import os
+from urllib.parse import urlparse
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -68,7 +69,7 @@ class TestCreateCheckoutSession:
             amount_cents=2500, currency="usd", product_name="X",
             success_url="https://s.co", cancel_url="https://c.co",
         )
-        assert "checkout.stripe.com" in result["url"]
+        assert urlparse(result["url"]).netloc == "checkout.stripe.com"
 
     def test_amount_preserved(self):
         result = self.client.create_checkout_session(
@@ -226,7 +227,7 @@ class TestPaymentLinks:
 
     def test_payment_link_has_url(self):
         result = self.client.create_payment_link(2500, "usd", "Test Product")
-        assert "stripe.com" in result["url"]
+        assert urlparse(result["url"]).netloc == "buy.stripe.com"
 
     def test_payment_link_active(self):
         result = self.client.create_payment_link(2500, "usd", "Test Product")
