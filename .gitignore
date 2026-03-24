@@ -6,3 +6,24 @@ __pycache__/
 dist/
 build/
 .env
+# Node.js
+node_modules/
+npm-debug.log*
+# Ruby
+vendor/bundle/
+.bundle/
+# PHP
+stripe/php/vendor/
+# Go
+stripe/go/vendor/
+# Java / Maven
+stripe/java/target/
+# .NET
+stripe/dotnet/bin/
+stripe/dotnet/obj/
+# iOS
+stripe/ios/Pods/
+*.xcworkspace
+# Android
+stripe/android/.gradle/
+stripe/android/build/
