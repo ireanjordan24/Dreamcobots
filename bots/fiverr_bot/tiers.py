@@ -3,14 +3,14 @@ Tier configuration for the Fiverr Automation Bot.
 
 Tiers:
   - FREE:       5 gig listings, basic order tracking, manual delivery.
-                Service fee: 20 % per transaction.
+                Service fee: 20% per transaction.
   - PRO ($49):  50 gig listings, auto order management, analytics, inbox
                 automation, freelancer/client matching, job postings,
                 proposal submissions, Stripe payments, milestones.
-                Service fee: 10 % per transaction.
-  - ENTERPRISE ($199): Unlimited gigs, AI-optimised pricing, white-label,
+                Service fee: 10% per transaction.
+  - ENTERPRISE ($199): Unlimited gigs, AI-optimized pricing, white-label,
                 CRM export, admin dashboard, featured gig placement.
-                Service fee: 5 % per transaction.
+                Service fee: 5% per transaction.
 """
 
 from __future__ import annotations

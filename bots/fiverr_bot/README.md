@@ -9,7 +9,7 @@ milestone management, featured gig placement, and an admin analytics dashboard.
 
 | Feature | Free | Pro ($49/mo) | Enterprise ($199/mo) |
 |---|---|---|---|
-| Service fee per transaction | 20 % | 10 % | 5 % |
+| Service fee per transaction | 20% | 10% | 5% |
 | Gig listings | 5 | 50 | Unlimited |
 | Orders per month | 20 | 500 | Unlimited |
 | Order tracking | ✅ | ✅ | ✅ |
@@ -168,7 +168,7 @@ print(dashboard["users"])
 ## Revenue Features
 
 - **Service fees**: charged automatically on every completed order/milestone
-  release. Rate depends on tier (5 %–20 %).
+  release. Rate depends on tier (5%–20%).
 - **Subscription tiers**: recurring monthly revenue at $49 (Pro) or $199
   (Enterprise).
 - **Featured gig placements**: ENTERPRISE clients can pay to highlight gigs

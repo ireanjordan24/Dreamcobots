@@ -7,9 +7,9 @@ freelancer/client matching, job postings, proposals, Stripe payments,
 milestones, featured gigs, and admin dashboard.
 
 Tier-aware:
-  FREE:       5 gigs + 20 orders/month, 20 % service fee.
-  PRO ($49):  50 gigs + matching/proposals/Stripe, 10 % service fee.
-  ENTERPRISE ($199): Unlimited, AI pricing, admin dashboard, 5 % fee.
+  FREE:       5 gigs + 20 orders/month, 20% service fee.
+  PRO ($49):  50 gigs + matching/proposals/Stripe, 10% service fee.
+  ENTERPRISE ($199): Unlimited, AI pricing, admin dashboard, 5% fee.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
@@ -20,12 +20,12 @@ not set so the bot remains fully functional in tests/development.
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Optional
 
@@ -1182,7 +1182,6 @@ class FiverrBot:
         gig = self._get_gig(gig_id)
         if days < 1:
             raise FiverrBotError("Featured duration must be at least 1 day.")
-        from datetime import timedelta
         until = (
             datetime.now(timezone.utc) + timedelta(days=days)
         ).isoformat()
