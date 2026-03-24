@@ -70,6 +70,57 @@ python tools/check_bot_framework.py
 ```
 
 ---
+## 💳 Stripe Payment Integration
+
+All DreamCobots bots support **Stripe** for payments, subscriptions, and payouts.
+The `stripe/` directory contains ready-to-use integration code for every major
+language and platform.
+
+### Supported Languages / Platforms
+
+| Language       | Directory          | Key Features                                |
+|----------------|--------------------|---------------------------------------------|
+| Node.js        | `stripe/node/`     | Payment Intents, webhooks (Express)         |
+| Python         | `stripe/python/`   | Payments, subscriptions, webhooks (Flask)   |
+| Ruby           | `stripe/ruby/`     | Checkout sessions, webhooks (Sinatra)       |
+| PHP            | `stripe/php/`      | Payment Intents, webhooks                   |
+| Go             | `stripe/go/`       | Payment Intents, webhooks (net/http)        |
+| Java           | `stripe/java/`     | Payments, subscriptions (Maven)             |
+| .NET           | `stripe/dotnet/`   | Payments, subscriptions (ASP.NET Core)      |
+| iOS (Swift)    | `stripe/ios/`      | PaymentSheet (SwiftUI + CocoaPods)          |
+| Android (Kotlin) | `stripe/android/`| PaymentSheet (Jetpack Compose + Gradle)     |
+
+### Quick Setup
+
+1. Copy `.env.example` to `.env` and add your Stripe keys:
+   ```bash
+   cp .env.example .env
+   # Set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+   ```
+
+2. Install the Python library:
+   ```bash
+   pip install stripe
+   ```
+
+3. Run the Python integration:
+   ```bash
+   cd stripe/python
+   pip install -r requirements.txt
+   export STRIPE_SECRET_KEY=sk_...
+   python app.py
+   ```
+
+4. Test webhooks locally with the Stripe CLI:
+   ```bash
+   stripe listen --forward-to localhost:5000/webhook
+   stripe trigger payment_intent.succeeded
+   ```
+
+See [`stripe/README.md`](stripe/README.md) for full documentation and per-language
+setup instructions.
+
+---
 ## Installation Instructions
 1. Clone this repository to your local machine:
    ```bash
@@ -130,7 +181,11 @@ See full documentation in:
 
 ---
 ## Folder Explanation
-### `framework`
+### `stripe`
+- Contains Stripe payment library integrations for every language/platform.
+- See [`stripe/README.md`](stripe/README.md) for full setup instructions.
+
+
 - Contains the mandatory **GLOBAL AI SOURCES FLOW** pipeline module
   (`global_ai_sources_flow.py`) that every bot must import and use.
 
