@@ -42,18 +42,14 @@ class StripeError(Exception):
     """Raised when a Stripe API call fails."""
 
 
-_PLACEHOLDER_PREFIXES = ("sk_test_placeholder", "sk_test_your_", "")
+_PLACEHOLDER_PREFIXES = ("sk_test_placeholder", "sk_test_your_")
 
 
 def _is_placeholder(key: str) -> bool:
     """Return True if *key* looks like a placeholder / missing value."""
     if not key:
         return True
-    for prefix in _PLACEHOLDER_PREFIXES:
-        if key.startswith(prefix) and key == prefix:
-            return True
-    # Any key that is not a real test/live key
-    return key in ("sk_test_your_secret_key_here",)
+    return any(key.startswith(prefix) for prefix in _PLACEHOLDER_PREFIXES)
 
 
 class StripeClient:

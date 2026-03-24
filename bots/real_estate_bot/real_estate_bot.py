@@ -1,5 +1,6 @@
 """Real Estate Bot — tier-aware real estate deal finder and ROI analyzer."""
 import sys, os
+from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.real_estate_bot.tiers import BOT_FEATURES, get_bot_tier_info
@@ -211,7 +212,7 @@ class RealEstateBot:
     def create_checkout_session(
         self,
         target_tier: Tier,
-        customer_email: str = None,
+        customer_email: Optional[str] = None,
         success_url: str = "https://dreamcobots.com/success",
         cancel_url: str = "https://dreamcobots.com/cancel",
     ) -> dict:
