@@ -6,3 +6,9 @@ __pycache__/
 dist/
 build/
 .env
+# Android Gradle build artifacts
+stripe/android/.gradle/
+stripe/android/gradle/wrapper/gradle-wrapper.jar
+# .NET build artifacts
+stripe/dotnet/obj/
+stripe/dotnet/bin/
