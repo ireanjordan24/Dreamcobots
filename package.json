@@ -1,1 +1,41 @@
-{"name": "dreamcobots","version": "1.0.0","description": "DreamCobots — Autonomous Money Operating System: AI-powered bots for lead generation, real estate, crypto, and more.","main": "index.js","scripts": {"start": "node index.js","build": "echo 'Build complete'","test": "jest --passWithNoTests","apply-fix": "node apply-fix.js","diagnose": "node diagnose.js","deploy": "node deploy.js"},"repository": {"type": "git","url": "https://github.com/ireanjordan24/Dreamcobots.git"},"author": "Irean Jordan","license": "ISC","dependencies": {"express": "^4.17.1"},"devDependencies": {"jest": "^29.0.0"},"jest": {"testEnvironment": "node","testMatch": ["**/__tests__/**/*.js","**/*.test.js"]}}
+{
+  "name": "dreamcobots",
+  "version": "1.0.0",
+  "description": "DreamCobots — Autonomous Money Operating System: AI-powered bots for lead generation, real estate, crypto, and more.",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "react-scripts build",
+    "test": "jest --passWithNoTests",
+    "apply-fix": "node apply-fix.js",
+    "diagnose": "node diagnose.js",
+    "deploy": "node deploy.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ireanjordan24/Dreamcobots.git"
+  },
+  "author": "Irean Jordan",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.17.1",
+    "stripe": "^17.7.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "react-scripts": "^5.0.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/*.test.js"
+    ]
+  }
+}

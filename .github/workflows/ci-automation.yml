@@ -12,15 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '18'
+
+      - name: Force clean install
+        run: rm -rf node_modules
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run Tests
         run: npm test
