@@ -7,9 +7,20 @@
 
 'use strict';
 
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Stripe initialization with fallback when STRIPE_SECRET_KEY is not set.
+// Add STRIPE_SECRET_KEY to GitHub Secrets under Settings > Secrets > Actions.
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+} else {
+  console.warn('WARNING: STRIPE_SECRET_KEY is not set. Stripe features will be unavailable.');
+}
 
 app.use(express.json());
 
