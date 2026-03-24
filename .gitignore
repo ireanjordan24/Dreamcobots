@@ -27,3 +27,4 @@ stripe/ios/Pods/
 # Android
 stripe/android/.gradle/
 stripe/android/build/
+=5.0.0
