@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gem 'stripe', '~> 10.0'
+gem 'sinatra', '~> 3.0'
+gem 'sinatra-contrib', '~> 3.0'

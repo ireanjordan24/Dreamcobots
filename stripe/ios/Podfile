@@ -1,0 +1,6 @@
+platform :ios, '14.0'
+use_frameworks!
+
+target 'DreamCobotsApp' do
+  pod 'StripePaymentSheet', '~> 23.0'
+end
