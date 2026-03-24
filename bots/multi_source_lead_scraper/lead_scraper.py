@@ -39,6 +39,7 @@ from bots.multi_source_lead_scraper.tiers import (
     FEATURE_INDUSTRY_FILTER,
     FEATURE_WEBHOOK_EXPORT,
 )
+from bots.stripe_integration import StripeClient
 
 
 # ---------------------------------------------------------------------------
@@ -165,6 +166,7 @@ class MultiSourceLeadScraper:
         self._counter: int = 0
         self._scrape_log: list = []
         self._export_log: list = []
+        self._stripe = StripeClient()
 
     # ------------------------------------------------------------------
     # Tier enforcement
@@ -431,8 +433,55 @@ class MultiSourceLeadScraper:
         return list(self._scrape_log)
 
     # ------------------------------------------------------------------
-    # BuddyAI chat interface
+    # Stripe payment & upgrade
     # ------------------------------------------------------------------
+
+    # Tier price map: (amount_cents, stripe_mode)
+    _STRIPE_PLANS = {
+        Tier.PRO: (4900, "subscription"),        # $49/month
+        Tier.ENTERPRISE: (19900, "subscription"), # $199/month
+    }
+
+    def create_checkout_session(
+        self,
+        target_tier: Tier,
+        customer_email: Optional[str] = None,
+        success_url: str = "https://dreamcobots.com/success",
+        cancel_url: str = "https://dreamcobots.com/cancel",
+    ) -> dict:
+        """
+        Create a Stripe Checkout session to upgrade to *target_tier*.
+
+        Returns a dict containing the checkout ``url`` the customer should
+        be redirected to, plus metadata about the session.
+        """
+        if target_tier not in self._STRIPE_PLANS:
+            raise LeadScraperTierError(
+                f"Cannot create checkout for tier '{target_tier.value}'."
+            )
+        amount_cents, mode = self._STRIPE_PLANS[target_tier]
+        return self._stripe.create_checkout_session(
+            plan=f"Lead Scraper {target_tier.value.capitalize()}",
+            amount_cents=amount_cents,
+            mode=mode,
+            customer_email=customer_email,
+            success_url=success_url,
+            cancel_url=cancel_url,
+        )
+
+    def create_payment_link(self, target_tier: Tier) -> dict:
+        """Return a shareable Stripe Payment Link for *target_tier*."""
+        if target_tier not in self._STRIPE_PLANS:
+            raise LeadScraperTierError(
+                f"Cannot create payment link for tier '{target_tier.value}'."
+            )
+        amount_cents, _ = self._STRIPE_PLANS[target_tier]
+        return self._stripe.create_payment_link(
+            plan=f"Lead Scraper {target_tier.value.capitalize()}",
+            amount_cents=amount_cents,
+        )
+
+
 
     def chat(self, message: str) -> dict:
         """Natural-language interface for BuddyAI routing."""
