@@ -3,8 +3,14 @@ Tier configuration for the Fiverr Automation Bot.
 
 Tiers:
   - FREE:       5 gig listings, basic order tracking, manual delivery.
-  - PRO ($49):  50 gig listings, auto order management, analytics, inbox automation.
-  - ENTERPRISE ($199): Unlimited gigs, AI-optimized pricing, white-label, CRM export.
+                Service fee: 20 % per transaction.
+  - PRO ($49):  50 gig listings, auto order management, analytics, inbox
+                automation, freelancer/client matching, job postings,
+                proposal submissions, Stripe payments, milestones.
+                Service fee: 10 % per transaction.
+  - ENTERPRISE ($199): Unlimited gigs, AI-optimised pricing, white-label,
+                CRM export, admin dashboard, featured gig placement.
+                Service fee: 5 % per transaction.
 """
 
 from __future__ import annotations
@@ -29,6 +35,7 @@ class TierConfig:
     max_orders_per_month: Optional[int]
     features: list
     support_level: str
+    service_fee_pct: float  # percentage charged per completed transaction
 
     def has_feature(self, feature: str) -> bool:
         return feature in self.features
@@ -47,6 +54,14 @@ FEATURE_CRM_EXPORT = "crm_export"
 FEATURE_AI_PRICING = "ai_pricing"
 FEATURE_WHITE_LABEL = "white_label"
 FEATURE_BULK_MESSAGING = "bulk_messaging"
+# New features
+FEATURE_FREELANCER_MATCHING = "freelancer_matching"
+FEATURE_JOB_POSTINGS = "job_postings"
+FEATURE_PROPOSALS = "proposals"
+FEATURE_STRIPE_PAYMENTS = "stripe_payments"
+FEATURE_MILESTONES = "milestones"
+FEATURE_ADMIN_DASHBOARD = "admin_dashboard"
+FEATURE_FEATURED_GIGS = "featured_gigs"
 
 FREE_FEATURES = [
     FEATURE_GIG_LISTING,
@@ -59,12 +74,19 @@ PRO_FEATURES = FREE_FEATURES + [
     FEATURE_ANALYTICS,
     FEATURE_PRICING_OPTIMIZER,
     FEATURE_BULK_MESSAGING,
+    FEATURE_FREELANCER_MATCHING,
+    FEATURE_JOB_POSTINGS,
+    FEATURE_PROPOSALS,
+    FEATURE_STRIPE_PAYMENTS,
+    FEATURE_MILESTONES,
 ]
 
 ENTERPRISE_FEATURES = PRO_FEATURES + [
     FEATURE_CRM_EXPORT,
     FEATURE_AI_PRICING,
     FEATURE_WHITE_LABEL,
+    FEATURE_ADMIN_DASHBOARD,
+    FEATURE_FEATURED_GIGS,
 ]
 
 TIER_CATALOGUE = {
@@ -76,6 +98,7 @@ TIER_CATALOGUE = {
         max_orders_per_month=20,
         features=FREE_FEATURES,
         support_level="Community",
+        service_fee_pct=20.0,
     ),
     Tier.PRO.value: TierConfig(
         name="Pro",
@@ -85,6 +108,7 @@ TIER_CATALOGUE = {
         max_orders_per_month=500,
         features=PRO_FEATURES,
         support_level="Email (24 h SLA)",
+        service_fee_pct=10.0,
     ),
     Tier.ENTERPRISE.value: TierConfig(
         name="Enterprise",
@@ -94,6 +118,7 @@ TIER_CATALOGUE = {
         max_orders_per_month=None,
         features=ENTERPRISE_FEATURES,
         support_level="Dedicated 24/7",
+        service_fee_pct=5.0,
     ),
 }
 
