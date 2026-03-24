@@ -1,0 +1,42 @@
+# Workflow for GitHub Automation
+
+name: CI Automation Workflows
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build Project
+        run: npm run build
+
+      - name: AI Debugging and Self-Healing
+        run: |
+          if npm run diagnose; then
+            echo 'No issues detected.';
+          else
+            npm run apply-fix;
+            echo 'Auto-healing applied.';
+          fi
+
+      - name: Redeploy on Successful Resolution
+        run: npm run deploy
+        if: success()
