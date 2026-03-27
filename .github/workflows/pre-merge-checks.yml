@@ -1,1 +1,77 @@
-name: Pre-Merge Checks\n\non: [pull_request]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n    - name: Checkout code\n      uses: actions/checkout@v2\n\n    - name: Setup Node.js\n      uses: actions/setup-node@v2\n      with:\n        node-version: '14'\n\n    - name: Install dependencies\n      run: npm install\n\n    - name: Run linting\n      run: npm run lint\n\n    - name: Check file existence\n      run: |\n        if [ ! -f path/to/your/file.js ]; then\n          echo 'Required file does not exist!';\n          exit 1;\n        fi\n\n    - name: Run tests\n      run: npm test\n
+name: Pre-Merge Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pre-merge:
+    name: Pre-Merge File & Dependency Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Node.js dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate critical repository files exist
+        run: |
+          CRITICAL_FILES=(
+            "requirements.txt"
+            "package.json"
+            "README.md"
+            "tools/check_bot_framework.py"
+            "framework/__init__.py"
+            "framework/global_ai_sources_flow.py"
+            "bots/ai-models-integration/ai_models_integration.py"
+            ".github/workflows/ci.yml"
+            ".github/workflows/bot-ci.yml"
+            ".github/workflows/auto-recovery.yml"
+          )
+          MISSING=0
+          for FILE in "${CRITICAL_FILES[@]}"; do
+            if [ ! -f "$FILE" ]; then
+              echo "❌ Required file missing: $FILE"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Present: $FILE"
+            fi
+          done
+          if [ $MISSING -gt 0 ]; then
+            echo "::error::$MISSING critical file(s) are missing. See log for details."
+            exit 1
+          fi
+          echo "All critical files are present."
+
+      - name: Run Python framework compliance check
+        run: python tools/check_bot_framework.py
+
+      - name: Run Python tests
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
+
+      - name: Run Node.js tests
+        run: npm test --if-present
