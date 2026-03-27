@@ -1,6 +1,7 @@
 # Comprehensive PR Validation Workflow
 #
 # Runs on every pull request to validate:
+#   0. PRValidationBot — critical files, cross-branch discrepancies, auto-fix
 #   1. JavaScript code style (ESLint + Prettier)
 #   2. Node.js tests (Jest)
 #   3. Python bot tests (pytest) and framework compliance
@@ -14,15 +15,142 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened]
 
-permissions:
-  contents: read
-  pull-requests: write
+# Prevent duplicate runs on the same branch/PR
+concurrency:
+  group: pr-validation-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
+  # ── 0. PRValidationBot — critical files + cross-branch discrepancies ─────────
+  validate-files:
+    name: Validate PR Files & Critical Files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    outputs:
+      validation_passed: ${{ steps.validate.outputs.passed }}
+      missing_files: ${{ steps.validate.outputs.missing_files }}
+      fixes_applied: ${{ steps.validate.outputs.fixes_applied }}
+
+    steps:
+      - name: Checkout PR branch (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run PR Validation Bot
+        id: validate
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python - <<'PYEOF'
+          import os
+          import sys
+          import json
+
+          sys.path.insert(0, ".")
+          from bots.pr_validation_bot.pr_validation_bot import PRValidationBot
+
+          base = os.environ.get("BASE_BRANCH", "main")
+          head = os.environ.get("HEAD_BRANCH", "HEAD")
+          pr_num = os.environ.get("PR_NUMBER", "")
+
+          bot = PRValidationBot(repo_root=".", log_dir="logs/pr-validation")
+          result = bot.run(
+              base_branch=base,
+              head_branch=head,
+              auto_fix=True,
+              pr_number=pr_num,
+          )
+
+          with open("/tmp/pr-validation-report.md", "w") as f:
+              f.write(result.report)
+
+          passed = "true" if result.passed else "false"
+          missing = json.dumps(result.missing_critical_files)
+          fixes = json.dumps(result.auto_fixes_applied)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as gh_out:
+              gh_out.write(f"passed={passed}\n")
+              gh_out.write(f"missing_files={missing}\n")
+              gh_out.write(f"fixes_applied={fixes}\n")
+
+          print(result.report)
+
+          if not result.passed:
+              sys.exit(1)
+          PYEOF
+
+      - name: Commit auto-fixes (if any)
+        if: always() && steps.validate.outputs.fixes_applied != '[]'
+        run: |
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add .
+          git diff --cached --quiet || git commit -m "🤖 PR auto-fix: restored missing critical files [skip ci]"
+          git push || echo "Nothing to push"
+
+      - name: Post PR comment with validation report
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              body = fs.readFileSync('/tmp/pr-validation-report.md', 'utf8');
+            } catch {
+              body = '⚠️ PR Validation report could not be generated. Check the workflow logs.';
+            }
+
+            const prNumber = context.payload.pull_request.number;
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const botComment = comments.data.find(c =>
+              c.user.type === 'Bot' && c.body.includes('DreamCo PR Validation Report')
+            );
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
   # ── 1. JavaScript Linting (ESLint) ────────────────────────────────────────
   lint-js:
     name: JavaScript Lint (ESLint)
     runs-on: ubuntu-latest
+    needs: validate-files
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,6 +181,9 @@ jobs:
   format-check:
     name: Code Format (Prettier)
     runs-on: ubuntu-latest
+    needs: validate-files
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -83,6 +214,9 @@ jobs:
   test-node:
     name: Node.js Tests (Jest)
     runs-on: ubuntu-latest
+    needs: validate-files
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -112,6 +246,9 @@ jobs:
   test-python:
     name: Python Tests & Bot Framework Compliance
     runs-on: ubuntu-latest
+    needs: validate-files
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ['3.11', '3.12']
@@ -154,8 +291,10 @@ jobs:
   deploy-simulation:
     name: Deployment Simulation
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python]
+    needs: [validate-files, lint-js, format-check, test-node, test-python]
     if: success()
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -170,7 +309,7 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build project
-        run: npm run build
+        run: npm run build --if-present
 
       - name: Simulate deployment
         run: |
@@ -184,8 +323,10 @@ jobs:
   feedback:
     name: Post PR Feedback
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python, deploy-simulation]
+    needs: [validate-files, lint-js, format-check, test-node, test-python, deploy-simulation]
     if: always()
+    permissions:
+      pull-requests: write
     steps:
       - name: Download ESLint results
         uses: actions/download-artifact@v4
@@ -215,14 +356,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            function readArtifact(path) {
-              try {
-                return fs.readFileSync(path, 'utf8').trim();
-              } catch {
-                return null;
-              }
-            }
-
+            const validateResult = '${{ needs.validate-files.result }}';
             const eslintResult   = '${{ needs.lint-js.result }}';
             const prettierResult = '${{ needs.format-check.result }}';
             const jestResult     = '${{ needs.test-node.result }}';
@@ -238,15 +372,16 @@ jobs:
               '',
               `| Check | Status |`,
               `|-------|--------|`,
-              `| ESLint (JavaScript Linting) | ${icon(eslintResult)} ${eslintResult} |`,
-              `| Prettier (Code Formatting)  | ${icon(prettierResult)} ${prettierResult} |`,
-              `| Jest (Node.js Tests)        | ${icon(jestResult)} ${jestResult} |`,
-              `| pytest (Python Bot Tests)   | ${icon(pytestResult)} ${pytestResult} |`,
-              `| Deployment Simulation       | ${icon(deployResult)} ${deployResult} |`,
+              `| PR Validation Bot (Critical Files) | ${icon(validateResult)} ${validateResult} |`,
+              `| ESLint (JavaScript Linting)        | ${icon(eslintResult)} ${eslintResult} |`,
+              `| Prettier (Code Formatting)         | ${icon(prettierResult)} ${prettierResult} |`,
+              `| Jest (Node.js Tests)               | ${icon(jestResult)} ${jestResult} |`,
+              `| pytest (Python Bot Tests)          | ${icon(pytestResult)} ${pytestResult} |`,
+              `| Deployment Simulation              | ${icon(deployResult)} ${deployResult} |`,
               '',
             ];
 
-            const allPassed = [eslintResult, prettierResult, jestResult, pytestResult]
+            const allPassed = [validateResult, eslintResult, prettierResult, jestResult, pytestResult]
               .every(r => r === 'success');
 
             if (allPassed) {
@@ -254,6 +389,9 @@ jobs:
             } else {
               lines.push('### ⚠️ Some checks failed. Please review the details below:');
               lines.push('');
+              if (validateResult !== 'success') {
+                lines.push('**PR Validation Bot:** Critical files missing or discrepancies detected. Check the validation report comment above.');
+              }
               if (eslintResult !== 'success') {
                 lines.push('**ESLint:** Run `npm run lint:fix` locally to auto-fix linting issues.');
               }
@@ -275,7 +413,6 @@ jobs:
 
             const body = lines.join('\n');
 
-            // Find existing bot comment and update, or create new
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -302,3 +439,44 @@ jobs:
                 body,
               });
             }
+
+  # ── 7. Maintainer notification on auto-fix or failure ─────────────────────
+  notify-maintainers:
+    name: Notify Maintainers
+    runs-on: ubuntu-latest
+    needs: [validate-files, lint-js, format-check, test-node, test-python]
+    if: always() && (needs.validate-files.result == 'failure' || needs.validate-files.outputs.fixes_applied != '[]')
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Post maintainer notification
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const fixesApplied = '${{ needs.validate-files.outputs.fixes_applied }}';
+            const missingFiles = '${{ needs.validate-files.outputs.missing_files }}';
+            const validationPassed = '${{ needs.validate-files.outputs.validation_passed }}';
+            const prNumber = context.payload.pull_request.number;
+
+            let body = '### 🤖 DreamCo Bot — Maintainer Notification\n\n';
+
+            if (fixesApplied && fixesApplied !== '[]') {
+              body += `**Auto-fix applied:** The bot restored the following missing files from \`main\`:\n`;
+              body += `\`\`\`json\n${fixesApplied}\n\`\`\`\n\n`;
+              body += `> You may override these changes by pushing your own fix.\n\n`;
+            }
+
+            if (validationPassed !== 'true') {
+              body += `**⚠️ Validation failed.** Missing files that could not be auto-fixed:\n`;
+              body += `\`\`\`json\n${missingFiles}\n\`\`\`\n\n`;
+              body += `Please add the missing files manually before this PR can be merged.\n`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body,
+            });

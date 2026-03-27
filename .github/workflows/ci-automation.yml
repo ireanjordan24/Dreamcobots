@@ -1,4 +1,6 @@
 # Workflow for GitHub Automation
+# Runs on every PR and push. Installs dependencies, runs tests, builds,
+# performs self-healing diagnostics, and (on push to main only) deploys.
 
 name: CI Automation Workflows
 
@@ -24,21 +26,20 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Run Tests
-        run: npm test
+        run: npm test --if-present
 
       - name: Build Project
-        run: npm run build
+        run: npm run build --if-present
 
       - name: AI Debugging and Self-Healing
         run: |
-          if npm run diagnose; then
+          if npm run diagnose --if-present; then
             echo 'No issues detected.';
           else
-            npm run apply-fix;
+            npm run apply-fix --if-present;
             echo 'Auto-healing applied.';
           fi
 
-      - name: Redeploy on Successful Resolution
-        run: npm run deploy
-        if: success()
-
+      - name: Deploy (main branch only)
+        if: success() && github.ref == 'refs/heads/main'
+        run: npm run deploy --if-present
