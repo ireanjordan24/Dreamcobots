@@ -21,7 +21,12 @@ app.get('/health', (_req, res) => {
 // Bot catalog endpoint
 app.get('/bots', (_req, res) => {
   const bots = [
-    { id: 'multi_source_lead_scraper', name: 'Multi-Source Lead Scraper', category: 'revenue', status: 'active' },
+    {
+      id: 'multi_source_lead_scraper',
+      name: 'Multi-Source Lead Scraper',
+      category: 'revenue',
+      status: 'active',
+    },
     { id: 'real_estate_bot', name: 'Real Estate Bot', category: 'revenue', status: 'active' },
     { id: 'crypto_bot', name: 'Crypto Bot', category: 'revenue', status: 'active' },
     { id: 'fiverr_bot', name: 'Fiverr Bot', category: 'revenue', status: 'active' },
@@ -35,7 +40,12 @@ app.get('/bots', (_req, res) => {
     { id: 'ai_level_up_bot', name: 'AI Level Up Bot', category: 'ai', status: 'active' },
     { id: 'bot_generator', name: 'Bot Generator', category: 'factory', status: 'active' },
     { id: 'dreamco_empire_os', name: 'DreamCo Empire OS', category: 'platform', status: 'active' },
-    { id: 'government_contract_grant_bot', name: 'Government Contract & Grant Bot', category: 'revenue', status: 'active' },
+    {
+      id: 'government_contract_grant_bot',
+      name: 'Government Contract & Grant Bot',
+      category: 'revenue',
+      status: 'active',
+    },
   ];
   res.json({ bots, total: bots.length });
 });
