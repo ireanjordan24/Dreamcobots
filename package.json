@@ -1,7 +1,7 @@
 {
   "name": "dreamcobots",
   "version": "1.0.0",
-  "description": "DreamCobots — Autonomous Money Operating System: AI-powered bots for lead generation, real estate, crypto, and more.",
+  "description": "DreamCobots \u2014 Autonomous Money Operating System: AI-powered bots for lead generation, real estate, crypto, and more.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -35,5 +35,8 @@
       "**/__tests__/**/*.js",
       "**/*.test.js"
     ]
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
