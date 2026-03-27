@@ -12,6 +12,9 @@ on:
       - "CI"
       - "Bot CI"
       - "Python Tests"
+      - "PR Validation"
+      - "Pre-Merge Checks"
+      - "CI Automation Workflows"
     types:
       - completed
 
