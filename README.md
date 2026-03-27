@@ -183,9 +183,92 @@ See full documentation in:
 3. Make sure necessary APIs and configurations are set before running.
 
 ---
+## Stripe Payment Integration
+
+All Dreamcobots bots with paid tiers are Stripe-enabled. The integration lives in
+`bots/stripe_integration/` and is used by the Lead Scraper, Real Estate Bot,
+Car Flipping Bot, and DreamCo Payments Bot.
+
+### Setting Up Stripe Keys
+
+1. **Create a `.env` file** (never commit this file — it is already in `.gitignore`):
+   ```bash
+   cp .env.example .env
+   ```
+2. **Fill in your Stripe credentials** in `.env`:
+   ```env
+   STRIPE_SECRET_KEY=sk_test_your_secret_key_here
+   STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+   ```
+   - Obtain keys from [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
+   - Use **test keys** (`sk_test_...`) during development
+   - Use **live keys** (`sk_live_...`) only in production and store them in GitHub Secrets (never in `.env` files committed to the repo)
+
+3. **For GitHub Actions / Deployment**: add `STRIPE_SECRET_KEY` as a repository secret:
+   - Go to **Settings → Secrets and variables → Actions → New repository secret**
+   - Name: `STRIPE_SECRET_KEY`, Value: your live secret key
+
+### Creating a Checkout Session (upgrade flow)
+
+```python
+from bots.real_estate_bot.real_estate_bot import RealEstateBot
+from tiers import Tier  # from bots/ai-models-integration/
+
+bot = RealEstateBot(tier=Tier.FREE)
+session = bot.create_checkout_session(
+    target_tier=Tier.PRO,
+    customer_email="user@example.com",
+    success_url="https://your-site.com/success",
+    cancel_url="https://your-site.com/cancel",
+)
+# Redirect the user to session["url"]
+print(session["url"])
+```
+
+The same pattern applies to `CarFlippingBot` and `MultiSourceLeadScraper`.
+
+### Shareable Payment Links
+
+```python
+link = bot.create_payment_link(target_tier=Tier.PRO)
+print(link["url"])  # https://buy.stripe.com/...
+```
+
+### Accepting Webhooks
+
+```python
+from bots.stripe_integration import StripeWebhookHandler, WebhookEvent
+
+handler = StripeWebhookHandler()  # reads STRIPE_WEBHOOK_SECRET from env
+
+@handler.on("payment_intent.succeeded")
+def on_payment(event: WebhookEvent) -> None:
+    print("Payment succeeded:", event.data)
+
+@handler.on("checkout.session.completed")
+def on_checkout(event: WebhookEvent) -> None:
+    print("Checkout completed:", event.data)
+
+@handler.on("customer.subscription.updated")
+def on_sub_update(event: WebhookEvent) -> None:
+    print("Subscription updated:", event.data)
+
+# In your Flask/FastAPI route handler:
+# event = handler.process(request.get_data(), request.headers.get("Stripe-Signature"))
+```
+
+### Mock Mode (no credentials required)
+
+When `STRIPE_SECRET_KEY` is absent or a placeholder, all Stripe calls run in
+**mock mode** — they return realistic simulated responses without contacting
+Stripe. This means tests and local development work out of the box with no keys.
+
+---
 ## GitHub Pages Instructions
 1. Navigate to **Settings > Pages**.
 2. Select the `deployment-setup` branch and root directory as the publishing source.
 3. Save your settings to host the frontend.
+
 
 ---

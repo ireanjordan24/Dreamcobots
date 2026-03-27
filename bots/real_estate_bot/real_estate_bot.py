@@ -1,8 +1,10 @@
 """Real Estate Bot — tier-aware real estate deal finder and ROI analyzer."""
 import sys, os
+from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config, get_upgrade_path
 from bots.real_estate_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.stripe_integration import StripeClient
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -85,6 +87,7 @@ class RealEstateBot:
         self.tier = tier
         self.config = get_tier_config(tier)
         self._searched_locations: list = []
+        self._stripe = StripeClient()
 
     def _check_location_limit(self, location: str) -> None:
         limit = self.LOCATION_LIMITS[self.tier]
@@ -195,3 +198,47 @@ class RealEstateBot:
         output = "\n".join(lines)
         print(output)
         return output
+
+    # ------------------------------------------------------------------
+    # Stripe payment & upgrade
+    # ------------------------------------------------------------------
+
+    # Tier price map: (amount_cents, stripe_mode)
+    _STRIPE_PLANS = {
+        Tier.PRO: (4900, "subscription"),         # $49/month
+        Tier.ENTERPRISE: (29900, "subscription"), # $299/month
+    }
+
+    def create_checkout_session(
+        self,
+        target_tier: Tier,
+        customer_email: Optional[str] = None,
+        success_url: str = "https://dreamcobots.com/success",
+        cancel_url: str = "https://dreamcobots.com/cancel",
+    ) -> dict:
+        """Create a Stripe Checkout session to upgrade to *target_tier*."""
+        if target_tier not in self._STRIPE_PLANS:
+            raise RealEstateBotTierError(
+                f"Cannot create checkout for tier '{target_tier.value}'."
+            )
+        amount_cents, mode = self._STRIPE_PLANS[target_tier]
+        return self._stripe.create_checkout_session(
+            plan=f"Real Estate Bot {target_tier.value.capitalize()}",
+            amount_cents=amount_cents,
+            mode=mode,
+            customer_email=customer_email,
+            success_url=success_url,
+            cancel_url=cancel_url,
+        )
+
+    def create_payment_link(self, target_tier: Tier) -> dict:
+        """Return a shareable Stripe Payment Link for *target_tier*."""
+        if target_tier not in self._STRIPE_PLANS:
+            raise RealEstateBotTierError(
+                f"Cannot create payment link for tier '{target_tier.value}'."
+            )
+        amount_cents, _ = self._STRIPE_PLANS[target_tier]
+        return self._stripe.create_payment_link(
+            plan=f"Real Estate Bot {target_tier.value.capitalize()}",
+            amount_cents=amount_cents,
+        )
