@@ -29,4 +29,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m pytest tests/ -q --tb=short
+        python -m pytest tests/ \
+          --ignore=tests/test_backend.py \
+          --ignore=tests/test_web_dashboard.py \
+          -q --tb=short

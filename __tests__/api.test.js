@@ -26,17 +26,21 @@ afterAll((done) => {
 
 function get(path) {
   return new Promise((resolve, reject) => {
-    http.get(`http://localhost:${port}${path}`, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          resolve({ status: res.statusCode, body: JSON.parse(data) });
-        } catch (e) {
-          resolve({ status: res.statusCode, body: data });
-        }
-      });
-    }).on('error', reject);
+    http
+      .get(`http://localhost:${port}${path}`, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve({ status: res.statusCode, body: JSON.parse(data) });
+          } catch (e) {
+            resolve({ status: res.statusCode, body: data });
+          }
+        });
+      })
+      .on('error', reject);
   });
 }
 
@@ -57,7 +61,7 @@ describe('DreamCobots API', () => {
 
   test('Bot catalog includes revenue bots', async () => {
     const { body } = await get('/bots');
-    const revenueBot = body.bots.find(b => b.id === 'multi_source_lead_scraper');
+    const revenueBot = body.bots.find((b) => b.id === 'multi_source_lead_scraper');
     expect(revenueBot).toBeDefined();
     expect(revenueBot.category).toBe('revenue');
     expect(revenueBot.status).toBe('active');
@@ -65,7 +69,7 @@ describe('DreamCobots API', () => {
 
   test('Bot catalog includes all key categories', async () => {
     const { body } = await get('/bots');
-    const categories = [...new Set(body.bots.map(b => b.category))];
+    const categories = [...new Set(body.bots.map((b) => b.category))];
     expect(categories).toContain('revenue');
     expect(categories).toContain('automation');
     expect(categories).toContain('ai');
