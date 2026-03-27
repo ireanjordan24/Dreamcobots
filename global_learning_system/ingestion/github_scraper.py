@@ -7,8 +7,17 @@ the DreamCo global learning pipeline.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
+
+try:
+    import requests as _requests
+    _REQUESTS_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    _REQUESTS_AVAILABLE = False
+
+_LOG = logging.getLogger(__name__)
 
 
 @dataclass
@@ -79,11 +88,59 @@ class GitHubScraper:
     # ------------------------------------------------------------------
 
     def _fetch_repos(self, query: str, language: Optional[str]) -> List[GitHubRepo]:
-        """Return mock repository records for *query*."""
-        results: List[GitHubRepo] = []
+        """Fetch repositories from the GitHub Search API for *query*.
+
+        Falls back to synthetic placeholder records if the API is unreachable
+        or returns an error (e.g. rate-limited with no token).
+        """
+        if _REQUESTS_AVAILABLE:
+            try:
+                search_q = query
+                if language:
+                    search_q += f" language:{language}"
+
+                headers: dict = {"Accept": "application/vnd.github+json"}
+                if self.token:
+                    headers["Authorization"] = f"Bearer {self.token}"
+
+                params = {
+                    "q": search_q,
+                    "sort": "stars",
+                    "order": "desc",
+                    "per_page": min(self.max_results, 30),
+                }
+
+                resp = _requests.get(
+                    f"{self.BASE_URL}/search/repositories",
+                    headers=headers,
+                    params=params,
+                    timeout=10,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                results: List[GitHubRepo] = []
+                for item in data.get("items", [])[: self.max_results]:
+                    results.append(
+                        GitHubRepo(
+                            full_name=item["full_name"],
+                            description=item.get("description"),
+                            url=item["html_url"],
+                            stars=item.get("stargazers_count", 0),
+                            language=item.get("language"),
+                            topics=item.get("topics", []),
+                            readme_excerpt=None,
+                        )
+                    )
+                if results:
+                    return results
+            except Exception as exc:  # requests errors, JSON errors, HTTP errors
+                _LOG.debug("GitHub API request failed (%s); using fallback data.", exc)
+
+        # Fallback: return synthetic records when the API is unavailable.
+        fallback: List[GitHubRepo] = []
         for i in range(min(3, self.max_results)):
             lang = language or "Python"
-            results.append(
+            fallback.append(
                 GitHubRepo(
                     full_name=f"dreamco-org/{query.replace(' ', '-')}-{i + 1}",
                     description=f"Sample repo #{i + 1} for query '{query}'",
@@ -94,4 +151,4 @@ class GitHubScraper:
                     readme_excerpt=f"README excerpt for {query} repo #{i + 1}.",
                 )
             )
-        return results
+        return fallback
