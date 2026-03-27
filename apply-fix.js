@@ -1,1 +1,1 @@
-console.log("Apply-fix script executed. Placeholder implementation.");
+console.log('Apply-fix script executed. Placeholder implementation.');

@@ -10,10 +10,47 @@ on:
 jobs:
   auto-fix:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run auto-fix
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Check code style (ESLint)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Check formatting (Prettier)
+        run: npm run format
+        continue-on-error: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
         run: |
-          # Your commands to auto-fix code (like linting, formatting, etc.)
-          echo 'Auto-fixing code...'
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run bot framework compliance check
+        run: python tools/check_bot_framework.py
+        continue-on-error: true
+
+      - name: Run Python tests
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
+        continue-on-error: true

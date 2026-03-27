@@ -1,0 +1,12 @@
+node_modules/
+coverage/
+dist/
+*.py
+*.yml
+*.yaml
+*.md
+*.txt
+*.html
+*.css
+data/
+docs/

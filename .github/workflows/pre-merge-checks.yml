@@ -1,1 +1,40 @@
-name: Pre-Merge Checks\n\non: [pull_request]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n    - name: Checkout code\n      uses: actions/checkout@v2\n\n    - name: Setup Node.js\n      uses: actions/setup-node@v2\n      with:\n        node-version: '14'\n\n    - name: Install dependencies\n      run: npm install\n\n    - name: Run linting\n      run: npm run lint\n\n    - name: Check file existence\n      run: |\n        if [ ! -f path/to/your/file.js ]; then\n          echo 'Required file does not exist!';\n          exit 1;\n        fi\n\n    - name: Run tests\n      run: npm test\n
+name: Pre-Merge Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pre-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Check critical file existence
+        run: |
+          for f in index.js package.json README.md requirements.txt framework/__init__.py tools/check_bot_framework.py; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Required file missing: $f"
+              exit 1
+            fi
+            echo "✅ $f"
+          done
+
+      - name: Run tests
+        run: npm test
