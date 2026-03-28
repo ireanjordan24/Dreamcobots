@@ -9,6 +9,8 @@ Supports:
   - CoreBluetooth (Apple iOS/macOS)
   - Android Bluetooth API
   - Windows Bluetooth API
+
+GLOBAL AI SOURCES FLOW: participates via buddy_os.py pipeline.
 """
 
 from __future__ import annotations

@@ -10,6 +10,8 @@ Modules:
   - SmartDeviceHub   — IFTTT/smart-home integrations
   - NvidiaToolsHub   — NVIDIA AI/GPU tools (Isaac, Omniverse, CUDA, Jetson)
   - StarlinkManager  — Starlink satellite internet management & resale
+
+GLOBAL AI SOURCES FLOW: participates via buddy_os.py pipeline.
 """
 
 from __future__ import annotations

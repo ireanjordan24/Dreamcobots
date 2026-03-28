@@ -4,6 +4,8 @@ Open Claw Bot — Client Manager
 Manages client profiles and their customised strategy configurations.
 Each client can have individual risk preferences, goals, and strategy rules
 that are injected into the strategy engine at generation time.
+
+GLOBAL AI SOURCES FLOW: participates via open_claw_bot.py pipeline.
 """
 
 from __future__ import annotations
