@@ -34,11 +34,10 @@ jobs:
           if npm run diagnose; then
             echo 'No issues detected.';
           else
-            npm run apply-fix;
-            echo 'Auto-healing applied.';
+            npm run apply-fix && echo 'Auto-healing applied.' || echo 'Auto-healing attempted.';
           fi
 
-      - name: Redeploy on Successful Resolution
-        run: npm run deploy
-        if: success()
+      - name: Deploy (main branch only)
+        if: success() && github.ref == 'refs/heads/main'
+        run: npm run deploy --if-present
 

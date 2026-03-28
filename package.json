@@ -29,6 +29,9 @@
     "prettier": "^3.3.3",
     "jest": "^29.0.0"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "jest": {
     "testEnvironment": "node",
     "testMatch": [
