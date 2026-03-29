@@ -1,17 +1,21 @@
 """
 PR Validation Bot — validates pull requests, auto-restores deleted critical files,
-enforces revenue readiness, and generates Markdown reports.
+enforces revenue readiness, scans for placeholder code, validates file structure,
+and generates Markdown reports.
 
 Key behaviors:
   - Only restores files with git status 'D' (deleted).  Files with status 'M'
     (modified) or 'R' (renamed) are intentional changes and must NOT be touched.
   - Validates that every bot directory contains the revenue-readiness files.
+  - Scans changed files for placeholder text (TODO, FIXME, PLACEHOLDER, etc.).
+  - Validates that all expected top-level files and directories are present.
   - Outputs a detailed Markdown report for the PR comment.
 """
 
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -39,6 +43,54 @@ REVENUE_REQUIRED_FILES = [
     "logger.js",
     "index.js",
 ]
+
+# Patterns that indicate incomplete / placeholder code
+PLACEHOLDER_PATTERNS: List[re.Pattern] = [
+    re.compile(r"\bTODO\b", re.IGNORECASE),
+    re.compile(r"\bFIXME\b", re.IGNORECASE),
+    re.compile(r"\bHACK\b", re.IGNORECASE),
+    re.compile(r"\bXXX\b"),
+    re.compile(r"\bPLACEHOLDER\b", re.IGNORECASE),
+    re.compile(r"\bNOT IMPLEMENTED\b", re.IGNORECASE),
+    re.compile(r"\bSTUB\b", re.IGNORECASE),
+]
+
+# File extensions to scan for placeholder text
+SCANNABLE_EXTENSIONS = {
+    ".py", ".js", ".ts", ".jsx", ".tsx",
+    ".sh", ".yml", ".yaml", ".json", ".md",
+    ".html", ".css", ".env",
+}
+
+# Expected top-level structure (files and directories that must be present)
+EXPECTED_STRUCTURE: List[str] = [
+    "index.js",
+    "package.json",
+    "README.md",
+    "requirements.txt",
+    "framework/__init__.py",
+    "tools/check_bot_framework.py",
+    "bots",
+    "tests",
+    ".github",
+]
+
+
+@dataclass
+class PlaceholderMatch:
+    """Represents a single placeholder found in a file."""
+    path: str
+    line_number: int
+    line_text: str
+    pattern: str
+
+    def to_dict(self) -> dict:
+        return {
+            "path": self.path,
+            "line_number": self.line_number,
+            "line_text": self.line_text,
+            "pattern": self.pattern,
+        }
 
 
 @dataclass
@@ -76,6 +128,8 @@ class ValidationResult:
     skipped_files: List[str] = field(default_factory=list)
     revenue_checks: List[RevenueCheck] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
+    placeholder_matches: List[PlaceholderMatch] = field(default_factory=list)
+    missing_structure: List[str] = field(default_factory=list)
     report_md: str = ""
 
 
@@ -100,7 +154,9 @@ class PRValidationBot:
         deleted, skipped = self._classify_files(changed)
         restored = self._restore_deleted_critical_files(deleted)
         revenue_checks = self._validate_revenue_bots()
-        errors = self._collect_errors(restored, revenue_checks)
+        placeholder_matches = self._scan_placeholders(changed)
+        missing_structure = self._validate_file_structure()
+        errors = self._collect_errors(restored, revenue_checks, placeholder_matches, missing_structure)
         critical_ok = self._check_critical_files_exist()
         passed = critical_ok and not errors
         result = ValidationResult(
@@ -110,6 +166,8 @@ class PRValidationBot:
             skipped_files=skipped,
             revenue_checks=revenue_checks,
             errors=errors,
+            placeholder_matches=placeholder_matches,
+            missing_structure=missing_structure,
         )
         result.report_md = self._build_report(result)
         return result
@@ -208,7 +266,11 @@ class PRValidationBot:
         return checks
 
     def _collect_errors(
-        self, restored: List[str], revenue_checks: List[RevenueCheck]
+        self,
+        restored: List[str],
+        revenue_checks: List[RevenueCheck],
+        placeholder_matches: Optional[List[PlaceholderMatch]] = None,
+        missing_structure: Optional[List[str]] = None,
     ) -> List[str]:
         errors: List[str] = []
         for rc in revenue_checks:
@@ -223,7 +285,54 @@ class PRValidationBot:
                 errors.append(
                     f"Bot '{rc.bot_path}' missing revenue files: {', '.join(missing)}"
                 )
+        if placeholder_matches:
+            for pm in placeholder_matches:
+                errors.append(
+                    f"Placeholder '{pm.pattern}' found in {pm.path}:{pm.line_number}"
+                )
+        if missing_structure:
+            for item in missing_structure:
+                errors.append(f"Expected repository item missing: {item}")
         return errors
+
+    def _scan_placeholders(self, changed: List[FileStatus]) -> List[PlaceholderMatch]:
+        """Scan changed files for placeholder text patterns."""
+        matches: List[PlaceholderMatch] = []
+        for fs in changed:
+            if fs.status == "D":
+                continue  # Skip deleted files
+            ext = os.path.splitext(fs.path)[1].lower()
+            if ext not in SCANNABLE_EXTENSIONS:
+                continue
+            full_path = os.path.join(self.repo_root, fs.path)
+            if not os.path.isfile(full_path):
+                continue
+            try:
+                with open(full_path, encoding="utf-8", errors="replace") as fh:
+                    for lineno, line in enumerate(fh, start=1):
+                        for pattern in PLACEHOLDER_PATTERNS:
+                            if pattern.search(line):
+                                matches.append(
+                                    PlaceholderMatch(
+                                        path=fs.path,
+                                        line_number=lineno,
+                                        line_text=line.rstrip(),
+                                        pattern=pattern.pattern,
+                                    )
+                                )
+                                break  # one hit per line is enough
+            except OSError:
+                pass
+        return matches
+
+    def _validate_file_structure(self) -> List[str]:
+        """Check that all expected top-level items are present in the repository."""
+        missing: List[str] = []
+        for item in EXPECTED_STRUCTURE:
+            full_path = os.path.join(self.repo_root, item)
+            if not os.path.exists(full_path):
+                missing.append(item)
+        return missing
 
     def _build_report(self, result: ValidationResult) -> str:
         """Generate a Markdown summary report for the PR comment."""
@@ -232,6 +341,8 @@ class PRValidationBot:
             "",
             f"**Overall Status:** {'✅ PASSED' if result.passed else '❌ FAILED'}",
             f"**Critical Files:** {'✅ All present' if result.critical_files_ok else '❌ Some missing'}",
+            f"**File Structure:** {'✅ Complete' if not result.missing_structure else '❌ Items missing'}",
+            f"**Placeholder Code:** {'✅ None found' if not result.placeholder_matches else f'❌ {len(result.placeholder_matches)} occurrence(s) found'}",
             "",
         ]
 
@@ -245,6 +356,24 @@ class PRValidationBot:
             lines.append("### ⏭️ Skipped (Intentional Changes — Not Overwritten)")
             for f in result.skipped_files:
                 lines.append(f"- `{f}`")
+            lines.append("")
+
+        if result.missing_structure:
+            lines.append("### 🗂️ Missing Expected Repository Items")
+            for item in result.missing_structure:
+                lines.append(f"- `{item}`")
+            lines.append("")
+
+        if result.placeholder_matches:
+            lines.append("### 🚧 Placeholder Code Detected")
+            lines.append("")
+            lines.append("The following files contain placeholder text that must be replaced with production code:")
+            lines.append("")
+            lines.append("| File | Line | Pattern | Content |")
+            lines.append("|------|------|---------|---------|")
+            for pm in result.placeholder_matches:
+                snippet = pm.line_text.strip()[:80].replace("|", "\\|")
+                lines.append(f"| `{pm.path}` | {pm.line_number} | `{pm.pattern}` | `{snippet}` |")
             lines.append("")
 
         # Revenue readiness table

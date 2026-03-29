@@ -7,12 +7,19 @@ on:
 permissions:
   contents: read
 
+# Centralised pattern — must match pr-validation.yml and PLACEHOLDER_PATTERNS in pr_validation_bot.py
+env:
+  PLACEHOLDER_GREP_PATTERN: '\b(TODO|FIXME|HACK|XXX|PLACEHOLDER|NOT IMPLEMENTED|STUB)\b'
+  SCANNABLE_EXTENSIONS: '\.(py|js|ts|jsx|tsx|sh|yml|yaml|json|md|html|css)$'
+
 jobs:
   pre-merge:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,15 +41,66 @@ jobs:
       - name: Run linting
         run: npm run lint
 
-      - name: Check critical file existence
+      - name: Validate required file structure
+        shell: bash
         run: |
-          for f in index.js package.json README.md requirements.txt framework/__init__.py tools/check_bot_framework.py; do
-            if [ ! -f "$f" ]; then
-              echo "❌ Required file missing: $f"
-              exit 1
+          MISSING=0
+          REQUIRED_ITEMS=(
+            "index.js"
+            "package.json"
+            "README.md"
+            "requirements.txt"
+            "framework/__init__.py"
+            "tools/check_bot_framework.py"
+            "bots"
+            "tests"
+            ".github"
+          )
+          for ITEM in "${REQUIRED_ITEMS[@]}"; do
+            if [ ! -e "$ITEM" ]; then
+              echo "❌ Missing required item: $ITEM"
+              MISSING=1
+            else
+              echo "✅ $ITEM"
             fi
-            echo "✅ $f"
           done
+          if [ "$MISSING" -eq 1 ]; then
+            echo "❌ File structure validation FAILED — required items are missing."
+            exit 1
+          fi
+          echo "✅ File structure validation passed."
+
+      - name: Scan for placeholder code
+        shell: bash
+        run: |
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }} 2>/dev/null || true
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only --diff-filter=ACMR "${BASE}...HEAD" 2>/dev/null || git diff --name-only --diff-filter=ACMR HEAD~1...HEAD)
+
+          FOUND=0
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changed files to scan."
+            exit 0
+          fi
+
+          while IFS= read -r FILE; do
+            [ -f "$FILE" ] || continue
+            echo "$FILE" | grep -qiE "${{ env.SCANNABLE_EXTENSIONS }}" || continue
+            MATCHES=$(grep -nE "${{ env.PLACEHOLDER_GREP_PATTERN }}" "$FILE" 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              echo "❌ Placeholder code in $FILE:"
+              echo "$MATCHES"
+              FOUND=1
+            fi
+          done <<< "$CHANGED"
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo ""
+            echo "❌ PR contains placeholder code. All code must be fully implemented and production-ready."
+            exit 1
+          fi
+          echo "✅ No placeholder code found."
 
       - name: Run bot framework compliance check
         run: python tools/check_bot_framework.py
@@ -52,3 +110,5 @@ jobs:
 
       - name: Run Python tests
         run: python -m pytest tests/ --ignore=tests/test_backend.py --ignore=tests/test_web_dashboard.py -q --tb=short
+
+
