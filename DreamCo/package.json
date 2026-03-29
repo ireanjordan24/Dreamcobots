@@ -1,0 +1,23 @@
+{
+  "name": "dreamco",
+  "version": "1.0.0",
+  "description": "DreamCo Money Operating System — self-scaling AI bot network for real estate, contracts, and jobs.",
+  "main": "orchestrator/index.js",
+  "scripts": {
+    "start": "node orchestrator/index.js",
+    "start:api": "node api/index.js",
+    "start:dashboard": "node dashboard/index.js",
+    "test": "jest --passWithNoTests"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/*.test.js"
+    ]
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "ISC"
+}
