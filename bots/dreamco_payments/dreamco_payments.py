@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """
 DreamCo Payments Bot — Main entry point
 
