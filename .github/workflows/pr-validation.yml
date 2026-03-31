@@ -188,21 +188,21 @@ jobs:
     if: always()
     steps:
       - name: Download ESLint results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: eslint-results
           path: /tmp/artifacts/eslint
         continue-on-error: true
 
       - name: Download Prettier results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: prettier-results
           path: /tmp/artifacts/prettier
         continue-on-error: true
 
       - name: Download Jest results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jest-results
           path: /tmp/artifacts/jest
