@@ -9,6 +9,8 @@ Validates:
   5. Static analysis checker (tools/check_bot_framework.py)
 """
 
+from __future__ import annotations
+
 import sys
 import os
 
