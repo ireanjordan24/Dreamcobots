@@ -505,6 +505,27 @@ _DREAMCO_BOTS: list[BotEntry] = [
         capabilities=["crypto_mining", "resource_tracking", "profit_analysis"],
     ),
     BotEntry(
+        bot_id="legal_money_bot",
+        display_name="LegalMoneyBot",
+        description=(
+            "AI-powered legal claim discovery, eligibility scoring, settlement "
+            "maximization, and auto-filing assistant. Connects users with "
+            "contingency-based attorneys."
+        ),
+        category=BotCategory.FINANCE,
+        module_path="bots.legal_money_bot.legal_money_bot",
+        class_name="LegalMoneyBot",
+        capabilities=[
+            "claim_finder",
+            "eligibility_scoring",
+            "settlement_maximizer",
+            "lawyer_matching",
+            "auto_filing",
+            "referral_tracking",
+            "notifications",
+        ],
+    ),
+    BotEntry(
         bot_id="money_finder_bot",
         display_name="Money Finder Bot",
         description="Discovers income opportunities, grants, and financial resources.",
