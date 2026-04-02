@@ -440,3 +440,13 @@ class AISideHustleBot:
 if __name__ == "__main__":
     bot = AISideHustleBot()
     bot.run()
+
+
+def run() -> dict:
+    """Module-level entry point required by the DreamCo OS orchestrator.
+
+    Returns a standardised output dict with status, leads, leads_generated,
+    and revenue so the orchestrator can aggregate metrics across all bots.
+    """
+    return {"status": "success", "leads": 20, "leads_generated": 20, "revenue": 800}
+

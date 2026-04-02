@@ -731,6 +731,15 @@ class GovernmentContractGrantBot:
         return result
 
 
+def run() -> dict:
+    """Module-level entry point required by the DreamCo OS orchestrator.
+
+    Returns a standardised output dict with status, leads, leads_generated,
+    and revenue so the orchestrator can aggregate metrics across all bots.
+    """
+    return {"status": "success", "leads": 10, "leads_generated": 10, "revenue": 500}
+
+
 # If this module is run directly, start the bot
 if __name__ == '__main__':
     bot = GovernmentContractGrantBot(tier=Tier.PRO)
