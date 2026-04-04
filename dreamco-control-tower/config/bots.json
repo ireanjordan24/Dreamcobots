@@ -1,0 +1,112 @@
+[
+  {
+    "name": "affiliate_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/affiliate_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Affiliate marketing automation bot"
+  },
+  {
+    "name": "mining_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/mining_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Crypto and data mining bot"
+  },
+  {
+    "name": "real_estate_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/real_estate_bot",
+    "tier": "enterprise",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Real estate lead generation and analysis bot"
+  },
+  {
+    "name": "sales_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/sales_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Lead conversion and sales automation bot"
+  },
+  {
+    "name": "deal_finder_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/deal_finder_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Deal discovery and opportunity finder"
+  },
+  {
+    "name": "money_finder_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/money_finder_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Revenue opportunity discovery bot"
+  },
+  {
+    "name": "fiverr_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/fiverr_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Fiverr gig management and automation"
+  },
+  {
+    "name": "crypto_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/crypto_bot",
+    "tier": "enterprise",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Cryptocurrency trading and analytics bot"
+  },
+  {
+    "name": "car_flipping_bot",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/car_flipping_bot",
+    "tier": "pro",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Vehicle resale opportunity finder"
+  },
+  {
+    "name": "ai_brain",
+    "repoName": "Dreamcobots",
+    "repoPath": "bots/ai_brain",
+    "tier": "enterprise",
+    "status": "active",
+    "heartbeat": null,
+    "lastUpdate": null,
+    "lastPR": null,
+    "description": "Central AI decision engine"
+  }
+]
