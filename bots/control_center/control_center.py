@@ -1,20 +1,33 @@
 """Control Center — central orchestration dashboard for all Dreamcobots."""
 import sys, os
 from datetime import datetime, timezone
+from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
 from tiers import Tier, get_tier_config
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from bots.control_center.bot_registry import BotRegistry
+from bots.control_center.heartbeat import HeartbeatMonitor
+from bots.control_center.github_integration import GitHubIntegration
 
 
 class ControlCenter:
     """Central control center for registering, monitoring, and orchestrating all bots."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        registry: Optional[BotRegistry] = None,
+        heartbeat: Optional[HeartbeatMonitor] = None,
+        github: Optional[GitHubIntegration] = None,
+    ):
         self._bots: dict = {}
         self._income_log: list = []
         self._run_log: list = []
+        self.registry: BotRegistry = registry or BotRegistry()
+        self.heartbeat: HeartbeatMonitor = heartbeat or HeartbeatMonitor()
+        self.github: GitHubIntegration = github or GitHubIntegration()
 
-    def register_bot(self, name: str, bot_instance) -> None:
+    def register_bot(self, name: str, bot_instance, repo_name: str = "") -> None:
         """Register a bot instance under the given name."""
         self._bots[name] = {
             "instance": bot_instance,
@@ -23,6 +36,8 @@ class ControlCenter:
             "last_run": None,
             "status": "idle",
         }
+        # Also register in the persistent bot registry
+        self.registry.register(name, repo_name=repo_name)
 
     def get_status(self) -> dict:
         """Return status of all registered bots."""
@@ -100,6 +115,8 @@ class ControlCenter:
         """Return full monitoring dashboard with all metrics."""
         income = self.get_income_summary()
         status = self.get_status()
+        heartbeat_summary = self.heartbeat.summary()
+        registry_summary = self.registry.summary()
         return {
             "dashboard": "Dreamcobots Control Center",
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -110,4 +127,42 @@ class ControlCenter:
             "health": "healthy" if all(
                 m["status"] != "error" for m in self._bots.values()
             ) else "degraded",
+            "heartbeat": heartbeat_summary,
+            "registry": registry_summary,
+        }
+
+    def ping_bot(self, bot_name: str, metadata: Optional[dict] = None) -> dict:
+        """Record a heartbeat ping for *bot_name*."""
+        self.registry.record_heartbeat(bot_name)
+        return self.heartbeat.ping(bot_name, metadata=metadata)
+
+    def get_github_repo_status(self, repo_name: str) -> dict:
+        """Return GitHub repository status for *repo_name*."""
+        return self.github.get_repo_status(repo_name)
+
+    def deploy_bot(
+        self,
+        bot_name: str,
+        repo_name: str = "",
+        tier: str = "free",
+        config: Optional[dict] = None,
+    ) -> dict:
+        """Register a new bot in the registry and prepare its deployment entry.
+
+        This creates the registry entry and returns the configuration that
+        can be used to provision the bot's GitHub repository and workflows.
+        The actual repository creation requires a valid ``GITHUB_TOKEN``
+        environment variable.
+        """
+        entry = self.registry.register(bot_name, repo_name=repo_name, config={
+            "tier": tier,
+            **(config or {}),
+        })
+        return {
+            "bot_name": bot_name,
+            "repo_name": repo_name,
+            "tier": entry["config"].get("tier", tier),  # sourced from registry entry
+            "status": "registered",
+            "entry": entry,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
