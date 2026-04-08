@@ -30,14 +30,14 @@ describe('config', () => {
   });
 
   test('features defaults are all enabled', () => {
-    const { features } = require('../DreamCo/core/config');
+    const {  features  } = require('../DreamCo/core/config');
     expect(features.autoFix).toBe(true);
     expect(features.autoDeploy).toBe(true);
     expect(features.monitoring).toBe(true);
   });
 
   test('revenue thresholds are positive numbers', () => {
-    const { revenue } = require('../DreamCo/core/config');
+    const {  revenue  } = require('../DreamCo/core/config');
     expect(revenue.scaleThreshold).toBeGreaterThan(0);
     expect(revenue.maintainThreshold).toBeGreaterThan(0);
     expect(revenue.scaleThreshold).toBeGreaterThan(revenue.maintainThreshold);
@@ -53,15 +53,15 @@ describe('botRegistry', () => {
   beforeEach(() => registry.reset());
 
   test('registers a bot and retrieves it', () => {
-    const record = registry.registerBot({ name: 'testBot' });
+    const record = registry.registerBot({  name: 'testBot'  });
     expect(record.name).toBe('testBot');
     expect(record.status).toBe('idle');
     expect(record.totalRevenue).toBe(0);
   });
 
   test('getBots returns all registered bots', () => {
-    registry.registerBot({ name: 'botA' });
-    registry.registerBot({ name: 'botB' });
+    registry.registerBot({  name: 'botA'  });
+    registry.registerBot({  name: 'botB'  });
     expect(registry.getBots().length).toBe(2);
   });
 
@@ -70,7 +70,7 @@ describe('botRegistry', () => {
   });
 
   test('updateStatus changes status and accumulates revenue', () => {
-    registry.registerBot({ name: 'moneyBot' });
+    registry.registerBot({  name: 'moneyBot'  });
     registry.updateStatus('moneyBot', 'scaling', 500);
     registry.updateStatus('moneyBot', 'idle', 300);
     const bot = registry.getBot('moneyBot');
@@ -84,7 +84,7 @@ describe('botRegistry', () => {
   });
 
   test('deregisterBot removes entry', () => {
-    registry.registerBot({ name: 'tempBot' });
+    registry.registerBot({  name: 'tempBot'  });
     registry.deregisterBot('tempBot');
     expect(registry.getBot('tempBot')).toBeUndefined();
   });
@@ -94,7 +94,7 @@ describe('botRegistry', () => {
   });
 
   test('category defaults to general', () => {
-    const record = registry.registerBot({ name: 'noCategory' });
+    const record = registry.registerBot({  name: 'noCategory'  });
     expect(record.category).toBe('general');
   });
 });
@@ -123,7 +123,7 @@ describe('queue', () => {
   });
 
   test('runQueue captures rejected jobs without throwing', async () => {
-    queue.addJob(async () => { throw new Error('boom'); });
+    queue.addJob(async () => {  throw new Error('boom');  });
     const results = await queue.runQueue();
     expect(results[0].status).toBe('rejected');
     expect(results[0].reason).toBe('boom');
@@ -144,7 +144,7 @@ describe('queue', () => {
 // validateEnv.js
 // ---------------------------------------------------------------------------
 describe('validateEnv', () => {
-  const { validateEnv, REQUIRED_VARS } = require('../DreamCo/core/validateEnv');
+  const {  validateEnv, REQUIRED_VARS  } = require('../DreamCo/core/validateEnv');
 
   test('REQUIRED_VARS is a non-empty array', () => {
     expect(Array.isArray(REQUIRED_VARS)).toBe(true);
@@ -155,7 +155,7 @@ describe('validateEnv', () => {
     const original = process.env.ADMIN_KEY;
     delete process.env.ADMIN_KEY;
     expect(() => validateEnv()).toThrow(/ADMIN_KEY/);
-    if (original !== undefined) process.env.ADMIN_KEY = original;
+    if (original !== undefined) { process.env.ADMIN_KEY = original; }
   });
 
   test('passes when all required vars are set', () => {
@@ -166,8 +166,8 @@ describe('validateEnv', () => {
     }
     expect(() => validateEnv()).not.toThrow();
     for (const key of REQUIRED_VARS) {
-      if (saved[key] === undefined) delete process.env[key];
-      else process.env[key] = saved[key];
+      if (saved[key] === undefined) { delete process.env[key]; }
+      else { process.env[key] = saved[key]; }
     }
   });
 });
@@ -176,17 +176,17 @@ describe('validateEnv', () => {
 // bootstrap.js
 // ---------------------------------------------------------------------------
 describe('bootstrap', () => {
-  const { bootstrap } = require('../DreamCo/core/bootstrap');
+  const {  bootstrap  } = require('../DreamCo/core/bootstrap');
 
   test('throws when ADMIN_KEY is missing', () => {
     const original = process.env.ADMIN_KEY;
     delete process.env.ADMIN_KEY;
     expect(() => bootstrap()).toThrow();
-    if (original !== undefined) process.env.ADMIN_KEY = original;
+    if (original !== undefined) { process.env.ADMIN_KEY = original; }
   });
 
   test('succeeds when all required env vars are present', () => {
-    const { REQUIRED_VARS } = require('../DreamCo/core/validateEnv');
+    const {  REQUIRED_VARS  } = require('../DreamCo/core/validateEnv');
     const saved = {};
     for (const key of REQUIRED_VARS) {
       saved[key] = process.env[key];
@@ -194,8 +194,8 @@ describe('bootstrap', () => {
     }
     expect(() => bootstrap()).not.toThrow();
     for (const key of REQUIRED_VARS) {
-      if (saved[key] === undefined) delete process.env[key];
-      else process.env[key] = saved[key];
+      if (saved[key] === undefined) { delete process.env[key]; }
+      else { process.env[key] = saved[key]; }
     }
   });
 });
@@ -218,13 +218,13 @@ describe('database', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origDataDir === undefined) delete process.env.DATA_DIR;
-    else process.env.DATA_DIR = origDataDir;
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    if (origDataDir === undefined) { delete process.env.DATA_DIR; }
+    else { process.env.DATA_DIR = origDataDir; }
+    fs.rmSync(tmpDir, {  recursive: true, force: true  });
   });
 
   test('save persists a document and load retrieves it', () => {
-    db.save('bots', { name: 'testBot', revenue: 100 });
+    db.save('bots', {  name: 'testBot', revenue: 100  });
     const docs = db.load('bots');
     expect(docs.length).toBe(1);
     expect(docs[0].name).toBe('testBot');
@@ -236,16 +236,16 @@ describe('database', () => {
   });
 
   test('find filters documents', () => {
-    db.save('events', { type: 'sale', amount: 50 });
-    db.save('events', { type: 'lead', amount: 0 });
+    db.save('events', {  type: 'sale', amount: 50  });
+    db.save('events', {  type: 'lead', amount: 0  });
     const sales = db.find('events', (d) => d.type === 'sale');
     expect(sales.length).toBe(1);
     expect(sales[0].type).toBe('sale');
   });
 
   test('count returns correct document count', () => {
-    db.save('runs', { bot: 'a' });
-    db.save('runs', { bot: 'b' });
+    db.save('runs', {  bot: 'a'  });
+    db.save('runs', {  bot: 'b'  });
     expect(db.count('runs')).toBe(2);
   });
 });
@@ -268,9 +268,9 @@ describe('revenueEngine', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origDataDir === undefined) delete process.env.DATA_DIR;
-    else process.env.DATA_DIR = origDataDir;
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    if (origDataDir === undefined) { delete process.env.DATA_DIR; }
+    else { process.env.DATA_DIR = origDataDir; }
+    fs.rmSync(tmpDir, {  recursive: true, force: true  });
   });
 
   test('trackRevenue persists a record', () => {
@@ -364,8 +364,8 @@ describe('auth', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origApiKeys === undefined) delete process.env.DREAMCO_API_KEYS;
-    else process.env.DREAMCO_API_KEYS = origApiKeys;
+    if (origApiKeys === undefined) { delete process.env.DREAMCO_API_KEYS; }
+    else { process.env.DREAMCO_API_KEYS = origApiKeys; }
   });
 
   test('VALID_KEYS contains configured keys', () => {
@@ -373,16 +373,16 @@ describe('auth', () => {
   });
 
   test('authenticate calls next() for a valid key', () => {
-    const req = { headers: { 'x-api-key': 'valid-key-123' } };
-    const res = { writeHead: jest.fn(), end: jest.fn() };
+    const req = {  headers: { 'x-api-key': 'valid-key-123' }  };
+    const res = {  writeHead: jest.fn(), end: jest.fn()  };
     const next = jest.fn();
     auth.authenticate(req, res, next);
     expect(next).toHaveBeenCalled();
   });
 
   test('authenticate returns 401 for missing key', () => {
-    const req = { headers: {} };
-    const res = { writeHead: jest.fn(), end: jest.fn() };
+    const req = {  headers: {}  };
+    const res = {  writeHead: jest.fn(), end: jest.fn()  };
     const next = jest.fn();
     auth.authenticate(req, res, next);
     expect(res.writeHead).toHaveBeenCalledWith(401, expect.any(Object));
@@ -390,8 +390,8 @@ describe('auth', () => {
   });
 
   test('authenticate returns 401 for invalid key', () => {
-    const req = { headers: { 'x-api-key': 'wrong-key' } };
-    const res = { writeHead: jest.fn(), end: jest.fn() };
+    const req = {  headers: { 'x-api-key': 'wrong-key' }  };
+    const res = {  writeHead: jest.fn(), end: jest.fn()  };
     const next = jest.fn();
     auth.authenticate(req, res, next);
     expect(res.writeHead).toHaveBeenCalledWith(401, expect.any(Object));
@@ -402,7 +402,7 @@ describe('auth', () => {
 // orchestrator/runAllBots.js — collectBotFiles helper
 // ---------------------------------------------------------------------------
 describe('runAllBots - collectBotFiles', () => {
-  const { collectBotFiles } = require('../DreamCo/orchestrator/runAllBots');
+  const {  collectBotFiles  } = require('../DreamCo/orchestrator/runAllBots');
 
   test('returns empty array for nonexistent directory', () => {
     expect(collectBotFiles('/tmp/no-such-dir-xyz')).toEqual([]);
@@ -412,8 +412,8 @@ describe('runAllBots - collectBotFiles', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bots-'));
     const subDir = path.join(tmpDir, 'sub');
     fs.mkdirSync(subDir);
-    fs.writeFileSync(path.join(tmpDir, 'bot1.js'), 'module.exports = { run: async () => ({}) };');
-    fs.writeFileSync(path.join(subDir, 'bot2.js'), 'module.exports = { run: async () => ({}) };');
+    fs.writeFileSync(path.join(tmpDir, 'bot1.js'), 'module.exports = {  run: async () => ({})  };');
+    fs.writeFileSync(path.join(subDir, 'bot2.js'), 'module.exports = {  run: async () => ({})  };');
     fs.writeFileSync(path.join(tmpDir, 'index.js'), '// index — should be skipped');
 
     const files = collectBotFiles(tmpDir);
@@ -422,6 +422,6 @@ describe('runAllBots - collectBotFiles', () => {
     expect(files.some((f) => f.endsWith('bot2.js'))).toBe(true);
     expect(files.every((f) => !f.endsWith('index.js'))).toBe(true);
 
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.rmSync(tmpDir, {  recursive: true, force: true  });
   });
 });

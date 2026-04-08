@@ -21,8 +21,8 @@ const COLLECTION = 'revenue';
  * @returns {Object} The persisted revenue record
  */
 function trackRevenue(source, amount, meta = {}) {
-  if (!source) throw new Error('"source" is required');
-  if (typeof amount !== 'number' || amount < 0) throw new Error('"amount" must be a non-negative number');
+  if (!source) {throw new Error('"source" is required');}
+  if (typeof amount !== 'number' || amount < 0) {throw new Error('"amount" must be a non-negative number');}
 
   const record = db.save(COLLECTION, { source, amount, ...meta });
   console.log(`💰 [RevenueEngine] ${source} → $${amount.toFixed(2)}`);

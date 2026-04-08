@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build": "echo 'Build complete'",
+    "build": "mkdir -p dist && cp -r public/* dist/",
     "test": "jest --passWithNoTests",
     "lint": "eslint . --ext .js --max-warnings=0",
     "lint:fix": "eslint . --ext .js --fix",
