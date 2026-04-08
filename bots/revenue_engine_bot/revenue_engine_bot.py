@@ -53,8 +53,22 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
+# ---------------------------------------------------------------------------
+# Exceptions
+# ---------------------------------------------------------------------------
+
 class RevenueEngineBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+DAYS_PER_MONTH = 30
+HOT_DEAL_ROI_THRESHOLD = 50    # ROI% → "🔥 Hot" deal
+GOOD_DEAL_ROI_THRESHOLD = 25   # ROI% → "✅ Good" deal
 
 
 # ---------------------------------------------------------------------------
@@ -253,7 +267,7 @@ class AffiliateEngine:
             {
                 **p,
                 "estimated_monthly_earnings_usd": round(
-                    p["avg_order_usd"] * p["commission_pct"] * 30, 2
+                    p["avg_order_usd"] * p["commission_pct"] * DAYS_PER_MONTH, 2
                 ),
             }
             for p in matching
@@ -271,7 +285,7 @@ class AffiliateEngine:
         breakdown = []
         for key in self._active_niches:
             prog = self.NICHE_PROGRAMS.get(key, list(self.NICHE_PROGRAMS.values())[0])
-            monthly_sales = daily_clicks * conversion_rate * 30
+            monthly_sales = daily_clicks * conversion_rate * DAYS_PER_MONTH
             monthly_earnings = monthly_sales * prog["avg_order_usd"] * prog["commission_pct"]
             total_monthly += monthly_earnings
             breakdown.append({
@@ -421,7 +435,7 @@ class RealEstatePipeline:
                     "market": market,
                     "estimated_profit_usd": profit,
                     "roi_pct": roi,
-                    "deal_score": "🔥 Hot" if roi >= 50 else ("✅ Good" if roi >= 25 else "⚠️ Marginal"),
+                    "deal_score": "🔥 Hot" if roi >= HOT_DEAL_ROI_THRESHOLD else ("✅ Good" if roi >= GOOD_DEAL_ROI_THRESHOLD else "⚠️ Marginal"),
                 })
         return results
 
