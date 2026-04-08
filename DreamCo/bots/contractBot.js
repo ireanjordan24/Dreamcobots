@@ -20,7 +20,7 @@ const CONTRACT_CATEGORIES = [
 ];
 
 const REVENUE_MODELS = {
-  percentage_of_contract: 0.05,  // 5% commission
+  percentage_of_contract: 0.05, // 5% commission
   proposal_fee: 500,
   subscription_alert: 29,
 };
@@ -93,15 +93,15 @@ function generateProposal(opportunity) {
  * @returns {Object} Standardised bot output
  */
 function run(options = {}) {
-  const keyword = options.keyword || CONTRACT_CATEGORIES[Math.floor(Math.random() * CONTRACT_CATEGORIES.length)];
+  const keyword =
+    options.keyword || CONTRACT_CATEGORIES[Math.floor(Math.random() * CONTRACT_CATEGORIES.length)];
 
   const opportunities = searchContracts(keyword);
   const { revenue, qualifiedLeads } = calculateRevenue(opportunities);
 
   const leadsGenerated = opportunities.length;
-  const conversionRate = leadsGenerated > 0
-    ? parseFloat((qualifiedLeads / leadsGenerated).toFixed(2))
-    : 0;
+  const conversionRate =
+    leadsGenerated > 0 ? parseFloat((qualifiedLeads / leadsGenerated).toFixed(2)) : 0;
 
   const botOutput = {
     bot: 'contractBot',
