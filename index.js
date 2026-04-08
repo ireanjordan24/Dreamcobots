@@ -3,6 +3,11 @@
  *
  * Entry point for the Node.js/Express API layer.
  * Python bots are managed via the bots/ directory.
+ *
+ * Boot order:
+ *   1. Bootstrap (env validation + pre-flight checks)
+ *   2. Wire Express routes
+ *   3. Start HTTP server
  */
 
 'use strict';
@@ -11,7 +16,29 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ---------------------------------------------------------------------------
+// Bootstrap — validate environment before anything else
+// ---------------------------------------------------------------------------
+const { bootstrap } = require('./DreamCo/core/bootstrap');
+
+// In non-production environments missing vars are only warned, not fatal,
+// so the test suite and local dev can run without a full .env file.
+try {
+  bootstrap();
+} catch (err) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('💥 Bootstrap failed — shutting down:', err.message);
+    process.exit(1);
+  } else {
+    console.warn('⚠️  Bootstrap warning (non-production):', err.message);
+  }
+}
+
 app.use(express.json());
+
+// ---------------------------------------------------------------------------
+// Routes
+// ---------------------------------------------------------------------------
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -50,11 +77,15 @@ app.get('/bots', (_req, res) => {
   res.json({ bots, total: bots.length });
 });
 
+// ---------------------------------------------------------------------------
 // Start server only when not in test mode
+// ---------------------------------------------------------------------------
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`DreamCobots API running on port ${PORT}`);
+    console.log(`🚀 DreamCobots API running on port ${PORT}`);
+    console.log('💰 System running at full power');
   });
 }
 
 module.exports = app;
+
