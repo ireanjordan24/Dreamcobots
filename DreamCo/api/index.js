@@ -15,7 +15,7 @@ const PORT = process.env.API_PORT || 3001;
 
 // Simple in-memory API key store (replace with database in production)
 const VALID_API_KEYS = new Set(
-  (process.env.DREAMCO_API_KEYS || 'dreamco_pro_123').split(',').map((k) => k.trim()),
+  (process.env.DREAMCO_API_KEYS || 'dreamco_pro_123').split(',').map((k) => k.trim())
 );
 
 /**
@@ -26,10 +26,15 @@ const VALID_API_KEYS = new Set(
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     let raw = '';
-    req.on('data', (chunk) => { raw += chunk; });
+    req.on('data', (chunk) => {
+      raw += chunk;
+    });
     req.on('end', () => {
-      try { resolve(raw ? JSON.parse(raw) : {}); }
-      catch (e) { reject(e); }
+      try {
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (e) {
+        reject(e);
+      }
     });
     req.on('error', reject);
   });
@@ -58,7 +63,9 @@ function json(res, statusCode, data) {
  * Runs all registered bots and returns aggregated results.
  */
 async function handleRunBots(req, res) {
-  if (!authenticate(req)) return json(res, 401, { error: 'Unauthorized' });
+  if (!authenticate(req)) {
+    return json(res, 401, { error: 'Unauthorized' });
+  }
   const data = runAllBots();
   json(res, 200, data);
 }
@@ -68,17 +75,26 @@ async function handleRunBots(req, res) {
  * Runs a single bot by name.
  */
 async function handleRunSingle(req, res) {
-  if (!authenticate(req)) return json(res, 401, { error: 'Unauthorized' });
+  if (!authenticate(req)) {
+    return json(res, 401, { error: 'Unauthorized' });
+  }
 
   let body;
-  try { body = await parseBody(req); }
-  catch { return json(res, 400, { error: 'Invalid JSON body' }); }
+  try {
+    body = await parseBody(req);
+  } catch {
+    return json(res, 400, { error: 'Invalid JSON body' });
+  }
 
   const { name } = body;
-  if (!name) return json(res, 400, { error: 'Missing "name" field in request body' });
+  if (!name) {
+    return json(res, 400, { error: 'Missing "name" field in request body' });
+  }
 
   const botEntry = BOTS.find((b) => b.name === name);
-  if (!botEntry) return json(res, 404, { error: `Bot "${name}" not found` });
+  if (!botEntry) {
+    return json(res, 404, { error: `Bot "${name}" not found` });
+  }
 
   const result = processBot(botEntry.name, botEntry.module, body.options || {});
   json(res, 200, result);
@@ -92,10 +108,18 @@ async function handleRunSingle(req, res) {
 function startServer(port = PORT) {
   const server = http.createServer(async (req, res) => {
     if (req.url === '/health' && req.method === 'GET') {
-      return json(res, 200, { status: 'ok', service: 'dreamco-api', bots: BOTS.map((b) => b.name) });
+      return json(res, 200, {
+        status: 'ok',
+        service: 'dreamco-api',
+        bots: BOTS.map((b) => b.name),
+      });
     }
-    if (req.url === '/run-bots' && req.method === 'POST') return handleRunBots(req, res);
-    if (req.url === '/run-single' && req.method === 'POST') return handleRunSingle(req, res);
+    if (req.url === '/run-bots' && req.method === 'POST') {
+      return handleRunBots(req, res);
+    }
+    if (req.url === '/run-single' && req.method === 'POST') {
+      return handleRunSingle(req, res);
+    }
     json(res, 404, { error: 'Not found' });
   });
 

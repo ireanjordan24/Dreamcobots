@@ -50,7 +50,7 @@ function calculateRevenue(leads) {
     if (lead.motivated) {
       const dealType = DEAL_TYPES[lead.dealType] || DEAL_TYPES.wholesale;
       revenue += Math.floor(
-        Math.random() * (dealType.maxProfit - dealType.minProfit) + dealType.minProfit,
+        Math.random() * (dealType.maxProfit - dealType.minProfit) + dealType.minProfit
       );
       deals++;
     }
@@ -65,7 +65,8 @@ function calculateRevenue(leads) {
  * @returns {Object} Standardised bot output
  */
 function run(options = {}) {
-  const market = options.market || PROPERTY_MARKETS[Math.floor(Math.random() * PROPERTY_MARKETS.length)];
+  const market =
+    options.market || PROPERTY_MARKETS[Math.floor(Math.random() * PROPERTY_MARKETS.length)];
 
   const leads = findLeads(market);
   const { revenue, deals } = calculateRevenue(leads);

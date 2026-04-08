@@ -77,7 +77,8 @@ function applyAndMonetize(job) {
  */
 function run(options = {}) {
   const role = options.role || JOB_CATEGORIES[Math.floor(Math.random() * JOB_CATEGORIES.length)];
-  const platform = options.platform || JOB_PLATFORMS[Math.floor(Math.random() * JOB_PLATFORMS.length)];
+  const platform =
+    options.platform || JOB_PLATFORMS[Math.floor(Math.random() * JOB_PLATFORMS.length)];
 
   const jobs = searchJobs(role, platform);
   let totalRevenue = 0;
@@ -92,9 +93,8 @@ function run(options = {}) {
   }
 
   const leadsGenerated = jobs.length;
-  const conversionRate = leadsGenerated > 0
-    ? parseFloat((conversions / leadsGenerated).toFixed(2))
-    : 0;
+  const conversionRate =
+    leadsGenerated > 0 ? parseFloat((conversions / leadsGenerated).toFixed(2)) : 0;
 
   const botOutput = {
     bot: 'jobBot',
