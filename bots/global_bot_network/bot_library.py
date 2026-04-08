@@ -295,6 +295,27 @@ _DREAMCO_BOTS: list[BotEntry] = [
         capabilities=["affiliate_tracking", "commission", "link_generation"],
     ),
     BotEntry(
+        bot_id="revenue_engine_bot",
+        display_name="Revenue Engine Bot",
+        description=(
+            "DreamCo automated income infrastructure. Orchestrates Stripe + PayPal "
+            "payments, affiliate auto-income, AI digital-product selling, and a "
+            "real-estate deal pipeline with cross-stream revenue tracking."
+        ),
+        category=BotCategory.FINANCE,
+        module_path="bots.revenue_engine_bot.revenue_engine_bot",
+        class_name="RevenueEngineBot",
+        capabilities=[
+            "stripe_payments",
+            "paypal_orders",
+            "affiliate_automation",
+            "digital_product_selling",
+            "real_estate_deals",
+            "revenue_tracking",
+            "income_orchestration",
+        ],
+    ),
+    BotEntry(
         bot_id="ai_models_integration",
         display_name="AI Models Integration Bot",
         description="Connects DreamCo bots with external AI models and APIs.",
