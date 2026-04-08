@@ -44,9 +44,10 @@ class TestTierConfig:
         assert info["price_usd_monthly"] > 0
 
     def test_get_bot_tier_info_enterprise(self):
-        info = get_bot_tier_info(Tier.ENTERPRISE)
-        assert info["tier"] == "enterprise"
-        assert info["price_usd_monthly"] > info["price_usd_monthly"] or info["tier"] == "enterprise"
+        info_enterprise = get_bot_tier_info(Tier.ENTERPRISE)
+        info_pro        = get_bot_tier_info(Tier.PRO)
+        assert info_enterprise["tier"] == "enterprise"
+        assert info_enterprise["price_usd_monthly"] > info_pro["price_usd_monthly"]
 
 
 # ===========================================================================

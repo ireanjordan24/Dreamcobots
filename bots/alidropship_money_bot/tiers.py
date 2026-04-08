@@ -24,7 +24,7 @@ BOT_FEATURES = {
     Tier.ENTERPRISE.value: [
         "unlimited product discovery",
         "AliExpress + TikTok + Facebook Ad Library",
-        "multi-store builder (5–10 stores)",
+        "multi-store builder (up to 10 stores)",
         "AI-powered pricing & profit optimizer",
         "auto fulfillment with customer notifications",
         "TikTok viral bot (3–10 videos/day)",

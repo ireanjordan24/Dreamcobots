@@ -371,18 +371,20 @@ class AliDropshipMoneyBot:
         """Return a pricing report for the supplied (or active) products."""
         if products is None:
             products = self._active_products if self._active_products else self.find_winning_products()
-        return [
-            {
-                "id":                 p["id"],
-                "title":              p["title"],
-                "cost_usd":           p["aliexpress_cost_usd"],
-                "sell_price_usd":     self.calculate_sell_price(p["aliexpress_cost_usd"]),
-                "profit_usd":         round(self.calculate_sell_price(p["aliexpress_cost_usd"]) - p["aliexpress_cost_usd"], 2),
-                "roi_multiplier":     3.0,
-                "tier":               self.tier.value,
-            }
-            for p in products
-        ]
+        report = []
+        for p in products:
+            sell_price = self.calculate_sell_price(p["aliexpress_cost_usd"])
+            profit     = round(sell_price - p["aliexpress_cost_usd"], 2)
+            report.append({
+                "id":             p["id"],
+                "title":          p["title"],
+                "cost_usd":       p["aliexpress_cost_usd"],
+                "sell_price_usd": sell_price,
+                "profit_usd":     profit,
+                "roi_multiplier": 3.0,
+                "tier":           self.tier.value,
+            })
+        return report
 
     # ================================================================== #
     # 4. Auto Fulfillment Engine                                           #
