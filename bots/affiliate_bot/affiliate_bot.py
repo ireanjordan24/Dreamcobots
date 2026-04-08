@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Affiliate Bot — tier-aware affiliate marketing automation."""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))

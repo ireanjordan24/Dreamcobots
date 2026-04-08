@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Deal Finder Bot — tier-aware deal scanning and arbitrage automation."""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))

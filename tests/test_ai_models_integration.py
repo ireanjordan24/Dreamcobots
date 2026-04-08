@@ -21,6 +21,10 @@ for _mod in _MODULES_TO_CLEAR:
     sys.modules.pop(_mod, None)
 
 import pytest
+# Clear any previously cached tiers/registry/ai_models_integration to avoid cross-test pollution
+for _mod in list(sys.modules.keys()):
+    if _mod in ('tiers', 'ai_models_integration', 'models.registry'):
+        sys.modules.pop(_mod, None)
 from tiers import (
     Tier, TierConfig, TIER_CATALOGUE, get_tier_config, get_upgrade_path,
     list_tiers, FREE_MODELS, PRO_MODELS, ENTERPRISE_MODELS,

@@ -1,3 +1,4 @@
+# GLOBAL AI SOURCES FLOW
 """Real Estate Bot — tier-aware real estate deal finder and ROI analyzer."""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
