@@ -582,6 +582,30 @@ _DREAMCO_BOTS: list[BotEntry] = [
         class_name="SoftwareBot",
         capabilities=["code_generation", "testing", "deployment", "devops"],
     ),
+    BotEntry(
+        bot_id="alidropship_money_bot",
+        display_name="AliDropship Money Bot",
+        description=(
+            "Autonomous DreamCo-level dropshipping empire: finds winning products, "
+            "builds WordPress + AliDropship stores, prices for profit, auto-fulfills "
+            "orders, drives TikTok/Facebook traffic, and scales winners automatically."
+        ),
+        category=BotCategory.BUSINESS,
+        module_path="bots.alidropship_money_bot.alidropship_money_bot",
+        class_name="AliDropshipMoneyBot",
+        capabilities=[
+            "product_discovery",
+            "store_builder",
+            "pricing_engine",
+            "auto_fulfillment",
+            "tiktok_viral_bot",
+            "facebook_ads_bot",
+            "influencer_outreach",
+            "scaling_engine",
+            "multi_store",
+            "self_marketing_network",
+        ],
+    ),
     # -- Category bots --
     BotEntry(
         bot_id="app_bots_category",
