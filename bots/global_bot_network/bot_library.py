@@ -695,4 +695,25 @@ _DREAMCO_BOTS: list[BotEntry] = [
         class_name="RealEstateBotFeature",
         capabilities=["property_analysis", "market_data", "rental"],
     ),
+    BotEntry(
+        bot_id="enterprise_integrations_bot",
+        display_name="Enterprise Integrations Bot",
+        description=(
+            "Unified gateway for Big Tech & AI services (Google Cloud AI, IBM Watson, "
+            "Microsoft Azure AI, Nvidia AI, AWS), Big Data/Analytics (Databricks, "
+            "Palantir, Snowflake, Tableau), Communication & Collaboration (Slack, "
+            "Teams, Zoom), subscription resales, and proprietary Dream AI Models."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.enterprise_integrations_bot.enterprise_integrations_bot",
+        class_name="EnterpriseIntegrationsBot",
+        capabilities=[
+            "google_cloud_ai", "ibm_watson", "azure_ai", "nvidia_ai", "aws_ai",
+            "databricks", "palantir", "snowflake", "tableau",
+            "slack", "teams", "zoom",
+            "dream_llm", "dream_vision", "dream_voice", "dream_code",
+            "dream_analytics", "dream_collab",
+            "subscription_resales", "multi_provider_routing",
+        ],
+    ),
 ]
