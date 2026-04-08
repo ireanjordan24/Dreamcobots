@@ -73,8 +73,8 @@ function cloneBot(botName) {
 
 const BOTS = [
   { name: 'realEstateBot', module: realEstateBot },
-  { name: 'contractBot',   module: contractBot },
-  { name: 'jobBot',        module: jobBot },
+  { name: 'contractBot', module: contractBot },
+  { name: 'jobBot', module: jobBot },
 ];
 
 /**
@@ -112,8 +112,8 @@ function runAllBots() {
   const results = BOTS.map(({ name, module }) => processBot(name, module));
 
   const totalRevenue = results.reduce((sum, r) => sum + (r.output ? r.output.revenue : 0), 0);
-  const totalLeads   = results.reduce((sum, r) => sum + (r.output ? r.output.leads_generated : 0), 0);
-  const scalingBots  = results.filter((r) => r.validation && r.validation.scale).map((r) => r.bot);
+  const totalLeads = results.reduce((sum, r) => sum + (r.output ? r.output.leads_generated : 0), 0);
+  const scalingBots = results.filter((r) => r.validation && r.validation.scale).map((r) => r.bot);
 
   console.log('\n─────────────────────────────────────');
   console.log(`💰 Total Revenue:   $${totalRevenue}`);

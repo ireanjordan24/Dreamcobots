@@ -21,7 +21,9 @@ function renderDashboard(cycleData) {
   const { summary, results } = cycleData;
   const rows = results
     .map((r) => {
-      if (!r.output) return `<tr><td>${r.bot}</td><td colspan="4">ERROR: ${r.error}</td></tr>`;
+      if (!r.output) {
+        return `<tr><td>${r.bot}</td><td colspan="4">ERROR: ${r.error}</td></tr>`;
+      }
       return `<tr>
         <td>${r.bot}</td>
         <td>$${r.output.revenue}</td>
