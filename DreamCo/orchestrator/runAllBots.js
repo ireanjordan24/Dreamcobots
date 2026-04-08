@@ -27,14 +27,14 @@ const BOTS_DIR = path.join(__dirname, '..', 'bots');
  * @returns {string[]}
  */
 function collectBotFiles(dir) {
-  if (!fs.existsSync(dir)) return [];
+  if (!fs.existsSync(dir)) {return [];}
 
   const results = [];
   const resolvedDir = path.resolve(dir);
   for (const entry of fs.readdirSync(dir)) {
     const full = path.resolve(dir, entry);
     // Safety: skip anything whose resolved path escapes the expected directory
-    if (!full.startsWith(resolvedDir + path.sep) && full !== resolvedDir) continue;
+    if (!full.startsWith(resolvedDir + path.sep) && full !== resolvedDir) {continue;}
     const stat = fs.statSync(full);
     if (stat.isDirectory()) {
       results.push(...collectBotFiles(full));
@@ -71,7 +71,6 @@ async function runAllBots() {
       registry.updateStatus(botName, 'running');
 
       try {
-        // eslint-disable-next-line import/no-dynamic-require
         const botModule = require(botFile);
         if (typeof botModule.run !== 'function') {
           throw new Error(`Bot "${botName}" does not export a run() function`);
@@ -113,7 +112,7 @@ async function runAllBots() {
   console.log(`💰 Total Revenue:   $${totalRevenue}`);
   console.log(`📋 Total Leads:     ${totalLeads}`);
   console.log(`📈 Scaling Bots:    ${scalingBots.length > 0 ? scalingBots.join(', ') : 'none'}`);
-  if (failedBots.length > 0) console.log(`❌ Failed Bots:     ${failedBots.join(', ')}`);
+  if (failedBots.length > 0) {console.log(`❌ Failed Bots:     ${failedBots.join(', ')}`);}
   console.log('─────────────────────────────────────\n');
 
   return {

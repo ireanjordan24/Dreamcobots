@@ -22,7 +22,7 @@ let _running = false;
  * @param {() => Promise<any>} job
  */
 function addJob(job) {
-  if (typeof job !== 'function') throw new Error('Job must be a function');
+  if (typeof job !== 'function') {throw new Error('Job must be a function');}
   _queue.push(job);
 }
 

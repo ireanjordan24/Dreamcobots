@@ -39,7 +39,7 @@ function _collectionPath(collection) {
 function load(collection) {
   _ensureDir();
   const file = _collectionPath(collection);
-  if (!fs.existsSync(file)) return [];
+  if (!fs.existsSync(file)) {return [];}
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch (err) {

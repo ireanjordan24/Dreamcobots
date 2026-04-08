@@ -155,7 +155,7 @@ describe('validateEnv', () => {
     const original = process.env.ADMIN_KEY;
     delete process.env.ADMIN_KEY;
     expect(() => validateEnv()).toThrow(/ADMIN_KEY/);
-    if (original !== undefined) process.env.ADMIN_KEY = original;
+    if (original !== undefined) {process.env.ADMIN_KEY = original;}
   });
 
   test('passes when all required vars are set', () => {
@@ -166,8 +166,8 @@ describe('validateEnv', () => {
     }
     expect(() => validateEnv()).not.toThrow();
     for (const key of REQUIRED_VARS) {
-      if (saved[key] === undefined) delete process.env[key];
-      else process.env[key] = saved[key];
+      if (saved[key] === undefined) {delete process.env[key];}
+      else {process.env[key] = saved[key];}
     }
   });
 });
@@ -182,7 +182,7 @@ describe('bootstrap', () => {
     const original = process.env.ADMIN_KEY;
     delete process.env.ADMIN_KEY;
     expect(() => bootstrap()).toThrow();
-    if (original !== undefined) process.env.ADMIN_KEY = original;
+    if (original !== undefined) {process.env.ADMIN_KEY = original;}
   });
 
   test('succeeds when all required env vars are present', () => {
@@ -194,8 +194,8 @@ describe('bootstrap', () => {
     }
     expect(() => bootstrap()).not.toThrow();
     for (const key of REQUIRED_VARS) {
-      if (saved[key] === undefined) delete process.env[key];
-      else process.env[key] = saved[key];
+      if (saved[key] === undefined) {delete process.env[key];}
+      else {process.env[key] = saved[key];}
     }
   });
 });
@@ -218,8 +218,8 @@ describe('database', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origDataDir === undefined) delete process.env.DATA_DIR;
-    else process.env.DATA_DIR = origDataDir;
+    if (origDataDir === undefined) {delete process.env.DATA_DIR;}
+    else {process.env.DATA_DIR = origDataDir;}
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
@@ -268,8 +268,8 @@ describe('revenueEngine', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origDataDir === undefined) delete process.env.DATA_DIR;
-    else process.env.DATA_DIR = origDataDir;
+    if (origDataDir === undefined) {delete process.env.DATA_DIR;}
+    else {process.env.DATA_DIR = origDataDir;}
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
@@ -364,8 +364,8 @@ describe('auth', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (origApiKeys === undefined) delete process.env.DREAMCO_API_KEYS;
-    else process.env.DREAMCO_API_KEYS = origApiKeys;
+    if (origApiKeys === undefined) {delete process.env.DREAMCO_API_KEYS;}
+    else {process.env.DREAMCO_API_KEYS = origApiKeys;}
   });
 
   test('VALID_KEYS contains configured keys', () => {
