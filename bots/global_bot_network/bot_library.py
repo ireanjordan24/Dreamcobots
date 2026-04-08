@@ -400,6 +400,40 @@ _DREAMCO_BOTS: list[BotEntry] = [
         capabilities=["bot_creation", "template_engine", "deployment"],
     ),
     BotEntry(
+        bot_id="buddy_bot",
+        display_name="Buddy Bot",
+        description=(
+            "DreamCo's most human-like AI companion. Features natural conversation, "
+            "emotion detection, long-term memory, 3D avatars, AR/VR presence, voice "
+            "synthesis and cloning (consent-gated), creativity tools, gamified "
+            "productivity, and dynamic personas (mentor, friend, coach, cheerleader)."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.buddy_bot.buddy_bot",
+        class_name="BuddyBot",
+        capabilities=[
+            "conversational_ai",
+            "emotion_detection",
+            "long_term_memory",
+            "milestone_tracker",
+            "avatar_3d",
+            "ar_vr_presence",
+            "voice_synthesis",
+            "voice_cloning",
+            "gan_image_mimicry",
+            "holographic_projection",
+            "multilingual",
+            "creativity_engine",
+            "storytelling",
+            "songwriting",
+            "gamified_productivity",
+            "dynamic_personas",
+            "conflict_resolution",
+            "wellness_tracker",
+            "ethical_ai",
+        ],
+    ),
+    BotEntry(
         bot_id="buddy_os",
         display_name="Buddy OS",
         description="Mobile-first OS framework for managing DreamCo bots on-device.",
