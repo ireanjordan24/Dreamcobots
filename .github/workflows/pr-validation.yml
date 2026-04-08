@@ -4,8 +4,10 @@
 #   1. JavaScript code style (ESLint + Prettier)
 #   2. Node.js tests (Jest)
 #   3. Python bot tests (pytest) and framework compliance
-#   4. Deployment simulation (smoke test)
-#   5. Posts a summary comment with actionable feedback
+#   4. Placeholder code scan (TODO, FIXME, PLACEHOLDER, HACK, etc.)
+#   5. File structure validation (all required files/directories present)
+#   6. Deployment simulation (smoke test)
+#   7. Posts a summary comment with actionable feedback
 
 name: PR Validation
 
@@ -17,6 +19,11 @@ on:
 permissions:
   contents: read
   pull-requests: write
+
+# Centralised pattern used by placeholder-scanning steps
+env:
+  PLACEHOLDER_GREP_PATTERN: '\b(TODO|FIXME|HACK|XXX|PLACEHOLDER|NOT IMPLEMENTED|STUB)\b'
+  SCANNABLE_EXTENSIONS: '\.(py|js|ts|jsx|tsx|sh|yml|yaml|json|md|html|css)$'
 
 jobs:
   # ── 1. JavaScript Linting (ESLint) ────────────────────────────────────────
@@ -150,11 +157,117 @@ jobs:
           path: /tmp/pytest-output.txt
           retention-days: 7
 
-  # ── 5. Deployment Simulation ───────────────────────────────────────────────
+  # ── 5. Placeholder Code Scan ───────────────────────────────────────────────
+  scan-placeholders:
+    name: Placeholder Code Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch for diff
+        run: git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+
+      - name: Scan changed files for placeholder text
+        id: placeholder-scan
+        shell: bash
+        run: |
+          set +e
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only --diff-filter=ACMR "${BASE}...HEAD")
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changed files detected."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          RESULTS=""
+          FOUND=0
+
+          while IFS= read -r FILE; do
+            # Skip deleted or non-existent files
+            [ -f "$FILE" ] || continue
+            # Only scan files with relevant extensions
+            echo "$FILE" | grep -qiE "${{ env.SCANNABLE_EXTENSIONS }}" || continue
+
+            MATCHES=$(grep -nE "${{ env.PLACEHOLDER_GREP_PATTERN }}" "$FILE" 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              FOUND=1
+              while IFS= read -r MATCH; do
+                RESULTS="${RESULTS}\n${FILE}: ${MATCH}"
+              done <<< "$MATCHES"
+            fi
+          done <<< "$CHANGED"
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo -e "❌ Placeholder code detected in the following files:\n${RESULTS}" | tee /tmp/placeholder-results.txt
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          else
+            echo "✅ No placeholder code found in changed files." | tee /tmp/placeholder-results.txt
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+      - name: Upload placeholder scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: placeholder-results
+          path: /tmp/placeholder-results.txt
+          retention-days: 7
+
+  # ── 6. File Structure Validation ──────────────────────────────────────────
+  validate-file-structure:
+    name: File Structure Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate required files and directories
+        shell: bash
+        run: |
+          MISSING=0
+          # All required items: top-level dirs, root files, and critical deep files
+          REQUIRED_ITEMS=(
+            "index.js"
+            "package.json"
+            "README.md"
+            "requirements.txt"
+            "framework/__init__.py"
+            "tools/check_bot_framework.py"
+            "bots"
+            "tests"
+            ".github"
+          )
+
+          for ITEM in "${REQUIRED_ITEMS[@]}"; do
+            if [ ! -e "$ITEM" ]; then
+              echo "❌ Missing required item: $ITEM"
+              MISSING=1
+            else
+              echo "✅ $ITEM"
+            fi
+          done
+
+          if [ "$MISSING" -eq 1 ]; then
+            echo ""
+            echo "❌ File structure validation FAILED — required items are missing."
+            exit 1
+          else
+            echo ""
+            echo "✅ All required files and directories are present."
+          fi
+
+  # ── 7. Deployment Simulation ───────────────────────────────────────────────
   deploy-simulation:
     name: Deployment Simulation
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python]
+    needs: [lint-js, format-check, test-node, test-python, scan-placeholders, validate-file-structure]
     if: success()
     steps:
       - name: Checkout code
@@ -180,11 +293,11 @@ jobs:
           node deploy.js --dry-run 2>/dev/null || echo "Deployment script ran (dry-run mode)"
           echo "✅ Deployment simulation complete — no production systems affected."
 
-  # ── 6. PR Feedback Summary ─────────────────────────────────────────────────
+  # ── 8. PR Feedback Summary ─────────────────────────────────────────────────
   feedback:
     name: Post PR Feedback
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python, deploy-simulation]
+    needs: [lint-js, format-check, test-node, test-python, scan-placeholders, validate-file-structure, deploy-simulation]
     if: always()
     steps:
       - name: Download ESLint results
@@ -208,6 +321,13 @@ jobs:
           path: /tmp/artifacts/jest
         continue-on-error: true
 
+      - name: Download placeholder scan results
+        uses: actions/download-artifact@v4
+        with:
+          name: placeholder-results
+          path: /tmp/artifacts/placeholders
+        continue-on-error: true
+
       - name: Build and post feedback comment
         uses: actions/github-script@v7
         with:
@@ -223,11 +343,13 @@ jobs:
               }
             }
 
-            const eslintResult   = '${{ needs.lint-js.result }}';
-            const prettierResult = '${{ needs.format-check.result }}';
-            const jestResult     = '${{ needs.test-node.result }}';
-            const pytestResult   = '${{ needs.test-python.result }}';
-            const deployResult   = '${{ needs.deploy-simulation.result }}';
+            const eslintResult        = '${{ needs.lint-js.result }}';
+            const prettierResult      = '${{ needs.format-check.result }}';
+            const jestResult          = '${{ needs.test-node.result }}';
+            const pytestResult        = '${{ needs.test-python.result }}';
+            const placeholderResult   = '${{ needs.scan-placeholders.result }}';
+            const fileStructureResult = '${{ needs.validate-file-structure.result }}';
+            const deployResult        = '${{ needs.deploy-simulation.result }}';
 
             const icon = (r) =>
               r === 'success' ? '✅' :
@@ -238,15 +360,17 @@ jobs:
               '',
               `| Check | Status |`,
               `|-------|--------|`,
-              `| ESLint (JavaScript Linting) | ${icon(eslintResult)} ${eslintResult} |`,
-              `| Prettier (Code Formatting)  | ${icon(prettierResult)} ${prettierResult} |`,
-              `| Jest (Node.js Tests)        | ${icon(jestResult)} ${jestResult} |`,
-              `| pytest (Python Bot Tests)   | ${icon(pytestResult)} ${pytestResult} |`,
-              `| Deployment Simulation       | ${icon(deployResult)} ${deployResult} |`,
+              `| ESLint (JavaScript Linting)     | ${icon(eslintResult)} ${eslintResult} |`,
+              `| Prettier (Code Formatting)      | ${icon(prettierResult)} ${prettierResult} |`,
+              `| Jest (Node.js Tests)            | ${icon(jestResult)} ${jestResult} |`,
+              `| pytest (Python Bot Tests)       | ${icon(pytestResult)} ${pytestResult} |`,
+              `| Placeholder Code Scan           | ${icon(placeholderResult)} ${placeholderResult} |`,
+              `| File Structure Validation       | ${icon(fileStructureResult)} ${fileStructureResult} |`,
+              `| Deployment Simulation           | ${icon(deployResult)} ${deployResult} |`,
               '',
             ];
 
-            const allPassed = [eslintResult, prettierResult, jestResult, pytestResult]
+            const allPassed = [eslintResult, prettierResult, jestResult, pytestResult, placeholderResult, fileStructureResult]
               .every(r => r === 'success');
 
             if (allPassed) {
@@ -266,6 +390,22 @@ jobs:
               if (pytestResult !== 'success') {
                 lines.push('**pytest:** Run `python -m pytest tests/ -q --tb=short` and fix failing Python tests.');
                 lines.push('Also verify: `python tools/check_bot_framework.py` passes (all bots must implement the GLOBAL AI SOURCES FLOW).');
+              }
+              if (placeholderResult !== 'success') {
+                lines.push('**Placeholder Scan:** Remove all TODO, FIXME, HACK, XXX, PLACEHOLDER, NOT IMPLEMENTED, and STUB markers from changed files. All code must be fully implemented and production-ready.');
+                const placeholderLog = readArtifact('/tmp/artifacts/placeholders/placeholder-results.txt');
+                if (placeholderLog) {
+                  lines.push('');
+                  lines.push('<details><summary>Placeholder scan details</summary>');
+                  lines.push('');
+                  lines.push('```');
+                  lines.push(placeholderLog.slice(0, 3000));
+                  lines.push('```');
+                  lines.push('</details>');
+                }
+              }
+              if (fileStructureResult !== 'success') {
+                lines.push('**File Structure:** Ensure all required files and directories are present. See the job log for details.');
               }
             }
 
@@ -302,3 +442,4 @@ jobs:
                 body,
               });
             }
+
