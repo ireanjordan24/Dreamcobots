@@ -27,6 +27,7 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
 from bots.stack_and_profit_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: F401
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Tier ordering for comparisons
