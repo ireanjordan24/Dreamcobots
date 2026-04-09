@@ -71,7 +71,7 @@ _COMPANIES: List[AICompany] = [
     AICompany(
         company_name="Anthropic",
         category="Core AI Models",
-        tools=["Claude", "Claude Instant", "Claude 3 Opus", "Claude 3 Sonnet"],
+        tools=["Claude", "Claude Instant", "Claude 3 Opus", "Claude 3 Sonnet", "Claude Mithos"],
         pricing="token-based",
         region="USA",
         api_available=True,

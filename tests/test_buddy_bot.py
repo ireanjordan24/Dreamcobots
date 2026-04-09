@@ -126,6 +126,400 @@ from bots.buddy_bot.buddy_bot import BuddyBot, BuddyBotError, BuddyBotTierError
 
 
 # ===========================================================================
+# 11. ReasoningEngine (Claude Mithos intelligence layer)
+# ===========================================================================
+
+class TestReasoningEngine:
+    """Tests for bots/buddy_bot/reasoning_engine.py"""
+
+    def _engine(self, chain_of_thought: bool = True):
+        from bots.buddy_bot.reasoning_engine import ReasoningEngine
+        return ReasoningEngine(enable_chain_of_thought=chain_of_thought)
+
+    # --- Imports -----------------------------------------------------------
+
+    def test_import_reasoning_engine(self):
+        from bots.buddy_bot.reasoning_engine import (
+            ReasoningEngine, ReasoningResult, ReasoningStep, QueryIntent,
+        )
+        assert ReasoningEngine is not None
+
+    # --- Intent detection --------------------------------------------------
+
+    def test_detect_factual_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("What is machine learning?")
+        assert result.intent == QueryIntent.FACTUAL
+
+    def test_detect_analytical_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("Why does inflation cause unemployment?")
+        assert result.intent == QueryIntent.ANALYTICAL
+
+    def test_detect_emotional_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("I feel so sad and lonely today.")
+        assert result.intent == QueryIntent.EMOTIONAL
+
+    def test_detect_instructional_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("Help me build a morning routine.")
+        assert result.intent == QueryIntent.INSTRUCTIONAL
+
+    def test_detect_creative_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("Write a short poem about the ocean.")
+        assert result.intent == QueryIntent.CREATIVE
+
+    def test_detect_ethical_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("Should I tell my friend the truth even if it hurts?")
+        assert result.intent == QueryIntent.ETHICAL
+
+    def test_detect_conversational_intent(self):
+        from bots.buddy_bot.reasoning_engine import QueryIntent
+        engine = self._engine()
+        result = engine.reason("Hello, how are you?")
+        assert result.intent == QueryIntent.CONVERSATIONAL
+
+    # --- Deep comprehension ------------------------------------------------
+
+    def test_deep_comprehend_returns_required_keys(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend("What is the best way to learn Python?")
+        assert "intent" in comp
+        assert "entities" in comp
+        assert "sentiment" in comp
+        assert "implicit_need" in comp
+        assert "complexity" in comp
+
+    def test_deep_comprehend_positive_sentiment(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend("This is amazing and I love it!")
+        assert comp["sentiment"] == "positive"
+
+    def test_deep_comprehend_negative_sentiment(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend("I hate this terrible awful situation.")
+        assert comp["sentiment"] == "negative"
+
+    def test_deep_comprehend_neutral_sentiment(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend("The meeting is at three o'clock.")
+        assert comp["sentiment"] == "neutral"
+
+    def test_deep_comprehend_complexity_simple(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend("Hello!")
+        assert comp["complexity"] == "simple"
+
+    def test_deep_comprehend_complexity_complex(self):
+        engine = self._engine()
+        long_text = "Can you explain in detail the historical, economic, and social factors that contributed to the rise of globalisation during the twentieth century and its long-term effects on labour markets?"
+        comp = engine.deep_comprehend(long_text)
+        assert comp["complexity"] == "complex"
+
+    def test_deep_comprehend_entity_extraction(self):
+        engine = self._engine()
+        comp = engine.deep_comprehend('Tell me about "Paris" and London.')
+        assert isinstance(comp["entities"], list)
+
+    # --- Chain-of-thought --------------------------------------------------
+
+    def test_chain_of_thought_returns_steps(self):
+        engine = self._engine()
+        steps = engine.chain_of_thought("Why do planets orbit the sun?")
+        assert len(steps) >= 3
+
+    def test_chain_of_thought_step_structure(self):
+        engine = self._engine()
+        steps = engine.chain_of_thought("Explain photosynthesis.")
+        for step in steps:
+            assert hasattr(step, "step_number")
+            assert hasattr(step, "description")
+            assert hasattr(step, "conclusion")
+
+    def test_chain_of_thought_step_to_dict(self):
+        engine = self._engine()
+        steps = engine.chain_of_thought("How does gravity work?")
+        for step in steps:
+            d = step.to_dict()
+            assert "step_number" in d
+            assert "description" in d
+            assert "conclusion" in d
+
+    def test_chain_of_thought_disabled(self):
+        engine = self._engine(chain_of_thought=False)
+        result = engine.reason("What is the speed of light?")
+        assert result.reasoning_steps == []
+
+    def test_chain_of_thought_enabled(self):
+        engine = self._engine(chain_of_thought=True)
+        result = engine.reason("What is the speed of light?")
+        assert len(result.reasoning_steps) >= 3
+
+    # --- Context synthesis -------------------------------------------------
+
+    def test_context_synthesis_empty_history(self):
+        engine = self._engine()
+        ctx = engine.synthesise_context([], "Tell me about yourself.")
+        assert isinstance(ctx, str)
+        assert len(ctx) > 0
+
+    def test_context_synthesis_with_history(self):
+        engine = self._engine()
+        history = [
+            {"user_input": "Tell me about Python.", "response": "Python is great."},
+            {"user_input": "And Django?", "response": "Django is a web framework."},
+        ]
+        ctx = engine.synthesise_context(history, "How do they compare?")
+        assert "exchange" in ctx.lower() or "recent" in ctx.lower() or "discussed" in ctx.lower()
+
+    # --- ReasoningResult ---------------------------------------------------
+
+    def test_reason_result_has_all_fields(self):
+        engine = self._engine()
+        result = engine.reason("What is consciousness?")
+        assert result.original_query == "What is consciousness?"
+        assert result.final_response
+        assert isinstance(result.confidence, float)
+        assert 0.0 <= result.confidence <= 1.0
+
+    def test_reason_result_to_dict(self):
+        engine = self._engine()
+        result = engine.reason("Tell me about the universe.")
+        d = result.to_dict()
+        assert "original_query" in d
+        assert "intent" in d
+        assert "reasoning_steps" in d
+        assert "synthesised_context" in d
+        assert "deep_comprehension" in d
+        assert "final_response" in d
+        assert "confidence" in d
+
+    def test_reason_updates_internal_history(self):
+        engine = self._engine()
+        engine.reason("Hello!")
+        engine.reason("How are you?")
+        assert engine.to_dict()["history_turns"] == 2
+
+    def test_clear_history(self):
+        engine = self._engine()
+        engine.reason("Hello!")
+        engine.clear_history()
+        assert engine.to_dict()["history_turns"] == 0
+
+    def test_to_dict_keys(self):
+        engine = self._engine()
+        d = engine.to_dict()
+        assert "model_name" in d
+        assert "enable_chain_of_thought" in d
+        assert "context_window" in d
+        assert "history_turns" in d
+
+    def test_model_name_is_claude_mithos(self):
+        engine = self._engine()
+        assert "claude-mithos" in engine.model_name.lower()
+
+    # --- Analytical response -----------------------------------------------
+
+    def test_analytical_response_returns_string(self):
+        engine = self._engine()
+        resp = engine.analytical_response("Compare democracy and autocracy.")
+        assert isinstance(resp, str)
+        assert len(resp) > 10
+
+
+# ===========================================================================
+# 12. BuddyBot — Claude Mithos integration
+# ===========================================================================
+
+class TestBuddyBotClaudeMithos:
+    """Tests for Claude-Mithos reasoning features integrated in BuddyBot."""
+
+    # --- Feature flags present on PRO/ENTERPRISE ---------------------------
+
+    def test_reasoning_engine_feature_on_pro(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier, FEATURE_REASONING_ENGINE,
+        )
+        cfg = get_tier_config(Tier.PRO)
+        assert cfg.has_feature(FEATURE_REASONING_ENGINE)
+
+    def test_chain_of_thought_feature_on_pro(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier, FEATURE_CHAIN_OF_THOUGHT,
+        )
+        cfg = get_tier_config(Tier.PRO)
+        assert cfg.has_feature(FEATURE_CHAIN_OF_THOUGHT)
+
+    def test_deep_context_feature_on_pro(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier, FEATURE_DEEP_CONTEXT,
+        )
+        cfg = get_tier_config(Tier.PRO)
+        assert cfg.has_feature(FEATURE_DEEP_CONTEXT)
+
+    def test_reasoning_features_on_enterprise(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_REASONING_ENGINE, FEATURE_CHAIN_OF_THOUGHT, FEATURE_DEEP_CONTEXT,
+        )
+        cfg = get_tier_config(Tier.ENTERPRISE)
+        assert cfg.has_feature(FEATURE_REASONING_ENGINE)
+        assert cfg.has_feature(FEATURE_CHAIN_OF_THOUGHT)
+        assert cfg.has_feature(FEATURE_DEEP_CONTEXT)
+
+    def test_reasoning_features_not_on_free(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_REASONING_ENGINE, FEATURE_CHAIN_OF_THOUGHT, FEATURE_DEEP_CONTEXT,
+        )
+        cfg = get_tier_config(Tier.FREE)
+        assert not cfg.has_feature(FEATURE_REASONING_ENGINE)
+        assert not cfg.has_feature(FEATURE_CHAIN_OF_THOUGHT)
+        assert not cfg.has_feature(FEATURE_DEEP_CONTEXT)
+
+    # --- BuddyBot has a ReasoningEngine instance ---------------------------
+
+    def test_buddy_has_reasoning_engine(self):
+        from bots.buddy_bot.reasoning_engine import ReasoningEngine
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        assert isinstance(buddy.reasoning, ReasoningEngine)
+
+    def test_reasoning_engine_model_name(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        assert "claude-mithos" in buddy.reasoning.model_name.lower()
+
+    # --- PRO chat includes reasoning result --------------------------------
+
+    def test_pro_chat_includes_reasoning_key(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        response = buddy.chat("What is artificial intelligence?")
+        assert "reasoning" in response
+        assert response["reasoning"] is not None
+
+    def test_pro_chat_reasoning_has_intent(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        response = buddy.chat("I feel really anxious today.")
+        assert response["reasoning"]["intent"] == "emotional"
+
+    def test_pro_chat_reasoning_confidence(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        response = buddy.chat("Help me write a cover letter.")
+        conf = response["reasoning"]["confidence"]
+        assert 0.0 <= conf <= 1.0
+
+    def test_free_chat_reasoning_is_none(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        response = buddy.chat("Hello!")
+        assert response["reasoning"] is None
+
+    # --- BuddyBot.reason() method ------------------------------------------
+
+    def test_buddy_reason_method_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.reason("Explain quantum entanglement.")
+        assert "final_response" in result
+        assert "intent" in result
+        assert "reasoning_steps" in result
+
+    def test_buddy_reason_method_requires_pro(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        with pytest.raises(BuddyBotTierError):
+            buddy.reason("What is the meaning of life?")
+
+    def test_buddy_reason_result_has_steps(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.reason("Why is the sky blue?")
+        assert len(result["reasoning_steps"]) >= 3
+
+    # --- BuddyBot.chain_of_thought() method --------------------------------
+
+    def test_buddy_chain_of_thought_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        steps = buddy.chain_of_thought("Compare renewable and fossil fuel energy.")
+        assert isinstance(steps, list)
+        assert len(steps) >= 3
+
+    def test_buddy_chain_of_thought_requires_pro(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        with pytest.raises(BuddyBotTierError):
+            buddy.chain_of_thought("Some question.")
+
+    def test_buddy_chain_of_thought_step_keys(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        steps = buddy.chain_of_thought("What causes inflation?")
+        for step in steps:
+            assert "step_number" in step
+            assert "description" in step
+            assert "conclusion" in step
+
+    # --- BuddyBot.deep_comprehend() method ---------------------------------
+
+    def test_buddy_deep_comprehend_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.deep_comprehend("I need help with my anxiety.")
+        assert "intent" in result
+        assert result["intent"] == "emotional"
+
+    def test_buddy_deep_comprehend_requires_pro(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        with pytest.raises(BuddyBotTierError):
+            buddy.deep_comprehend("Tell me about yourself.")
+
+    def test_buddy_deep_comprehend_returns_sentiment(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.deep_comprehend("I am so happy and excited today!")
+        assert result["sentiment"] == "positive"
+
+    def test_buddy_deep_comprehend_returns_implicit_need(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.deep_comprehend("Help me improve my productivity.")
+        assert isinstance(result["implicit_need"], str)
+        assert len(result["implicit_need"]) > 0
+
+    # --- System status includes reasoning ----------------------------------
+
+    def test_system_status_includes_reasoning(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        status = buddy.system_status()
+        assert "reasoning" in status
+        assert "model_name" in status["reasoning"]
+
+    # --- Context window larger on ENTERPRISE / PRO -------------------------
+
+    def test_enterprise_has_larger_context_window(self):
+        pro_buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        enterprise_buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Alex")
+        assert enterprise_buddy.reasoning.context_window >= pro_buddy.reasoning.context_window
+
+    def test_free_has_smaller_context_window(self):
+        free_buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        pro_buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        assert free_buddy.reasoning.context_window <= pro_buddy.reasoning.context_window
+
+
+# ===========================================================================
+# 13. Claude Mithos in AI companies database
+# ===========================================================================
+
+class TestClaudeMithosAIDatabase:
+    def test_claude_mithos_in_anthropic_tools(self):
+        from bots.ai_level_up_bot.ai_companies_database import AICompanyDatabase
+        db = AICompanyDatabase()
+        anthropic = db.get_company("Anthropic")
+        assert anthropic is not None, "Anthropic entry missing from database"
+        assert "Claude Mithos" in anthropic.tools
+
+
+# ===========================================================================
 # 1. Tiers
 # ===========================================================================
 
