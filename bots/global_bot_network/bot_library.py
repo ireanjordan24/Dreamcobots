@@ -737,4 +737,22 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "subscription_resales", "multi_provider_routing",
         ],
     ),
+    BotEntry(
+        bot_id="stack_and_profit_bot",
+        display_name="Stack & Profit Bot",
+        description=(
+            "AI-powered deal stacking and profit optimization bot. "
+            "Orchestrates DealBot, PennyBot, ReceiptBot, FlipBot, and CouponBot "
+            "with AI ProfitEngine, RankingAI, and AlertEngine. "
+            "Covers the full DreamCo $1,000 launch plan deal-sourcing pipeline."
+        ),
+        category=BotCategory.FINANCE,
+        module_path="bots.stack_and_profit_bot.stack_and_profit_bot",
+        class_name="StackAndProfitBot",
+        capabilities=[
+            "deal_finding", "penny_deals", "receipt_cashback", "flip_finder",
+            "coupon_stacking", "ai_profit_ranking", "alert_engine",
+            "affiliate_commissions", "cashback_stacking",
+        ],
+    ),
 ]
