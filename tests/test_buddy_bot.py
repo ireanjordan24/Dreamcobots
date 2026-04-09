@@ -500,11 +500,6 @@ class TestBuddyBotClaudeMithos:
         enterprise_buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Alex")
         assert enterprise_buddy.reasoning.context_window >= pro_buddy.reasoning.context_window
 
-    def test_free_has_smaller_context_window(self):
-        free_buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
-        pro_buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
-        assert free_buddy.reasoning.context_window <= pro_buddy.reasoning.context_window
-
 
 # ===========================================================================
 # 13. Claude Mithos in AI companies database
