@@ -308,7 +308,7 @@ class StackAndProfitBot:
         FREE tier: deal_bot + penny_bot + coupon_bot only.
         PRO/ENTERPRISE: all five bots.
         """
-        result: dict = {
+        result = {
             "tier": self.tier.value,
             "deal_bot": self.deal_bot.run(min_profit=min_profit),
             "penny_bot": self.penny_bot.run(),
