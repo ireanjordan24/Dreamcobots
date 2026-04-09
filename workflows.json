@@ -1,0 +1,143 @@
+{
+  "name": "DreamCo Money OS Workflows",
+  "version": "1.0.0",
+  "description": "Make.com / Zapier automation workflows for the DreamCo Money Operating System",
+  "workflows": [
+    {
+      "id": "wf-001",
+      "name": "Hourly Deal Finder",
+      "description": "Scans top retail stores for the best deals every hour and stores results",
+      "trigger": { "type": "schedule", "interval": "1h" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/deals?store=amazon&category=electronics" },
+        { "step": 2, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/deals?store=walmart&category=appliances" },
+        { "step": 3, "type": "filter", "condition": "savings >= 20" },
+        { "step": 4, "type": "store_record", "collection": "deals", "schema": "dealSchema" },
+        { "step": 5, "type": "notify", "channel": "push_notification", "template": "New deal found: {{title}} — Save ${{savings}}" }
+      ]
+    },
+    {
+      "id": "wf-002",
+      "name": "Penny Deal Scanner",
+      "description": "Scans clearance sections at penny stores twice daily",
+      "trigger": { "type": "schedule", "interval": "12h" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/penny-deals?store=dollar_general" },
+        { "step": 2, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/penny-deals?store=walmart" },
+        { "step": 3, "type": "filter", "condition": "profit >= 5" },
+        { "step": 4, "type": "store_record", "collection": "pennyDeals", "schema": "pennyDealSchema" },
+        { "step": 5, "type": "notify", "channel": "email", "template": "Penny Deal Alert: {{name}} at {{store}} — Resale profit: ${{profit}}" }
+      ]
+    },
+    {
+      "id": "wf-003",
+      "name": "Receipt Cashback Tracker",
+      "description": "Processes uploaded receipts across all cashback apps automatically",
+      "trigger": { "type": "webhook", "event": "receipt_uploaded" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/cashback?store={{store}}&amount={{amount}}" },
+        { "step": 2, "type": "store_record", "collection": "receipts", "schema": "receiptSchema" },
+        { "step": 3, "type": "notify", "channel": "push_notification", "template": "Cashback stacked: ${{total_cashback}} across {{cashback_opportunities}} apps!" }
+      ]
+    },
+    {
+      "id": "wf-004",
+      "name": "Flip Opportunity Finder",
+      "description": "Finds local high-profit flip opportunities every 6 hours",
+      "trigger": { "type": "schedule", "interval": "6h" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/flips?location={{USER_LOCATION}}&budget={{USER_BUDGET}}" },
+        { "step": 2, "type": "filter", "condition": "profitPct >= 50" },
+        { "step": 3, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/rank?type=flip&n=5" },
+        { "step": 4, "type": "store_record", "collection": "flips", "schema": "flipSchema" },
+        { "step": 5, "type": "notify", "channel": "push_notification", "template": "Top flip: {{name}} — Buy ${{buyPrice}}, Sell ${{estimatedSellPrice}}, Profit ${{profit}}" }
+      ]
+    },
+    {
+      "id": "wf-005",
+      "name": "Coupon Stacker",
+      "description": "Stacks coupons for planned purchases before checkout",
+      "trigger": { "type": "webhook", "event": "purchase_intent" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/coupons?store={{store}}&product={{product}}&price={{price}}" },
+        { "step": 2, "type": "filter", "condition": "best_savings >= 5" },
+        { "step": 3, "type": "notify", "channel": "push_notification", "template": "Coupons ready! Save ${{best_savings}} on {{product}} at {{store}}" }
+      ]
+    },
+    {
+      "id": "wf-006",
+      "name": "Profit Calculator",
+      "description": "Calculates and logs profit for every completed transaction",
+      "trigger": { "type": "webhook", "event": "transaction_completed" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/profit/{{transaction_type}}?buyPrice={{buy_price}}&sellPrice={{sell_price}}&fees={{fees}}" },
+        { "step": 2, "type": "store_record", "collection": "transactions", "data": "profit_result" },
+        { "step": 3, "type": "update_dashboard", "metric": "total_profit", "value": "{{netProfit}}" }
+      ]
+    },
+    {
+      "id": "wf-007",
+      "name": "Deal & Job Ranker",
+      "description": "Ranks all active opportunities by profit score every 2 hours",
+      "trigger": { "type": "schedule", "interval": "2h" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/rank?type=deal&n=10" },
+        { "step": 2, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/rank?type=flip&n=10" },
+        { "step": 3, "type": "update_dashboard", "widget": "top_opportunities", "data": "ranked_results" }
+      ]
+    },
+    {
+      "id": "wf-008",
+      "name": "Alert Sender",
+      "description": "Monitors all opportunities and sends alerts for high-value items",
+      "trigger": { "type": "schedule", "interval": "30m" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/alerts?minProfit={{MIN_PROFIT_THRESHOLD}}" },
+        { "step": 2, "type": "filter", "condition": "urgency == 'HIGH'" },
+        { "step": 3, "type": "notify", "channel": "sms", "template": "🔥 HIGH ALERT: {{formatted}}" },
+        { "step": 4, "type": "notify", "channel": "push_notification", "template": "{{formatted}}" }
+      ]
+    },
+    {
+      "id": "wf-009",
+      "name": "Revenue Monitor",
+      "description": "Aggregates revenue across all bots and updates the earnings dashboard daily",
+      "trigger": { "type": "schedule", "interval": "24h" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "POST", "url": "{{SERVER_URL}}/bots/run/dealBot" },
+        { "step": 2, "type": "http_request", "method": "POST", "url": "{{SERVER_URL}}/bots/run/flipBot" },
+        { "step": 3, "type": "http_request", "method": "POST", "url": "{{SERVER_URL}}/bots/run/pennyBot" },
+        { "step": 4, "type": "http_request", "method": "POST", "url": "{{SERVER_URL}}/bots/run/receiptBot" },
+        { "step": 5, "type": "http_request", "method": "POST", "url": "{{SERVER_URL}}/bots/run/couponBot" },
+        { "step": 6, "type": "aggregate", "field": "revenue", "operation": "sum", "output": "daily_revenue" },
+        { "step": 7, "type": "update_dashboard", "widget": "earnings_chart", "value": "{{daily_revenue}}" },
+        { "step": 8, "type": "notify", "channel": "email", "template": "Daily Revenue Report: ${{daily_revenue}} earned today" }
+      ]
+    },
+    {
+      "id": "wf-010",
+      "name": "Legal Payout Tracker",
+      "description": "Monitors class-action and legal payout deadlines weekly",
+      "trigger": { "type": "schedule", "interval": "7d" },
+      "actions": [
+        { "step": 1, "type": "web_scrape", "url": "https://topclassactions.com", "selector": ".settlement-list" },
+        { "step": 2, "type": "filter", "condition": "days_until_deadline <= 30" },
+        { "step": 3, "type": "store_record", "collection": "legalPayouts", "schema": "legalPayoutSchema" },
+        { "step": 4, "type": "notify", "channel": "email", "template": "Legal payout deadline soon: {{case_name}} — ${{amount}} — Deadline: {{deadline}}" }
+      ]
+    },
+    {
+      "id": "wf-011",
+      "name": "Grant Opportunity Scanner",
+      "description": "Scans government and private grant databases weekly for new opportunities",
+      "trigger": { "type": "schedule", "interval": "7d" },
+      "actions": [
+        { "step": 1, "type": "http_request", "method": "GET", "url": "https://api.grants.gov/v1/opportunities/search?oppStatuses=forecasted,posted" },
+        { "step": 2, "type": "http_request", "method": "GET", "url": "{{SERVER_URL}}/profit/grant?grantAmount={{amount}}&applicationCost={{cost}}" },
+        { "step": 3, "type": "filter", "condition": "netProfit >= 500" },
+        { "step": 4, "type": "store_record", "collection": "grants", "schema": "grantSchema" },
+        { "step": 5, "type": "notify", "channel": "email", "template": "New grant opportunity: {{name}} — ${{amount}} — Deadline: {{deadline}}" }
+      ]
+    }
+  ]
+}
