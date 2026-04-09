@@ -458,7 +458,7 @@ class TestProfitEngine:
     def test_final_cost_correct(self):
         engine = ProfitEngine()
         result = engine.calculate_profit(self._make_deal(100.0, 60.0, 5.0))
-        assert result["finalCost"] == 57.0
+        assert result["final_cost"] == 57.0
 
     def test_net_profit_positive(self):
         engine = ProfitEngine()

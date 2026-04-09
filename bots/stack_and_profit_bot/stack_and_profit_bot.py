@@ -433,7 +433,7 @@ class ProfitEngine:
         return {
             "deal_id": deal.deal_id,
             "title": deal.title,
-            "finalCost": final_cost,
+            "final_cost": final_cost,
             "savings": savings,
             "savings_pct": savings_pct,
             "cashback": cashback,
