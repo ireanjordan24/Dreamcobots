@@ -80,6 +80,11 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    FEATURE_LEAD_FINDER,
+    FEATURE_OFFER_GENERATOR,
+    FEATURE_CONVERSION_ENGINE,
+    FEATURE_FULFILLMENT_ENGINE,
+    FEATURE_RETENTION_ENGINE,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
@@ -121,6 +126,49 @@ from bots.buddy_bot.personality_engine import (
     PersonalityEngine,
     PersonaMode,
     PersonaTone,
+)
+from bots.buddy_bot.lead_finder_engine import (
+    LeadFinderEngine,
+    BusinessLead,
+    BusinessVertical,
+    LeadStatus as LeadFinderStatus,
+    LeadContactType,
+    LeadFinderError,
+    LeadFinderTierError,
+)
+from bots.buddy_bot.offer_generator_engine import (
+    OfferGeneratorEngine,
+    ServiceOffer,
+    ServiceType,
+    PricingModel,
+    OfferGeneratorError,
+    OfferGeneratorTierError,
+)
+from bots.buddy_bot.conversion_engine import (
+    ConversionEngine,
+    Proposal,
+    ConversionRecord,
+    OutreachChannel,
+    ConversionStage,
+    ConversionEngineError,
+    ConversionEngineTierError,
+)
+from bots.buddy_bot.fulfillment_engine import (
+    FulfillmentEngine,
+    Deliverable,
+    DeliverableType,
+    DeliverableStatus,
+    FulfillmentEngineError,
+    FulfillmentEngineTierError,
+)
+from bots.buddy_bot.retention_engine import (
+    RetentionEngine,
+    ClientHealthRecord,
+    HealthStatus,
+    UpsellStage,
+    UpsellOffer,
+    RetentionEngineError,
+    RetentionEngineTierError,
 )
 
 from framework import GlobalAISourcesFlow
@@ -183,6 +231,46 @@ class BuddyBot:
         self.voice = VoiceEngine()
         self.creativity = CreativityEngine(user_id=user_id)
         self.personality = PersonalityEngine(initial_persona=initial_persona)
+
+        # --- Autonomous SaaS engines ---
+        _is_pro_plus = tier in (Tier.PRO, Tier.ENTERPRISE)
+        _is_enterprise = tier == Tier.ENTERPRISE
+        self.lead_finder = LeadFinderEngine(
+            max_leads_per_scan=(100 if _is_pro_plus else (None if _is_enterprise else 5)),
+            can_filter_vertical=_is_pro_plus,
+            can_enrich=_is_pro_plus,
+            can_ai_score=_is_enterprise,
+        )
+        from bots.buddy_bot.offer_generator_engine import _ALL_SERVICE_TYPES, _FREE_SERVICE_TYPES
+        self.offer_generator = OfferGeneratorEngine(
+            available_service_types=(_ALL_SERVICE_TYPES if _is_pro_plus else _FREE_SERVICE_TYPES),
+            can_dynamic_pricing=_is_pro_plus,
+            can_performance_pricing=_is_enterprise,
+            can_custom_bundle=_is_enterprise,
+        )
+        self.conversion = ConversionEngine(
+            can_outreach=_is_pro_plus,
+            can_sms=_is_enterprise,
+            can_ai_closing=_is_enterprise,
+            can_booking=_is_enterprise,
+            max_outreach_per_day=(None if _is_enterprise else (50 if _is_pro_plus else 0)),
+            require_human_approval=(not _is_enterprise),
+        )
+        self.fulfillment = FulfillmentEngine(
+            can_landing_pages=_is_pro_plus,
+            can_email_sequences=_is_pro_plus,
+            can_funnels=_is_enterprise,
+            can_automation_setup=_is_enterprise,
+            can_brand_kit=_is_enterprise,
+            can_bulk_generate=_is_enterprise,
+        )
+        self.retention = RetentionEngine(
+            can_auto_checkins=_is_pro_plus,
+            can_upsell_detection=_is_pro_plus,
+            can_referral_engine=_is_enterprise,
+            can_churn_prediction=_is_enterprise,
+            can_mrr_dashboard=_is_enterprise,
+        )
 
         # Bootstrap memory profile for the primary user
         try:
@@ -717,7 +805,256 @@ class BuddyBot:
             "voice": self.voice.to_dict(),
             "creativity": self.creativity.to_dict(),
             "personality": self.personality.to_dict(),
+            "lead_finder": self.lead_finder.to_dict(),
+            "offer_generator": self.offer_generator.to_dict(),
+            "conversion": self.conversion.to_dict(),
+            "fulfillment": self.fulfillment.to_dict(),
+            "retention": self.retention.to_dict(),
             "features_enabled": self.config.features,
+        }
+
+    # ------------------------------------------------------------------
+    # Autonomous SaaS — Lead Finder
+    # ------------------------------------------------------------------
+
+    def find_leads(
+        self,
+        vertical: "BusinessVertical | None" = None,
+        location: "str | None" = None,
+        min_value: float = 0.0,
+    ) -> list:
+        """Scan for business leads that need marketing services (PRO+).
+
+        Parameters
+        ----------
+        vertical : BusinessVertical | None
+            Filter by business vertical (requires PRO).
+        location : str | None
+            Optional location hint.
+        min_value : float
+            Minimum estimated monthly value.
+
+        Returns
+        -------
+        list[BusinessLead]
+        """
+        self._require_feature(FEATURE_LEAD_FINDER)
+        return self.lead_finder.scan(
+            vertical=vertical, location=location, min_value=min_value
+        )
+
+    def get_top_leads(self, n: int = 5) -> list:
+        """Return the top *n* leads by estimated value (PRO+)."""
+        self._require_feature(FEATURE_LEAD_FINDER)
+        return self.lead_finder.get_top_leads(n)
+
+    # ------------------------------------------------------------------
+    # Autonomous SaaS — Offer Generator
+    # ------------------------------------------------------------------
+
+    def build_offer(
+        self,
+        business_name: str,
+        service_type: "ServiceType | None" = None,
+        estimated_lead_value: float = 1000.0,
+    ) -> "ServiceOffer":
+        """Build a tailored service offer for a lead (PRO+).
+
+        Parameters
+        ----------
+        business_name : str
+            Target business name.
+        service_type : ServiceType | None
+            Specific service type (auto-selected if None).
+        estimated_lead_value : float
+            Lead's estimated monthly value.
+
+        Returns
+        -------
+        ServiceOffer
+        """
+        self._require_feature(FEATURE_OFFER_GENERATOR)
+        return self.offer_generator.build_offer(
+            business_name=business_name,
+            service_type=service_type,
+            estimated_lead_value=estimated_lead_value,
+        )
+
+    # ------------------------------------------------------------------
+    # Autonomous SaaS — Conversion
+    # ------------------------------------------------------------------
+
+    def generate_proposal(
+        self,
+        business_name: str,
+        service_headline: str,
+        deliverables: list,
+        monthly_fee_usd: float,
+        setup_fee_usd: float,
+        guarantee: str,
+        channel: "OutreachChannel" = None,
+    ) -> "Proposal":
+        """Generate a conversion proposal for a lead (PRO+).
+
+        Parameters
+        ----------
+        business_name : str
+            Target business.
+        service_headline : str
+            Primary pitch headline.
+        deliverables : list[str]
+            Service deliverables to include.
+        monthly_fee_usd : float
+            Monthly fee.
+        setup_fee_usd : float
+            One-time setup fee.
+        guarantee : str
+            Guarantee statement.
+        channel : OutreachChannel | None
+            Contact channel (defaults to EMAIL).
+
+        Returns
+        -------
+        Proposal
+        """
+        self._require_feature(FEATURE_CONVERSION_ENGINE)
+        ch = channel if channel is not None else OutreachChannel.EMAIL
+        return self.conversion.generate_proposal(
+            business_name=business_name,
+            service_headline=service_headline,
+            deliverables=deliverables,
+            monthly_fee_usd=monthly_fee_usd,
+            setup_fee_usd=setup_fee_usd,
+            guarantee=guarantee,
+            channel=ch,
+        )
+
+    def handle_objection(self, business_name: str, objection_text: str) -> str:
+        """Get an AI response to a lead's objection (PRO+)."""
+        self._require_feature(FEATURE_CONVERSION_ENGINE)
+        return self.conversion.handle_objection(business_name, objection_text)
+
+    # ------------------------------------------------------------------
+    # Autonomous SaaS — Fulfillment
+    # ------------------------------------------------------------------
+
+    def deliver_ad_copy(self, client_name: str, industry: str = "local business") -> "Deliverable":
+        """Generate ad copy for a client (PRO+)."""
+        self._require_feature(FEATURE_FULFILLMENT_ENGINE)
+        return self.fulfillment.generate_ad_copy(client_name, industry)
+
+    def deliver_ad_campaign(
+        self,
+        client_name: str,
+        budget_usd: float = 1000.0,
+        duration_days: int = 30,
+    ) -> "Deliverable":
+        """Generate a full ad campaign structure (PRO+)."""
+        self._require_feature(FEATURE_FULFILLMENT_ENGINE)
+        return self.fulfillment.generate_ad_campaign(client_name, budget_usd, duration_days)
+
+    def deliver_landing_page(
+        self, client_name: str, headline: str, offer_summary: str
+    ) -> "Deliverable":
+        """Build a landing page layout for a client (PRO+)."""
+        self._require_feature(FEATURE_FULFILLMENT_ENGINE)
+        return self.fulfillment.build_landing_page(client_name, headline, offer_summary)
+
+    def deliver_email_sequence(
+        self, client_name: str, sequence_length: int = 5, goal: str = "onboarding"
+    ) -> "Deliverable":
+        """Generate an email drip sequence (PRO+)."""
+        self._require_feature(FEATURE_FULFILLMENT_ENGINE)
+        return self.fulfillment.generate_email_sequence(client_name, sequence_length, goal)
+
+    # ------------------------------------------------------------------
+    # Autonomous SaaS — Retention
+    # ------------------------------------------------------------------
+
+    def add_retained_client(
+        self,
+        client_name: str,
+        plan_name: str,
+        monthly_value_usd: float,
+        months_active: int = 1,
+        satisfaction_score: float = 7.0,
+        results_delivered: int = 0,
+        last_contact_days_ago: int = 0,
+    ) -> "ClientHealthRecord":
+        """Register a retained client in the retention system (PRO+)."""
+        self._require_feature(FEATURE_RETENTION_ENGINE)
+        return self.retention.add_client(
+            client_name=client_name,
+            plan_name=plan_name,
+            monthly_value_usd=monthly_value_usd,
+            months_active=months_active,
+            satisfaction_score=satisfaction_score,
+            results_delivered=results_delivered,
+            last_contact_days_ago=last_contact_days_ago,
+        )
+
+    def detect_upsell_moment(self, client_name: str) -> "UpsellStage":
+        """Detect if a client is ready for an upsell (PRO+)."""
+        self._require_feature(FEATURE_RETENTION_ENGINE)
+        return self.retention.detect_upsell_moment(client_name)
+
+    def build_upsell_offer(self, client_name: str) -> "UpsellOffer":
+        """Generate a personalised upsell offer (PRO+)."""
+        self._require_feature(FEATURE_RETENTION_ENGINE)
+        return self.retention.build_upsell_offer(client_name)
+
+    def get_revenue_summary(self) -> dict:
+        """Return basic revenue summary from retained clients (PRO+)."""
+        self._require_feature(FEATURE_RETENTION_ENGINE)
+        return self.retention.simple_revenue_summary()
+
+    # ------------------------------------------------------------------
+    # Autonomous loop — convenience orchestrator
+    # ------------------------------------------------------------------
+
+    def run_autonomous_cycle(self, location: "str | None" = None) -> dict:
+        """Run one full autonomous money cycle (PRO+).
+
+        Finds leads → selects best lead → builds offer → generates proposal.
+
+        Parameters
+        ----------
+        location : str | None
+            Optional location filter for lead scanning.
+
+        Returns
+        -------
+        dict
+            Summary with ``leads_found``, ``best_lead``, ``offer``, ``proposal``.
+        """
+        self._require_feature(FEATURE_LEAD_FINDER)
+        self._require_feature(FEATURE_OFFER_GENERATOR)
+        self._require_feature(FEATURE_CONVERSION_ENGINE)
+
+        leads = self.lead_finder.scan(location=location)
+        if not leads:
+            return {"status": "no_leads_found", "action": "retrying_next_cycle"}
+
+        best = max(leads, key=lambda l: l.estimated_monthly_value_usd)
+        offer = self.offer_generator.build_offer(
+            business_name=best.business_name,
+            estimated_lead_value=best.estimated_monthly_value_usd,
+        )
+        proposal = self.conversion.generate_proposal(
+            business_name=best.business_name,
+            service_headline=offer.headline,
+            deliverables=offer.deliverables,
+            monthly_fee_usd=offer.monthly_fee_usd,
+            setup_fee_usd=offer.setup_fee_usd,
+            guarantee=offer.guarantee,
+            channel=OutreachChannel.EMAIL,
+        )
+        return {
+            "status": "cycle_complete",
+            "leads_found": len(leads),
+            "best_lead": best.to_dict(),
+            "offer": offer.to_dict(),
+            "proposal": proposal.to_dict(),
         }
 
     def describe_tier(self) -> str:

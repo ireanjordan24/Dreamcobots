@@ -1469,3 +1469,941 @@ class TestBotLibraryRegistration:
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS
         bot_ids = [e.bot_id for e in _DREAMCO_BOTS]
         assert "buddy_os" in bot_ids
+
+
+# ===========================================================================
+# 10b. Lead Finder Engine
+# ===========================================================================
+
+from bots.buddy_bot.lead_finder_engine import (
+    LeadFinderEngine,
+    BusinessLead,
+    BusinessVertical,
+    LeadStatus as LeadFinderStatus,
+    LeadContactType,
+    LeadFinderError,
+    LeadFinderTierError,
+)
+
+
+class TestLeadFinderEngine:
+    """Tests for the LeadFinderEngine."""
+
+    def test_free_scan_returns_leads(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5)
+        leads = engine.scan()
+        assert len(leads) <= 5
+        assert all(isinstance(l, BusinessLead) for l in leads)
+
+    def test_pro_scan_returns_up_to_100(self):
+        engine = LeadFinderEngine(max_leads_per_scan=100, can_filter_vertical=True, can_enrich=True)
+        leads = engine.scan()
+        assert len(leads) <= 100
+
+    def test_vertical_filter_requires_feature(self):
+        engine = LeadFinderEngine(can_filter_vertical=False)
+        with pytest.raises(LeadFinderTierError):
+            engine.scan(vertical=BusinessVertical.CONTRACTOR)
+
+    def test_vertical_filter_works_with_permission(self):
+        engine = LeadFinderEngine(max_leads_per_scan=10, can_filter_vertical=True)
+        leads = engine.scan(vertical=BusinessVertical.HEALTH_FITNESS)
+        assert all(l.vertical == BusinessVertical.HEALTH_FITNESS for l in leads)
+
+    def test_lead_has_required_fields(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5)
+        leads = engine.scan()
+        for lead in leads:
+            assert lead.lead_id
+            assert lead.business_name
+            assert lead.problem
+            assert lead.estimated_monthly_value_usd > 0
+            assert 0.0 <= lead.close_probability <= 1.0
+            assert 0.0 <= lead.digital_gap_score <= 100.0
+
+    def test_enrichment_adds_location_and_contact(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5, can_filter_vertical=True, can_enrich=True)
+        leads = engine.scan()
+        assert any(l.location is not None for l in leads)
+        assert any(l.contact_info is not None for l in leads)
+
+    def test_no_enrichment_no_contact(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5, can_enrich=False)
+        leads = engine.scan()
+        for lead in leads:
+            assert lead.contact_info is None
+
+    def test_get_all_leads(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5)
+        engine.scan()
+        engine.scan()
+        assert len(engine.get_all_leads()) > 0
+
+    def test_get_top_leads(self):
+        engine = LeadFinderEngine(max_leads_per_scan=10, can_filter_vertical=True)
+        engine.scan()
+        top = engine.get_top_leads(3)
+        assert len(top) <= 3
+        if len(top) >= 2:
+            assert top[0].estimated_monthly_value_usd >= top[1].estimated_monthly_value_usd
+
+    def test_mark_lead_status(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5)
+        leads = engine.scan()
+        lead = leads[0]
+        updated = engine.mark_lead_status(lead.lead_id, LeadFinderStatus.QUALIFIED)
+        assert updated.status == LeadFinderStatus.QUALIFIED
+
+    def test_mark_nonexistent_lead_raises(self):
+        engine = LeadFinderEngine()
+        with pytest.raises(LeadFinderError):
+            engine.mark_lead_status("nonexistent_id", LeadFinderStatus.LOST)
+
+    def test_to_dict(self):
+        engine = LeadFinderEngine(max_leads_per_scan=5)
+        d = engine.to_dict()
+        assert "scan_count" in d
+        assert "total_leads" in d
+        assert d["max_leads_per_scan"] == 5
+
+    def test_lead_to_dict(self):
+        engine = LeadFinderEngine(max_leads_per_scan=2)
+        leads = engine.scan()
+        d = leads[0].to_dict()
+        assert "lead_id" in d
+        assert "business_name" in d
+        assert "vertical" in d
+        assert "estimated_monthly_value_usd" in d
+
+    def test_unlimited_scan(self):
+        engine = LeadFinderEngine(max_leads_per_scan=None)
+        leads = engine.scan()
+        assert len(leads) > 0
+
+    def test_min_value_filter(self):
+        engine = LeadFinderEngine(max_leads_per_scan=100, can_filter_vertical=True)
+        leads = engine.scan(min_value=3000.0)
+        for lead in leads:
+            assert lead.estimated_monthly_value_usd >= 3000.0
+
+    def test_all_verticals_covered(self):
+        for vertical in BusinessVertical:
+            engine = LeadFinderEngine(max_leads_per_scan=10, can_filter_vertical=True)
+            leads = engine.scan(vertical=vertical)
+            assert isinstance(leads, list)
+
+
+# ===========================================================================
+# 10c. Offer Generator Engine
+# ===========================================================================
+
+from bots.buddy_bot.offer_generator_engine import (
+    OfferGeneratorEngine,
+    ServiceOffer,
+    ServiceType,
+    PricingModel,
+    OfferGeneratorError,
+    OfferGeneratorTierError,
+    _FREE_SERVICE_TYPES,
+    _ALL_SERVICE_TYPES,
+)
+
+
+class TestOfferGeneratorEngine:
+    """Tests for the OfferGeneratorEngine."""
+
+    def test_free_tier_can_generate_basic_offer(self):
+        engine = OfferGeneratorEngine()
+        offer = engine.build_offer("Test Business", ServiceType.AD_CAMPAIGN, 1000.0)
+        assert isinstance(offer, ServiceOffer)
+        assert offer.target_business == "Test Business"
+        assert offer.service_type == ServiceType.AD_CAMPAIGN
+
+    def test_free_tier_cannot_use_pro_service(self):
+        engine = OfferGeneratorEngine(available_service_types=_FREE_SERVICE_TYPES)
+        with pytest.raises(OfferGeneratorTierError):
+            engine.build_offer("Test", ServiceType.FULL_AI_OPERATOR, 5000.0)
+
+    def test_pro_tier_can_use_all_services(self):
+        engine = OfferGeneratorEngine(
+            available_service_types=_ALL_SERVICE_TYPES,
+            can_dynamic_pricing=True,
+        )
+        for stype in _ALL_SERVICE_TYPES:
+            offer = engine.build_offer("TestCo", stype, 2000.0)
+            assert offer.service_type == stype
+
+    def test_dynamic_pricing_scales_with_value(self):
+        engine = OfferGeneratorEngine(
+            available_service_types=_ALL_SERVICE_TYPES,
+            can_dynamic_pricing=True,
+        )
+        low_offer = engine.build_offer("LowCo", ServiceType.AD_CAMPAIGN, 100.0)
+        high_offer = engine.build_offer("HighCo", ServiceType.AD_CAMPAIGN, 5000.0)
+        assert high_offer.monthly_fee_usd >= low_offer.monthly_fee_usd
+
+    def test_performance_pricing_for_high_value(self):
+        engine = OfferGeneratorEngine(
+            available_service_types=_ALL_SERVICE_TYPES,
+            can_dynamic_pricing=True,
+            can_performance_pricing=True,
+        )
+        offer = engine.build_offer("BigCo", ServiceType.LEAD_GENERATION, 6000.0)
+        assert offer.pricing_model == PricingModel.PERFORMANCE_BASED
+
+    def test_bundle_requires_enterprise(self):
+        engine = OfferGeneratorEngine(
+            available_service_types=_ALL_SERVICE_TYPES,
+            can_custom_bundle=False,
+        )
+        with pytest.raises(OfferGeneratorTierError):
+            engine.build_bundle("Co", [ServiceType.AD_CAMPAIGN, ServiceType.EMAIL_MARKETING])
+
+    def test_bundle_enterprise(self):
+        engine = OfferGeneratorEngine(
+            available_service_types=_ALL_SERVICE_TYPES,
+            can_custom_bundle=True,
+            can_dynamic_pricing=True,
+        )
+        offers = engine.build_bundle(
+            "BigCo",
+            [ServiceType.AD_CAMPAIGN, ServiceType.EMAIL_MARKETING],
+            2000.0,
+        )
+        assert len(offers) == 2
+
+    def test_offer_has_required_fields(self):
+        engine = OfferGeneratorEngine()
+        offer = engine.build_offer("Test Gym", ServiceType.AD_CAMPAIGN, 500.0)
+        assert offer.headline
+        assert offer.deliverables
+        assert offer.guarantee
+        assert offer.setup_fee_usd >= 0
+        assert offer.monthly_fee_usd >= 0
+        assert offer.timeline_days > 0
+
+    def test_offer_to_dict(self):
+        engine = OfferGeneratorEngine()
+        offer = engine.build_offer("MyBiz", ServiceType.AD_CAMPAIGN, 1000.0)
+        d = offer.to_dict()
+        assert "offer_id" in d
+        assert "service_type" in d
+        assert "headline" in d
+        assert "deliverables" in d
+
+    def test_get_all_offers(self):
+        engine = OfferGeneratorEngine()
+        engine.build_offer("A", ServiceType.AD_CAMPAIGN, 500.0)
+        engine.build_offer("B", ServiceType.MARKETING_FUNNEL, 800.0)
+        assert len(engine.get_all_offers()) == 2
+
+    def test_list_available_services(self):
+        engine = OfferGeneratorEngine(available_service_types=_FREE_SERVICE_TYPES)
+        services = engine.list_available_services()
+        assert ServiceType.AD_CAMPAIGN.value in services
+
+    def test_best_fit_service_selection(self):
+        engine = OfferGeneratorEngine(available_service_types=_ALL_SERVICE_TYPES)
+        offer_low = engine.build_offer("LowVal", estimated_lead_value=500.0)
+        assert offer_low.service_type == ServiceType.AD_CAMPAIGN
+        offer_high = engine.build_offer("HighVal", estimated_lead_value=6000.0)
+        assert offer_high.service_type == ServiceType.FULL_AI_OPERATOR
+
+    def test_offer_counter_increments(self):
+        engine = OfferGeneratorEngine()
+        o1 = engine.build_offer("A", ServiceType.AD_CAMPAIGN, 500.0)
+        o2 = engine.build_offer("B", ServiceType.AD_CAMPAIGN, 500.0)
+        assert o1.offer_id != o2.offer_id
+
+    def test_to_dict(self):
+        engine = OfferGeneratorEngine()
+        d = engine.to_dict()
+        assert "offer_count" in d
+        assert "available_service_types" in d
+
+
+# ===========================================================================
+# 10d. Conversion Engine
+# ===========================================================================
+
+from bots.buddy_bot.conversion_engine import (
+    ConversionEngine,
+    Proposal,
+    ConversionRecord,
+    OutreachChannel,
+    ConversionStage,
+    ConversionEngineError,
+    ConversionEngineTierError,
+)
+
+
+class TestConversionEngine:
+    """Tests for the ConversionEngine."""
+
+    def _make_engine_pro(self):
+        return ConversionEngine(
+            can_outreach=True,
+            can_sms=False,
+            can_ai_closing=False,
+            can_booking=False,
+            max_outreach_per_day=50,
+            require_human_approval=True,
+        )
+
+    def _make_engine_enterprise(self):
+        return ConversionEngine(
+            can_outreach=True,
+            can_sms=True,
+            can_ai_closing=True,
+            can_booking=True,
+            max_outreach_per_day=None,
+            require_human_approval=False,
+        )
+
+    def test_generate_proposal(self):
+        engine = self._make_engine_pro()
+        proposal = engine.generate_proposal(
+            "Gym Co", "Get 50 leads/month", ["Ads", "Landing page"],
+            999.0, 500.0, "30 leads or free",
+        )
+        assert isinstance(proposal, Proposal)
+        assert proposal.business_name == "Gym Co"
+        assert "Gym Co" in proposal.body
+        assert "[Unsubscribe]" in proposal.body
+
+    def test_proposal_creates_conversion_record(self):
+        engine = self._make_engine_pro()
+        engine.generate_proposal(
+            "Roofing Co", "Get 30 leads", ["Ads"], 500.0, 250.0, "Guarantee",
+        )
+        pipeline = engine.get_pipeline()
+        assert any(r["business_name"] == "Roofing Co" for r in pipeline)
+
+    def test_send_outreach_requires_permission(self):
+        engine = ConversionEngine(can_outreach=False)
+        proposal = Proposal(
+            proposal_id="p001", business_name="Co", service_headline="Test",
+            body="body", deliverables=[], monthly_fee_usd=100.0,
+            setup_fee_usd=50.0, guarantee="g", call_to_action="cta",
+            channel=OutreachChannel.EMAIL,
+        )
+        with pytest.raises(ConversionEngineTierError):
+            engine.send_outreach(proposal)
+
+    def test_send_outreach_respects_rate_limit(self):
+        engine = ConversionEngine(
+            can_outreach=True,
+            max_outreach_per_day=2,
+            require_human_approval=False,
+        )
+        proposal = engine.generate_proposal(
+            "Co", "Test", ["item"], 100.0, 50.0, "guarantee"
+        )
+        engine.send_outreach(proposal)
+        engine.send_outreach(proposal)
+        result = engine.send_outreach(proposal)
+        assert result["queued"] is False
+        assert "limit" in result["message"].lower()
+
+    def test_sms_outreach_requires_enterprise(self):
+        engine = self._make_engine_pro()
+        with pytest.raises(ConversionEngineTierError):
+            engine.generate_proposal(
+                "SmsTest", "Test", ["item"], 100.0, 50.0, "g",
+                channel=OutreachChannel.SMS,
+            )
+
+    def test_sms_works_on_enterprise(self):
+        engine = self._make_engine_enterprise()
+        proposal = engine.generate_proposal(
+            "SmsOK", "Test", ["item"], 100.0, 50.0, "g",
+            channel=OutreachChannel.SMS,
+        )
+        assert proposal.channel == OutreachChannel.SMS
+
+    def test_handle_objection_too_expensive(self):
+        engine = self._make_engine_pro()
+        response = engine.handle_objection("Gym", "it's too expensive for us")
+        assert response
+        assert len(response) > 10
+
+    def test_handle_objection_default(self):
+        engine = self._make_engine_pro()
+        response = engine.handle_objection("Gym", "random objection xyz")
+        assert response
+
+    def test_generate_agreement_requires_enterprise(self):
+        engine = self._make_engine_pro()
+        with pytest.raises(ConversionEngineTierError):
+            engine.generate_agreement("Co", "Summary")
+
+    def test_generate_agreement_enterprise(self):
+        engine = self._make_engine_enterprise()
+        agreement = engine.generate_agreement("BigCo", "Full AI package $999/mo")
+        assert "BigCo" in agreement
+        assert "DreamCo Buddy AI" in agreement
+
+    def test_book_meeting_requires_enterprise(self):
+        engine = self._make_engine_pro()
+        with pytest.raises(ConversionEngineTierError):
+            engine.book_meeting("Co", "2026-04-20T10:00:00Z")
+
+    def test_book_meeting_enterprise(self):
+        engine = self._make_engine_enterprise()
+        engine.generate_proposal("MeetCo", "h", ["d"], 100.0, 50.0, "g")
+        result = engine.book_meeting("MeetCo", "2026-04-20T10:00:00Z")
+        assert result["status"] == "confirmed"
+        assert "meet.dreamco.ai" in result["meeting_link"]
+
+    def test_mark_won(self):
+        engine = self._make_engine_pro()
+        engine.generate_proposal("WonCo", "h", ["d"], 100.0, 50.0, "g")
+        result = engine.mark_won("WonCo")
+        assert result["status"] == "won"
+        assert engine.get_won_count() == 1
+
+    def test_mark_won_missing_raises(self):
+        engine = self._make_engine_pro()
+        with pytest.raises(ConversionEngineError):
+            engine.mark_won("NonExistent")
+
+    def test_reset_daily_sends(self):
+        engine = ConversionEngine(
+            can_outreach=True, max_outreach_per_day=1, require_human_approval=False
+        )
+        proposal = engine.generate_proposal("A", "h", ["d"], 100.0, 50.0, "g")
+        engine.send_outreach(proposal)
+        engine.reset_daily_sends()
+        assert engine._sends_today == 0
+
+    def test_to_dict(self):
+        engine = self._make_engine_pro()
+        d = engine.to_dict()
+        assert "proposal_count" in d
+        assert "pipeline_size" in d
+        assert "won_count" in d
+
+
+# ===========================================================================
+# 10e. Fulfillment Engine
+# ===========================================================================
+
+from bots.buddy_bot.fulfillment_engine import (
+    FulfillmentEngine,
+    Deliverable,
+    DeliverableType,
+    DeliverableStatus,
+    FulfillmentEngineError,
+    FulfillmentEngineTierError,
+)
+
+
+class TestFulfillmentEngine:
+    """Tests for the FulfillmentEngine."""
+
+    def _make_free_engine(self):
+        return FulfillmentEngine()
+
+    def _make_pro_engine(self):
+        return FulfillmentEngine(
+            can_landing_pages=True,
+            can_email_sequences=True,
+        )
+
+    def _make_enterprise_engine(self):
+        return FulfillmentEngine(
+            can_landing_pages=True,
+            can_email_sequences=True,
+            can_funnels=True,
+            can_automation_setup=True,
+            can_brand_kit=True,
+            can_bulk_generate=True,
+        )
+
+    def test_generate_ad_copy_free(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Gym Co")
+        assert isinstance(d, Deliverable)
+        assert d.deliverable_type == DeliverableType.AD_COPY
+        assert d.status == DeliverableStatus.DRAFT
+
+    def test_ad_copy_has_ads(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Roofing Co", "contractor", ["Google", "Facebook"])
+        assert "ads" in d.content
+        assert len(d.content["ads"]) == 2
+
+    def test_generate_ad_campaign(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_campaign("Co", budget_usd=500.0, duration_days=14)
+        assert d.deliverable_type == DeliverableType.AD_CAMPAIGN
+        assert d.content["total_budget_usd"] == 500.0
+        assert d.content["duration_days"] == 14
+
+    def test_landing_page_requires_pro(self):
+        engine = self._make_free_engine()
+        with pytest.raises(FulfillmentEngineTierError):
+            engine.build_landing_page("Co", "Headline", "Offer summary")
+
+    def test_landing_page_pro(self):
+        engine = self._make_pro_engine()
+        d = engine.build_landing_page("Test Gym", "Grow your gym", "Full AI package")
+        assert d.deliverable_type == DeliverableType.LANDING_PAGE
+        assert "headline" in d.content
+        assert "cta_button" in d.content
+
+    def test_email_sequence_requires_pro(self):
+        engine = self._make_free_engine()
+        with pytest.raises(FulfillmentEngineTierError):
+            engine.generate_email_sequence("Co")
+
+    def test_email_sequence_pro(self):
+        engine = self._make_pro_engine()
+        d = engine.generate_email_sequence("Gym Co", sequence_length=5)
+        assert d.deliverable_type == DeliverableType.EMAIL_SEQUENCE
+        assert len(d.content["emails"]) == 5
+
+    def test_email_sequence_clamped(self):
+        engine = self._make_pro_engine()
+        d = engine.generate_email_sequence("Co", sequence_length=20)
+        assert len(d.content["emails"]) == 10
+
+    def test_funnel_requires_enterprise(self):
+        engine = self._make_pro_engine()
+        with pytest.raises(FulfillmentEngineTierError):
+            engine.assemble_funnel("Co", "lead magnet", "offer")
+
+    def test_funnel_enterprise(self):
+        engine = self._make_enterprise_engine()
+        d = engine.assemble_funnel("BigCo", "Free audit", "Full AI package")
+        assert d.deliverable_type == DeliverableType.SALES_FUNNEL
+        assert len(d.content["stages"]) == 5
+
+    def test_automation_setup_enterprise(self):
+        engine = self._make_enterprise_engine()
+        d = engine.setup_automation("BigCo")
+        assert d.deliverable_type == DeliverableType.AUTOMATION_SETUP
+        assert "systems" in d.content
+
+    def test_brand_kit_enterprise(self):
+        engine = self._make_enterprise_engine()
+        d = engine.generate_brand_kit("Brand Co", "retail")
+        assert d.deliverable_type == DeliverableType.BRAND_KIT
+        assert "colour_palette" in d.content
+        assert "logo_brief" in d.content
+
+    def test_bulk_generate_requires_enterprise(self):
+        engine = self._make_pro_engine()
+        with pytest.raises(FulfillmentEngineTierError):
+            engine.bulk_generate("Co", [DeliverableType.AD_COPY])
+
+    def test_bulk_generate_enterprise(self):
+        engine = self._make_enterprise_engine()
+        deliverables = engine.bulk_generate(
+            "BigCo",
+            [DeliverableType.AD_COPY, DeliverableType.AD_CAMPAIGN],
+        )
+        assert len(deliverables) == 2
+
+    def test_approve_deliverable(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Co")
+        approved = engine.approve_deliverable(d.deliverable_id)
+        assert approved.status == DeliverableStatus.APPROVED
+        assert approved.approved_at is not None
+
+    def test_deploy_requires_approval(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Co")
+        with pytest.raises(FulfillmentEngineError):
+            engine.deploy_deliverable(d.deliverable_id)
+
+    def test_deploy_after_approve(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Co")
+        engine.approve_deliverable(d.deliverable_id)
+        deployed = engine.deploy_deliverable(d.deliverable_id)
+        assert deployed.status == DeliverableStatus.DEPLOYED
+
+    def test_approve_nonexistent_raises(self):
+        engine = self._make_free_engine()
+        with pytest.raises(FulfillmentEngineError):
+            engine.approve_deliverable("nonexistent")
+
+    def test_get_deliverables_for_client(self):
+        engine = self._make_free_engine()
+        engine.generate_ad_copy("ClientA")
+        engine.generate_ad_copy("ClientA")
+        engine.generate_ad_copy("ClientB")
+        assert len(engine.get_deliverables_for_client("ClientA")) == 2
+        assert len(engine.get_deliverables_for_client("ClientB")) == 1
+
+    def test_deliverable_to_dict(self):
+        engine = self._make_free_engine()
+        d = engine.generate_ad_copy("Co")
+        data = d.to_dict()
+        assert "deliverable_id" in data
+        assert "deliverable_type" in data
+        assert "status" in data
+        assert "content" in data
+
+    def test_to_dict(self):
+        engine = self._make_enterprise_engine()
+        d = engine.to_dict()
+        assert "total_deliverables" in d
+        assert d["can_funnels"] is True
+
+
+# ===========================================================================
+# 10f. Retention Engine
+# ===========================================================================
+
+from bots.buddy_bot.retention_engine import (
+    RetentionEngine,
+    ClientHealthRecord,
+    HealthStatus,
+    UpsellStage,
+    UpsellOffer,
+    CheckIn,
+    RetentionEngineError,
+    RetentionEngineTierError,
+)
+
+
+class TestRetentionEngine:
+    """Tests for the RetentionEngine."""
+
+    def _make_pro_engine(self):
+        return RetentionEngine(
+            can_auto_checkins=True,
+            can_upsell_detection=True,
+        )
+
+    def _make_enterprise_engine(self):
+        return RetentionEngine(
+            can_auto_checkins=True,
+            can_upsell_detection=True,
+            can_referral_engine=True,
+            can_churn_prediction=True,
+            can_mrr_dashboard=True,
+        )
+
+    def test_add_client(self):
+        engine = self._make_pro_engine()
+        record = engine.add_client("Gym Co", "pro", 299.0)
+        assert isinstance(record, ClientHealthRecord)
+        assert record.client_name == "Gym Co"
+        assert record.monthly_value_usd == 299.0
+
+    def test_score_health_champion(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "Champion Gym", "pro", 299.0,
+            months_active=4, satisfaction_score=9.0, results_delivered=5,
+        )
+        record = engine.score_health("Champion Gym")
+        assert record.health_status == HealthStatus.CHAMPION
+
+    def test_score_health_at_risk(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "AtRisk Co", "pro", 299.0,
+            months_active=2, satisfaction_score=5.5,
+            last_contact_days_ago=20,
+        )
+        record = engine.score_health("AtRisk Co")
+        assert record.health_status == HealthStatus.AT_RISK
+
+    def test_score_health_churning(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "Churning Co", "pro", 299.0,
+            months_active=2, satisfaction_score=2.0,
+            last_contact_days_ago=35,
+        )
+        record = engine.score_health("Churning Co")
+        assert record.health_status == HealthStatus.CHURNING
+
+    def test_score_nonexistent_raises(self):
+        engine = self._make_pro_engine()
+        with pytest.raises(RetentionEngineError):
+            engine.score_health("NonExistent")
+
+    def test_get_at_risk_clients(self):
+        engine = self._make_pro_engine()
+        engine.add_client("Good Co", "pro", 299.0, months_active=3, satisfaction_score=8.0, results_delivered=5)
+        engine.add_client("Risk Co", "pro", 199.0, months_active=1, satisfaction_score=5.0, last_contact_days_ago=20)
+        at_risk = engine.get_at_risk_clients()
+        names = [r.client_name for r in at_risk]
+        assert "Risk Co" in names
+
+    def test_schedule_checkin_requires_pro(self):
+        engine = RetentionEngine(can_auto_checkins=False)
+        engine.add_client("Co", "free", 0.0)
+        with pytest.raises(RetentionEngineTierError):
+            engine.schedule_checkin("Co")
+
+    def test_schedule_checkin_pro(self):
+        engine = self._make_pro_engine()
+        engine.add_client("Check Co", "pro", 99.0)
+        checkin = engine.schedule_checkin("Check Co", channel="email")
+        assert isinstance(checkin, CheckIn)
+        assert checkin.client_name == "Check Co"
+        assert "Check Co" in checkin.message
+
+    def test_detect_upsell_moment_ready(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "Ready Co", "pro", 299.0,
+            months_active=3, satisfaction_score=9.0, results_delivered=5,
+        )
+        stage = engine.detect_upsell_moment("Ready Co")
+        assert stage == UpsellStage.READY
+
+    def test_detect_upsell_moment_not_ready(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "NotReady Co", "starter", 29.0,
+            months_active=0, satisfaction_score=6.0, results_delivered=0,
+        )
+        stage = engine.detect_upsell_moment("NotReady Co")
+        assert stage == UpsellStage.NOT_READY
+
+    def test_detect_upsell_requires_pro(self):
+        engine = RetentionEngine(can_upsell_detection=False)
+        engine.add_client("Co", "free", 0.0)
+        with pytest.raises(RetentionEngineTierError):
+            engine.detect_upsell_moment("Co")
+
+    def test_build_upsell_offer(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "Gym Co", "starter", 29.0,
+            months_active=3, satisfaction_score=8.5, results_delivered=5,
+        )
+        offer = engine.build_upsell_offer("Gym Co")
+        assert isinstance(offer, UpsellOffer)
+        assert offer.client_name == "Gym Co"
+        assert offer.proposed_plan
+        assert len(offer.new_features) > 0
+
+    def test_referral_requires_enterprise(self):
+        engine = self._make_pro_engine()
+        engine.add_client(
+            "Champ Co", "pro", 299.0,
+            months_active=4, satisfaction_score=9.0, results_delivered=5,
+        )
+        with pytest.raises(RetentionEngineTierError):
+            engine.trigger_referral_ask("Champ Co")
+
+    def test_referral_champion_enterprise(self):
+        engine = self._make_enterprise_engine()
+        engine.add_client(
+            "Champ Co", "pro", 299.0,
+            months_active=4, satisfaction_score=9.0, results_delivered=5,
+        )
+        result = engine.trigger_referral_ask("Champ Co")
+        assert result["eligible"] is True
+        assert "referral_link" in result
+
+    def test_referral_not_eligible_for_at_risk(self):
+        engine = self._make_enterprise_engine()
+        engine.add_client(
+            "Risk Co", "starter", 29.0,
+            months_active=1, satisfaction_score=4.0, last_contact_days_ago=20,
+        )
+        result = engine.trigger_referral_ask("Risk Co")
+        assert result["eligible"] is False
+
+    def test_revenue_report_requires_enterprise(self):
+        engine = self._make_pro_engine()
+        with pytest.raises(RetentionEngineTierError):
+            engine.revenue_report()
+
+    def test_revenue_report_enterprise(self):
+        engine = self._make_enterprise_engine()
+        engine.add_client("Co A", "pro", 299.0, months_active=3)
+        engine.add_client("Co B", "business", 99.0, months_active=1)
+        report = engine.revenue_report()
+        assert report["mrr_usd"] == pytest.approx(398.0, abs=0.01)
+        assert report["total_clients"] == 2
+        assert "churn_rate_pct" in report
+
+    def test_simple_revenue_summary_all_tiers(self):
+        engine = RetentionEngine()
+        engine.add_client("Co", "free", 0.0)
+        summary = engine.simple_revenue_summary()
+        assert "total_clients" in summary
+        assert "mrr_usd" in summary
+
+    def test_get_all_clients(self):
+        engine = self._make_pro_engine()
+        engine.add_client("A", "pro", 100.0)
+        engine.add_client("B", "pro", 200.0)
+        clients = engine.get_all_clients()
+        assert len(clients) == 2
+
+    def test_lifetime_value_computed(self):
+        engine = self._make_pro_engine()
+        engine.add_client("LTV Co", "pro", 299.0, months_active=6)
+        record = engine.get_client("LTV Co")
+        assert record.lifetime_value_usd == pytest.approx(299.0 * 6, abs=0.01)
+
+    def test_upsell_offer_to_dict(self):
+        engine = self._make_pro_engine()
+        engine.add_client("Co", "starter", 29.0, months_active=3, satisfaction_score=8.5, results_delivered=5)
+        offer = engine.build_upsell_offer("Co")
+        d = offer.to_dict()
+        assert "offer_id" in d
+        assert "proposed_plan" in d
+        assert "new_features" in d
+
+    def test_checkin_to_dict(self):
+        engine = self._make_pro_engine()
+        engine.add_client("Check Co", "pro", 99.0)
+        ci = engine.schedule_checkin("Check Co")
+        d = ci.to_dict()
+        assert "checkin_id" in d
+        assert "message" in d
+        assert "completed" in d
+
+    def test_to_dict(self):
+        engine = self._make_enterprise_engine()
+        d = engine.to_dict()
+        assert "total_clients" in d
+        assert "mrr_usd" in d
+        assert d["can_mrr_dashboard"] is True
+
+
+# ===========================================================================
+# 10g. BuddyBot — Autonomous SaaS Integration Tests
+# ===========================================================================
+
+class TestBuddyBotAutonomousSaaS:
+    """Integration tests for the new autonomous SaaS engines via BuddyBot."""
+
+    def test_free_tier_blocked_from_find_leads(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        with pytest.raises(BuddyBotTierError):
+            buddy.find_leads()
+
+    def test_pro_tier_find_leads(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        leads = buddy.find_leads()
+        assert len(leads) > 0
+        assert isinstance(leads[0], BusinessLead)
+
+    def test_pro_tier_build_offer(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        offer = buddy.build_offer("Test Roofing", estimated_lead_value=3000.0)
+        assert isinstance(offer, ServiceOffer)
+        assert "Test Roofing" in offer.headline
+
+    def test_pro_tier_generate_proposal(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        proposal = buddy.generate_proposal(
+            "Test Gym", "50 leads/month", ["Ad campaigns", "Landing page"],
+            999.0, 500.0, "30 leads guaranteed",
+        )
+        assert isinstance(proposal, Proposal)
+        assert "Test Gym" in proposal.body
+
+    def test_pro_tier_handle_objection(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        buddy.generate_proposal("Co", "h", ["d"], 100.0, 50.0, "g")
+        response = buddy.handle_objection("Co", "it's too expensive")
+        assert response
+
+    def test_pro_tier_deliver_ad_copy(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        d = buddy.deliver_ad_copy("Test Co", "contractor")
+        assert isinstance(d, Deliverable)
+        assert d.deliverable_type == DeliverableType.AD_COPY
+
+    def test_pro_tier_deliver_ad_campaign(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        d = buddy.deliver_ad_campaign("Test Co", budget_usd=2000.0, duration_days=30)
+        assert d.deliverable_type == DeliverableType.AD_CAMPAIGN
+
+    def test_pro_tier_deliver_landing_page(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        d = buddy.deliver_landing_page("Test Co", "Headline", "Offer")
+        assert d.deliverable_type == DeliverableType.LANDING_PAGE
+
+    def test_pro_tier_deliver_email_sequence(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        d = buddy.deliver_email_sequence("Test Co", sequence_length=4)
+        assert d.deliverable_type == DeliverableType.EMAIL_SEQUENCE
+
+    def test_pro_tier_add_retained_client(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        record = buddy.add_retained_client("Client A", "pro", 299.0, months_active=2)
+        assert isinstance(record, ClientHealthRecord)
+        assert record.client_name == "Client A"
+
+    def test_pro_tier_detect_upsell_moment(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        buddy.add_retained_client(
+            "Upsell Co", "starter", 29.0,
+            months_active=3, satisfaction_score=9.0, results_delivered=5,
+        )
+        stage = buddy.detect_upsell_moment("Upsell Co")
+        assert stage in list(UpsellStage)
+
+    def test_pro_tier_build_upsell_offer(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        buddy.add_retained_client(
+            "Upsell Co", "starter", 29.0,
+            months_active=3, satisfaction_score=8.5, results_delivered=5,
+        )
+        offer = buddy.build_upsell_offer("Upsell Co")
+        assert isinstance(offer, UpsellOffer)
+
+    def test_pro_tier_get_revenue_summary(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        buddy.add_retained_client("Co A", "pro", 299.0)
+        summary = buddy.get_revenue_summary()
+        assert summary["total_clients"] == 1
+        assert summary["mrr_usd"] == pytest.approx(299.0, abs=0.01)
+
+    def test_pro_tier_run_autonomous_cycle(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        result = buddy.run_autonomous_cycle()
+        assert result["status"] == "cycle_complete"
+        assert result["leads_found"] > 0
+        assert "offer" in result
+        assert "proposal" in result
+
+    def test_enterprise_tier_system_status_includes_engines(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE)
+        status = buddy.system_status()
+        assert "lead_finder" in status
+        assert "offer_generator" in status
+        assert "conversion" in status
+        assert "fulfillment" in status
+        assert "retention" in status
+
+    def test_pro_features_include_saas_flags(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        from bots.buddy_bot.tiers import (
+            FEATURE_LEAD_FINDER, FEATURE_OFFER_GENERATOR,
+            FEATURE_CONVERSION_ENGINE, FEATURE_FULFILLMENT_ENGINE,
+            FEATURE_RETENTION_ENGINE,
+        )
+        for feat in [
+            FEATURE_LEAD_FINDER, FEATURE_OFFER_GENERATOR,
+            FEATURE_CONVERSION_ENGINE, FEATURE_FULFILLMENT_ENGINE,
+            FEATURE_RETENTION_ENGINE,
+        ]:
+            assert buddy.config.has_feature(feat), f"PRO should have {feat}"
+
+    def test_free_does_not_have_saas_flags(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        from bots.buddy_bot.tiers import FEATURE_LEAD_FINDER
+        assert not buddy.config.has_feature(FEATURE_LEAD_FINDER)
+
+    def test_get_top_leads(self):
+        buddy = BuddyBot(tier=Tier.PRO)
+        buddy.find_leads()
+        top = buddy.get_top_leads(3)
+        assert len(top) <= 3
