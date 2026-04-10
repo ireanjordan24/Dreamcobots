@@ -80,6 +80,20 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    # Media Production
+    FEATURE_COMMERCIAL_PRODUCTION,
+    FEATURE_RADIO_AD_STUDIO,
+    FEATURE_VIDEO_AD_STUDIO,
+    FEATURE_MUSIC_VIDEO_PRODUCTION,
+    FEATURE_MOVIE_PRODUCTION,
+    FEATURE_AI_ONLY_ADS,
+    FEATURE_CLIENT_ASSET_ADS,
+    # Self-Learning
+    FEATURE_SELF_LEARNING,
+    FEATURE_CAPABILITY_CHECK,
+    FEATURE_TRAINING_SESSION,
+    FEATURE_GITHUB_ACQUISITION,
+    FEATURE_TOP_MODEL_REGISTRY,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
@@ -121,6 +135,26 @@ from bots.buddy_bot.personality_engine import (
     PersonalityEngine,
     PersonaMode,
     PersonaTone,
+)
+from bots.buddy_bot.media_production_engine import (
+    MediaProductionEngine,
+    MediaProductionEngineError,
+    ClientBrief,
+    AdFormat,
+    AdStyle,
+    MusicVideoStyle,
+    MovieGenre,
+    CommercialScript,
+    MusicVideoProject,
+    MovieProject,
+)
+from bots.buddy_bot.self_learning_engine import (
+    SelfLearningEngine,
+    SelfLearningEngineError,
+    LearningRecord,
+    TrainingSession,
+    GitHubAcquisitionResult,
+    TOP_100_AI_MODELS,
 )
 
 from framework import GlobalAISourcesFlow
@@ -183,6 +217,8 @@ class BuddyBot:
         self.voice = VoiceEngine()
         self.creativity = CreativityEngine(user_id=user_id)
         self.personality = PersonalityEngine(initial_persona=initial_persona)
+        self.media = MediaProductionEngine(user_id=user_id)
+        self.learning = SelfLearningEngine()
 
         # Bootstrap memory profile for the primary user
         try:
@@ -717,8 +753,389 @@ class BuddyBot:
             "voice": self.voice.to_dict(),
             "creativity": self.creativity.to_dict(),
             "personality": self.personality.to_dict(),
+            "media": self.media.to_dict(),
+            "learning": self.learning.to_dict(),
             "features_enabled": self.config.features,
         }
+
+    # ------------------------------------------------------------------
+    # Media Production — Commercials
+    # ------------------------------------------------------------------
+
+    def create_commercial(
+        self,
+        client_name: str,
+        product_or_service: str,
+        target_audience: str,
+        key_message: str,
+        ad_format: str = "video_30s",
+        ad_style: str = "fully_ai",
+        tagline: str = "",
+        call_to_action: str = "Visit our website",
+        client_assets: list = None,
+        tone: str = "professional",
+    ) -> dict:
+        """
+        Produce a fully scripted commercial for a client (PRO+).
+
+        Buddy generates every element of the ad — script, voice direction,
+        visual direction, and music direction.  The ad can be fully AI-generated
+        or built around client-supplied photos and assets.
+
+        Parameters
+        ----------
+        client_name : str
+            Name of the client / brand.
+        product_or_service : str
+            What is being advertised.
+        target_audience : str
+            Who the ad is aimed at.
+        key_message : str
+            The single most important thing the ad must communicate.
+        ad_format : str
+            One of: ``"radio_30s"``, ``"radio_60s"``, ``"video_15s"``,
+            ``"video_30s"``, ``"video_60s"``, ``"social_reel"``,
+            ``"podcast_ad"``, ``"banner"``.
+        ad_style : str
+            One of: ``"fully_ai"``, ``"client_assets"``, ``"hybrid"``.
+        tagline : str
+            Brand tagline (auto-generated if empty).
+        call_to_action : str
+            Final CTA line for the ad.
+        client_assets : list | None
+            References to client-supplied photos, logos, or audio files.
+        tone : str
+            Creative tone (e.g. ``"professional"``, ``"fun"``, ``"inspirational"``).
+
+        Returns
+        -------
+        dict  — CommercialScript serialised to dict.
+        """
+        self._require_feature(FEATURE_COMMERCIAL_PRODUCTION)
+
+        brief = ClientBrief(
+            client_name=client_name,
+            product_or_service=product_or_service,
+            target_audience=target_audience,
+            key_message=key_message,
+            tone=tone,
+            call_to_action=call_to_action,
+            tagline=tagline,
+            assets_provided=client_assets or [],
+        )
+
+        fmt = AdFormat(ad_format)
+        style = AdStyle(ad_style)
+
+        # Style-specific tier checks
+        if style == AdStyle.CLIENT_ASSETS:
+            self._require_feature(FEATURE_CLIENT_ASSET_ADS)
+        if style == AdStyle.FULLY_AI:
+            self._require_feature(FEATURE_AI_ONLY_ADS)
+
+        script = self.media.create_commercial(brief, fmt, style)
+        self.creativity.award_xp(30, "commercial_produced")
+        return script.to_dict()
+
+    def create_radio_ad(
+        self,
+        client_name: str,
+        product_or_service: str,
+        target_audience: str,
+        key_message: str,
+        duration: str = "30s",
+        ad_style: str = "fully_ai",
+        tagline: str = "",
+        call_to_action: str = "Call us today",
+        client_assets: list = None,
+    ) -> dict:
+        """
+        Produce a radio advertisement for a client (PRO+).
+
+        Parameters
+        ----------
+        client_name : str
+            Client / brand name.
+        product_or_service : str
+            Advertised offering.
+        target_audience : str
+            Intended audience.
+        key_message : str
+            Core message of the ad.
+        duration : str
+            ``"30s"`` or ``"60s"``.
+        ad_style : str
+            ``"fully_ai"``, ``"client_assets"``, or ``"hybrid"``.
+        tagline : str
+            Brand tagline.
+        call_to_action : str
+            Closing CTA.
+        client_assets : list | None
+            Client-supplied audio or asset references.
+
+        Returns
+        -------
+        dict — CommercialScript serialised to dict.
+        """
+        self._require_feature(FEATURE_RADIO_AD_STUDIO)
+        brief = ClientBrief(
+            client_name=client_name,
+            product_or_service=product_or_service,
+            target_audience=target_audience,
+            key_message=key_message,
+            call_to_action=call_to_action,
+            tagline=tagline,
+            assets_provided=client_assets or [],
+        )
+        style = AdStyle(ad_style)
+        script = self.media.create_radio_ad(brief, duration, style)
+        self.creativity.award_xp(25, "radio_ad_produced")
+        return script.to_dict()
+
+    def list_productions(self) -> list:
+        """Return all produced commercials (PRO+)."""
+        self._require_feature(FEATURE_COMMERCIAL_PRODUCTION)
+        return self.media.list_productions()
+
+    # ------------------------------------------------------------------
+    # Media Production — Music Videos
+    # ------------------------------------------------------------------
+
+    def create_music_video(
+        self,
+        artist_name: str,
+        song_title: str,
+        style: str = "narrative",
+        color_palette: str = "warm cinematic",
+        vfx_notes: str = "",
+    ) -> dict:
+        """
+        Generate a complete music video production package (PRO+).
+
+        Buddy produces a storyboard, shot list, visual direction brief,
+        and VFX notes for the artist's track.
+
+        Parameters
+        ----------
+        artist_name : str
+            Name of the artist or band.
+        song_title : str
+            Song being visualised.
+        style : str
+            One of: ``"narrative"``, ``"performance"``, ``"abstract"``,
+            ``"lyric_video"``, ``"animated"``, ``"documentary"``.
+        color_palette : str
+            Colour-grading direction (e.g. ``"warm cinematic"``).
+        vfx_notes : str
+            Any VFX or CGI requirements.
+
+        Returns
+        -------
+        dict — MusicVideoProject serialised to dict.
+        """
+        self._require_feature(FEATURE_MUSIC_VIDEO_PRODUCTION)
+        style_enum = MusicVideoStyle(style)
+        mv = self.media.create_music_video(artist_name, song_title, style_enum, color_palette, vfx_notes)
+        self.creativity.award_xp(40, "music_video_produced")
+        return mv.to_dict()
+
+    def list_music_videos(self) -> list:
+        """Return all music video projects (PRO+)."""
+        self._require_feature(FEATURE_MUSIC_VIDEO_PRODUCTION)
+        return self.media.list_music_videos()
+
+    # ------------------------------------------------------------------
+    # Media Production — Movies
+    # ------------------------------------------------------------------
+
+    def create_movie(
+        self,
+        title: str,
+        genre: str = "short_film",
+        logline: str = "",
+        runtime_minutes: int = 20,
+    ) -> dict:
+        """
+        Generate a complete movie / short-film production package (ENTERPRISE).
+
+        Buddy produces a logline, synopsis, act breakdown, cast descriptions,
+        key scenes, cinematography notes, and score direction.
+
+        Parameters
+        ----------
+        title : str
+            Working title of the film.
+        genre : str
+            One of: ``"action"``, ``"drama"``, ``"comedy"``, ``"horror"``,
+            ``"documentary"``, ``"romance"``, ``"thriller"``,
+            ``"science_fiction"``, ``"animation"``, ``"short_film"``.
+        logline : str
+            One-sentence pitch (auto-generated if empty).
+        runtime_minutes : int
+            Target runtime in minutes.
+
+        Returns
+        -------
+        dict — MovieProject serialised to dict.
+        """
+        self._require_feature(FEATURE_MOVIE_PRODUCTION)
+        genre_enum = MovieGenre(genre)
+        movie = self.media.create_movie(title, genre_enum, logline, runtime_minutes)
+        self.creativity.award_xp(100, "movie_produced")
+        return movie.to_dict()
+
+    def list_movies(self) -> list:
+        """Return all movie projects (ENTERPRISE)."""
+        self._require_feature(FEATURE_MOVIE_PRODUCTION)
+        return self.media.list_movies()
+
+    def media_production_summary(self) -> dict:
+        """Return a summary of all media productions (PRO+)."""
+        self._require_feature(FEATURE_COMMERCIAL_PRODUCTION)
+        return self.media.production_summary()
+
+    # ------------------------------------------------------------------
+    # Self-Learning — Capability checking
+    # ------------------------------------------------------------------
+
+    def can_do(self, task_description: str) -> bool:
+        """
+        Return True if Buddy currently has a capability matching the task (PRO+).
+
+        Parameters
+        ----------
+        task_description : str
+            Natural-language description of what the client wants.
+        """
+        self._require_feature(FEATURE_CAPABILITY_CHECK)
+        return self.learning.can_do(task_description)
+
+    def check_capability(self, task_description: str) -> dict:
+        """
+        Perform a full capability gap analysis for a task description (PRO+).
+
+        If Buddy cannot do the task, it automatically:
+        1. Identifies the missing capabilities.
+        2. Recommends the top AI models that can help.
+        3. Provides a GitHub acquisition plan.
+
+        Parameters
+        ----------
+        task_description : str
+            What the client wants Buddy to do.
+
+        Returns
+        -------
+        dict with keys: ``can_do``, ``matched_capabilities``, ``gap``.
+        """
+        self._require_feature(FEATURE_CAPABILITY_CHECK)
+        return self.learning.check_capability(task_description)
+
+    # ------------------------------------------------------------------
+    # Self-Learning — Learning from top AI models
+    # ------------------------------------------------------------------
+
+    def learn_from_top_models(
+        self,
+        capability: str,
+        top_n: int = 5,
+    ) -> list:
+        """
+        Ask the top-N AI models most relevant to *capability* to teach Buddy (PRO+).
+
+        Buddy consults the global top-100 model registry, identifies the best
+        models for the requested skill, simulates querying them for guidance,
+        records the lessons, and adds the capability to its registry.
+
+        Parameters
+        ----------
+        capability : str
+            The skill or topic for Buddy to learn.
+        top_n : int
+            How many models to consult (1–10).
+
+        Returns
+        -------
+        list[dict] — Learning records for each model consulted.
+        """
+        self._require_feature(FEATURE_SELF_LEARNING)
+        records = self.learning.ask_top_models(capability, top_n)
+        return [r.to_dict() for r in records]
+
+    # ------------------------------------------------------------------
+    # Self-Learning — GitHub code acquisition
+    # ------------------------------------------------------------------
+
+    def acquire_code_from_github(self, capability: str) -> dict:
+        """
+        Search GitHub for code that would give Buddy a new capability (ENTERPRISE).
+
+        All discovered repositories are quarantined for human review before
+        being merged into the DreamCo codebase.
+
+        Parameters
+        ----------
+        capability : str
+            The capability to search GitHub for.
+
+        Returns
+        -------
+        dict — GitHubAcquisitionResult serialised to dict.
+        """
+        self._require_feature(FEATURE_GITHUB_ACQUISITION)
+        result = self.learning.search_github_for_code(capability)
+        return result.to_dict()
+
+    # ------------------------------------------------------------------
+    # Self-Learning — Training sessions
+    # ------------------------------------------------------------------
+
+    def run_training_session(
+        self,
+        focus_specialties: list = None,
+    ) -> dict:
+        """
+        Run one complete self-training session against all 100 top AI models (ENTERPRISE).
+
+        Buddy cycles through the entire top-100 model registry, identifies any
+        capabilities those models have that Buddy does not yet possess, and
+        records a learning outcome for each new capability acquired.
+
+        Parameters
+        ----------
+        focus_specialties : list[str] | None
+            If provided, only models with those specialties are consulted.
+            Omit to train against all 100 models.
+
+        Returns
+        -------
+        dict — TrainingSession serialised to dict.
+        """
+        self._require_feature(FEATURE_TRAINING_SESSION)
+        session = self.learning.run_training_session(focus_specialties)
+        return session.to_dict()
+
+    def list_capabilities(self) -> list:
+        """Return all of Buddy's currently known capabilities (PRO+)."""
+        self._require_feature(FEATURE_SELF_LEARNING)
+        return self.learning.list_capabilities()
+
+    def get_learning_log(self, limit: int = 50) -> list:
+        """Return the most recent learning records (PRO+)."""
+        self._require_feature(FEATURE_SELF_LEARNING)
+        return self.learning.get_learning_log(limit)
+
+    def get_top_models(self, limit: int = 10) -> list:
+        """Return the top AI models from the global registry (ENTERPRISE)."""
+        self._require_feature(FEATURE_TOP_MODEL_REGISTRY)
+        return self.learning.get_top_models(limit)
+
+    def get_training_sessions(self) -> list:
+        """Return all completed training session records (ENTERPRISE)."""
+        self._require_feature(FEATURE_TRAINING_SESSION)
+        return self.learning.get_training_sessions()
+
+
 
     def describe_tier(self) -> str:
         """Return a human-readable tier description."""

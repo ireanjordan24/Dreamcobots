@@ -1446,6 +1446,800 @@ class TestBuddyBot:
 # 10. Bot Library registration
 # ===========================================================================
 
+# ===========================================================================
+# 11. MediaProductionEngine
+# ===========================================================================
+
+class TestMediaProductionEngine:
+    def _engine(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+            MusicVideoStyle, MovieGenre,
+        )
+        return MediaProductionEngine(user_id="test_user"), ClientBrief, AdFormat, AdStyle, MusicVideoStyle, MovieGenre
+
+    def test_create_commercial_video(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief(
+            client_name="Acme Corp",
+            product_or_service="Widget Pro",
+            target_audience="small business owners",
+            key_message="Save time, earn more",
+        )
+        script = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        assert script.client_name == "Acme Corp"
+        assert script.ad_format == AdFormat.VIDEO_30
+        assert script.ad_style == AdStyle.FULLY_AI
+        assert "Acme Corp" in script.script
+        assert script.duration_seconds == 30
+        assert "AI" in script.ai_disclosure
+
+    def test_create_radio_ad_30s(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdStyle, AdFormat,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief(
+            client_name="Radio Brand",
+            product_or_service="Podcast App",
+            target_audience="commuters",
+            key_message="Listen anywhere",
+            call_to_action="Download now",
+        )
+        script = engine.create_radio_ad(brief, duration="30s")
+        assert script.ad_format == AdFormat.RADIO_30
+        assert script.duration_seconds == 30
+
+    def test_create_radio_ad_60s(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief(
+            client_name="LongAd Co",
+            product_or_service="Service",
+            target_audience="everyone",
+            key_message="Best service",
+        )
+        script = engine.create_radio_ad(brief, duration="60s")
+        assert script.ad_format == AdFormat.RADIO_60
+        assert script.duration_seconds == 60
+
+    def test_create_social_ad(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief(
+            client_name="SocialBrand",
+            product_or_service="App",
+            target_audience="gen z",
+            key_message="Go viral",
+        )
+        script = engine.create_social_ad(brief)
+        assert script.ad_format == AdFormat.SOCIAL_REEL
+
+    def test_commercial_with_client_assets(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief(
+            client_name="PhotoBrand",
+            product_or_service="Camera",
+            target_audience="photographers",
+            key_message="Capture every moment",
+            assets_provided=["hero_photo.jpg", "logo.png"],
+        )
+        script = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.CLIENT_ASSETS)
+        assert script.ad_style == AdStyle.CLIENT_ASSETS
+        assert "hero_photo.jpg" in script.visual_direction or "logo.png" in script.visual_direction
+
+    def test_commercial_production_id_unique(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("A", "B", "C", "D")
+        s1 = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        s2 = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        assert s1.production_id != s2.production_id
+
+    def test_list_productions(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("Brand", "Product", "Audience", "Message")
+        engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        engine.create_commercial(brief, AdFormat.RADIO_30, AdStyle.FULLY_AI)
+        assert len(engine.list_productions()) == 2
+
+    def test_get_production_by_id(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("Brand", "Product", "Audience", "Message")
+        s = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        fetched = engine.get_production(s.production_id)
+        assert fetched.production_id == s.production_id
+
+    def test_get_production_not_found_raises(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MediaProductionEngineError,
+        )
+        engine = MediaProductionEngine()
+        with pytest.raises(MediaProductionEngineError):
+            engine.get_production("COMM_9999")
+
+    def test_commercial_to_dict(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("Brand", "Product", "Audience", "Message")
+        s = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        d = s.to_dict()
+        assert "production_id" in d
+        assert "script" in d
+        assert "visual_direction" in d
+        assert "music_direction" in d
+        assert "ai_disclosure" in d
+
+    def test_create_music_video_narrative(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        mv = engine.create_music_video("Artist X", "Song Y", MusicVideoStyle.NARRATIVE)
+        assert mv.artist_name == "Artist X"
+        assert mv.song_title == "Song Y"
+        assert mv.style == MusicVideoStyle.NARRATIVE
+        assert len(mv.storyboard) > 0
+        assert len(mv.shot_list) > 0
+
+    def test_create_music_video_all_styles(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        for style in MusicVideoStyle:
+            mv = engine.create_music_video("Artist", "Track", style)
+            assert mv.style == style
+
+    def test_music_video_unique_ids(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        mv1 = engine.create_music_video("A", "S1", MusicVideoStyle.PERFORMANCE)
+        mv2 = engine.create_music_video("A", "S2", MusicVideoStyle.PERFORMANCE)
+        assert mv1.production_id != mv2.production_id
+
+    def test_list_music_videos(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        engine.create_music_video("A", "T1", MusicVideoStyle.LYRIC_VIDEO)
+        engine.create_music_video("B", "T2", MusicVideoStyle.ANIMATED)
+        assert len(engine.list_music_videos()) == 2
+
+    def test_get_music_video_by_id(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        mv = engine.create_music_video("Artist", "Song", MusicVideoStyle.ABSTRACT)
+        fetched = engine.get_music_video(mv.production_id)
+        assert fetched.production_id == mv.production_id
+
+    def test_get_music_video_not_found_raises(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MediaProductionEngineError,
+        )
+        engine = MediaProductionEngine()
+        with pytest.raises(MediaProductionEngineError):
+            engine.get_music_video("MV_9999")
+
+    def test_music_video_to_dict(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MusicVideoStyle,
+        )
+        engine = MediaProductionEngine()
+        mv = engine.create_music_video("A", "S", MusicVideoStyle.NARRATIVE)
+        d = mv.to_dict()
+        assert "storyboard" in d
+        assert "shot_list" in d
+        assert "visual_direction" in d
+        assert "color_palette" in d
+
+    def test_create_movie(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        movie = engine.create_movie("My Film", MovieGenre.DRAMA, runtime_minutes=90)
+        assert movie.title == "My Film"
+        assert movie.genre == MovieGenre.DRAMA
+        assert movie.estimated_runtime_minutes == 90
+        assert len(movie.act_breakdown) == 4
+        assert len(movie.cast_descriptions) > 0
+        assert len(movie.key_scenes) > 0
+
+    def test_create_movie_auto_logline(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        movie = engine.create_movie("No Logline", MovieGenre.COMEDY)
+        assert len(movie.logline) > 10
+
+    def test_create_movie_with_logline(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        movie = engine.create_movie("Film", MovieGenre.ACTION, logline="A hero rises.")
+        assert movie.logline == "A hero rises."
+
+    def test_list_movies(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        engine.create_movie("Film A", MovieGenre.DRAMA)
+        engine.create_movie("Film B", MovieGenre.COMEDY)
+        assert len(engine.list_movies()) == 2
+
+    def test_get_movie_by_id(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        movie = engine.create_movie("Find Me", MovieGenre.THRILLER)
+        fetched = engine.get_movie(movie.production_id)
+        assert fetched.production_id == movie.production_id
+
+    def test_get_movie_not_found_raises(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MediaProductionEngineError,
+        )
+        engine = MediaProductionEngine()
+        with pytest.raises(MediaProductionEngineError):
+            engine.get_movie("FILM_9999")
+
+    def test_movie_to_dict(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        movie = engine.create_movie("DictFilm", MovieGenre.SHORT_FILM)
+        d = movie.to_dict()
+        assert "logline" in d
+        assert "synopsis" in d
+        assert "act_breakdown" in d
+        assert "cinematography_notes" in d
+
+    def test_production_summary(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+            MusicVideoStyle, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("B", "P", "A", "M")
+        engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.FULLY_AI)
+        engine.create_music_video("A", "S", MusicVideoStyle.NARRATIVE)
+        engine.create_movie("F", MovieGenre.DRAMA)
+        summary = engine.production_summary()
+        assert summary["commercials"] == 1
+        assert summary["music_videos"] == 1
+        assert summary["movies"] == 1
+        assert summary["total"] == 3
+
+    def test_all_ad_formats(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("B", "P", "A", "M")
+        for fmt in AdFormat:
+            script = engine.create_commercial(brief, fmt, AdStyle.FULLY_AI)
+            assert script.ad_format == fmt
+
+    def test_hybrid_style(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, ClientBrief, AdFormat, AdStyle,
+        )
+        engine = MediaProductionEngine()
+        brief = ClientBrief("HB", "HP", "HA", "HM")
+        script = engine.create_commercial(brief, AdFormat.VIDEO_30, AdStyle.HYBRID)
+        assert script.ad_style == AdStyle.HYBRID
+
+    def test_all_movie_genres(self):
+        from bots.buddy_bot.media_production_engine import (
+            MediaProductionEngine, MovieGenre,
+        )
+        engine = MediaProductionEngine()
+        for genre in MovieGenre:
+            movie = engine.create_movie(f"Film-{genre.value}", genre)
+            assert movie.genre == genre
+
+    def test_engine_to_dict(self):
+        from bots.buddy_bot.media_production_engine import MediaProductionEngine
+        engine = MediaProductionEngine(user_id="u1")
+        d = engine.to_dict()
+        assert d["user_id"] == "u1"
+        assert "summary" in d
+
+
+# ===========================================================================
+# 12. SelfLearningEngine
+# ===========================================================================
+
+class TestSelfLearningEngine:
+    def _engine(self):
+        from bots.buddy_bot.self_learning_engine import SelfLearningEngine
+        return SelfLearningEngine()
+
+    def test_initial_capabilities_not_empty(self):
+        engine = self._engine()
+        assert engine.capability_count() > 0
+
+    def test_can_do_known_capability(self):
+        engine = self._engine()
+        assert engine.can_do("code generation") is True
+
+    def test_can_do_chat(self):
+        engine = self._engine()
+        assert engine.can_do("chat with user") is True
+
+    def test_can_do_unknown_returns_false(self):
+        engine = self._engine()
+        # a totally nonsense capability
+        result = engine.can_do("xyzzy_unknown_magic_capability_12345")
+        assert result is False
+
+    def test_check_capability_known(self):
+        engine = self._engine()
+        result = engine.check_capability("chat")
+        assert result["can_do"] is True
+        assert len(result["matched_capabilities"]) > 0
+        assert result["gap"] is None
+
+    def test_check_capability_unknown_returns_gap(self):
+        engine = self._engine()
+        result = engine.check_capability("xyzzy_impossible_task_aaabbb")
+        assert result["can_do"] is False
+        assert result["gap"] is not None
+        gap = result["gap"]
+        assert "acquisition_plan" in gap
+        assert "github_search_query" in gap
+        assert "recommended_models" in gap
+
+    def test_capability_gap_logged(self):
+        engine = self._engine()
+        engine.check_capability("xyzzy_task_888")
+        assert len(engine.get_capability_gaps()) >= 1
+
+    def test_ask_top_models_returns_records(self):
+        engine = self._engine()
+        records = engine.ask_top_models("image_generation", top_n=3)
+        assert len(records) == 3
+        for r in records:
+            assert r.capability_learned == "image_generation"
+            assert r.confidence_score > 0
+
+    def test_ask_top_models_adds_capability(self):
+        engine = self._engine()
+        new_cap = "holographic_telepathy_9999"
+        engine.ask_top_models(new_cap, top_n=1)
+        assert new_cap in engine.list_capabilities()
+
+    def test_ask_top_models_records_logged(self):
+        engine = self._engine()
+        initial = len(engine.get_learning_log())
+        engine.ask_top_models("video_generation", top_n=2)
+        assert len(engine.get_learning_log()) >= initial + 2
+
+    def test_search_github_for_code(self):
+        engine = self._engine()
+        result = engine.search_github_for_code("video_editing")
+        assert result.query == "video_editing"
+        assert len(result.repositories_found) > 0
+        assert result.quarantine_required is True
+        assert "quarantine" in result.integration_notes.lower()
+
+    def test_github_acquisition_logged(self):
+        engine = self._engine()
+        engine.search_github_for_code("audio_synthesis")
+        assert len(engine.get_github_acquisitions()) >= 1
+
+    def test_github_acquisition_to_dict(self):
+        engine = self._engine()
+        result = engine.search_github_for_code("music_generation")
+        d = result.to_dict()
+        assert "query" in d
+        assert "repositories_found" in d
+        assert "recommended_repo" in d
+        assert "integration_notes" in d
+        assert "quarantine_required" in d
+
+    def test_run_training_session(self):
+        engine = self._engine()
+        session = engine.run_training_session()
+        assert session.session_id.startswith("TRAIN_")
+        assert len(session.models_consulted) > 0
+        assert "knowledge_breadth" in session.benchmarks
+        assert session.benchmarks["models_in_registry"] == 100
+
+    def test_training_session_adds_capabilities(self):
+        engine = self._engine()
+        before = engine.capability_count()
+        engine.run_training_session()
+        # After a full training session Buddy should have at least as many capabilities
+        assert engine.capability_count() >= before
+
+    def test_training_session_logged(self):
+        engine = self._engine()
+        engine.run_training_session()
+        assert len(engine.get_training_sessions()) >= 1
+
+    def test_training_session_focused(self):
+        engine = self._engine()
+        session = engine.run_training_session(focus_specialties=["music_generation"])
+        assert len(session.models_consulted) > 0
+
+    def test_add_capability(self):
+        engine = self._engine()
+        engine.add_capability("hologram_rendering", source="github/hologram-py")
+        assert "hologram_rendering" in engine.list_capabilities()
+
+    def test_add_capability_returns_record(self):
+        engine = self._engine()
+        record = engine.add_capability("quantum_decode")
+        assert record.capability_learned == "quantum_decode"
+        assert record.confidence_score == 1.0
+
+    def test_list_capabilities_sorted(self):
+        engine = self._engine()
+        caps = engine.list_capabilities()
+        assert caps == sorted(caps)
+
+    def test_get_learning_log_limit(self):
+        engine = self._engine()
+        for i in range(10):
+            engine.add_capability(f"cap_{i}")
+        log = engine.get_learning_log(limit=5)
+        assert len(log) <= 5
+
+    def test_get_top_models(self):
+        engine = self._engine()
+        models = engine.get_top_models(limit=10)
+        assert len(models) == 10
+        ranks = [m["rank"] for m in models]
+        assert ranks == sorted(ranks)
+
+    def test_top_models_have_required_keys(self):
+        engine = self._engine()
+        for model in engine.get_top_models(limit=5):
+            assert "provider" in model
+            assert "model" in model
+            assert "rank" in model
+            assert "specialties" in model
+
+    def test_top_100_model_registry_size(self):
+        from bots.buddy_bot.self_learning_engine import TOP_100_AI_MODELS
+        assert len(TOP_100_AI_MODELS) == 100
+
+    def test_training_session_to_dict(self):
+        engine = self._engine()
+        session = engine.run_training_session(focus_specialties=["code"])
+        d = session.to_dict()
+        assert "session_id" in d
+        assert "models_consulted" in d
+        assert "capabilities_added" in d
+        assert "benchmarks" in d
+        assert "duration_seconds" in d
+
+    def test_learning_record_to_dict(self):
+        engine = self._engine()
+        records = engine.ask_top_models("reasoning", top_n=1)
+        d = records[0].to_dict()
+        assert "record_id" in d
+        assert "source" in d
+        assert "lesson_summary" in d
+        assert "confidence_score" in d
+
+    def test_engine_to_dict(self):
+        engine = self._engine()
+        d = engine.to_dict()
+        assert "capability_count" in d
+        assert "learning_records" in d
+        assert "training_sessions" in d
+        assert "top_model_registry_size" in d
+        assert d["top_model_registry_size"] == 100
+
+    def test_initial_capabilities_custom(self):
+        from bots.buddy_bot.self_learning_engine import SelfLearningEngine
+        engine = SelfLearningEngine(initial_capabilities={"a", "b", "c"})
+        assert engine.capability_count() == 3
+        assert "a" in engine.list_capabilities()
+
+    def test_multiple_training_sessions_logged(self):
+        engine = self._engine()
+        engine.run_training_session(focus_specialties=["code"])
+        engine.run_training_session(focus_specialties=["vision"])
+        assert len(engine.get_training_sessions()) == 2
+
+
+# ===========================================================================
+# 13. BuddyBot — Media Production Integration
+# ===========================================================================
+
+class TestBuddyBotMediaProduction:
+    def test_create_commercial_pro_tier(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Client")
+        result = buddy.create_commercial(
+            client_name="DreamBrand",
+            product_or_service="Dream Widget",
+            target_audience="entrepreneurs",
+            key_message="Build your dream",
+            ad_format="video_30s",
+            ad_style="fully_ai",
+        )
+        assert result["client_name"] == "DreamBrand"
+        assert "script" in result
+
+    def test_create_commercial_pro_tier_only(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Client")
+        with pytest.raises(BuddyBotTierError):
+            buddy.create_commercial(
+                client_name="Brand",
+                product_or_service="Product",
+                target_audience="everyone",
+                key_message="Buy now",
+            )
+
+    def test_create_radio_ad_pro_tier(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="DJ")
+        # radio ad studio requires PRO; but ai_only_ads requires ENTERPRISE
+        # so use hybrid style which is not gated
+        result = buddy.create_radio_ad(
+            client_name="RadioCo",
+            product_or_service="Radio App",
+            target_audience="drivers",
+            key_message="Listen on the road",
+            duration="30s",
+            ad_style="hybrid",
+        )
+        assert result["ad_format"] == "radio_30s"
+        assert "script" in result
+
+    def test_create_radio_ad_free_tier_blocked(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Client")
+        with pytest.raises(BuddyBotTierError):
+            buddy.create_radio_ad(
+                client_name="R",
+                product_or_service="P",
+                target_audience="A",
+                key_message="M",
+            )
+
+    def test_create_music_video_pro_tier(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Artist")
+        result = buddy.create_music_video(
+            artist_name="Dream Artist",
+            song_title="Rise Up",
+            style="narrative",
+        )
+        assert result["artist_name"] == "Dream Artist"
+        assert result["song_title"] == "Rise Up"
+        assert "storyboard" in result
+
+    def test_create_music_video_free_tier_blocked(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Artist")
+        with pytest.raises(BuddyBotTierError):
+            buddy.create_music_video("A", "S")
+
+    def test_create_movie_enterprise_only(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Director")
+        result = buddy.create_movie(
+            title="The DreamCo Story",
+            genre="drama",
+            runtime_minutes=90,
+        )
+        assert result["title"] == "The DreamCo Story"
+        assert "act_breakdown" in result
+        assert len(result["act_breakdown"]) == 4
+
+    def test_create_movie_pro_tier_blocked(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Director")
+        with pytest.raises(BuddyBotTierError):
+            buddy.create_movie("Film", "drama")
+
+    def test_list_productions_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Client")
+        buddy.create_radio_ad("B", "P", "A", "M", ad_style="hybrid")
+        prods = buddy.list_productions()
+        assert len(prods) >= 1
+
+    def test_list_music_videos_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Artist")
+        buddy.create_music_video("A", "S", style="performance")
+        mvs = buddy.list_music_videos()
+        assert len(mvs) >= 1
+
+    def test_list_movies_enterprise(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Director")
+        buddy.create_movie("Film X", "action")
+        movies = buddy.list_movies()
+        assert len(movies) >= 1
+
+    def test_media_production_summary(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Producer")
+        buddy.create_commercial(
+            "B", "P", "A", "M",
+            ad_format="video_30s", ad_style="fully_ai",
+        )
+        summary = buddy.media_production_summary()
+        assert "total" in summary
+        assert summary["total"] >= 1
+
+    def test_system_status_includes_media(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Client")
+        status = buddy.system_status()
+        assert "media" in status
+        assert "learning" in status
+
+
+# ===========================================================================
+# 14. BuddyBot — Self-Learning Integration
+# ===========================================================================
+
+class TestBuddyBotSelfLearning:
+    def test_can_do_returns_bool(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        result = buddy.can_do("chat with user")
+        assert isinstance(result, bool)
+
+    def test_can_do_free_tier_blocked(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="User")
+        with pytest.raises(BuddyBotTierError):
+            buddy.can_do("chat")
+
+    def test_check_capability_known(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        result = buddy.check_capability("code generation")
+        assert "can_do" in result
+        assert isinstance(result["can_do"], bool)
+
+    def test_check_capability_free_tier_blocked(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="User")
+        with pytest.raises(BuddyBotTierError):
+            buddy.check_capability("any task")
+
+    def test_learn_from_top_models_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        records = buddy.learn_from_top_models("video_editing", top_n=2)
+        assert len(records) >= 1
+        assert all("lesson_summary" in r for r in records)
+
+    def test_learn_from_top_models_free_blocked(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="User")
+        with pytest.raises(BuddyBotTierError):
+            buddy.learn_from_top_models("something")
+
+    def test_acquire_code_from_github_enterprise(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Dev")
+        result = buddy.acquire_code_from_github("3d_rendering")
+        assert "query" in result
+        assert result["quarantine_required"] is True
+
+    def test_acquire_code_pro_blocked(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Dev")
+        with pytest.raises(BuddyBotTierError):
+            buddy.acquire_code_from_github("something")
+
+    def test_run_training_session_enterprise(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Trainer")
+        session = buddy.run_training_session(focus_specialties=["code"])
+        assert "session_id" in session
+        assert "models_consulted" in session
+        assert "benchmarks" in session
+
+    def test_run_training_session_pro_blocked(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Trainer")
+        with pytest.raises(BuddyBotTierError):
+            buddy.run_training_session()
+
+    def test_list_capabilities_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        caps = buddy.list_capabilities()
+        assert isinstance(caps, list)
+        assert len(caps) > 0
+
+    def test_get_learning_log_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        buddy.learn_from_top_models("music_generation", top_n=1)
+        log = buddy.get_learning_log(limit=5)
+        assert len(log) >= 1
+
+    def test_get_top_models_enterprise(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="User")
+        models = buddy.get_top_models(limit=5)
+        assert len(models) == 5
+        for m in models:
+            assert "provider" in m
+
+    def test_get_top_models_pro_blocked(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="User")
+        with pytest.raises(BuddyBotTierError):
+            buddy.get_top_models()
+
+    def test_get_training_sessions_enterprise(self):
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Trainer")
+        buddy.run_training_session(focus_specialties=["vision"])
+        sessions = buddy.get_training_sessions()
+        assert len(sessions) >= 1
+
+    def test_get_training_sessions_pro_blocked(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Trainer")
+        with pytest.raises(BuddyBotTierError):
+            buddy.get_training_sessions()
+
+    def test_pro_tier_has_self_learning_features(self):
+        from bots.buddy_bot.tiers import get_tier_config, Tier, FEATURE_SELF_LEARNING, FEATURE_CAPABILITY_CHECK
+        cfg = get_tier_config(Tier.PRO)
+        assert cfg.has_feature(FEATURE_SELF_LEARNING)
+        assert cfg.has_feature(FEATURE_CAPABILITY_CHECK)
+
+    def test_enterprise_tier_has_training_features(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_TRAINING_SESSION, FEATURE_GITHUB_ACQUISITION, FEATURE_TOP_MODEL_REGISTRY,
+        )
+        cfg = get_tier_config(Tier.ENTERPRISE)
+        assert cfg.has_feature(FEATURE_TRAINING_SESSION)
+        assert cfg.has_feature(FEATURE_GITHUB_ACQUISITION)
+        assert cfg.has_feature(FEATURE_TOP_MODEL_REGISTRY)
+
+    def test_pro_tier_has_media_features(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_COMMERCIAL_PRODUCTION, FEATURE_RADIO_AD_STUDIO,
+            FEATURE_VIDEO_AD_STUDIO, FEATURE_MUSIC_VIDEO_PRODUCTION,
+        )
+        cfg = get_tier_config(Tier.PRO)
+        assert cfg.has_feature(FEATURE_COMMERCIAL_PRODUCTION)
+        assert cfg.has_feature(FEATURE_RADIO_AD_STUDIO)
+        assert cfg.has_feature(FEATURE_VIDEO_AD_STUDIO)
+        assert cfg.has_feature(FEATURE_MUSIC_VIDEO_PRODUCTION)
+
+    def test_enterprise_tier_has_movie_features(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_MOVIE_PRODUCTION, FEATURE_AI_ONLY_ADS, FEATURE_CLIENT_ASSET_ADS,
+        )
+        cfg = get_tier_config(Tier.ENTERPRISE)
+        assert cfg.has_feature(FEATURE_MOVIE_PRODUCTION)
+        assert cfg.has_feature(FEATURE_AI_ONLY_ADS)
+        assert cfg.has_feature(FEATURE_CLIENT_ASSET_ADS)
+
+    def test_free_tier_missing_media_features(self):
+        from bots.buddy_bot.tiers import (
+            get_tier_config, Tier,
+            FEATURE_COMMERCIAL_PRODUCTION, FEATURE_SELF_LEARNING,
+        )
+        cfg = get_tier_config(Tier.FREE)
+        assert not cfg.has_feature(FEATURE_COMMERCIAL_PRODUCTION)
+        assert not cfg.has_feature(FEATURE_SELF_LEARNING)
+
+
 class TestBotLibraryRegistration:
     def test_buddy_bot_registered(self):
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS
