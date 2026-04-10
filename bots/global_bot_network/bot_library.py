@@ -661,6 +661,34 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "self_marketing_network",
         ],
     ),
+    BotEntry(
+        bot_id="cinecore_bot",
+        display_name="DreamCo CineCore Bot",
+        description=(
+            "AI-Powered Commercial & Video Creation System. Automates script "
+            "generation, AI video creation (Runway/Pika), voiceovers, multi-platform "
+            "ad distribution, legal lead generation, AI deal closing, Stripe billing, "
+            "CRM, bulk commercial generation, and self-healing system monitoring."
+        ),
+        category=BotCategory.MARKETING,
+        module_path="bots.cinecore_bot.cinecore_bot",
+        class_name="CineCoreBot",
+        capabilities=[
+            "script_generation",
+            "ai_video_generation",
+            "voiceover_creation",
+            "platform_optimization",
+            "lead_generation",
+            "business_scoring",
+            "ai_closer",
+            "stripe_billing",
+            "analytics_engine",
+            "bulk_generator",
+            "self_healing",
+            "crm",
+            "auto_posting",
+        ],
+    ),
     # -- Category bots --
     BotEntry(
         bot_id="app_bots_category",
