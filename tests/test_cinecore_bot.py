@@ -1071,7 +1071,7 @@ class TestCineCoreBotIntegration:
         bot = CineCoreBot(tier=Tier.FREE)
         description = bot.describe_tier()
         assert "CineCore" in description
-        assert "free" in description.lower() or "Free" in description
+        assert "free" in description.lower()
 
     def test_describe_tier_pro(self):
         bot = CineCoreBot(tier=Tier.PRO)

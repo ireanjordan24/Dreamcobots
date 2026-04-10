@@ -46,6 +46,7 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
+import random
 import sys
 import os
 import uuid
@@ -835,7 +836,6 @@ class AnalyticsEngine:
 
     def track(self, video_id: str, platform: str = "all") -> AnalyticsRecord:
         """Simulate fetching analytics for a video asset."""
-        import random  # noqa: PLC0415
         random.seed(hash(video_id + platform))
 
         views = random.randint(100, 50_000)
