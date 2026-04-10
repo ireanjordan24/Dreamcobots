@@ -210,11 +210,21 @@ function runDailyPosting(niche = 'business', platforms = ['tiktok', 'instagram',
 function getNextOptimalTime(bestTimes) {
   const now = new Date();
   const today = now.toISOString().split('T')[0];
+
   const nextSlot = bestTimes.find((t) => {
-    const [hour] = t.split(':');
-    return parseInt(hour, 10) > now.getHours();
+    const isPm = t.includes('pm');
+    let hour = parseInt(t.replace(/[^0-9]/g, ''), 10);
+    if (isPm && hour !== 12) hour += 12;
+    if (!isPm && hour === 12) hour = 0;
+    return hour > now.getHours();
   }) || bestTimes[0];
-  return `${today}T${nextSlot.replace('am', ':00').replace('pm', ':00')}:00Z`;
+
+  const isPm = nextSlot.includes('pm');
+  let hour = parseInt(nextSlot.replace(/[^0-9]/g, ''), 10);
+  if (isPm && hour !== 12) hour += 12;
+  if (!isPm && hour === 12) hour = 0;
+  const hourStr = String(hour).padStart(2, '0');
+  return `${today}T${hourStr}:00:00Z`;
 }
 
 function hashStr(str) {

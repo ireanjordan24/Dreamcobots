@@ -309,6 +309,8 @@ jobs:
   god-mode-ci-summary:
     name: "✅ God Mode CI — All Systems Green"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs:
       - python-god-mode-tests
       - python-full-suite
