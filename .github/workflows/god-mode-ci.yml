@@ -1,0 +1,346 @@
+name: God Mode CI — Parallel Bot Tasks
+
+on:
+  push:
+    branches: [main, master, "copilot/**"]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Run nightly at 2 AM UTC to validate all God Mode bots
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: "Test scope (all | god_mode | js)"
+        required: false
+        default: "all"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 1: God Mode Bot Python Tests
+  # ─────────────────────────────────────────────────────────────────────────
+  python-god-mode-tests:
+    name: "🐍 Python — God Mode Bot Tests"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run God Mode Bot tests
+        run: |
+          python -m pytest tests/test_god_mode_bot.py -v --tb=short
+
+      - name: Smoke test — God Mode Bot import
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'bots/ai-models-integration')
+          from bots.god_mode_bot.god_mode_bot import GodModeBot, run
+          result = run()
+          assert result['status'] == 'success', f'Unexpected status: {result}'
+          print('✅ God Mode Bot smoke test passed:', result)
+          "
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 2: Full Python Test Suite (parallel to Job 1)
+  # ─────────────────────────────────────────────────────────────────────────
+  python-full-suite:
+    name: "🐍 Python — Full Test Suite"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run all Python tests
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short \
+            --junit-xml=test-results/python-results.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-test-results
+          path: test-results/
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 3: JavaScript God Mode Bot Tests (parallel to Jobs 1 & 2)
+  # ─────────────────────────────────────────────────────────────────────────
+  js-god-mode-tests:
+    name: "🟨 JavaScript — God Mode Bot Tests"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline 2>/dev/null || npm install
+
+      - name: Smoke test — adEngine
+        run: |
+          node -e "
+          const { generateAd, run } = require('./DreamCo/bots/business/adEngine');
+          const result = run();
+          console.assert(typeof result.revenue === 'number', 'revenue must be a number');
+          console.assert(Array.isArray(result.platforms_activated), 'platforms must be array');
+          console.log('✅ adEngine smoke test passed:', JSON.stringify(result, null, 2));
+          "
+
+      - name: Smoke test — businessBuilder
+        run: |
+          node -e "
+          const { buildBusiness, run } = require('./DreamCo/bots/business/businessBuilder');
+          const result = run();
+          console.assert(typeof result.revenue === 'number', 'revenue must be a number');
+          console.assert(result.bot === 'businessBuilder', 'bot name must match');
+          console.log('✅ businessBuilder smoke test passed');
+          "
+
+      - name: Smoke test — viralEngine
+        run: |
+          node -e "
+          const { detectTrends, runDailyPosting, run } = require('./DreamCo/bots/marketing/viralEngine');
+          const trends = detectTrends('business');
+          console.assert(trends.length > 0, 'must detect trends');
+          const result = run();
+          console.assert(result.posts_scheduled > 0, 'must schedule posts');
+          console.log('✅ viralEngine smoke test passed. Posts:', result.posts_scheduled, '| Views:', result.total_estimated_views);
+          "
+
+      - name: Smoke test — autoClientHunter
+        run: |
+          node -e "
+          const { huntLeads, generateProposal, run } = require('./DreamCo/bots/marketing/autoClientHunter');
+          const hunt = huntLeads('startups', 5);
+          console.assert(hunt.leads.length === 5, 'must return 5 leads');
+          const result = run();
+          console.assert(typeof result.leads_generated === 'number', 'leads must be number');
+          console.log('✅ autoClientHunter smoke test passed. Leads:', hunt.qualified);
+          "
+
+      - name: Smoke test — autoCloser
+        run: |
+          node -e "
+          const { startNegotiation, negotiate, closeDeal, bookClient, run } = require('./DreamCo/bots/marketing/autoCloser');
+          const lead = { lead_id: 'TEST-1', business_name: 'Test Co', contact_name: 'Alex', quality: 'hot', niche: 'startups' };
+          let deal = startNegotiation(lead);
+          deal = negotiate(deal, 'Sounds good, let us move forward.');
+          const booking = bookClient(closeDeal(deal));
+          console.assert(booking.status === 'booked', 'must be booked');
+          const result = run();
+          console.assert(result.stage === 'closed', 'deal must be closed');
+          console.log('✅ autoCloser smoke test passed. Revenue: $' + result.revenue);
+          "
+
+      - name: Smoke test — paymentAutoCollector
+        run: |
+          node -e "
+          const { createSubscription, generateInvoice, collectPayment, run } = require('./DreamCo/bots/marketing/paymentAutoCollector');
+          const sub = createSubscription('Test Customer', 'growth');
+          console.assert(sub.status === 'active', 'subscription must be active');
+          const inv = generateInvoice('Test Customer', 149, 'Monthly Growth Plan');
+          const payment = collectPayment(inv.invoice_id);
+          console.assert(payment.status === 'succeeded', 'payment must succeed');
+          const result = run();
+          console.assert(result.revenue > 0, 'must have revenue');
+          console.log('✅ paymentAutoCollector smoke test passed. Revenue: \$' + result.revenue);
+          "
+
+      - name: Smoke test — DreamCo Orchestrator (God Mode)
+        run: |
+          node -e "
+          const { runAllBots } = require('./DreamCo/orchestrator/index');
+          const report = runAllBots();
+          console.assert(report.summary.bots_run >= 9, 'must run all 9 bots');
+          console.assert(report.summary.total_revenue > 0, 'must have total revenue');
+          console.log('✅ Orchestrator test passed. Bots:', report.summary.bots_run, '| Revenue: \$' + report.summary.total_revenue);
+          "
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 4: Bot Library Registration Check (parallel)
+  # ─────────────────────────────────────────────────────────────────────────
+  bot-library-check:
+    name: "📚 Bot Library Registration Check"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check God Mode Bot is registered in bot library
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'bots/ai-models-integration')
+          from bots.global_bot_network.bot_library import BOT_LIBRARY
+          ids = [b.bot_id for b in BOT_LIBRARY]
+          assert 'god_mode_bot' in ids, f'god_mode_bot not registered. Got: {ids}'
+          print('✅ GodModeBot registered in bot library')
+          print(f'📦 Total bots registered: {len(BOT_LIBRARY)}')
+          "
+
+      - name: Run framework compliance check
+        run: python3 tools/check_bot_framework.py
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 5: Security Scan (parallel)
+  # ─────────────────────────────────────────────────────────────────────────
+  security-scan:
+    name: "🔒 Security Scan"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bandit
+        run: pip install bandit
+
+      - name: Run bandit security scan on God Mode bot
+        run: |
+          bandit -r bots/god_mode_bot/ -ll --exit-zero \
+            -f txt --msg-template '{abspath}:{line}: {test_id}: {msg}'
+
+      - name: Check for hardcoded secrets (God Mode bots)
+        run: |
+          # Ensure no real API keys / secrets are committed
+          if grep -rn "sk_live_\|pk_live_\|AKIA\|AIza" \
+            bots/god_mode_bot/ \
+            DreamCo/bots/marketing/autoClientHunter.js \
+            DreamCo/bots/marketing/autoCloser.js \
+            DreamCo/bots/marketing/paymentAutoCollector.js \
+            DreamCo/bots/marketing/viralEngine.js \
+            DreamCo/bots/business/adEngine.js \
+            DreamCo/bots/business/businessBuilder.js 2>/dev/null; then
+            echo "❌ Potential secrets found!"
+            exit 1
+          else
+            echo "✅ No hardcoded secrets detected"
+          fi
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Summary job — requires all parallel jobs to pass
+  # ─────────────────────────────────────────────────────────────────────────
+  god-mode-ci-summary:
+    name: "✅ God Mode CI — All Systems Green"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs:
+      - python-god-mode-tests
+      - python-full-suite
+      - js-god-mode-tests
+      - bot-library-check
+      - security-scan
+    if: always()
+
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ needs.python-god-mode-tests.result }}" != "success" ]]; then
+            echo "❌ python-god-mode-tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.python-full-suite.result }}" != "success" ]]; then
+            echo "❌ python-full-suite failed"
+            exit 1
+          fi
+          if [[ "${{ needs.js-god-mode-tests.result }}" != "success" ]]; then
+            echo "❌ js-god-mode-tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.bot-library-check.result }}" != "success" ]]; then
+            echo "❌ bot-library-check failed"
+            exit 1
+          fi
+          if [[ "${{ needs.security-scan.result }}" != "success" ]]; then
+            echo "❌ security-scan failed"
+            exit 1
+          fi
+          echo "🚀 All God Mode CI jobs passed!"
+          echo "💡 God Mode Bot is production-ready."

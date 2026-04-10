@@ -14,6 +14,14 @@ const realEstateBot = require('../bots/realEstateBot');
 const contractBot = require('../bots/contractBot');
 const jobBot = require('../bots/jobBot');
 
+// God Mode bots
+const adEngine = require('../bots/business/adEngine');
+const businessBuilder = require('../bots/business/businessBuilder');
+const viralEngine = require('../bots/marketing/viralEngine');
+const autoClientHunter = require('../bots/marketing/autoClientHunter');
+const autoCloser = require('../bots/marketing/autoCloser');
+const paymentAutoCollector = require('../bots/marketing/paymentAutoCollector');
+
 // ---------------------------------------------------------------------------
 // Revenue Validator
 // ---------------------------------------------------------------------------
@@ -75,6 +83,13 @@ const BOTS = [
   { name: 'realEstateBot', module: realEstateBot },
   { name: 'contractBot', module: contractBot },
   { name: 'jobBot', module: jobBot },
+  // God Mode bots
+  { name: 'adEngine', module: adEngine },
+  { name: 'businessBuilder', module: businessBuilder },
+  { name: 'viralEngine', module: viralEngine },
+  { name: 'autoClientHunter', module: autoClientHunter },
+  { name: 'autoCloser', module: autoCloser },
+  { name: 'paymentAutoCollector', module: paymentAutoCollector },
 ];
 
 /**
