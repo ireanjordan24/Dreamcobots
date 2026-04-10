@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "description": "DreamCo Master Workflow Registry",
+  "workflows": [
+    {
+      "id": "fiverr",
+      "file": "workflows/fiverr.json",
+      "enabled": true,
+      "priority": 1
+    },
+    {
+      "id": "real_estate",
+      "file": "workflows/real_estate.json",
+      "enabled": true,
+      "priority": 2
+    },
+    {
+      "id": "grants",
+      "file": "workflows/grants.json",
+      "enabled": true,
+      "priority": 3
+    },
+    {
+      "id": "legal_money",
+      "file": "workflows/legal_money.json",
+      "enabled": false,
+      "priority": 4
+    },
+    {
+      "id": "crypto",
+      "file": "workflows/crypto.json",
+      "enabled": true,
+      "priority": 5
+    }
+  ],
+  "global_settings": {
+    "max_concurrent_workflows": 3,
+    "default_retry_attempts": 3,
+    "notify_on_failure": true
+  }
+}
