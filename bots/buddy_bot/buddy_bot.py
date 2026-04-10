@@ -80,6 +80,9 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    FEATURE_REASONING_ENGINE,
+    FEATURE_CHAIN_OF_THOUGHT,
+    FEATURE_DEEP_CONTEXT,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
@@ -121,6 +124,11 @@ from bots.buddy_bot.personality_engine import (
     PersonalityEngine,
     PersonaMode,
     PersonaTone,
+)
+from bots.buddy_bot.reasoning_engine import (
+    ReasoningEngine,
+    ReasoningResult,
+    QueryIntent,
 )
 
 from framework import GlobalAISourcesFlow
@@ -183,6 +191,10 @@ class BuddyBot:
         self.voice = VoiceEngine()
         self.creativity = CreativityEngine(user_id=user_id)
         self.personality = PersonalityEngine(initial_persona=initial_persona)
+        self.reasoning = ReasoningEngine(
+            enable_chain_of_thought=self.config.has_feature(FEATURE_CHAIN_OF_THOUGHT),
+            context_window=20 if self.config.has_feature(FEATURE_DEEP_CONTEXT) else 5,
+        )
 
         # Bootstrap memory profile for the primary user
         try:
@@ -273,6 +285,16 @@ class BuddyBot:
         turn = self.conversation.respond(message, tone=resolved_tone)
         base_response = turn.response
 
+        # 3b. Claude-Mithos Reasoning Engine upgrade (PRO+)
+        reasoning_result: ReasoningResult | None = None
+        if self.config.has_feature(FEATURE_REASONING_ENGINE):
+            reasoning_result = self.reasoning.reason(
+                message,
+                conversation_history=self.conversation.get_history(),
+            )
+            # Blend the enriched response with the conversational layer
+            base_response = reasoning_result.final_response
+
         # 4. Mood sync (PRO+)
         mood_response = ""
         if self.config.has_feature(FEATURE_MOOD_SYNC):
@@ -306,6 +328,7 @@ class BuddyBot:
             "persona": self.personality.config.active_persona.value,
             "tier": self.tier.value,
             "language": self.conversation.active_language,
+            "reasoning": reasoning_result.to_dict() if reasoning_result else None,
         }
 
     def process(self, message: str, **kwargs) -> dict:
@@ -673,6 +696,70 @@ class BuddyBot:
         return {"is_ethical": is_ethical, "reasoning": reasoning}
 
     # ------------------------------------------------------------------
+    # Claude-Mithos Reasoning
+    # ------------------------------------------------------------------
+
+    def reason(self, query: str) -> dict:
+        """
+        Apply Claude-Mithos-level reasoning to *query* (PRO+).
+
+        Returns a full ReasoningResult dict including chain-of-thought steps,
+        context synthesis, deep comprehension, and the enriched response.
+
+        Parameters
+        ----------
+        query : str
+            The question or topic to reason about.
+
+        Returns
+        -------
+        dict
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        result = self.reasoning.reason(
+            query,
+            conversation_history=self.conversation.get_history(),
+        )
+        return result.to_dict()
+
+    def chain_of_thought(self, query: str) -> list[dict]:
+        """
+        Return a chain-of-thought reasoning trace for *query* (ENTERPRISE).
+
+        Parameters
+        ----------
+        query : str
+            The question to reason through.
+
+        Returns
+        -------
+        list[dict]
+        """
+        self._require_feature(FEATURE_CHAIN_OF_THOUGHT)
+        steps = self.reasoning.chain_of_thought(query)
+        return [s.to_dict() for s in steps]
+
+    def deep_comprehend(self, text: str) -> dict:
+        """
+        Return a structured deep comprehension of *text* (PRO+).
+
+        Includes intent, entities, sentiment, implicit need, and complexity.
+
+        Parameters
+        ----------
+        text : str
+            Any natural-language text.
+
+        Returns
+        -------
+        dict
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        result = self.reasoning.deep_comprehend(text)
+        result["intent"] = result["intent"].value
+        return result
+
+    # ------------------------------------------------------------------
     # Wellness
     # ------------------------------------------------------------------
 
@@ -717,6 +804,7 @@ class BuddyBot:
             "voice": self.voice.to_dict(),
             "creativity": self.creativity.to_dict(),
             "personality": self.personality.to_dict(),
+            "reasoning": self.reasoning.to_dict(),
             "features_enabled": self.config.features,
         }
 
