@@ -28,7 +28,7 @@ Usage
 
     # Collect payment
     invoice = bot.generate_invoice(deal.client_name, deal.agreed_price, "AI consulting")
-    bot.collect_payment(invoice["invoice_id"])
+    bot.collect_payment(invoice.record_id)
 
     # Run all engines at once
     report = bot.run_all_engines()
@@ -400,7 +400,7 @@ class AutoCloser:
 
     def negotiate(self, deal_record: DealRecord, user_message: str) -> DealRecord:
         """Process a negotiation message and return updated deal."""
-        if deal_record.status not in ("negotiating",):
+        if deal_record.status != "negotiating":
             raise GodModeBotTierError(
                 f"Deal {deal_record.deal_id} is in '{deal_record.status}' status and cannot be negotiated."
             )
@@ -1035,7 +1035,7 @@ class GodModeBot:
             "Features:",
         ]
         for f in info["features"]:
-            lines.append(f"  \u2713 {f}")
+            lines.append(f"  ✓ {f}")
         upgrade = get_upgrade_path(self.tier)
         if upgrade:
             lines.append(f"\nUpgrade to {upgrade.name} for ${upgrade.price_usd_monthly:.2f}/month")
