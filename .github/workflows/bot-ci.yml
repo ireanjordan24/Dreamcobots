@@ -42,6 +42,17 @@ jobs:
         run: |
           python -c "import sys; sys.path.insert(0, 'bots/ai-side-hustle-bots'); import bot; print('ai-side-hustle-bot: OK')"
 
+      - name: Smoke test — God Mode Bot
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'bots/ai-models-integration')
+          from bots.god_mode_bot.god_mode_bot import GodModeBot, run
+          result = run()
+          assert result['status'] == 'success', f'Unexpected: {result}'
+          print('god-mode-bot: OK — leads=' + str(result['leads']) + ' revenue=' + str(result['revenue']))
+          "
+
       - name: Lint with flake8
         run: |
           flake8 bots/ --count --max-line-length=120 --ignore=E501,W503,E241,E302,E401,E402,E741,F401,F541,F841,W292 --statistics --exit-zero

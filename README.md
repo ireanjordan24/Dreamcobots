@@ -6,6 +6,65 @@ Welcome to **DreamCobots** — a versatile, user-friendly platform for automatio
 > See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
 ---
+
+## 🔥 GOD MODE — Autonomous Business Operator
+
+DreamCobots now ships with **God Mode** — a suite of autonomous business capabilities that make DreamCo the first AI platform to combine lead hunting, deal closing, payment collection, viral growth, and self-optimization in a single integrated system.
+
+### God Mode Features
+
+| Feature | Description | Location |
+|---------|-------------|----------|
+| 🎯 **Auto Client Hunter** | AI scrapes potential clients by niche, scores leads, and sends personalized outreach proposals automatically | `bots/god_mode_bot/` · `DreamCo/bots/marketing/autoClientHunter.js` |
+| 💬 **Auto Closer** | Automates deal negotiation via AI chat — handles objections, advances stages, books clients | `bots/god_mode_bot/` · `DreamCo/bots/marketing/autoCloser.js` |
+| 💳 **Payment Auto Collector** | Streamlined Stripe-compatible subscription billing, invoice generation, and automated payment collection | `bots/god_mode_bot/` · `DreamCo/bots/marketing/paymentAutoCollector.js` |
+| 📡 **Viral Engine** | Detects trends, generates platform-optimized content, and schedules daily posts to TikTok, Instagram, X, Facebook, LinkedIn | `bots/god_mode_bot/` · `DreamCo/bots/marketing/viralEngine.js` |
+| 🤖 **Self-Improving AI** | Analyzes performance metrics, auto-prioritizes revenue streams, and continuously applies optimizations | `bots/god_mode_bot/` |
+
+### Quick Start — God Mode Bot (Python)
+
+```python
+from bots.god_mode_bot import GodModeBot
+from bots.god_mode_bot.tiers import Tier
+
+# Initialize with PRO tier
+bot = GodModeBot(tier=Tier.PRO)
+
+# Hunt leads in a niche
+leads = bot.hunt_leads("tech startups", count=20)
+
+# Generate and send outreach proposals
+proposals = [bot.generate_proposal(lead) for lead in leads[:5]]
+
+# Run all God Mode engines
+report = bot.run_all_engines()
+print(report["revenue_summary"])
+```
+
+### Quick Start — God Mode Orchestrator (Node.js)
+
+```javascript
+const { runAllBots } = require('./DreamCo/orchestrator/index');
+
+// Run all 9 bots including God Mode bots in parallel
+const report = runAllBots();
+// → 💰 Total Revenue:  $17,517
+// → 📋 Total Leads:    431
+// → 📈 Scaling Bots:   businessBuilder, autoClientHunter, autoCloser
+```
+
+### Tier Comparison
+
+| Feature | FREE | PRO ($49/mo) | ENTERPRISE ($199/mo) |
+|---------|------|-------------|---------------------|
+| Auto Client Hunter | 5 leads/day | Unlimited leads | Unlimited + custom scraping |
+| Auto Closer | Basic scripts | Full AI negotiation | White-label closer |
+| Payment Collection | Stripe only | Stripe + PayPal + invoices | All providers + crypto |
+| Viral Engine | — | 3 platforms | All 6 platforms |
+| Self-Improving AI | — | Revenue optimization | Custom AI model training |
+| API Access | — | — | ✅ |
+
+---
 ## 🚀 Why DreamCobots?
 
 - **Non-Technical Friendly**: Each bot ships with detailed setup guides and Docker support — no coding required to get started.
