@@ -756,4 +756,25 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "referral_system", "premium_subscription",
         ],
     ),
+    BotEntry(
+        bot_id="commercial_bot",
+        display_name="CommercialBot AI (DreamCo CineCore™)",
+        description=(
+            "Autonomous commercial creation and revenue bot. Writes scripts, builds "
+            "video concepts, generates voiceovers, optimizes ads for TikTok/YouTube/"
+            "Instagram/Facebook, scrapes leads, closes deals via AI, and manages "
+            "Stripe subscriptions. Integrates with Shopify, Real Estate, and "
+            "Affiliate bots inside the DreamCo ecosystem."
+        ),
+        category=BotCategory.MARKETING,
+        module_path="bots.commercial_bot.commercial_bot",
+        class_name="CommercialBot",
+        capabilities=[
+            "script_generation", "video_scene_builder", "voiceover_generation",
+            "platform_optimizer", "lead_scraping", "ai_closing_agent",
+            "stripe_billing", "performance_analytics", "bulk_commercial_generator",
+            "self_healing_system", "crm_pipeline", "auto_outreach",
+            "movie_biography_creator", "affiliate_ads", "upsell_engine",
+        ],
+    ),
 ]
