@@ -1,5 +1,4 @@
 'use strict';
-const { randomInt } = require('crypto');
 
 function run(options = {}) {
   const { minProfit = 10, limit = 10 } = options;
