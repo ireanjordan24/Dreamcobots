@@ -122,6 +122,12 @@ from bots.buddy_bot.personality_engine import (
     PersonalityConfig,
     ETHICAL_GUARDRAILS,
 )
+from bots.buddy_bot.reasoning_engine import (
+    ReasoningEngine,
+    TaskType,
+    AIModel,
+    ModelSelectionResult,
+)
 from bots.buddy_bot.buddy_bot import BuddyBot, BuddyBotError, BuddyBotTierError
 
 
@@ -1440,6 +1446,266 @@ class TestBuddyBot:
         buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
         response = buddy.chat("Hello!")
         assert "persona" in response
+
+
+# ===========================================================================
+# 9b. ReasoningEngine
+# ===========================================================================
+
+class TestReasoningEngine:
+
+    # ── Registry ────────────────────────────────────────────────────────────
+
+    def test_registry_has_100_models(self):
+        engine = ReasoningEngine()
+        assert len(engine.all_models) == 100
+
+    def test_top_5_default(self):
+        engine = ReasoningEngine()
+        assert len(engine.top_models) == 5
+
+    def test_top_models_sorted_by_score(self):
+        engine = ReasoningEngine()
+        scores = [m.composite_score for m in engine.top_models]
+        assert scores == sorted(scores, reverse=True)
+
+    def test_claude_mythos_is_number_one(self):
+        engine = ReasoningEngine()
+        assert engine.top_models[0].model_id == "claude_mythos"
+
+    def test_top_5_model_ids(self):
+        engine = ReasoningEngine()
+        ids = [m.model_id for m in engine.top_models]
+        assert "claude_mythos" in ids
+        assert "gpt_4o" in ids
+        assert "gemini_1_5_ultra" in ids
+        assert "claude_3_5_sonnet" in ids
+        assert "llama_3_1_405b" in ids
+
+    def test_get_model_by_id(self):
+        engine = ReasoningEngine()
+        m = engine.get_model("claude_mythos")
+        assert m is not None
+        assert m.name == "Claude Mythos"
+        assert m.provider == "Anthropic"
+
+    def test_get_model_unknown_returns_none(self):
+        engine = ReasoningEngine()
+        assert engine.get_model("nonexistent_model_xyz") is None
+
+    # ── AIModel data ─────────────────────────────────────────────────────────
+
+    def test_model_has_pros_and_cons(self):
+        engine = ReasoningEngine()
+        for m in engine.top_models:
+            assert isinstance(m.pros, list) and len(m.pros) > 0
+            assert isinstance(m.cons, list) and len(m.cons) > 0
+
+    def test_model_has_best_for(self):
+        engine = ReasoningEngine()
+        for m in engine.top_models:
+            assert isinstance(m.best_for, list) and len(m.best_for) > 0
+
+    def test_model_to_dict(self):
+        engine = ReasoningEngine()
+        d = engine.top_models[0].to_dict()
+        for key in ("model_id", "name", "provider", "pros", "cons",
+                    "best_for", "composite_score", "is_multimodal",
+                    "is_open_source", "context_window_k"):
+            assert key in d
+
+    def test_llama_is_open_source(self):
+        engine = ReasoningEngine()
+        m = engine.get_model("llama_3_1_405b")
+        assert m.is_open_source is True
+
+    def test_claude_mythos_not_open_source(self):
+        engine = ReasoningEngine()
+        m = engine.get_model("claude_mythos")
+        assert m.is_open_source is False
+
+    # ── Task-type detection ──────────────────────────────────────────────────
+
+    def test_detect_coding_task(self):
+        engine = ReasoningEngine()
+        tt = engine.detect_task_type("Can you help me debug this Python function?")
+        assert tt == TaskType.CODING
+
+    def test_detect_creative_writing_task(self):
+        engine = ReasoningEngine()
+        tt = engine.detect_task_type("Write a short story about a lost dragon.")
+        assert tt == TaskType.CREATIVE_WRITING
+
+    def test_detect_math_task(self):
+        engine = ReasoningEngine()
+        tt = engine.detect_task_type("Solve this algebra equation for x.")
+        assert tt == TaskType.MATH_REASONING
+
+    def test_detect_translation_task(self):
+        engine = ReasoningEngine()
+        tt = engine.detect_task_type("Translate this sentence to Spanish.")
+        assert tt == TaskType.TRANSLATION
+
+    def test_detect_general_on_empty(self):
+        engine = ReasoningEngine()
+        tt = engine.detect_task_type("")
+        assert tt == TaskType.GENERAL
+
+    # ── Model selection ──────────────────────────────────────────────────────
+
+    def test_select_best_model_returns_result(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CODING)
+        assert isinstance(result, ModelSelectionResult)
+
+    def test_coding_selects_claude_mythos(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CODING)
+        assert result.selected_model.model_id == "claude_mythos"
+
+    def test_creative_writing_selects_sonnet(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CREATIVE_WRITING)
+        assert result.selected_model.model_id == "claude_3_5_sonnet"
+
+    def test_research_selects_gemini(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.RESEARCH)
+        assert result.selected_model.model_id == "gemini_1_5_ultra"
+
+    def test_general_selects_gpt4o(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.GENERAL)
+        assert result.selected_model.model_id == "gpt_4o"
+
+    def test_open_source_filter(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CODING, require_open_source=True)
+        assert result.selected_model.is_open_source is True
+
+    def test_multimodal_filter(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.IMAGE_DESCRIPTION, require_multimodal=True)
+        assert result.selected_model.is_multimodal is True
+
+    def test_result_has_rationale(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CODING)
+        assert isinstance(result.rationale, str) and len(result.rationale) > 10
+
+    def test_result_has_runner_up(self):
+        engine = ReasoningEngine()
+        result = engine.select_best_model(TaskType.CODING)
+        assert result.runner_up is not None
+
+    def test_result_to_dict(self):
+        engine = ReasoningEngine()
+        d = engine.select_best_model(TaskType.CODING).to_dict()
+        for key in ("selected_model", "task_type", "rationale", "runner_up", "score"):
+            assert key in d
+
+    def test_select_for_task_convenience(self):
+        engine = ReasoningEngine()
+        result = engine.select_for_task("Help me write a Python algorithm.")
+        assert result.task_type == TaskType.CODING
+        assert result.selected_model.model_id == "claude_mythos"
+
+    def test_compare_top_models_returns_5(self):
+        engine = ReasoningEngine()
+        comparison = engine.compare_top_models()
+        assert len(comparison) == 5
+
+    def test_list_models_for_task(self):
+        engine = ReasoningEngine()
+        models = engine.list_models_for_task(TaskType.CODING)
+        assert len(models) > 0
+        ids = [m.model_id for m in models]
+        assert "claude_mythos" in ids
+
+    def test_to_dict(self):
+        engine = ReasoningEngine()
+        d = engine.to_dict()
+        assert d["total_models"] == 100
+        assert d["top_n"] == 5
+        assert len(d["top_models"]) == 5
+
+    # ── BuddyBot integration ─────────────────────────────────────────────────
+
+    def test_buddy_bot_has_reasoning_engine(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        assert hasattr(buddy, "reasoning")
+        assert isinstance(buddy.reasoning, ReasoningEngine)
+
+    def test_select_ai_model_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.select_ai_model("I need to write a Python script.")
+        assert "selected_model" in result
+        assert result["selected_model"]["model_id"] == "claude_mythos"
+
+    def test_select_ai_model_free_raises(self):
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        with pytest.raises(BuddyBotTierError):
+            buddy.select_ai_model("Write some code.")
+
+    def test_get_top_models_pro(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        top = buddy.get_top_models()
+        assert len(top) == 5
+        ids = [m["model_id"] for m in top]
+        assert "claude_mythos" in ids
+
+    def test_get_ai_model_profile(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        profile = buddy.get_ai_model_profile("gpt_4o")
+        assert profile["name"] == "GPT-4o"
+        assert len(profile["pros"]) > 0
+        assert len(profile["cons"]) > 0
+
+    def test_get_ai_model_profile_unknown_raises(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        with pytest.raises(BuddyBotError):
+            buddy.get_ai_model_profile("does_not_exist")
+
+    def test_list_models_for_task_via_buddy(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        models = buddy.list_models_for_task("coding")
+        assert any(m["model_id"] == "claude_mythos" for m in models)
+
+    def test_list_models_for_task_invalid_raises(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        with pytest.raises(BuddyBotError):
+            buddy.list_models_for_task("flying_cars")
+
+    def test_reasoning_in_system_status(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        status = buddy.system_status()
+        assert "reasoning" in status
+        assert status["reasoning"]["total_models"] == 100
+
+    def test_reasoning_engine_feature_in_pro(self):
+        from bots.buddy_bot.tiers import FEATURE_REASONING_ENGINE
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        assert buddy.config.has_feature(FEATURE_REASONING_ENGINE)
+
+    def test_reasoning_engine_feature_in_enterprise(self):
+        from bots.buddy_bot.tiers import FEATURE_REASONING_ENGINE
+        buddy = BuddyBot(tier=Tier.ENTERPRISE, user_name="Alex")
+        assert buddy.config.has_feature(FEATURE_REASONING_ENGINE)
+
+    def test_reasoning_engine_feature_not_in_free(self):
+        from bots.buddy_bot.tiers import FEATURE_REASONING_ENGINE
+        buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
+        assert not buddy.config.has_feature(FEATURE_REASONING_ENGINE)
+
+    def test_select_ai_model_open_source_filter(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.select_ai_model("Write code", require_open_source=True)
+        assert result["selected_model"]["is_open_source"] is True
+
+    def test_select_ai_model_multimodal_filter(self):
+        buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
+        result = buddy.select_ai_model("Describe this image", require_multimodal=True)
+        assert result["selected_model"]["is_multimodal"] is True
 
 
 # ===========================================================================

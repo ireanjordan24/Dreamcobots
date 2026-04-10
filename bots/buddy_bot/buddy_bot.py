@@ -80,11 +80,17 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    FEATURE_REASONING_ENGINE,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
     ConversationTone,
     SUPPORTED_LANGUAGES,
+)
+from bots.buddy_bot.reasoning_engine import (
+    ReasoningEngine,
+    TaskType,
+    ModelSelectionResult,
 )
 from bots.buddy_bot.emotion_engine import (
     EmotionEngine,
@@ -183,6 +189,7 @@ class BuddyBot:
         self.voice = VoiceEngine()
         self.creativity = CreativityEngine(user_id=user_id)
         self.personality = PersonalityEngine(initial_persona=initial_persona)
+        self.reasoning = ReasoningEngine()
 
         # Bootstrap memory profile for the primary user
         try:
@@ -673,6 +680,93 @@ class BuddyBot:
         return {"is_ethical": is_ethical, "reasoning": reasoning}
 
     # ------------------------------------------------------------------
+    # Reasoning Engine — AI model selection
+    # ------------------------------------------------------------------
+
+    def select_ai_model(
+        self,
+        task_description: str,
+        require_multimodal: bool = False,
+        require_open_source: bool = False,
+    ) -> dict:
+        """
+        Choose the best AI model from BuddyBot's top-5 roster for a task.
+
+        The ReasoningEngine analyses the task description, detects the
+        task type, then scores each of the top-5 models against it and
+        returns the optimal choice with a full rationale.
+
+        Requires PRO+ (FEATURE_REASONING_ENGINE).
+
+        Parameters
+        ----------
+        task_description : str
+            Plain-text description of what needs to be done.
+        require_multimodal : bool
+            If True, only models that accept non-text input are considered.
+        require_open_source : bool
+            If True, only open-source models are considered.
+
+        Returns
+        -------
+        dict  ModelSelectionResult as a dictionary.
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        result = self.reasoning.select_for_task(
+            task_description,
+            require_multimodal=require_multimodal,
+            require_open_source=require_open_source,
+        )
+        return result.to_dict()
+
+    def get_top_models(self) -> list:
+        """
+        Return BuddyBot's top-5 AI models with full pros/cons profiles.
+
+        Requires PRO+ (FEATURE_REASONING_ENGINE).
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        return self.reasoning.compare_top_models()
+
+    def get_ai_model_profile(self, model_id: str) -> dict:
+        """
+        Return the full profile (pros, cons, best_for, …) for a model.
+
+        Requires PRO+ (FEATURE_REASONING_ENGINE).
+
+        Parameters
+        ----------
+        model_id : str
+            The model identifier (e.g. ``"claude_mythos"``).
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        model = self.reasoning.get_model(model_id)
+        if model is None:
+            raise BuddyBotError(f"No model found with id '{model_id}'.")
+        return model.to_dict()
+
+    def list_models_for_task(self, task_type: str) -> list:
+        """
+        Return all known models optimised for a given task type.
+
+        Requires PRO+ (FEATURE_REASONING_ENGINE).
+
+        Parameters
+        ----------
+        task_type : str
+            One of the TaskType values (e.g. ``"coding"``, ``"research"``).
+        """
+        self._require_feature(FEATURE_REASONING_ENGINE)
+        try:
+            tt = TaskType(task_type)
+        except ValueError:
+            valid = [t.value for t in TaskType]
+            raise BuddyBotError(
+                f"Unknown task type '{task_type}'. Valid options: {valid}"
+            )
+        return [m.to_dict() for m in self.reasoning.list_models_for_task(tt)]
+
+    # ------------------------------------------------------------------
     # Wellness
     # ------------------------------------------------------------------
 
@@ -717,6 +811,7 @@ class BuddyBot:
             "voice": self.voice.to_dict(),
             "creativity": self.creativity.to_dict(),
             "personality": self.personality.to_dict(),
+            "reasoning": self.reasoning.to_dict(),
             "features_enabled": self.config.features,
         }
 

@@ -34,6 +34,7 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    FEATURE_REASONING_ENGINE,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
@@ -93,6 +94,12 @@ from bots.buddy_bot.personality_engine import (
     PersonaTone,
     PersonalityConfig,
 )
+from bots.buddy_bot.reasoning_engine import (
+    ReasoningEngine,
+    TaskType,
+    AIModel,
+    ModelSelectionResult,
+)
 
 __all__ = [
     # Main bot
@@ -132,6 +139,7 @@ __all__ = [
     "FEATURE_WHITE_LABEL",
     "FEATURE_API_ACCESS",
     "FEATURE_DEDICATED_SUPPORT",
+    "FEATURE_REASONING_ENGINE",
     # Sub-engines
     "ConversationEngine",
     "ConversationTone",
@@ -177,4 +185,9 @@ __all__ = [
     "PersonaMode",
     "PersonaTone",
     "PersonalityConfig",
+    # Reasoning Engine
+    "ReasoningEngine",
+    "TaskType",
+    "AIModel",
+    "ModelSelectionResult",
 ]
