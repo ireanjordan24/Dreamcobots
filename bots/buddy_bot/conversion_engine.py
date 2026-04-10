@@ -27,10 +27,19 @@ via BuddyBot.
 from __future__ import annotations
 
 import random
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
+
+def _slugify(name: str) -> str:
+    """Convert *name* to a URL-safe slug."""
+    slug = name.lower()
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"[\s-]+", "-", slug).strip("-")
+    return slug
 
 
 # ---------------------------------------------------------------------------
@@ -343,7 +352,11 @@ class ConversionEngine:
 
         needs_approval = self.require_human_approval and (
             proposal.channel == OutreachChannel.SMS
-            or (is_follow_up and self._records.get(proposal.business_name, ConversionRecord("", "", ConversionStage.PROPOSAL_SENT)).follow_up_count >= 2)
+            or (
+                is_follow_up
+                and proposal.business_name in self._records
+                and self._records[proposal.business_name].follow_up_count >= 2
+            )
         )
         if needs_approval:
             return {
@@ -466,7 +479,7 @@ class ConversionEngine:
             "status": "confirmed",
             "business": business_name,
             "slot": preferred_slot,
-            "meeting_link": f"https://meet.dreamco.ai/strategy/{business_name.lower().replace(' ', '-')}",
+            "meeting_link": f"https://meet.dreamco.ai/strategy/{_slugify(business_name)}",
             "confirmation": f"Strategy call booked with {business_name} for {preferred_slot}.",
         }
 

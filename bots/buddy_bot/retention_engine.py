@@ -23,10 +23,19 @@ via BuddyBot.
 from __future__ import annotations
 
 import random
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
+
+def _slugify(name: str) -> str:
+    """Convert *name* to a URL-safe slug."""
+    slug = name.lower()
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"[\s-]+", "-", slug).strip("-")
+    return slug
 
 
 # ---------------------------------------------------------------------------
@@ -518,7 +527,7 @@ class RetentionEngine:
                 f"If you know any other business owners who could use a growth system like yours, "
                 f"we'd love to help them too — and you'll earn $200 credit for every referral who signs up."
             ),
-            "referral_link": f"https://dreamco.ai/refer/{client_name.lower().replace(' ', '-')}",
+            "referral_link": f"https://dreamco.ai/refer/{_slugify(client_name)}",
             "incentive": "$200 account credit per successful referral",
         }
 

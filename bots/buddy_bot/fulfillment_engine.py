@@ -32,6 +32,11 @@ from enum import Enum
 from typing import Optional
 
 
+# Email sequence length limits
+MIN_EMAIL_SEQUENCE_LENGTH: int = 3
+MAX_EMAIL_SEQUENCE_LENGTH: int = 10
+
+
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
@@ -346,7 +351,7 @@ class FulfillmentEngine:
             raise FulfillmentEngineTierError(
                 "Email sequence generation requires PRO tier or above."
             )
-        sequence_length = max(3, min(sequence_length, 10))
+        sequence_length = max(MIN_EMAIL_SEQUENCE_LENGTH, min(sequence_length, MAX_EMAIL_SEQUENCE_LENGTH))
         rng = random.Random(self._counter + hash(client_name) % 555)
 
         emails = []

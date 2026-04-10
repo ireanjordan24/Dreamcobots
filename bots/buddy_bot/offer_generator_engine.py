@@ -30,6 +30,10 @@ from enum import Enum
 from typing import Optional
 
 
+# Minimum lead value (USD/month) to qualify for performance-based pricing
+PERFORMANCE_PRICING_THRESHOLD_USD: float = 3000.0
+
+
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
@@ -357,7 +361,7 @@ class OfferGeneratorEngine:
             monthly = round((lo + hi) / 2, 2)
 
         pricing_model = PricingModel.MONTHLY_RETAINER
-        if self.can_performance_pricing and estimated_lead_value >= 3000:
+        if self.can_performance_pricing and estimated_lead_value >= PERFORMANCE_PRICING_THRESHOLD_USD:
             pricing_model = PricingModel.PERFORMANCE_BASED
 
         offer = ServiceOffer(

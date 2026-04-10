@@ -236,7 +236,7 @@ class BuddyBot:
         _is_pro_plus = tier in (Tier.PRO, Tier.ENTERPRISE)
         _is_enterprise = tier == Tier.ENTERPRISE
         self.lead_finder = LeadFinderEngine(
-            max_leads_per_scan=(100 if _is_pro_plus else (None if _is_enterprise else 5)),
+            max_leads_per_scan=(None if _is_enterprise else (100 if _is_pro_plus else 5)),
             can_filter_vertical=_is_pro_plus,
             can_enrich=_is_pro_plus,
             can_ai_score=_is_enterprise,
