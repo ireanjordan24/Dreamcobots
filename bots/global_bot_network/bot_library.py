@@ -756,4 +756,58 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "referral_system", "premium_subscription",
         ],
     ),
+    BotEntry(
+        bot_id="cinecore_lead_engine",
+        display_name="CineCore Lead Engine",
+        description=(
+            "DreamCo CineCore™ original lead engine. Scans businesses from "
+            "multiple sources, scores them for commercial opportunity, generates "
+            "ad scripts, builds outreach drafts, and exports qualified leads. "
+            "Operates as a standalone bot and integrates with CineCore for script "
+            "generation, ad creation, and client outreach."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
+        class_name="CineCoreLeadEngine",
+        capabilities=[
+            "business_scan",
+            "lead_scoring",
+            "script_generation",
+            "outreach_draft",
+            "ad_package_builder",
+            "bulk_generation",
+            "crm_export",
+            "analytics",
+            "niche_filter",
+            "cinecore_integration",
+        ],
+    ),
+    BotEntry(
+        bot_id="public_lead_engine",
+        display_name="Public Lead Engine",
+        description=(
+            "DreamCo CineCore™ legal public lead search engine. Uses Google "
+            "Places API and Yelp Fusion to discover businesses, filters by low "
+            "star ratings and weak marketing presence, scores commercial "
+            "opportunity, and generates targeted ad scripts and outreach drafts "
+            "for human review. Fully compliant with public API terms of service "
+            "and anti-spam regulations."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.public_lead_engine.public_lead_engine",
+        class_name="PublicLeadEngine",
+        capabilities=[
+            "google_places_search",
+            "yelp_search",
+            "rating_filter",
+            "weak_marketing_filter",
+            "ad_opportunity_scoring",
+            "script_generation",
+            "outreach_draft",
+            "crm_export",
+            "bulk_search",
+            "analytics",
+            "compliance_mode",
+        ],
+    ),
 ]
