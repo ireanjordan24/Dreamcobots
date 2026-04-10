@@ -709,7 +709,7 @@ class BuddyBot:
 
         Returns
         -------
-        dict  ModelSelectionResult as a dictionary.
+        dict : ModelSelectionResult as a dictionary.
         """
         self._require_feature(FEATURE_REASONING_ENGINE)
         result = self.reasoning.select_for_task(

@@ -1043,7 +1043,7 @@ def _build_model_registry() -> list:
             is_open_source=True,
             composite_score=30.0,
         ),
-        # ── Models 101 placeholder: additional models 63–100 ──────────────
+        # ── Additional models 63–100 ──────────────────────────────────────
         AIModel(
             model_id="solar_mini",
             name="SOLAR Mini",
@@ -1707,8 +1707,8 @@ class ReasoningEngine:
         # Primary sort: task explicitly in model's best_for list
         # Secondary sort: composite_score
         def _score(m: AIModel) -> tuple:
-            task_match = 1 if task_type in m.best_for else 0
-            return (task_match, m.composite_score)
+            has_task_match = 1 if task_type in m.best_for else 0
+            return (has_task_match, m.composite_score)
 
         ranked = sorted(candidates, key=_score, reverse=True)
         best = ranked[0]

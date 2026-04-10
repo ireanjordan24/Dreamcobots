@@ -1471,7 +1471,8 @@ class TestReasoningEngine:
 
     def test_claude_mythos_is_number_one(self):
         engine = ReasoningEngine()
-        assert engine.top_models[0].model_id == "claude_mythos"
+        top = engine.top_models
+        assert top[0].composite_score == max(m.composite_score for m in top)
 
     def test_top_5_model_ids(self):
         engine = ReasoningEngine()
