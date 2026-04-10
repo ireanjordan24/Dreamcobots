@@ -720,7 +720,8 @@ class TestCommercialBotEnterprise:
         for i in range(5):
             self.bot.create_subscription(f"client{i}@test.com", "monthly_package")
         mrr = self.bot.revenue_summary()["mrr_usd"]
-        assert mrr >= 5 * PRICING_TIERS["monthly_package"][0]
+        _, high = PRICING_TIERS["monthly_package"]
+        assert mrr >= 5 * high
 
 
 # ---------------------------------------------------------------------------

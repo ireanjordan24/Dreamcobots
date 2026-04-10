@@ -412,7 +412,7 @@ class ClosingAgent:
 
     def create_deal(self, client: str, package: str = "pro_commercial") -> Deal:
         low, high = PRICING_TIERS.get(package, (300, 1000))
-        value = high if high else 500.0
+        value = high if high is not None else low
         return Deal(client=client, package=package, monthly_value=float(value))
 
 
@@ -428,7 +428,7 @@ class BillingEngine:
 
     def create_subscription(self, customer_email: str, package: str = "pro_commercial") -> Dict:
         low, high = PRICING_TIERS.get(package, (300, 1000))
-        amount = high if high else 500
+        amount = high if high is not None else low
         record = {
             "customer_email": customer_email,
             "package": package,
