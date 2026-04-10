@@ -1,1 +1,229 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <div id="root"></div>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamCo — Money Operating System</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#0d0d0d;--card:#161616;--border:#2a2a2a;--accent:#00ff88;--accent2:#00ccff;--text:#e8e8e8;--muted:#666;--danger:#ff4d4d;--warn:#ffa500;}
+    body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;}
+    header{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+    .logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--accent);text-decoration:none;}
+    .logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+    nav{display:flex;gap:4px;}
+    nav a{color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:6px;font-size:13px;transition:all .15s;cursor:pointer;}
+    nav a:hover,nav a.active{color:var(--text);background:var(--border);}
+    nav a.active{color:var(--accent);}
+    .header-right{display:flex;align-items:center;gap:12px;}
+    .refresh-badge{font-size:11px;color:var(--muted);}
+    .live-dot{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;margin-right:5px;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+    main{padding:24px;max-width:1400px;margin:0 auto;}
+    .page-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+    .page-sub{color:var(--muted);margin-bottom:24px;font-size:13px;}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:28px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;}
+    .card:hover{border-color:#3a3a3a;}
+    .card-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+    .card-value{font-size:28px;font-weight:800;line-height:1.1;}
+    .card-change{font-size:12px;color:var(--accent);margin-top:6px;}
+    .card-accent-bar{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:12px 0 0 12px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+    @media(max-width:900px){.grid-2{grid-template-columns:1fr;}}
+    .section{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;}
+    .section-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+    .section-title{font-size:14px;font-weight:700;}
+    .section-actions{display:flex;gap:8px;}
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    thead th{text-align:left;padding:10px 20px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);white-space:nowrap;}
+    tbody tr{border-bottom:1px solid #1e1e1e;transition:background .1s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:#1a1a1a;}
+    tbody td{padding:12px 20px;vertical-align:middle;}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+    .badge-success{background:rgba(0,255,136,.12);color:var(--accent);}
+    .badge-warn{background:rgba(255,165,0,.12);color:var(--warn);}
+    .badge-danger{background:rgba(255,77,77,.12);color:var(--danger);}
+    .badge-info{background:rgba(0,204,255,.12);color:var(--accent2);}
+    .badge-muted{background:rgba(102,102,102,.12);color:var(--muted);}
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+    .btn-primary{background:var(--accent);color:#000;border-color:var(--accent);}
+    .btn-primary:hover{background:#00e07a;}
+    .btn-ghost{background:transparent;color:var(--text);border-color:var(--border);}
+    .btn-ghost:hover{border-color:#444;background:#1e1e1e;}
+    .chart-container{padding:20px;position:relative;height:260px;}
+    .workflow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:20px;}
+    .workflow-card{background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:16px;transition:border-color .2s;}
+    .workflow-card:hover{border-color:#3a3a3a;}
+    .workflow-name{font-weight:700;margin-bottom:4px;font-size:13px;}
+    .workflow-desc{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4;}
+    .workflow-meta{display:flex;align-items:center;justify-content:space-between;}
+    .workflow-revenue{font-size:12px;font-weight:600;color:var(--accent);}
+    .text-accent{color:var(--accent);}
+    .text-muted{color:var(--muted);}
+    .empty-state{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+    .status-indicator{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;}
+    .status-running{background:var(--accent);}
+    .status-stopped{background:var(--muted);}
+  </style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#"><span class="logo-icon">💰</span>DreamCo</a>
+  <nav>
+    <a class="active" href="#">Dashboard</a>
+    <a href="#">Bots</a>
+    <a href="#">Revenue</a>
+    <a href="#">Leads</a>
+    <a href="#">Workflows</a>
+    <a href="#">Settings</a>
+  </nav>
+  <div class="header-right">
+    <span class="refresh-badge"><span class="live-dot"></span>Auto-refresh 30s</span>
+    <button class="btn btn-primary" onclick="refreshData()">↻ Refresh</button>
+  </div>
+</header>
+<main>
+  <div class="page-title">Money Operating System</div>
+  <div class="page-sub" id="lastRefresh">Loading data…</div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-accent-bar" style="background:var(--accent)"></div>
+      <div class="card-label">Total Revenue</div>
+      <div class="card-value text-accent" id="totalRevenue">$—</div>
+      <div class="card-change" id="revenueChange">+$0 this cycle</div>
+    </div>
+    <div class="card">
+      <div class="card-accent-bar" style="background:var(--accent2)"></div>
+      <div class="card-label">Active Bots</div>
+      <div class="card-value" id="activeBots">—</div>
+      <div class="card-change">of <span id="totalBots">—</span> registered</div>
+    </div>
+    <div class="card">
+      <div class="card-accent-bar" style="background:#a855f7"></div>
+      <div class="card-label">Total Leads</div>
+      <div class="card-value" id="totalLeads">—</div>
+      <div class="card-change">generated this month</div>
+    </div>
+    <div class="card">
+      <div class="card-accent-bar" style="background:var(--warn)"></div>
+      <div class="card-label">Deals Closed</div>
+      <div class="card-value" id="dealsClosed">—</div>
+      <div class="card-change">total closed</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Revenue Over Time</span>
+        <div class="section-actions">
+          <button class="btn btn-ghost">7D</button>
+          <button class="btn btn-ghost">30D</button>
+          <button class="btn btn-ghost">90D</button>
+        </div>
+      </div>
+      <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Bot Performance</span>
+      </div>
+      <div class="chart-container"><canvas id="botChart"></canvas></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Active Bots</span>
+      <div class="section-actions">
+        <button class="btn btn-primary">▶ Start All</button>
+        <button class="btn btn-ghost">■ Stop All</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Bot Name</th><th>Category</th><th>Status</th><th>Revenue</th><th>Leads</th><th>Last Run</th><th>Actions</th></tr></thead>
+        <tbody id="dashBotBody"><tr><td colspan="7" class="empty-state">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Recent Leads</span>
+      <div class="section-actions">
+        <button class="btn btn-ghost">Export CSV</button>
+        <button class="btn btn-primary">+ Add Lead</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Source</th><th>Category</th><th>Score</th><th>Status</th></tr></thead>
+        <tbody id="leadsTableBody"><tr><td colspan="6" class="empty-state">Loading leads…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Workflow Pipelines</span>
+      <button class="btn btn-primary">+ New Workflow</button>
+    </div>
+    <div class="workflow-grid" id="workflowGrid"><div class="empty-state">Loading workflows…</div></div>
+  </div>
+</main>
+<script>
+'use strict';
+var revenueChart=null,botChart=null;
+var SAMPLE_BOTS=[
+  {id:'multi_source_lead_scraper',name:'Lead Scraper',category:'revenue',status:'active',revenue:4850,leads:312,lastRun:'2 min ago'},
+  {id:'fiverr_auto_apply',name:'Fiverr Auto Apply',category:'freelance',status:'active',revenue:2100,leads:0,lastRun:'18 min ago'},
+  {id:'real_estate_scanner',name:'Real Estate Scanner',category:'real_estate',status:'active',revenue:15000,leads:45,lastRun:'1h ago'},
+  {id:'crypto_trader',name:'Crypto Trader',category:'crypto',status:'active',revenue:890,leads:0,lastRun:'14 min ago'},
+  {id:'grant_finder',name:'Grant Finder',category:'grants',status:'idle',revenue:0,leads:8,lastRun:'3d ago'},
+  {id:'email_campaign_sender',name:'Email Campaigns',category:'marketing',status:'active',revenue:320,leads:89,lastRun:'4h ago'},
+  {id:'affiliate_optimizer',name:'Affiliate Optimizer',category:'affiliate',status:'active',revenue:760,leads:0,lastRun:'30 min ago'},
+  {id:'pricing_optimizer',name:'Pricing Optimizer',category:'monetization',status:'idle',revenue:0,leads:0,lastRun:'6h ago'}
+];
+var SAMPLE_LEADS=[
+  {name:'Alice Johnson',email:'alice@example.com',source:'LinkedIn',category:'real_estate',score:91,status:'qualified'},
+  {name:'Bob Smith',email:'bob@example.com',source:'Google',category:'crypto',score:78,status:'new'},
+  {name:'Carol White',email:'carol@example.com',source:'Zillow',category:'real_estate',score:85,status:'sold'},
+  {name:'David Brown',email:'david@example.com',source:'Indeed',category:'business',score:64,status:'contacted'},
+  {name:'Eva Martinez',email:'eva@example.com',source:'organic',category:'marketing',score:55,status:'new'},
+  {name:'Frank Lee',email:'frank@example.com',source:'LinkedIn',category:'legal',score:72,status:'qualified'}
+];
+var WORKFLOWS=[
+  {id:'fiverr',name:'Fiverr Pipeline',desc:'Find gigs → apply → close → upsell',enabled:true,revenue:'$350/cycle'},
+  {id:'real_estate',name:'Real Estate Deals',desc:'Scan listings → ROI → contact → close',enabled:true,revenue:'$15,000/cycle'},
+  {id:'grants',name:'Government Grants',desc:'SAM.gov → score → draft → submit',enabled:true,revenue:'$50,000/cycle'},
+  {id:'legal_money',name:'Legal Claims',desc:'Find claims → intake → file → track',enabled:false,revenue:'$8,500/cycle'},
+  {id:'crypto',name:'Crypto Trading',desc:'Monitor → signal → trade → rebalance',enabled:true,revenue:'$450/cycle'}
+];
+function fmt(n){if(n>=1000000){return'$'+(n/1000000).toFixed(1)+'M';}if(n>=1000){return'$'+(n/1000).toFixed(1)+'K';}return'$'+n.toLocaleString();}
+function statusBadge(s){var m={active:'<span class="badge badge-success"><span class="status-indicator status-running"></span>Active</span>',idle:'<span class="badge badge-muted">Idle</span>',stopped:'<span class="badge badge-muted">Stopped</span>',error:'<span class="badge badge-danger">Error</span>',new:'<span class="badge badge-info">New</span>',contacted:'<span class="badge badge-warn">Contacted</span>',qualified:'<span class="badge badge-success">Qualified</span>',sold:'<span class="badge badge-info">Sold</span>',rejected:'<span class="badge badge-danger">Rejected</span>'};return m[s]||('<span class="badge badge-muted">'+s+'</span>');}
+function scoreBar(s){var c=s>=75?'var(--accent)':s>=50?'var(--warn)':'var(--danger)';return'<span style="font-weight:700;color:'+c+'">'+s+'</span>';}
+function renderCards(bots,leads){var r=bots.reduce(function(s,b){return s+(b.revenue||0);},0);var a=bots.filter(function(b){return b.status==='active';}).length;document.getElementById('totalRevenue').textContent=fmt(r);document.getElementById('activeBots').textContent=a;document.getElementById('totalBots').textContent=bots.length;document.getElementById('totalLeads').textContent=leads.length;document.getElementById('dealsClosed').textContent=Math.floor(r/500);document.getElementById('lastRefresh').textContent='Last updated: '+new Date().toLocaleTimeString();}
+function renderBotTable(id,bots){var tb=document.getElementById(id);if(!tb){return;}tb.innerHTML=bots.map(function(b){return'<tr><td><strong>'+(b.name||b.id)+'</strong></td><td><span class="badge badge-info">'+b.category+'</span></td><td>'+statusBadge(b.status)+'</td><td class="text-accent">'+fmt(b.revenue||0)+'</td><td>'+(b.leads||0)+'</td><td class="text-muted">'+(b.lastRun||'—')+'</td><td><button class="btn btn-primary" style="padding:4px 10px;font-size:11px">▶</button> <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">■</button></td></tr>';}).join('');}
+function renderLeads(leads){var tb=document.getElementById('leadsTableBody');if(!tb){return;}tb.innerHTML=leads.map(function(l){return'<tr><td><strong>'+l.name+'</strong></td><td class="text-muted">'+l.email+'</td><td>'+l.source+'</td><td>'+l.category+'</td><td>'+scoreBar(l.score)+'</td><td>'+statusBadge(l.status)+'</td></tr>';}).join('');}
+function renderWorkflows(wfs){var g=document.getElementById('workflowGrid');if(!g){return;}g.innerHTML=wfs.map(function(w){return'<div class="workflow-card"><div class="workflow-name">'+w.name+'</div><div class="workflow-desc">'+w.desc+'</div><div class="workflow-meta">'+(w.enabled?'<span class="badge badge-success">Enabled</span>':'<span class="badge badge-muted">Disabled</span>')+'<span class="workflow-revenue">'+w.revenue+'</span></div><div style="margin-top:10px;display:flex;gap:6px"><button class="btn btn-primary" style="font-size:11px;flex:1">▶ Run</button><button class="btn btn-ghost" style="font-size:11px">Details</button></div></div>';}).join('');}
+function initCharts(bots){
+  var ctx1=document.getElementById('revenueChart');
+  if(ctx1){var labels=[],data=[],base=18000;for(var i=29;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));base+=Math.floor(Math.random()*1500-200);data.push(Math.max(base,10000));}if(revenueChart){revenueChart.destroy();}revenueChart=new Chart(ctx1,{type:'line',data:{labels:labels,datasets:[{label:'Revenue ($)',data:data,borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.07)',borderWidth:2,pointRadius:0,fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',maxTicksLimit:8},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#666',callback:function(v){return'$'+(v/1000).toFixed(0)+'K';}},grid:{color:'#1e1e1e'}}}}});}
+  var ctx2=document.getElementById('botChart');
+  if(ctx2){var top=bots.slice().sort(function(a,b){return(b.revenue||0)-(a.revenue||0);}).slice(0,6);if(botChart){botChart.destroy();}botChart=new Chart(ctx2,{type:'bar',data:{labels:top.map(function(b){return b.name||b.id;}),datasets:[{label:'Revenue',data:top.map(function(b){return b.revenue||0;}),backgroundColor:'rgba(0,255,136,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',maxRotation:30},grid:{color:'#1e1e1e'}},y:{ticks:{color:'#666',callback:function(v){return'$'+v.toLocaleString();}},grid:{color:'#1e1e1e'}}}}});}
+}
+async function refreshData(){
+  var bots=SAMPLE_BOTS,leads=SAMPLE_LEADS;
+  try{var res=await fetch('/api/status',{signal:AbortSignal.timeout(5000)});if(res.ok){var json=await res.json();if(json.bots&&json.bots.length>0){bots=json.bots;}if(json.leads&&json.leads.length>0){leads=json.leads;}}}catch(e){}
+  renderCards(bots,leads);
+  renderBotTable('dashBotBody',bots);
+  renderLeads(leads);
+  renderWorkflows(WORKFLOWS);
+  initCharts(bots);
+}
+refreshData();
+setInterval(refreshData,30000);
+</script>
+</body>
+</html>
