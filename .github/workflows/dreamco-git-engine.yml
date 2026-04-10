@@ -1,0 +1,52 @@
+name: DreamCo Git Engine
+
+# Runs the git-engine on every push to main (by humans/external bots) and on
+# manual dispatch.  The job guard below prevents an infinite loop when this
+# workflow itself merges a bot PR back into main.
+# Requires a repo secret named DREAMCO_TOKEN (PAT with repo + workflow + pull-requests scopes).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bot_name:
+        description: "Name of the bot triggering the engine"
+        required: false
+        default: "core_bot"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  git-engine:
+    name: Run DreamCo Git Engine
+    runs-on: ubuntu-latest
+    # Skip when the commit was pushed by this workflow's own bot account to
+    # break the push-to-main → workflow-creates-PR → merge → push-to-main loop.
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history so the engine can branch off any commit
+          fetch-depth: 0
+          token: ${{ secrets.DREAMCO_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        # --legacy-peer-deps is required for the existing dependency tree in this repo
+        run: npm install --legacy-peer-deps
+
+      - name: Run DreamCo Git Engine
+        env:
+          DREAMCO_TOKEN: ${{ secrets.DREAMCO_TOKEN }}
+          BOT_NAME: ${{ inputs.bot_name || 'core_bot' }}
+        run: node git-engine.js
