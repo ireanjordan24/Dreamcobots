@@ -522,3 +522,180 @@ class TestBotLibraryRegistration:
         entry = next(e for e in _DREAMCO_BOTS if e.bot_id == "stack_and_profit_bot")
         for cap in ["deal_scanning", "penny_deals", "flip_finding", "coupon_stacking"]:
             assert cap in entry.capabilities
+
+
+# ---------------------------------------------------------------------------
+# Additional tests — 25 new test methods reaching 105 total
+# ---------------------------------------------------------------------------
+
+class TestProfitEngineEdgeCases:
+    """ProfitEngine edge cases: zero price, no resale, large numbers."""
+
+    def test_zero_price_returns_zero_final_cost(self):
+        result = ProfitEngine.calculate({"price": 0, "coupon": 0, "cashback": 0})
+        assert result["final_cost"] == 0.0
+
+    def test_no_resale_profit_equals_cashback_plus_coupon(self):
+        result = ProfitEngine.calculate({"price": 50, "coupon": 5, "cashback": 3})
+        assert result["profit"] == 8.0
+
+    def test_large_numbers_precision(self):
+        result = ProfitEngine.calculate({"price": 9999.99, "coupon": 1000.00, "cashback": 500.00, "resale": 15000.00})
+        assert result["final_cost"] == 8499.99
+        assert result["profit"] == round(15000.00 - 8499.99, 2)
+
+    def test_coupon_exceeds_price_clamps_to_zero(self):
+        result = ProfitEngine.calculate({"price": 5, "coupon": 10, "cashback": 0})
+        assert result["final_cost"] == 0.0
+
+    def test_resale_zero_falls_back_to_coupon_cashback(self):
+        result = ProfitEngine.calculate({"current": 20, "coupon": 4, "cashback": 2, "resale": 0})
+        assert result["profit"] == 6.0
+
+
+class TestRankingAIEdgeCases:
+    """RankingAI score ranges: capped at 100, zero-profit deals."""
+
+    def test_score_capped_at_100(self):
+        deal = {"profit": 200, "effort": 1, "fast_payout": True, "category": "electronics"}
+        assert RankingAI.score(deal) == 100
+
+    def test_zero_profit_deal_scores_above_zero_with_fast_payout(self):
+        deal = {"profit": 0, "effort": 1, "fast_payout": True}
+        score = RankingAI.score(deal)
+        assert score > 0
+
+    def test_zero_profit_no_fast_payout_minimum_score(self):
+        deal = {"profit": 0, "effort": 5, "fast_payout": False, "category": "misc"}
+        assert RankingAI.score(deal) == 5
+
+    def test_rank_returns_sorted_descending(self):
+        deals = [
+            {"profit": 10, "effort": 3},
+            {"profit": 200, "effort": 1, "fast_payout": True, "category": "electronics"},
+            {"profit": 30, "effort": 2},
+        ]
+        ranked = RankingAI.rank(deals)
+        scores = [d["rank_score"] for d in ranked]
+        assert scores == sorted(scores, reverse=True)
+
+    def test_electronics_category_bonus_applied(self):
+        deal_elec = {"profit": 25, "effort": 3, "category": "electronics"}
+        deal_other = {"profit": 25, "effort": 3, "category": "clothing"}
+        assert RankingAI.score(deal_elec) > RankingAI.score(deal_other)
+
+
+class TestAlertEngineMinProfit:
+    """AlertEngine with min_profit parameter on StackAndProfitBot.get_alerts."""
+
+    def setup_method(self):
+        self.bot = StackAndProfitBot(Tier.PRO)
+        self.deals = [
+            {"name": "Big Deal", "profit": 100, "effort": 2, "fast_payout": True},
+            {"name": "Small Deal", "profit": 5, "effort": 3},
+            {"name": "Medium Deal", "profit": 30, "effort": 2},
+        ]
+
+    def test_get_alerts_no_min_profit_uses_default(self):
+        alerts = self.bot.get_alerts(self.deals)
+        assert isinstance(alerts, list)
+
+    def test_get_alerts_min_profit_filters_below_threshold(self):
+        alerts = self.bot.get_alerts(self.deals, min_profit=50)
+        for d in alerts:
+            assert float(d.get("profit", 0)) >= 50
+
+    def test_get_alerts_min_profit_zero_allows_all_alertable(self):
+        alerts = self.bot.get_alerts(self.deals, min_profit=0)
+        assert len(alerts) >= 1
+
+    def test_get_alerts_min_profit_very_high_returns_empty(self):
+        alerts = self.bot.get_alerts(self.deals, min_profit=99999)
+        assert alerts == []
+
+    def test_get_alerts_min_profit_respects_alert_engine_threshold(self):
+        alerts = self.bot.get_alerts(self.deals, min_profit=20)
+        for d in alerts:
+            assert AlertEngine.should_alert(d)
+
+
+class TestFlipBotEstimateFlipProfit:
+    """FlipBot.estimate_flip_profit calculations."""
+
+    def setup_method(self):
+        self.bot = StackAndProfitBot(Tier.PRO)
+
+    def test_basic_flip_profit(self):
+        result = self.bot.flip_bot.estimate_flip_profit(50.0, 100.0)
+        assert result["gross_profit"] == 50.0
+        assert result["net_profit"] < 50.0
+
+    def test_flip_fees_calculated_correctly(self):
+        result = self.bot.flip_bot.estimate_flip_profit(50.0, 100.0, fees_pct=0.10)
+        assert result["platform_fees"] == 10.0
+        assert result["net_profit"] == 40.0
+
+    def test_flip_roi_positive_when_profitable(self):
+        result = self.bot.flip_bot.estimate_flip_profit(20.0, 50.0, fees_pct=0.0)
+        assert result["roi_pct"] > 0
+
+    def test_flip_zero_buy_price_roi_zero(self):
+        result = self.bot.flip_bot.estimate_flip_profit(0.0, 50.0)
+        assert result["roi_pct"] == 0
+
+
+class TestCouponBotSources:
+    """CouponBot.get_available_sources per tier."""
+
+    def test_free_tier_limited_sources(self):
+        bot = StackAndProfitBot(Tier.FREE)
+        sources = bot.coupon_bot.get_available_sources()
+        assert len(sources) <= 3
+
+    def test_pro_tier_more_sources_than_free(self):
+        free_bot = StackAndProfitBot(Tier.FREE)
+        pro_bot = StackAndProfitBot(Tier.PRO)
+        assert len(pro_bot.coupon_bot.get_available_sources()) > len(free_bot.coupon_bot.get_available_sources())
+
+    def test_sources_returns_list(self):
+        bot = StackAndProfitBot(Tier.PRO)
+        assert isinstance(bot.coupon_bot.get_available_sources(), list)
+
+
+class TestReceiptBotScanReceipt:
+    """ReceiptBot.scan_receipt: PRO raises no error, FREE raises error."""
+
+    def test_pro_scan_receipt_no_error(self):
+        bot = StackAndProfitBot(Tier.PRO)
+        result = bot.receipt_bot.scan_receipt(["groceries"])
+        assert "items_submitted" in result
+
+    def test_free_scan_receipt_raises_tier_error(self):
+        bot = StackAndProfitBot(Tier.FREE)
+        with pytest.raises(StackAndProfitBotTierError):
+            bot.receipt_bot.scan_receipt(["groceries"])
+
+    def test_enterprise_scan_receipt_no_error(self):
+        bot = StackAndProfitBot(Tier.ENTERPRISE)
+        result = bot.receipt_bot.scan_receipt([])
+        assert result["items_submitted"] == 0
+
+
+class TestLoadPreloadedDeals:
+    """load_preloaded_deals() method."""
+
+    def test_returns_list(self):
+        bot = StackAndProfitBot(Tier.FREE)
+        deals = bot.load_preloaded_deals()
+        assert isinstance(deals, list)
+
+    def test_returns_50_deals(self):
+        bot = StackAndProfitBot(Tier.FREE)
+        deals = bot.load_preloaded_deals()
+        assert len(deals) == 50
+
+    def test_returns_copy_not_original(self):
+        bot = StackAndProfitBot(Tier.FREE)
+        deals = bot.load_preloaded_deals()
+        deals.clear()
+        assert len(bot.load_preloaded_deals()) == 50

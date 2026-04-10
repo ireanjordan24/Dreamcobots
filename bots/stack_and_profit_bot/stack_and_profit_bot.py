@@ -327,8 +327,14 @@ class StackAndProfitBot:
         """Return deals ranked by AI profit score."""
         return self.ranking_ai.rank(deals)
 
-    def get_alerts(self, deals: list) -> list:
+    def load_preloaded_deals(self) -> list:
+        """Return the preloaded deals dataset."""
+        return list(self._deals)
+
+    def get_alerts(self, deals: list, min_profit: float = None) -> list:
         """Return only deals that meet alert thresholds."""
+        if min_profit is not None:
+            return [d for d in deals if float(d.get("profit", 0)) >= min_profit and AlertEngine.should_alert(d)]
         return self.alert_engine.filter_alerts(deals)
 
     def calculate_profit(self, deal: dict) -> dict:

@@ -13,6 +13,11 @@
 const realEstateBot = require('../bots/realEstateBot');
 const contractBot = require('../bots/contractBot');
 const jobBot = require('../bots/jobBot');
+const dealBot = require('../bots/dealBot');
+const pennyBot = require('../bots/pennyBot');
+const receiptBot = require('../bots/receiptBot');
+const flipBot = require('../bots/flipBot');
+const couponBot = require('../bots/couponBot');
 
 // ---------------------------------------------------------------------------
 // Revenue Validator
@@ -75,6 +80,11 @@ const BOTS = [
   { name: 'realEstateBot', module: realEstateBot },
   { name: 'contractBot', module: contractBot },
   { name: 'jobBot', module: jobBot },
+  { name: 'dealBot', module: dealBot },
+  { name: 'pennyBot', module: pennyBot },
+  { name: 'receiptBot', module: receiptBot },
+  { name: 'flipBot', module: flipBot },
+  { name: 'couponBot', module: couponBot },
 ];
 
 /**
