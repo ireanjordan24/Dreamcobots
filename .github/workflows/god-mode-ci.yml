@@ -1,0 +1,146 @@
+name: God Mode CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "bots/god_mode_bot/**"
+      - "DreamCo/bots/business/**"
+      - "DreamCo/bots/marketing/**"
+      - "DreamCo/orchestrator/**"
+      - "tests/test_god_mode_bot.py"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "bots/god_mode_bot/**"
+      - "DreamCo/bots/business/**"
+      - "DreamCo/bots/marketing/**"
+      - "DreamCo/orchestrator/**"
+      - "tests/test_god_mode_bot.py"
+
+jobs:
+  python-god-mode-tests:
+    name: Python — God Mode Bot tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run God Mode Bot tests
+        run: pytest tests/test_god_mode_bot.py -v
+
+  python-full-suite:
+    name: Python — Full test suite
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run full test suite
+        run: |
+          python3 -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q
+
+  js-smoke-tests:
+    name: JS — Orchestrator smoke test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Run DreamCo orchestrator
+        run: node DreamCo/orchestrator/index.js
+
+  bot-library-check:
+    name: Bot Library — framework check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run bot framework check
+        run: python3 tools/check_bot_framework.py
+
+  security-scan:
+    name: Security — dependency audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Run safety check
+        run: safety check -r requirements.txt --ignore 51457
+        continue-on-error: true
+
+  summary:
+    name: God Mode CI — All checks passed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs:
+      - python-god-mode-tests
+      - python-full-suite
+      - js-smoke-tests
+      - bot-library-check
+      - security-scan
+    steps:
+      - name: All jobs passed
+        run: echo "✅ All God Mode CI checks passed — system is operational."

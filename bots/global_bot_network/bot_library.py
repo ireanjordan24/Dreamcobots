@@ -783,4 +783,27 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "god_mode",
         ],
     ),
+    BotEntry(
+        bot_id="god_mode_bot",
+        display_name="God Mode Bot",
+        description=(
+            "DreamCo's fully autonomous business operator suite. Orchestrates five "
+            "specialised engines — AutoClientHunter, AutoCloser, PaymentAutoCollector, "
+            "ViralEngine, and SelfImprovingAI — to hunt leads, close deals, collect "
+            "subscription payments, generate viral content, and continuously optimise "
+            "performance across every revenue channel."
+        ),
+        category=BotCategory.BUSINESS,
+        module_path="bots.god_mode_bot.god_mode_bot",
+        class_name="GodModeBot",
+        capabilities=[
+            "lead_hunting",
+            "auto_closing",
+            "payment_collection",
+            "viral_engine",
+            "self_improving_ai",
+            "autonomous_business",
+            "god_mode",
+        ],
+    ),
 ]
