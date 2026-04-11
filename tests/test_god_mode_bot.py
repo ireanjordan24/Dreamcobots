@@ -625,22 +625,29 @@ class TestEdgeCases:
 
 class TestBotLibraryRegistration:
     def test_god_mode_bot_in_library(self):
-        from bots.global_bot_network.bot_library import BOT_LIBRARY
-        ids = [entry.bot_id for entry in BOT_LIBRARY]
-        assert "god_mode_bot" in ids
+        from bots.global_bot_network.bot_library import BotLibrary, BotNotFound
+        lib = BotLibrary()
+        lib.populate_dreamco_bots()
+        try:
+            entry = lib.get_bot("god_mode_bot")
+            assert entry.bot_id == "god_mode_bot"
+        except BotNotFound:
+            raise AssertionError("god_mode_bot not found in library")
 
     def test_god_mode_bot_entry_fields(self):
-        from bots.global_bot_network.bot_library import BOT_LIBRARY
-        entry = next((e for e in BOT_LIBRARY if e.bot_id == "god_mode_bot"), None)
-        assert entry is not None
+        from bots.global_bot_network.bot_library import BotLibrary
+        lib = BotLibrary()
+        lib.populate_dreamco_bots()
+        entry = lib.get_bot("god_mode_bot")
         assert entry.display_name == "God Mode Bot"
         assert entry.class_name == "GodModeBot"
         assert entry.module_path == "bots.god_mode_bot.god_mode_bot"
 
     def test_god_mode_bot_capabilities(self):
-        from bots.global_bot_network.bot_library import BOT_LIBRARY
-        entry = next((e for e in BOT_LIBRARY if e.bot_id == "god_mode_bot"), None)
-        assert entry is not None
+        from bots.global_bot_network.bot_library import BotLibrary
+        lib = BotLibrary()
+        lib.populate_dreamco_bots()
+        entry = lib.get_bot("god_mode_bot")
         expected = ["lead_hunting", "auto_closing", "payment_collection", "viral_engine", "god_mode"]
         for cap in expected:
             assert cap in entry.capabilities, f"Missing capability: {cap}"
