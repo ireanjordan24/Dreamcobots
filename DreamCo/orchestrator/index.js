@@ -1,11 +1,13 @@
 'use strict';
 
 /**
- * DreamCo Orchestrator
+ * DreamCo Orchestrator — God Mode Edition
  *
  * Central brain for the DreamCo Money Operating System.
- * Wires all bots together, validates revenue output, and triggers scaling
+ * Wires all 9 bots together, validates revenue output, and triggers scaling
  * for profitable bots.
+ *
+ * Cycle targets: ~$17,500 revenue | ~431 leads
  *
  * BOT → ACTION → RESULT → REVENUE → VALIDATION → SCALE
  */
@@ -13,6 +15,12 @@
 const realEstateBot = require('../bots/realEstateBot');
 const contractBot = require('../bots/contractBot');
 const jobBot = require('../bots/jobBot');
+const adEngine = require('../bots/business/adEngine');
+const businessBuilder = require('../bots/business/businessBuilder');
+const viralEngine = require('../bots/marketing/viralEngine');
+const autoClientHunter = require('../bots/marketing/autoClientHunter');
+const autoCloser = require('../bots/marketing/autoCloser');
+const paymentAutoCollector = require('../bots/marketing/paymentAutoCollector');
 
 // ---------------------------------------------------------------------------
 // Revenue Validator
@@ -75,6 +83,12 @@ const BOTS = [
   { name: 'realEstateBot', module: realEstateBot },
   { name: 'contractBot', module: contractBot },
   { name: 'jobBot', module: jobBot },
+  { name: 'adEngine', module: adEngine },
+  { name: 'businessBuilder', module: businessBuilder },
+  { name: 'viralEngine', module: viralEngine },
+  { name: 'autoClientHunter', module: autoClientHunter },
+  { name: 'autoCloser', module: autoCloser },
+  { name: 'paymentAutoCollector', module: paymentAutoCollector },
 ];
 
 /**
@@ -116,8 +130,8 @@ function runAllBots() {
   const scalingBots = results.filter((r) => r.validation && r.validation.scale).map((r) => r.bot);
 
   console.log('\n─────────────────────────────────────');
-  console.log(`💰 Total Revenue:   $${totalRevenue}`);
-  console.log(`📋 Total Leads:     ${totalLeads}`);
+  console.log(`💰 Total Revenue:   $${totalRevenue}  (cycle target ~$17,500)`);
+  console.log(`📋 Total Leads:     ${totalLeads}  (cycle target ~431)`);
   console.log(`📈 Scaling Bots:    ${scalingBots.length > 0 ? scalingBots.join(', ') : 'none'}`);
   console.log('─────────────────────────────────────\n');
 
