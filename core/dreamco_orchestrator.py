@@ -200,14 +200,36 @@ class DreamCoOrchestrator:
         _root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
         bots: List[tuple[str, str]] = [
-            (
-                os.path.join(_root, "bots", "government-contract-grant-bot", "government_contract_grant_bot.py"),
-                "gov_bot",
-            ),
+            # Core 7 bots required by the DreamCo God Mode spec
             (
                 "bots.real_estate_bot.real_estate_bot",
                 "real_estate_bot",
             ),
+            (
+                "bots.deal_finder_bot.deal_finder_bot",
+                "deal_finder_bot",
+            ),
+            (
+                "bots.revenue_engine_bot.revenue_engine_bot",
+                "revenue_engine_bot",
+            ),
+            (
+                "bots.dreamco_payments.dreamco_payments",
+                "dreamco_payments",
+            ),
+            (
+                "bots.multi_source_lead_scraper.lead_scraper",
+                "multi_source_lead_scraper",
+            ),
+            (
+                os.path.join(_root, "bots", "government-contract-grant-bot", "government_contract_grant_bot.py"),
+                "gov_contract_grant_bot",
+            ),
+            (
+                os.path.join(_root, "bots", "ai-models-integration", "ai_models_integration.py"),
+                "ai_models_integration_bot",
+            ),
+            # Additional bots
             (
                 os.path.join(_root, "bots", "ai-side-hustle-bots", "bot.py"),
                 "side_hustle_bot",

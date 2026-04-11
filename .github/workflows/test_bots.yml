@@ -1,0 +1,84 @@
+name: Bot Validation (Structure + run() Compliance)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-bots:
+    name: Validate Bot Structure & run() Compliance
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check GLOBAL AI SOURCES FLOW framework compliance
+        run: python tools/check_bot_framework.py
+
+      - name: Validate BaseBot run() contract on core bots
+        run: |
+          python -c "
+          import sys, os
+          sys.path.insert(0, '.')
+          sys.path.insert(0, os.path.join('.', 'bots', 'ai-models-integration'))
+
+          errors = []
+          core_bots = [
+              ('bots.real_estate_bot.real_estate_bot', 'RealEstateBot'),
+              ('bots.deal_finder_bot.deal_finder_bot', 'DealFinderBot'),
+              ('bots.revenue_engine_bot.revenue_engine_bot', 'RevenueEngineBot'),
+              ('bots.dreamco_payments.dreamco_payments', 'DreamcoPaymentsBot'),
+              ('bots.multi_source_lead_scraper.lead_scraper', 'MultiSourceLeadScraper'),
+          ]
+          for module_path, class_name in core_bots:
+              try:
+                  import importlib
+                  mod = importlib.import_module(module_path)
+                  fn = getattr(mod, 'run', None)
+                  if fn is None:
+                      errors.append(f'MISSING run() in {module_path}')
+                  elif not callable(fn):
+                      errors.append(f'run() is not callable in {module_path}')
+                  else:
+                      result = fn()
+                      if not isinstance(result, dict):
+                          errors.append(f'run() must return dict in {module_path}')
+                      elif 'status' not in result:
+                          errors.append(f'run() result missing \"status\" key in {module_path}')
+                      else:
+                          print(f'  OK  {module_path} -> status={result[\"status\"]}')
+              except Exception as exc:
+                  errors.append(f'ERROR importing {module_path}: {exc}')
+
+          if errors:
+              print()
+              print('VALIDATION FAILURES:')
+              for e in errors:
+                  print(f'  {e}')
+              sys.exit(1)
+          else:
+              print()
+              print('All core bot run() functions are compliant.')
+          "
+
+      - name: Run bot unit tests
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
