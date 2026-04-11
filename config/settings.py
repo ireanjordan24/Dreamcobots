@@ -58,7 +58,7 @@ class Settings:
     # ---- Runtime flags ----------------------------------------------------
     simulation_mode: bool = field(
         default_factory=lambda: os.getenv("SIMULATION_MODE", "true").lower()
-        not in ("false", "0", "no")
+        in ("true", "1", "yes")
     )
     log_level: str = field(
         default_factory=lambda: os.getenv("LOG_LEVEL", "INFO")

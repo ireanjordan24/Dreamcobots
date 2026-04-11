@@ -10,6 +10,8 @@ jobs:
   validate-bots:
     name: Validate Bot Structure & run() Compliance
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository

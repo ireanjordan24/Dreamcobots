@@ -19,6 +19,8 @@ jobs:
   run-bots:
     name: Execute DreamCo Autonomous Bot Network
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository

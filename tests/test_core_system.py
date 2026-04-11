@@ -26,6 +26,7 @@ from core.base_bot import (
 from core.executor import BotExecutor
 from core.workflow import WorkflowEngine, WorkflowStep
 from core.money_loop import MoneyLoopEngine
+from core.dreamco_orchestrator import SCALE_THRESHOLD
 
 
 # ===========================================================================
@@ -347,8 +348,8 @@ class TestMoneyLoopEngine:
         assert report["total_leads"] == 8
 
     def test_scaling_triggered_above_threshold(self):
-        # Revenue of 1500 > SCALE_THRESHOLD (1000)
-        loop = self._make_loop(revenue=1500.0)
+        # Revenue above SCALE_THRESHOLD triggers auto-scaling
+        loop = self._make_loop(revenue=SCALE_THRESHOLD + 500.0)
         report = loop.run()
         assert len(report["scaled_bots"]) > 0
 
