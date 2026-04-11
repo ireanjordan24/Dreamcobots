@@ -98,6 +98,16 @@ FEATURE_WHITE_LABEL = "white_label"
 FEATURE_API_ACCESS = "api_access"
 FEATURE_DEDICATED_SUPPORT = "dedicated_support"
 
+# ---------------------------------------------------------------------------
+# Autonomous SaaS feature flags
+# ---------------------------------------------------------------------------
+
+FEATURE_LEAD_FINDER = "lead_finder"
+FEATURE_OFFER_GENERATOR = "offer_generator"
+FEATURE_CONVERSION_ENGINE = "conversion_engine"
+FEATURE_FULFILLMENT_ENGINE = "fulfillment_engine"
+FEATURE_RETENTION_ENGINE = "retention_engine"
+
 FREE_FEATURES: list = [
     FEATURE_CONVERSATIONAL_AI,
     FEATURE_EMOTION_DETECTION,
@@ -122,6 +132,11 @@ PRO_FEATURES: list = FREE_FEATURES + [
     FEATURE_GAMIFIED_PRODUCTIVITY,
     FEATURE_REAL_TIME_TRANSLATION,
     FEATURE_WELLNESS_TRACKER,
+    FEATURE_LEAD_FINDER,
+    FEATURE_OFFER_GENERATOR,
+    FEATURE_CONVERSION_ENGINE,
+    FEATURE_FULFILLMENT_ENGINE,
+    FEATURE_RETENTION_ENGINE,
 ]
 
 ENTERPRISE_FEATURES: list = PRO_FEATURES + [

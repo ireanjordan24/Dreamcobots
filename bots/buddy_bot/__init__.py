@@ -34,6 +34,11 @@ from bots.buddy_bot.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_API_ACCESS,
     FEATURE_DEDICATED_SUPPORT,
+    FEATURE_LEAD_FINDER,
+    FEATURE_OFFER_GENERATOR,
+    FEATURE_CONVERSION_ENGINE,
+    FEATURE_FULFILLMENT_ENGINE,
+    FEATURE_RETENTION_ENGINE,
 )
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
@@ -93,6 +98,49 @@ from bots.buddy_bot.personality_engine import (
     PersonaTone,
     PersonalityConfig,
 )
+from bots.buddy_bot.lead_finder_engine import (
+    LeadFinderEngine,
+    BusinessLead,
+    BusinessVertical,
+    LeadContactType,
+    LeadFinderError,
+    LeadFinderTierError,
+)
+from bots.buddy_bot.offer_generator_engine import (
+    OfferGeneratorEngine,
+    ServiceOffer,
+    ServiceType,
+    PricingModel,
+    OfferGeneratorError,
+    OfferGeneratorTierError,
+)
+from bots.buddy_bot.conversion_engine import (
+    ConversionEngine,
+    Proposal,
+    ConversionRecord,
+    OutreachChannel,
+    ConversionStage,
+    ConversionEngineError,
+    ConversionEngineTierError,
+)
+from bots.buddy_bot.fulfillment_engine import (
+    FulfillmentEngine,
+    Deliverable,
+    DeliverableType,
+    DeliverableStatus,
+    FulfillmentEngineError,
+    FulfillmentEngineTierError,
+)
+from bots.buddy_bot.retention_engine import (
+    RetentionEngine,
+    ClientHealthRecord,
+    HealthStatus,
+    UpsellStage,
+    UpsellOffer,
+    CheckIn,
+    RetentionEngineError,
+    RetentionEngineTierError,
+)
 
 __all__ = [
     # Main bot
@@ -132,6 +180,11 @@ __all__ = [
     "FEATURE_WHITE_LABEL",
     "FEATURE_API_ACCESS",
     "FEATURE_DEDICATED_SUPPORT",
+    "FEATURE_LEAD_FINDER",
+    "FEATURE_OFFER_GENERATOR",
+    "FEATURE_CONVERSION_ENGINE",
+    "FEATURE_FULFILLMENT_ENGINE",
+    "FEATURE_RETENTION_ENGINE",
     # Sub-engines
     "ConversationEngine",
     "ConversationTone",
@@ -177,4 +230,38 @@ __all__ = [
     "PersonaMode",
     "PersonaTone",
     "PersonalityConfig",
+    # Autonomous SaaS engines
+    "LeadFinderEngine",
+    "BusinessLead",
+    "BusinessVertical",
+    "LeadContactType",
+    "LeadFinderError",
+    "LeadFinderTierError",
+    "OfferGeneratorEngine",
+    "ServiceOffer",
+    "ServiceType",
+    "PricingModel",
+    "OfferGeneratorError",
+    "OfferGeneratorTierError",
+    "ConversionEngine",
+    "Proposal",
+    "ConversionRecord",
+    "OutreachChannel",
+    "ConversionStage",
+    "ConversionEngineError",
+    "ConversionEngineTierError",
+    "FulfillmentEngine",
+    "Deliverable",
+    "DeliverableType",
+    "DeliverableStatus",
+    "FulfillmentEngineError",
+    "FulfillmentEngineTierError",
+    "RetentionEngine",
+    "ClientHealthRecord",
+    "HealthStatus",
+    "UpsellStage",
+    "UpsellOffer",
+    "CheckIn",
+    "RetentionEngineError",
+    "RetentionEngineTierError",
 ]
