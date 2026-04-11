@@ -26,6 +26,9 @@ const paymentAutoCollector = require('../bots/marketing/paymentAutoCollector');
 // Revenue Validator
 // ---------------------------------------------------------------------------
 
+const CYCLE_REVENUE_TARGET = 17500;
+const CYCLE_LEADS_TARGET = 431;
+
 const REVENUE_THRESHOLDS = {
   scale: 1000,
   maintain: 100,
@@ -130,8 +133,8 @@ function runAllBots() {
   const scalingBots = results.filter((r) => r.validation && r.validation.scale).map((r) => r.bot);
 
   console.log('\n─────────────────────────────────────');
-  console.log(`💰 Total Revenue:   $${totalRevenue}  (cycle target ~$17,500)`);
-  console.log(`📋 Total Leads:     ${totalLeads}  (cycle target ~431)`);
+  console.log(`💰 Total Revenue:   $${totalRevenue}  (cycle target ~$${CYCLE_REVENUE_TARGET})`);
+  console.log(`📋 Total Leads:     ${totalLeads}  (cycle target ~${CYCLE_LEADS_TARGET})`);
   console.log(`📈 Scaling Bots:    ${scalingBots.length > 0 ? scalingBots.join(', ') : 'none'}`);
   console.log('─────────────────────────────────────\n');
 
@@ -147,7 +150,7 @@ function runAllBots() {
   };
 }
 
-module.exports = { runAllBots, processBot, validateRevenue, cloneBot, BOTS };
+module.exports = { runAllBots, processBot, validateRevenue, cloneBot, BOTS, CYCLE_REVENUE_TARGET, CYCLE_LEADS_TARGET };
 
 // Run directly if invoked as a script
 if (require.main === module) {

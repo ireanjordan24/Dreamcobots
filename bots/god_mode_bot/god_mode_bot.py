@@ -94,6 +94,7 @@ class AutoClientHunter:
         leads = []
         for i in range(count):
             score_label = random.choice(_LEAD_SCORES)
+            niche_match = random.random() > 0.3
             leads.append({
                 "id": f"LEAD-{int(time.time() * 1000)}-{i}",
                 "niche": niche,
@@ -102,8 +103,8 @@ class AutoClientHunter:
                 "email": f"contact{i + 1}@{niche.replace('_', '')}.example.com",
                 "pain_point": random.choice(pain_points),
                 "score": score_label,
-                "niche_match": random.random() > 0.3,
-                "qualified": score_label in ("hot", "warm"),
+                "niche_match": niche_match,
+                "qualified": score_label in ("hot", "warm") and niche_match,
             })
         return leads
 

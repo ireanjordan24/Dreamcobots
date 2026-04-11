@@ -13,6 +13,7 @@
 /**
  * Pre-written closing scripts keyed by stage.
  */
+const WIN_PROBABILITY = 0.65; // simulation only — not used for security or cryptography
 const CLOSING_SCRIPTS = {
   initial_contact:
     'Hi [NAME], I came across [COMPANY] and thought there could be a great fit between what we offer and what you need. Do you have 10 minutes this week?',
@@ -104,7 +105,7 @@ function closeDeal(session = {}) {
   const currentIndex = STAGES.indexOf(session.stage || STAGES[0]);
   const nextIndex = Math.min(currentIndex + 1, STAGES.length - 1);
   const nextStage = STAGES[nextIndex];
-  const won = Math.random() > 0.35; // simulation only — not used for security or cryptography
+  const won = Math.random() > (1 - WIN_PROBABILITY); // simulation only — not used for security or cryptography
   const dealValue = Math.floor(Math.random() * 5000) + 1000;
 
   const updatedSession = {

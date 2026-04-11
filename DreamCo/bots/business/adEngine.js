@@ -23,6 +23,11 @@ const PLATFORM_MULTIPLIERS = {
   youtube_ads: 2.9,
 };
 
+const REVENUE_MIN = 1500;
+const REVENUE_MAX = 3500;
+const LEADS_MIN = 40;
+const LEADS_MAX = 80;
+
 /**
  * Generate an ad campaign for a given platform and budget.
  * @param {string} platform - One of AD_PLATFORMS
@@ -75,9 +80,9 @@ function run(options = {}) {
 
   const campaign = generateCampaign(platform, budget);
   const revenue =
-    Math.floor(Math.random() * (3500 - 1500 + 1)) + 1500;
+    Math.floor(Math.random() * (REVENUE_MAX - REVENUE_MIN + 1)) + REVENUE_MIN;
   const roi = calculateROI(budget, revenue);
-  const leadsGenerated = Math.floor(Math.random() * (80 - 40 + 1)) + 40;
+  const leadsGenerated = Math.floor(Math.random() * (LEADS_MAX - LEADS_MIN + 1)) + LEADS_MIN;
   const conversions = campaign.estimated_conversions;
   const conversionRate =
     leadsGenerated > 0 ? parseFloat((conversions / leadsGenerated).toFixed(2)) : 0;
