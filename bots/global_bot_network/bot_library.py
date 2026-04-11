@@ -756,4 +756,31 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "referral_system", "premium_subscription",
         ],
     ),
+    BotEntry(
+        bot_id="quantum_decision_bot",
+        display_name="Quantum Decision Bot",
+        description=(
+            "DreamCo Reality Optimization System. Simulates thousands of outcome "
+            "paths using Monte Carlo methods, assigns probabilities, and collapses to "
+            "the highest-return decision path. Features a multi-dimensional decision "
+            "mapper (time/capital/risk/scale), an entangled bot network router that "
+            "propagates decisions to all connected bots instantly, and an autonomous "
+            "money scanner that ranks income opportunities by quantum score."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.quantum_decision_bot.quantum_decision_bot",
+        class_name="QuantumDecisionBot",
+        capabilities=[
+            "quantum_decision_engine",
+            "monte_carlo_simulation",
+            "probability_model",
+            "wave_function_collapse",
+            "dimension_mapper",
+            "entangled_bot_router",
+            "autonomous_money_scanner",
+            "multi_path_tracker",
+            "self_improving_ai",
+            "god_mode",
+        ],
+    ),
 ]
