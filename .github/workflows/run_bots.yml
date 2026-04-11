@@ -1,0 +1,75 @@
+name: Run DreamCo Bots (Money Loop)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run daily at 06:00 UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      cycles:
+        description: 'Number of Money Loop cycles'
+        required: false
+        default: '1'
+
+jobs:
+  run-bots:
+    name: Execute DreamCo Autonomous Bot Network
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run DreamCo Orchestrator (all 7 core bots)
+        env:
+          ZILLOW_API_KEY: ${{ secrets.ZILLOW_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+          SIMULATION_MODE: 'true'
+          MONEY_LOOP_CYCLES: ${{ github.event.inputs.cycles || '1' }}
+        run: |
+          python -c "
+          import sys, os
+          sys.path.insert(0, '.')
+          from core.dreamco_orchestrator import DreamCoOrchestrator
+          orch = DreamCoOrchestrator()
+          results = orch.run_all_bots()
+          summary = orch.summary(results)
+          print('=== DreamCo Money Loop Results ===')
+          for r in results:
+              if 'error' in r:
+                  print(f'  FAILED  [{r[\"bot\"]}]: {r[\"error\"]}')
+              else:
+                  print(f'  OK      [{r[\"bot\"]}]: revenue={r[\"output\"].get(\"revenue\", 0)}')
+          print()
+          print(f'Total Revenue : \${summary[\"total_revenue\"]:,.2f}')
+          print(f'Total Leads   : {summary[\"total_leads\"]}')
+          print(f'Bots Run      : {summary[\"bots_run\"]}')
+          print(f'Scaling Bots  : {summary[\"scaling_bots\"]}')
+          print(f'Failed Bots   : {summary[\"failed_bots\"]}')
+          if summary['failed_bots']:
+              sys.exit(1)
+          "
+
+      - name: Upload run summary as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-run-summary
+          path: logs/
+          if-no-files-found: ignore

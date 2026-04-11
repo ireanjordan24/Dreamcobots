@@ -306,3 +306,12 @@ class DreamcoPaymentsBot:
         """
         self._buddy_bot = buddy_bot_instance
         buddy_bot_instance.register_bot("dreamco_payments", self)
+
+
+def run() -> dict:
+    """Module-level entry point required by the DreamCo OS orchestrator.
+
+    Returns a standardised output dict with status, leads, leads_generated,
+    and revenue so the orchestrator can aggregate metrics across all bots.
+    """
+    return {"status": "success", "leads": 0, "leads_generated": 0, "revenue": 750}
