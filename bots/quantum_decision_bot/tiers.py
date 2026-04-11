@@ -4,7 +4,7 @@ Tier configuration for the DreamCo Quantum Decision Bot.
 Tiers:
   - FREE:       Basic simulation (10 runs), core quantum decision, simple scoring.
   - PRO ($49):  Full simulation (1000 runs), dimension mapping, bot routing, money engine.
-  - ENTERPRISE ($199): Hyper simulation (10 000 runs), self-improving AI, god mode, unlimited paths.
+  - ENTERPRISE ($199): Hyper simulation (10,000 runs), self-improving AI, god mode, unlimited paths.
 """
 
 from __future__ import annotations
