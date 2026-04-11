@@ -603,9 +603,12 @@ class TestContentViralEngine:
         assert script.title
 
     def test_script_id_is_uuid(self):
+        import uuid as _uuid
         viral = ContentViralEngine()
         script = viral.generate(self._make_decision(), fmt=ContentFormat.TIKTOK)
-        assert len(script.script_id) == 36  # UUID4 format
+        # Verify the script_id is a valid UUID4
+        parsed = _uuid.UUID(script.script_id, version=4)
+        assert str(parsed) == script.script_id
 
 
 # ===========================================================================

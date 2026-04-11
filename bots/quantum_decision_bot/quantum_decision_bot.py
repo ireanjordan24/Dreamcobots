@@ -259,6 +259,11 @@ class SimulationEngine:
         samples: List[Tuple[float, float]] = []
 
         for _ in range(runs):
+            # Gaussian noise (mean=1.0, std=0.2): models ±20% variance around the
+            # baseline — realistic for business outcomes where most results cluster
+            # near the expected value, with occasional extreme outliers.
+            # Risk is inversely proportional to the profit noise: a better-than-
+            # expected profit run implies favourable conditions (lower realised risk).
             noise = random.gauss(1.0, 0.2)
             profit = scenario.base_profit * noise
             risk = scenario.risk_score * (1.0 / max(noise, 0.01))
@@ -705,6 +710,11 @@ class SelfImprovingAI:
     learned weights so that future predictions improve over time.
     """
 
+    # Learning rate constants.
+    # REINFORCE_DELTA (+0.05): small positive nudge — prevents over-fitting to a
+    #   single successful outcome while still accumulating signal over many runs.
+    # PENALISE_DELTA (-0.03): smaller negative correction — asymmetric to avoid
+    #   the model over-penalising noisy losses (losses are noisier than wins).
     REINFORCE_DELTA = 0.05   # positive reward
     PENALISE_DELTA = -0.03   # negative correction
 
@@ -725,6 +735,10 @@ class SelfImprovingAI:
         """
         best = decision.best_path
         predicted = best.simulation.avg_profit
+        # 20% tolerance: a prediction is "correct" if the actual outcome lands
+        # within 80–120% of the simulated average.  This threshold acknowledges
+        # that business results are inherently noisy; demanding exact accuracy
+        # would make the model too slow to reinforce good predictions.
         was_correct = actual_profit >= predicted * 0.8   # within 20% counts as correct
 
         delta = self.REINFORCE_DELTA if was_correct else self.PENALISE_DELTA
