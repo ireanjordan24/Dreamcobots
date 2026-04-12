@@ -6,6 +6,9 @@ Aggregates property listings across markets and surfaces key metrics
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
+
+Also exposes ``Feature1Bot`` — a DreamCo OS-compatible wrapper that can be
+loaded by the orchestrator and wired into the shared event bus.
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -95,3 +98,40 @@ class PropertyListingAggregator:
             "avg_monthly_rent_usd": avg_rent,
             "avg_flip_purchase_price_usd": avg_flip_price,
         }
+
+# ---------------------------------------------------------------------------
+# DreamCo OS — Feature1Bot wrapper
+# ---------------------------------------------------------------------------
+
+try:
+    from python_bots.base_bot import BaseBot as _OSBaseBot
+    from event_bus.base_bus import BaseEventBus as _BaseEventBus
+
+    class Feature1Bot(_OSBaseBot):
+        """
+        DreamCo OS wrapper around the ``PropertyListingAggregator``.
+
+        Inherits from the OS ``BaseBot`` so it can be auto-discovered and
+        run by the master orchestrator.
+
+        Publishes
+        ---------
+        deal_found
+            ``{"type": "real_estate", "profit": int, "source": str}``
+        """
+
+        def run(self, event_bus: "_BaseEventBus") -> None:
+            print(f"🏠 {self.name}: Feature 1 Bot Running")
+
+            deal = {
+                "type": "real_estate",
+                "profit": 20000,
+                "source": self.name,
+            }
+
+            event_bus.publish("deal_found", deal)
+            print(f"🏠 {self.name}: Published deal_found → {deal}")
+
+except ImportError:
+    # python_bots / event_bus packages not on sys.path — skip OS wrapper
+    pass

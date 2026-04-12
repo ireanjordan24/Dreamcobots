@@ -1,4 +1,4 @@
-name: Run DreamCo Bots (Money Loop)
+name: DreamCo OS Runner
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Run daily at 06:00 UTC
-    - cron: '0 6 * * *'
+    # Run hourly
+    - cron: '0 * * * *'
   workflow_dispatch:
     inputs:
       cycles:
@@ -21,6 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -36,7 +47,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run DreamCo Orchestrator (all 7 core bots)
+      - name: Run DreamCo OS Orchestrator
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          ZILLOW_API_KEY: ${{ secrets.ZILLOW_API_KEY }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+          SIMULATION_MODE: 'true'
+          MONEY_LOOP_CYCLES: ${{ github.event.inputs.cycles || '1' }}
+        run: python core/orchestrator.py
+
+      - name: Run DreamCo Money Loop (legacy bots)
         env:
           ZILLOW_API_KEY: ${{ secrets.ZILLOW_API_KEY }}
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
