@@ -465,6 +465,15 @@ class BuddyTrainerBot:
                 "data": {"feature": FEATURE_GITHUB_BUDDY, "available": self.config.has_feature(FEATURE_GITHUB_BUDDY)},
             }
 
+        # --- Apply sponsorship --- (must be checked BEFORE general "sponsor" keyword)
+        if "apply for sponsorship" in msg or "apply sponsorship" in msg:
+            result = self.apply_sponsorship()
+            return {
+                "response": "buddy_trainer_bot",
+                "message": result.get("message", "Sponsorship processed."),
+                "data": result,
+            }
+
         # --- Sponsorship / affordability ---
         if any(k in msg for k in ("free", "afford", "sponsor", "help", "poor", "assistance")):
             return {
@@ -475,15 +484,6 @@ class BuddyTrainerBot:
                     "'apply for sponsorship'."
                 ),
                 "data": {"sponsorship_available": True},
-            }
-
-        # --- Apply sponsorship ---
-        if "apply for sponsorship" in msg or "apply sponsorship" in msg:
-            result = self.apply_sponsorship()
-            return {
-                "response": "buddy_trainer_bot",
-                "message": result.get("message", "Sponsorship processed."),
-                "data": result,
             }
 
         # --- Deployment ---

@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """Brand Identity module for Business Launch Pad."""
 
 import uuid

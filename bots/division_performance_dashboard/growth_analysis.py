@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 from dataclasses import dataclass
 from typing import Optional
 import math

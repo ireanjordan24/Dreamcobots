@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Optional

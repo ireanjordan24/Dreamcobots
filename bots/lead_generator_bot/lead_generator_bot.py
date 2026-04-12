@@ -78,7 +78,12 @@ class LeadGeneratorBot:
         results = results[:effective_limit]
 
         if self.tier == Tier.FREE:
-            results = [{k: v for k, v in lead.items() if k not in ("phone", "verified")} for lead in results]
+            masked = []
+            for lead in results:
+                masked_lead = {k: v for k, v in lead.items() if k not in ("phone", "verified")}
+                masked_lead["email"] = "[UPGRADE TO PRO]"
+                masked.append(masked_lead)
+            results = masked
 
         return results
 

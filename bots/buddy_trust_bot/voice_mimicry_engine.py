@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 Voice Mimicry Engine — Buddy Trust Bot
 
