@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 Image Synthesis Engine — Buddy Trust Bot
 

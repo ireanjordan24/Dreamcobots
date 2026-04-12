@@ -73,7 +73,7 @@ jobs:
             const orch = require('./DreamCo/orchestrator/index');
             const { results, summary } = orch.runAllBots();
             console.log('Summary:', JSON.stringify(summary, null, 2));
-            if (summary.bots_run !== 3) throw new Error('Expected 3 bots to run');
+            if (summary.bots_run !== 8) throw new Error('Expected 8 bots to run');
             console.log('Orchestrator: PASSED');
           "
 

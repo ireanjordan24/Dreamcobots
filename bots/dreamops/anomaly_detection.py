@@ -68,7 +68,13 @@ class AnomalyDetector:
         if len(history) > self._window_size:
             history.pop(0)
         if len(history) < 5:
-            return None
+            return AnomalyAlert(
+                alert_id=str(uuid.uuid4()),
+                workflow_id=workflow_id,
+                severity=AlertSeverity.LOW,
+                score=0.0,
+                description=f"Insufficient history for workflow '{workflow_id}' — collecting baseline data",
+            )
         score = self._compute_deviation_score(history, metrics)
         if score < 1.5:
             return None

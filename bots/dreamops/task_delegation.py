@@ -39,7 +39,7 @@ class Task:
     required_skills: Set[str]
     priority: int          # 1 (highest) - 5 (lowest)
     estimated_hours: float
-    deadline: datetime
+    deadline: Optional[datetime] = None
 
 
 class TaskDelegationAI:
@@ -55,7 +55,7 @@ class TaskDelegationAI:
         agent = Agent(
             agent_id=agent_id,
             name=agent_id,
-            skills=skills,
+            skills=set(skills),
             current_load=0.0,
             capacity=capacity,
             success_rate=1.0,
@@ -91,7 +91,7 @@ class TaskDelegationAI:
         if not agent:
             return 0.0
         # Skill match
-        required = task.required_skills
+        required = set(task.required_skills)
         matched = required & agent.skills
         skill_score = len(matched) / max(len(required), 1)
         # Capacity headroom; use 0.1 as minimum divisor to avoid division by zero

@@ -403,6 +403,8 @@ class HumanTrainer:
         if step_id in learner.completed_steps:
             return {
                 "learner_id": learner_id,
+                "step_id": step_id,
+                "xp_earned": 0,
                 "message": f"Step '{step_id}' was already completed.",
                 "xp": learner.xp,
                 "skill_level": learner.skill_level.value,

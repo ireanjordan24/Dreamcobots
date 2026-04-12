@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 Inventor Toolkit for the DreamAIInvent Hub.
 

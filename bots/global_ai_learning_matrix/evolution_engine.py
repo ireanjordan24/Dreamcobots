@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """Modular evolution engine for tracking AI model lifecycle stages."""
 
 from __future__ import annotations

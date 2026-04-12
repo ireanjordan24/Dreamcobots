@@ -22,6 +22,17 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,6 +53,8 @@ jobs:
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+          REDIS_HOST: localhost
+          REDIS_PORT: '6379'
           SIMULATION_MODE: 'true'
           MONEY_LOOP_CYCLES: ${{ github.event.inputs.cycles || '1' }}
         run: |
