@@ -29,6 +29,7 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
 from flask import Flask, jsonify, request  # type: ignore[import]
+from werkzeug.utils import secure_filename  # type: ignore[import]
 
 from core.bot_lab import BotLab
 from core.bot_registry import get_registered_bots, register_bot
@@ -64,13 +65,21 @@ def upload_bot():
         return jsonify({"error": "No file field in request"}), 400
 
     uploaded = request.files["file"]
-    filename = uploaded.filename or "unknown_bot.py"
+    raw_filename = uploaded.filename or "unknown_bot.py"
+    filename = secure_filename(raw_filename)
+
+    if not filename:
+        return jsonify({"error": "Invalid filename"}), 400
 
     # Reject non-Python files early
     if not filename.endswith(".py"):
         return jsonify({"error": "Only .py files are accepted"}), 400
 
-    save_path = os.path.join(UPLOAD_FOLDER, filename)
+    # Resolve and validate the save path is within UPLOAD_FOLDER
+    save_path = os.path.realpath(os.path.join(UPLOAD_FOLDER, filename))
+    if not save_path.startswith(os.path.realpath(UPLOAD_FOLDER) + os.sep):
+        return jsonify({"error": "Invalid file path"}), 400
+
     uploaded.save(save_path)
 
     result = _lab.process_upload(save_path)

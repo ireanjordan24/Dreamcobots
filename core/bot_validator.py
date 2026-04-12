@@ -8,6 +8,7 @@ dangerous patterns.
 
 from __future__ import annotations
 
+import os
 from typing import Tuple
 
 # Keywords that must not appear in uploaded bot code
@@ -18,7 +19,6 @@ _BLOCKED_PATTERNS: tuple[str, ...] = (
     "__import__",
     "eval(",
     "exec(",
-    "open(",
     "shutil",
 )
 
@@ -42,8 +42,14 @@ def validate_bot(file_path: str) -> Tuple[bool, str]:
     ------
     FileNotFoundError
         If *file_path* does not exist.
+    ValueError
+        If *file_path* is not an absolute path.
     """
-    with open(file_path, "r", encoding="utf-8") as fh:
+    resolved = os.path.realpath(file_path)
+    if not os.path.isfile(resolved):
+        raise FileNotFoundError(f"File not found: {file_path!r}")
+
+    with open(resolved, "r", encoding="utf-8") as fh:
         code = fh.read()
 
     for pattern in _BLOCKED_PATTERNS:

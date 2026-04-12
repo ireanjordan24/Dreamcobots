@@ -249,6 +249,13 @@ class TestBotValidator:
         assert valid is False
         os.unlink(path)
 
+    def test_open_not_blocked(self):
+        """Reading files is legitimate; open() should not be blocked."""
+        path = self._write_tmp("with open('/tmp/test.txt', 'r') as f: pass\n")
+        valid, msg = validate_bot(path)
+        assert valid is True
+        os.unlink(path)
+
     def test_nonexistent_file_raises(self):
         with pytest.raises(FileNotFoundError):
             validate_bot("/tmp/definitely_does_not_exist_xyz.py")
