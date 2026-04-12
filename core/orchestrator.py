@@ -24,6 +24,15 @@ import os
 import sys
 from typing import Any, List, Optional
 
+# ---------------------------------------------------------------------------
+# Ensure the repo root is on sys.path so that sibling packages (event_bus,
+# python_bots, etc.) are importable whether this file is run as a script
+# (python core/orchestrator.py) or imported as a module.
+# ---------------------------------------------------------------------------
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 from event_bus.redis_bus import RedisEventBus
 from python_bots.base_bot import BaseBot
 from python_bots.real_estate.bot import RealEstateBot

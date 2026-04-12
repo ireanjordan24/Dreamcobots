@@ -50,11 +50,26 @@ class RedisEventBus(BaseEventBus):
 
         try:
             import redis  # type: ignore[import]
+            from redis.backoff import NoBackoff  # type: ignore[import]
+            from redis.retry import Retry  # type: ignore[import]
 
-            client = redis.Redis(host=host, port=port, db=db)
+            client = redis.Redis(
+                host=host,
+                port=port,
+                db=db,
+                socket_connect_timeout=2,
+                socket_timeout=2,
+                retry=Retry(NoBackoff(), 0),
+                retry_on_error=[],
+            )
             client.ping()
             self._redis = client
         except Exception:  # pragma: no cover — Redis not available in all envs
+            # Close the connection pool so it doesn't block process exit
+            try:
+                client.close()  # type: ignore[possibly-undefined]
+            except Exception:
+                pass
             self._redis = None
 
     # ------------------------------------------------------------------
