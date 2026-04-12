@@ -1,644 +1,654 @@
-test-and-recover	Set up job	﻿2026-04-12T05:40:23.0405710Z Current runner version: '2.333.1'
-test-and-recover	Set up job	2026-04-12T05:40:23.0433544Z ##[group]Runner Image Provisioner
-test-and-recover	Set up job	2026-04-12T05:40:23.0434383Z Hosted Compute Agent
-test-and-recover	Set up job	2026-04-12T05:40:23.0434952Z Version: 20260213.493
-test-and-recover	Set up job	2026-04-12T05:40:23.0435556Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
-test-and-recover	Set up job	2026-04-12T05:40:23.0436382Z Build Date: 2026-02-13T00:28:41Z
-test-and-recover	Set up job	2026-04-12T05:40:23.0437021Z Worker ID: {e1c06d10-6add-4762-a8b8-6231b803b1aa}
-test-and-recover	Set up job	2026-04-12T05:40:23.0437702Z Azure Region: northcentralus
-test-and-recover	Set up job	2026-04-12T05:40:23.0438231Z ##[endgroup]
-test-and-recover	Set up job	2026-04-12T05:40:23.0439731Z ##[group]Operating System
-test-and-recover	Set up job	2026-04-12T05:40:23.0440347Z Ubuntu
-test-and-recover	Set up job	2026-04-12T05:40:23.0440797Z 24.04.4
-test-and-recover	Set up job	2026-04-12T05:40:23.0441338Z LTS
-test-and-recover	Set up job	2026-04-12T05:40:23.0441764Z ##[endgroup]
-test-and-recover	Set up job	2026-04-12T05:40:23.0442239Z ##[group]Runner Image
-test-and-recover	Set up job	2026-04-12T05:40:23.0443253Z Image: ubuntu-24.04
-test-and-recover	Set up job	2026-04-12T05:40:23.0443832Z Version: 20260406.80.1
-test-and-recover	Set up job	2026-04-12T05:40:23.0444808Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
-test-and-recover	Set up job	2026-04-12T05:40:23.0446562Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
-test-and-recover	Set up job	2026-04-12T05:40:23.0447447Z ##[endgroup]
-test-and-recover	Set up job	2026-04-12T05:40:23.0448606Z ##[group]GITHUB_TOKEN Permissions
-test-and-recover	Set up job	2026-04-12T05:40:23.0450725Z Contents: read
-test-and-recover	Set up job	2026-04-12T05:40:23.0451325Z Metadata: read
-test-and-recover	Set up job	2026-04-12T05:40:23.0451850Z Packages: read
-test-and-recover	Set up job	2026-04-12T05:40:23.0452309Z ##[endgroup]
-test-and-recover	Set up job	2026-04-12T05:40:23.0454921Z Secret source: Actions
-test-and-recover	Set up job	2026-04-12T05:40:23.0455707Z Prepare workflow directory
-test-and-recover	Set up job	2026-04-12T05:40:23.0804165Z Prepare all required actions
-test-and-recover	Set up job	2026-04-12T05:40:23.0847163Z Getting action download info
-test-and-recover	Set up job	2026-04-12T05:40:23.4280386Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
-test-and-recover	Set up job	2026-04-12T05:40:23.5778808Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
-test-and-recover	Set up job	2026-04-12T05:40:23.7537530Z Complete job name: test-and-recover
-test-and-recover	Checkout code	﻿2026-04-12T05:40:23.8239546Z ##[group]Run actions/checkout@v4
-test-and-recover	Checkout code	2026-04-12T05:40:23.8240544Z with:
-test-and-recover	Checkout code	2026-04-12T05:40:23.8241016Z   repository: DreamCo-Technologies/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:23.8241748Z   token: ***
-test-and-recover	Checkout code	2026-04-12T05:40:23.8242130Z   ssh-strict: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8242748Z   ssh-user: git
-test-and-recover	Checkout code	2026-04-12T05:40:23.8243159Z   persist-credentials: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8243602Z   clean: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8243989Z   sparse-checkout-cone-mode: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8244472Z   fetch-depth: 1
-test-and-recover	Checkout code	2026-04-12T05:40:23.8244853Z   fetch-tags: false
-test-and-recover	Checkout code	2026-04-12T05:40:23.8245251Z   show-progress: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8245643Z   lfs: false
-test-and-recover	Checkout code	2026-04-12T05:40:23.8246012Z   submodules: false
-test-and-recover	Checkout code	2026-04-12T05:40:23.8246404Z   set-safe-directory: true
-test-and-recover	Checkout code	2026-04-12T05:40:23.8247119Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:23.9474515Z Syncing repository: DreamCo-Technologies/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:23.9477327Z ##[group]Getting Git version info
-test-and-recover	Checkout code	2026-04-12T05:40:23.9478132Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
-test-and-recover	Checkout code	2026-04-12T05:40:23.9479563Z [command]/usr/bin/git version
-test-and-recover	Checkout code	2026-04-12T05:40:23.9484726Z git version 2.53.0
-test-and-recover	Checkout code	2026-04-12T05:40:23.9513446Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:23.9529535Z Temporarily overriding HOME='/home/runner/work/_temp/faf3721b-e124-464e-9b03-034fde0f0229' before making global git config changes
-test-and-recover	Checkout code	2026-04-12T05:40:23.9531901Z Adding repository directory to the temporary git global config as a safe directory
-test-and-recover	Checkout code	2026-04-12T05:40:23.9546952Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:23.9585247Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
-test-and-recover	Checkout code	2026-04-12T05:40:23.9588957Z ##[group]Initializing the repository
-test-and-recover	Checkout code	2026-04-12T05:40:23.9595120Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:23.9679500Z hint: Using 'master' as the name for the initial branch. This default branch name
-test-and-recover	Checkout code	2026-04-12T05:40:23.9681124Z hint: will change to "main" in Git 3.0. To configure the initial branch name
-test-and-recover	Checkout code	2026-04-12T05:40:23.9683524Z hint: to use in all of your new repositories, which will suppress this warning,
-test-and-recover	Checkout code	2026-04-12T05:40:23.9685232Z hint: call:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9685861Z hint:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9687009Z hint: 	git config --global init.defaultBranch <name>
-test-and-recover	Checkout code	2026-04-12T05:40:23.9688014Z hint:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9689015Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-test-and-recover	Checkout code	2026-04-12T05:40:23.9690469Z hint: 'development'. The just-created branch can be renamed via this command:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9691623Z hint:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9692263Z hint: 	git branch -m <name>
-test-and-recover	Checkout code	2026-04-12T05:40:23.9693264Z hint:
-test-and-recover	Checkout code	2026-04-12T05:40:23.9694293Z hint: Disable this message with "git config set advice.defaultBranchName false"
-test-and-recover	Checkout code	2026-04-12T05:40:23.9696106Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
-test-and-recover	Checkout code	2026-04-12T05:40:23.9698914Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:23.9730901Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:23.9732107Z ##[group]Disabling automatic garbage collection
-test-and-recover	Checkout code	2026-04-12T05:40:23.9736410Z [command]/usr/bin/git config --local gc.auto 0
-test-and-recover	Checkout code	2026-04-12T05:40:23.9768855Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:23.9770036Z ##[group]Setting up auth
-test-and-recover	Checkout code	2026-04-12T05:40:23.9776971Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-test-and-recover	Checkout code	2026-04-12T05:40:23.9811138Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-test-and-recover	Checkout code	2026-04-12T05:40:24.0125899Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-test-and-recover	Checkout code	2026-04-12T05:40:24.0150078Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-test-and-recover	Checkout code	2026-04-12T05:40:24.0391738Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-test-and-recover	Checkout code	2026-04-12T05:40:24.0426754Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-test-and-recover	Checkout code	2026-04-12T05:40:24.0730434Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
-test-and-recover	Checkout code	2026-04-12T05:40:24.0777863Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:24.0779455Z ##[group]Fetching the repository
-test-and-recover	Checkout code	2026-04-12T05:40:24.0790064Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +cff120431ec0c4fe22bc1dc9ffd830753f4c4092:refs/remotes/origin/main
-test-and-recover	Checkout code	2026-04-12T05:40:24.6288511Z From https://github.com/DreamCo-Technologies/Dreamcobots
-test-and-recover	Checkout code	2026-04-12T05:40:24.6289778Z  * [new ref]         cff120431ec0c4fe22bc1dc9ffd830753f4c4092 -> origin/main
-test-and-recover	Checkout code	2026-04-12T05:40:24.6324120Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:24.6325536Z ##[group]Determining the checkout info
-test-and-recover	Checkout code	2026-04-12T05:40:24.6333098Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:24.6342729Z [command]/usr/bin/git sparse-checkout disable
-test-and-recover	Checkout code	2026-04-12T05:40:24.6378850Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
-test-and-recover	Checkout code	2026-04-12T05:40:24.6410901Z ##[group]Checking out the ref
-test-and-recover	Checkout code	2026-04-12T05:40:24.6416969Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
-test-and-recover	Checkout code	2026-04-12T05:40:24.6954071Z Switched to a new branch 'main'
-test-and-recover	Checkout code	2026-04-12T05:40:24.6955920Z branch 'main' set up to track 'origin/main'.
-test-and-recover	Checkout code	2026-04-12T05:40:24.6963531Z ##[endgroup]
-test-and-recover	Checkout code	2026-04-12T05:40:24.7000455Z [command]/usr/bin/git log -1 --format=%H
-test-and-recover	Checkout code	2026-04-12T05:40:24.7023778Z cff120431ec0c4fe22bc1dc9ffd830753f4c4092
-test-and-recover	Set up Python	﻿2026-04-12T05:40:24.7362683Z ##[group]Run actions/setup-python@v5
-test-and-recover	Set up Python	2026-04-12T05:40:24.7363891Z with:
-test-and-recover	Set up Python	2026-04-12T05:40:24.7364692Z   python-version: 3.11
-test-and-recover	Set up Python	2026-04-12T05:40:24.7365611Z   check-latest: false
-test-and-recover	Set up Python	2026-04-12T05:40:24.7366810Z   token: ***
-test-and-recover	Set up Python	2026-04-12T05:40:24.7367671Z   update-environment: true
-test-and-recover	Set up Python	2026-04-12T05:40:24.7368680Z   allow-prereleases: false
-test-and-recover	Set up Python	2026-04-12T05:40:24.7369662Z   freethreaded: false
-test-and-recover	Set up Python	2026-04-12T05:40:24.7370557Z ##[endgroup]
-test-and-recover	Set up Python	2026-04-12T05:40:24.9079649Z ##[group]Installed versions
-test-and-recover	Set up Python	2026-04-12T05:40:24.9189294Z Successfully set up CPython (3.11.15)
-test-and-recover	Set up Python	2026-04-12T05:40:24.9190398Z ##[endgroup]
-test-and-recover	Install dependencies	﻿2026-04-12T05:40:24.9308827Z ##[group]Run python -m pip install --upgrade pip
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9309359Z [36;1mpython -m pip install --upgrade pip[0m
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9309725Z [36;1mpip install -r requirements.txt[0m
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9344947Z shell: /usr/bin/bash -e {0}
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9345295Z env:
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9345585Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9346059Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9346533Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9346934Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9347329Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9347732Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
-test-and-recover	Install dependencies	2026-04-12T05:40:24.9348089Z ##[endgroup]
-test-and-recover	Install dependencies	2026-04-12T05:40:26.1135109Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages (26.0.1)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.7398920Z Collecting pytest>=7.0.0 (from -r requirements.txt (line 1))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.7957951Z   Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8125455Z Collecting pytest-benchmark>=4.0.0 (from -r requirements.txt (line 2))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8163592Z   Downloading pytest_benchmark-5.2.3-py3-none-any.whl.metadata (29 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8371666Z Collecting pytest-cov>=4.0.0 (from -r requirements.txt (line 3))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8407208Z   Downloading pytest_cov-7.1.0-py3-none-any.whl.metadata (32 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8627421Z Collecting requests>=2.28.0 (from -r requirements.txt (line 4))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8668395Z   Downloading requests-2.33.1-py3-none-any.whl.metadata (4.8 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8817618Z Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 5))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8850871Z   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.8984629Z Collecting schedule>=1.2.0 (from -r requirements.txt (line 6))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9028442Z   Downloading schedule-1.2.2-py3-none-any.whl.metadata (3.8 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9265057Z Collecting jinja2>=3.1.0 (from -r requirements.txt (line 7))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9308079Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9583595Z Collecting selenium>=4.10.0 (from -r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9623002Z   Downloading selenium-4.43.0-py3-none-any.whl.metadata (7.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9784221Z Collecting webdriver-manager>=4.0.0 (from -r requirements.txt (line 9))
-test-and-recover	Install dependencies	2026-04-12T05:40:26.9820244Z   Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl.metadata (12 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.0348973Z Collecting openai>=1.0.0 (from -r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.0385856Z   Downloading openai-2.31.0-py3-none-any.whl.metadata (31 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.0804558Z Collecting fastapi>=0.100.0 (from -r requirements.txt (line 11))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.0840418Z   Downloading fastapi-0.135.3-py3-none-any.whl.metadata (28 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1048058Z Collecting httpx>=0.24.0 (from -r requirements.txt (line 12))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1080860Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1274105Z Collecting flask>=2.0.0 (from -r requirements.txt (line 13))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1307162Z   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1469339Z Collecting flask-cors>=4.0.0 (from -r requirements.txt (line 14))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1502071Z   Downloading flask_cors-6.0.2-py3-none-any.whl.metadata (5.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1611645Z Collecting iniconfig>=1.0.1 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1645405Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1784038Z Collecting packaging>=22 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1820221Z   Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1936842Z Collecting pluggy<2,>=1.5 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.1969255Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.2151890Z Collecting pygments>=2.7.2 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.2186028Z   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.2331846Z Collecting py-cpuinfo (from pytest-benchmark>=4.0.0->-r requirements.txt (line 2))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.2419191Z   Downloading py_cpuinfo-9.0.0-py3-none-any.whl.metadata (794 bytes)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.6092037Z Collecting coverage>=7.10.6 (from coverage[toml]>=7.10.6->pytest-cov>=4.0.0->-r requirements.txt (line 3))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.6129110Z   Downloading coverage-7.13.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7058432Z Collecting charset_normalizer<4,>=2 (from requests>=2.28.0->-r requirements.txt (line 4))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7096605Z   Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7248823Z Collecting idna<4,>=2.5 (from requests>=2.28.0->-r requirements.txt (line 4))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7287162Z   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7495139Z Collecting urllib3<3,>=1.26 (from requests>=2.28.0->-r requirements.txt (line 4))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7530136Z   Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7703303Z Collecting certifi>=2023.5.7 (from requests>=2.28.0->-r requirements.txt (line 4))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.7740726Z   Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8244497Z Collecting MarkupSafe>=2.0 (from jinja2>=3.1.0->-r requirements.txt (line 7))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8285375Z   Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8473427Z Collecting trio<1.0,>=0.31.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8507941Z   Downloading trio-0.33.0-py3-none-any.whl.metadata (8.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8638921Z Collecting trio-websocket<1.0,>=0.12.2 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8675092Z   Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8823692Z Collecting typing_extensions<5.0,>=4.15.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.8857860Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9018727Z Collecting websocket-client<2.0,>=1.8.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9053955Z   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9196811Z Collecting attrs>=23.2.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9229662Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9387247Z Collecting sortedcontainers (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9419042Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9575249Z Collecting outcome (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9608196Z   Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9707236Z Collecting sniffio>=1.3.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9744073Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9889077Z Collecting wsproto>=0.14 (from trio-websocket<1.0,>=0.12.2->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:27.9924449Z   Downloading wsproto-1.3.2-py3-none-any.whl.metadata (5.2 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0043833Z Collecting pysocks!=1.5.7,<2.0,>=1.5.6 (from urllib3[socks]<3.0,>=2.6.3->selenium>=4.10.0->-r requirements.txt (line 8))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0078660Z   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0286741Z Collecting anyio<5,>=3.5.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0320115Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0432201Z Collecting distro<2,>=1.7.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.0464662Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.1232904Z Collecting jiter<1,>=0.10.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.1272787Z   Downloading jiter-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.2576732Z Collecting pydantic<3,>=1.9.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.2614847Z   Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.2943112Z Collecting tqdm>4 (from openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.2978724Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3213543Z Collecting httpcore==1.* (from httpx>=0.24.0->-r requirements.txt (line 12))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3246267Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3434876Z Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.24.0->-r requirements.txt (line 12))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3468153Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3583894Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:28.3617622Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:28.9975823Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.0012138Z   Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1360022Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1427125Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1637602Z Collecting starlette>=0.46.0 (from fastapi>=0.100.0->-r requirements.txt (line 11))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1675496Z   Downloading starlette-1.0.0-py3-none-any.whl.metadata (6.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1847138Z Collecting annotated-doc>=0.0.2 (from fastapi>=0.100.0->-r requirements.txt (line 11))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.1886145Z   Downloading annotated_doc-0.0.4-py3-none-any.whl.metadata (6.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2011888Z Collecting blinker>=1.9.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2049052Z   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2217277Z Collecting click>=8.1.3 (from flask>=2.0.0->-r requirements.txt (line 13))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2256296Z   Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2373329Z Collecting itsdangerous>=2.2.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2409469Z   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2616762Z Collecting werkzeug>=3.1.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2656463Z   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.2945889Z Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3041132Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3098717Z Downloading pytest_benchmark-5.2.3-py3-none-any.whl (45 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3158460Z Downloading pytest_cov-7.1.0-py3-none-any.whl (22 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3219843Z Downloading requests-2.33.1-py3-none-any.whl (64 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3283524Z Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (214 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3345517Z Downloading idna-3.11-py3-none-any.whl (71 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3403726Z Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3469155Z Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3546254Z Downloading schedule-1.2.2-py3-none-any.whl (12 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3605078Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.3666267Z Downloading selenium-4.43.0-py3-none-any.whl (9.6 MB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4040936Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 268.7 MB/s  0:00:00
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4080129Z Downloading trio-0.33.0-py3-none-any.whl (510 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4145260Z Downloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4207349Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4267859Z Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4321676Z Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4399614Z Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl (27 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4452038Z Downloading openai-2.31.0-py3-none-any.whl (1.2 MB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4513872Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 229.2 MB/s  0:00:00
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4547570Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4602071Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4659066Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4713751Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4770878Z Downloading jiter-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (358 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4831339Z Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4896459Z Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.4993600Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 239.9 MB/s  0:00:00
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5027672Z Downloading fastapi-0.135.3-py3-none-any.whl (117 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5086221Z Downloading flask-3.1.3-py3-none-any.whl (103 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5145324Z Downloading flask_cors-6.0.2-py3-none-any.whl (13 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5197449Z Downloading annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5255038Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5308422Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5375111Z Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5428777Z Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5485530Z Downloading click-8.3.2-py3-none-any.whl (108 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5548301Z Downloading coverage-7.13.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (252 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5604998Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5661854Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5714721Z Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5771834Z Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5837392Z Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5925125Z Downloading packaging-26.0-py3-none-any.whl (74 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.5998777Z Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6069633Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 216.6 MB/s  0:00:00
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6102246Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6155160Z Downloading starlette-1.0.0-py3-none-any.whl (72 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6209040Z Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6266998Z Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6331462Z Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6388964Z Downloading wsproto-1.3.2-py3-none-any.whl (24 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6439322Z Downloading py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.6491313Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
-test-and-recover	Install dependencies	2026-04-12T05:40:29.8298875Z Installing collected packages: sortedcontainers, py-cpuinfo, websocket-client, urllib3, typing_extensions, tqdm, sniffio, schedule, python-dotenv, pysocks, pygments, pluggy, packaging, MarkupSafe, jiter, itsdangerous, iniconfig, idna, h11, distro, coverage, click, charset_normalizer, certifi, blinker, attrs, annotated-types, annotated-doc, wsproto, werkzeug, typing-inspection, requests, pytest, pydantic-core, outcome, jinja2, httpcore, anyio, webdriver-manager, trio, starlette, pytest-cov, pytest-benchmark, pydantic, httpx, flask, trio-websocket, openai, flask-cors, fastapi, selenium
-test-and-recover	Install dependencies	2026-04-12T05:40:34.1521854Z 
-test-and-recover	Install dependencies	2026-04-12T05:40:34.1551394Z Successfully installed MarkupSafe-3.0.3 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 attrs-26.1.0 blinker-1.9.0 certifi-2026.2.25 charset_normalizer-3.4.7 click-8.3.2 coverage-7.13.5 distro-1.9.0 fastapi-0.135.3 flask-3.1.3 flask-cors-6.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jiter-0.14.0 openai-2.31.0 outcome-1.3.0.post0 packaging-26.0 pluggy-1.6.0 py-cpuinfo-9.0.0 pydantic-2.12.5 pydantic-core-2.41.5 pygments-2.20.0 pysocks-1.7.1 pytest-9.0.3 pytest-benchmark-5.2.3 pytest-cov-7.1.0 python-dotenv-1.2.2 requests-2.33.1 schedule-1.2.2 selenium-4.43.0 sniffio-1.3.1 sortedcontainers-2.4.0 starlette-1.0.0 tqdm-4.67.3 trio-0.33.0 trio-websocket-0.12.2 typing-inspection-0.4.2 typing_extensions-4.15.0 urllib3-2.6.3 webdriver-manager-4.0.2 websocket-client-1.9.0 werkzeug-3.1.8 wsproto-1.3.2
-test-and-recover	Check bot framework compliance	﻿2026-04-12T05:40:34.5479764Z ##[group]Run python tools/check_bot_framework.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5480152Z [36;1mpython tools/check_bot_framework.py[0m
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5505676Z shell: /usr/bin/bash -e {0}
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5505908Z env:
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5506151Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5506550Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5506952Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5507297Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5507654Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5508030Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5508397Z ##[endgroup]
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5960929Z ============================================================
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5961755Z DreamCObots Bot Framework Compliance Report
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5962736Z ============================================================
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5963467Z Root : /home/runner/work/Dreamcobots/Dreamcobots
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5964048Z Files scanned : 197
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5964517Z Compliant     : 197
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5964937Z Violations    : 0
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5965249Z 
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5965735Z ✅  COMPLIANT FILES
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5966220Z    bots/211-resource-eligibility-bot/bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5966831Z    bots/ad_copy_generator_bot/ad_copy_generator_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5967432Z    bots/affiliate_bot/affiliate_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5968015Z    bots/ai-models-integration/ai_models_integration.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5968638Z    bots/ai-side-hustle-bots/bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5969145Z    bots/ai_brain/ai_brain.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5969625Z    bots/ai_brain/decision_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5970130Z    bots/ai_brain/metrics_tracker.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5970653Z    bots/ai_brain/state_manager.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5971178Z    bots/ai_chatbot/chatbot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5972120Z    bots/ai_learning_system/ai_learning_system.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5973041Z    bots/ai_learning_system/analytics.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5973665Z    bots/ai_learning_system/classifier.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5974282Z    bots/ai_learning_system/database.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5974902Z    bots/ai_learning_system/deployment.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5975533Z    bots/ai_learning_system/governance.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5976181Z    bots/ai_learning_system/hybrid_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5976806Z    bots/ai_learning_system/ingestion.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5977371Z    bots/ai_learning_system/learning_loop.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5978028Z    bots/ai_learning_system/sandbox.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5978651Z    bots/ai_learning_system/scheduler.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5979288Z    bots/ai_level_up_bot/ai_agents_generator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5979979Z    bots/ai_level_up_bot/ai_companies_database.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5980651Z    bots/ai_level_up_bot/ai_course_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5981322Z    bots/ai_level_up_bot/ai_level_up_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5981952Z    bots/ai_level_up_bot/ai_skill_tree.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5982820Z    bots/ai_level_up_bot/token_marketplace.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5983525Z    bots/alidropship_money_bot/alidropship_money_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5984357Z    bots/analytics_dashboard_bot/analytics_dashboard_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5985080Z    bots/app_builder_bot/app_builder_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5985704Z    bots/auto_bot_factory/auto_bot_factory.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5986380Z    bots/auto_bot_factory/competitor_analyzer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5987056Z    bots/auto_bot_factory/safety_controller.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5987738Z    bots/auto_bot_factory/strategy_framework.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5988369Z    bots/auto_scaler/auto_scaler_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5988910Z    bots/big_bro_ai/big_bro_ai.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5989450Z    bots/big_bro_ai/bot_factory.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5989977Z    bots/big_bro_ai/catalog_franchise.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5990884Z    bots/big_bro_ai/continuous_study.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5991460Z    bots/big_bro_ai/courses_system.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5992044Z    bots/big_bro_ai/interactive_dashboard.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5992912Z    bots/big_bro_ai/master_dashboard.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5993483Z    bots/big_bro_ai/memory_system.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5994038Z    bots/big_bro_ai/mentor_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5994577Z    bots/big_bro_ai/personality.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5995122Z    bots/big_bro_ai/prospectus.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5995643Z    bots/big_bro_ai/route_gps.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5996166Z    bots/big_bro_ai/sales_monetization.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5996773Z    bots/bot_generator/benchmarking_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5997385Z    bots/bot_generator/code_generator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5997990Z    bots/bot_generator/competitor_analyzer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5998601Z    bots/bot_generator/feature_optimizer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5999186Z    bots/bot_generator/request_interface.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.5999772Z    bots/bot_generator/revenue_tracker.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6000465Z    bots/bot_generator_bot/bot_generator_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6001089Z    bots/bot_generator_bot/deployer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6001669Z    bots/bot_generator_bot/parser.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6002274Z    bots/bot_generator_bot/template_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6003269Z    bots/bot_generator_bot/tool_injector.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6003884Z    bots/buddy_bot/avatar_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6004481Z    bots/buddy_bot/buddy_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6005053Z    bots/buddy_bot/conversation_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6005663Z    bots/buddy_bot/conversion_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6006281Z    bots/buddy_bot/creativity_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6006882Z    bots/buddy_bot/emotion_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6007460Z    bots/buddy_bot/fulfillment_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6008058Z    bots/buddy_bot/lead_finder_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6008650Z    bots/buddy_bot/memory_system.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6009579Z    bots/buddy_bot/offer_generator_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6010236Z    bots/buddy_bot/personality_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6010841Z    bots/buddy_bot/retention_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6011423Z    bots/buddy_bot/voice_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6011996Z    bots/buddy_os/app_framework.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6012804Z    bots/buddy_os/bluetooth_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6013381Z    bots/buddy_os/buddy_os.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6013906Z    bots/buddy_os/cast_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6014455Z    bots/buddy_os/device_manager.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6015033Z    bots/car_flipping_bot/car_flipping_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6015651Z    bots/ci_auto_fix_bot/ci_auto_fix_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6016251Z    bots/cinecore_bot/cinecore_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6016820Z    bots/control_center/control_center.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6017395Z    bots/crypto_bot/crypto_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6017904Z    bots/crypto_bot/crypto_database.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6018420Z    bots/crypto_bot/dashboard.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6018923Z    bots/crypto_bot/mining.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6019399Z    bots/crypto_bot/portfolio.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6019890Z    bots/crypto_bot/price_feed.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6020387Z    bots/crypto_bot/prospectus.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6020916Z    bots/crypto_bot/trading.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6021424Z    bots/deal_finder_bot/deal_finder_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6022033Z    bots/dreamco_cloud_bot/dreamco_cloud_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6022940Z    bots/dreamco_code_bot/dreamco_code_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6023496Z    bots/dreamco_empire_os/ai_leaders.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6024050Z    bots/dreamco_empire_os/bot_fleet.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6024621Z    bots/dreamco_empire_os/cost_tracking.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6025298Z    bots/dreamco_empire_os/deal_analyzer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6025883Z    bots/dreamco_empire_os/empire_hq.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6026449Z    bots/dreamco_empire_os/empire_os.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6027025Z    bots/dreamco_empire_os/formula_vault.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6027869Z    bots/dreamco_empire_os/learning_matrix.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6028830Z    bots/dreamco_empire_os/marketplace.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6029401Z    bots/dreamco_empire_os/modules.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6029915Z    bots/dreamco_empire_os/orchestration.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6030475Z    bots/dreamco_empire_os/revenue_tracker.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6031022Z    bots/dreamco_payments/account_manager.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6031560Z    bots/dreamco_payments/api_manager.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6032212Z    bots/dreamco_payments/dreamco_payments.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6032928Z    bots/dreamco_payments/payment_processor.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6033693Z    bots/dreamco_payments/reporting_dashboard.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6034230Z    bots/dreamco_workspace_bot/dreamco_workspace_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6034855Z    bots/email_campaign_manager_bot/email_campaign_manager_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6035554Z    bots/enterprise_integrations_bot/enterprise_integrations_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6036225Z    bots/financial_literacy_bot/financial_literacy_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6036715Z    bots/fiverr_bot/fiverr_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6037167Z    bots/forecasting_tools_bot/forecasting_tools_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6037745Z    bots/foreclosure_finder_bot/foreclosure_finder_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6038151Z    bots/global_bot_network/api_gateway.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6038416Z    bots/global_bot_network/bot_library.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6038679Z    bots/global_bot_network/global_bot_network.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6038956Z    bots/global_bot_network/marketplace.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6039217Z    bots/global_bot_network/messaging_network.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6039498Z    bots/global_bot_network/owner_dashboard.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6039793Z    bots/global_bot_network/universal_bot_protocol.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6040105Z    bots/global_bot_network/verification_system.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6040376Z    bots/god_bot/god_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6040687Z    bots/government-contract-grant-bot/government_contract_grant_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6041241Z    bots/home_buyer_bot/home_buyer_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6041544Z    bots/home_flipping_analyzer/home_flipping_analyzer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6041858Z    bots/job_titles_bot/autonomous_trainer.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6042132Z    bots/job_titles_bot/cost_justification.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6042704Z    bots/job_titles_bot/job_bot_generator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6042967Z    bots/job_titles_bot/job_titles_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6043227Z    bots/job_titles_bot/job_titles_database.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6043493Z    bots/lead_gen_bot/lead_scraper.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6043753Z    bots/lead_generator_bot/lead_generator_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6044034Z    bots/legal_money_bot/legal_money_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6044300Z    bots/logo_generator_bot/logo_generator_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6044569Z    bots/mining_bot/mining_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6044809Z    bots/money_finder_bot/money_finder_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6045088Z    bots/multi_source_lead_scraper/lead_scraper.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6045376Z    bots/open_claw_bot/ai_models.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6045612Z    bots/open_claw_bot/client_manager.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6045864Z    bots/open_claw_bot/open_claw_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6046105Z    bots/open_claw_bot/strategy_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6046371Z    bots/pr_validation_bot/pr_validation_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6046683Z    bots/profit_calculator_bot/profit_calculator_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6046993Z    bots/quantum_decision_bot/bot_router.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6047273Z    bots/quantum_decision_bot/dimension_mapper.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6047563Z    bots/quantum_decision_bot/money_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6047842Z    bots/quantum_decision_bot/probability_model.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6048143Z    bots/quantum_decision_bot/quantum_decision_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6048445Z    bots/quantum_decision_bot/quantum_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6048723Z    bots/quantum_decision_bot/simulation_engine.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6049008Z    bots/real_estate_bot/real_estate_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6049427Z    bots/rental_cashflow_bot/rental_cashflow_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6049724Z    bots/resume_builder_bot/resume_builder_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6049999Z    bots/revenue_engine_bot/revenue_engine_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6050304Z    bots/revenue_validation/revenue_validation_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6050588Z    bots/sales_bot/conversion_tracker.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6050829Z    bots/sales_bot/followup_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6051062Z    bots/sales_bot/sales_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6051278Z    bots/sales_bot/sms_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6051516Z    bots/selenium-job-application-bot/bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6051828Z    bots/social_media_manager_bot/social_media_manager_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6052137Z    bots/software_bot/software_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6052651Z    bots/stack_and_profit_bot/stack_and_profit_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6052973Z    bots/stripe_payment_bot/stripe_payment_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6053275Z    bots/wealth_system_bot/wealth_system_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6053542Z    Business_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6053777Z    Business_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6053985Z    Business_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6054195Z    App_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6054390Z    App_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6054586Z    App_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6054782Z    Marketing_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6055003Z    Marketing_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6055219Z    Marketing_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6055435Z    Occupational_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6055671Z    Occupational_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6055896Z    Occupational_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6056124Z    Real_Estate_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6056343Z    Real_Estate_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6056567Z    Real_Estate_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6056784Z    Fiverr_bots/feature_1.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6057162Z    Fiverr_bots/feature_2.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6057392Z    Fiverr_bots/feature_3.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6057705Z    automation-tools/color_palette_generator/color_palette_generator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6058145Z    automation-tools/smart_meeting_scheduler/smart_meeting_scheduler.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6058555Z    automation-tools/workplace_audit_tool/workplace_audit_tool.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6058964Z    education-tools/recipe_scaling_tool/recipe_scaling_tool.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6059391Z    healthcare-tools/drug_discovery_pipeline_ai/drug_discovery_pipeline_ai.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6059877Z    healthcare-tools/mental_health_screening_bot/mental_health_screening_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6060344Z    analytics-elites/algorithmic_trading_bot/algorithmic_trading_bot.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6060839Z    analytics-elites/loyalty_program_impact_simulator/loyalty_program_impact_simulator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6061358Z    analytics-elites/predictive_engagement_tool/predictive_engagement_tool.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6061873Z    real-estate-tools/real_estate_cashflow_simulator/real_estate_cashflow_simulator.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6062279Z    compliance-tools/compliance_checker.py
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6062700Z 
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6062882Z All scanned bot files comply with the GLOBAL AI SOURCES FLOW framework.
-test-and-recover	Check bot framework compliance	2026-04-12T05:40:34.6063243Z ============================================================
-test-and-recover	Run Tests	﻿2026-04-12T05:40:34.6091550Z ##[group]Run python -m pytest tests/ \
-test-and-recover	Run Tests	2026-04-12T05:40:34.6091884Z [36;1mpython -m pytest tests/ \[0m
-test-and-recover	Run Tests	2026-04-12T05:40:34.6092153Z [36;1m  --ignore=tests/test_backend.py \[0m
-test-and-recover	Run Tests	2026-04-12T05:40:34.6092753Z [36;1m  --ignore=tests/test_web_dashboard.py \[0m
-test-and-recover	Run Tests	2026-04-12T05:40:34.6093157Z [36;1m  -q --tb=short[0m
-test-and-recover	Run Tests	2026-04-12T05:40:34.6115657Z shell: /usr/bin/bash -e {0}
-test-and-recover	Run Tests	2026-04-12T05:40:34.6115880Z env:
-test-and-recover	Run Tests	2026-04-12T05:40:34.6116125Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Run Tests	2026-04-12T05:40:34.6116531Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
-test-and-recover	Run Tests	2026-04-12T05:40:34.6116943Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Run Tests	2026-04-12T05:40:34.6117303Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Run Tests	2026-04-12T05:40:34.6117665Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Run Tests	2026-04-12T05:40:34.6118028Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
-test-and-recover	Run Tests	2026-04-12T05:40:34.6118325Z ##[endgroup]
-test-and-recover	Run Tests	2026-04-12T05:40:43.1843050Z ........................................................................ [  1%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.2465272Z ........................................................................ [  2%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.3082777Z ........................................................................ [  3%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.3673310Z ........................................................................ [  5%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.4294883Z ........................................................................ [  6%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.5080727Z ........................................................................ [  7%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.5691522Z ........................................................................ [  9%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.6338126Z ........................................................................ [ 10%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.6940376Z ........................................................................ [ 11%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.7508880Z ........................................................................ [ 13%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.8125419Z ........................................................................ [ 14%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.9017351Z ........................................................................ [ 15%]
-test-and-recover	Run Tests	2026-04-12T05:40:43.9630474Z ........................................................................ [ 17%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.0278713Z ........................................................................ [ 18%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.0997679Z ........................................................................ [ 19%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.1724637Z ........................................................................ [ 21%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.2377384Z ........................................................................ [ 22%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.3188567Z ........................................................................ [ 23%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.4584373Z ........................................................................ [ 25%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.5152813Z ........................................................................ [ 26%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.5739934Z ........................................................................ [ 27%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.6361614Z ........................................................................ [ 28%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.6951940Z ........................................................................ [ 30%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.7519217Z ........................................................................ [ 31%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.8171565Z ........................................................................ [ 32%]
-test-and-recover	Run Tests	2026-04-12T05:40:44.9652193Z ........................................................................ [ 34%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.0227426Z ........................................................................ [ 35%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.0813195Z ........................................................................ [ 36%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.1621642Z ........................................................................ [ 38%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.2241820Z ........................................................................ [ 39%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.3715782Z ........................................................................ [ 40%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.4332004Z ........................................................................ [ 42%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.4901837Z ........................................................................ [ 43%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.5461635Z ........................................................................ [ 44%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.6134668Z ........................................................................ [ 46%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.6758608Z ........................................................................ [ 47%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.7424599Z ........................................................................ [ 48%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.8029587Z ........................................................................ [ 50%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.8612277Z ........................................................................ [ 51%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.9231818Z ........................................................................ [ 52%]
-test-and-recover	Run Tests	2026-04-12T05:40:45.9813504Z ........................................................................ [ 53%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.0452796Z ........................................................................ [ 55%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.1095353Z ........................................................................ [ 56%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.1750341Z ........................................................................ [ 57%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.2415689Z ........................................................................ [ 59%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.3026095Z ........................................................................ [ 60%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.3614923Z ........................................................................ [ 61%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.4996895Z ........................................................................ [ 63%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.5667298Z ........................................................................ [ 64%]
-test-and-recover	Run Tests	2026-04-12T05:40:46.6369864Z ........................................................................ [ 65%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.4854356Z ........................................................................ [ 67%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.5424789Z ........................................................................ [ 68%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.6679839Z ........................................................................ [ 69%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.7580721Z ........................................................................ [ 71%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.8223398Z ........................................................................ [ 72%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.8912809Z ........................................................................ [ 73%]
-test-and-recover	Run Tests	2026-04-12T05:40:51.9590053Z ........................................................................ [ 75%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.1357169Z ........................................................................ [ 76%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.2463951Z ...........F............................................................ [ 77%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.3062629Z ........................................................................ [ 78%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.3659516Z ........................................................................ [ 80%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.5136415Z ........................................................................ [ 81%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.5717845Z ........................................................................ [ 82%]
-test-and-recover	Run Tests	2026-04-12T05:40:52.7073253Z ........................................................................ [ 84%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.2389981Z ........................................................................ [ 85%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.2978361Z ........................................................................ [ 86%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.3549768Z ........................................................................ [ 88%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.4271392Z ........................................................................ [ 89%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.4858206Z ........................................................................ [ 90%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.5499952Z ........................................................................ [ 92%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.6238729Z ........................................................................ [ 93%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.6838587Z ........................................................................ [ 94%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.7416978Z ........................................................................ [ 96%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.8046948Z ........................................................................ [ 97%]
-test-and-recover	Run Tests	2026-04-12T05:40:53.8737172Z ........................................................................ [ 98%]
-test-and-recover	Run Tests	2026-04-12T05:40:54.4831215Z .......................................................................  [100%]
-test-and-recover	Run Tests	2026-04-12T05:40:54.4832122Z =================================== FAILURES ===================================
-test-and-recover	Run Tests	2026-04-12T05:40:54.4833304Z _________________ TestSearchLeads.test_free_hides_contact_info _________________
-test-and-recover	Run Tests	2026-04-12T05:40:54.4834298Z tests/test_lead_generator_bot.py:77: in test_free_hides_contact_info
-test-and-recover	Run Tests	2026-04-12T05:40:54.4835163Z     assert lead.get("email") in (None, "[UPGRADE TO PRO]", "***")
-test-and-recover	Run Tests	2026-04-12T05:40:54.4836089Z E   AssertionError: assert 'bkim@apexfintech.io' in (None, '[UPGRADE TO PRO]', '***')
-test-and-recover	Run Tests	2026-04-12T05:40:54.4837179Z E    +  where 'bkim@apexfintech.io' = <built-in method get of dict object at 0x7f23376d1b80>('email')
-test-and-recover	Run Tests	2026-04-12T05:40:54.4838516Z E    +    where <built-in method get of dict object at 0x7f23376d1b80> = {'company': 'Apex Fintech', 'company_size': 'small', 'email': 'bkim@apexfintech.io', 'employees': 15, ...}.get
-test-and-recover	Run Tests	2026-04-12T05:40:54.4839623Z =========================== short test summary info ============================
-test-and-recover	Run Tests	2026-04-12T05:40:54.4840962Z FAILED tests/test_lead_generator_bot.py::TestSearchLeads::test_free_hides_contact_info - AssertionError: assert 'bkim@apexfintech.io' in (None, '[UPGRADE TO PRO]', '***')
-test-and-recover	Run Tests	2026-04-12T05:40:54.4842315Z  +  where 'bkim@apexfintech.io' = <built-in method get of dict object at 0x7f23376d1b80>('email')
-test-and-recover	Run Tests	2026-04-12T05:40:54.4843882Z  +    where <built-in method get of dict object at 0x7f23376d1b80> = {'company': 'Apex Fintech', 'company_size': 'small', 'email': 'bkim@apexfintech.io', 'employees': 15, ...}.get
-test-and-recover	Run Tests	2026-04-12T05:40:54.4845265Z 1 failed, 5470 passed in 17.24s
-test-and-recover	Run Tests	2026-04-12T05:40:55.1688641Z ##[error]Process completed with exit code 1.
-test-and-recover	Report status	﻿2026-04-12T05:40:55.1755028Z ##[group]Run if [ "failure" = "success" ]; then
-test-and-recover	Report status	2026-04-12T05:40:55.1755405Z [36;1mif [ "failure" = "success" ]; then[0m
-test-and-recover	Report status	2026-04-12T05:40:55.1755759Z [36;1m  echo "✅ All tests passed — branch is merge-ready."[0m
-test-and-recover	Report status	2026-04-12T05:40:55.1756087Z [36;1melse[0m
-test-and-recover	Report status	2026-04-12T05:40:55.1756403Z [36;1m  echo "❌ Tests or checks failed — review the output above to diagnose."[0m
-test-and-recover	Report status	2026-04-12T05:40:55.1756763Z [36;1mfi[0m
-test-and-recover	Report status	2026-04-12T05:40:55.1778309Z shell: /usr/bin/bash -e {0}
-test-and-recover	Report status	2026-04-12T05:40:55.1778559Z env:
-test-and-recover	Report status	2026-04-12T05:40:55.1778813Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Report status	2026-04-12T05:40:55.1779251Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
-test-and-recover	Report status	2026-04-12T05:40:55.1779677Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Report status	2026-04-12T05:40:55.1780052Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Report status	2026-04-12T05:40:55.1780450Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
-test-and-recover	Report status	2026-04-12T05:40:55.1780819Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
-test-and-recover	Report status	2026-04-12T05:40:55.1781170Z ##[endgroup]
-test-and-recover	Report status	2026-04-12T05:40:55.1826246Z ❌ Tests or checks failed — review the output above to diagnose.
-test-and-recover	Post Checkout code	﻿2026-04-12T05:40:55.1913586Z Post job cleanup.
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.2901765Z [command]/usr/bin/git version
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.2939832Z git version 2.53.0
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.2985769Z Temporarily overriding HOME='/home/runner/work/_temp/4861ee94-12a9-47d7-ab2d-05e76a192a73' before making global git config changes
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.2987171Z Adding repository directory to the temporary git global config as a safe directory
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.2992424Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3035660Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3068262Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3293057Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3315561Z http.https://github.com/.extraheader
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3327998Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3359330Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3583459Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-test-and-recover	Post Checkout code	2026-04-12T05:40:55.3618743Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-test-and-recover	Complete job	﻿2026-04-12T05:40:55.3987274Z Cleaning up orphan processes
-test-and-recover	Complete job	2026-04-12T05:40:55.4368254Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test-and-recover	Set up job	﻿2026-04-12T05:41:37.1735266Z Current runner version: '2.333.1'
+test-and-recover	Set up job	2026-04-12T05:41:37.1768495Z ##[group]Runner Image Provisioner
+test-and-recover	Set up job	2026-04-12T05:41:37.1769553Z Hosted Compute Agent
+test-and-recover	Set up job	2026-04-12T05:41:37.1770593Z Version: 20260213.493
+test-and-recover	Set up job	2026-04-12T05:41:37.1771425Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+test-and-recover	Set up job	2026-04-12T05:41:37.1772458Z Build Date: 2026-02-13T00:28:41Z
+test-and-recover	Set up job	2026-04-12T05:41:37.1773475Z Worker ID: {b2e57cc0-057c-4687-b774-10e4e6e24634}
+test-and-recover	Set up job	2026-04-12T05:41:37.1774558Z Azure Region: centralus
+test-and-recover	Set up job	2026-04-12T05:41:37.1775306Z ##[endgroup]
+test-and-recover	Set up job	2026-04-12T05:41:37.1777526Z ##[group]Operating System
+test-and-recover	Set up job	2026-04-12T05:41:37.1778430Z Ubuntu
+test-and-recover	Set up job	2026-04-12T05:41:37.1779035Z 24.04.4
+test-and-recover	Set up job	2026-04-12T05:41:37.1779859Z LTS
+test-and-recover	Set up job	2026-04-12T05:41:37.1780592Z ##[endgroup]
+test-and-recover	Set up job	2026-04-12T05:41:37.1781294Z ##[group]Runner Image
+test-and-recover	Set up job	2026-04-12T05:41:37.1781987Z Image: ubuntu-24.04
+test-and-recover	Set up job	2026-04-12T05:41:37.1782777Z Version: 20260406.80.1
+test-and-recover	Set up job	2026-04-12T05:41:37.1784266Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+test-and-recover	Set up job	2026-04-12T05:41:37.1786588Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+test-and-recover	Set up job	2026-04-12T05:41:37.1787825Z ##[endgroup]
+test-and-recover	Set up job	2026-04-12T05:41:37.1789344Z ##[group]GITHUB_TOKEN Permissions
+test-and-recover	Set up job	2026-04-12T05:41:37.1792167Z Contents: read
+test-and-recover	Set up job	2026-04-12T05:41:37.1793048Z Metadata: read
+test-and-recover	Set up job	2026-04-12T05:41:37.1793771Z Packages: read
+test-and-recover	Set up job	2026-04-12T05:41:37.1794444Z ##[endgroup]
+test-and-recover	Set up job	2026-04-12T05:41:37.1797061Z Secret source: Actions
+test-and-recover	Set up job	2026-04-12T05:41:37.1798536Z Prepare workflow directory
+test-and-recover	Set up job	2026-04-12T05:41:37.2145743Z Prepare all required actions
+test-and-recover	Set up job	2026-04-12T05:41:37.2202223Z Getting action download info
+test-and-recover	Set up job	2026-04-12T05:41:37.5399616Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+test-and-recover	Set up job	2026-04-12T05:41:37.6953999Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+test-and-recover	Set up job	2026-04-12T05:41:37.8439256Z Complete job name: test-and-recover
+test-and-recover	Checkout code	﻿2026-04-12T05:41:37.9051387Z ##[group]Run actions/checkout@v4
+test-and-recover	Checkout code	2026-04-12T05:41:37.9052377Z with:
+test-and-recover	Checkout code	2026-04-12T05:41:37.9052888Z   repository: DreamCo-Technologies/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:37.9053631Z   token: ***
+test-and-recover	Checkout code	2026-04-12T05:41:37.9054070Z   ssh-strict: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9054517Z   ssh-user: git
+test-and-recover	Checkout code	2026-04-12T05:41:37.9054956Z   persist-credentials: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9055393Z   clean: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9055855Z   sparse-checkout-cone-mode: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9056353Z   fetch-depth: 1
+test-and-recover	Checkout code	2026-04-12T05:41:37.9056731Z   fetch-tags: false
+test-and-recover	Checkout code	2026-04-12T05:41:37.9057224Z   show-progress: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9057634Z   lfs: false
+test-and-recover	Checkout code	2026-04-12T05:41:37.9058032Z   submodules: false
+test-and-recover	Checkout code	2026-04-12T05:41:37.9058487Z   set-safe-directory: true
+test-and-recover	Checkout code	2026-04-12T05:41:37.9059198Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.0111375Z Syncing repository: DreamCo-Technologies/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:38.0114616Z ##[group]Getting Git version info
+test-and-recover	Checkout code	2026-04-12T05:41:38.0115895Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
+test-and-recover	Checkout code	2026-04-12T05:41:38.0117820Z [command]/usr/bin/git version
+test-and-recover	Checkout code	2026-04-12T05:41:38.0136928Z git version 2.53.0
+test-and-recover	Checkout code	2026-04-12T05:41:38.0161059Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.0175911Z Temporarily overriding HOME='/home/runner/work/_temp/c78a9e5e-b34d-4af4-9ef9-46b109cc6db1' before making global git config changes
+test-and-recover	Checkout code	2026-04-12T05:41:38.0178174Z Adding repository directory to the temporary git global config as a safe directory
+test-and-recover	Checkout code	2026-04-12T05:41:38.0191125Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:38.0219881Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
+test-and-recover	Checkout code	2026-04-12T05:41:38.0223697Z ##[group]Initializing the repository
+test-and-recover	Checkout code	2026-04-12T05:41:38.0228389Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:38.0307613Z hint: Using 'master' as the name for the initial branch. This default branch name
+test-and-recover	Checkout code	2026-04-12T05:41:38.0308602Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test-and-recover	Checkout code	2026-04-12T05:41:38.0309547Z hint: to use in all of your new repositories, which will suppress this warning,
+test-and-recover	Checkout code	2026-04-12T05:41:38.0310815Z hint: call:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0311198Z hint:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0311816Z hint: 	git config --global init.defaultBranch <name>
+test-and-recover	Checkout code	2026-04-12T05:41:38.0312509Z hint:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0313216Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test-and-recover	Checkout code	2026-04-12T05:41:38.0314068Z hint: 'development'. The just-created branch can be renamed via this command:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0314775Z hint:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0315186Z hint: 	git branch -m <name>
+test-and-recover	Checkout code	2026-04-12T05:41:38.0315655Z hint:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0316320Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test-and-recover	Checkout code	2026-04-12T05:41:38.0317360Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
+test-and-recover	Checkout code	2026-04-12T05:41:38.0319312Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:38.0346685Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.0348029Z ##[group]Disabling automatic garbage collection
+test-and-recover	Checkout code	2026-04-12T05:41:38.0351866Z [command]/usr/bin/git config --local gc.auto 0
+test-and-recover	Checkout code	2026-04-12T05:41:38.0377406Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.0378686Z ##[group]Setting up auth
+test-and-recover	Checkout code	2026-04-12T05:41:38.0385664Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test-and-recover	Checkout code	2026-04-12T05:41:38.0412374Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test-and-recover	Checkout code	2026-04-12T05:41:38.0653405Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test-and-recover	Checkout code	2026-04-12T05:41:38.0681242Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test-and-recover	Checkout code	2026-04-12T05:41:38.0854353Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test-and-recover	Checkout code	2026-04-12T05:41:38.0886325Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test-and-recover	Checkout code	2026-04-12T05:41:38.1062463Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test-and-recover	Checkout code	2026-04-12T05:41:38.1185192Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.1186621Z ##[group]Fetching the repository
+test-and-recover	Checkout code	2026-04-12T05:41:38.1188653Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2f41deb011f77fbdf8decd9fb37902ef3933a9ea:refs/remotes/origin/main
+test-and-recover	Checkout code	2026-04-12T05:41:38.7807561Z From https://github.com/DreamCo-Technologies/Dreamcobots
+test-and-recover	Checkout code	2026-04-12T05:41:38.7809397Z  * [new ref]         2f41deb011f77fbdf8decd9fb37902ef3933a9ea -> origin/main
+test-and-recover	Checkout code	2026-04-12T05:41:38.7859973Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.7861351Z ##[group]Determining the checkout info
+test-and-recover	Checkout code	2026-04-12T05:41:38.7862659Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.7863467Z [command]/usr/bin/git sparse-checkout disable
+test-and-recover	Checkout code	2026-04-12T05:41:38.7871584Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test-and-recover	Checkout code	2026-04-12T05:41:38.7895182Z ##[group]Checking out the ref
+test-and-recover	Checkout code	2026-04-12T05:41:38.7898604Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test-and-recover	Checkout code	2026-04-12T05:41:38.8265279Z Switched to a new branch 'main'
+test-and-recover	Checkout code	2026-04-12T05:41:38.8267126Z branch 'main' set up to track 'origin/main'.
+test-and-recover	Checkout code	2026-04-12T05:41:38.8272636Z ##[endgroup]
+test-and-recover	Checkout code	2026-04-12T05:41:38.8301642Z [command]/usr/bin/git log -1 --format=%H
+test-and-recover	Checkout code	2026-04-12T05:41:38.8319415Z 2f41deb011f77fbdf8decd9fb37902ef3933a9ea
+test-and-recover	Set up Python	﻿2026-04-12T05:41:38.8625224Z ##[group]Run actions/setup-python@v5
+test-and-recover	Set up Python	2026-04-12T05:41:38.8626404Z with:
+test-and-recover	Set up Python	2026-04-12T05:41:38.8627187Z   python-version: 3.11
+test-and-recover	Set up Python	2026-04-12T05:41:38.8628129Z   check-latest: false
+test-and-recover	Set up Python	2026-04-12T05:41:38.8629348Z   token: ***
+test-and-recover	Set up Python	2026-04-12T05:41:38.8630305Z   update-environment: true
+test-and-recover	Set up Python	2026-04-12T05:41:38.8631342Z   allow-prereleases: false
+test-and-recover	Set up Python	2026-04-12T05:41:38.8632323Z   freethreaded: false
+test-and-recover	Set up Python	2026-04-12T05:41:38.8633224Z ##[endgroup]
+test-and-recover	Set up Python	2026-04-12T05:41:39.0219509Z ##[group]Installed versions
+test-and-recover	Set up Python	2026-04-12T05:41:39.0325612Z Successfully set up CPython (3.11.15)
+test-and-recover	Set up Python	2026-04-12T05:41:39.0327542Z ##[endgroup]
+test-and-recover	Install dependencies	﻿2026-04-12T05:41:39.0465610Z ##[group]Run python -m pip install --upgrade pip
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0466943Z [36;1mpython -m pip install --upgrade pip[0m
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0468023Z [36;1mpip install -r requirements.txt[0m
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0499023Z shell: /usr/bin/bash -e {0}
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0499924Z env:
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0501046Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0502463Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0503846Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0505111Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0506385Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0507657Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+test-and-recover	Install dependencies	2026-04-12T05:41:39.0508753Z ##[endgroup]
+test-and-recover	Install dependencies	2026-04-12T05:41:39.6316869Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages (26.0.1)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.2792311Z Collecting pytest>=7.0.0 (from -r requirements.txt (line 1))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.3756543Z   Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.4003740Z Collecting pytest-benchmark>=4.0.0 (from -r requirements.txt (line 2))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.4170875Z   Downloading pytest_benchmark-5.2.3-py3-none-any.whl.metadata (29 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.4514102Z Collecting pytest-cov>=4.0.0 (from -r requirements.txt (line 3))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.4684466Z   Downloading pytest_cov-7.1.0-py3-none-any.whl.metadata (32 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5017476Z Collecting requests>=2.28.0 (from -r requirements.txt (line 4))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5183806Z   Downloading requests-2.33.1-py3-none-any.whl.metadata (4.8 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5400877Z Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 5))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5563704Z   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5781730Z Collecting schedule>=1.2.0 (from -r requirements.txt (line 6))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.5945551Z   Downloading schedule-1.2.2-py3-none-any.whl.metadata (3.8 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.6259631Z Collecting jinja2>=3.1.0 (from -r requirements.txt (line 7))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.6423851Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.6765955Z Collecting selenium>=4.10.0 (from -r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.6931126Z   Downloading selenium-4.43.0-py3-none-any.whl.metadata (7.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.7160876Z Collecting webdriver-manager>=4.0.0 (from -r requirements.txt (line 9))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.7323197Z   Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl.metadata (12 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.7950059Z Collecting openai>=1.0.0 (from -r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.8114305Z   Downloading openai-2.31.0-py3-none-any.whl.metadata (31 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.8649290Z Collecting fastapi>=0.100.0 (from -r requirements.txt (line 11))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.8814790Z   Downloading fastapi-0.135.3-py3-none-any.whl.metadata (28 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.9108856Z Collecting httpx>=0.24.0 (from -r requirements.txt (line 12))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.9276869Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.9530507Z Collecting flask>=2.0.0 (from -r requirements.txt (line 13))
+test-and-recover	Install dependencies	2026-04-12T05:41:40.9739071Z   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:40.9979439Z Collecting flask-cors>=4.0.0 (from -r requirements.txt (line 14))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.0146822Z   Downloading flask_cors-6.0.2-py3-none-any.whl.metadata (5.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.0322789Z Collecting iniconfig>=1.0.1 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.0487913Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.0703319Z Collecting packaging>=22 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.0868937Z   Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.1059247Z Collecting pluggy<2,>=1.5 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.1224179Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.1487518Z Collecting pygments>=2.7.2 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.1655988Z   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.1867401Z Collecting py-cpuinfo (from pytest-benchmark>=4.0.0->-r requirements.txt (line 2))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.2032872Z   Downloading py_cpuinfo-9.0.0-py3-none-any.whl.metadata (794 bytes)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.5809793Z Collecting coverage>=7.10.6 (from coverage[toml]>=7.10.6->pytest-cov>=4.0.0->-r requirements.txt (line 3))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.5970890Z   Downloading coverage-7.13.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.6907518Z Collecting charset_normalizer<4,>=2 (from requests>=2.28.0->-r requirements.txt (line 4))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.7077234Z   Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.7319691Z Collecting idna<4,>=2.5 (from requests>=2.28.0->-r requirements.txt (line 4))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.7480705Z   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.7749090Z Collecting urllib3<3,>=1.26 (from requests>=2.28.0->-r requirements.txt (line 4))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.7912925Z   Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.8144019Z Collecting certifi>=2023.5.7 (from requests>=2.28.0->-r requirements.txt (line 4))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.8305871Z   Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.8840569Z Collecting MarkupSafe>=2.0 (from jinja2>=3.1.0->-r requirements.txt (line 7))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9004585Z   Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9223746Z Collecting trio<1.0,>=0.31.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9386765Z   Downloading trio-0.33.0-py3-none-any.whl.metadata (8.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9577094Z Collecting trio-websocket<1.0,>=0.12.2 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9740062Z   Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:41.9953858Z Collecting typing_extensions<5.0,>=4.15.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.0117052Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.0349675Z Collecting websocket-client<2.0,>=1.8.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.0512311Z   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.0722491Z Collecting attrs>=23.2.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.0885442Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1091251Z Collecting sortedcontainers (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1252548Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1435785Z Collecting outcome (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1598308Z   Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1770008Z Collecting sniffio>=1.3.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.1933195Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.2136263Z Collecting wsproto>=0.14 (from trio-websocket<1.0,>=0.12.2->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.2305434Z   Downloading wsproto-1.3.2-py3-none-any.whl.metadata (5.2 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.2493278Z Collecting pysocks!=1.5.7,<2.0,>=1.5.6 (from urllib3[socks]<3.0,>=2.6.3->selenium>=4.10.0->-r requirements.txt (line 8))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.2658157Z   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.2916752Z Collecting anyio<5,>=3.5.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.3083502Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.3267142Z Collecting distro<2,>=1.7.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.3429689Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.4215245Z Collecting jiter<1,>=0.10.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.4376193Z   Downloading jiter-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.5773220Z Collecting pydantic<3,>=1.9.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.5937606Z   Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.6451890Z Collecting tqdm>4 (from openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.6611858Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.6901497Z Collecting httpcore==1.* (from httpx>=0.24.0->-r requirements.txt (line 12))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.7067766Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.7295202Z Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.24.0->-r requirements.txt (line 12))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.7457665Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:42.7641464Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:42.7805741Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.3862760Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.4027738Z   Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.6748620Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.6912453Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.7196164Z Collecting starlette>=0.46.0 (from fastapi>=0.100.0->-r requirements.txt (line 11))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.7363309Z   Downloading starlette-1.0.0-py3-none-any.whl.metadata (6.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.7589292Z Collecting annotated-doc>=0.0.2 (from fastapi>=0.100.0->-r requirements.txt (line 11))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.7752258Z   Downloading annotated_doc-0.0.4-py3-none-any.whl.metadata (6.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.7933814Z Collecting blinker>=1.9.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.8097176Z   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.8321413Z Collecting click>=8.1.3 (from flask>=2.0.0->-r requirements.txt (line 13))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.8484060Z   Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.8661080Z Collecting itsdangerous>=2.2.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.8823095Z   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.9105359Z Collecting werkzeug>=3.1.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test-and-recover	Install dependencies	2026-04-12T05:41:43.9268255Z   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:43.9643624Z Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.0151433Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.0336999Z Downloading pytest_benchmark-5.2.3-py3-none-any.whl (45 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.0520759Z Downloading pytest_cov-7.1.0-py3-none-any.whl (22 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.0703688Z Downloading requests-2.33.1-py3-none-any.whl (64 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.0889720Z Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (214 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.1104115Z Downloading idna-3.11-py3-none-any.whl (71 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.1291225Z Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.1486350Z Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.1691312Z Downloading schedule-1.2.2-py3-none-any.whl (12 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.1876371Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.2075642Z Downloading selenium-4.43.0-py3-none-any.whl (9.6 MB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.3185073Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 87.9 MB/s  0:00:00
+test-and-recover	Install dependencies	2026-04-12T05:41:44.3350069Z Downloading trio-0.33.0-py3-none-any.whl (510 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.3545038Z Downloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.3727711Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.3910371Z Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4096212Z Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4280796Z Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl (27 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4468042Z Downloading openai-2.31.0-py3-none-any.whl (1.2 MB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4537641Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 201.2 MB/s  0:00:00
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4702206Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.4889325Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5080690Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5261981Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5446160Z Downloading jiter-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (358 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5644349Z Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5838778Z Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.5915860Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 328.3 MB/s  0:00:00
+test-and-recover	Install dependencies	2026-04-12T05:41:44.6078102Z Downloading fastapi-0.135.3-py3-none-any.whl (117 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.6266494Z Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.6453578Z Downloading flask_cors-6.0.2-py3-none-any.whl (13 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.6643231Z Downloading annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.6821725Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7004747Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7188337Z Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7372383Z Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7558452Z Downloading click-8.3.2-py3-none-any.whl (108 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7746069Z Downloading coverage-7.13.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (252 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.7932634Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.8112504Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.8292117Z Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.8478022Z Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.8655980Z Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.8838811Z Downloading packaging-26.0-py3-none-any.whl (74 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9019192Z Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9081093Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 251.2 MB/s  0:00:00
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9248926Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9437721Z Downloading starlette-1.0.0-py3-none-any.whl (72 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9621070Z Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9806022Z Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:44.9991571Z Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:45.0181849Z Downloading wsproto-1.3.2-py3-none-any.whl (24 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:45.0364488Z Downloading py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:45.0549425Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+test-and-recover	Install dependencies	2026-04-12T05:41:45.2330683Z Installing collected packages: sortedcontainers, py-cpuinfo, websocket-client, urllib3, typing_extensions, tqdm, sniffio, schedule, python-dotenv, pysocks, pygments, pluggy, packaging, MarkupSafe, jiter, itsdangerous, iniconfig, idna, h11, distro, coverage, click, charset_normalizer, certifi, blinker, attrs, annotated-types, annotated-doc, wsproto, werkzeug, typing-inspection, requests, pytest, pydantic-core, outcome, jinja2, httpcore, anyio, webdriver-manager, trio, starlette, pytest-cov, pytest-benchmark, pydantic, httpx, flask, trio-websocket, openai, flask-cors, fastapi, selenium
+test-and-recover	Install dependencies	2026-04-12T05:41:49.0151029Z 
+test-and-recover	Install dependencies	2026-04-12T05:41:49.0183084Z Successfully installed MarkupSafe-3.0.3 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 attrs-26.1.0 blinker-1.9.0 certifi-2026.2.25 charset_normalizer-3.4.7 click-8.3.2 coverage-7.13.5 distro-1.9.0 fastapi-0.135.3 flask-3.1.3 flask-cors-6.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jiter-0.14.0 openai-2.31.0 outcome-1.3.0.post0 packaging-26.0 pluggy-1.6.0 py-cpuinfo-9.0.0 pydantic-2.12.5 pydantic-core-2.41.5 pygments-2.20.0 pysocks-1.7.1 pytest-9.0.3 pytest-benchmark-5.2.3 pytest-cov-7.1.0 python-dotenv-1.2.2 requests-2.33.1 schedule-1.2.2 selenium-4.43.0 sniffio-1.3.1 sortedcontainers-2.4.0 starlette-1.0.0 tqdm-4.67.3 trio-0.33.0 trio-websocket-0.12.2 typing-inspection-0.4.2 typing_extensions-4.15.0 urllib3-2.6.3 webdriver-manager-4.0.2 websocket-client-1.9.0 werkzeug-3.1.8 wsproto-1.3.2
+test-and-recover	Check bot framework compliance	﻿2026-04-12T05:41:49.3923783Z ##[group]Run python tools/check_bot_framework.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3924121Z [36;1mpython tools/check_bot_framework.py[0m
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3938404Z shell: /usr/bin/bash -e {0}
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3938651Z env:
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3938894Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3939281Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3939657Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3939982Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3940395Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3940724Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.3941009Z ##[endgroup]
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5357638Z ============================================================
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5358802Z DreamCObots Bot Framework Compliance Report
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5359268Z ============================================================
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5359851Z Root : /home/runner/work/Dreamcobots/Dreamcobots
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5360452Z Files scanned : 204
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5360745Z Compliant     : 204
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5361007Z Violations    : 0
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5361166Z 
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5361521Z ✅  COMPLIANT FILES
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5361835Z    bots/211-resource-eligibility-bot/bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5362306Z    bots/ad_copy_generator_bot/ad_copy_generator_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5362744Z    bots/affiliate_bot/affiliate_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5363179Z    bots/ai-models-integration/ai_models_integration.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5363632Z    bots/ai-side-hustle-bots/bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5364015Z    bots/ai_brain/ai_brain.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5364394Z    bots/ai_brain/decision_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5364784Z    bots/ai_brain/metrics_tracker.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5365180Z    bots/ai_brain/state_manager.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5365555Z    bots/ai_chatbot/chatbot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5366318Z    bots/ai_learning_system/ai_learning_system.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5366775Z    bots/ai_learning_system/analytics.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5367201Z    bots/ai_learning_system/classifier.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5367625Z    bots/ai_learning_system/database.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5368121Z    bots/ai_learning_system/deployment.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5368703Z    bots/ai_learning_system/governance.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5369226Z    bots/ai_learning_system/hybrid_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5369774Z    bots/ai_learning_system/ingestion.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5370478Z    bots/ai_learning_system/learning_loop.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5370978Z    bots/ai_learning_system/sandbox.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5371468Z    bots/ai_learning_system/scheduler.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5371930Z    bots/ai_level_up_bot/ai_agents_generator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5372429Z    bots/ai_level_up_bot/ai_companies_database.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5372893Z    bots/ai_level_up_bot/ai_course_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5373373Z    bots/ai_level_up_bot/ai_level_up_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5373796Z    bots/ai_level_up_bot/ai_skill_tree.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5374429Z    bots/ai_level_up_bot/token_marketplace.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5374951Z    bots/alidropship_money_bot/alidropship_money_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5375545Z    bots/analytics_dashboard_bot/analytics_dashboard_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5376101Z    bots/app_builder_bot/app_builder_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5376519Z    bots/auto_bot_factory/auto_bot_factory.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5376998Z    bots/auto_bot_factory/competitor_analyzer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5377591Z    bots/auto_bot_factory/safety_controller.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5378216Z    bots/auto_bot_factory/strategy_framework.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5378723Z    bots/auto_scaler/auto_scaler_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5379216Z    bots/big_bro_ai/big_bro_ai.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5379619Z    bots/big_bro_ai/bot_factory.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5380022Z    bots/big_bro_ai/catalog_franchise.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5380913Z    bots/big_bro_ai/continuous_study.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5381294Z    bots/big_bro_ai/courses_system.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5381790Z    bots/big_bro_ai/interactive_dashboard.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5382212Z    bots/big_bro_ai/master_dashboard.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5382597Z    bots/big_bro_ai/memory_system.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5382965Z    bots/big_bro_ai/mentor_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5383352Z    bots/big_bro_ai/personality.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5383743Z    bots/big_bro_ai/prospectus.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5384120Z    bots/big_bro_ai/route_gps.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5384502Z    bots/big_bro_ai/sales_monetization.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5384929Z    bots/bot_generator/benchmarking_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5385369Z    bots/bot_generator/code_generator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5385794Z    bots/bot_generator/competitor_analyzer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5386228Z    bots/bot_generator/feature_optimizer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5386662Z    bots/bot_generator/request_interface.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5387098Z    bots/bot_generator/revenue_tracker.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5387686Z    bots/bot_generator_bot/bot_generator_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5388126Z    bots/bot_generator_bot/deployer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5388534Z    bots/bot_generator_bot/parser.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5388992Z    bots/bot_generator_bot/template_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5389563Z    bots/bot_generator_bot/tool_injector.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5389968Z    bots/buddy_bot/avatar_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5390496Z    bots/buddy_bot/buddy_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5390875Z    bots/buddy_bot/conversation_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5391297Z    bots/buddy_bot/conversion_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5391721Z    bots/buddy_bot/creativity_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5392241Z    bots/buddy_bot/emotion_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5392667Z    bots/buddy_bot/fulfillment_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5393093Z    bots/buddy_bot/lead_finder_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5393531Z    bots/buddy_bot/memory_system.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5394123Z    bots/buddy_bot/offer_generator_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5394610Z    bots/buddy_bot/personality_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5395106Z    bots/buddy_bot/retention_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5395516Z    bots/buddy_bot/voice_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5395963Z    bots/buddy_core/bot_generator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5396382Z    bots/buddy_core/buddy_core.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5396821Z    bots/buddy_core/feedback_loop.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5397290Z    bots/buddy_core/intent_parser.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5397719Z    bots/buddy_core/lead_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5398134Z    bots/buddy_core/privacy_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5398547Z    bots/buddy_core/tool_db.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5398916Z    bots/buddy_os/app_framework.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5399319Z    bots/buddy_os/bluetooth_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5399762Z    bots/buddy_os/buddy_os.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5400138Z    bots/buddy_os/cast_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5400697Z    bots/buddy_os/device_manager.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5401233Z    bots/car_flipping_bot/car_flipping_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5401684Z    bots/ci_auto_fix_bot/ci_auto_fix_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5402106Z    bots/cinecore_bot/cinecore_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5402533Z    bots/control_center/control_center.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5402957Z    bots/crypto_bot/crypto_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5403360Z    bots/crypto_bot/crypto_database.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5403782Z    bots/crypto_bot/dashboard.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5404163Z    bots/crypto_bot/mining.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5404544Z    bots/crypto_bot/portfolio.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5404914Z    bots/crypto_bot/price_feed.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5405309Z    bots/crypto_bot/prospectus.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5405663Z    bots/crypto_bot/trading.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5406057Z    bots/deal_finder_bot/deal_finder_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5406541Z    bots/dreamco_cloud_bot/dreamco_cloud_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5407009Z    bots/dreamco_code_bot/dreamco_code_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5407437Z    bots/dreamco_empire_os/ai_leaders.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5408016Z    bots/dreamco_empire_os/bot_fleet.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5408383Z    bots/dreamco_empire_os/cost_tracking.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5408785Z    bots/dreamco_empire_os/deal_analyzer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5409169Z    bots/dreamco_empire_os/empire_hq.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5409530Z    bots/dreamco_empire_os/empire_os.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5409898Z    bots/dreamco_empire_os/formula_vault.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5410486Z    bots/dreamco_empire_os/learning_matrix.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5410930Z    bots/dreamco_empire_os/marketplace.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5411351Z    bots/dreamco_empire_os/modules.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5411749Z    bots/dreamco_empire_os/orchestration.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5412177Z    bots/dreamco_empire_os/revenue_tracker.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5412597Z    bots/dreamco_payments/account_manager.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5413057Z    bots/dreamco_payments/api_manager.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5413505Z    bots/dreamco_payments/dreamco_payments.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5414013Z    bots/dreamco_payments/payment_processor.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5414512Z    bots/dreamco_payments/reporting_dashboard.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5415054Z    bots/dreamco_workspace_bot/dreamco_workspace_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5415618Z    bots/email_campaign_manager_bot/email_campaign_manager_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5416114Z    bots/enterprise_integrations_bot/enterprise_integrations_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5416474Z    bots/financial_literacy_bot/financial_literacy_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5416748Z    bots/fiverr_bot/fiverr_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5417006Z    bots/forecasting_tools_bot/forecasting_tools_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5417312Z    bots/foreclosure_finder_bot/foreclosure_finder_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5417920Z    bots/global_bot_network/api_gateway.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5418318Z    bots/global_bot_network/bot_library.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5418727Z    bots/global_bot_network/global_bot_network.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5419174Z    bots/global_bot_network/marketplace.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5419574Z    bots/global_bot_network/messaging_network.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5419843Z    bots/global_bot_network/owner_dashboard.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5420130Z    bots/global_bot_network/universal_bot_protocol.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5420618Z    bots/global_bot_network/verification_system.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5420875Z    bots/god_bot/god_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5421184Z    bots/government-contract-grant-bot/government_contract_grant_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5421529Z    bots/home_buyer_bot/home_buyer_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5421813Z    bots/home_flipping_analyzer/home_flipping_analyzer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5422100Z    bots/job_titles_bot/autonomous_trainer.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5422362Z    bots/job_titles_bot/cost_justification.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5422611Z    bots/job_titles_bot/job_bot_generator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5422863Z    bots/job_titles_bot/job_titles_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5423123Z    bots/job_titles_bot/job_titles_database.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5423374Z    bots/lead_gen_bot/lead_scraper.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5423635Z    bots/lead_generator_bot/lead_generator_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5423894Z    bots/legal_money_bot/legal_money_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5424161Z    bots/logo_generator_bot/logo_generator_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5424410Z    bots/mining_bot/mining_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5424644Z    bots/money_finder_bot/money_finder_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5424909Z    bots/multi_source_lead_scraper/lead_scraper.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5425175Z    bots/open_claw_bot/ai_models.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5425409Z    bots/open_claw_bot/client_manager.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5425645Z    bots/open_claw_bot/open_claw_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5425889Z    bots/open_claw_bot/strategy_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5426142Z    bots/pr_validation_bot/pr_validation_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5426438Z    bots/profit_calculator_bot/profit_calculator_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5426712Z    bots/quantum_decision_bot/bot_router.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5426978Z    bots/quantum_decision_bot/dimension_mapper.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5427340Z    bots/quantum_decision_bot/money_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5427615Z    bots/quantum_decision_bot/probability_model.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5427916Z    bots/quantum_decision_bot/quantum_decision_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5428197Z    bots/quantum_decision_bot/quantum_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5428485Z    bots/quantum_decision_bot/simulation_engine.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5428747Z    bots/real_estate_bot/real_estate_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5429018Z    bots/rental_cashflow_bot/rental_cashflow_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5429298Z    bots/resume_builder_bot/resume_builder_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5429584Z    bots/revenue_engine_bot/revenue_engine_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5429878Z    bots/revenue_validation/revenue_validation_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5430146Z    bots/sales_bot/conversion_tracker.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5430551Z    bots/sales_bot/followup_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5430781Z    bots/sales_bot/sales_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5431016Z    bots/sales_bot/sms_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5431256Z    bots/selenium-job-application-bot/bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5431577Z    bots/social_media_manager_bot/social_media_manager_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5431870Z    bots/software_bot/software_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5432138Z    bots/stack_and_profit_bot/stack_and_profit_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5432432Z    bots/stripe_payment_bot/stripe_payment_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5432700Z    bots/wealth_system_bot/wealth_system_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5432962Z    Business_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5433172Z    Business_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5433392Z    Business_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5433594Z    App_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5433800Z    App_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5433991Z    App_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5434193Z    Marketing_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5434403Z    Marketing_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5434614Z    Marketing_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5435041Z    Occupational_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5435296Z    Occupational_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5435520Z    Occupational_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5435749Z    Real_Estate_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5435965Z    Real_Estate_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5436180Z    Real_Estate_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5436400Z    Fiverr_bots/feature_1.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5436610Z    Fiverr_bots/feature_2.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5436805Z    Fiverr_bots/feature_3.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5437109Z    automation-tools/color_palette_generator/color_palette_generator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5437527Z    automation-tools/smart_meeting_scheduler/smart_meeting_scheduler.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5437914Z    automation-tools/workplace_audit_tool/workplace_audit_tool.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5438310Z    education-tools/recipe_scaling_tool/recipe_scaling_tool.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5438709Z    healthcare-tools/drug_discovery_pipeline_ai/drug_discovery_pipeline_ai.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5439176Z    healthcare-tools/mental_health_screening_bot/mental_health_screening_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5439620Z    analytics-elites/algorithmic_trading_bot/algorithmic_trading_bot.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5440083Z    analytics-elites/loyalty_program_impact_simulator/loyalty_program_impact_simulator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5440757Z    analytics-elites/predictive_engagement_tool/predictive_engagement_tool.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5441240Z    real-estate-tools/real_estate_cashflow_simulator/real_estate_cashflow_simulator.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5441639Z    compliance-tools/compliance_checker.py
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5441808Z 
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5441976Z All scanned bot files comply with the GLOBAL AI SOURCES FLOW framework.
+test-and-recover	Check bot framework compliance	2026-04-12T05:41:49.5442317Z ============================================================
+test-and-recover	Run Tests	﻿2026-04-12T05:41:49.5467601Z ##[group]Run python -m pytest tests/ \
+test-and-recover	Run Tests	2026-04-12T05:41:49.5467923Z [36;1mpython -m pytest tests/ \[0m
+test-and-recover	Run Tests	2026-04-12T05:41:49.5468175Z [36;1m  --ignore=tests/test_backend.py \[0m
+test-and-recover	Run Tests	2026-04-12T05:41:49.5468467Z [36;1m  --ignore=tests/test_web_dashboard.py \[0m
+test-and-recover	Run Tests	2026-04-12T05:41:49.5468721Z [36;1m  -q --tb=short[0m
+test-and-recover	Run Tests	2026-04-12T05:41:49.5483089Z shell: /usr/bin/bash -e {0}
+test-and-recover	Run Tests	2026-04-12T05:41:49.5483339Z env:
+test-and-recover	Run Tests	2026-04-12T05:41:49.5483582Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Run Tests	2026-04-12T05:41:49.5483977Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+test-and-recover	Run Tests	2026-04-12T05:41:49.5484364Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Run Tests	2026-04-12T05:41:49.5484700Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Run Tests	2026-04-12T05:41:49.5485049Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Run Tests	2026-04-12T05:41:49.5485381Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+test-and-recover	Run Tests	2026-04-12T05:41:49.5485666Z ##[endgroup]
+test-and-recover	Run Tests	2026-04-12T05:41:56.8439844Z ........................................................................ [  1%]
+test-and-recover	Run Tests	2026-04-12T05:41:56.8981210Z ........................................................................ [  2%]
+test-and-recover	Run Tests	2026-04-12T05:41:56.9520968Z ........................................................................ [  3%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.0015730Z ........................................................................ [  5%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.0534164Z ........................................................................ [  6%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.1216363Z ........................................................................ [  7%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.1753312Z ........................................................................ [  8%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.2313017Z ........................................................................ [ 10%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.2827648Z ........................................................................ [ 11%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.3307936Z ........................................................................ [ 12%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.3816097Z ........................................................................ [ 14%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.4595563Z ........................................................................ [ 15%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.5124756Z ........................................................................ [ 16%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.5694983Z ........................................................................ [ 17%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.6340545Z ........................................................................ [ 19%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.6983050Z ........................................................................ [ 20%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.7546572Z ........................................................................ [ 21%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.8253805Z ........................................................................ [ 23%]
+test-and-recover	Run Tests	2026-04-12T05:41:57.9567749Z ........................................................................ [ 24%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.0039802Z ........................................................................ [ 25%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.0540385Z ........................................................................ [ 26%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.1063072Z ........................................................................ [ 28%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.1564654Z ........................................................................ [ 29%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.2144029Z ........................................................................ [ 30%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.2760780Z ........................................................................ [ 31%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.3256107Z ........................................................................ [ 33%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.3816305Z ........................................................................ [ 34%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.4445834Z ........................................................................ [ 35%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.4987397Z ........................................................................ [ 37%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.5478133Z ........................................................................ [ 38%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.6216751Z ........................................................................ [ 39%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.6730103Z ........................................................................ [ 40%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.7942840Z ........................................................................ [ 42%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.8475778Z ........................................................................ [ 43%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.8963768Z ........................................................................ [ 44%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.9441707Z ........................................................................ [ 46%]
+test-and-recover	Run Tests	2026-04-12T05:41:58.9994685Z ........................................................................ [ 47%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.0529341Z ........................................................................ [ 48%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.1128271Z ........................................................................ [ 49%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.2402519Z ........................................................................ [ 51%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.2903578Z ........................................................................ [ 52%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.3417027Z ........................................................................ [ 53%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.3905187Z ........................................................................ [ 55%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.4435781Z ........................................................................ [ 56%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.4998221Z ........................................................................ [ 57%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.5543082Z ........................................................................ [ 58%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.6116080Z ........................................................................ [ 60%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.6653690Z ........................................................................ [ 61%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.7116009Z ........................................................................ [ 62%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.8222504Z ........................................................................ [ 63%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.8777226Z ........................................................................ [ 65%]
+test-and-recover	Run Tests	2026-04-12T05:41:59.9387773Z ........................................................................ [ 66%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.2619047Z ........................................................................ [ 67%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.3103194Z ........................................................................ [ 69%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.4143582Z ........................................................................ [ 70%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.4982163Z ........................................................................ [ 71%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.5545883Z ........................................................................ [ 72%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.6125902Z ........................................................................ [ 74%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.6698472Z ........................................................................ [ 75%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.7352790Z ........................................................................ [ 76%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.8239999Z ......................F................................................. [ 78%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.8727302Z ........................................................................ [ 79%]
+test-and-recover	Run Tests	2026-04-12T05:42:05.9203443Z ........................................................................ [ 80%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.0526448Z ........................................................................ [ 81%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.1009343Z ........................................................................ [ 83%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.2772650Z ........................................................................ [ 84%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.4888250Z ........................................................................ [ 85%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.8301152Z ........................................................................ [ 87%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.8785716Z ........................................................................ [ 88%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.9375099Z ........................................................................ [ 89%]
+test-and-recover	Run Tests	2026-04-12T05:42:06.9891396Z ........................................................................ [ 90%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.0439819Z ........................................................................ [ 92%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.1142176Z ........................................................................ [ 93%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.1640542Z ........................................................................ [ 94%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.2134608Z ........................................................................ [ 95%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.2649514Z ........................................................................ [ 97%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.3244314Z ........................................................................ [ 98%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.3809870Z ........................................................................ [ 99%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.8350455Z ..........                                                               [100%]
+test-and-recover	Run Tests	2026-04-12T05:42:07.8350949Z =================================== FAILURES ===================================
+test-and-recover	Run Tests	2026-04-12T05:42:07.8351337Z _________________ TestSearchLeads.test_free_hides_contact_info _________________
+test-and-recover	Run Tests	2026-04-12T05:42:07.8351764Z tests/test_lead_generator_bot.py:77: in test_free_hides_contact_info
+test-and-recover	Run Tests	2026-04-12T05:42:07.8352155Z     assert lead.get("email") in (None, "[UPGRADE TO PRO]", "***")
+test-and-recover	Run Tests	2026-04-12T05:42:07.8352585Z E   AssertionError: assert 'bkim@apexfintech.io' in (None, '[UPGRADE TO PRO]', '***')
+test-and-recover	Run Tests	2026-04-12T05:42:07.8353106Z E    +  where 'bkim@apexfintech.io' = <built-in method get of dict object at 0x7efd4923d640>('email')
+test-and-recover	Run Tests	2026-04-12T05:42:07.8353907Z E    +    where <built-in method get of dict object at 0x7efd4923d640> = {'company': 'Apex Fintech', 'company_size': 'small', 'email': 'bkim@apexfintech.io', 'employees': 15, ...}.get
+test-and-recover	Run Tests	2026-04-12T05:42:07.8354838Z =========================== short test summary info ============================
+test-and-recover	Run Tests	2026-04-12T05:42:07.8355638Z FAILED tests/test_lead_generator_bot.py::TestSearchLeads::test_free_hides_contact_info - AssertionError: assert 'bkim@apexfintech.io' in (None, '[UPGRADE TO PRO]', '***')
+test-and-recover	Run Tests	2026-04-12T05:42:07.8356407Z  +  where 'bkim@apexfintech.io' = <built-in method get of dict object at 0x7efd4923d640>('email')
+test-and-recover	Run Tests	2026-04-12T05:42:07.8357141Z  +    where <built-in method get of dict object at 0x7efd4923d640> = {'company': 'Apex Fintech', 'company_size': 'small', 'email': 'bkim@apexfintech.io', 'employees': 15, ...}.get
+test-and-recover	Run Tests	2026-04-12T05:42:07.8357735Z 1 failed, 5625 passed in 16.09s
+test-and-recover	Run Tests	2026-04-12T05:42:08.4190962Z ##[error]Process completed with exit code 1.
+test-and-recover	Report status	﻿2026-04-12T05:42:08.4252061Z ##[group]Run if [ "failure" = "success" ]; then
+test-and-recover	Report status	2026-04-12T05:42:08.4252412Z [36;1mif [ "failure" = "success" ]; then[0m
+test-and-recover	Report status	2026-04-12T05:42:08.4252762Z [36;1m  echo "✅ All tests passed — branch is merge-ready."[0m
+test-and-recover	Report status	2026-04-12T05:42:08.4253043Z [36;1melse[0m
+test-and-recover	Report status	2026-04-12T05:42:08.4253321Z [36;1m  echo "❌ Tests or checks failed — review the output above to diagnose."[0m
+test-and-recover	Report status	2026-04-12T05:42:08.4253639Z [36;1mfi[0m
+test-and-recover	Report status	2026-04-12T05:42:08.4266905Z shell: /usr/bin/bash -e {0}
+test-and-recover	Report status	2026-04-12T05:42:08.4267148Z env:
+test-and-recover	Report status	2026-04-12T05:42:08.4267384Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Report status	2026-04-12T05:42:08.4267776Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+test-and-recover	Report status	2026-04-12T05:42:08.4268159Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Report status	2026-04-12T05:42:08.4268484Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Report status	2026-04-12T05:42:08.4268822Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+test-and-recover	Report status	2026-04-12T05:42:08.4269149Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+test-and-recover	Report status	2026-04-12T05:42:08.4269479Z ##[endgroup]
+test-and-recover	Report status	2026-04-12T05:42:08.4302571Z ❌ Tests or checks failed — review the output above to diagnose.
+test-and-recover	Post Checkout code	﻿2026-04-12T05:42:08.4450852Z Post job cleanup.
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5327770Z [command]/usr/bin/git version
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5360550Z git version 2.53.0
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5397622Z Temporarily overriding HOME='/home/runner/work/_temp/01066b81-4ef2-4630-8f92-eeda45d9461e' before making global git config changes
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5398661Z Adding repository directory to the temporary git global config as a safe directory
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5410405Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5439103Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5465543Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5639020Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5656906Z http.https://github.com/.extraheader
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5666934Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5691302Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5859779Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test-and-recover	Post Checkout code	2026-04-12T05:42:08.5885093Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test-and-recover	Complete job	﻿2026-04-12T05:42:08.6145437Z Cleaning up orphan processes
+test-and-recover	Complete job	2026-04-12T05:42:08.6364009Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
