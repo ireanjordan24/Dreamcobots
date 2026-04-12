@@ -1,547 +1,551 @@
-test	Set up job	﻿2026-04-12T05:45:37.7096697Z Current runner version: '2.333.1'
-test	Set up job	2026-04-12T05:45:37.7136803Z ##[group]Runner Image Provisioner
-test	Set up job	2026-04-12T05:45:37.7138260Z Hosted Compute Agent
-test	Set up job	2026-04-12T05:45:37.7139154Z Version: 20260213.493
-test	Set up job	2026-04-12T05:45:37.7140248Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
-test	Set up job	2026-04-12T05:45:37.7141632Z Build Date: 2026-02-13T00:28:41Z
-test	Set up job	2026-04-12T05:45:37.7143017Z Worker ID: {9f01f2d9-ba49-4957-8706-d3480905efbc}
-test	Set up job	2026-04-12T05:45:37.7144227Z Azure Region: eastus2
-test	Set up job	2026-04-12T05:45:37.7145083Z ##[endgroup]
-test	Set up job	2026-04-12T05:45:37.7147291Z ##[group]Operating System
-test	Set up job	2026-04-12T05:45:37.7148304Z Ubuntu
-test	Set up job	2026-04-12T05:45:37.7149068Z 24.04.4
-test	Set up job	2026-04-12T05:45:37.7149737Z LTS
-test	Set up job	2026-04-12T05:45:37.7150511Z ##[endgroup]
-test	Set up job	2026-04-12T05:45:37.7151274Z ##[group]Runner Image
-test	Set up job	2026-04-12T05:45:37.7152165Z Image: ubuntu-24.04
-test	Set up job	2026-04-12T05:45:37.7153465Z Version: 20260406.80.1
-test	Set up job	2026-04-12T05:45:37.7155099Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
-test	Set up job	2026-04-12T05:45:37.7157790Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
-test	Set up job	2026-04-12T05:45:37.7159323Z ##[endgroup]
-test	Set up job	2026-04-12T05:45:37.7161188Z ##[group]GITHUB_TOKEN Permissions
-test	Set up job	2026-04-12T05:45:37.7164165Z Contents: read
-test	Set up job	2026-04-12T05:45:37.7164953Z Metadata: read
-test	Set up job	2026-04-12T05:45:37.7165862Z Packages: read
-test	Set up job	2026-04-12T05:45:37.7166612Z ##[endgroup]
-test	Set up job	2026-04-12T05:45:37.7169597Z Secret source: Actions
-test	Set up job	2026-04-12T05:45:37.7170994Z Prepare workflow directory
-test	Set up job	2026-04-12T05:45:37.7662312Z Prepare all required actions
-test	Set up job	2026-04-12T05:45:37.7721043Z Getting action download info
-test	Set up job	2026-04-12T05:45:38.0138577Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
-test	Set up job	2026-04-12T05:45:38.1504921Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
-test	Set up job	2026-04-12T05:45:38.3325678Z Complete job name: test
-test	Checkout code	﻿2026-04-12T05:45:38.4021507Z ##[group]Run actions/checkout@v4
-test	Checkout code	2026-04-12T05:45:38.4022618Z with:
-test	Checkout code	2026-04-12T05:45:38.4023311Z   repository: DreamCo-Technologies/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.4024029Z   token: ***
-test	Checkout code	2026-04-12T05:45:38.4024411Z   ssh-strict: true
-test	Checkout code	2026-04-12T05:45:38.4024790Z   ssh-user: git
-test	Checkout code	2026-04-12T05:45:38.4025177Z   persist-credentials: true
-test	Checkout code	2026-04-12T05:45:38.4025611Z   clean: true
-test	Checkout code	2026-04-12T05:45:38.4026012Z   sparse-checkout-cone-mode: true
-test	Checkout code	2026-04-12T05:45:38.4026480Z   fetch-depth: 1
-test	Checkout code	2026-04-12T05:45:38.4026860Z   fetch-tags: false
-test	Checkout code	2026-04-12T05:45:38.4027242Z   show-progress: true
-test	Checkout code	2026-04-12T05:45:38.4027639Z   lfs: false
-test	Checkout code	2026-04-12T05:45:38.4027996Z   submodules: false
-test	Checkout code	2026-04-12T05:45:38.4028393Z   set-safe-directory: true
-test	Checkout code	2026-04-12T05:45:38.4029128Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.5114149Z Syncing repository: DreamCo-Technologies/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.5116004Z ##[group]Getting Git version info
-test	Checkout code	2026-04-12T05:45:38.5116722Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
-test	Checkout code	2026-04-12T05:45:38.5117745Z [command]/usr/bin/git version
-test	Checkout code	2026-04-12T05:45:38.5153906Z git version 2.53.0
-test	Checkout code	2026-04-12T05:45:38.5179238Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.5200967Z Temporarily overriding HOME='/home/runner/work/_temp/9f6e7098-3fec-4be5-ba2b-8a5efba7013f' before making global git config changes
-test	Checkout code	2026-04-12T05:45:38.5202335Z Adding repository directory to the temporary git global config as a safe directory
-test	Checkout code	2026-04-12T05:45:38.5206439Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.5237778Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
-test	Checkout code	2026-04-12T05:45:38.5241165Z ##[group]Initializing the repository
-test	Checkout code	2026-04-12T05:45:38.5245406Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.5335428Z hint: Using 'master' as the name for the initial branch. This default branch name
-test	Checkout code	2026-04-12T05:45:38.5337239Z hint: will change to "main" in Git 3.0. To configure the initial branch name
-test	Checkout code	2026-04-12T05:45:38.5338317Z hint: to use in all of your new repositories, which will suppress this warning,
-test	Checkout code	2026-04-12T05:45:38.5339382Z hint: call:
-test	Checkout code	2026-04-12T05:45:38.5339769Z hint:
-test	Checkout code	2026-04-12T05:45:38.5340276Z hint: 	git config --global init.defaultBranch <name>
-test	Checkout code	2026-04-12T05:45:38.5340960Z hint:
-test	Checkout code	2026-04-12T05:45:38.5341876Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
-test	Checkout code	2026-04-12T05:45:38.5343370Z hint: 'development'. The just-created branch can be renamed via this command:
-test	Checkout code	2026-04-12T05:45:38.5344068Z hint:
-test	Checkout code	2026-04-12T05:45:38.5344434Z hint: 	git branch -m <name>
-test	Checkout code	2026-04-12T05:45:38.5344867Z hint:
-test	Checkout code	2026-04-12T05:45:38.5345609Z hint: Disable this message with "git config set advice.defaultBranchName false"
-test	Checkout code	2026-04-12T05:45:38.5346569Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
-test	Checkout code	2026-04-12T05:45:38.5348608Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.5379449Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.5380192Z ##[group]Disabling automatic garbage collection
-test	Checkout code	2026-04-12T05:45:38.5383447Z [command]/usr/bin/git config --local gc.auto 0
-test	Checkout code	2026-04-12T05:45:38.5410909Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.5411581Z ##[group]Setting up auth
-test	Checkout code	2026-04-12T05:45:38.5417572Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-test	Checkout code	2026-04-12T05:45:38.5447042Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-test	Checkout code	2026-04-12T05:45:38.5718219Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-test	Checkout code	2026-04-12T05:45:38.5745994Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-test	Checkout code	2026-04-12T05:45:38.5956716Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-test	Checkout code	2026-04-12T05:45:38.5986873Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-test	Checkout code	2026-04-12T05:45:38.6202167Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
-test	Checkout code	2026-04-12T05:45:38.6234972Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.6235755Z ##[group]Fetching the repository
-test	Checkout code	2026-04-12T05:45:38.6243735Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +616213e2d7bd3cf481d1a1fdc141912423cb3902:refs/remotes/origin/main
-test	Checkout code	2026-04-12T05:45:38.8765401Z From https://github.com/DreamCo-Technologies/Dreamcobots
-test	Checkout code	2026-04-12T05:45:38.8767009Z  * [new ref]         616213e2d7bd3cf481d1a1fdc141912423cb3902 -> origin/main
-test	Checkout code	2026-04-12T05:45:38.8794970Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.8795772Z ##[group]Determining the checkout info
-test	Checkout code	2026-04-12T05:45:38.8797221Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.8802049Z [command]/usr/bin/git sparse-checkout disable
-test	Checkout code	2026-04-12T05:45:38.8918299Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
-test	Checkout code	2026-04-12T05:45:38.8921314Z ##[group]Checking out the ref
-test	Checkout code	2026-04-12T05:45:38.8922997Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
-test	Checkout code	2026-04-12T05:45:38.9408378Z Switched to a new branch 'main'
-test	Checkout code	2026-04-12T05:45:38.9409578Z branch 'main' set up to track 'origin/main'.
-test	Checkout code	2026-04-12T05:45:38.9417722Z ##[endgroup]
-test	Checkout code	2026-04-12T05:45:38.9455225Z [command]/usr/bin/git log -1 --format=%H
-test	Checkout code	2026-04-12T05:45:38.9477683Z 616213e2d7bd3cf481d1a1fdc141912423cb3902
-test	Set up Python	﻿2026-04-12T05:45:38.9738509Z ##[group]Run actions/setup-python@v5
-test	Set up Python	2026-04-12T05:45:38.9739151Z with:
-test	Set up Python	2026-04-12T05:45:38.9739537Z   python-version: 3.x
-test	Set up Python	2026-04-12T05:45:38.9740021Z   check-latest: false
-test	Set up Python	2026-04-12T05:45:38.9740623Z   token: ***
-test	Set up Python	2026-04-12T05:45:38.9741053Z   update-environment: true
-test	Set up Python	2026-04-12T05:45:38.9741553Z   allow-prereleases: false
-test	Set up Python	2026-04-12T05:45:38.9742056Z   freethreaded: false
-test	Set up Python	2026-04-12T05:45:38.9742496Z ##[endgroup]
-test	Set up Python	2026-04-12T05:45:39.1397841Z ##[group]Installed versions
-test	Set up Python	2026-04-12T05:45:39.1490747Z Successfully set up CPython (3.14.3)
-test	Set up Python	2026-04-12T05:45:39.1493262Z ##[endgroup]
-test	Install dependencies	﻿2026-04-12T05:45:39.1640960Z ##[group]Run python -m pip install --upgrade pip
-test	Install dependencies	2026-04-12T05:45:39.1642944Z [36;1mpython -m pip install --upgrade pip[0m
-test	Install dependencies	2026-04-12T05:45:39.1644494Z [36;1mpip install -r requirements.txt[0m
-test	Install dependencies	2026-04-12T05:45:39.1680762Z shell: /usr/bin/bash -e {0}
-test	Install dependencies	2026-04-12T05:45:39.1681940Z env:
-test	Install dependencies	2026-04-12T05:45:39.1683410Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Install dependencies	2026-04-12T05:45:39.1685327Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib/pkgconfig
-test	Install dependencies	2026-04-12T05:45:39.1687235Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Install dependencies	2026-04-12T05:45:39.1688899Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Install dependencies	2026-04-12T05:45:39.1690629Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Install dependencies	2026-04-12T05:45:39.1692398Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib
-test	Install dependencies	2026-04-12T05:45:39.1694121Z ##[endgroup]
-test	Install dependencies	2026-04-12T05:45:39.7773000Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.14.3/x64/lib/python3.14/site-packages (26.0.1)
-test	Install dependencies	2026-04-12T05:45:40.4714662Z Collecting pytest>=7.0.0 (from -r requirements.txt (line 1))
-test	Install dependencies	2026-04-12T05:45:40.5392132Z   Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
-test	Install dependencies	2026-04-12T05:45:40.5603438Z Collecting pytest-benchmark>=4.0.0 (from -r requirements.txt (line 2))
-test	Install dependencies	2026-04-12T05:45:40.5687257Z   Downloading pytest_benchmark-5.2.3-py3-none-any.whl.metadata (29 kB)
-test	Install dependencies	2026-04-12T05:45:40.5965703Z Collecting pytest-cov>=4.0.0 (from -r requirements.txt (line 3))
-test	Install dependencies	2026-04-12T05:45:40.6036605Z   Downloading pytest_cov-7.1.0-py3-none-any.whl.metadata (32 kB)
-test	Install dependencies	2026-04-12T05:45:40.6365161Z Collecting requests>=2.28.0 (from -r requirements.txt (line 4))
-test	Install dependencies	2026-04-12T05:45:40.6441090Z   Downloading requests-2.33.1-py3-none-any.whl.metadata (4.8 kB)
-test	Install dependencies	2026-04-12T05:45:40.6635182Z Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 5))
-test	Install dependencies	2026-04-12T05:45:40.6703732Z   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
-test	Install dependencies	2026-04-12T05:45:40.6894368Z Collecting schedule>=1.2.0 (from -r requirements.txt (line 6))
-test	Install dependencies	2026-04-12T05:45:40.6965979Z   Downloading schedule-1.2.2-py3-none-any.whl.metadata (3.8 kB)
-test	Install dependencies	2026-04-12T05:45:40.7132756Z Collecting jinja2>=3.1.0 (from -r requirements.txt (line 7))
-test	Install dependencies	2026-04-12T05:45:40.7200107Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
-test	Install dependencies	2026-04-12T05:45:40.7497071Z Collecting selenium>=4.10.0 (from -r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:40.7567718Z   Downloading selenium-4.43.0-py3-none-any.whl.metadata (7.5 kB)
-test	Install dependencies	2026-04-12T05:45:40.7758993Z Collecting webdriver-manager>=4.0.0 (from -r requirements.txt (line 9))
-test	Install dependencies	2026-04-12T05:45:40.7831718Z   Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl.metadata (12 kB)
-test	Install dependencies	2026-04-12T05:45:40.8412348Z Collecting openai>=1.0.0 (from -r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:40.8481494Z   Downloading openai-2.31.0-py3-none-any.whl.metadata (31 kB)
-test	Install dependencies	2026-04-12T05:45:40.8997317Z Collecting fastapi>=0.100.0 (from -r requirements.txt (line 11))
-test	Install dependencies	2026-04-12T05:45:40.9066326Z   Downloading fastapi-0.135.3-py3-none-any.whl.metadata (28 kB)
-test	Install dependencies	2026-04-12T05:45:40.9327088Z Collecting httpx>=0.24.0 (from -r requirements.txt (line 12))
-test	Install dependencies	2026-04-12T05:45:40.9399608Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
-test	Install dependencies	2026-04-12T05:45:40.9600734Z Collecting flask>=2.0.0 (from -r requirements.txt (line 13))
-test	Install dependencies	2026-04-12T05:45:40.9670701Z   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
-test	Install dependencies	2026-04-12T05:45:40.9851508Z Collecting flask-cors>=4.0.0 (from -r requirements.txt (line 14))
-test	Install dependencies	2026-04-12T05:45:40.9919508Z   Downloading flask_cors-6.0.2-py3-none-any.whl.metadata (5.3 kB)
-test	Install dependencies	2026-04-12T05:45:41.0060112Z Collecting iniconfig>=1.0.1 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test	Install dependencies	2026-04-12T05:45:41.0130638Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
-test	Install dependencies	2026-04-12T05:45:41.0319868Z Collecting packaging>=22 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test	Install dependencies	2026-04-12T05:45:41.0388741Z   Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
-test	Install dependencies	2026-04-12T05:45:41.0546354Z Collecting pluggy<2,>=1.5 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test	Install dependencies	2026-04-12T05:45:41.0614633Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
-test	Install dependencies	2026-04-12T05:45:41.0824564Z Collecting pygments>=2.7.2 (from pytest>=7.0.0->-r requirements.txt (line 1))
-test	Install dependencies	2026-04-12T05:45:41.0894967Z   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
-test	Install dependencies	2026-04-12T05:45:41.1060627Z Collecting py-cpuinfo (from pytest-benchmark>=4.0.0->-r requirements.txt (line 2))
-test	Install dependencies	2026-04-12T05:45:41.1131466Z   Downloading py_cpuinfo-9.0.0-py3-none-any.whl.metadata (794 bytes)
-test	Install dependencies	2026-04-12T05:45:41.4766732Z Collecting coverage>=7.10.6 (from coverage[toml]>=7.10.6->pytest-cov>=4.0.0->-r requirements.txt (line 3))
-test	Install dependencies	2026-04-12T05:45:41.4850641Z   Downloading coverage-7.13.5-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.5 kB)
-test	Install dependencies	2026-04-12T05:45:41.5773153Z Collecting charset_normalizer<4,>=2 (from requests>=2.28.0->-r requirements.txt (line 4))
-test	Install dependencies	2026-04-12T05:45:41.5843891Z   Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
-test	Install dependencies	2026-04-12T05:45:41.6049918Z Collecting idna<4,>=2.5 (from requests>=2.28.0->-r requirements.txt (line 4))
-test	Install dependencies	2026-04-12T05:45:41.6120608Z   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
-test	Install dependencies	2026-04-12T05:45:41.6351616Z Collecting urllib3<3,>=1.26 (from requests>=2.28.0->-r requirements.txt (line 4))
-test	Install dependencies	2026-04-12T05:45:41.6420793Z   Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
-test	Install dependencies	2026-04-12T05:45:41.6619892Z Collecting certifi>=2023.5.7 (from requests>=2.28.0->-r requirements.txt (line 4))
-test	Install dependencies	2026-04-12T05:45:41.6687620Z   Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
-test	Install dependencies	2026-04-12T05:45:41.7201092Z Collecting MarkupSafe>=2.0 (from jinja2>=3.1.0->-r requirements.txt (line 7))
-test	Install dependencies	2026-04-12T05:45:41.7270654Z   Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
-test	Install dependencies	2026-04-12T05:45:41.7447226Z Collecting trio<1.0,>=0.31.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.7515459Z   Downloading trio-0.33.0-py3-none-any.whl.metadata (8.5 kB)
-test	Install dependencies	2026-04-12T05:45:41.7673769Z Collecting trio-websocket<1.0,>=0.12.2 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.7744680Z   Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)
-test	Install dependencies	2026-04-12T05:45:41.7927711Z Collecting typing_extensions<5.0,>=4.15.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.7996992Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
-test	Install dependencies	2026-04-12T05:45:41.8198779Z Collecting websocket-client<2.0,>=1.8.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.8266758Z   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
-test	Install dependencies	2026-04-12T05:45:41.8461183Z Collecting attrs>=23.2.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.8529242Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
-test	Install dependencies	2026-04-12T05:45:41.8699225Z Collecting sortedcontainers (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.8774436Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
-test	Install dependencies	2026-04-12T05:45:41.8915646Z Collecting outcome (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.8983794Z   Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)
-test	Install dependencies	2026-04-12T05:45:41.9121280Z Collecting sniffio>=1.3.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.9190661Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
-test	Install dependencies	2026-04-12T05:45:41.9352650Z Collecting wsproto>=0.14 (from trio-websocket<1.0,>=0.12.2->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.9428745Z   Downloading wsproto-1.3.2-py3-none-any.whl.metadata (5.2 kB)
-test	Install dependencies	2026-04-12T05:45:41.9587868Z Collecting pysocks!=1.5.7,<2.0,>=1.5.6 (from urllib3[socks]<3.0,>=2.6.3->selenium>=4.10.0->-r requirements.txt (line 8))
-test	Install dependencies	2026-04-12T05:45:41.9655448Z   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
-test	Install dependencies	2026-04-12T05:45:41.9882147Z Collecting anyio<5,>=3.5.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:41.9949222Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
-test	Install dependencies	2026-04-12T05:45:42.0093467Z Collecting distro<2,>=1.7.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.0161099Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
-test	Install dependencies	2026-04-12T05:45:42.0941995Z Collecting jiter<1,>=0.10.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.1017887Z   Downloading jiter-0.14.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
-test	Install dependencies	2026-04-12T05:45:42.2082154Z Collecting pydantic<3,>=1.9.0 (from openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.2154270Z   Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
-test	Install dependencies	2026-04-12T05:45:42.2582188Z Collecting tqdm>4 (from openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.2650635Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
-test	Install dependencies	2026-04-12T05:45:42.2957716Z Collecting httpcore==1.* (from httpx>=0.24.0->-r requirements.txt (line 12))
-test	Install dependencies	2026-04-12T05:45:42.3024709Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
-test	Install dependencies	2026-04-12T05:45:42.3209763Z Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.24.0->-r requirements.txt (line 12))
-test	Install dependencies	2026-04-12T05:45:42.3280267Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
-test	Install dependencies	2026-04-12T05:45:42.3434851Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.3502180Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
-test	Install dependencies	2026-04-12T05:45:42.9757513Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:42.9831330Z   Downloading pydantic_core-2.41.5-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
-test	Install dependencies	2026-04-12T05:45:43.0000977Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
-test	Install dependencies	2026-04-12T05:45:43.0069740Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
-test	Install dependencies	2026-04-12T05:45:43.0329800Z Collecting starlette>=0.46.0 (from fastapi>=0.100.0->-r requirements.txt (line 11))
-test	Install dependencies	2026-04-12T05:45:43.0398323Z   Downloading starlette-1.0.0-py3-none-any.whl.metadata (6.3 kB)
-test	Install dependencies	2026-04-12T05:45:43.0580021Z Collecting annotated-doc>=0.0.2 (from fastapi>=0.100.0->-r requirements.txt (line 11))
-test	Install dependencies	2026-04-12T05:45:43.0648220Z   Downloading annotated_doc-0.0.4-py3-none-any.whl.metadata (6.6 kB)
-test	Install dependencies	2026-04-12T05:45:43.0807068Z Collecting blinker>=1.9.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test	Install dependencies	2026-04-12T05:45:43.0939036Z   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
-test	Install dependencies	2026-04-12T05:45:43.1074775Z Collecting click>=8.1.3 (from flask>=2.0.0->-r requirements.txt (line 13))
-test	Install dependencies	2026-04-12T05:45:43.1145272Z   Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
-test	Install dependencies	2026-04-12T05:45:43.1293555Z Collecting itsdangerous>=2.2.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test	Install dependencies	2026-04-12T05:45:43.1361914Z   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
-test	Install dependencies	2026-04-12T05:45:43.1587792Z Collecting werkzeug>=3.1.0 (from flask>=2.0.0->-r requirements.txt (line 13))
-test	Install dependencies	2026-04-12T05:45:43.1658480Z   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
-test	Install dependencies	2026-04-12T05:45:43.1963403Z Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
-test	Install dependencies	2026-04-12T05:45:43.2374803Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
-test	Install dependencies	2026-04-12T05:45:43.2470374Z Downloading pytest_benchmark-5.2.3-py3-none-any.whl (45 kB)
-test	Install dependencies	2026-04-12T05:45:43.2577714Z Downloading pytest_cov-7.1.0-py3-none-any.whl (22 kB)
-test	Install dependencies	2026-04-12T05:45:43.2667395Z Downloading requests-2.33.1-py3-none-any.whl (64 kB)
-test	Install dependencies	2026-04-12T05:45:43.2786578Z Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (215 kB)
-test	Install dependencies	2026-04-12T05:45:43.3009604Z Downloading idna-3.11-py3-none-any.whl (71 kB)
-test	Install dependencies	2026-04-12T05:45:43.3121923Z Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
-test	Install dependencies	2026-04-12T05:45:43.3270401Z Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
-test	Install dependencies	2026-04-12T05:45:43.3357661Z Downloading schedule-1.2.2-py3-none-any.whl (12 kB)
-test	Install dependencies	2026-04-12T05:45:43.3445381Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
-test	Install dependencies	2026-04-12T05:45:43.3592165Z Downloading selenium-4.43.0-py3-none-any.whl (9.6 MB)
-test	Install dependencies	2026-04-12T05:45:43.5702073Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 47.5 MB/s  0:00:00
-test	Install dependencies	2026-04-12T05:45:43.5773490Z Downloading trio-0.33.0-py3-none-any.whl (510 kB)
-test	Install dependencies	2026-04-12T05:45:43.5893480Z Downloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)
-test	Install dependencies	2026-04-12T05:45:43.5983764Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
-test	Install dependencies	2026-04-12T05:45:43.6078623Z Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
-test	Install dependencies	2026-04-12T05:45:43.6170873Z Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
-test	Install dependencies	2026-04-12T05:45:43.6263549Z Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl (27 kB)
-test	Install dependencies	2026-04-12T05:45:43.6355714Z Downloading openai-2.31.0-py3-none-any.whl (1.2 MB)
-test	Install dependencies	2026-04-12T05:45:43.6493038Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 82.0 MB/s  0:00:00
-test	Install dependencies	2026-04-12T05:45:43.6562151Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
-test	Install dependencies	2026-04-12T05:45:43.6658015Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
-test	Install dependencies	2026-04-12T05:45:43.6756325Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
-test	Install dependencies	2026-04-12T05:45:43.6849456Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
-test	Install dependencies	2026-04-12T05:45:43.6942602Z Downloading jiter-0.14.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (354 kB)
-test	Install dependencies	2026-04-12T05:45:43.7060005Z Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
-test	Install dependencies	2026-04-12T05:45:43.7174150Z Downloading pydantic_core-2.41.5-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
-test	Install dependencies	2026-04-12T05:45:43.7381811Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 98.3 MB/s  0:00:00
-test	Install dependencies	2026-04-12T05:45:43.7450989Z Downloading fastapi-0.135.3-py3-none-any.whl (117 kB)
-test	Install dependencies	2026-04-12T05:45:43.7547482Z Downloading flask-3.1.3-py3-none-any.whl (103 kB)
-test	Install dependencies	2026-04-12T05:45:43.7639135Z Downloading flask_cors-6.0.2-py3-none-any.whl (13 kB)
-test	Install dependencies	2026-04-12T05:45:43.7728296Z Downloading annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
-test	Install dependencies	2026-04-12T05:45:43.7832415Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
-test	Install dependencies	2026-04-12T05:45:43.7921117Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
-test	Install dependencies	2026-04-12T05:45:43.8012162Z Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
-test	Install dependencies	2026-04-12T05:45:43.8099605Z Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
-test	Install dependencies	2026-04-12T05:45:43.8195362Z Downloading click-8.3.2-py3-none-any.whl (108 kB)
-test	Install dependencies	2026-04-12T05:45:43.8290319Z Downloading coverage-7.13.5-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (253 kB)
-test	Install dependencies	2026-04-12T05:45:43.8392816Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
-test	Install dependencies	2026-04-12T05:45:43.8484510Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
-test	Install dependencies	2026-04-12T05:45:43.8576767Z Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
-test	Install dependencies	2026-04-12T05:45:43.8671685Z Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (23 kB)
-test	Install dependencies	2026-04-12T05:45:43.8762256Z Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)
-test	Install dependencies	2026-04-12T05:45:43.8856485Z Downloading packaging-26.0-py3-none-any.whl (74 kB)
-test	Install dependencies	2026-04-12T05:45:43.8957560Z Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
-test	Install dependencies	2026-04-12T05:45:43.9086875Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 92.8 MB/s  0:00:00
-test	Install dependencies	2026-04-12T05:45:43.9157942Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
-test	Install dependencies	2026-04-12T05:45:43.9251770Z Downloading starlette-1.0.0-py3-none-any.whl (72 kB)
-test	Install dependencies	2026-04-12T05:45:43.9348412Z Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
-test	Install dependencies	2026-04-12T05:45:43.9446629Z Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
-test	Install dependencies	2026-04-12T05:45:43.9539927Z Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
-test	Install dependencies	2026-04-12T05:45:43.9640318Z Downloading wsproto-1.3.2-py3-none-any.whl (24 kB)
-test	Install dependencies	2026-04-12T05:45:43.9729635Z Downloading py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
-test	Install dependencies	2026-04-12T05:45:43.9827842Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
-test	Install dependencies	2026-04-12T05:45:44.1234417Z Installing collected packages: sortedcontainers, py-cpuinfo, websocket-client, urllib3, typing_extensions, tqdm, sniffio, schedule, python-dotenv, pysocks, pygments, pluggy, packaging, MarkupSafe, jiter, itsdangerous, iniconfig, idna, h11, distro, coverage, click, charset_normalizer, certifi, blinker, attrs, annotated-types, annotated-doc, wsproto, werkzeug, typing-inspection, requests, pytest, pydantic-core, outcome, jinja2, httpcore, anyio, webdriver-manager, trio, starlette, pytest-cov, pytest-benchmark, pydantic, httpx, flask, trio-websocket, openai, flask-cors, fastapi, selenium
-test	Install dependencies	2026-04-12T05:45:50.2815170Z 
-test	Install dependencies	2026-04-12T05:45:50.2869333Z Successfully installed MarkupSafe-3.0.3 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 attrs-26.1.0 blinker-1.9.0 certifi-2026.2.25 charset_normalizer-3.4.7 click-8.3.2 coverage-7.13.5 distro-1.9.0 fastapi-0.135.3 flask-3.1.3 flask-cors-6.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jiter-0.14.0 openai-2.31.0 outcome-1.3.0.post0 packaging-26.0 pluggy-1.6.0 py-cpuinfo-9.0.0 pydantic-2.12.5 pydantic-core-2.41.5 pygments-2.20.0 pysocks-1.7.1 pytest-9.0.3 pytest-benchmark-5.2.3 pytest-cov-7.1.0 python-dotenv-1.2.2 requests-2.33.1 schedule-1.2.2 selenium-4.43.0 sniffio-1.3.1 sortedcontainers-2.4.0 starlette-1.0.0 tqdm-4.67.3 trio-0.33.0 trio-websocket-0.12.2 typing-inspection-0.4.2 typing_extensions-4.15.0 urllib3-2.6.3 webdriver-manager-4.0.2 websocket-client-1.9.0 werkzeug-3.1.8 wsproto-1.3.2
-test	Check bot framework compliance	﻿2026-04-12T05:45:50.7121912Z ##[group]Run python tools/check_bot_framework.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7122317Z [36;1mpython tools/check_bot_framework.py[0m
-test	Check bot framework compliance	2026-04-12T05:45:50.7145497Z shell: /usr/bin/bash -e {0}
-test	Check bot framework compliance	2026-04-12T05:45:50.7145746Z env:
-test	Check bot framework compliance	2026-04-12T05:45:50.7145985Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Check bot framework compliance	2026-04-12T05:45:50.7146375Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib/pkgconfig
-test	Check bot framework compliance	2026-04-12T05:45:50.7146771Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Check bot framework compliance	2026-04-12T05:45:50.7147117Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Check bot framework compliance	2026-04-12T05:45:50.7147459Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
-test	Check bot framework compliance	2026-04-12T05:45:50.7147804Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib
-test	Check bot framework compliance	2026-04-12T05:45:50.7148086Z ##[endgroup]
-test	Check bot framework compliance	2026-04-12T05:45:50.7863089Z ============================================================
-test	Check bot framework compliance	2026-04-12T05:45:50.7864178Z DreamCObots Bot Framework Compliance Report
-test	Check bot framework compliance	2026-04-12T05:45:50.7864758Z ============================================================
-test	Check bot framework compliance	2026-04-12T05:45:50.7865346Z Root : /home/runner/work/Dreamcobots/Dreamcobots
-test	Check bot framework compliance	2026-04-12T05:45:50.7865856Z Files scanned : 215
-test	Check bot framework compliance	2026-04-12T05:45:50.7866220Z Compliant     : 210
-test	Check bot framework compliance	2026-04-12T05:45:50.7866585Z Violations    : 5
-test	Check bot framework compliance	2026-04-12T05:45:50.7866840Z 
-test	Check bot framework compliance	2026-04-12T05:45:50.7867243Z ✅  COMPLIANT FILES
-test	Check bot framework compliance	2026-04-12T05:45:50.7867690Z    bots/211-resource-eligibility-bot/bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7868323Z    bots/ad_copy_generator_bot/ad_copy_generator_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7868946Z    bots/affiliate_bot/affiliate_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7869548Z    bots/ai-models-integration/ai_models_integration.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7870163Z    bots/ai-side-hustle-bots/bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7870653Z    bots/ai_brain/ai_brain.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7871101Z    bots/ai_brain/decision_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7871696Z    bots/ai_brain/metrics_tracker.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7872101Z    bots/ai_brain/state_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7872399Z    bots/ai_chatbot/chatbot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7873025Z    bots/ai_learning_system/ai_learning_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7873706Z    bots/ai_learning_system/analytics.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7874032Z    bots/ai_learning_system/classifier.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7874360Z    bots/ai_learning_system/database.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7874683Z    bots/ai_learning_system/deployment.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7875008Z    bots/ai_learning_system/governance.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7875341Z    bots/ai_learning_system/hybrid_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7875673Z    bots/ai_learning_system/ingestion.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7876000Z    bots/ai_learning_system/learning_loop.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7876326Z    bots/ai_learning_system/sandbox.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7876645Z    bots/ai_learning_system/scheduler.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7876979Z    bots/ai_level_up_bot/ai_agents_generator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7877593Z    bots/ai_level_up_bot/ai_companies_database.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7877953Z    bots/ai_level_up_bot/ai_course_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7878291Z    bots/ai_level_up_bot/ai_level_up_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7878630Z    bots/ai_level_up_bot/ai_skill_tree.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7878966Z    bots/ai_level_up_bot/token_marketplace.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7879349Z    bots/alidropship_money_bot/alidropship_money_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7879795Z    bots/analytics_dashboard_bot/analytics_dashboard_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7880201Z    bots/app_builder_bot/app_builder_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7880545Z    bots/auto_bot_factory/auto_bot_factory.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7880905Z    bots/auto_bot_factory/competitor_analyzer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7881268Z    bots/auto_bot_factory/safety_controller.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7881627Z    bots/auto_bot_factory/strategy_framework.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7881966Z    bots/auto_scaler/auto_scaler_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7882288Z    bots/big_bro_ai/big_bro_ai.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7882576Z    bots/big_bro_ai/bot_factory.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7883079Z    bots/big_bro_ai/catalog_franchise.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7883341Z    bots/big_bro_ai/continuous_study.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7883835Z    bots/big_bro_ai/courses_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7884086Z    bots/big_bro_ai/interactive_dashboard.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7884345Z    bots/big_bro_ai/master_dashboard.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7884584Z    bots/big_bro_ai/memory_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7884810Z    bots/big_bro_ai/mentor_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7885043Z    bots/big_bro_ai/personality.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7885266Z    bots/big_bro_ai/prospectus.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7885513Z    bots/big_bro_ai/route_gps.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7885817Z    bots/big_bro_ai/sales_monetization.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7886074Z    bots/bot_generator/benchmarking_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7886336Z    bots/bot_generator/code_generator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7886585Z    bots/bot_generator/competitor_analyzer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7886865Z    bots/bot_generator/feature_optimizer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7887147Z    bots/bot_generator/request_interface.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7887402Z    bots/bot_generator/revenue_tracker.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7887680Z    bots/bot_generator_bot/bot_generator_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7887944Z    bots/bot_generator_bot/deployer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7888186Z    bots/bot_generator_bot/parser.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7888429Z    bots/bot_generator_bot/template_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7888687Z    bots/bot_generator_bot/tool_injector.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7888928Z    bots/buddy_bot/avatar_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7889159Z    bots/buddy_bot/buddy_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7889407Z    bots/buddy_bot/conversation_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7889650Z    bots/buddy_bot/conversion_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7889892Z    bots/buddy_bot/creativity_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7890121Z    bots/buddy_bot/emotion_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7890355Z    bots/buddy_bot/fulfillment_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7890595Z    bots/buddy_bot/lead_finder_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7890829Z    bots/buddy_bot/memory_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7891059Z    bots/buddy_bot/offer_generator_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7891475Z    bots/buddy_bot/personality_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7891729Z    bots/buddy_bot/retention_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7891967Z    bots/buddy_bot/voice_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7892201Z    bots/buddy_core/bot_generator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7892437Z    bots/buddy_core/buddy_core.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7892661Z    bots/buddy_core/feedback_loop.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7893122Z    bots/buddy_core/intent_parser.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7893360Z    bots/buddy_core/lead_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7893589Z    bots/buddy_core/privacy_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7893826Z    bots/buddy_core/tool_db.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7894044Z    bots/buddy_os/app_framework.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7894264Z    bots/buddy_os/bluetooth_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7894500Z    bots/buddy_os/buddy_os.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7894709Z    bots/buddy_os/cast_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7894930Z    bots/buddy_os/device_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7895159Z    bots/buddy_trainer_bot/ai_trainer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7895435Z    bots/buddy_trainer_bot/buddy_trainer_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7895713Z    bots/buddy_trainer_bot/github_buddy_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7895990Z    bots/buddy_trainer_bot/human_trainer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7896248Z    bots/buddy_trainer_bot/ownership_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7896517Z    bots/buddy_trainer_bot/robot_trainer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7896783Z    bots/car_flipping_bot/car_flipping_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7897037Z    bots/ci_auto_fix_bot/ci_auto_fix_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7897285Z    bots/cinecore_bot/cinecore_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7897517Z    bots/control_center/control_center.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7897764Z    bots/crypto_bot/crypto_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7897988Z    bots/crypto_bot/crypto_database.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7898228Z    bots/crypto_bot/dashboard.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7898450Z    bots/crypto_bot/mining.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7898655Z    bots/crypto_bot/portfolio.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7899022Z    bots/crypto_bot/price_feed.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7899254Z    bots/crypto_bot/prospectus.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7899473Z    bots/crypto_bot/trading.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7899687Z    bots/deal_finder_bot/deal_finder_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7899950Z    bots/dreamco_cloud_bot/dreamco_cloud_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7900216Z    bots/dreamco_code_bot/dreamco_code_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7900473Z    bots/dreamco_empire_os/ai_leaders.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7900713Z    bots/dreamco_empire_os/bot_fleet.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7900949Z    bots/dreamco_empire_os/cost_tracking.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7901203Z    bots/dreamco_empire_os/deal_analyzer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7901444Z    bots/dreamco_empire_os/empire_hq.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7901686Z    bots/dreamco_empire_os/empire_os.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7901922Z    bots/dreamco_empire_os/formula_vault.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7902176Z    bots/dreamco_empire_os/learning_matrix.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7902424Z    bots/dreamco_empire_os/marketplace.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7902908Z    bots/dreamco_empire_os/modules.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7903171Z    bots/dreamco_empire_os/orchestration.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7903428Z    bots/dreamco_empire_os/revenue_tracker.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7903695Z    bots/dreamco_payments/account_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7903952Z    bots/dreamco_payments/api_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7904219Z    bots/dreamco_payments/dreamco_payments.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7904493Z    bots/dreamco_payments/payment_processor.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7904780Z    bots/dreamco_payments/reporting_dashboard.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7905076Z    bots/dreamco_workspace_bot/dreamco_workspace_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7905433Z    bots/email_campaign_manager_bot/email_campaign_manager_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7905840Z    bots/enterprise_integrations_bot/enterprise_integrations_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7906208Z    bots/financial_literacy_bot/financial_literacy_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7906500Z    bots/fiverr_bot/fiverr_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7906753Z    bots/forecasting_tools_bot/forecasting_tools_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7907259Z    bots/foreclosure_finder_bot/foreclosure_finder_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7907548Z    bots/global_bot_network/api_gateway.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7907805Z    bots/global_bot_network/bot_library.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7908074Z    bots/global_bot_network/global_bot_network.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7908341Z    bots/global_bot_network/marketplace.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7908602Z    bots/global_bot_network/messaging_network.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7908874Z    bots/global_bot_network/owner_dashboard.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7909158Z    bots/global_bot_network/universal_bot_protocol.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7909452Z    bots/global_bot_network/verification_system.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7909719Z    bots/god_bot/god_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7910021Z    bots/government-contract-grant-bot/government_contract_grant_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7910376Z    bots/home_buyer_bot/home_buyer_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7910659Z    bots/home_flipping_analyzer/home_flipping_analyzer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7910964Z    bots/job_titles_bot/autonomous_trainer.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7911234Z    bots/job_titles_bot/cost_justification.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7911493Z    bots/job_titles_bot/job_bot_generator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7911749Z    bots/job_titles_bot/job_titles_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7912002Z    bots/job_titles_bot/job_titles_database.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7912261Z    bots/lead_gen_bot/lead_scraper.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7912517Z    bots/lead_generator_bot/lead_generator_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7913080Z    bots/legal_money_bot/legal_money_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7913503Z    bots/logo_generator_bot/logo_generator_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7913908Z    bots/mining_bot/mining_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7914155Z    bots/money_finder_bot/money_finder_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7914429Z    bots/multi_source_lead_scraper/lead_scraper.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7914702Z    bots/open_claw_bot/ai_models.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7914934Z    bots/open_claw_bot/client_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7915344Z    bots/open_claw_bot/open_claw_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7915585Z    bots/open_claw_bot/strategy_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7915851Z    bots/pr_validation_bot/pr_validation_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7916148Z    bots/profit_calculator_bot/profit_calculator_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7916440Z    bots/quantum_decision_bot/bot_router.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7916718Z    bots/quantum_decision_bot/dimension_mapper.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7916992Z    bots/quantum_decision_bot/money_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7917269Z    bots/quantum_decision_bot/probability_model.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7917568Z    bots/quantum_decision_bot/quantum_decision_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7917862Z    bots/quantum_decision_bot/quantum_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7918143Z    bots/quantum_decision_bot/simulation_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7918410Z    bots/real_estate_bot/real_estate_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7918688Z    bots/rental_cashflow_bot/rental_cashflow_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7918981Z    bots/resume_builder_bot/resume_builder_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7919268Z    bots/revenue_engine_bot/revenue_engine_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7919557Z    bots/revenue_validation/revenue_validation_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7919842Z    bots/sales_bot/conversion_tracker.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7920082Z    bots/sales_bot/followup_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7920316Z    bots/sales_bot/sales_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7920557Z    bots/sales_bot/sms_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7920797Z    bots/selenium-job-application-bot/bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7921111Z    bots/social_media_manager_bot/social_media_manager_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7921421Z    bots/software_bot/software_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7921684Z    bots/stack_and_profit_bot/stack_and_profit_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7921981Z    bots/stripe_payment_bot/stripe_payment_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7922260Z    bots/wealth_system_bot/wealth_system_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7922527Z    Business_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7922945Z    Business_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7923276Z    Business_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7923486Z    App_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7923678Z    App_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7923867Z    App_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7924057Z    Marketing_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7924273Z    Marketing_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7924479Z    Marketing_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7924695Z    Occupational_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7924922Z    Occupational_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7925146Z    Occupational_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7925499Z    Real_Estate_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7925856Z    Real_Estate_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7926195Z    Real_Estate_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7926568Z    Fiverr_bots/feature_1.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7926924Z    Fiverr_bots/feature_2.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7927263Z    Fiverr_bots/feature_3.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7927785Z    automation-tools/color_palette_generator/color_palette_generator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7928558Z    automation-tools/smart_meeting_scheduler/smart_meeting_scheduler.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7929275Z    automation-tools/workplace_audit_tool/workplace_audit_tool.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7930001Z    education-tools/recipe_scaling_tool/recipe_scaling_tool.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7930447Z    healthcare-tools/drug_discovery_pipeline_ai/drug_discovery_pipeline_ai.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7930940Z    healthcare-tools/mental_health_screening_bot/mental_health_screening_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7931404Z    analytics-elites/algorithmic_trading_bot/algorithmic_trading_bot.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7931904Z    analytics-elites/loyalty_program_impact_simulator/loyalty_program_impact_simulator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7932420Z    analytics-elites/predictive_engagement_tool/predictive_engagement_tool.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7933066Z    real-estate-tools/real_estate_cashflow_simulator/real_estate_cashflow_simulator.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7933527Z    compliance-tools/compliance_checker.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7933994Z 
-test	Check bot framework compliance	2026-04-12T05:45:50.7934377Z ❌  VIOLATIONS — files missing a reference to GlobalAISourcesFlow
-test	Check bot framework compliance	2026-04-12T05:45:50.7934721Z    bots/buddy_trust_bot/audit_log.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7934971Z    bots/buddy_trust_bot/consent_manager.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7935251Z    bots/buddy_trust_bot/image_synthesis_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7935523Z    bots/buddy_trust_bot/vault_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7935786Z    bots/buddy_trust_bot/voice_mimicry_engine.py
-test	Check bot framework compliance	2026-04-12T05:45:50.7935971Z 
-test	Check bot framework compliance	2026-04-12T05:45:50.7936140Z Each listed file must import and use GlobalAISourcesFlow from the
-test	Check bot framework compliance	2026-04-12T05:45:50.7936512Z 'framework' package.  See CONTRIBUTING.md for details.
-test	Check bot framework compliance	2026-04-12T05:45:50.7936818Z ============================================================
-test	Check bot framework compliance	2026-04-12T05:45:50.7969470Z ##[error]Process completed with exit code 1.
-test	Post Checkout code	﻿2026-04-12T05:45:50.8088703Z Post job cleanup.
-test	Post Checkout code	2026-04-12T05:45:50.9058305Z [command]/usr/bin/git version
-test	Post Checkout code	2026-04-12T05:45:50.9101730Z git version 2.53.0
-test	Post Checkout code	2026-04-12T05:45:50.9167931Z Temporarily overriding HOME='/home/runner/work/_temp/7f59b21c-4f39-4dea-95cb-0e767a3b19c7' before making global git config changes
-test	Post Checkout code	2026-04-12T05:45:50.9169292Z Adding repository directory to the temporary git global config as a safe directory
-test	Post Checkout code	2026-04-12T05:45:50.9187435Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
-test	Post Checkout code	2026-04-12T05:45:50.9234755Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-test	Post Checkout code	2026-04-12T05:45:50.9277822Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-test	Post Checkout code	2026-04-12T05:45:50.9533752Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-test	Post Checkout code	2026-04-12T05:45:50.9558731Z http.https://github.com/.extraheader
-test	Post Checkout code	2026-04-12T05:45:50.9573687Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
-test	Post Checkout code	2026-04-12T05:45:50.9608454Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-test	Post Checkout code	2026-04-12T05:45:50.9855657Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-test	Post Checkout code	2026-04-12T05:45:50.9891597Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-test	Complete job	﻿2026-04-12T05:45:51.0248452Z Cleaning up orphan processes
-test	Complete job	2026-04-12T05:45:51.0539874Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test	Set up job	﻿2026-04-12T05:47:29.6104401Z Current runner version: '2.333.1'
+test	Set up job	2026-04-12T05:47:29.6130627Z ##[group]Runner Image Provisioner
+test	Set up job	2026-04-12T05:47:29.6131439Z Hosted Compute Agent
+test	Set up job	2026-04-12T05:47:29.6131981Z Version: 20260213.493
+test	Set up job	2026-04-12T05:47:29.6132640Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+test	Set up job	2026-04-12T05:47:29.6133328Z Build Date: 2026-02-13T00:28:41Z
+test	Set up job	2026-04-12T05:47:29.6133990Z Worker ID: {34055743-e5fe-41f7-8578-bddb92ac7f34}
+test	Set up job	2026-04-12T05:47:29.6134714Z Azure Region: northcentralus
+test	Set up job	2026-04-12T05:47:29.6135314Z ##[endgroup]
+test	Set up job	2026-04-12T05:47:29.6136813Z ##[group]Operating System
+test	Set up job	2026-04-12T05:47:29.6137540Z Ubuntu
+test	Set up job	2026-04-12T05:47:29.6137999Z 24.04.4
+test	Set up job	2026-04-12T05:47:29.6138485Z LTS
+test	Set up job	2026-04-12T05:47:29.6138930Z ##[endgroup]
+test	Set up job	2026-04-12T05:47:29.6139440Z ##[group]Runner Image
+test	Set up job	2026-04-12T05:47:29.6140196Z Image: ubuntu-24.04
+test	Set up job	2026-04-12T05:47:29.6140739Z Version: 20260406.80.1
+test	Set up job	2026-04-12T05:47:29.6141749Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+test	Set up job	2026-04-12T05:47:29.6143478Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+test	Set up job	2026-04-12T05:47:29.6144350Z ##[endgroup]
+test	Set up job	2026-04-12T05:47:29.6145417Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-04-12T05:47:29.6147565Z Contents: read
+test	Set up job	2026-04-12T05:47:29.6148173Z Metadata: read
+test	Set up job	2026-04-12T05:47:29.6148629Z Packages: read
+test	Set up job	2026-04-12T05:47:29.6149216Z ##[endgroup]
+test	Set up job	2026-04-12T05:47:29.6151771Z Secret source: Actions
+test	Set up job	2026-04-12T05:47:29.6152857Z Prepare workflow directory
+test	Set up job	2026-04-12T05:47:29.6501864Z Prepare all required actions
+test	Set up job	2026-04-12T05:47:29.6540030Z Getting action download info
+test	Set up job	2026-04-12T05:47:29.9812037Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+test	Set up job	2026-04-12T05:47:30.1317287Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+test	Set up job	2026-04-12T05:47:30.3164395Z Complete job name: test
+test	Checkout code	﻿2026-04-12T05:47:30.3874967Z ##[group]Run actions/checkout@v4
+test	Checkout code	2026-04-12T05:47:30.3875819Z with:
+test	Checkout code	2026-04-12T05:47:30.3876290Z   repository: DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.3877006Z   token: ***
+test	Checkout code	2026-04-12T05:47:30.3877378Z   ssh-strict: true
+test	Checkout code	2026-04-12T05:47:30.3877765Z   ssh-user: git
+test	Checkout code	2026-04-12T05:47:30.3878148Z   persist-credentials: true
+test	Checkout code	2026-04-12T05:47:30.3878584Z   clean: true
+test	Checkout code	2026-04-12T05:47:30.3878968Z   sparse-checkout-cone-mode: true
+test	Checkout code	2026-04-12T05:47:30.3879430Z   fetch-depth: 1
+test	Checkout code	2026-04-12T05:47:30.3880072Z   fetch-tags: false
+test	Checkout code	2026-04-12T05:47:30.3880474Z   show-progress: true
+test	Checkout code	2026-04-12T05:47:30.3880867Z   lfs: false
+test	Checkout code	2026-04-12T05:47:30.3881230Z   submodules: false
+test	Checkout code	2026-04-12T05:47:30.3881624Z   set-safe-directory: true
+test	Checkout code	2026-04-12T05:47:30.3882319Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.4957518Z Syncing repository: DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.4959327Z ##[group]Getting Git version info
+test	Checkout code	2026-04-12T05:47:30.4960297Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
+test	Checkout code	2026-04-12T05:47:30.4961335Z [command]/usr/bin/git version
+test	Checkout code	2026-04-12T05:47:30.5014095Z git version 2.53.0
+test	Checkout code	2026-04-12T05:47:30.5041676Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.5057314Z Temporarily overriding HOME='/home/runner/work/_temp/421b4ea0-2e5a-40e1-9683-4fd570e3d437' before making global git config changes
+test	Checkout code	2026-04-12T05:47:30.5059521Z Adding repository directory to the temporary git global config as a safe directory
+test	Checkout code	2026-04-12T05:47:30.5071425Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.5105980Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
+test	Checkout code	2026-04-12T05:47:30.5109549Z ##[group]Initializing the repository
+test	Checkout code	2026-04-12T05:47:30.5114068Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.5189117Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Checkout code	2026-04-12T05:47:30.5190976Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test	Checkout code	2026-04-12T05:47:30.5192089Z hint: to use in all of your new repositories, which will suppress this warning,
+test	Checkout code	2026-04-12T05:47:30.5193070Z hint: call:
+test	Checkout code	2026-04-12T05:47:30.5193435Z hint:
+test	Checkout code	2026-04-12T05:47:30.5194084Z hint: 	git config --global init.defaultBranch <name>
+test	Checkout code	2026-04-12T05:47:30.5194824Z hint:
+test	Checkout code	2026-04-12T05:47:30.5195655Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Checkout code	2026-04-12T05:47:30.5196545Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Checkout code	2026-04-12T05:47:30.5197217Z hint:
+test	Checkout code	2026-04-12T05:47:30.5197570Z hint: 	git branch -m <name>
+test	Checkout code	2026-04-12T05:47:30.5197999Z hint:
+test	Checkout code	2026-04-12T05:47:30.5198562Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Checkout code	2026-04-12T05:47:30.5199519Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
+test	Checkout code	2026-04-12T05:47:30.5202951Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.5232601Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.5233341Z ##[group]Disabling automatic garbage collection
+test	Checkout code	2026-04-12T05:47:30.5236946Z [command]/usr/bin/git config --local gc.auto 0
+test	Checkout code	2026-04-12T05:47:30.5264593Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.5265268Z ##[group]Setting up auth
+test	Checkout code	2026-04-12T05:47:30.5272047Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Checkout code	2026-04-12T05:47:30.5301418Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Checkout code	2026-04-12T05:47:30.5576621Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Checkout code	2026-04-12T05:47:30.5605691Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Checkout code	2026-04-12T05:47:30.5830632Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Checkout code	2026-04-12T05:47:30.5875088Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Checkout code	2026-04-12T05:47:30.6104394Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Checkout code	2026-04-12T05:47:30.6141550Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.6142884Z ##[group]Fetching the repository
+test	Checkout code	2026-04-12T05:47:30.6151122Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2fa15ebbeb86f9c3696633e94eb8d8fc4b9a985a:refs/remotes/origin/main
+test	Checkout code	2026-04-12T05:47:30.9636003Z From https://github.com/DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-12T05:47:30.9637554Z  * [new ref]         2fa15ebbeb86f9c3696633e94eb8d8fc4b9a985a -> origin/main
+test	Checkout code	2026-04-12T05:47:30.9664830Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.9665575Z ##[group]Determining the checkout info
+test	Checkout code	2026-04-12T05:47:30.9669438Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:30.9675168Z [command]/usr/bin/git sparse-checkout disable
+test	Checkout code	2026-04-12T05:47:30.9713574Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Checkout code	2026-04-12T05:47:30.9740278Z ##[group]Checking out the ref
+test	Checkout code	2026-04-12T05:47:30.9744132Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test	Checkout code	2026-04-12T05:47:31.0275679Z Switched to a new branch 'main'
+test	Checkout code	2026-04-12T05:47:31.0276875Z branch 'main' set up to track 'origin/main'.
+test	Checkout code	2026-04-12T05:47:31.0285363Z ##[endgroup]
+test	Checkout code	2026-04-12T05:47:31.0325171Z [command]/usr/bin/git log -1 --format=%H
+test	Checkout code	2026-04-12T05:47:31.0348351Z 2fa15ebbeb86f9c3696633e94eb8d8fc4b9a985a
+test	Set up Python	﻿2026-04-12T05:47:31.0612250Z ##[group]Run actions/setup-python@v5
+test	Set up Python	2026-04-12T05:47:31.0612881Z with:
+test	Set up Python	2026-04-12T05:47:31.0613244Z   python-version: 3.x
+test	Set up Python	2026-04-12T05:47:31.0613667Z   check-latest: false
+test	Set up Python	2026-04-12T05:47:31.0614247Z   token: ***
+test	Set up Python	2026-04-12T05:47:31.0614645Z   update-environment: true
+test	Set up Python	2026-04-12T05:47:31.0615092Z   allow-prereleases: false
+test	Set up Python	2026-04-12T05:47:31.0615535Z   freethreaded: false
+test	Set up Python	2026-04-12T05:47:31.0615934Z ##[endgroup]
+test	Set up Python	2026-04-12T05:47:31.2330105Z ##[group]Installed versions
+test	Set up Python	2026-04-12T05:47:31.2423643Z Successfully set up CPython (3.14.3)
+test	Set up Python	2026-04-12T05:47:31.2425208Z ##[endgroup]
+test	Install dependencies	﻿2026-04-12T05:47:31.2564602Z ##[group]Run python -m pip install --upgrade pip
+test	Install dependencies	2026-04-12T05:47:31.2565867Z [36;1mpython -m pip install --upgrade pip[0m
+test	Install dependencies	2026-04-12T05:47:31.2566901Z [36;1mpip install -r requirements.txt[0m
+test	Install dependencies	2026-04-12T05:47:31.2603396Z shell: /usr/bin/bash -e {0}
+test	Install dependencies	2026-04-12T05:47:31.2604188Z env:
+test	Install dependencies	2026-04-12T05:47:31.2604919Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Install dependencies	2026-04-12T05:47:31.2606371Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib/pkgconfig
+test	Install dependencies	2026-04-12T05:47:31.2607812Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Install dependencies	2026-04-12T05:47:31.2609081Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Install dependencies	2026-04-12T05:47:31.2610609Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Install dependencies	2026-04-12T05:47:31.2611900Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib
+test	Install dependencies	2026-04-12T05:47:31.2612949Z ##[endgroup]
+test	Install dependencies	2026-04-12T05:47:33.4323216Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.14.3/x64/lib/python3.14/site-packages (26.0.1)
+test	Install dependencies	2026-04-12T05:47:34.0919638Z Collecting pytest>=7.0.0 (from -r requirements.txt (line 1))
+test	Install dependencies	2026-04-12T05:47:34.1517805Z   Downloading pytest-9.0.3-py3-none-any.whl.metadata (7.6 kB)
+test	Install dependencies	2026-04-12T05:47:34.1700217Z Collecting pytest-benchmark>=4.0.0 (from -r requirements.txt (line 2))
+test	Install dependencies	2026-04-12T05:47:34.1738959Z   Downloading pytest_benchmark-5.2.3-py3-none-any.whl.metadata (29 kB)
+test	Install dependencies	2026-04-12T05:47:34.1994162Z Collecting pytest-cov>=4.0.0 (from -r requirements.txt (line 3))
+test	Install dependencies	2026-04-12T05:47:34.2033730Z   Downloading pytest_cov-7.1.0-py3-none-any.whl.metadata (32 kB)
+test	Install dependencies	2026-04-12T05:47:34.2273054Z Collecting requests>=2.28.0 (from -r requirements.txt (line 4))
+test	Install dependencies	2026-04-12T05:47:34.2310207Z   Downloading requests-2.33.1-py3-none-any.whl.metadata (4.8 kB)
+test	Install dependencies	2026-04-12T05:47:34.2457051Z Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 5))
+test	Install dependencies	2026-04-12T05:47:34.2494720Z   Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+test	Install dependencies	2026-04-12T05:47:34.2664100Z Collecting schedule>=1.2.0 (from -r requirements.txt (line 6))
+test	Install dependencies	2026-04-12T05:47:34.2707319Z   Downloading schedule-1.2.2-py3-none-any.whl.metadata (3.8 kB)
+test	Install dependencies	2026-04-12T05:47:34.2847561Z Collecting jinja2>=3.1.0 (from -r requirements.txt (line 7))
+test	Install dependencies	2026-04-12T05:47:34.2886600Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+test	Install dependencies	2026-04-12T05:47:34.3150544Z Collecting selenium>=4.10.0 (from -r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:34.3191125Z   Downloading selenium-4.43.0-py3-none-any.whl.metadata (7.5 kB)
+test	Install dependencies	2026-04-12T05:47:34.3362696Z Collecting webdriver-manager>=4.0.0 (from -r requirements.txt (line 9))
+test	Install dependencies	2026-04-12T05:47:34.3406482Z   Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl.metadata (12 kB)
+test	Install dependencies	2026-04-12T05:47:34.3925062Z Collecting openai>=1.0.0 (from -r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:34.3964246Z   Downloading openai-2.31.0-py3-none-any.whl.metadata (31 kB)
+test	Install dependencies	2026-04-12T05:47:34.4381035Z Collecting fastapi>=0.100.0 (from -r requirements.txt (line 11))
+test	Install dependencies	2026-04-12T05:47:34.4425352Z   Downloading fastapi-0.135.3-py3-none-any.whl.metadata (28 kB)
+test	Install dependencies	2026-04-12T05:47:34.4637362Z Collecting httpx>=0.24.0 (from -r requirements.txt (line 12))
+test	Install dependencies	2026-04-12T05:47:34.4688309Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+test	Install dependencies	2026-04-12T05:47:34.4899345Z Collecting flask>=2.0.0 (from -r requirements.txt (line 13))
+test	Install dependencies	2026-04-12T05:47:34.4943337Z   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+test	Install dependencies	2026-04-12T05:47:34.5109968Z Collecting flask-cors>=4.0.0 (from -r requirements.txt (line 14))
+test	Install dependencies	2026-04-12T05:47:34.5149000Z   Downloading flask_cors-6.0.2-py3-none-any.whl.metadata (5.3 kB)
+test	Install dependencies	2026-04-12T05:47:34.5257910Z Collecting iniconfig>=1.0.1 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test	Install dependencies	2026-04-12T05:47:34.5294144Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+test	Install dependencies	2026-04-12T05:47:34.5465306Z Collecting packaging>=22 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test	Install dependencies	2026-04-12T05:47:34.5505405Z   Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
+test	Install dependencies	2026-04-12T05:47:34.5620052Z Collecting pluggy<2,>=1.5 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test	Install dependencies	2026-04-12T05:47:34.5657458Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+test	Install dependencies	2026-04-12T05:47:34.5833978Z Collecting pygments>=2.7.2 (from pytest>=7.0.0->-r requirements.txt (line 1))
+test	Install dependencies	2026-04-12T05:47:34.5869200Z   Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+test	Install dependencies	2026-04-12T05:47:34.6002568Z Collecting py-cpuinfo (from pytest-benchmark>=4.0.0->-r requirements.txt (line 2))
+test	Install dependencies	2026-04-12T05:47:34.6037699Z   Downloading py_cpuinfo-9.0.0-py3-none-any.whl.metadata (794 bytes)
+test	Install dependencies	2026-04-12T05:47:34.9456788Z Collecting coverage>=7.10.6 (from coverage[toml]>=7.10.6->pytest-cov>=4.0.0->-r requirements.txt (line 3))
+test	Install dependencies	2026-04-12T05:47:34.9495805Z   Downloading coverage-7.13.5-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.5 kB)
+test	Install dependencies	2026-04-12T05:47:35.0398802Z Collecting charset_normalizer<4,>=2 (from requests>=2.28.0->-r requirements.txt (line 4))
+test	Install dependencies	2026-04-12T05:47:35.0438621Z   Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+test	Install dependencies	2026-04-12T05:47:35.0590843Z Collecting idna<4,>=2.5 (from requests>=2.28.0->-r requirements.txt (line 4))
+test	Install dependencies	2026-04-12T05:47:35.0627339Z   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+test	Install dependencies	2026-04-12T05:47:35.0831833Z Collecting urllib3<3,>=1.26 (from requests>=2.28.0->-r requirements.txt (line 4))
+test	Install dependencies	2026-04-12T05:47:35.0872190Z   Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+test	Install dependencies	2026-04-12T05:47:35.1043249Z Collecting certifi>=2023.5.7 (from requests>=2.28.0->-r requirements.txt (line 4))
+test	Install dependencies	2026-04-12T05:47:35.1082272Z   Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+test	Install dependencies	2026-04-12T05:47:35.1565351Z Collecting MarkupSafe>=2.0 (from jinja2>=3.1.0->-r requirements.txt (line 7))
+test	Install dependencies	2026-04-12T05:47:35.1606752Z   Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+test	Install dependencies	2026-04-12T05:47:35.1752905Z Collecting trio<1.0,>=0.31.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.1788421Z   Downloading trio-0.33.0-py3-none-any.whl.metadata (8.5 kB)
+test	Install dependencies	2026-04-12T05:47:35.1902483Z Collecting trio-websocket<1.0,>=0.12.2 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.1939596Z   Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)
+test	Install dependencies	2026-04-12T05:47:35.2097991Z Collecting typing_extensions<5.0,>=4.15.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.2137092Z   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+test	Install dependencies	2026-04-12T05:47:35.2312841Z Collecting websocket-client<2.0,>=1.8.0 (from selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.2349497Z   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
+test	Install dependencies	2026-04-12T05:47:35.2492585Z Collecting attrs>=23.2.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.2527388Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+test	Install dependencies	2026-04-12T05:47:35.2675173Z Collecting sortedcontainers (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.2710085Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+test	Install dependencies	2026-04-12T05:47:35.2820742Z Collecting outcome (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.2857198Z   Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)
+test	Install dependencies	2026-04-12T05:47:35.2967371Z Collecting sniffio>=1.3.0 (from trio<1.0,>=0.31.0->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.3004400Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+test	Install dependencies	2026-04-12T05:47:35.3142453Z Collecting wsproto>=0.14 (from trio-websocket<1.0,>=0.12.2->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.3177807Z   Downloading wsproto-1.3.2-py3-none-any.whl.metadata (5.2 kB)
+test	Install dependencies	2026-04-12T05:47:35.3297638Z Collecting pysocks!=1.5.7,<2.0,>=1.5.6 (from urllib3[socks]<3.0,>=2.6.3->selenium>=4.10.0->-r requirements.txt (line 8))
+test	Install dependencies	2026-04-12T05:47:35.3334431Z   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
+test	Install dependencies	2026-04-12T05:47:35.3532192Z Collecting anyio<5,>=3.5.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.3569402Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+test	Install dependencies	2026-04-12T05:47:35.3686993Z Collecting distro<2,>=1.7.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.3724023Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+test	Install dependencies	2026-04-12T05:47:35.4449700Z Collecting jiter<1,>=0.10.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.4490870Z   Downloading jiter-0.14.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+test	Install dependencies	2026-04-12T05:47:35.5480655Z Collecting pydantic<3,>=1.9.0 (from openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.5519818Z   Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+test	Install dependencies	2026-04-12T05:47:35.5856559Z Collecting tqdm>4 (from openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.5897127Z   Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+test	Install dependencies	2026-04-12T05:47:35.6125020Z Collecting httpcore==1.* (from httpx>=0.24.0->-r requirements.txt (line 12))
+test	Install dependencies	2026-04-12T05:47:35.6164417Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+test	Install dependencies	2026-04-12T05:47:35.6318855Z Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.24.0->-r requirements.txt (line 12))
+test	Install dependencies	2026-04-12T05:47:35.6356953Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+test	Install dependencies	2026-04-12T05:47:35.6472112Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:35.6506989Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+test	Install dependencies	2026-04-12T05:47:36.2684853Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:36.2726787Z   Downloading pydantic_core-2.41.5-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+test	Install dependencies	2026-04-12T05:47:36.2840771Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->openai>=1.0.0->-r requirements.txt (line 10))
+test	Install dependencies	2026-04-12T05:47:36.2876971Z   Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+test	Install dependencies	2026-04-12T05:47:36.3120562Z Collecting starlette>=0.46.0 (from fastapi>=0.100.0->-r requirements.txt (line 11))
+test	Install dependencies	2026-04-12T05:47:36.3217955Z   Downloading starlette-1.0.0-py3-none-any.whl.metadata (6.3 kB)
+test	Install dependencies	2026-04-12T05:47:36.3298938Z Collecting annotated-doc>=0.0.2 (from fastapi>=0.100.0->-r requirements.txt (line 11))
+test	Install dependencies	2026-04-12T05:47:36.3338073Z   Downloading annotated_doc-0.0.4-py3-none-any.whl.metadata (6.6 kB)
+test	Install dependencies	2026-04-12T05:47:36.3449383Z Collecting blinker>=1.9.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test	Install dependencies	2026-04-12T05:47:36.3484750Z   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+test	Install dependencies	2026-04-12T05:47:36.3626167Z Collecting click>=8.1.3 (from flask>=2.0.0->-r requirements.txt (line 13))
+test	Install dependencies	2026-04-12T05:47:36.3661563Z   Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
+test	Install dependencies	2026-04-12T05:47:36.3809959Z Collecting itsdangerous>=2.2.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test	Install dependencies	2026-04-12T05:47:36.3849407Z   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+test	Install dependencies	2026-04-12T05:47:36.4037449Z Collecting werkzeug>=3.1.0 (from flask>=2.0.0->-r requirements.txt (line 13))
+test	Install dependencies	2026-04-12T05:47:36.4076756Z   Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+test	Install dependencies	2026-04-12T05:47:36.4356044Z Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
+test	Install dependencies	2026-04-12T05:47:36.4494334Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+test	Install dependencies	2026-04-12T05:47:36.4555432Z Downloading pytest_benchmark-5.2.3-py3-none-any.whl (45 kB)
+test	Install dependencies	2026-04-12T05:47:36.4636362Z Downloading pytest_cov-7.1.0-py3-none-any.whl (22 kB)
+test	Install dependencies	2026-04-12T05:47:36.4703806Z Downloading requests-2.33.1-py3-none-any.whl (64 kB)
+test	Install dependencies	2026-04-12T05:47:36.4777845Z Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (215 kB)
+test	Install dependencies	2026-04-12T05:47:36.4872888Z Downloading idna-3.11-py3-none-any.whl (71 kB)
+test	Install dependencies	2026-04-12T05:47:36.4933081Z Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+test	Install dependencies	2026-04-12T05:47:36.5007713Z Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+test	Install dependencies	2026-04-12T05:47:36.5064708Z Downloading schedule-1.2.2-py3-none-any.whl (12 kB)
+test	Install dependencies	2026-04-12T05:47:36.5151346Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+test	Install dependencies	2026-04-12T05:47:36.5263317Z Downloading selenium-4.43.0-py3-none-any.whl (9.6 MB)
+test	Install dependencies	2026-04-12T05:47:36.6079269Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 124.9 MB/s  0:00:00
+test	Install dependencies	2026-04-12T05:47:36.6125200Z Downloading trio-0.33.0-py3-none-any.whl (510 kB)
+test	Install dependencies	2026-04-12T05:47:36.6211320Z Downloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)
+test	Install dependencies	2026-04-12T05:47:36.6285029Z Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+test	Install dependencies	2026-04-12T05:47:36.6382908Z Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
+test	Install dependencies	2026-04-12T05:47:36.6440010Z Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
+test	Install dependencies	2026-04-12T05:47:36.6497834Z Downloading webdriver_manager-4.0.2-py2.py3-none-any.whl (27 kB)
+test	Install dependencies	2026-04-12T05:47:36.6556372Z Downloading openai-2.31.0-py3-none-any.whl (1.2 MB)
+test	Install dependencies	2026-04-12T05:47:36.6644832Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 140.2 MB/s  0:00:00
+test	Install dependencies	2026-04-12T05:47:36.6681701Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+test	Install dependencies	2026-04-12T05:47:36.6741744Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+test	Install dependencies	2026-04-12T05:47:36.6806310Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+test	Install dependencies	2026-04-12T05:47:36.6873999Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+test	Install dependencies	2026-04-12T05:47:36.6933394Z Downloading jiter-0.14.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (354 kB)
+test	Install dependencies	2026-04-12T05:47:36.7010720Z Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
+test	Install dependencies	2026-04-12T05:47:36.7081675Z Downloading pydantic_core-2.41.5-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+test	Install dependencies	2026-04-12T05:47:36.7214738Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 162.7 MB/s  0:00:00
+test	Install dependencies	2026-04-12T05:47:36.7251435Z Downloading fastapi-0.135.3-py3-none-any.whl (117 kB)
+test	Install dependencies	2026-04-12T05:47:36.7311830Z Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+test	Install dependencies	2026-04-12T05:47:36.7370727Z Downloading flask_cors-6.0.2-py3-none-any.whl (13 kB)
+test	Install dependencies	2026-04-12T05:47:36.7426187Z Downloading annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
+test	Install dependencies	2026-04-12T05:47:36.7484754Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+test	Install dependencies	2026-04-12T05:47:36.7543011Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+test	Install dependencies	2026-04-12T05:47:36.7605647Z Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+test	Install dependencies	2026-04-12T05:47:36.7665200Z Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
+test	Install dependencies	2026-04-12T05:47:36.7725472Z Downloading click-8.3.2-py3-none-any.whl (108 kB)
+test	Install dependencies	2026-04-12T05:47:36.7800412Z Downloading coverage-7.13.5-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (253 kB)
+test	Install dependencies	2026-04-12T05:47:36.7860686Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+test	Install dependencies	2026-04-12T05:47:36.7919460Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+test	Install dependencies	2026-04-12T05:47:36.7976267Z Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+test	Install dependencies	2026-04-12T05:47:36.8035424Z Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (23 kB)
+test	Install dependencies	2026-04-12T05:47:36.8092949Z Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)
+test	Install dependencies	2026-04-12T05:47:36.8149284Z Downloading packaging-26.0-py3-none-any.whl (74 kB)
+test	Install dependencies	2026-04-12T05:47:36.8207857Z Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+test	Install dependencies	2026-04-12T05:47:36.8287527Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 175.6 MB/s  0:00:00
+test	Install dependencies	2026-04-12T05:47:36.8324733Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+test	Install dependencies	2026-04-12T05:47:36.8379663Z Downloading starlette-1.0.0-py3-none-any.whl (72 kB)
+test	Install dependencies	2026-04-12T05:47:36.8437198Z Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+test	Install dependencies	2026-04-12T05:47:36.8495837Z Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+test	Install dependencies	2026-04-12T05:47:36.8575221Z Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+test	Install dependencies	2026-04-12T05:47:36.8638304Z Downloading wsproto-1.3.2-py3-none-any.whl (24 kB)
+test	Install dependencies	2026-04-12T05:47:36.8694045Z Downloading py_cpuinfo-9.0.0-py3-none-any.whl (22 kB)
+test	Install dependencies	2026-04-12T05:47:36.8751166Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+test	Install dependencies	2026-04-12T05:47:37.0226608Z Installing collected packages: sortedcontainers, py-cpuinfo, websocket-client, urllib3, typing_extensions, tqdm, sniffio, schedule, python-dotenv, pysocks, pygments, pluggy, packaging, MarkupSafe, jiter, itsdangerous, iniconfig, idna, h11, distro, coverage, click, charset_normalizer, certifi, blinker, attrs, annotated-types, annotated-doc, wsproto, werkzeug, typing-inspection, requests, pytest, pydantic-core, outcome, jinja2, httpcore, anyio, webdriver-manager, trio, starlette, pytest-cov, pytest-benchmark, pydantic, httpx, flask, trio-websocket, openai, flask-cors, fastapi, selenium
+test	Install dependencies	2026-04-12T05:47:43.5011558Z 
+test	Install dependencies	2026-04-12T05:47:43.5062277Z Successfully installed MarkupSafe-3.0.3 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 attrs-26.1.0 blinker-1.9.0 certifi-2026.2.25 charset_normalizer-3.4.7 click-8.3.2 coverage-7.13.5 distro-1.9.0 fastapi-0.135.3 flask-3.1.3 flask-cors-6.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jiter-0.14.0 openai-2.31.0 outcome-1.3.0.post0 packaging-26.0 pluggy-1.6.0 py-cpuinfo-9.0.0 pydantic-2.12.5 pydantic-core-2.41.5 pygments-2.20.0 pysocks-1.7.1 pytest-9.0.3 pytest-benchmark-5.2.3 pytest-cov-7.1.0 python-dotenv-1.2.2 requests-2.33.1 schedule-1.2.2 selenium-4.43.0 sniffio-1.3.1 sortedcontainers-2.4.0 starlette-1.0.0 tqdm-4.67.3 trio-0.33.0 trio-websocket-0.12.2 typing-inspection-0.4.2 typing_extensions-4.15.0 urllib3-2.6.3 webdriver-manager-4.0.2 websocket-client-1.9.0 werkzeug-3.1.8 wsproto-1.3.2
+test	Check bot framework compliance	﻿2026-04-12T05:47:43.8688738Z ##[group]Run python tools/check_bot_framework.py
+test	Check bot framework compliance	2026-04-12T05:47:43.8689148Z [36;1mpython tools/check_bot_framework.py[0m
+test	Check bot framework compliance	2026-04-12T05:47:43.8712010Z shell: /usr/bin/bash -e {0}
+test	Check bot framework compliance	2026-04-12T05:47:43.8712263Z env:
+test	Check bot framework compliance	2026-04-12T05:47:43.8712517Z   pythonLocation: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Check bot framework compliance	2026-04-12T05:47:43.8712955Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib/pkgconfig
+test	Check bot framework compliance	2026-04-12T05:47:43.8713385Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Check bot framework compliance	2026-04-12T05:47:43.8713750Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Check bot framework compliance	2026-04-12T05:47:43.8714137Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.14.3/x64
+test	Check bot framework compliance	2026-04-12T05:47:43.8714503Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.14.3/x64/lib
+test	Check bot framework compliance	2026-04-12T05:47:43.8714815Z ##[endgroup]
+test	Check bot framework compliance	2026-04-12T05:47:43.9533963Z ============================================================
+test	Check bot framework compliance	2026-04-12T05:47:43.9534864Z DreamCObots Bot Framework Compliance Report
+test	Check bot framework compliance	2026-04-12T05:47:43.9535323Z ============================================================
+test	Check bot framework compliance	2026-04-12T05:47:43.9535914Z Root : /home/runner/work/Dreamcobots/Dreamcobots
+test	Check bot framework compliance	2026-04-12T05:47:43.9536330Z Files scanned : 219
+test	Check bot framework compliance	2026-04-12T05:47:43.9536607Z Compliant     : 211
+test	Check bot framework compliance	2026-04-12T05:47:43.9536881Z Violations    : 8
+test	Check bot framework compliance	2026-04-12T05:47:43.9537049Z 
+test	Check bot framework compliance	2026-04-12T05:47:43.9537409Z ✅  COMPLIANT FILES
+test	Check bot framework compliance	2026-04-12T05:47:43.9537750Z    bots/211-resource-eligibility-bot/bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9538232Z    bots/ad_copy_generator_bot/ad_copy_generator_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9538771Z    bots/affiliate_bot/affiliate_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9539237Z    bots/ai-models-integration/ai_models_integration.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9539967Z    bots/ai-side-hustle-bots/bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9540346Z    bots/ai_brain/ai_brain.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9540675Z    bots/ai_brain/decision_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9541041Z    bots/ai_brain/metrics_tracker.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9541394Z    bots/ai_brain/state_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9541753Z    bots/ai_chatbot/chatbot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9542527Z    bots/ai_learning_system/ai_learning_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9543020Z    bots/ai_learning_system/analytics.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9543438Z    bots/ai_learning_system/classifier.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9543832Z    bots/ai_learning_system/database.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9544210Z    bots/ai_learning_system/deployment.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9544577Z    bots/ai_learning_system/governance.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9544955Z    bots/ai_learning_system/hybrid_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9545335Z    bots/ai_learning_system/ingestion.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9545734Z    bots/ai_learning_system/learning_loop.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9546151Z    bots/ai_learning_system/sandbox.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9546545Z    bots/ai_learning_system/scheduler.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9546980Z    bots/ai_level_up_bot/ai_agents_generator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9547458Z    bots/ai_level_up_bot/ai_companies_database.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9547903Z    bots/ai_level_up_bot/ai_course_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9548298Z    bots/ai_level_up_bot/ai_level_up_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9548718Z    bots/ai_level_up_bot/ai_skill_tree.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9549142Z    bots/ai_level_up_bot/token_marketplace.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9549676Z    bots/alidropship_money_bot/alidropship_money_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9550508Z    bots/analytics_dashboard_bot/analytics_dashboard_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9551032Z    bots/app_builder_bot/app_builder_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9551510Z    bots/auto_bot_factory/auto_bot_factory.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9551998Z    bots/auto_bot_factory/competitor_analyzer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9552508Z    bots/auto_bot_factory/safety_controller.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9552997Z    bots/auto_bot_factory/strategy_framework.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9553486Z    bots/auto_scaler/auto_scaler_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9553966Z    bots/big_bro_ai/big_bro_ai.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9554373Z    bots/big_bro_ai/bot_factory.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9554791Z    bots/big_bro_ai/catalog_franchise.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9555237Z    bots/big_bro_ai/continuous_study.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9555948Z    bots/big_bro_ai/courses_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9556362Z    bots/big_bro_ai/interactive_dashboard.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9556801Z    bots/big_bro_ai/master_dashboard.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9557211Z    bots/big_bro_ai/memory_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9557604Z    bots/big_bro_ai/mentor_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9557992Z    bots/big_bro_ai/personality.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9558342Z    bots/big_bro_ai/prospectus.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9558684Z    bots/big_bro_ai/route_gps.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9559022Z    bots/big_bro_ai/sales_monetization.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9559452Z    bots/bot_generator/benchmarking_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9560111Z    bots/bot_generator/code_generator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9560592Z    bots/bot_generator/competitor_analyzer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9561072Z    bots/bot_generator/feature_optimizer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9561554Z    bots/bot_generator/request_interface.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9562024Z    bots/bot_generator/revenue_tracker.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9562505Z    bots/bot_generator_bot/bot_generator_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9562994Z    bots/bot_generator_bot/deployer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9563424Z    bots/bot_generator_bot/parser.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9563904Z    bots/bot_generator_bot/template_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9564535Z    bots/bot_generator_bot/tool_injector.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9564982Z    bots/buddy_bot/avatar_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9565392Z    bots/buddy_bot/buddy_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9565791Z    bots/buddy_bot/conversation_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9566249Z    bots/buddy_bot/conversion_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9566677Z    bots/buddy_bot/creativity_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9567091Z    bots/buddy_bot/emotion_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9567557Z    bots/buddy_bot/fulfillment_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9568034Z    bots/buddy_bot/lead_finder_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9568455Z    bots/buddy_bot/memory_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9568891Z    bots/buddy_bot/offer_generator_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9569573Z    bots/buddy_bot/personality_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9570180Z    bots/buddy_bot/retention_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9570586Z    bots/buddy_bot/voice_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9571008Z    bots/buddy_core/bot_generator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9571422Z    bots/buddy_core/buddy_core.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9571847Z    bots/buddy_core/feedback_loop.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9572212Z    bots/buddy_core/intent_parser.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9572564Z    bots/buddy_core/lead_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9572939Z    bots/buddy_core/privacy_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9573356Z    bots/buddy_core/tool_db.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9573748Z    bots/buddy_os/app_framework.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9574166Z    bots/buddy_os/bluetooth_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9574578Z    bots/buddy_os/buddy_os.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9574963Z    bots/buddy_os/cast_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9575360Z    bots/buddy_os/device_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9575782Z    bots/buddy_trainer_bot/ai_trainer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9576269Z    bots/buddy_trainer_bot/buddy_trainer_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9576753Z    bots/buddy_trainer_bot/github_buddy_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9577207Z    bots/buddy_trainer_bot/human_trainer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9577611Z    bots/buddy_trainer_bot/ownership_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9578010Z    bots/buddy_trainer_bot/robot_trainer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9578415Z    bots/car_flipping_bot/car_flipping_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9578880Z    bots/ci_auto_fix_bot/ci_auto_fix_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9579301Z    bots/cinecore_bot/cinecore_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9579941Z    bots/control_center/control_center.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9580386Z    bots/crypto_bot/crypto_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9580778Z    bots/crypto_bot/crypto_database.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9581197Z    bots/crypto_bot/dashboard.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9581562Z    bots/crypto_bot/mining.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9581934Z    bots/crypto_bot/portfolio.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9582535Z    bots/crypto_bot/price_feed.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9582924Z    bots/crypto_bot/prospectus.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9583309Z    bots/crypto_bot/trading.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9583693Z    bots/deal_finder_bot/deal_finder_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9584156Z    bots/dreamai_invent_hub/dreamai_invent_hub.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9584656Z    bots/dreamco_cloud_bot/dreamco_cloud_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9585106Z    bots/dreamco_code_bot/dreamco_code_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9585548Z    bots/dreamco_empire_os/ai_leaders.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9585978Z    bots/dreamco_empire_os/bot_fleet.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9586408Z    bots/dreamco_empire_os/cost_tracking.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9586850Z    bots/dreamco_empire_os/deal_analyzer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9587283Z    bots/dreamco_empire_os/empire_hq.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9587705Z    bots/dreamco_empire_os/empire_os.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9588128Z    bots/dreamco_empire_os/formula_vault.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9588583Z    bots/dreamco_empire_os/learning_matrix.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9589041Z    bots/dreamco_empire_os/marketplace.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9589470Z    bots/dreamco_empire_os/modules.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9590143Z    bots/dreamco_empire_os/orchestration.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9590613Z    bots/dreamco_empire_os/revenue_tracker.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9591076Z    bots/dreamco_payments/account_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9591516Z    bots/dreamco_payments/api_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9591964Z    bots/dreamco_payments/dreamco_payments.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9592430Z    bots/dreamco_payments/payment_processor.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9592915Z    bots/dreamco_payments/reporting_dashboard.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9593436Z    bots/dreamco_workspace_bot/dreamco_workspace_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9594047Z    bots/email_campaign_manager_bot/email_campaign_manager_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9594750Z    bots/enterprise_integrations_bot/enterprise_integrations_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9595404Z    bots/financial_literacy_bot/financial_literacy_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9596110Z    bots/fiverr_bot/fiverr_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9596551Z    bots/forecasting_tools_bot/forecasting_tools_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9597132Z    bots/foreclosure_finder_bot/foreclosure_finder_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9597636Z    bots/global_bot_network/api_gateway.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9598054Z    bots/global_bot_network/bot_library.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9598520Z    bots/global_bot_network/global_bot_network.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9599027Z    bots/global_bot_network/marketplace.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9599614Z    bots/global_bot_network/messaging_network.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9600340Z    bots/global_bot_network/owner_dashboard.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9600886Z    bots/global_bot_network/universal_bot_protocol.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9601505Z    bots/global_bot_network/verification_system.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9601997Z    bots/god_bot/god_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9602535Z    bots/government-contract-grant-bot/government_contract_grant_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9603168Z    bots/home_buyer_bot/home_buyer_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9603706Z    bots/home_flipping_analyzer/home_flipping_analyzer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9604229Z    bots/job_titles_bot/autonomous_trainer.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9604698Z    bots/job_titles_bot/cost_justification.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9605131Z    bots/job_titles_bot/job_bot_generator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9605595Z    bots/job_titles_bot/job_titles_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9606124Z    bots/job_titles_bot/job_titles_database.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9606609Z    bots/lead_gen_bot/lead_scraper.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9607101Z    bots/lead_generator_bot/lead_generator_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9607643Z    bots/legal_money_bot/legal_money_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9608125Z    bots/logo_generator_bot/logo_generator_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9608595Z    bots/mining_bot/mining_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9609016Z    bots/money_finder_bot/money_finder_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9609514Z    bots/multi_source_lead_scraper/lead_scraper.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9610191Z    bots/open_claw_bot/ai_models.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9610828Z    bots/open_claw_bot/client_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9611258Z    bots/open_claw_bot/open_claw_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9611686Z    bots/open_claw_bot/strategy_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9612142Z    bots/pr_validation_bot/pr_validation_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9612676Z    bots/profit_calculator_bot/profit_calculator_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9613194Z    bots/quantum_decision_bot/bot_router.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9613647Z    bots/quantum_decision_bot/dimension_mapper.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9614177Z    bots/quantum_decision_bot/money_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9614699Z    bots/quantum_decision_bot/probability_model.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9615234Z    bots/quantum_decision_bot/quantum_decision_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9615766Z    bots/quantum_decision_bot/quantum_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9616269Z    bots/quantum_decision_bot/simulation_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9616747Z    bots/real_estate_bot/real_estate_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9617203Z    bots/rental_cashflow_bot/rental_cashflow_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9617671Z    bots/resume_builder_bot/resume_builder_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9618168Z    bots/revenue_engine_bot/revenue_engine_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9618653Z    bots/revenue_validation/revenue_validation_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9619133Z    bots/sales_bot/conversion_tracker.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9619548Z    bots/sales_bot/followup_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9620165Z    bots/sales_bot/sales_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9620543Z    bots/sales_bot/sms_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9620933Z    bots/selenium-job-application-bot/bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9621409Z    bots/social_media_manager_bot/social_media_manager_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9621927Z    bots/software_bot/software_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9622355Z    bots/stack_and_profit_bot/stack_and_profit_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9622859Z    bots/stripe_payment_bot/stripe_payment_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9623318Z    bots/wealth_system_bot/wealth_system_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9623946Z    Business_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9624282Z    Business_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9624623Z    Business_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9624988Z    App_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9625313Z    App_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9625620Z    App_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9625947Z    Marketing_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9626317Z    Marketing_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9626685Z    Marketing_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9627067Z    Occupational_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9627470Z    Occupational_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9627865Z    Occupational_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9628254Z    Real_Estate_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9628613Z    Real_Estate_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9628982Z    Real_Estate_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9629329Z    Fiverr_bots/feature_1.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9629912Z    Fiverr_bots/feature_2.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9630275Z    Fiverr_bots/feature_3.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9630827Z    automation-tools/color_palette_generator/color_palette_generator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9631594Z    automation-tools/smart_meeting_scheduler/smart_meeting_scheduler.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9632327Z    automation-tools/workplace_audit_tool/workplace_audit_tool.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9632990Z    education-tools/recipe_scaling_tool/recipe_scaling_tool.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9633527Z    healthcare-tools/drug_discovery_pipeline_ai/drug_discovery_pipeline_ai.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9634036Z    healthcare-tools/mental_health_screening_bot/mental_health_screening_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9634532Z    analytics-elites/algorithmic_trading_bot/algorithmic_trading_bot.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9635059Z    analytics-elites/loyalty_program_impact_simulator/loyalty_program_impact_simulator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9635753Z    analytics-elites/predictive_engagement_tool/predictive_engagement_tool.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9636829Z    real-estate-tools/real_estate_cashflow_simulator/real_estate_cashflow_simulator.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9637802Z    compliance-tools/compliance_checker.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9638084Z 
+test	Check bot framework compliance	2026-04-12T05:47:43.9638496Z ❌  VIOLATIONS — files missing a reference to GlobalAISourcesFlow
+test	Check bot framework compliance	2026-04-12T05:47:43.9638906Z    bots/buddy_trust_bot/audit_log.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9639165Z    bots/buddy_trust_bot/consent_manager.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9639476Z    bots/buddy_trust_bot/image_synthesis_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9640065Z    bots/buddy_trust_bot/vault_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9640358Z    bots/buddy_trust_bot/voice_mimicry_engine.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9640658Z    bots/dreamai_invent_hub/inventor_toolkit.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9640941Z    bots/dreamai_invent_hub/marketplace.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9641225Z    bots/dreamai_invent_hub/matchmaking.py
+test	Check bot framework compliance	2026-04-12T05:47:43.9641408Z 
+test	Check bot framework compliance	2026-04-12T05:47:43.9641580Z Each listed file must import and use GlobalAISourcesFlow from the
+test	Check bot framework compliance	2026-04-12T05:47:43.9641982Z 'framework' package.  See CONTRIBUTING.md for details.
+test	Check bot framework compliance	2026-04-12T05:47:43.9642321Z ============================================================
+test	Check bot framework compliance	2026-04-12T05:47:43.9653325Z ##[error]Process completed with exit code 1.
+test	Post Checkout code	﻿2026-04-12T05:47:43.9777957Z Post job cleanup.
+test	Post Checkout code	2026-04-12T05:47:44.0744894Z [command]/usr/bin/git version
+test	Post Checkout code	2026-04-12T05:47:44.0784100Z git version 2.53.0
+test	Post Checkout code	2026-04-12T05:47:44.0828058Z Temporarily overriding HOME='/home/runner/work/_temp/4cb9879f-5171-4345-88fc-b91c0a15f17f' before making global git config changes
+test	Post Checkout code	2026-04-12T05:47:44.0829339Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Checkout code	2026-04-12T05:47:44.0834309Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test	Post Checkout code	2026-04-12T05:47:44.0871314Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Checkout code	2026-04-12T05:47:44.0904052Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Checkout code	2026-04-12T05:47:44.1135002Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Checkout code	2026-04-12T05:47:44.1156540Z http.https://github.com/.extraheader
+test	Post Checkout code	2026-04-12T05:47:44.1169626Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Checkout code	2026-04-12T05:47:44.1202480Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Checkout code	2026-04-12T05:47:44.1431895Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Checkout code	2026-04-12T05:47:44.1464335Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Complete job	﻿2026-04-12T05:47:44.1820780Z Cleaning up orphan processes
+test	Complete job	2026-04-12T05:47:44.2143794Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
