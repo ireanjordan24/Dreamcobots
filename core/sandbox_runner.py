@@ -20,10 +20,10 @@ import subprocess
 import sys
 from typing import Any, Dict
 
-_DEFAULT_TIMEOUT: int = 10  # seconds
+DEFAULT_TIMEOUT: int = 10  # seconds
 
 
-def run_in_sandbox(file_path: str, timeout: int = _DEFAULT_TIMEOUT) -> Dict[str, Any]:
+def run_in_sandbox(file_path: str, timeout: int = DEFAULT_TIMEOUT) -> Dict[str, Any]:
     """
     Run the Python file at *file_path* in an isolated subprocess.
 

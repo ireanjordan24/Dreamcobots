@@ -11,7 +11,10 @@ from __future__ import annotations
 import os
 from typing import Tuple
 
-# Keywords that must not appear in uploaded bot code
+# Keywords that must not appear in uploaded bot code.
+# NOTE: This is intentionally a simple first-line defence.  Sophisticated
+# evasion (e.g. getattr indirection) is out of scope here; production
+# deployments should run bots in a Docker-isolated sandbox.
 _BLOCKED_PATTERNS: tuple[str, ...] = (
     "os.system",
     "subprocess",

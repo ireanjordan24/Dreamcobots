@@ -76,8 +76,9 @@ def upload_bot():
         return jsonify({"error": "Only .py files are accepted"}), 400
 
     # Resolve and validate the save path is within UPLOAD_FOLDER
+    upload_root = os.path.realpath(UPLOAD_FOLDER)
     save_path = os.path.realpath(os.path.join(UPLOAD_FOLDER, filename))
-    if not save_path.startswith(os.path.realpath(UPLOAD_FOLDER) + os.sep):
+    if os.path.commonpath([save_path, upload_root]) != upload_root:
         return jsonify({"error": "Invalid file path"}), 400
 
     uploaded.save(save_path)
