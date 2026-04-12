@@ -62,12 +62,21 @@ class SandboxRunner:
         dict
             ``{ success, output, error, exit_code, timed_out }``
         """
-        if not os.path.isfile(file_path):
-            return {"success": False, "error": f"file not found: {file_path}"}
+        import os as _os
+        # Resolve and validate path to prevent directory traversal
+        try:
+            resolved = _os.path.realpath(file_path)
+        except (TypeError, ValueError):
+            return {"success": False, "error": "invalid file path", "output": "",
+                    "exit_code": -1, "timed_out": False}
+
+        if not _os.path.isfile(resolved):
+            return {"success": False, "error": "file not found", "output": "",
+                    "exit_code": -1, "timed_out": False}
 
         try:
             proc = subprocess.run(
-                [self.python_executable, file_path],
+                [self.python_executable, resolved],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout_seconds,
@@ -87,11 +96,11 @@ class SandboxRunner:
                 "exit_code": -1,
                 "timed_out": True,
             }
-        except Exception as exc:
+        except Exception:
             return {
                 "success": False,
                 "output": "",
-                "error": str(exc),
+                "error": "execution failed",
                 "exit_code": -1,
                 "timed_out": False,
             }

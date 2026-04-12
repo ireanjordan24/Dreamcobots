@@ -17,11 +17,16 @@ GET  /revenue                Revenue summary (PRO+ required)
 
 POST /billing/subscribe      Create or upgrade a Stripe subscription
 GET  /billing/status         Current subscription status
+
+Note: The in-memory bot registry (_user_bots) is intended for development /
+testing only.  Replace with a persistent database in production deployments.
 """
 
 from __future__ import annotations
 
+import logging
 import os
+import re
 from typing import Any, Dict
 
 from core.dreamco_orchestrator import DreamCoOrchestrator
@@ -31,6 +36,8 @@ from saas.auth.auth import AuthService, UserRegistry
 from saas.auth.middleware import AuthMiddleware, RateLimiter
 from saas.auth.user_model import SubscriptionTier
 from saas.stripe_billing import StripeBillingService
+
+_logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Shared service instances
@@ -45,20 +52,77 @@ _validator = BotValidator()
 _sandbox = SandboxRunner(timeout_seconds=10)
 _billing = StripeBillingService(simulation_mode=not os.environ.get("STRIPE_API_KEY"))
 
-# Legacy API-key support (backwards compatible)
-_raw_keys = os.environ.get("DREAMCO_API_KEYS", "dreamco_pro_123")
+# Legacy API-key support (backwards compatible).
+# Set DREAMCO_API_KEYS env var with comma-separated keys in production.
+_raw_keys = os.environ.get("DREAMCO_API_KEYS", "")
 VALID_API_KEYS: set = {k.strip() for k in _raw_keys.split(",") if k.strip()}
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Resolved absolute upload directory
+_ABS_UPLOAD_FOLDER = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), "..", "uploads")
+)
+os.makedirs(_ABS_UPLOAD_FOLDER, exist_ok=True)
 
-# In-memory bot registry per user
+# In-memory bot registry per user.
+# NOTE: Replace with a persistent database in production.
 _user_bots: Dict[str, list] = {}
+
+# Allowed user-id character set (hex after 'usr_' prefix)
+_USER_ID_RE = re.compile(r'^usr_[0-9a-f]{16}$')
 
 
 def authenticate_legacy(api_key: str | None) -> bool:
     """Return True if *api_key* is a valid legacy key."""
-    return bool(api_key and api_key in VALID_API_KEYS)
+    return bool(api_key and VALID_API_KEYS and api_key in VALID_API_KEYS)
+
+
+def _safe_user_dir(user_id: str) -> str | None:
+    """
+    Return an absolute path for the user's upload directory, or None if
+    *user_id* fails format validation.  Prevents path traversal attacks.
+    """
+    if not _USER_ID_RE.match(user_id):
+        return None
+    candidate = os.path.realpath(os.path.join(_ABS_UPLOAD_FOLDER, user_id))
+    # Ensure the resolved path is inside the upload folder
+    if not candidate.startswith(_ABS_UPLOAD_FOLDER + os.sep):
+        return None
+    return candidate
+
+
+def _safe_filename(raw_name: str) -> str | None:
+    """
+    Return a sanitised filename (alphanumeric, underscores, hyphens + .py)
+    or None if *raw_name* is not a safe .py filename.
+    """
+    base = os.path.basename(raw_name)
+    if not base.endswith(".py"):
+        return None
+    stem = base[:-3]
+    if not re.match(r'^[a-zA-Z0-9_\-]+$', stem):
+        return None
+    return base
+
+
+def _sanitise_bot_result(result: dict) -> dict:
+    """
+    Return a copy of *result* with internal error details removed so that
+    raw exception messages are never forwarded to API callers.
+    """
+    safe = {
+        "bot": result.get("bot", ""),
+        "status": "error" if result.get("error") else "ok",
+    }
+    if result.get("output"):
+        output = result["output"]
+        safe["output"] = {
+            k: output[k]
+            for k in ("revenue", "leads_generated", "conversion_rate")
+            if k in output
+        }
+    if result.get("validation"):
+        safe["validation"] = result["validation"]
+    return safe
 
 
 # ---------------------------------------------------------------------------
@@ -66,9 +130,7 @@ def authenticate_legacy(api_key: str | None) -> bool:
 # ---------------------------------------------------------------------------
 
 try:
-    import json as _json
     from flask import Flask, request, jsonify  # type: ignore[import]
-    import os as _os
 
     app = Flask(__name__)
 
@@ -93,8 +155,8 @@ try:
             password=data.get("password", ""),
         )
         if not result.get("success"):
-            return jsonify(result), 400
-        return jsonify(result), 201
+            return jsonify({"error": result.get("error", "signup failed")}), 400
+        return jsonify({"success": True, "user_id": result["user_id"], "token": result["token"]}), 201
 
     @app.route("/auth/login", methods=["POST"])
     def login() -> Any:
@@ -104,8 +166,13 @@ try:
             password=data.get("password", ""),
         )
         if not result.get("success"):
-            return jsonify(result), 401
-        return jsonify(result)
+            return jsonify({"error": "invalid credentials"}), 401
+        return jsonify({
+            "success": True,
+            "user_id": result["user_id"],
+            "token": result["token"],
+            "tier": result["tier"],
+        })
 
     # ------------------------------------------------------------------ #
     #  Bot execution                                                       #
@@ -113,10 +180,9 @@ try:
 
     @app.route("/bots/run-all", methods=["POST"])
     def run_all_bots() -> Any:
-        # Support both Bearer token and legacy API key
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err and not authenticate_legacy(request.headers.get("x-api-key")):
-            return jsonify({"error": err or "Unauthorized"}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         if user and not _rate_limiter.is_allowed(user.user_id):
             return jsonify({"error": "rate limit exceeded"}), 429
@@ -127,13 +193,14 @@ try:
         if user:
             _auth_svc.consume_quota(user.user_id)
 
-        return jsonify({"results": results, "summary": summary})
+        safe_results = [_sanitise_bot_result(r) for r in results]
+        return jsonify({"results": safe_results, "summary": summary})
 
     @app.route("/bots/run-single", methods=["POST"])
     def run_single_bot() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err and not authenticate_legacy(request.headers.get("x-api-key")):
-            return jsonify({"error": err or "Unauthorized"}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         data: Dict[str, Any] = request.get_json(silent=True) or {}
         bot_path: str = data.get("path", "")
@@ -149,7 +216,7 @@ try:
         if user:
             _auth_svc.consume_quota(user.user_id)
 
-        return jsonify(result)
+        return jsonify(_sanitise_bot_result(result))
 
     # ------------------------------------------------------------------ #
     #  Bot upload                                                          #
@@ -159,55 +226,62 @@ try:
     def upload_bot() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         if not _rate_limiter.is_allowed(user.user_id):
             return jsonify({"error": "rate limit exceeded"}), 429
 
-        # Check quota
         quota = _auth_svc.check_quota(user.user_id)
         if not quota.get("allowed"):
-            return jsonify({"error": "daily bot quota exceeded", "quota": quota}), 429
+            return jsonify({"error": "daily bot quota exceeded"}), 429
 
         if "file" not in request.files:
             return jsonify({"error": "no file provided"}), 400
 
         file = request.files["file"]
-        if not file.filename or not file.filename.endswith(".py"):
-            return jsonify({"error": "only .py files are accepted"}), 400
+        safe_name = _safe_filename(file.filename or "")
+        if not safe_name:
+            return jsonify({"error": "invalid filename; only alphanumeric .py files are accepted"}), 400
 
-        # Save to user-specific uploads directory
-        user_dir = _os.path.join(UPLOAD_FOLDER, user.user_id)
-        _os.makedirs(user_dir, exist_ok=True)
-        file_path = _os.path.join(user_dir, _os.path.basename(file.filename))
-        file.save(file_path)
+        user_dir = _safe_user_dir(user.user_id)
+        if not user_dir:
+            return jsonify({"error": "invalid user account"}), 400
 
-        # Validate
-        ok, issues = _validator.validate_file(file_path)
+        # --- Validate code in memory BEFORE writing to disk ---
+        file_bytes = file.read()
+        try:
+            source = file_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            return jsonify({"error": "file must be valid UTF-8 Python source"}), 422
+
+        ok, issues = _validator.validate_source(source)
         if not ok:
-            _os.unlink(file_path)
             return jsonify({"error": "validation failed", "issues": issues}), 422
+
+        # Write to disk only after validation passes
+        os.makedirs(user_dir, exist_ok=True)
+        file_path = os.path.join(user_dir, safe_name)
+        with open(file_path, "w", encoding="utf-8") as fh:
+            fh.write(source)
 
         # Sandbox test
         run_result = _sandbox.run_file(file_path)
 
-        # Register bot
         _user_bots.setdefault(user.user_id, []).append(
-            {"filename": file.filename, "path": file_path, "status": "approved"}
+            {"filename": safe_name, "status": "approved"}
         )
 
         return jsonify({
             "status": "approved",
-            "filename": file.filename,
-            "sandbox_output": run_result.get("output", ""),
-            "sandbox_error": run_result.get("error", ""),
+            "filename": safe_name,
+            "sandbox_success": run_result.get("success", False),
         })
 
     @app.route("/bots/list", methods=["GET"])
     def list_bots() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
         bots = _user_bots.get(user.user_id, [])
         return jsonify({"bots": bots, "count": len(bots)})
 
@@ -219,7 +293,7 @@ try:
     def stats() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         quota = _auth_svc.check_quota(user.user_id)
         return jsonify({
@@ -233,7 +307,7 @@ try:
     def revenue() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         tier_err = _middleware.require_tier(user, SubscriptionTier.PRO)
         if tier_err:
@@ -250,7 +324,7 @@ try:
     def subscribe() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         data: Dict[str, Any] = request.get_json(silent=True) or {}
         tier = data.get("tier", "")
@@ -259,23 +333,30 @@ try:
 
         cust_result = _billing.create_customer(user.user_id, user.email)
         if not cust_result.get("success"):
-            return jsonify(cust_result), 500
+            _logger.error("create_customer failed for user %s", user.user_id)
+            return jsonify({"error": "billing service unavailable"}), 500
 
         sub_result = _billing.create_subscription(
             customer_id=cust_result["customer_id"],
             tier=tier,
             user_id=user.user_id,
         )
-        if sub_result.get("success"):
-            _auth_svc.upgrade_tier(user.user_id, SubscriptionTier(tier))
+        if not sub_result.get("success"):
+            _logger.error("create_subscription failed for user %s", user.user_id)
+            return jsonify({"error": "subscription creation failed"}), 500
 
-        return jsonify(sub_result)
+        _auth_svc.upgrade_tier(user.user_id, SubscriptionTier(tier))
+        return jsonify({
+            "success": True,
+            "tier": tier,
+            "subscription_id": sub_result.get("subscription_id"),
+        })
 
     @app.route("/billing/status", methods=["GET"])
     def billing_status() -> Any:
         user, err = _middleware.authenticate(request.headers.get("Authorization"))
         if err:
-            return jsonify({"error": err}), 401
+            return jsonify({"error": "Unauthorized"}), 401
 
         return jsonify({
             "user_id": user.user_id,
@@ -291,7 +372,7 @@ try:
             return jsonify({"error": "Unauthorized"}), 401
         results = _orch.run_all_bots()
         summary = _orch.summary(results)
-        return jsonify({"results": results, "summary": summary})
+        return jsonify({"results": [_sanitise_bot_result(r) for r in results], "summary": summary})
 
     @app.route("/run-single", methods=["POST"])
     def run_single_legacy() -> Any:
@@ -304,7 +385,7 @@ try:
         if not bot_path or not bot_name:
             return jsonify({"error": "Both 'path' and 'name' are required"}), 400
         result = _orch.run_bot(bot_path, bot_name)
-        return jsonify(result)
+        return jsonify(_sanitise_bot_result(result))
 
     FLASK_AVAILABLE = True
 

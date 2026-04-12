@@ -93,18 +93,23 @@ class BotValidator:
             *ok* is True when no issues were found.
             *issues* is a list of human-readable problem descriptions.
         """
-        path = Path(file_path)
-        if not path.exists():
-            return False, [f"file not found: {file_path}"]
-        if path.suffix != ".py":
+        # Resolve to an absolute, canonical path to prevent traversal
+        try:
+            resolved = Path(file_path).resolve(strict=False)
+        except (OSError, ValueError) as exc:
+            return False, [f"invalid file path: {exc}"]
+
+        if not resolved.exists():
+            return False, [f"file not found: {resolved.name}"]
+        if resolved.suffix != ".py":
             return False, ["only .py files are accepted"]
-        if path.stat().st_size > 512_000:  # 512 KB hard cap
+        if resolved.stat().st_size > 512_000:  # 512 KB hard cap
             return False, ["file exceeds 512 KB size limit"]
 
         try:
-            source = path.read_text(encoding="utf-8")
-        except OSError as exc:
-            return False, [f"could not read file: {exc}"]
+            source = resolved.read_text(encoding="utf-8")
+        except OSError:
+            return False, ["could not read file"]
 
         return self.validate_source(source)
 
