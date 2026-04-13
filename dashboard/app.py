@@ -114,6 +114,72 @@ def create_app() -> Any:
     return app
 
 
+class DashboardApp:
+    """Programmatic dashboard interface (no Flask required).
+
+    Parameters
+    ----------
+    orchestrator : DreamCoOrchestrator
+        The orchestrator to fetch bot results from.
+    scale_threshold : float
+        Revenue threshold above which a bot is counted as a scaling event.
+    """
+
+    def __init__(
+        self,
+        orchestrator: Any = None,
+        scale_threshold: float = 100.0,
+    ) -> None:
+        self._orch = orchestrator if orchestrator is not None else _orch
+        self._scale_threshold = scale_threshold
+
+    def get_view(self) -> dict:
+        """Run all bots and return a dashboard view dict."""
+        from datetime import datetime, timezone
+
+        results = self._orch.run_all_bots()
+        bots = []
+        total_revenue = 0.0
+        scaling_events = 0
+
+        for r in results:
+            if r.get("error"):
+                continue
+            out = r.get("output") or {}
+            val = r.get("validation") or {}
+            rev = float(out.get("revenue", 0))
+            total_revenue += rev
+            scale = val.get("scale", rev >= self._scale_threshold)
+            if scale:
+                scaling_events += 1
+            bots.append({
+                "bot_name": r.get("bot_name", r.get("bot", "unknown")),
+                "revenue": rev,
+                "conversion_rate": float(out.get("conversion_rate", 0)),
+                "scaling": scale,
+            })
+
+        top_performers = sorted(bots, key=lambda x: x["revenue"], reverse=True)[:5]
+
+        return {
+            "bots": bots,
+            "total_revenue": total_revenue,
+            "top_performers": top_performers,
+            "scaling_events": scaling_events,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def get_summary_stats(self) -> dict:
+        """Return aggregate statistics."""
+        view = self.get_view()
+        return {
+            "total_revenue": view["total_revenue"],
+            "bots_count": len(view["bots"]),
+            "scaling_events": view["scaling_events"],
+            "top_performers_count": len(view["top_performers"]),
+        }
+
+
 def main() -> None:  # pragma: no cover
     if not FLASK_AVAILABLE:
         print("Flask not installed.  Run: pip install flask")

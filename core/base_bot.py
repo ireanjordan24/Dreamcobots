@@ -65,6 +65,28 @@ class BaseBot(abc.ABC):
     name: str = ""
     category: str = ""
 
+    def __init__(self, name: str = "", description: str = "", version: str = "1.0.0", **kwargs) -> None:
+        if name:
+            self.__class__.name = name
+        self.description = description
+        self.version = version
+        self.revenue = 0.0
+        self._logs: List[str] = []
+        self._running = False
+
+    def start(self) -> None:
+        """Start the bot."""
+        self._running = True
+        print(f"[{self.__class__.__name__}] Starting...")
+
+    def stop(self) -> None:
+        """Stop the bot."""
+        self._running = False
+
+    def log(self, message: str) -> None:
+        """Log a message."""
+        self._logs.append(message)
+
     # ------------------------------------------------------------------
     # Execution contract
     # ------------------------------------------------------------------

@@ -43,7 +43,7 @@ class BuddyBot:
         Default token cost per routed message when billing is enabled.
     """
 
-    def __init__(self, billing: Optional["BillingSystem"] = None, default_token_cost: int = 1) -> None:
+    def __init__(self, billing: Optional["BillingSystem"] = None, default_token_cost: int = 1, enable_scheduler: bool = True) -> None:
         self.event_bus: EventBus = EventBus()
         self._bots: dict[str, object] = {}
         self.billing: Optional["BillingSystem"] = billing

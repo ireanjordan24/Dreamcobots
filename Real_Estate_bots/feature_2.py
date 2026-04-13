@@ -1,110 +1,190 @@
 """
-Feature 2: Real estate viewing scheduler.
-
-Allows users and agents to schedule, reschedule, and cancel property viewings.
-Maintains an in-memory appointment calendar keyed by property address.
+Feature 2: Real Estate Property Viewing Scheduler Bot
+Functionality: Allows users to schedule, manage, and confirm property viewings via chat.
+Use Cases: Prospective buyers wanting to view properties, agents managing their calendar.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+from __future__ import annotations
+
+import sys
+import os
 from datetime import datetime, timedelta
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-class ViewingScheduler:
-    """Manages property viewing appointments."""
+from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FLOW
 
-    AVAILABLE_SLOTS_PER_DAY = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"]
+# ---------------------------------------------------------------------------
+# 30 example property viewing slots
+# ---------------------------------------------------------------------------
 
-    def __init__(self):
-        # {appointment_id: {address, date, time, agent, buyer, status}}
-        self._appointments: dict = {}
-        self._next_id = 1
+EXAMPLES = [
+    {"id": 1,  "property": "123 Oak St, Austin TX",          "date": "2025-05-01", "time": "10:00", "agent": "Sarah Johnson",   "status": "available"},
+    {"id": 2,  "property": "456 Maple Ave, Austin TX",       "date": "2025-05-01", "time": "14:00", "agent": "Mike Davis",      "status": "available"},
+    {"id": 3,  "property": "789 Pine Rd, Phoenix AZ",        "date": "2025-05-02", "time": "09:00", "agent": "Lisa Chen",       "status": "booked"},
+    {"id": 4,  "property": "321 Elm Dr, Phoenix AZ",         "date": "2025-05-02", "time": "11:00", "agent": "Tom Williams",    "status": "available"},
+    {"id": 5,  "property": "654 Cedar Ln, Nashville TN",     "date": "2025-05-02", "time": "15:00", "agent": "Anna Martinez",   "status": "available"},
+    {"id": 6,  "property": "987 Birch Blvd, Nashville TN",   "date": "2025-05-03", "time": "10:00", "agent": "James Brown",     "status": "cancelled"},
+    {"id": 7,  "property": "147 Walnut St, Denver CO",       "date": "2025-05-03", "time": "13:00", "agent": "Maria Garcia",    "status": "available"},
+    {"id": 8,  "property": "258 Spruce Ave, Denver CO",      "date": "2025-05-04", "time": "10:00", "agent": "David Lee",       "status": "available"},
+    {"id": 9,  "property": "369 Aspen Ct, Tampa FL",         "date": "2025-05-04", "time": "14:00", "agent": "Jennifer Wilson", "status": "booked"},
+    {"id": 10, "property": "741 Palm Dr, Tampa FL",          "date": "2025-05-05", "time": "09:00", "agent": "Robert Taylor",   "status": "available"},
+    {"id": 11, "property": "852 Peachtree Rd, Atlanta GA",   "date": "2025-05-05", "time": "11:00", "agent": "Patricia Moore",  "status": "available"},
+    {"id": 12, "property": "963 Magnolia St, Atlanta GA",    "date": "2025-05-05", "time": "15:00", "agent": "Charles Anderson","status": "available"},
+    {"id": 13, "property": "159 Mesquite Way, Dallas TX",    "date": "2025-05-06", "time": "10:00", "agent": "Linda Jackson",   "status": "available"},
+    {"id": 14, "property": "267 Bluebonnet St, Dallas TX",   "date": "2025-05-06", "time": "14:00", "agent": "Mark White",      "status": "booked"},
+    {"id": 15, "property": "375 Live Oak Blvd, Houston TX",  "date": "2025-05-07", "time": "09:00", "agent": "Barbara Harris",  "status": "available"},
+    {"id": 16, "property": "483 Bayou Dr, Houston TX",       "date": "2025-05-07", "time": "13:00", "agent": "Steven Martin",   "status": "available"},
+    {"id": 17, "property": "591 Desert Rose, Las Vegas NV",  "date": "2025-05-08", "time": "10:00", "agent": "Nancy Thompson",  "status": "available"},
+    {"id": 18, "property": "628 Cactus Ave, Las Vegas NV",   "date": "2025-05-08", "time": "15:00", "agent": "George Garcia",   "status": "cancelled"},
+    {"id": 19, "property": "714 Lakeside Dr, Charlotte NC",  "date": "2025-05-09", "time": "10:00", "agent": "Betty Robinson",  "status": "available"},
+    {"id": 20, "property": "836 Uptown Blvd, Charlotte NC",  "date": "2025-05-09", "time": "14:00", "agent": "Edward Clark",    "status": "booked"},
+    {"id": 21, "property": "922 Mission St, San Antonio TX", "date": "2025-05-10", "time": "09:00", "agent": "Dorothy Lewis",   "status": "available"},
+    {"id": 22, "property": "1014 River Rd, San Antonio TX",  "date": "2025-05-10", "time": "13:00", "agent": "Ronald Lee",      "status": "available"},
+    {"id": 23, "property": "1126 Sunset Blvd, Orlando FL",   "date": "2025-05-11", "time": "10:00", "agent": "Jessica Walker",  "status": "available"},
+    {"id": 24, "property": "1238 Harbor View, Orlando FL",   "date": "2025-05-11", "time": "14:00", "agent": "Daniel Hall",     "status": "booked"},
+    {"id": 25, "property": "1344 Magnolia Pkwy, Raleigh NC", "date": "2025-05-12", "time": "09:00", "agent": "Helen Allen",     "status": "available"},
+    {"id": 26, "property": "1456 Glenwood Ave, Raleigh NC",  "date": "2025-05-12", "time": "14:00", "agent": "Kevin Young",     "status": "available"},
+    {"id": 27, "property": "1562 Broadway, Salt Lake City UT","date": "2025-05-13","time": "10:00", "agent": "Karen Hernandez", "status": "available"},
+    {"id": 28, "property": "1674 Main St, Salt Lake City UT","date": "2025-05-13", "time": "15:00", "agent": "Brian King",      "status": "cancelled"},
+    {"id": 29, "property": "1786 Garden Way, Indianapolis IN","date": "2025-05-14","time": "10:00", "agent": "Gary Wright",     "status": "available"},
+    {"id": 30, "property": "1892 Canal Blvd, Indianapolis IN","date": "2025-05-14","time": "14:00", "agent": "Sharon Lopez",    "status": "available"},
+]
 
-    def _make_id(self) -> str:
-        aid = f"APT{self._next_id:04d}"
-        self._next_id += 1
-        return aid
+TIERS = {
+    "FREE":       {"price_usd": 0,   "max_bookings": 3,    "reminders": False, "ai_scheduling": False},
+    "PRO":        {"price_usd": 29,  "max_bookings": 30,   "reminders": True,  "ai_scheduling": False},
+    "ENTERPRISE": {"price_usd": 99,  "max_bookings": None, "reminders": True,  "ai_scheduling": True},
+}
 
-    def schedule_viewing(self, address: str, date: str, time_slot: str,
-                         buyer_name: str, agent_name: str = "Unassigned") -> dict:
-        """Schedule a property viewing. Returns the appointment record.
 
-        Args:
-            address:    Property address.
-            date:       Date string 'YYYY-MM-DD'.
-            time_slot:  Time string 'HH:MM'.
-            buyer_name: Name of the prospective buyer.
-            agent_name: Name of the listing/buyer's agent.
-        """
-        # Validate no double-booking
-        for appt in self._appointments.values():
-            if (appt["address"] == address and appt["date"] == date
-                    and appt["time"] == time_slot and appt["status"] == "confirmed"):
-                raise ValueError(f"Slot {date} {time_slot} at {address} is already booked.")
+class PropertyViewingSchedulerBot:
+    """Schedules and manages property viewings for buyers and agents.
 
-        aid = self._make_id()
-        record = {
-            "appointment_id": aid,
-            "address": address,
-            "date": date,
-            "time": time_slot,
-            "buyer": buyer_name,
-            "agent": agent_name,
+    Competes with Calendly and Showingtime by adding real-estate-specific
+    scheduling logic, agent availability, and AI-powered time slot optimization.
+    Monetization: $29/month (PRO) or $99/month (ENTERPRISE) subscription.
+    """
+
+    def __init__(self, tier: str = "FREE"):
+        if tier not in TIERS:
+            raise ValueError(f"Invalid tier '{tier}'. Choose from {list(TIERS)}")
+        self.tier = tier
+        self._config = TIERS[tier]
+        self._flow = GlobalAISourcesFlow(bot_name="PropertyViewingSchedulerBot")
+        self._bookings: list[dict] = []
+
+    def get_available_slots(self, date: str | None = None) -> list[dict]:
+        """Return available viewing slots, optionally filtered by date."""
+        slots = [s for s in EXAMPLES if s["status"] == "available"]
+        if date:
+            slots = [s for s in slots if s["date"] == date]
+        return slots
+
+    def book_viewing(self, slot_id: int, buyer_name: str, buyer_email: str) -> dict:
+        """Book a viewing slot for a buyer. Returns booking confirmation."""
+        max_b = self._config["max_bookings"]
+        if max_b is not None and len(self._bookings) >= max_b:
+            raise PermissionError(
+                f"Booking limit of {max_b} reached on {self.tier} tier. "
+                "Upgrade at dreamcobots.com/pricing"
+            )
+        slot = next((s for s in EXAMPLES if s["id"] == slot_id), None)
+        if slot is None:
+            raise ValueError(f"Slot ID {slot_id} not found.")
+        if slot["status"] != "available":
+            raise ValueError(f"Slot {slot_id} is not available (status: {slot['status']}).")
+        booking = {
+            "booking_id": f"BOOK-{slot_id:04d}",
+            "slot_id": slot_id,
+            "property": slot["property"],
+            "date": slot["date"],
+            "time": slot["time"],
+            "agent": slot["agent"],
+            "buyer_name": buyer_name,
+            "buyer_email": buyer_email,
             "status": "confirmed",
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "reminder_scheduled": self._config["reminders"],
         }
-        self._appointments[aid] = record
-        return dict(record)
+        self._bookings.append(booking)
+        return booking
 
-    def cancel_viewing(self, appointment_id: str) -> dict:
-        """Cancel a scheduled viewing. Returns updated record."""
-        if appointment_id not in self._appointments:
-            raise KeyError(f"Appointment {appointment_id} not found.")
-        self._appointments[appointment_id]["status"] = "cancelled"
-        return dict(self._appointments[appointment_id])
+    def cancel_booking(self, booking_id: str) -> dict:
+        """Cancel a booking and free up the slot."""
+        booking = next((b for b in self._bookings if b["booking_id"] == booking_id), None)
+        if booking is None:
+            raise ValueError(f"Booking {booking_id} not found.")
+        booking["status"] = "cancelled"
+        return {"message": f"Booking {booking_id} cancelled successfully.", "booking": booking}
 
-    def reschedule_viewing(self, appointment_id: str, new_date: str, new_time: str) -> dict:
-        """Reschedule an existing viewing to a new date/time."""
-        if appointment_id not in self._appointments:
-            raise KeyError(f"Appointment {appointment_id} not found.")
-        appt = self._appointments[appointment_id]
-        appt["date"] = new_date
-        appt["time"] = new_time
-        appt["status"] = "rescheduled"
-        return dict(appt)
+    def get_my_bookings(self) -> list[dict]:
+        """Return all bookings made in this session."""
+        return list(self._bookings)
 
-    def get_appointments(self, address: str = None, buyer: str = None) -> list:
-        """Return all appointments, optionally filtered by address or buyer."""
-        results = list(self._appointments.values())
-        if address:
-            results = [a for a in results if address.lower() in a["address"].lower()]
-        if buyer:
-            results = [a for a in results if buyer.lower() in a["buyer"].lower()]
-        return [dict(a) for a in results if a["status"] != "cancelled"]
+    def suggest_best_time(self, preferred_date: str) -> dict | None:
+        """Suggest the best available slot on a date (AI feature for ENTERPRISE)."""
+        slots = self.get_available_slots(date=preferred_date)
+        if not slots:
+            return None
+        if self._config["ai_scheduling"]:
+            morning = [s for s in slots if s["time"] < "12:00"]
+            if morning:
+                best = morning[0]
+            else:
+                best = slots[0]
+            best = dict(best)
+            best["ai_suggestion"] = "Optimal morning slot for highest buyer engagement."
+            return best
+        return slots[0]
 
-    def get_available_slots(self, address: str, date: str) -> list:
-        """Return available time slots for a property on a given date."""
-        booked = {
-            a["time"]
-            for a in self._appointments.values()
-            if a["address"] == address and a["date"] == date and a["status"] == "confirmed"
+    def get_agent_schedule(self, agent_name: str) -> list[dict]:
+        """Return all slots for a specific agent."""
+        return [s for s in EXAMPLES if agent_name.lower() in s["agent"].lower()]
+
+    def get_calendar_summary(self) -> dict:
+        """Return a summary of the viewing calendar."""
+        by_status: dict[str, int] = {}
+        for s in EXAMPLES:
+            by_status[s["status"]] = by_status.get(s["status"], 0) + 1
+        return {
+            "total_slots": len(EXAMPLES),
+            "by_status": by_status,
+            "total_bookings": len(self._bookings),
+            "tier": self.tier,
         }
-        return [s for s in self.AVAILABLE_SLOTS_PER_DAY if s not in booked]
 
-    def get_upcoming_viewings(self, days_ahead: int = 7) -> list:
-        """Return confirmed viewings scheduled within the next N days."""
-        today = datetime.now().date()
-        cutoff = today + timedelta(days=days_ahead)
-        results = []
-        for appt in self._appointments.values():
-            if appt["status"] in ("confirmed", "rescheduled"):
-                try:
-                    appt_date = datetime.strptime(appt["date"], "%Y-%m-%d").date()
-                    if today <= appt_date <= cutoff:
-                        results.append(dict(appt))
-                except ValueError:
-                    pass
-        return sorted(results, key=lambda x: (x["date"], x["time"]))
+    def describe_tier(self) -> str:
+        cfg = self._config
+        limit = cfg["max_bookings"] if cfg["max_bookings"] else "unlimited"
+        lines = [
+            f"=== PropertyViewingSchedulerBot — {self.tier} Tier ===",
+            f"  Monthly price    : ${cfg['price_usd']}/month",
+            f"  Max bookings     : {limit}",
+            f"  Reminders        : {'enabled' if cfg['reminders'] else 'disabled'}",
+            f"  AI scheduling    : {'enabled' if cfg['ai_scheduling'] else 'disabled (upgrade to ENTERPRISE)'}",
+        ]
+        return "\n".join(lines)
+
+    def run(self) -> dict:
+        """Run the GLOBAL AI SOURCES FLOW pipeline and return a summary."""
+        result = self._flow.run_pipeline(
+            raw_data={"domain": "property_viewing_scheduling", "slots_count": len(EXAMPLES)},
+            learning_method="supervised",
+        )
+        return {"pipeline_complete": result.get("pipeline_complete"), "calendar": self.get_calendar_summary()}
+
+
+if __name__ == "__main__":
+    bot = PropertyViewingSchedulerBot(tier="PRO")
+    slots = bot.get_available_slots("2025-05-01")
+    print(f"Available slots on 2025-05-01: {len(slots)}")
+    if slots:
+        booking = bot.book_viewing(slots[0]["id"], "John Buyer", "john@example.com")
+        print(f"Booked: {booking['booking_id']} — {booking['property']}")
+    print(bot.describe_tier())
+
+
+ViewingSchedulerBot = PropertyViewingSchedulerBot

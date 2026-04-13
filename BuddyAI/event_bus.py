@@ -60,7 +60,7 @@ class EventBus:
                 except ValueError:
                     pass
 
-    def publish(self, event_type: str, data: Any) -> None:
+    def publish(self, event_type: str, data: Any = None) -> None:
         """
         Publish an event, invoking all registered callbacks.
 
@@ -94,3 +94,22 @@ class EventBus:
         """
         with self._lock:
             return list(self._event_log.get(event_type, []))
+
+    def emit(self, event_type: str, data: Any = None) -> None:
+        """Alias for publish."""
+        self.publish(event_type, data)
+
+    def clear(self, event_type: str = None) -> None:
+        """Clear subscribers and event log for event_type, or all if None."""
+        with self._lock:
+            if event_type is None:
+                self._subscribers.clear()
+                self._event_log.clear()
+            else:
+                self._subscribers.pop(event_type, None)
+                self._event_log.pop(event_type, None)
+
+    def subscriber_count(self, event_type: str) -> int:
+        """Return number of subscribers for event_type."""
+        with self._lock:
+            return len(self._subscribers.get(event_type, []))

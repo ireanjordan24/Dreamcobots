@@ -135,3 +135,12 @@ class SandboxRunner:
                 os.unlink(tmp_path)
             except OSError:
                 pass
+
+
+_default_runner = SandboxRunner()
+
+
+def run_in_sandbox(file_path: str, timeout: int = 10) -> dict:
+    """Run a Python file in the sandbox and return the result dict."""
+    runner = SandboxRunner(timeout_seconds=timeout)
+    return runner.run_file(file_path)

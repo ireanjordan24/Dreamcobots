@@ -162,3 +162,20 @@ def get_upgrade_path(current: Tier) -> Optional[TierConfig]:
     if idx + 1 < len(order):
         return get_tier_config(order[idx + 1])
     return None
+
+
+BOT_FEATURES = {
+    Tier.FREE.value: FREE_FEATURES,
+    Tier.PRO.value: PRO_FEATURES,
+    Tier.ENTERPRISE.value: ENTERPRISE_FEATURES,
+}
+
+
+def get_bot_tier_info(tier: Tier) -> dict:
+    config = get_tier_config(tier)
+    return {
+        "tier": tier.value,
+        "price_usd_monthly": config.price_usd_monthly,
+        "max_leads_per_day": config.max_leads_per_day,
+        "features": BOT_FEATURES[tier.value],
+    }
