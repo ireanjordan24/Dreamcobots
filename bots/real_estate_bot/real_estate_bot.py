@@ -93,6 +93,9 @@ class RealEstateBot:
     # Housing + Gov Contract Bot data                                      #
     # ------------------------------------------------------------------ #
 
+    DEFAULT_PAYMENT_PER_PERSON_MONTHLY = 750   # conservative fallback rate (USD)
+    OPERATING_COST_RATE = 0.20                 # 20% of gross rent reserved for operations
+
     DISTRESSED_PROPERTIES = [
         {
             "id": "DP001",
@@ -496,7 +499,13 @@ class RealEstateBot:
         if category:
             results = [p for p in results if p["category"] == category]
         if portal:
-            results = [p for p in results if portal.lower() in p["portal"].lower()]
+            results = [
+                p for p in results
+                if (
+                    p["portal"].lower() == portal.lower()
+                    or p["portal"].lower().startswith(portal.lower() + "/")
+                )
+            ]
         if self.tier == Tier.PRO:
             results = results[:5]
         return results
@@ -513,7 +522,7 @@ class RealEstateBot:
         program's payment rate; otherwise uses a conservative default of
         $750/person/month.
         """
-        rate = 750  # default conservative rate
+        rate = self.DEFAULT_PAYMENT_PER_PERSON_MONTHLY  # default conservative rate
         program_name = "default"
         if program_id and self.tier != Tier.FREE:
             programs = {p["id"]: p for p in self.GOV_HOUSING_PROGRAMS}
@@ -522,7 +531,7 @@ class RealEstateBot:
                 program_name = programs[program_id]["name"]
         tenants = max(1, beds)
         monthly_gross = tenants * rate
-        operating_costs = round(monthly_gross * 0.20, 2)
+        operating_costs = round(monthly_gross * self.OPERATING_COST_RATE, 2)
         monthly_net = round(monthly_gross - operating_costs, 2)
         return {
             "beds": beds,
