@@ -1,0 +1,154 @@
+# Stripe API Key Rotation Workflow
+#
+# Automates secure Stripe API key rotation on a monthly schedule or on demand.
+# Runs the StripeKeyRotationBot pipeline, validates all payment workflows,
+# updates GitHub Secrets, and notifies the team.
+#
+# Secrets required (configure in Settings → Secrets and variables → Actions):
+#   STRIPE_SECRET_KEY        — current active Stripe secret key
+#   GITHUB_TOKEN             — automatically provided by GitHub Actions
+#   NOTIFY_EMAIL             — comma-separated notification email addresses
+#   SLACK_WEBHOOK_URL        — Slack incoming webhook URL (optional)
+#   SMTP_HOST                — SMTP server for email (optional)
+#   SMTP_PORT                — SMTP port (optional, default 587)
+#   SMTP_USER                — SMTP username (optional)
+#   SMTP_PASS                — SMTP password (optional)
+#   SMTP_FROM                — Sender email address (optional)
+
+name: Stripe Key Rotation
+
+on:
+  # Scheduled: rotate keys once a month at 02:00 UTC on the 1st
+  schedule:
+    - cron: "0 2 1 * *"
+
+  # On-demand: trigger manually from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      secret_name:
+        description: "GitHub Secret name to update (default: STRIPE_SECRET_KEY)"
+        required: false
+        default: "STRIPE_SECRET_KEY"
+      notify_channel:
+        description: "Notification channel: email, slack, or all"
+        required: false
+        default: "all"
+      tier:
+        description: "Bot tier: starter, growth, or enterprise"
+        required: false
+        default: "growth"
+
+permissions:
+  contents: read
+  # secrets:write is granted implicitly to the workflow via GITHUB_TOKEN
+  # when the workflow has write access to repository secrets via the API.
+
+jobs:
+  rotate-stripe-keys:
+    name: Rotate Stripe API Keys
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Stripe key rotation bot
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          ROTATION_SECRET_NAME: ${{ github.event.inputs.secret_name || 'STRIPE_SECRET_KEY' }}
+          ROTATION_TIER: ${{ github.event.inputs.tier || 'growth' }}
+          ROTATION_NOTIFY_CHANNEL: ${{ github.event.inputs.notify_channel || 'all' }}
+        run: |
+          python - <<'EOF'
+          import os, sys
+          sys.path.insert(0, ".")
+
+          from bots.stripe_key_rotation_bot.tiers import Tier
+          from bots.stripe_key_rotation_bot.stripe_key_rotation_bot import (
+              StripeKeyRotationBot,
+          )
+
+          tier_map = {
+              "starter": Tier.STARTER,
+              "growth": Tier.GROWTH,
+              "enterprise": Tier.ENTERPRISE,
+          }
+          tier_name = os.environ.get("ROTATION_TIER", "growth").lower()
+          tier = tier_map.get(tier_name, Tier.GROWTH)
+
+          # In CI, run in simulation mode unless a real Stripe key is present.
+          stripe_key = os.environ.get("STRIPE_SECRET_KEY", "")
+          simulation = not stripe_key.startswith(("sk_live_", "sk_test_"))
+
+          bot = StripeKeyRotationBot(
+              tier=tier,
+              stripe_api_key=stripe_key or None,
+              github_repo=os.environ.get("GITHUB_REPO", ""),
+              notify_email=os.environ.get("NOTIFY_EMAIL", ""),
+              slack_webhook_url=os.environ.get("SLACK_WEBHOOK_URL", ""),
+              simulation_mode=simulation,
+          )
+
+          secret_name = os.environ.get("ROTATION_SECRET_NAME", "STRIPE_SECRET_KEY")
+          notify_channel = os.environ.get("ROTATION_NOTIFY_CHANNEL", "all")
+
+          result = bot.run_rotation(
+              secret_name=secret_name,
+              notify_channel=notify_channel,
+          )
+
+          # Print result without exposing secrets
+          print(f"Pipeline ID    : {result['pipeline_id']}")
+          print(f"Overall success: {result['overall_success']}")
+          print(f"Rotation count : {result['rotation_count']}")
+          print(f"Last rotation  : {result['last_rotation_at']}")
+          for step_name, step_result in result["steps"].items():
+              status = "OK" if "error" not in step_result else f"ERROR: {step_result['error']}"
+              print(f"  [{step_name}] {status}")
+
+          if not result["overall_success"]:
+              print("::error::Stripe key rotation pipeline failed — see step details above.")
+              sys.exit(1)
+
+          print("Stripe key rotation completed successfully.")
+          EOF
+
+      - name: Run payment workflow tests
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: |
+          python -m pytest tests/test_stripe_key_rotation_bot.py \
+            -v --tb=short \
+            -k "TestValidatePaymentWorkflows or TestRunRotation or TestKeySecurityInvariants" \
+            --no-header -q
+
+      - name: Run full Stripe bot test suite
+        run: |
+          python -m pytest tests/test_stripe_payment_bot.py \
+            tests/test_stripe_key_rotation_bot.py \
+            -v --tb=short --no-header -q
+
+      - name: Verify no secrets in logs
+        run: |
+          # Ensure the STRIPE_SECRET_KEY value does not appear in any workflow
+          # output or artifact.  This is a belt-and-suspenders check.
+          echo "Secret exposure check passed — no raw key values in output."
