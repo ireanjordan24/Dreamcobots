@@ -151,6 +151,7 @@ class TestSubscriptionCreation:
         result = billing.create_subscription(cust["customer_id"], "nonexistent_tier")
         assert result["success"] is False
         assert "error" in result
+        assert "nonexistent_tier" in result["error"]
 
     def test_multiple_subscriptions_tracked(self, billing):
         for i in range(3):
@@ -244,7 +245,7 @@ class TestWebhookHandling:
         result = billing.handle_webhook(b"{}", "sig_test")
         assert result["simulation"] is True
 
-    def test_webhook_no_secret_fails_in_live_mode(self, monkeypatch):
+    def test_webhook_succeeds_in_simulation_when_no_secret(self, monkeypatch):
         monkeypatch.delenv("STRIPE_API_KEY", raising=False)
         monkeypatch.delenv("STRIPE_WEBHOOK_SECRET", raising=False)
         # Without an API key the service is in simulation mode, so
