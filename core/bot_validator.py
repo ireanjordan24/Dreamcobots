@@ -161,3 +161,80 @@ class BotValidator:
 
         ok = len(issues) == 0
         return ok, issues
+
+
+# ---------------------------------------------------------------------------
+# Standalone validate_bot function
+# ---------------------------------------------------------------------------
+
+# Patterns blocked by validate_bot (open() is intentionally omitted)
+_VALIDATE_BOT_BLOCKED: Tuple[str, ...] = (
+    "os.system(",
+    "subprocess.call(",
+    "subprocess.Popen(",
+    "subprocess.check_output(",
+    "__import__(",
+    "eval(",
+    "exec(",
+    "compile(",
+    "socket.socket(",
+    "urllib.request",
+    "http.client",
+    "ftplib",
+    "shutil.rmtree(",
+    "shutil.move(",
+)
+
+
+def validate_bot(file_path: str) -> Tuple[bool, str]:
+    """
+    Validate a Python bot file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the Python file to validate.
+
+    Returns
+    -------
+    (ok, message)
+        ok is True when no blocked patterns are found.
+        message is "Safe" or a description of the first violation found.
+
+    Raises
+    ------
+    FileNotFoundError
+        If *file_path* does not exist.
+    """
+    resolved = Path(file_path).resolve(strict=False)
+    if not resolved.exists():
+        raise FileNotFoundError(f"Bot file not found: {file_path}")
+
+    try:
+        source = resolved.read_text(encoding="utf-8")
+    except OSError as exc:
+        return False, f"could not read file: {exc}"
+
+    # String-level checks
+    for pattern in _VALIDATE_BOT_BLOCKED:
+        if pattern in source:
+            return False, f"blocked pattern detected: {pattern!r}"
+
+    # AST-level checks
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as exc:
+        return False, f"syntax error: {exc}"
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                top = alias.name.split(".")[0]
+                if top in ("os", "subprocess", "socket", "ftplib", "shutil"):
+                    return False, f"import of blocked module: {alias.name!r}"
+        if isinstance(node, ast.ImportFrom):
+            module = (node.module or "").split(".")[0]
+            if module in ("os", "subprocess", "socket", "ftplib", "shutil"):
+                return False, f"import from blocked module: {node.module!r}"
+
+    return True, "Safe"

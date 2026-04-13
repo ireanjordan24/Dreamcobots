@@ -6,6 +6,7 @@ Import the main pipeline class from this package:
     from framework import GlobalAISourcesFlow
 """
 
+from .base_bot import BaseBot
 from .global_ai_sources_flow import (
     GlobalAISourcesFlow,
     DataIngestionLayer,
@@ -22,6 +23,7 @@ from .global_ai_sources_flow import (
 )
 
 __all__ = [
+    "BaseBot",
     "GlobalAISourcesFlow",
     "DataIngestionLayer",
     "LearningMethodClassifier",

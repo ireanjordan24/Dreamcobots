@@ -1,149 +1,192 @@
 """
-Feature 3: Real estate market analysis.
-
-Analyzes market trends, price indices, and investment signals across
-major metro areas. Provides actionable insights for investors and agents.
+Feature 3: Real Estate Market Analysis Bot
+Functionality: Analyzes market trends and provides data-driven insights for
+  investors and buyers across 30 US metro markets.
+Use Cases: Investors making data-driven decisions, agents advising clients.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from __future__ import annotations
+
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FLOW
+
+# ---------------------------------------------------------------------------
+# 30 real US metro market data examples
+# ---------------------------------------------------------------------------
+
+EXAMPLES = [
+    {"id": 1,  "city": "Austin",         "state": "TX", "median_price": 520000, "price_change_yoy_pct": 6.2,  "inventory_months": 2.1, "days_on_market": 18, "price_per_sqft": 285, "cap_rate_avg_pct": 4.8, "population_growth_pct": 3.1},
+    {"id": 2,  "city": "Phoenix",        "state": "AZ", "median_price": 410000, "price_change_yoy_pct": 4.8,  "inventory_months": 2.8, "days_on_market": 22, "price_per_sqft": 210, "cap_rate_avg_pct": 5.2, "population_growth_pct": 2.4},
+    {"id": 3,  "city": "Nashville",      "state": "TN", "median_price": 455000, "price_change_yoy_pct": 5.5,  "inventory_months": 1.9, "days_on_market": 15, "price_per_sqft": 260, "cap_rate_avg_pct": 5.0, "population_growth_pct": 2.8},
+    {"id": 4,  "city": "Denver",         "state": "CO", "median_price": 580000, "price_change_yoy_pct": 3.2,  "inventory_months": 3.1, "days_on_market": 28, "price_per_sqft": 295, "cap_rate_avg_pct": 4.2, "population_growth_pct": 1.9},
+    {"id": 5,  "city": "Tampa",          "state": "FL", "median_price": 395000, "price_change_yoy_pct": 7.1,  "inventory_months": 2.5, "days_on_market": 20, "price_per_sqft": 230, "cap_rate_avg_pct": 5.5, "population_growth_pct": 3.4},
+    {"id": 6,  "city": "Charlotte",      "state": "NC", "median_price": 375000, "price_change_yoy_pct": 5.9,  "inventory_months": 2.2, "days_on_market": 17, "price_per_sqft": 218, "cap_rate_avg_pct": 5.3, "population_growth_pct": 2.9},
+    {"id": 7,  "city": "Atlanta",        "state": "GA", "median_price": 400000, "price_change_yoy_pct": 4.4,  "inventory_months": 2.7, "days_on_market": 24, "price_per_sqft": 225, "cap_rate_avg_pct": 4.9, "population_growth_pct": 2.1},
+    {"id": 8,  "city": "Dallas",         "state": "TX", "median_price": 415000, "price_change_yoy_pct": 3.8,  "inventory_months": 3.0, "days_on_market": 26, "price_per_sqft": 215, "cap_rate_avg_pct": 4.6, "population_growth_pct": 2.3},
+    {"id": 9,  "city": "Houston",        "state": "TX", "median_price": 340000, "price_change_yoy_pct": 3.1,  "inventory_months": 3.4, "days_on_market": 30, "price_per_sqft": 190, "cap_rate_avg_pct": 5.4, "population_growth_pct": 2.0},
+    {"id": 10, "city": "Las Vegas",      "state": "NV", "median_price": 420000, "price_change_yoy_pct": 4.9,  "inventory_months": 2.6, "days_on_market": 21, "price_per_sqft": 220, "cap_rate_avg_pct": 4.7, "population_growth_pct": 2.5},
+    {"id": 11, "city": "Raleigh",        "state": "NC", "median_price": 430000, "price_change_yoy_pct": 6.8,  "inventory_months": 1.8, "days_on_market": 14, "price_per_sqft": 240, "cap_rate_avg_pct": 5.1, "population_growth_pct": 3.3},
+    {"id": 12, "city": "Orlando",        "state": "FL", "median_price": 380000, "price_change_yoy_pct": 6.4,  "inventory_months": 2.3, "days_on_market": 19, "price_per_sqft": 225, "cap_rate_avg_pct": 5.6, "population_growth_pct": 3.0},
+    {"id": 13, "city": "San Antonio",    "state": "TX", "median_price": 295000, "price_change_yoy_pct": 4.1,  "inventory_months": 2.9, "days_on_market": 25, "price_per_sqft": 180, "cap_rate_avg_pct": 5.8, "population_growth_pct": 2.2},
+    {"id": 14, "city": "Indianapolis",   "state": "IN", "median_price": 260000, "price_change_yoy_pct": 5.2,  "inventory_months": 2.4, "days_on_market": 20, "price_per_sqft": 160, "cap_rate_avg_pct": 6.2, "population_growth_pct": 1.5},
+    {"id": 15, "city": "Columbus",       "state": "OH", "median_price": 285000, "price_change_yoy_pct": 4.7,  "inventory_months": 2.6, "days_on_market": 22, "price_per_sqft": 170, "cap_rate_avg_pct": 5.9, "population_growth_pct": 1.7},
+    {"id": 16, "city": "Salt Lake City", "state": "UT", "median_price": 510000, "price_change_yoy_pct": 3.5,  "inventory_months": 3.2, "days_on_market": 27, "price_per_sqft": 275, "cap_rate_avg_pct": 4.3, "population_growth_pct": 2.6},
+    {"id": 17, "city": "Jacksonville",   "state": "FL", "median_price": 335000, "price_change_yoy_pct": 5.8,  "inventory_months": 2.5, "days_on_market": 21, "price_per_sqft": 195, "cap_rate_avg_pct": 5.7, "population_growth_pct": 2.7},
+    {"id": 18, "city": "Memphis",        "state": "TN", "median_price": 230000, "price_change_yoy_pct": 4.3,  "inventory_months": 2.7, "days_on_market": 24, "price_per_sqft": 145, "cap_rate_avg_pct": 7.1, "population_growth_pct": 0.8},
+    {"id": 19, "city": "Richmond",       "state": "VA", "median_price": 370000, "price_change_yoy_pct": 5.0,  "inventory_months": 2.1, "days_on_market": 18, "price_per_sqft": 210, "cap_rate_avg_pct": 5.0, "population_growth_pct": 1.8},
+    {"id": 20, "city": "Louisville",     "state": "KY", "median_price": 255000, "price_change_yoy_pct": 4.6,  "inventory_months": 2.8, "days_on_market": 23, "price_per_sqft": 155, "cap_rate_avg_pct": 6.0, "population_growth_pct": 1.2},
+    {"id": 21, "city": "Oklahoma City",  "state": "OK", "median_price": 235000, "price_change_yoy_pct": 3.9,  "inventory_months": 3.1, "days_on_market": 27, "price_per_sqft": 140, "cap_rate_avg_pct": 6.4, "population_growth_pct": 1.3},
+    {"id": 22, "city": "Kansas City",    "state": "MO", "median_price": 285000, "price_change_yoy_pct": 4.2,  "inventory_months": 2.9, "days_on_market": 24, "price_per_sqft": 165, "cap_rate_avg_pct": 6.1, "population_growth_pct": 1.4},
+    {"id": 23, "city": "Minneapolis",    "state": "MN", "median_price": 370000, "price_change_yoy_pct": 2.8,  "inventory_months": 3.5, "days_on_market": 31, "price_per_sqft": 205, "cap_rate_avg_pct": 4.5, "population_growth_pct": 1.1},
+    {"id": 24, "city": "Pittsburgh",     "state": "PA", "median_price": 230000, "price_change_yoy_pct": 3.3,  "inventory_months": 3.3, "days_on_market": 29, "price_per_sqft": 145, "cap_rate_avg_pct": 6.5, "population_growth_pct": 0.5},
+    {"id": 25, "city": "Cincinnati",     "state": "OH", "median_price": 245000, "price_change_yoy_pct": 4.0,  "inventory_months": 2.8, "days_on_market": 25, "price_per_sqft": 150, "cap_rate_avg_pct": 6.3, "population_growth_pct": 0.9},
+    {"id": 26, "city": "Boise",          "state": "ID", "median_price": 465000, "price_change_yoy_pct": 5.4,  "inventory_months": 2.4, "days_on_market": 20, "price_per_sqft": 265, "cap_rate_avg_pct": 4.4, "population_growth_pct": 4.1},
+    {"id": 27, "city": "Spokane",        "state": "WA", "median_price": 380000, "price_change_yoy_pct": 4.5,  "inventory_months": 2.6, "days_on_market": 22, "price_per_sqft": 215, "cap_rate_avg_pct": 4.8, "population_growth_pct": 2.0},
+    {"id": 28, "city": "Albuquerque",    "state": "NM", "median_price": 300000, "price_change_yoy_pct": 4.8,  "inventory_months": 2.5, "days_on_market": 21, "price_per_sqft": 175, "cap_rate_avg_pct": 5.6, "population_growth_pct": 1.0},
+    {"id": 29, "city": "Tucson",         "state": "AZ", "median_price": 310000, "price_change_yoy_pct": 5.1,  "inventory_months": 2.7, "days_on_market": 23, "price_per_sqft": 180, "cap_rate_avg_pct": 5.5, "population_growth_pct": 1.6},
+    {"id": 30, "city": "El Paso",        "state": "TX", "median_price": 225000, "price_change_yoy_pct": 4.6,  "inventory_months": 2.9, "days_on_market": 25, "price_per_sqft": 135, "cap_rate_avg_pct": 6.6, "population_growth_pct": 1.1},
+]
+
+TIERS = {
+    "FREE":       {"price_usd": 0,   "markets": 5,    "forecasting": False, "export": False},
+    "PRO":        {"price_usd": 49,  "markets": 15,   "forecasting": True,  "export": False},
+    "ENTERPRISE": {"price_usd": 199, "markets": None, "forecasting": True,  "export": True},
+}
 
 
-class MarketAnalyzer:
-    """Analyzes real estate market trends and surfaces investment signals."""
+class MarketAnalysisBot:
+    """Analyzes real estate market trends across 30 US metros.
 
-    MARKET_DATA = {
-        "austin": {
-            "avg_price_change_pct_yoy": 6.2, "inventory_months": 2.1,
-            "days_on_market": 18, "price_per_sqft": 285,
-            "avg_home_price": 485000, "rent_growth_pct_yoy": 4.5,
-            "vacancy_rate_pct": 4.2, "population_growth_pct": 2.8,
-        },
-        "phoenix": {
-            "avg_price_change_pct_yoy": 4.8, "inventory_months": 2.8,
-            "days_on_market": 22, "price_per_sqft": 210,
-            "avg_home_price": 375000, "rent_growth_pct_yoy": 3.8,
-            "vacancy_rate_pct": 5.1, "population_growth_pct": 2.1,
-        },
-        "nashville": {
-            "avg_price_change_pct_yoy": 5.5, "inventory_months": 1.9,
-            "days_on_market": 15, "price_per_sqft": 260,
-            "avg_home_price": 430000, "rent_growth_pct_yoy": 4.2,
-            "vacancy_rate_pct": 3.9, "population_growth_pct": 2.5,
-        },
-        "denver": {
-            "avg_price_change_pct_yoy": 3.2, "inventory_months": 3.1,
-            "days_on_market": 28, "price_per_sqft": 295,
-            "avg_home_price": 560000, "rent_growth_pct_yoy": 2.9,
-            "vacancy_rate_pct": 5.8, "population_growth_pct": 1.4,
-        },
-        "tampa": {
-            "avg_price_change_pct_yoy": 7.1, "inventory_months": 2.5,
-            "days_on_market": 20, "price_per_sqft": 230,
-            "avg_home_price": 410000, "rent_growth_pct_yoy": 5.1,
-            "vacancy_rate_pct": 4.6, "population_growth_pct": 3.1,
-        },
-        "charlotte": {
-            "avg_price_change_pct_yoy": 5.9, "inventory_months": 2.2,
-            "days_on_market": 17, "price_per_sqft": 218,
-            "avg_home_price": 380000, "rent_growth_pct_yoy": 4.0,
-            "vacancy_rate_pct": 4.4, "population_growth_pct": 2.6,
-        },
-        "atlanta": {
-            "avg_price_change_pct_yoy": 4.4, "inventory_months": 2.7,
-            "days_on_market": 24, "price_per_sqft": 225,
-            "avg_home_price": 405000, "rent_growth_pct_yoy": 3.6,
-            "vacancy_rate_pct": 5.0, "population_growth_pct": 1.9,
-        },
-        "dallas": {
-            "avg_price_change_pct_yoy": 3.8, "inventory_months": 3.0,
-            "days_on_market": 26, "price_per_sqft": 215,
-            "avg_home_price": 390000, "rent_growth_pct_yoy": 3.0,
-            "vacancy_rate_pct": 5.3, "population_growth_pct": 1.7,
-        },
-        "houston": {
-            "avg_price_change_pct_yoy": 3.1, "inventory_months": 3.4,
-            "days_on_market": 30, "price_per_sqft": 190,
-            "avg_home_price": 340000, "rent_growth_pct_yoy": 2.8,
-            "vacancy_rate_pct": 6.0, "population_growth_pct": 1.5,
-        },
-        "las_vegas": {
-            "avg_price_change_pct_yoy": 4.9, "inventory_months": 2.6,
-            "days_on_market": 21, "price_per_sqft": 220,
-            "avg_home_price": 415000, "rent_growth_pct_yoy": 3.5,
-            "vacancy_rate_pct": 5.5, "population_growth_pct": 1.8,
-        },
-    }
+    Competes with CoStar and Mashvisor by providing cap rate analysis,
+    price forecasts, and investor scoring in one bot.
+    Monetization: $49/month PRO or $199/month ENTERPRISE subscription.
+    """
 
-    def _market_type(self, inventory_months: float) -> str:
-        if inventory_months < 2.5:
-            return "Strong Seller's Market"
-        if inventory_months < 4.0:
-            return "Seller's Market"
-        if inventory_months < 6.0:
-            return "Balanced Market"
-        return "Buyer's Market"
+    def __init__(self, tier: str = "FREE"):
+        if tier not in TIERS:
+            raise ValueError(f"Invalid tier '{tier}'. Choose from {list(TIERS)}")
+        self.tier = tier
+        self._config = TIERS[tier]
+        self._flow = GlobalAISourcesFlow(bot_name="MarketAnalysisBot")
 
-    def _investment_score(self, data: dict) -> int:
-        """Score 0-100: combines appreciation, rent growth, population growth, vacancy."""
-        score = 0
-        score += min(30, int(data["avg_price_change_pct_yoy"] * 4))
-        score += min(25, int(data["rent_growth_pct_yoy"] * 5))
-        score += min(25, int(data["population_growth_pct"] * 8))
-        vacancy = data["vacancy_rate_pct"]
-        score += 20 if vacancy < 4 else (15 if vacancy < 5 else (10 if vacancy < 6 else 5))
-        return min(100, score)
+    def _get_markets(self) -> list[dict]:
+        limit = self._config["markets"]
+        return EXAMPLES[:limit] if limit else EXAMPLES
 
-    def get_market_report(self, market: str) -> dict:
-        """Return comprehensive market report for a metro area."""
-        key = market.lower().replace(" ", "_")
-        data = self.MARKET_DATA.get(key)
-        if data is None:
-            return {"market": market, "data_available": False}
+    def get_market_overview(self, city: str) -> dict:
+        """Return detailed market overview for a city."""
+        market = next((m for m in EXAMPLES if m["city"].lower() == city.lower()), None)
+        if market is None:
+            raise ValueError(f"City '{city}' not found. Available: {[m['city'] for m in EXAMPLES]}")
+        result = dict(market)
+        result["market_type"] = "Seller's" if market["inventory_months"] < 3 else "Buyer's"
+        result["investment_grade"] = self._grade_market(market)
+        if self._config["forecasting"]:
+            result["forecast_12mo_price_change_pct"] = round(market["price_change_yoy_pct"] * 0.9, 1)
+            result["forecast_24mo_price_change_pct"] = round(market["price_change_yoy_pct"] * 1.7, 1)
+        return result
 
+    def get_top_investment_markets(self, count: int = 5) -> list[dict]:
+        """Return top N markets ranked by investment score."""
+        markets = self._get_markets()
+        scored = [
+            {**m, "investment_score": self._score_market(m)}
+            for m in markets
+        ]
+        scored.sort(key=lambda x: x["investment_score"], reverse=True)
+        return scored[:count]
+
+    def compare_markets(self, city1: str, city2: str) -> dict:
+        """Compare two markets side by side."""
+        m1 = self.get_market_overview(city1)
+        m2 = self.get_market_overview(city2)
+        winner = city1 if self._score_market(m1) >= self._score_market(m2) else city2
         return {
-            "market": market,
-            "data_available": True,
-            "avg_home_price_usd": data["avg_home_price"],
-            "price_change_pct_yoy": data["avg_price_change_pct_yoy"],
-            "price_per_sqft_usd": data["price_per_sqft"],
-            "avg_days_on_market": data["days_on_market"],
-            "inventory_months_supply": data["inventory_months"],
-            "market_type": self._market_type(data["inventory_months"]),
-            "rent_growth_pct_yoy": data["rent_growth_pct_yoy"],
-            "vacancy_rate_pct": data["vacancy_rate_pct"],
-            "population_growth_pct": data["population_growth_pct"],
-            "investment_score": self._investment_score(data),
+            city1: m1,
+            city2: m2,
+            "recommended": winner,
         }
 
-    def rank_markets(self, top_n: int = 5) -> list:
-        """Return markets ranked by investment score (best first)."""
-        ranked = [
-            {"market": k, **{"investment_score": self._investment_score(v)},
-             "price_change_pct": v["avg_price_change_pct_yoy"],
-             "avg_home_price_usd": v["avg_home_price"]}
-            for k, v in self.MARKET_DATA.items()
+    def get_high_cap_rate_markets(self, min_cap_rate: float = 5.5) -> list[dict]:
+        """Return markets with average cap rates above the threshold."""
+        return [m for m in self._get_markets() if m["cap_rate_avg_pct"] >= min_cap_rate]
+
+    def get_fastest_growing_markets(self, count: int = 5) -> list[dict]:
+        """Return the fastest-growing markets by YoY price change."""
+        markets = sorted(self._get_markets(), key=lambda m: m["price_change_yoy_pct"], reverse=True)
+        return markets[:count]
+
+    def export_report(self, city: str) -> dict:
+        """Export a full investment report for a city (ENTERPRISE only)."""
+        if not self._config["export"]:
+            raise PermissionError(
+                "Report export requires ENTERPRISE tier. Upgrade at dreamcobots.com/pricing"
+            )
+        overview = self.get_market_overview(city)
+        return {
+            "report_type": "Investment Market Report",
+            "generated_by": "DreamCo MarketAnalysisBot",
+            "tier": self.tier,
+            "market": overview,
+            "comparable_markets": self.compare_markets(
+                city, "Austin" if city != "Austin" else "Nashville"
+            ),
+        }
+
+    def describe_tier(self) -> str:
+        cfg = self._config
+        limit = cfg["markets"] if cfg["markets"] else "all 30"
+        lines = [
+            f"=== MarketAnalysisBot — {self.tier} Tier ===",
+            f"  Monthly price : ${cfg['price_usd']}/month",
+            f"  Markets access: {limit}",
+            f"  Forecasting   : {'enabled' if cfg['forecasting'] else 'disabled'}",
+            f"  Export reports: {'enabled' if cfg['export'] else 'disabled (ENTERPRISE only)'}",
         ]
-        return sorted(ranked, key=lambda x: x["investment_score"], reverse=True)[:top_n]
+        return "\n".join(lines)
 
-    def compare_markets(self, markets: list) -> list:
-        """Return side-by-side comparison of multiple markets."""
-        return [self.get_market_report(m) for m in markets]
-
-    def get_price_trend_signal(self, market: str) -> str:
-        """Return BUY / HOLD / SELL signal based on market conditions."""
-        key = market.lower().replace(" ", "_")
-        data = self.MARKET_DATA.get(key)
-        if data is None:
-            return "INSUFFICIENT_DATA"
-
-        score = self._investment_score(data)
+    def _grade_market(self, market: dict) -> str:
+        score = self._score_market(market)
+        if score >= 80:
+            return "A+"
         if score >= 70:
-            return "STRONG BUY"
+            return "A"
+        if score >= 60:
+            return "B+"
         if score >= 50:
-            return "BUY"
-        if score >= 35:
-            return "HOLD"
-        return "SELL"
+            return "B"
+        return "C"
+
+    def _score_market(self, market: dict) -> int:
+        growth_score = min(30, int(market["price_change_yoy_pct"] * 4))
+        cap_score = min(30, int(market["cap_rate_avg_pct"] * 4))
+        pop_score = min(20, int(market["population_growth_pct"] * 6))
+        days_score = max(0, 20 - int(market["days_on_market"] / 2))
+        return growth_score + cap_score + pop_score + days_score
+
+    def run(self) -> dict:
+        """Run the GLOBAL AI SOURCES FLOW pipeline."""
+        result = self._flow.run_pipeline(
+            raw_data={"domain": "real_estate_market_analysis", "markets_count": len(EXAMPLES)},
+            learning_method="supervised",
+        )
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "top_markets": self.get_top_investment_markets(3),
+        }
+
+
+if __name__ == "__main__":
+    bot = MarketAnalysisBot(tier="PRO")
+    top = bot.get_top_investment_markets(5)
+    print("Top 5 Investment Markets:")
+    for m in top:
+        print(f"  {m['city']}, {m['state']} — Score: {m['investment_score']} — Cap Rate: {m['cap_rate_avg_pct']}%")
+    print(bot.describe_tier())

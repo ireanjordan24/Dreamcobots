@@ -98,4 +98,7 @@ class Marketplace:
         return self._listings.get(listing_id)
 
 
-__all__ = ["Marketplace", "BotListing"]
+__all__ = ["Marketplace", "BotListing", "BotMarketplace"]
+
+
+BotMarketplace = Marketplace

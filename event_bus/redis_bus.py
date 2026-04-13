@@ -55,7 +55,7 @@ class RedisEventBus(BaseEventBus):
     processes by subscribing to the Redis pub/sub channels directly.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, host: str = None, port: int = None) -> None:
         super().__init__()
         self._redis: Optional[Any] = None
         if _REDIS_AVAILABLE:

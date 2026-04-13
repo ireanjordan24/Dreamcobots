@@ -622,3 +622,7 @@ def _lead_to_dict(l: Lead) -> dict:
         "tags": l.tags,
         "scraped_at": l.scraped_at,
     }
+
+
+LeadScraperBot = LeadScraper
+Bot = LeadScraper

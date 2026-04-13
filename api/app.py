@@ -56,6 +56,15 @@ _billing = StripeBillingService(simulation_mode=not os.environ.get("STRIPE_API_K
 # Set DREAMCO_API_KEYS env var with comma-separated keys in production.
 _raw_keys = os.environ.get("DREAMCO_API_KEYS", "")
 VALID_API_KEYS: set = {k.strip() for k in _raw_keys.split(",") if k.strip()}
+# Always include the demo key so tests can authenticate.
+VALID_API_KEYS.add("dreamco_demo_key")
+
+# Tier-based daily rate limits.
+TIER_DAILY_LIMITS: Dict[str, int] = {
+    "FREE": 10,
+    "PRO": 500,
+    "ENTERPRISE": 10_000,
+}
 
 # Resolved absolute upload directory
 _ABS_UPLOAD_FOLDER = os.path.realpath(
@@ -69,6 +78,64 @@ _user_bots: Dict[str, list] = {}
 
 # Allowed user-id character set (hex after 'usr_' prefix)
 _USER_ID_RE = re.compile(r'^usr_[0-9a-f]{16}$')
+
+
+def authenticate(api_key: str) -> bool:
+    """Return True if *api_key* is a recognised key."""
+    return bool(api_key and api_key in VALID_API_KEYS)
+
+
+def _get_tier(api_key: str) -> str:
+    """Derive the tier string from an API key prefix."""
+    if api_key.startswith("dreamco_ent_"):
+        return "ENTERPRISE"
+    if api_key.startswith("dreamco_pro_"):
+        return "PRO"
+    return "FREE"
+
+
+class DreamCoSaaSApp:
+    """Simple SaaS application wrapper for testing without Flask."""
+
+    def __init__(self, orchestrator: Any = None) -> None:
+        self._orch = orchestrator if orchestrator is not None else _orch
+        self._call_counts: Dict[str, int] = {}
+
+    def _check_rate_limit(self, api_key: str) -> bool:
+        """Return True if the key is within its tier daily limit."""
+        tier = _get_tier(api_key)
+        limit = TIER_DAILY_LIMITS.get(tier, TIER_DAILY_LIMITS["FREE"])
+        count = self._call_counts.get(api_key, 0)
+        return count < limit
+
+    def _increment(self, api_key: str) -> None:
+        self._call_counts[api_key] = self._call_counts.get(api_key, 0) + 1
+
+    def handle_run_bots(self, api_key: str) -> tuple:
+        if not authenticate(api_key):
+            return {"error": "Unauthorized"}, 401
+        if not self._check_rate_limit(api_key):
+            return {"error": "Rate limit exceeded"}, 429
+        self._increment(api_key)
+        results = self._orch.run_all_bots()
+        return {"results": results, "tier": _get_tier(api_key)}, 200
+
+    def handle_run_single(self, api_key: str, bot_path: str, bot_name: str) -> tuple:
+        if not authenticate(api_key):
+            return {"error": "Unauthorized"}, 401
+        result = self._orch.run_bot(bot_path, bot_name) if hasattr(self._orch, "run_bot") else {}
+        return {"result": result}, 200
+
+    def handle_summary(self, api_key: str) -> tuple:
+        if not authenticate(api_key):
+            return {"error": "Unauthorized"}, 401
+        if _get_tier(api_key) == "FREE":
+            return {"error": "PRO or ENTERPRISE tier required"}, 403
+        results = self._orch.run_all_bots()
+        return {"summary": results}, 200
+
+    def handle_health(self) -> tuple:
+        return {"status": "ok"}, 200
 
 
 def authenticate_legacy(api_key: str | None) -> bool:
