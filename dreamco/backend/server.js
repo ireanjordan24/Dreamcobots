@@ -13,6 +13,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const leadsRouter = require('./routes/leads');
 const botsRouter = require('./routes/bots');
@@ -22,10 +23,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ---------------------------------------------------------------------------
+// Rate limiting — protect all routes from abuse
+// ---------------------------------------------------------------------------
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // max 200 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — please try again later.' },
+});
+
+// ---------------------------------------------------------------------------
 // Middleware
 // ---------------------------------------------------------------------------
 app.use(cors());
 app.use(express.json());
+app.use(limiter);
 
 // Serve static frontend files from the /frontend directory
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
