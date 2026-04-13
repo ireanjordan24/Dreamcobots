@@ -19,6 +19,7 @@ via BuddyBot.
 
 from __future__ import annotations
 
+import re
 import random
 from dataclasses import dataclass, field
 from enum import Enum
@@ -384,7 +385,6 @@ class ConversationEngine:
         result = text
         for slang, standard in _SLANG_MAP.items():
             # Case-insensitive whole-word replacement
-            import re
             pattern = re.compile(r'\b' + re.escape(slang) + r'\b', re.IGNORECASE)
             result = pattern.sub(standard, result)
         return result
