@@ -613,11 +613,30 @@ _DREAMCO_BOTS: list[BotEntry] = [
     BotEntry(
         bot_id="real_estate_bot",
         display_name="Real Estate Bot",
-        description="Property search, valuation, deal analysis, and rental management.",
+        description=(
+            "Full-stack housing + government contract bot. Finds cheap/distressed properties "
+            "across Zillow, Facebook Marketplace, county tax sales, and auction sites. "
+            "Runs end-to-end house flip pipeline with multi-platform listing comparison. "
+            "Matches properties to SAM.gov, HUD, and Grants.gov housing programs. "
+            "Generates owner/housing-department outreach scripts. Calculates revenue across "
+            "gov-paid housing, master lease, and flip-and-convert models."
+        ),
         category=BotCategory.REAL_ESTATE,
         module_path="bots.real_estate_bot.real_estate_bot",
         class_name="RealEstateBot",
-        capabilities=["property_search", "valuation", "deal_analysis", "rental"],
+        capabilities=[
+            "property_search",
+            "valuation",
+            "deal_analysis",
+            "rental",
+            "multi_platform_acquisition",
+            "house_flip_pipeline",
+            "government_contract_matching",
+            "outreach_scripts",
+            "revenue_matching_engine",
+            "master_lease_strategy",
+            "flip_and_convert",
+        ],
     ),
     BotEntry(
         bot_id="selenium_job_application_bot",

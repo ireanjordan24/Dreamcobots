@@ -3,9 +3,37 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-inte
 from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers, TIER_CATALOGUE
 
 BOT_FEATURES = {
-    Tier.FREE.value: ["1 location", "basic property search", "price estimate", "cap rate calculator"],
-    Tier.PRO.value: ["10 locations", "advanced search filters", "ROI calculator", "market trends", "cash flow analysis", "rental comps"],
-    Tier.ENTERPRISE.value: ["unlimited locations", "AI valuation", "predictive analytics", "investment portfolio tracker", "deal scoring", "API access"],
+    Tier.FREE.value: [
+        "1 location",
+        "basic property search",
+        "price estimate",
+        "cap rate calculator",
+        "multi-platform property search (Zillow, Facebook Marketplace, county tax, auctions)",
+    ],
+    Tier.PRO.value: [
+        "10 locations",
+        "advanced search filters",
+        "ROI calculator",
+        "market trends",
+        "cash flow analysis",
+        "rental comps",
+        "multi-platform property search across all platforms",
+        "house flip pipeline (acquire → renovate → list on 5 platforms)",
+        "outreach script generator (owners + city housing departments)",
+    ],
+    Tier.ENTERPRISE.value: [
+        "unlimited locations",
+        "AI valuation",
+        "predictive analytics",
+        "investment portfolio tracker",
+        "deal scoring",
+        "API access",
+        "government contract matcher (SAM.gov, HUD, Grants.gov)",
+        "revenue matching engine (property → program → monthly income)",
+        "master lease strategy calculator",
+        "LLC + nonprofit hybrid structure analysis",
+        "automated deal dashboard",
+    ],
 }
 
 def get_bot_tier_info(tier: Tier) -> dict:
