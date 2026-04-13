@@ -64,6 +64,14 @@ from bots.control_center.control_center import ControlCenter
 _GITHUB_API_BASE = "https://api.github.com"
 _DEFAULT_REPO = "DreamCo-Technologies/Dreamcobots"
 
+# Clamp per_page to this range for GitHub API requests
+_GITHUB_PER_PAGE_MIN = 1
+_GITHUB_PER_PAGE_MAX = 100
+
+# Cached QuantumAIBot check result (reset on each process start)
+_quantum_cache: dict = {}
+_QUANTUM_CACHE_TTL_S = 60
+
 
 def _github_headers() -> dict:
     """Return HTTP headers for GitHub API calls, including auth if available."""
@@ -84,6 +92,7 @@ def _fetch_github_workflows(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
     if not _REQUESTS_AVAILABLE:
         return {"runs": [], "source": "unavailable", "reason": "requests library not installed"}
 
+    per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, per_page))
     url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/runs"
     try:
         resp = _requests.get(
@@ -115,8 +124,8 @@ def _fetch_github_workflows(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
             "source": "unavailable",
             "reason": f"GitHub API returned HTTP {resp.status_code}",
         }
-    except Exception as exc:  # noqa: BLE001
-        return {"runs": [], "source": "unavailable", "reason": str(exc)}
+    except Exception:  # noqa: BLE001
+        return {"runs": [], "source": "unavailable", "reason": "GitHub API request failed"}
 
 
 def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> dict:
@@ -127,6 +136,7 @@ def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
     if not _REQUESTS_AVAILABLE:
         return {"artifacts": [], "source": "unavailable", "reason": "requests library not installed"}
 
+    per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, per_page))
     url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/artifacts"
     try:
         resp = _requests.get(
@@ -155,20 +165,29 @@ def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
             "source": "unavailable",
             "reason": f"GitHub API returned HTTP {resp.status_code}",
         }
-    except Exception as exc:  # noqa: BLE001
-        return {"artifacts": [], "source": "unavailable", "reason": str(exc)}
+    except Exception:  # noqa: BLE001
+        return {"artifacts": [], "source": "unavailable", "reason": "GitHub API request failed"}
 
 
 def _check_quantum_bot_status() -> dict:
-    """Instantiate the QuantumAIBot (FREE tier) and return a health summary.
+    """Return a cached Quantum Bot health summary (read-only).
 
-    Read-only — no mutations.  Returns a dict with ``status`` (``"ok"`` or
-    ``"error"``), ``tier``, and ``engines``.
+    Instantiates QuantumAIBot (FREE tier) at most once per
+    ``_QUANTUM_CACHE_TTL_S`` seconds to avoid expensive repeated
+    construction on every request.  Never raises.
     """
+    global _quantum_cache  # noqa: PLW0603
+    import time as _time
+
+    now = _time.monotonic()
+    if _quantum_cache and now - _quantum_cache.get("_cached_at", 0) < _QUANTUM_CACHE_TTL_S:
+        result = {k: v for k, v in _quantum_cache.items() if not k.startswith("_")}
+        result["checked_at"] = datetime.now(timezone.utc).isoformat()
+        return result
+
     try:
-        import sys as _sys
-        import os as _os
-        _ai_models_dir = _os.path.join(_os.path.dirname(__file__), "..", "bots", "ai-models-integration")
+        _ai_models_dir = os.path.join(os.path.dirname(__file__), "..", "bots", "ai-models-integration")
+        import sys as _sys  # noqa: PLC0415
         if _ai_models_dir not in _sys.path:
             _sys.path.insert(0, _ai_models_dir)
 
@@ -176,7 +195,7 @@ def _check_quantum_bot_status() -> dict:
         from bots.ai_learning_system.tiers import Tier  # noqa: PLC0415
 
         bot = QuantumAIBot(tier=Tier.FREE)
-        return {
+        result = {
             "status": "ok",
             "bot": "QuantumAIBot",
             "tier": bot.tier.value,
@@ -186,15 +205,17 @@ def _check_quantum_bot_status() -> dict:
                 "QuantumOptimizer",
                 "QuantumPartnershipManager",
             ],
-            "checked_at": datetime.now(timezone.utc).isoformat(),
         }
-    except Exception as exc:  # noqa: BLE001
-        return {
+    except Exception:  # noqa: BLE001
+        result = {
             "status": "error",
             "bot": "QuantumAIBot",
-            "reason": str(exc),
-            "checked_at": datetime.now(timezone.utc).isoformat(),
+            "reason": "Quantum Bot health check failed",
         }
+
+    _quantum_cache = {**result, "_cached_at": now}
+    result["checked_at"] = datetime.now(timezone.utc).isoformat()
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -957,16 +978,16 @@ def create_app(
     @app.route("/api/github/workflows")
     def api_github_workflows() -> Response:
         """Return recent GitHub Actions workflow runs (read-only)."""
-        repo = request.args.get("repo", os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO))
-        per_page = request.args.get("per_page", 10, type=int)
+        repo = os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO)
+        per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)))
         data = _fetch_github_workflows(repo=repo, per_page=per_page)
         return jsonify(data)
 
     @app.route("/api/github/artifacts")
     def api_github_artifacts() -> Response:
         """Return recent GitHub Actions artifacts (read-only)."""
-        repo = request.args.get("repo", os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO))
-        per_page = request.args.get("per_page", 10, type=int)
+        repo = os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO)
+        per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)))
         data = _fetch_github_artifacts(repo=repo, per_page=per_page)
         return jsonify(data)
 

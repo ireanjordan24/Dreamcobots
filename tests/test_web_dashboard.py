@@ -756,6 +756,7 @@ class TestQuantumStatusEndpoint:
     def test_check_quantum_bot_error_has_reason(self):
         """When import fails the response must contain a reason."""
         import builtins
+        import ui.web_dashboard as _wdash
         real_import = builtins.__import__
 
         def _fail_import(name, *args, **kwargs):
@@ -763,6 +764,8 @@ class TestQuantumStatusEndpoint:
                 raise ImportError("simulated import failure")
             return real_import(name, *args, **kwargs)
 
+        # Clear the module-level cache so the mocked import path is exercised
+        _wdash._quantum_cache.clear()
         with patch("builtins.__import__", side_effect=_fail_import):
             result = _check_quantum_bot_status()
         assert result["status"] == "error"
