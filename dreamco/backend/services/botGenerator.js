@@ -13,7 +13,7 @@
  *   SalesBot         — sales pipeline automation
  */
 
-const { generateId, formatTimestamp } = require("../utils/helpers");
+const { generateId, formatTimestamp } = require('../utils/helpers');
 
 // ---------------------------------------------------------------------------
 // In-memory bot registry
@@ -22,15 +22,16 @@ const _botRegistry = new Map();
 
 // Pre-register LeadGenBot as the flagship MVP bot
 const _leadGenBot = {
-  id: "leadgenbot-001",
-  name: "LeadGenBot",
-  industry: "General",
-  template: "LeadGenBot",
-  tier: "pro",
+  id: 'leadgenbot-001',
+  name: 'LeadGenBot',
+  industry: 'General',
+  template: 'LeadGenBot',
+  tier: 'pro',
   command: "createBot('LeadGenBot')",
-  description: "AI-powered lead scraper and qualification engine. Generates 50–200 qualified leads per week for realtors, agencies, and small businesses.",
-  features: ["lead_scraping", "email_validation", "csv_export", "dashboard", "stripe_monetization"],
-  status: "active",
+  description:
+    'AI-powered lead scraper and qualification engine. Generates 50–200 qualified leads per week for realtors, agencies, and small businesses.',
+  features: ['lead_scraping', 'email_validation', 'csv_export', 'dashboard', 'stripe_monetization'],
+  status: 'active',
   created_at: formatTimestamp(),
   dreamco_powered: true,
 };
@@ -42,34 +43,34 @@ _botRegistry.set(_leadGenBot.id, _leadGenBot);
 
 const BOT_TEMPLATES = {
   LeadGenBot: {
-    template: "LeadGenBot",
-    description: "AI-powered lead scraping and qualification engine.",
-    features: ["lead_scraping", "email_validation", "csv_export", "stripe_monetization"],
-    default_command: "scrape_leads",
+    template: 'LeadGenBot',
+    description: 'AI-powered lead scraping and qualification engine.',
+    features: ['lead_scraping', 'email_validation', 'csv_export', 'stripe_monetization'],
+    default_command: 'scrape_leads',
   },
   RealEstateBot: {
-    template: "RealEstateBot",
-    description: "Automated realtor and property lead generation for real estate professionals.",
-    features: ["property_leads", "realtor_contacts", "mls_integration", "email_campaigns"],
-    default_command: "find_realtors",
+    template: 'RealEstateBot',
+    description: 'Automated realtor and property lead generation for real estate professionals.',
+    features: ['property_leads', 'realtor_contacts', 'mls_integration', 'email_campaigns'],
+    default_command: 'find_realtors',
   },
   FinanceBot: {
-    template: "FinanceBot",
-    description: "Financial advisor and broker lead generation platform.",
-    features: ["advisor_leads", "broker_contacts", "compliance_check", "crm_export"],
-    default_command: "find_advisors",
+    template: 'FinanceBot',
+    description: 'Financial advisor and broker lead generation platform.',
+    features: ['advisor_leads', 'broker_contacts', 'compliance_check', 'crm_export'],
+    default_command: 'find_advisors',
   },
   LocalBizBot: {
-    template: "LocalBizBot",
-    description: "Local business discovery and outreach automation.",
-    features: ["yelp_scraping", "google_maps", "business_enrichment", "outreach_sequences"],
-    default_command: "find_local_businesses",
+    template: 'LocalBizBot',
+    description: 'Local business discovery and outreach automation.',
+    features: ['yelp_scraping', 'google_maps', 'business_enrichment', 'outreach_sequences'],
+    default_command: 'find_local_businesses',
   },
   SalesBot: {
-    template: "SalesBot",
-    description: "Full sales pipeline automation from prospect to close.",
-    features: ["prospect_research", "email_sequences", "crm_sync", "deal_tracking"],
-    default_command: "manage_pipeline",
+    template: 'SalesBot',
+    description: 'Full sales pipeline automation from prospect to close.',
+    features: ['prospect_research', 'email_sequences', 'crm_sync', 'deal_tracking'],
+    default_command: 'manage_pipeline',
   },
 };
 
@@ -87,7 +88,7 @@ const BOT_TEMPLATES = {
  * @param {string} options.tier      - Subscription tier (free|pro|agency).
  * @returns {object} The created bot record.
  */
-function generateBot({ name, industry = "General", command, tier = "free" }) {
+function generateBot({ name, industry = 'General', command, tier = 'free' }) {
   // Determine the best matching template
   const templateKey = _matchTemplate(name, industry);
   const template = BOT_TEMPLATES[templateKey];
@@ -101,7 +102,7 @@ function generateBot({ name, industry = "General", command, tier = "free" }) {
     command: command || template.default_command,
     description: template.description,
     features: [...template.features],
-    status: "active",
+    status: 'active',
     created_at: formatTimestamp(),
     dreamco_powered: true,
   };
@@ -138,7 +139,7 @@ function runBot(bot, payload = {}) {
     bot_id: bot.id,
     bot_name: bot.name,
     command: bot.command,
-    status: "executed",
+    status: 'executed',
     message: `${bot.name} executed command '${bot.command}' successfully.`,
     payload_received: payload,
     timestamp: formatTimestamp(),
@@ -152,13 +153,21 @@ function runBot(bot, payload = {}) {
 
 function _matchTemplate(name, industry) {
   const n = name.toLowerCase();
-  const ind = (industry || "").toLowerCase();
+  const ind = (industry || '').toLowerCase();
 
-  if (n.includes("real estate") || ind.includes("real estate")) return "RealEstateBot";
-  if (n.includes("finance") || n.includes("financial") || ind.includes("finance")) return "FinanceBot";
-  if (n.includes("local") || n.includes("biz") || ind.includes("local")) return "LocalBizBot";
-  if (n.includes("sales") || ind.includes("sales")) return "SalesBot";
-  return "LeadGenBot";
+  if (n.includes('real estate') || ind.includes('real estate')) {
+    return 'RealEstateBot';
+  }
+  if (n.includes('finance') || n.includes('financial') || ind.includes('finance')) {
+    return 'FinanceBot';
+  }
+  if (n.includes('local') || n.includes('biz') || ind.includes('local')) {
+    return 'LocalBizBot';
+  }
+  if (n.includes('sales') || ind.includes('sales')) {
+    return 'SalesBot';
+  }
+  return 'LeadGenBot';
 }
 
 module.exports = { generateBot, listBots, getBot, runBot };

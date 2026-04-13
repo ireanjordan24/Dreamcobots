@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const TEMPLATES = [
-  { id: "affiliate", label: "Affiliate Bot", description: "Tracks affiliate links and commissions." },
-  { id: "mining", label: "Mining Bot", description: "Automates crypto mining operations." },
-  { id: "sales", label: "Sales Bot", description: "Manages outreach and lead follow-ups." },
-  { id: "deal_finder", label: "Deal Finder Bot", description: "Scans for discount deals and alerts." },
-  { id: "custom", label: "Custom Bot", description: "Start from a blank template." },
+  {
+    id: 'affiliate',
+    label: 'Affiliate Bot',
+    description: 'Tracks affiliate links and commissions.',
+  },
+  { id: 'mining', label: 'Mining Bot', description: 'Automates crypto mining operations.' },
+  { id: 'sales', label: 'Sales Bot', description: 'Manages outreach and lead follow-ups.' },
+  {
+    id: 'deal_finder',
+    label: 'Deal Finder Bot',
+    description: 'Scans for discount deals and alerts.',
+  },
+  { id: 'custom', label: 'Custom Bot', description: 'Start from a blank template.' },
 ];
 
 export default function BotDeployment() {
-  const [form, setForm] = useState({ name: "", template: "", niche: "" });
+  const [form, setForm] = useState({ name: '', template: '', niche: '' });
   const [status, setStatus] = useState(null);
 
   function handleChange(e) {
@@ -19,29 +27,29 @@ export default function BotDeployment() {
   async function handleDeploy(e) {
     e.preventDefault();
     if (!form.name || !form.template) {
-      setStatus({ type: "error", message: "Bot name and template are required." });
+      setStatus({ type: 'error', message: 'Bot name and template are required.' });
       return;
     }
 
-    setStatus({ type: "loading", message: "Deploying bot…" });
+    setStatus({ type: 'loading', message: 'Deploying bot…' });
 
     try {
       // POST to the heartbeat endpoint to register the new bot as "active"
-      const res = await fetch("/api/bot-heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ botName: form.name, status: "active" }),
+      const res = await fetch('/api/bot-heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ botName: form.name, status: 'active' }),
       });
 
       if (res.ok) {
-        setStatus({ type: "success", message: `✅ Bot "${form.name}" deployed successfully!` });
-        setForm({ name: "", template: "", niche: "" });
+        setStatus({ type: 'success', message: `✅ Bot "${form.name}" deployed successfully!` });
+        setForm({ name: '', template: '', niche: '' });
       } else {
         const err = await res.json();
-        setStatus({ type: "error", message: err.error ?? "Deployment failed." });
+        setStatus({ type: 'error', message: err.error ?? 'Deployment failed.' });
       }
     } catch {
-      setStatus({ type: "error", message: "Could not reach the Control Tower API." });
+      setStatus({ type: 'error', message: 'Could not reach the Control Tower API.' });
     }
   }
 
@@ -119,11 +127,11 @@ export default function BotDeployment() {
         {status && (
           <div
             className={`mt-4 px-4 py-2 rounded-lg text-sm ${
-              status.type === "success"
-                ? "bg-green-900 text-green-300"
-                : status.type === "error"
-                ? "bg-red-900 text-red-300"
-                : "bg-slate-700 text-slate-300"
+              status.type === 'success'
+                ? 'bg-green-900 text-green-300'
+                : status.type === 'error'
+                  ? 'bg-red-900 text-red-300'
+                  : 'bg-slate-700 text-slate-300'
             }`}
           >
             {status.message}

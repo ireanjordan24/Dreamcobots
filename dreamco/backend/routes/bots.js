@@ -8,23 +8,22 @@
  *   POST /api/bots/:id/run  — execute a bot by ID
  */
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const { generateBot, listBots, getBot, runBot } = require("../services/botGenerator");
-const { generateId, formatTimestamp } = require("../utils/helpers");
+const { generateBot, listBots, getBot, runBot } = require('../services/botGenerator');
 
 // ---------------------------------------------------------------------------
 // POST /api/bots  — generate a new bot from a template + command
 // ---------------------------------------------------------------------------
-router.post("/", (req, res) => {
-  const { name, industry, command, tier = "free" } = req.body;
+router.post('/', (req, res) => {
+  const { name, industry, command, tier = 'free' } = req.body;
   if (!name) {
-    return res.status(400).json({ success: false, error: "name is required" });
+    return res.status(400).json({ success: false, error: 'name is required' });
   }
 
   try {
-    const bot = generateBot({ name, industry: industry || "General", command, tier });
+    const bot = generateBot({ name, industry: industry || 'General', command, tier });
     res.status(201).json({ success: true, bot });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -34,7 +33,7 @@ router.post("/", (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/bots  — list all bots
 // ---------------------------------------------------------------------------
-router.get("/", (_req, res) => {
+router.get('/', (_req, res) => {
   const bots = listBots();
   res.json({ success: true, total: bots.length, bots });
 });
@@ -42,10 +41,10 @@ router.get("/", (_req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/bots/:id  — get a single bot
 // ---------------------------------------------------------------------------
-router.get("/:id", (req, res) => {
+router.get('/:id', (req, res) => {
   const bot = getBot(req.params.id);
   if (!bot) {
-    return res.status(404).json({ success: false, error: "Bot not found" });
+    return res.status(404).json({ success: false, error: 'Bot not found' });
   }
   res.json({ success: true, bot });
 });
@@ -53,10 +52,10 @@ router.get("/:id", (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/bots/:id/run  — execute a bot
 // ---------------------------------------------------------------------------
-router.post("/:id/run", (req, res) => {
+router.post('/:id/run', (req, res) => {
   const bot = getBot(req.params.id);
   if (!bot) {
-    return res.status(404).json({ success: false, error: "Bot not found" });
+    return res.status(404).json({ success: false, error: 'Bot not found' });
   }
 
   try {

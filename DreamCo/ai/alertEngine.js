@@ -15,15 +15,23 @@ const THRESHOLDS = {
 function getUrgency(item) {
   const profit = parseFloat(item.profit || item.revenue || 0);
   const s = score(item);
-  if (profit >= THRESHOLDS.HIGH.minProfit || s >= THRESHOLDS.HIGH.minScore) return 'HIGH';
-  if (profit >= THRESHOLDS.MEDIUM.minProfit || s >= THRESHOLDS.MEDIUM.minScore) return 'MEDIUM';
-  if (profit >= THRESHOLDS.LOW.minProfit || s >= THRESHOLDS.LOW.minScore) return 'LOW';
+  if (profit >= THRESHOLDS.HIGH.minProfit || s >= THRESHOLDS.HIGH.minScore) {
+    return 'HIGH';
+  }
+  if (profit >= THRESHOLDS.MEDIUM.minProfit || s >= THRESHOLDS.MEDIUM.minScore) {
+    return 'MEDIUM';
+  }
+  if (profit >= THRESHOLDS.LOW.minProfit || s >= THRESHOLDS.LOW.minScore) {
+    return 'LOW';
+  }
   return null;
 }
 
 function generateAlert(item) {
   const urgency = getUrgency(item);
-  if (!urgency) return null;
+  if (!urgency) {
+    return null;
+  }
   return {
     urgency,
     item: item.name || item.id || 'Unknown',
@@ -38,8 +46,8 @@ function filterAlerts(items, minUrgency = 'LOW') {
   const levels = ['LOW', 'MEDIUM', 'HIGH'];
   const minIdx = levels.indexOf(minUrgency);
   return items
-    .map(item => generateAlert(item))
-    .filter(a => a !== null && levels.indexOf(a.urgency) >= minIdx);
+    .map((item) => generateAlert(item))
+    .filter((a) => a !== null && levels.indexOf(a.urgency) >= minIdx);
 }
 
 module.exports = { getUrgency, generateAlert, filterAlerts, THRESHOLDS };

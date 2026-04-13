@@ -1,11 +1,12 @@
 # Comprehensive PR Validation Workflow
 #
 # Runs on every pull request to validate:
-#   1. JavaScript code style (ESLint + Prettier)
+#   1. JavaScript code style (ESLint + Prettier) — JS/TS files only
 #   2. Node.js tests (Jest)
-#   3. Python bot tests (pytest) and framework compliance
-#   4. Deployment simulation (smoke test)
-#   5. Posts a summary comment with actionable feedback
+#   3. Python bot checks (flake8 + Black) + pytest + framework compliance
+#   4. Java bot checks (Checkstyle + google-java-format)
+#   5. Deployment simulation (smoke test)
+#   6. Posts a summary comment with actionable feedback
 
 name: PR Validation
 
@@ -19,10 +20,57 @@ permissions:
   pull-requests: write
 
 jobs:
-  # ── 1. JavaScript Linting (ESLint) ────────────────────────────────────────
+  # ── 0. Detect which language categories have changed files ─────────────────
+  detect-languages:
+    name: Detect Changed Languages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      has_python: ${{ steps.detect.outputs.has_python }}
+      has_java: ${{ steps.detect.outputs.has_java }}
+      has_js: ${{ steps.detect.outputs.has_js }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file types in changeset
+        id: detect
+        shell: bash
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD" 2>/dev/null || git diff --name-only HEAD~1 HEAD)
+
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '\.py$'; then
+            echo "has_python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_python=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if echo "$CHANGED" | grep -qE '\.java$'; then
+            echo "has_java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_java=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if echo "$CHANGED" | grep -qE '\.(js|ts|jsx|tsx)$'; then
+            echo "has_js=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_js=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── 1. JavaScript Linting (ESLint) — JS/TS files only ─────────────────────
   lint-js:
     name: JavaScript Lint (ESLint)
     runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_js == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,10 +84,10 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run ESLint
+      - name: Run ESLint (JS/TS only)
         id: eslint
         shell: bash
-        run: npm run lint -- --format=compact 2>&1 | tee /tmp/eslint-output.txt; exit ${PIPESTATUS[0]}
+        run: npm run lint -- --ext .js,.ts,.jsx,.tsx --format=compact 2>&1 | tee /tmp/eslint-output.txt; exit ${PIPESTATUS[0]}
 
       - name: Upload ESLint results
         if: always()
@@ -49,10 +97,12 @@ jobs:
           path: /tmp/eslint-output.txt
           retention-days: 7
 
-  # ── 2. Code Formatting (Prettier) ─────────────────────────────────────────
+  # ── 2. Code Formatting (Prettier) — JS/TS files only ─────────────────────
   format-check:
     name: Code Format (Prettier)
     runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_js == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,10 +116,15 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run Prettier check
+      - name: Run Prettier check (JS/TS only)
         id: prettier
         shell: bash
-        run: npm run format 2>&1 | tee /tmp/prettier-output.txt; exit ${PIPESTATUS[0]}
+        run: |
+          npx prettier --check \
+            --ignore-path .prettierignore \
+            "**/*.{js,ts,jsx,tsx}" \
+            2>&1 | tee /tmp/prettier-output.txt
+          exit ${PIPESTATUS[0]}
 
       - name: Upload Prettier results
         if: always()
@@ -108,7 +163,55 @@ jobs:
           path: /tmp/jest-output.txt
           retention-days: 7
 
-  # ── 4. Python Bot Framework Compliance + Tests ────────────────────────────
+  # ── 4. Python Bot Lint + Format (Flake8 + Black) ─────────────────────────
+  lint-python:
+    name: Python Lint & Format (Flake8 + Black)
+    runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_python == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python lint/format tools
+        run: pip install flake8 black
+
+      - name: Flake8 — lint python_bots/
+        run: |
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            flake8 python_bots/ \
+              --max-line-length=120 \
+              --ignore=W503 \
+              --statistics \
+              2>&1 | tee /tmp/flake8-output.txt
+            exit ${PIPESTATUS[0]}
+          else
+            echo "No Python files found in python_bots/ — skipping Flake8." | tee /tmp/flake8-output.txt
+          fi
+
+      - name: Black — format check python_bots/
+        run: |
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            black --check --diff python_bots/ 2>&1 | tee /tmp/black-output.txt
+            exit ${PIPESTATUS[0]}
+          else
+            echo "No Python files found in python_bots/ — skipping Black." | tee /tmp/black-output.txt
+          fi
+
+      - name: Upload Python lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-lint-results
+          path: /tmp/flake8-output.txt
+          retention-days: 7
+
+  # ── 5. Python Bot Framework Compliance + Tests ────────────────────────────
   test-python:
     name: Python Tests & Bot Framework Compliance
     runs-on: ubuntu-latest
@@ -150,12 +253,100 @@ jobs:
           path: /tmp/pytest-output.txt
           retention-days: 7
 
-  # ── 5. Deployment Simulation ───────────────────────────────────────────────
+  # ── 6. Java Bot Lint + Format (Checkstyle + google-java-format) ───────────
+  lint-java:
+    name: Java Lint & Format (Checkstyle + google-java-format)
+    runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_java == 'true'
+
+    env:
+      CHECKSTYLE_VERSION: '10.21.0'
+      GJF_VERSION: '1.22.0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Checkstyle JAR
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/checkstyle
+          key: checkstyle-${{ env.CHECKSTYLE_VERSION }}
+
+      - name: Download Checkstyle JAR
+        run: |
+          mkdir -p ~/.cache/checkstyle
+          JAR=~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${{ env.CHECKSTYLE_VERSION }}/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar" \
+              -o "$JAR"
+          fi
+
+      - name: Checkstyle — lint java_bots/
+        run: |
+          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
+            java -jar ~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar \
+              -c checkstyle.xml \
+              $(find java_bots -name "*.java") \
+              2>&1 | tee /tmp/checkstyle-output.txt
+            exit ${PIPESTATUS[0]}
+          else
+            echo "No Java files found in java_bots/ — skipping Checkstyle." | tee /tmp/checkstyle-output.txt
+          fi
+
+      - name: Cache google-java-format JAR
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/gjf
+          key: gjf-${{ env.GJF_VERSION }}
+
+      - name: Download google-java-format JAR
+        run: |
+          mkdir -p ~/.cache/gjf
+          JAR=~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/google/google-java-format/releases/download/v${{ env.GJF_VERSION }}/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar" \
+              -o "$JAR"
+          fi
+
+      - name: google-java-format — format check java_bots/
+        run: |
+          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
+            java -jar ~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar \
+              --dry-run --set-exit-if-changed \
+              $(find java_bots -name "*.java") \
+              2>&1 | tee /tmp/gjf-output.txt
+            exit ${PIPESTATUS[0]}
+          else
+            echo "No Java files found in java_bots/ — skipping google-java-format." | tee /tmp/gjf-output.txt
+          fi
+
+      - name: Upload Java lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-lint-results
+          path: /tmp/checkstyle-output.txt
+          retention-days: 7
+
+  # ── 7. Deployment Simulation ───────────────────────────────────────────────
   deploy-simulation:
     name: Deployment Simulation
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python]
-    if: success()
+    needs: [lint-js, format-check, test-node, lint-python, test-python, lint-java]
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -180,29 +371,29 @@ jobs:
           node deploy.js --dry-run 2>/dev/null || echo "Deployment script ran (dry-run mode)"
           echo "✅ Deployment simulation complete — no production systems affected."
 
-  # ── 6. PR Feedback Summary ─────────────────────────────────────────────────
+  # ── 8. PR Feedback Summary ─────────────────────────────────────────────────
   feedback:
     name: Post PR Feedback
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, test-python, deploy-simulation]
+    needs: [lint-js, format-check, test-node, lint-python, test-python, lint-java, deploy-simulation]
     if: always()
     steps:
       - name: Download ESLint results
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: eslint-results
           path: /tmp/artifacts/eslint
         continue-on-error: true
 
       - name: Download Prettier results
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: prettier-results
           path: /tmp/artifacts/prettier
         continue-on-error: true
 
       - name: Download Jest results
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: jest-results
           path: /tmp/artifacts/jest
@@ -213,21 +404,13 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-
-            function readArtifact(path) {
-              try {
-                return fs.readFileSync(path, 'utf8').trim();
-              } catch {
-                return null;
-              }
-            }
-
-            const eslintResult   = '${{ needs.lint-js.result }}';
-            const prettierResult = '${{ needs.format-check.result }}';
-            const jestResult     = '${{ needs.test-node.result }}';
-            const pytestResult   = '${{ needs.test-python.result }}';
-            const deployResult   = '${{ needs.deploy-simulation.result }}';
+            const eslintResult      = '${{ needs.lint-js.result }}';
+            const prettierResult    = '${{ needs.format-check.result }}';
+            const jestResult        = '${{ needs.test-node.result }}';
+            const pythonLintResult  = '${{ needs.lint-python.result }}';
+            const pytestResult      = '${{ needs.test-python.result }}';
+            const javaLintResult    = '${{ needs.lint-java.result }}';
+            const deployResult      = '${{ needs.deploy-simulation.result }}';
 
             const icon = (r) =>
               r === 'success' ? '✅' :
@@ -236,36 +419,58 @@ jobs:
             const lines = [
               '## 🤖 DreamCobots PR Validation Report',
               '',
+              '### JavaScript / TypeScript Checks',
               `| Check | Status |`,
               `|-------|--------|`,
-              `| ESLint (JavaScript Linting) | ${icon(eslintResult)} ${eslintResult} |`,
-              `| Prettier (Code Formatting)  | ${icon(prettierResult)} ${prettierResult} |`,
-              `| Jest (Node.js Tests)        | ${icon(jestResult)} ${jestResult} |`,
-              `| pytest (Python Bot Tests)   | ${icon(pytestResult)} ${pytestResult} |`,
-              `| Deployment Simulation       | ${icon(deployResult)} ${deployResult} |`,
+              `| ESLint (JS/TS Linting)        | ${icon(eslintResult)} ${eslintResult} |`,
+              `| Prettier (JS/TS Formatting)   | ${icon(prettierResult)} ${prettierResult} |`,
+              `| Jest (Node.js Tests)          | ${icon(jestResult)} ${jestResult} |`,
+              '',
+              '### Python Bot Checks',
+              `| Check | Status |`,
+              `|-------|--------|`,
+              `| Flake8 + Black (python_bots/) | ${icon(pythonLintResult)} ${pythonLintResult} |`,
+              `| pytest + Framework Compliance | ${icon(pytestResult)} ${pytestResult} |`,
+              '',
+              '### Java Bot Checks',
+              `| Check | Status |`,
+              `|-------|--------|`,
+              `| Checkstyle + google-java-format (java_bots/) | ${icon(javaLintResult)} ${javaLintResult} |`,
+              '',
+              '### Deployment',
+              `| Check | Status |`,
+              `|-------|--------|`,
+              `| Deployment Simulation | ${icon(deployResult)} ${deployResult} |`,
               '',
             ];
 
-            const allPassed = [eslintResult, prettierResult, jestResult, pytestResult]
-              .every(r => r === 'success');
+            const checkResults = [eslintResult, prettierResult, jestResult, pythonLintResult, pytestResult, javaLintResult];
+            const relevantResults = checkResults.filter(r => r !== 'skipped');
+            const allPassed = relevantResults.every(r => r === 'success');
 
             if (allPassed) {
               lines.push('### 🎉 All checks passed — this PR is ready for review!');
             } else {
               lines.push('### ⚠️ Some checks failed. Please review the details below:');
               lines.push('');
-              if (eslintResult !== 'success') {
-                lines.push('**ESLint:** Run `npm run lint:fix` locally to auto-fix linting issues.');
+              if (eslintResult === 'failure') {
+                lines.push('**ESLint:** Run `npm run lint:fix` locally to auto-fix JS/TS linting issues.');
               }
-              if (prettierResult !== 'success') {
-                lines.push('**Prettier:** Run `npm run format:fix` locally to auto-format your code.');
+              if (prettierResult === 'failure') {
+                lines.push('**Prettier:** Run `npm run format:fix` locally to auto-format JS/TS files.');
               }
-              if (jestResult !== 'success') {
+              if (jestResult === 'failure') {
                 lines.push('**Jest:** Run `npm test` locally and fix failing tests.');
               }
-              if (pytestResult !== 'success') {
+              if (pythonLintResult === 'failure') {
+                lines.push('**Python Lint:** Run `flake8 python_bots/ --max-line-length=120` and `black python_bots/` locally.');
+              }
+              if (pytestResult === 'failure') {
                 lines.push('**pytest:** Run `python -m pytest tests/ -q --tb=short` and fix failing Python tests.');
-                lines.push('Also verify: `python tools/check_bot_framework.py` passes (all bots must implement the GLOBAL AI SOURCES FLOW).');
+                lines.push('Also verify: `python tools/check_bot_framework.py` passes.');
+              }
+              if (javaLintResult === 'failure') {
+                lines.push('**Java Lint:** Fix Checkstyle and google-java-format issues in `java_bots/`.');
               }
             }
 

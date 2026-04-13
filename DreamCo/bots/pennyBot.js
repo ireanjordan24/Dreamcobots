@@ -1,7 +1,7 @@
 'use strict';
 
 function run(options = {}) {
-  const { threshold = 1.00 } = options;
+  const { threshold = 1.0 } = options;
   const stores = ['Dollar General', 'Walmart', 'Walgreens', 'CVS', 'Target'];
   const pennyDeals = stores.map((store, i) => ({
     id: `penny-${i + 1}`,

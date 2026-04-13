@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -11,9 +11,9 @@ import {
   Pie,
   Cell,
   Legend,
-} from "recharts";
+} from 'recharts';
 
-const COLORS = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4"];
+const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4'];
 
 function StatCard({ label, value, sub }) {
   return (
@@ -28,20 +28,20 @@ function StatCard({ label, value, sub }) {
 // Build mock uptime data from bots list
 function buildUptimeData(bots) {
   return bots.map((b, i) => ({
-    name: b.name.split("-").slice(0, 2).join("-"),
+    name: b.name.split('-').slice(0, 2).join('-'),
     uptime: b.lastHeartbeat ? Math.max(60, 99 - i * 3) : 0,
   }));
 }
 
 // Build mock PR trend data (last 7 days placeholder)
 const PR_TREND = [
-  { day: "Mon", opened: 2, merged: 1 },
-  { day: "Tue", opened: 3, merged: 2 },
-  { day: "Wed", opened: 1, merged: 3 },
-  { day: "Thu", opened: 4, merged: 2 },
-  { day: "Fri", opened: 2, merged: 4 },
-  { day: "Sat", opened: 0, merged: 1 },
-  { day: "Sun", opened: 1, merged: 0 },
+  { day: 'Mon', opened: 2, merged: 1 },
+  { day: 'Tue', opened: 3, merged: 2 },
+  { day: 'Wed', opened: 1, merged: 3 },
+  { day: 'Thu', opened: 4, merged: 2 },
+  { day: 'Fri', opened: 2, merged: 4 },
+  { day: 'Sat', opened: 0, merged: 1 },
+  { day: 'Sun', opened: 1, merged: 0 },
 ];
 
 export default function Analytics() {
@@ -50,7 +50,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([fetch("/api/bots"), fetch("/api/status")])
+    Promise.all([fetch('/api/bots'), fetch('/api/status')])
       .then(([b, s]) => Promise.all([b.json(), s.json()]))
       .then(([botsData, statusData]) => {
         setBots(botsData);
@@ -65,7 +65,7 @@ export default function Analytics() {
   const activeCount = systemStatus?.bots?.active ?? 0;
   const totalCount = systemStatus?.bots?.total ?? bots.length;
   const staleCount = systemStatus?.bots?.stale ?? 0;
-  const healthLabel = systemStatus?.health ?? "unknown";
+  const healthLabel = systemStatus?.health ?? 'unknown';
 
   const uptimeData = buildUptimeData(bots);
 
@@ -87,7 +87,7 @@ export default function Analytics() {
         <StatCard label="Stale Bots" value={staleCount} sub="no heartbeat > 5 min" />
         <StatCard
           label="System Health"
-          value={healthLabel === "healthy" ? "✅" : "⚠️"}
+          value={healthLabel === 'healthy' ? '✅' : '⚠️'}
           sub={healthLabel}
         />
       </div>
@@ -101,10 +101,24 @@ export default function Analytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis dataKey="day" stroke="#94a3b8" tick={{ fontSize: 11 }} />
               <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: "#1e293b", border: "none" }} />
-              <Line type="monotone" dataKey="opened" stroke="#6366f1" strokeWidth={2} dot={false} name="Opened" />
-              <Line type="monotone" dataKey="merged" stroke="#22c55e" strokeWidth={2} dot={false} name="Merged" />
-              <Legend wrapperStyle={{ fontSize: 11, color: "#94a3b8" }} />
+              <Tooltip contentStyle={{ background: '#1e293b', border: 'none' }} />
+              <Line
+                type="monotone"
+                dataKey="opened"
+                stroke="#6366f1"
+                strokeWidth={2}
+                dot={false}
+                name="Opened"
+              />
+              <Line
+                type="monotone"
+                dataKey="merged"
+                stroke="#22c55e"
+                strokeWidth={2}
+                dot={false}
+                name="Merged"
+              />
+              <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -117,8 +131,15 @@ export default function Analytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 10 }} />
               <YAxis domain={[0, 100]} stroke="#94a3b8" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: "#1e293b", border: "none" }} />
-              <Line type="monotone" dataKey="uptime" stroke="#f59e0b" strokeWidth={2} dot={false} name="Uptime %" />
+              <Tooltip contentStyle={{ background: '#1e293b', border: 'none' }} />
+              <Line
+                type="monotone"
+                dataKey="uptime"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                dot={false}
+                name="Uptime %"
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -129,13 +150,21 @@ export default function Analytics() {
             <h3 className="text-sm font-semibold text-slate-300 mb-4">Bot Status Distribution</h3>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={70}
+                  label
+                >
                   {pieData.map((_, idx) => (
                     <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend wrapperStyle={{ fontSize: 11, color: "#94a3b8" }} />
-                <Tooltip contentStyle={{ background: "#1e293b", border: "none" }} />
+                <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: 'none' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

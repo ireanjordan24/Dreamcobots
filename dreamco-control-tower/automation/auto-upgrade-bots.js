@@ -15,24 +15,24 @@
  *   GITHUB_OWNER  — GitHub username / org (default: ireanjordan24)
  */
 
-import { execSync } from "child_process";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { Octokit } from "@octokit/rest";
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Octokit } from '@octokit/rest';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_FILE = path.join(__dirname, "../config/bots.json");
+const BOTS_FILE = path.join(__dirname, '../config/bots.json');
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const OWNER = process.env.GITHUB_OWNER || "ireanjordan24";
+const OWNER = process.env.GITHUB_OWNER || 'ireanjordan24';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function readBots() {
-  return JSON.parse(fs.readFileSync(BOTS_FILE, "utf8"));
+  return JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
 }
 
 /**
@@ -40,13 +40,13 @@ function readBots() {
  */
 function pullLatest(repoPath) {
   try {
-    execSync(`git -C ${repoPath} pull --rebase origin main`, { stdio: "pipe" });
+    execSync(`git -C ${repoPath} pull --rebase origin main`, { stdio: 'pipe' });
     console.log(`  ✅ Pulled latest for ${repoPath}`);
     return true;
   } catch (_err) {
     console.warn(`  ⚠️  Conflict detected in ${repoPath} — auto-resolving with "theirs" strategy`);
     try {
-      execSync(`git -C ${repoPath} merge -X theirs origin/main`, { stdio: "pipe" });
+      execSync(`git -C ${repoPath} merge -X theirs origin/main`, { stdio: 'pipe' });
       console.log(`  ✅ Conflict resolved for ${repoPath}`);
       return true;
     } catch (mergeErr) {
@@ -60,13 +60,13 @@ function pullLatest(repoPath) {
  * Run npm tests in the repo directory (skips if no package.json).
  */
 function runTests(repoPath) {
-  const pkgPath = path.join(repoPath, "package.json");
+  const pkgPath = path.join(repoPath, 'package.json');
   if (!fs.existsSync(pkgPath)) {
     console.log(`  ℹ️  No package.json in ${repoPath} — skipping npm test`);
     return true;
   }
   try {
-    execSync(`npm --prefix ${repoPath} test`, { stdio: "pipe" });
+    execSync(`npm --prefix ${repoPath} test`, { stdio: 'pipe' });
     console.log(`  ✅ Tests passed for ${repoPath}`);
     return true;
   } catch (err) {
@@ -85,8 +85,8 @@ async function createUpgradePR(repoName, branch, title) {
       repo: repoName,
       title,
       head: branch,
-      base: "main",
-      body: "🤖 Automated upgrade created by DreamCo Control Tower.",
+      base: 'main',
+      body: '🤖 Automated upgrade created by DreamCo Control Tower.',
     });
     console.log(`  🔀 PR opened: ${data.html_url}`);
     return data.html_url;
@@ -118,7 +118,7 @@ async function runUpgrades() {
     if (testsPassed) {
       await createUpgradePR(
         bot.repoName,
-        bot.branch ?? "auto-update",
+        bot.branch ?? 'auto-update',
         `🤖 Auto-upgrade from Control Tower — ${bot.name}`
       );
     }
@@ -126,10 +126,10 @@ async function runUpgrades() {
     console.log();
   }
 
-  console.log("✅ Auto-upgrade run complete.");
+  console.log('✅ Auto-upgrade run complete.');
 }
 
 runUpgrades().catch((err) => {
-  console.error("Fatal error during upgrade run:", err);
+  console.error('Fatal error during upgrade run:', err);
   process.exit(1);
 });

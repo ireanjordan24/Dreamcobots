@@ -28,7 +28,7 @@ app.get('/flips', (req, res) => {
 
 // 3. GET /penny-deals
 app.get('/penny-deals', (req, res) => {
-  const { threshold = 1.00 } = req.query;
+  const { threshold = 1.0 } = req.query;
   res.json(pennyBot.run({ threshold: parseFloat(threshold) }));
 });
 
@@ -75,7 +75,13 @@ app.post('/profit', (req, res) => {
 // 10. POST /profit/flip
 app.post('/profit/flip', (req, res) => {
   const { buyPrice, sellPrice, feesPct } = req.body;
-  res.json(profitEngine.calculateFlip(parseFloat(buyPrice), parseFloat(sellPrice), feesPct ? parseFloat(feesPct) : undefined));
+  res.json(
+    profitEngine.calculateFlip(
+      parseFloat(buyPrice),
+      parseFloat(sellPrice),
+      feesPct ? parseFloat(feesPct) : undefined
+    )
+  );
 });
 
 // 11. GET /health

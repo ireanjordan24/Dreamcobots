@@ -26,7 +26,9 @@ for (const key of REQUIRED_VARS) {
 const bots = registry.getBots();
 console.log(`\n🤖 Registered bots: ${bots.length}`);
 for (const bot of bots) {
-  console.log(`  • ${bot.name} [${bot.status}] — runs: ${bot.runCount}, revenue: $${bot.totalRevenue}`);
+  console.log(
+    `  • ${bot.name} [${bot.status}] — runs: ${bot.runCount}, revenue: $${bot.totalRevenue}`
+  );
 }
 
 // --- Recent errors ---
