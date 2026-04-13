@@ -6,6 +6,8 @@ Provides a real-time web UI to:
   - Enable manual bot creation, management, and overrides.
   - Visualize system behavior via REST endpoints consumed by a browser.
   - Launch high-revenue bots live via Go Live buttons.
+  - Display live GitHub Actions workflow runs and artifacts (read-only).
+  - Show Quantum Bot system health.
 
 Usage
 -----
@@ -27,10 +29,14 @@ Endpoints
   GET  /api/underperformers       — Bots with composite score < threshold
   POST /api/record_run            — Record a bot run with KPIs
   GET  /api/history/<bot_name>    — Run history for a specific bot
+  GET  /api/github/workflows      — Live GitHub Actions workflow runs (read-only)
+  GET  /api/github/artifacts      — GitHub Actions artifact list (read-only)
+  GET  /api/quantum/status        — Quantum Bot system health check
 """
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -40,8 +46,155 @@ try:
 except ImportError:  # pragma: no cover
     _FLASK_AVAILABLE = False
 
+try:
+    import requests as _requests
+    _REQUESTS_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    _requests = None  # type: ignore[assignment]
+    _REQUESTS_AVAILABLE = False
+
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
+
+
+# ---------------------------------------------------------------------------
+# GitHub Actions helpers (read-only)
+# ---------------------------------------------------------------------------
+
+_GITHUB_API_BASE = "https://api.github.com"
+_DEFAULT_REPO = "DreamCo-Technologies/Dreamcobots"
+
+
+def _github_headers() -> dict:
+    """Return HTTP headers for GitHub API calls, including auth if available."""
+    token = os.environ.get("GITHUB_TOKEN", "")
+    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+def _fetch_github_workflows(repo: str = _DEFAULT_REPO, per_page: int = 10) -> dict:
+    """Fetch the most recent GitHub Actions workflow runs for *repo*.
+
+    Returns a dict with ``runs`` (list) and ``source`` (``"github_api"`` or
+    ``"unavailable"``).  Never raises — failures produce a safe placeholder
+    payload so the dashboard always renders.
+    """
+    if not _REQUESTS_AVAILABLE:
+        return {"runs": [], "source": "unavailable", "reason": "requests library not installed"}
+
+    url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/runs"
+    try:
+        resp = _requests.get(
+            url,
+            headers=_github_headers(),
+            params={"per_page": per_page},
+            timeout=5,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            runs = [
+                {
+                    "id": r["id"],
+                    "name": r["name"],
+                    "workflow_id": r.get("workflow_id"),
+                    "status": r["status"],
+                    "conclusion": r.get("conclusion"),
+                    "branch": r.get("head_branch"),
+                    "event": r.get("event"),
+                    "run_started_at": r.get("run_started_at"),
+                    "updated_at": r.get("updated_at"),
+                    "url": r.get("html_url"),
+                }
+                for r in data.get("workflow_runs", [])
+            ]
+            return {"runs": runs, "total_count": data.get("total_count", len(runs)), "source": "github_api"}
+        return {
+            "runs": [],
+            "source": "unavailable",
+            "reason": f"GitHub API returned HTTP {resp.status_code}",
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"runs": [], "source": "unavailable", "reason": str(exc)}
+
+
+def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> dict:
+    """Fetch the most recent GitHub Actions artifacts for *repo*.
+
+    Returns a dict with ``artifacts`` (list) and ``source``.  Never raises.
+    """
+    if not _REQUESTS_AVAILABLE:
+        return {"artifacts": [], "source": "unavailable", "reason": "requests library not installed"}
+
+    url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/artifacts"
+    try:
+        resp = _requests.get(
+            url,
+            headers=_github_headers(),
+            params={"per_page": per_page},
+            timeout=5,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            artifacts = [
+                {
+                    "id": a["id"],
+                    "name": a["name"],
+                    "size_in_bytes": a.get("size_in_bytes", 0),
+                    "created_at": a.get("created_at"),
+                    "expires_at": a.get("expires_at"),
+                    "expired": a.get("expired", False),
+                    "url": a.get("url"),
+                }
+                for a in data.get("artifacts", [])
+            ]
+            return {"artifacts": artifacts, "total_count": data.get("total_count", len(artifacts)), "source": "github_api"}
+        return {
+            "artifacts": [],
+            "source": "unavailable",
+            "reason": f"GitHub API returned HTTP {resp.status_code}",
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"artifacts": [], "source": "unavailable", "reason": str(exc)}
+
+
+def _check_quantum_bot_status() -> dict:
+    """Instantiate the QuantumAIBot (FREE tier) and return a health summary.
+
+    Read-only — no mutations.  Returns a dict with ``status`` (``"ok"`` or
+    ``"error"``), ``tier``, and ``engines``.
+    """
+    try:
+        import sys as _sys
+        import os as _os
+        _ai_models_dir = _os.path.join(_os.path.dirname(__file__), "..", "bots", "ai-models-integration")
+        if _ai_models_dir not in _sys.path:
+            _sys.path.insert(0, _ai_models_dir)
+
+        from bots.quantum_ai_bot.quantum_ai_bot import QuantumAIBot  # noqa: PLC0415
+        from bots.ai_learning_system.tiers import Tier  # noqa: PLC0415
+
+        bot = QuantumAIBot(tier=Tier.FREE)
+        return {
+            "status": "ok",
+            "bot": "QuantumAIBot",
+            "tier": bot.tier.value,
+            "engines": [
+                "QuantumCircuitSimulator",
+                "HybridQuantumAIModel",
+                "QuantumOptimizer",
+                "QuantumPartnershipManager",
+            ],
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "status": "error",
+            "bot": "QuantumAIBot",
+            "reason": str(exc),
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -327,6 +480,59 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- ── QUANTUM BOT SYSTEM HEALTH ── -->
+  <p class="section-header">⚛️ Quantum Bot — System Health</p>
+  <div class="grid" id="quantum-health" style="padding-top:0">
+    <div class="card">
+      <h2>Quantum Status</h2>
+      <div class="value" id="quantum-status">—</div>
+      <div class="sub" id="quantum-tier"></div>
+    </div>
+    <div class="card">
+      <h2>Quantum Engines</h2>
+      <div id="quantum-engines" style="font-size:0.8rem;color:#aaa;margin-top:6px">Loading…</div>
+    </div>
+    <div class="card">
+      <h2>Last Checked</h2>
+      <div class="value" style="font-size:1rem;color:#aaa" id="quantum-checked">—</div>
+    </div>
+  </div>
+
+  <!-- ── WORKFLOW MONITOR ── -->
+  <p class="section-header">⚙️ GitHub Actions — Workflow Monitor (Live, Read-Only)</p>
+  <div style="padding: 0 24px 24px;">
+    <div class="card">
+      <h2 style="margin-bottom:12px;">Recent Workflow Runs</h2>
+      <table id="workflow-table">
+        <thead>
+          <tr>
+            <th>Workflow</th><th>Branch</th><th>Event</th>
+            <th>Status</th><th>Conclusion</th><th>Started</th><th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="workflow-body">
+          <tr><td colspan="7" style="color:#555">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ARTIFACTS ── -->
+  <p class="section-header">📦 GitHub Actions — Artifacts</p>
+  <div style="padding: 0 24px 24px;">
+    <div class="card">
+      <h2 style="margin-bottom:12px;">Available Artifacts</h2>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Size</th><th>Created</th><th>Expires</th><th>Status</th></tr>
+        </thead>
+        <tbody id="artifact-body">
+          <tr><td colspan="5" style="color:#555">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <p id="refresh-note">Auto-refreshes every 15 s</p>
   <footer>DreamCo Empire OS — Powered by the GLOBAL AI SOURCES FLOW framework</footer>
 
@@ -362,6 +568,82 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
         btn.textContent = '⚠ Error';
         btn.classList.remove('loading');
         btn.disabled = false;
+      }
+    }
+
+    async function loadWorkflows() {
+      try {
+        const [wf, art] = await Promise.all([
+          fetch('/api/github/workflows').then(r => r.json()),
+          fetch('/api/github/artifacts').then(r => r.json()),
+        ]);
+
+        const wfBody = document.getElementById('workflow-body');
+        const runs = wf.runs || [];
+        if (runs.length) {
+          const conclusionColor = c => {
+            if (c === 'success') return '#22cc44';
+            if (c === 'failure') return '#ff4444';
+            if (c === 'cancelled') return '#ff9900';
+            return '#888';
+          };
+          wfBody.innerHTML = runs.map(r => `
+            <tr>
+              <td>${r.name || '—'}</td>
+              <td>${r.branch || '—'}</td>
+              <td>${r.event || '—'}</td>
+              <td>${r.status || '—'}</td>
+              <td style="color:${conclusionColor(r.conclusion)};font-weight:600">${r.conclusion || '—'}</td>
+              <td>${r.run_started_at ? new Date(r.run_started_at).toLocaleString() : '—'}</td>
+              <td>${r.url ? `<a href="${r.url}" target="_blank" rel="noopener" style="color:#00d4aa">View</a>` : '—'}</td>
+            </tr>`).join('');
+        } else {
+          const msg = wf.reason ? `Unavailable: ${wf.reason}` : 'No workflow runs found.';
+          wfBody.innerHTML = `<tr><td colspan="7" style="color:#555">${msg}</td></tr>`;
+        }
+
+        const artBody = document.getElementById('artifact-body');
+        const artifacts = art.artifacts || [];
+        if (artifacts.length) {
+          artBody.innerHTML = artifacts.map(a => {
+            const kb = a.size_in_bytes ? (a.size_in_bytes / 1024).toFixed(1) + ' KB' : '—';
+            const created = a.created_at ? new Date(a.created_at).toLocaleString() : '—';
+            const expires = a.expires_at ? new Date(a.expires_at).toLocaleDateString() : '—';
+            const statusBadge = a.expired
+              ? '<span style="color:#ff4444">Expired</span>'
+              : '<span style="color:#22cc44">Active</span>';
+            return `<tr><td>${a.name}</td><td>${kb}</td><td>${created}</td><td>${expires}</td><td>${statusBadge}</td></tr>`;
+          }).join('');
+        } else {
+          const msg = art.reason ? `Unavailable: ${art.reason}` : 'No artifacts found.';
+          artBody.innerHTML = `<tr><td colspan="5" style="color:#555">${msg}</td></tr>`;
+        }
+      } catch (e) {
+        console.error('Workflow load error:', e);
+      }
+    }
+
+    async function loadQuantum() {
+      try {
+        const q = await fetch('/api/quantum/status').then(r => r.json());
+        const statusEl = document.getElementById('quantum-status');
+        const tierEl = document.getElementById('quantum-tier');
+        const engEl = document.getElementById('quantum-engines');
+        const checkedEl = document.getElementById('quantum-checked');
+        if (q.status === 'ok') {
+          statusEl.textContent = '✅ OK';
+          statusEl.style.color = '#22cc44';
+          tierEl.textContent = 'Tier: ' + (q.tier || '—');
+          engEl.innerHTML = (q.engines || []).map(e => `<div>✓ ${e}</div>`).join('');
+        } else {
+          statusEl.textContent = '⚠ Error';
+          statusEl.style.color = '#ff4444';
+          tierEl.textContent = q.reason || '';
+          engEl.textContent = '';
+        }
+        checkedEl.textContent = q.checked_at ? new Date(q.checked_at).toLocaleTimeString() : '—';
+      } catch (e) {
+        console.error('Quantum status load error:', e);
       }
     }
 
@@ -445,7 +727,9 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
 
     loadCatalog();
     loadAll();
-    setInterval(loadAll, 15000);
+    loadWorkflows();
+    loadQuantum();
+    setInterval(() => { loadAll(); loadWorkflows(); loadQuantum(); }, 15000);
   </script>
 </body>
 </html>
@@ -666,7 +950,36 @@ def create_app(
         history = perf_db.get_run_history(bot_name, limit=limit)
         return jsonify({"bot_name": bot_name, "history": history})
 
+    # ---------------------------------------------------------------
+    # GitHub Actions — read-only workflow monitor
+    # ---------------------------------------------------------------
+
+    @app.route("/api/github/workflows")
+    def api_github_workflows() -> Response:
+        """Return recent GitHub Actions workflow runs (read-only)."""
+        repo = request.args.get("repo", os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO))
+        per_page = request.args.get("per_page", 10, type=int)
+        data = _fetch_github_workflows(repo=repo, per_page=per_page)
+        return jsonify(data)
+
+    @app.route("/api/github/artifacts")
+    def api_github_artifacts() -> Response:
+        """Return recent GitHub Actions artifacts (read-only)."""
+        repo = request.args.get("repo", os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO))
+        per_page = request.args.get("per_page", 10, type=int)
+        data = _fetch_github_artifacts(repo=repo, per_page=per_page)
+        return jsonify(data)
+
+    # ---------------------------------------------------------------
+    # Quantum Bot — system health check (read-only)
+    # ---------------------------------------------------------------
+
+    @app.route("/api/quantum/status")
+    def api_quantum_status() -> Response:
+        """Return Quantum Bot health status (read-only instantiation check)."""
+        return jsonify(_check_quantum_bot_status())
+
     return app
 
 
-__all__ = ["create_app", "_BOT_CATALOG"]
+__all__ = ["create_app", "_BOT_CATALOG", "_fetch_github_workflows", "_fetch_github_artifacts", "_check_quantum_bot_status"]
