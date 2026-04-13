@@ -12,6 +12,10 @@ Covers:
   8. /api/underperformers
   9. /api/record_run (POST)
   10. /api/history/<bot_name>
+  11. /api/github/workflows (GitHub Actions read-only)
+  12. /api/github/artifacts (GitHub Actions read-only)
+  13. /api/quantum/status (Quantum Bot health)
+  14. Helper functions (_fetch_github_workflows, _fetch_github_artifacts, _check_quantum_bot_status)
 """
 
 import sys
@@ -26,8 +30,14 @@ sys.path.insert(0, AI_MODELS_DIR)
 
 import json
 import pytest
+from unittest.mock import patch, MagicMock
 
-from ui.web_dashboard import create_app
+from ui.web_dashboard import (
+    create_app,
+    _fetch_github_workflows,
+    _fetch_github_artifacts,
+    _check_quantum_bot_status,
+)
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
 
@@ -504,3 +514,326 @@ class TestGoLive:
     def test_dashboard_html_contains_bot_catalog(self, client):
         resp = client.get("/")
         assert b"bot-catalog" in resp.data
+
+    def test_dashboard_html_contains_workflow_monitor(self, client):
+        resp = client.get("/")
+        assert b"workflow" in resp.data.lower() or b"Workflow" in resp.data
+
+    def test_dashboard_html_contains_quantum_section(self, client):
+        resp = client.get("/")
+        assert b"quantum" in resp.data.lower() or b"Quantum" in resp.data
+
+
+# ===========================================================================
+# 11. /api/github/workflows (read-only, GitHub Actions integration)
+# ===========================================================================
+
+class TestGitHubWorkflowsEndpoint:
+    def test_endpoint_returns_200(self, client):
+        resp = client.get("/api/github/workflows")
+        assert resp.status_code == 200
+
+    def test_response_has_runs_key(self, client):
+        data = json.loads(client.get("/api/github/workflows").data)
+        assert "runs" in data
+
+    def test_response_has_source_key(self, client):
+        data = json.loads(client.get("/api/github/workflows").data)
+        assert "source" in data
+
+    def test_runs_is_list(self, client):
+        data = json.loads(client.get("/api/github/workflows").data)
+        assert isinstance(data["runs"], list)
+
+    def test_no_exception_without_token(self, client):
+        """Endpoint must not raise even when GITHUB_TOKEN is absent."""
+        import os
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
+        with patch.dict(os.environ, env, clear=True):
+            resp = client.get("/api/github/workflows")
+        assert resp.status_code == 200
+
+    def test_mocked_github_api_success(self, client):
+        fake_run = {
+            "id": 1,
+            "name": "CI",
+            "workflow_id": 10,
+            "status": "completed",
+            "conclusion": "success",
+            "head_branch": "main",
+            "event": "push",
+            "run_started_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:01:00Z",
+            "html_url": "https://github.com/example/run/1",
+        }
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"workflow_runs": [fake_run], "total_count": 1}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_workflows(repo="owner/repo")
+        assert data["source"] == "github_api"
+        assert len(data["runs"]) == 1
+        assert data["runs"][0]["name"] == "CI"
+        assert data["runs"][0]["conclusion"] == "success"
+
+    def test_mocked_github_api_non_200(self, client):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 403
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_workflows(repo="owner/repo")
+        assert data["source"] == "unavailable"
+        assert data["runs"] == []
+
+    def test_mocked_github_api_exception(self, client):
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.side_effect = Exception("network error")
+            data = _fetch_github_workflows(repo="owner/repo")
+        assert data["source"] == "unavailable"
+        assert data["runs"] == []
+
+    def test_workflow_run_fields_present(self, client):
+        """Each run dict must include all expected keys."""
+        fake_run = {
+            "id": 99,
+            "name": "Test",
+            "workflow_id": 5,
+            "status": "in_progress",
+            "conclusion": None,
+            "head_branch": "feature",
+            "event": "pull_request",
+            "run_started_at": None,
+            "updated_at": None,
+            "html_url": None,
+        }
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"workflow_runs": [fake_run], "total_count": 1}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_workflows(repo="owner/repo")
+        run = data["runs"][0]
+        for key in ("id", "name", "status", "conclusion", "branch", "event", "url"):
+            assert key in run
+
+
+# ===========================================================================
+# 12. /api/github/artifacts (read-only, GitHub Actions integration)
+# ===========================================================================
+
+class TestGitHubArtifactsEndpoint:
+    def test_endpoint_returns_200(self, client):
+        resp = client.get("/api/github/artifacts")
+        assert resp.status_code == 200
+
+    def test_response_has_artifacts_key(self, client):
+        data = json.loads(client.get("/api/github/artifacts").data)
+        assert "artifacts" in data
+
+    def test_response_has_source_key(self, client):
+        data = json.loads(client.get("/api/github/artifacts").data)
+        assert "source" in data
+
+    def test_artifacts_is_list(self, client):
+        data = json.loads(client.get("/api/github/artifacts").data)
+        assert isinstance(data["artifacts"], list)
+
+    def test_no_exception_without_token(self, client):
+        import os
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
+        with patch.dict(os.environ, env, clear=True):
+            resp = client.get("/api/github/artifacts")
+        assert resp.status_code == 200
+
+    def test_mocked_artifacts_success(self, client):
+        fake_artifact = {
+            "id": 42,
+            "name": "bot-logs",
+            "size_in_bytes": 2048,
+            "created_at": "2024-01-01T00:00:00Z",
+            "expires_at": "2024-02-01T00:00:00Z",
+            "expired": False,
+            "url": "https://api.github.com/repos/owner/repo/actions/artifacts/42",
+        }
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"artifacts": [fake_artifact], "total_count": 1}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_artifacts(repo="owner/repo")
+        assert data["source"] == "github_api"
+        assert len(data["artifacts"]) == 1
+        assert data["artifacts"][0]["name"] == "bot-logs"
+
+    def test_mocked_artifacts_non_200(self, client):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_artifacts(repo="owner/repo")
+        assert data["source"] == "unavailable"
+        assert data["artifacts"] == []
+
+    def test_mocked_artifacts_exception(self, client):
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.side_effect = ConnectionError("timeout")
+            data = _fetch_github_artifacts(repo="owner/repo")
+        assert data["source"] == "unavailable"
+        assert data["artifacts"] == []
+
+    def test_artifact_fields_present(self, client):
+        fake_artifact = {
+            "id": 1,
+            "name": "logs",
+            "size_in_bytes": 512,
+            "created_at": "2024-01-01T00:00:00Z",
+            "expires_at": "2024-02-01T00:00:00Z",
+            "expired": False,
+            "url": "https://example.com",
+        }
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"artifacts": [fake_artifact], "total_count": 1}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            data = _fetch_github_artifacts(repo="owner/repo")
+        art = data["artifacts"][0]
+        for key in ("id", "name", "size_in_bytes", "created_at", "expires_at", "expired"):
+            assert key in art
+
+
+# ===========================================================================
+# 13. /api/quantum/status (Quantum Bot health check, read-only)
+# ===========================================================================
+
+class TestQuantumStatusEndpoint:
+    def test_endpoint_returns_200(self, client):
+        resp = client.get("/api/quantum/status")
+        assert resp.status_code == 200
+
+    def test_response_has_status_key(self, client):
+        data = json.loads(client.get("/api/quantum/status").data)
+        assert "status" in data
+
+    def test_response_has_bot_key(self, client):
+        data = json.loads(client.get("/api/quantum/status").data)
+        assert "bot" in data
+
+    def test_response_has_checked_at(self, client):
+        data = json.loads(client.get("/api/quantum/status").data)
+        assert "checked_at" in data
+
+    def test_quantum_status_ok(self, client):
+        data = json.loads(client.get("/api/quantum/status").data)
+        assert data["status"] in ("ok", "error")
+
+    def test_check_quantum_bot_returns_dict(self):
+        result = _check_quantum_bot_status()
+        assert isinstance(result, dict)
+
+    def test_check_quantum_bot_has_required_keys(self):
+        result = _check_quantum_bot_status()
+        assert "status" in result
+        assert "bot" in result
+        assert "checked_at" in result
+
+    def test_check_quantum_bot_status_ok_has_engines(self):
+        result = _check_quantum_bot_status()
+        if result["status"] == "ok":
+            assert "engines" in result
+            assert isinstance(result["engines"], list)
+            assert len(result["engines"]) > 0
+
+    def test_check_quantum_bot_never_raises(self):
+        """_check_quantum_bot_status must never propagate exceptions."""
+        try:
+            result = _check_quantum_bot_status()
+            assert isinstance(result, dict)
+        except Exception as exc:
+            pytest.fail(f"_check_quantum_bot_status raised unexpectedly: {exc}")
+
+    def test_check_quantum_bot_error_has_reason(self):
+        """When import fails the response must contain a reason."""
+        import builtins
+        import ui.web_dashboard as _wdash
+        real_import = builtins.__import__
+
+        def _fail_import(name, *args, **kwargs):
+            if "quantum_ai_bot" in name:
+                raise ImportError("simulated import failure")
+            return real_import(name, *args, **kwargs)
+
+        # Clear the module-level cache so the mocked import path is exercised
+        _wdash._quantum_cache.clear()
+        with patch("builtins.__import__", side_effect=_fail_import):
+            result = _check_quantum_bot_status()
+        assert result["status"] == "error"
+        assert "reason" in result
+
+
+# ===========================================================================
+# 14. Helper function unit tests (_fetch_github_workflows / _fetch_github_artifacts)
+# ===========================================================================
+
+class TestFetchGitHubHelpers:
+    def test_fetch_workflows_returns_dict(self):
+        result = _fetch_github_workflows()
+        assert isinstance(result, dict)
+
+    def test_fetch_artifacts_returns_dict(self):
+        result = _fetch_github_artifacts()
+        assert isinstance(result, dict)
+
+    def test_fetch_workflows_graceful_without_requests(self):
+        with patch("ui.web_dashboard._REQUESTS_AVAILABLE", False):
+            result = _fetch_github_workflows()
+        assert result["source"] == "unavailable"
+        assert result["runs"] == []
+
+    def test_fetch_artifacts_graceful_without_requests(self):
+        with patch("ui.web_dashboard._REQUESTS_AVAILABLE", False):
+            result = _fetch_github_artifacts()
+        assert result["source"] == "unavailable"
+        assert result["artifacts"] == []
+
+    def test_fetch_workflows_per_page_param(self):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"workflow_runs": [], "total_count": 0}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            _fetch_github_workflows(per_page=5)
+        call_kwargs = mock_req.get.call_args
+        assert call_kwargs[1]["params"]["per_page"] == 5
+
+    def test_fetch_artifacts_per_page_param(self):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"artifacts": [], "total_count": 0}
+        with patch("ui.web_dashboard._requests") as mock_req:
+            mock_req.get.return_value = mock_resp
+            _fetch_github_artifacts(per_page=3)
+        call_kwargs = mock_req.get.call_args
+        assert call_kwargs[1]["params"]["per_page"] == 3
+
+    def test_github_headers_include_accept(self):
+        from ui.web_dashboard import _github_headers
+        headers = _github_headers()
+        assert "Accept" in headers
+        assert headers["Accept"] == "application/vnd.github+json"
+
+    def test_github_headers_include_auth_when_token_set(self):
+        from ui.web_dashboard import _github_headers
+        with patch.dict(__import__("os").environ, {"GITHUB_TOKEN": "test_token_xyz"}):
+            headers = _github_headers()
+        assert "Authorization" in headers
+        assert "test_token_xyz" in headers["Authorization"]
+
+    def test_github_headers_no_auth_without_token(self):
+        from ui.web_dashboard import _github_headers
+        import os
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
+        with patch.dict(os.environ, env, clear=True):
+            headers = _github_headers()
+        assert "Authorization" not in headers
