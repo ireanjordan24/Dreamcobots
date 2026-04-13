@@ -8,7 +8,7 @@ BOT_FEATURES = {
         "basic property search",
         "price estimate",
         "cap rate calculator",
-        "multi-platform property search (Zillow, Facebook Marketplace, county tax, auctions)",
+        "multi-platform property search (Zillow + Facebook Marketplace only)",
     ],
     Tier.PRO.value: [
         "10 locations",
@@ -17,7 +17,7 @@ BOT_FEATURES = {
         "market trends",
         "cash flow analysis",
         "rental comps",
-        "multi-platform property search across all platforms",
+        "multi-platform property search across all 5 platforms (+ county tax, auctions, Realtor.com)",
         "house flip pipeline (acquire → renovate → list on 5 platforms)",
         "outreach script generator (owners + city housing departments)",
     ],

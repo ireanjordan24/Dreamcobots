@@ -459,10 +459,14 @@ class TestOutreachBot:
 
     def test_partnership_proposal_total_monthly(self):
         bot = OutreachBot(Tier.PRO)
+        unit_count = 4
+        monthly_per_unit = 900
         result = bot.generate_partnership_proposal(
-            partner_name="Test Org", city="Detroit", unit_count=4, monthly_per_unit=900
+            partner_name="Test Org", city="Detroit",
+            unit_count=unit_count, monthly_per_unit=monthly_per_unit
         )
-        assert "3600" in result  # 4 * 900 = 3600
+        expected_total = str(unit_count * monthly_per_unit)  # "3600"
+        assert expected_total in result
 
 
 # ============================================================

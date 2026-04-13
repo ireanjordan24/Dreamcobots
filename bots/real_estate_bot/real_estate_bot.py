@@ -854,7 +854,10 @@ class RealEstateBot:
             raise RealEstateBotTierError("Government contract matching requires ENTERPRISE tier.")
         programs = self.gov_matcher.find_matching_programs(property_dict)
         grants = self.gov_matcher.find_grants(property_dict)
-        best_income = self.gov_matcher.calculate_monthly_income(property_dict, programs[0]["id"]) if programs else {}
+        best_income = (
+            self.gov_matcher.calculate_monthly_income(property_dict, programs[0]["id"])
+            if len(programs) > 0 else {}
+        )
         revenue_matches = self.revenue_engine.match(property_dict, programs)
         return {
             "address": property_dict.get("address", "Unknown"),
