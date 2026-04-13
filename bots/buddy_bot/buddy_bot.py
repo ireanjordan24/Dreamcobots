@@ -89,6 +89,7 @@ from bots.buddy_bot.tiers import (
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
     ConversationTone,
+    CommunicationContext,
     SUPPORTED_LANGUAGES,
 )
 from bots.buddy_bot.emotion_engine import (
@@ -656,8 +657,58 @@ class BuddyBot:
         return self.conversation.list_supported_languages()
 
     # ------------------------------------------------------------------
-    # Creativity features
+    # Adaptive context: casual ↔ business language switching
     # ------------------------------------------------------------------
+
+    def set_communication_context(self, context: str) -> dict:
+        """
+        Set the communication context for Buddy's language register.
+
+        Parameters
+        ----------
+        context : str
+            ``"casual"`` — relaxed, slang-friendly responses.
+            ``"business"`` — professional, polished, profanity-free responses.
+
+        Returns
+        -------
+        dict
+            Confirmation with the new context value.
+        """
+        try:
+            ctx = CommunicationContext(context.lower())
+        except ValueError:
+            raise ValueError(
+                f"Invalid context '{context}'. Choose 'casual' or 'business'."
+            )
+        self.conversation.set_context(ctx)
+        return {"context": ctx.value, "status": "updated"}
+
+    def get_communication_context(self) -> dict:
+        """Return the current communication context."""
+        return {
+            "context": self.conversation.context.value,
+            "auto_detect": self.conversation.auto_detect_context,
+        }
+
+    def detect_communication_context(self, text: str) -> dict:
+        """
+        Analyse *text* and return the detected communication context
+        without modifying the engine state.
+
+        Parameters
+        ----------
+        text : str
+            A message or phrase to analyse.
+
+        Returns
+        -------
+        dict
+            ``{"detected_context": "casual" | "business"}``
+        """
+        ctx = self.conversation.detect_context(text)
+        return {"detected_context": ctx.value}
+
 
     def start_story(
         self,

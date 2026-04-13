@@ -10,6 +10,8 @@ Handles natural, human-like dialogue including:
   • AI conflict resolution and mediation for difficult conversations
   • Sarcasm / irony detection
   • Conversational humor integration (witty remarks, light banter)
+  • Adaptive context awareness: CASUAL (slang-friendly) vs BUSINESS (professional, profanity-free)
+  • Automatic context detection from user input keywords
 
 GLOBAL AI SOURCES FLOW: this module participates in GlobalAISourcesFlow
 via BuddyBot.
@@ -17,6 +19,7 @@ via BuddyBot.
 
 from __future__ import annotations
 
+import re
 import random
 from dataclasses import dataclass, field
 from enum import Enum
@@ -36,6 +39,78 @@ class ConversationTone(Enum):
     EXCITED = "excited"
     SERIOUS = "serious"
     ENCOURAGING = "encouraging"
+
+
+# ---------------------------------------------------------------------------
+# Communication context (adaptive language mode)
+# ---------------------------------------------------------------------------
+
+class CommunicationContext(Enum):
+    """
+    Controls Buddy's language register for the current interaction.
+
+    CASUAL  — slang-friendly, relaxed, uses colloquial expressions.
+    BUSINESS — polished, professional; no profanity; structured etiquette.
+    """
+    CASUAL = "casual"
+    BUSINESS = "business"
+
+
+# Keywords that signal a professional / business context
+_BUSINESS_CONTEXT_SIGNALS: frozenset[str] = frozenset({
+    "proposal", "contract", "invoice", "client", "deal", "leads", "enterprise",
+    "meeting", "conference", "presentation", "report", "revenue", "budget",
+    "negotiate", "stakeholder", "deliverable", "milestone", "roi", "kpi",
+    "strategy", "partner", "acquisition", "agreement", "pitch", "investor",
+    "quarterly", "annual", "compliance", "legal", "policy",
+})
+
+# Slang look-up table: user slang → Buddy's casual-friendly translation
+_SLANG_MAP: dict[str, str] = {
+    "bruh": "Hey",
+    "bro": "Hey",
+    "sis": "Hey",
+    "fam": "Hey",
+    "lowkey": "honestly",
+    "highkey": "definitely",
+    "lit": "amazing",
+    "fire": "outstanding",
+    "slay": "crush it",
+    "vibe": "feel",
+    "vibes": "energy",
+    "drip": "style",
+    "cap": "lie",
+    "no cap": "for real",
+    "bussin": "really good",
+    "goat": "the best",
+    "flex": "show off",
+    "bet": "sounds good",
+    "fr fr": "seriously",
+    "ngl": "to be honest",
+    "imo": "in my opinion",
+    "fomo": "fear of missing out",
+    "salty": "upset",
+    "ghost": "ignore",
+    "clout": "influence",
+    "sus": "suspicious",
+    "periodt": "period — end of story",
+    "woke": "socially aware",
+    "rizz": "charm",
+    "snatched": "on point",
+    "yeet": "toss",
+    "simp": "someone overly devoted",
+    "ghosting": "ignoring someone",
+    "mood": "totally relatable",
+    "catch feelings": "develop emotions",
+    "hit different": "feel unique",
+}
+
+# Light profanity word list for business context filtering
+_PROFANITY_WORDS: frozenset[str] = frozenset({
+    "damn", "hell", "ass", "crap", "shit", "fuck", "bitch", "bastard",
+    "damnit", "goddamn", "wtf", "bs", "bullshit", "pissed", "piss",
+    "bloody", "cunt", "dick", "cock", "jackass", "motherfucker", "asshole",
+})
 
 
 # ---------------------------------------------------------------------------
@@ -222,6 +297,10 @@ class ConversationEngine:
         ISO 639-1 language code for the primary conversation language.
     humor_probability : float
         Probability (0–1) of inserting a humorous response when appropriate.
+    context : CommunicationContext
+        Initial communication context (CASUAL or BUSINESS).
+    auto_detect_context : bool
+        If True, automatically switch context based on user input keywords.
     """
 
     def __init__(
@@ -229,11 +308,86 @@ class ConversationEngine:
         enable_fillers: bool = True,
         active_language: str = "en",
         humor_probability: float = 0.15,
+        context: CommunicationContext = CommunicationContext.CASUAL,
+        auto_detect_context: bool = True,
     ) -> None:
         self.enable_fillers = enable_fillers
         self.active_language = active_language
         self.humor_probability = humor_probability
+        self.context = context
+        self.auto_detect_context = auto_detect_context
         self._history: list[ConversationTurn] = []
+
+    # ------------------------------------------------------------------
+    # Adaptive context helpers
+    # ------------------------------------------------------------------
+
+    def detect_context(self, text: str) -> CommunicationContext:
+        """
+        Detect whether *text* belongs to a business or casual context.
+
+        Returns
+        -------
+        CommunicationContext
+        """
+        lower = text.lower()
+        tokens = set(lower.split())
+        if tokens & _BUSINESS_CONTEXT_SIGNALS:
+            return CommunicationContext.BUSINESS
+        return CommunicationContext.CASUAL
+
+    def set_context(self, context: CommunicationContext) -> None:
+        """Manually override the current communication context."""
+        self.context = context
+
+    def sanitize_for_business(self, text: str) -> str:
+        """
+        Remove profanity from *text* when in BUSINESS context.
+
+        Replaces profane words with a professional placeholder so the
+        response always maintains polished, client-ready language.
+
+        Parameters
+        ----------
+        text : str
+            Raw text that may contain profanity.
+
+        Returns
+        -------
+        str
+            Cleaned text safe for professional / business use.
+        """
+        words = text.split()
+        cleaned = []
+        for word in words:
+            stripped = word.strip(".,!?;:\"'").lower()
+            if stripped in _PROFANITY_WORDS:
+                cleaned.append("[noted]")
+            else:
+                cleaned.append(word)
+        return " ".join(cleaned)
+
+    def adapt_slang(self, text: str) -> str:
+        """
+        Translate known slang terms in *text* into standard English so
+        Buddy can acknowledge them naturally in casual mode.
+
+        Parameters
+        ----------
+        text : str
+            User's raw input that may include slang.
+
+        Returns
+        -------
+        str
+            Text with slang mapped to friendly equivalents.
+        """
+        result = text
+        for slang, standard in _SLANG_MAP.items():
+            # Case-insensitive whole-word replacement
+            pattern = re.compile(r'\b' + re.escape(slang) + r'\b', re.IGNORECASE)
+            result = pattern.sub(standard, result)
+        return result
 
     # ------------------------------------------------------------------
     # Core response generation
@@ -248,6 +402,12 @@ class ConversationEngine:
         """
         Generate a conversational response to *user_input*.
 
+        Automatically adjusts language register based on the active
+        ``CommunicationContext``:
+
+        * **CASUAL** — mirrors the user's relaxed, slang-friendly tone.
+        * **BUSINESS** — delivers a polished, profanity-free professional reply.
+
         Parameters
         ----------
         user_input : str
@@ -261,6 +421,16 @@ class ConversationEngine:
         -------
         ConversationTurn
         """
+        # Auto-detect context from user input if enabled
+        if self.auto_detect_context:
+            detected = self.detect_context(user_input)
+            if detected == CommunicationContext.BUSINESS:
+                self.context = CommunicationContext.BUSINESS
+
+        # Sanitize profanity when in business mode
+        if self.context == CommunicationContext.BUSINESS:
+            user_input = self.sanitize_for_business(user_input)
+
         filler = ""
         used_filler = False
         if self.enable_fillers and random.random() < 0.25:
@@ -271,6 +441,12 @@ class ConversationEngine:
 
         if inject_humor or (tone == ConversationTone.HUMOROUS and random.random() < self.humor_probability):
             base_response = random.choice(HUMOR_RESPONSES) + " " + base_response
+
+        # In BUSINESS mode, strip fillers and ensure professional opening
+        if self.context == CommunicationContext.BUSINESS:
+            filler = ""
+            used_filler = False
+            base_response = self._apply_business_polish(base_response)
 
         response = filler + base_response
 
@@ -283,6 +459,24 @@ class ConversationEngine:
         )
         self._history.append(turn)
         return turn
+
+    def _apply_business_polish(self, text: str) -> str:
+        """Ensure the response opens with professional framing."""
+        professional_openers = [
+            "Certainly. ",
+            "Understood. ",
+            "Absolutely. ",
+            "Of course. ",
+            "Thank you for bringing this to my attention. ",
+        ]
+        # Only prepend an opener if the text doesn't already start formally
+        lower = text.lstrip().lower()
+        formal_starts = ("certainly", "understood", "absolutely", "of course",
+                         "thank you", "i would", "please", "let me", "i'll")
+        if not any(lower.startswith(s) for s in formal_starts):
+            text = random.choice(professional_openers) + text
+        return text
+
 
     def _generate_response(self, user_input: str, tone: ConversationTone) -> str:
         """Build a tone-appropriate response string."""
@@ -439,6 +633,8 @@ class ConversationEngine:
             "active_language": self.active_language,
             "enable_fillers": self.enable_fillers,
             "humor_probability": self.humor_probability,
+            "context": self.context.value,
+            "auto_detect_context": self.auto_detect_context,
             "history_turns": len(self._history),
             "supported_languages": len(SUPPORTED_LANGUAGES),
         }
