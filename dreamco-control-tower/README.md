@@ -171,7 +171,7 @@ dreamco-control-tower/
     └── (place .java bot files here)
 ```
 
-The CI pipeline (`language-specific-lint.yml`) runs **Checkstyle** and **google-java-format** checks against `java_bots/` whenever `.java` files are changed.
+The CI pipeline (`language-specific-lint.yml`) runs **Checkstyle** and **google-java-format** checks against `java-bots/` whenever `.java` files are changed.
 
 ### Python Bots
 
@@ -183,7 +183,7 @@ dreamco-control-tower/
     └── (place .py bot files here)
 ```
 
-The CI pipeline runs **Flake8** and **Black** format checks against `python_bots/` whenever `.py` files are changed.
+The CI pipeline runs **Flake8** and **Black** format checks against `python-bots/` whenever `.py` files are changed.
 
 | Language | Directory | Linter | Formatter |
 |----------|-----------|--------|-----------|
