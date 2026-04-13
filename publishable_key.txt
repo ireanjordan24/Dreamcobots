@@ -1,3 +1,14 @@
-# Publishable Key
+# Stripe Publishable Key
 
-The publishable key for the Dreamcobots project is: `pk_live_51T2MeW1lCBsH8`
+The Stripe publishable key (safe to use on the client side) must be stored
+in the environment or a secrets manager — never hard-coded in source files.
+
+Configure it as a GitHub Actions secret named `STRIPE_PUBLISHABLE_KEY` and
+reference it in your application via:
+
+```
+STRIPE_PUBLISHABLE_KEY=pk_live_...   # production
+STRIPE_PUBLISHABLE_KEY=pk_test_...   # test / staging
+```
+
+See docs/stripe.md for full setup instructions.

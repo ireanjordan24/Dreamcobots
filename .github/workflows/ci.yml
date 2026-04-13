@@ -35,6 +35,15 @@ jobs:
         run: python tools/check_bot_framework.py
 
       - name: Run tests with pytest
+        env:
+          # Stripe credentials — set these as GitHub Actions secrets.
+          # When absent the Stripe modules run in simulation mode and
+          # all tests still pass.
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRICE_PRO: ${{ secrets.STRIPE_PRICE_PRO }}
+          STRIPE_PRICE_ENTERPRISE: ${{ secrets.STRIPE_PRICE_ENTERPRISE }}
         run: |
           python -m pytest tests/ \
             --ignore=tests/test_backend.py \
