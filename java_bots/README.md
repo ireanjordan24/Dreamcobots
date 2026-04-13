@@ -13,7 +13,7 @@ Java bots in this directory are checked with:
 
 ```bash
 # Checkstyle (download JAR first)
-java -jar checkstyle-10.21.0-all.jar -c /google_checks.xml java_bots/
+java -jar checkstyle-10.21.0-all.jar -c checkstyle.xml java_bots/
 
 # google-java-format (download JAR first)
 java -jar google-java-format-1.22.0-all-deps.jar --check java_bots/**/*.java
