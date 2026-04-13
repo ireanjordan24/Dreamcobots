@@ -460,7 +460,8 @@ class RealEstateBot:
         if state:
             results = [p for p in results if p["state"].upper() == state.upper()]
         if city and self.tier != Tier.FREE:
-            results = [p for p in results if p["city"].lower() == city.lower().replace(" ", "_")]
+            city_normalized = city.lower().replace(" ", "_")
+            results = [p for p in results if p["city"].lower() == city_normalized]
         if max_price is not None:
             results = [p for p in results if p["price"] <= max_price]
         if property_type and self.tier != Tier.FREE:
@@ -499,11 +500,12 @@ class RealEstateBot:
         if category:
             results = [p for p in results if p["category"] == category]
         if portal:
+            portal_lower = portal.lower()
             results = [
                 p for p in results
                 if (
-                    p["portal"].lower() == portal.lower()
-                    or p["portal"].lower().startswith(portal.lower() + "/")
+                    p["portal"].lower() == portal_lower
+                    or p["portal"].lower().startswith(portal_lower + "/")
                 )
             ]
         if self.tier == Tier.PRO:

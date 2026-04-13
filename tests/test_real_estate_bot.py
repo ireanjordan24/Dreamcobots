@@ -205,8 +205,7 @@ class TestFindGovHousingPrograms:
         bot = RealEstateBot(tier=Tier.ENTERPRISE)
         result = bot.find_gov_housing_programs(portal="sam.gov")
         for prog in result:
-            portal = prog["portal"].lower()
-            assert portal == "sam.gov" or portal.startswith("sam.gov/")
+            assert prog["portal"].lower() == "sam.gov"
 
     def test_result_has_required_keys(self):
         bot = RealEstateBot(tier=Tier.PRO)
@@ -217,6 +216,7 @@ class TestFindGovHousingPrograms:
 
 
 class TestCalculateHousingRevenue:
+    FLOATING_POINT_TOLERANCE = 0.01
     def test_free_tier_returns_dict(self):
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.calculate_housing_revenue(beds=3)
@@ -245,10 +245,9 @@ class TestCalculateHousingRevenue:
         assert result["monthly_net_usd"] < result["monthly_gross_usd"]
 
     def test_annual_is_twelve_times_monthly(self):
-        FLOATING_POINT_TOLERANCE = 0.01
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.calculate_housing_revenue(beds=2)
-        assert abs(result["annual_net_usd"] - result["monthly_net_usd"] * 12) < FLOATING_POINT_TOLERANCE
+        assert abs(result["annual_net_usd"] - result["monthly_net_usd"] * 12) < self.FLOATING_POINT_TOLERANCE
 
 
 class TestMatchPropertyToProgram:
