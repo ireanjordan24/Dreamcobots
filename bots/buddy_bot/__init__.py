@@ -43,6 +43,7 @@ from bots.buddy_bot.tiers import (
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
     ConversationTone,
+    CommunicationContext,
     TranslationResult,
     ConversationTurn,
 )
@@ -188,6 +189,7 @@ __all__ = [
     # Sub-engines
     "ConversationEngine",
     "ConversationTone",
+    "CommunicationContext",
     "TranslationResult",
     "ConversationTurn",
     "EmotionEngine",

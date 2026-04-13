@@ -64,6 +64,7 @@ from bots.buddy_bot.tiers import (
 from bots.buddy_bot.conversation_engine import (
     ConversationEngine,
     ConversationTone,
+    CommunicationContext,
     TranslationResult,
     ConversationTurn,
     SUPPORTED_LANGUAGES,
@@ -2407,3 +2408,152 @@ class TestBuddyBotAutonomousSaaS:
         buddy.find_leads()
         top = buddy.get_top_leads(3)
         assert len(top) <= 3
+
+
+# ===========================================================================
+# Adaptive Language / Communication Context
+# ===========================================================================
+
+class TestCommunicationContext:
+    """Tests for CommunicationContext enum and ConversationEngine context awareness."""
+
+    def test_default_context_is_casual(self):
+        engine = ConversationEngine()
+        assert engine.context == CommunicationContext.CASUAL
+
+    def test_set_context_to_business(self):
+        engine = ConversationEngine()
+        engine.set_context(CommunicationContext.BUSINESS)
+        assert engine.context == CommunicationContext.BUSINESS
+
+    def test_detect_context_business_keyword(self):
+        engine = ConversationEngine()
+        ctx = engine.detect_context("Please prepare a proposal for the client.")
+        assert ctx == CommunicationContext.BUSINESS
+
+    def test_detect_context_casual_default(self):
+        engine = ConversationEngine()
+        ctx = engine.detect_context("Yo bruh what's up")
+        assert ctx == CommunicationContext.CASUAL
+
+    def test_sanitize_profanity_in_business_mode(self):
+        engine = ConversationEngine(context=CommunicationContext.BUSINESS)
+        cleaned = engine.sanitize_for_business("Close the damn deal already!")
+        assert "damn" not in cleaned
+        assert "[noted]" in cleaned
+
+    def test_sanitize_clean_text_unchanged(self):
+        engine = ConversationEngine(context=CommunicationContext.BUSINESS)
+        text = "Please finalize the contract today."
+        assert engine.sanitize_for_business(text) == text
+
+    def test_adapt_slang_replaces_known_terms(self):
+        engine = ConversationEngine()
+        result = engine.adapt_slang("Bruh, can you hook me up with leads?")
+        assert "Bruh" not in result
+        assert "Hey" in result
+
+    def test_adapt_slang_no_cap_replacement(self):
+        engine = ConversationEngine()
+        result = engine.adapt_slang("No cap, this is fire.")
+        assert "no cap" not in result.lower()
+
+    def test_adapt_slang_case_insensitive(self):
+        engine = ConversationEngine()
+        result = engine.adapt_slang("BET that works for me.")
+        assert "sounds good" in result.lower()
+
+    def test_respond_business_mode_no_profanity_in_output(self):
+        engine = ConversationEngine(context=CommunicationContext.BUSINESS)
+        turn = engine.respond("Close the damn contract!", tone=ConversationTone.NEUTRAL)
+        assert "damn" not in turn.response.lower()
+
+    def test_respond_business_mode_no_filler(self):
+        # Business mode should never use speech fillers
+        engine = ConversationEngine(
+            enable_fillers=True,
+            context=CommunicationContext.BUSINESS,
+        )
+        for _ in range(20):
+            turn = engine.respond("Prepare the quarterly report.")
+            assert not turn.used_filler
+
+    def test_respond_auto_detect_switches_to_business(self):
+        engine = ConversationEngine(
+            context=CommunicationContext.CASUAL,
+            auto_detect_context=True,
+        )
+        engine.respond("Please send a proposal to the client.")
+        assert engine.context == CommunicationContext.BUSINESS
+
+    def test_respond_casual_mode_allows_fillers(self):
+        # With fillers enabled and many iterations, at least one should use a filler
+        engine = ConversationEngine(
+            enable_fillers=True,
+            context=CommunicationContext.CASUAL,
+            auto_detect_context=False,
+        )
+        used = False
+        for _ in range(50):
+            turn = engine.respond("Hey what can you do?")
+            if turn.used_filler:
+                used = True
+                break
+        assert used
+
+    def test_to_dict_includes_context(self):
+        engine = ConversationEngine(context=CommunicationContext.BUSINESS)
+        d = engine.to_dict()
+        assert d["context"] == "business"
+        assert "auto_detect_context" in d
+
+
+class TestBuddyBotAdaptiveContext:
+    """Tests for BuddyBot's adaptive context / language switching API."""
+
+    def test_set_communication_context_casual(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        result = buddy.set_communication_context("casual")
+        assert result["context"] == "casual"
+
+    def test_set_communication_context_business(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        result = buddy.set_communication_context("business")
+        assert result["context"] == "business"
+
+    def test_set_communication_context_invalid_raises(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        with pytest.raises(ValueError):
+            buddy.set_communication_context("invalid_mode")
+
+    def test_get_communication_context_default(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        result = buddy.get_communication_context()
+        assert result["context"] == "casual"
+        assert "auto_detect" in result
+
+    def test_detect_communication_context_business(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        result = buddy.detect_communication_context(
+            "Please prepare a contract for the enterprise client."
+        )
+        assert result["detected_context"] == "business"
+
+    def test_detect_communication_context_casual(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        result = buddy.detect_communication_context("Hey, what's up?")
+        assert result["detected_context"] == "casual"
+
+    def test_business_context_chat_no_cursing(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        buddy.set_communication_context("business")
+        result = buddy.chat("Close this damn deal", tone="neutral")
+        assert "damn" not in result["message"].lower()
+
+    def test_context_persists_across_chats(self):
+        buddy = BuddyBot(tier=Tier.FREE)
+        buddy.set_communication_context("business")
+        for _ in range(3):
+            result = buddy.chat("Follow up with the client.")
+            assert result["message"]  # non-empty response
+        assert buddy.get_communication_context()["context"] == "business"
