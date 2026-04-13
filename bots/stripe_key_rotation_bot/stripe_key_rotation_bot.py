@@ -539,8 +539,14 @@ class StripeKeyRotationBot:
             stripe.api_key = self._stripe_key
             stripe.checkout.Session.create(
                 mode="payment",
-                line_items=[{"price_data": {"currency": "usd", "unit_amount": 100,
-                                             "product_data": {"name": "smoke"}}, "quantity": 1}],
+                line_items=[{
+                    "price_data": {
+                        "currency": "usd",
+                        "unit_amount": 100,
+                        "product_data": {"name": "smoke"},
+                    },
+                    "quantity": 1,
+                }],
                 success_url="https://dreamco.ai/success",
                 cancel_url="https://dreamco.ai/cancel",
             )

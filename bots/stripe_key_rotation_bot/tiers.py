@@ -64,6 +64,8 @@ class TierConfig:
     price_usd_monthly: float
     features: list = field(default_factory=list)
     support_level: str = "Community"
+    # Days between automatic scheduled rotations; None means manual-only.
+    # Used by the GitHub Actions workflow cron schedule.
     rotation_interval_days: Optional[int] = None
 
     def has_feature(self, feature: str) -> bool:
