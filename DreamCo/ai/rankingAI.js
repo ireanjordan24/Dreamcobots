@@ -10,26 +10,39 @@ function score(item) {
   const effort = parseInt(item.effort || 3, 10);
   const fastPayout = Boolean(item.fast_payout || item.fastPayout);
 
-  if (profit > 100) s += 40;
-  else if (profit > 50) s += 30;
-  else if (profit > 20) s += 20;
-  else if (profit > 5) s += 10;
+  if (profit > 100) {
+    s += 40;
+  } else if (profit > 50) {
+    s += 30;
+  } else if (profit > 20) {
+    s += 20;
+  } else if (profit > 5) {
+    s += 10;
+  }
 
-  if (effort <= 1) s += 30;
-  else if (effort === 2) s += 20;
-  else s += 5;
+  if (effort <= 1) {
+    s += 30;
+  } else if (effort === 2) {
+    s += 20;
+  } else {
+    s += 5;
+  }
 
-  if (fastPayout) s += 20;
+  if (fastPayout) {
+    s += 20;
+  }
 
   const category = (item.category || '').toLowerCase();
-  if (category === 'electronics' || category === 'appliances') s += 10;
+  if (category === 'electronics' || category === 'appliances') {
+    s += 10;
+  }
 
   return Math.min(s, 100);
 }
 
 function rank(items) {
   return items
-    .map(item => ({ ...item, rankScore: score(item) }))
+    .map((item) => ({ ...item, rankScore: score(item) }))
     .sort((a, b) => b.rankScore - a.rankScore);
 }
 

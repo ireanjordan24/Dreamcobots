@@ -137,6 +137,15 @@ const realEstate = {
   },
 };
 
-const SCHEMAS = { deals, flips, pennyDeals, receipts, legalPayouts, grants, fiverrGigs, realEstate };
+const SCHEMAS = {
+  deals,
+  flips,
+  pennyDeals,
+  receipts,
+  legalPayouts,
+  grants,
+  fiverrGigs,
+  realEstate,
+};
 
 module.exports = SCHEMAS;

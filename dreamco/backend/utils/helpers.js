@@ -4,15 +4,15 @@
  * Shared utility functions for formatting, ID generation, and CSV export.
  */
 
-const { randomUUID } = require("crypto");
+const { randomUUID } = require('crypto');
 
 /**
  * Generate a unique ID string.
  * @returns {string}
  */
 function generateId() {
-  if (typeof randomUUID === "function") {
-    return randomUUID().replace(/-/g, "").slice(0, 16);
+  if (typeof randomUUID === 'function') {
+    return randomUUID().replace(/-/g, '').slice(0, 16);
   }
   // Fallback for older Node versions
   return Math.random().toString(36).slice(2, 18) + Date.now().toString(36);
@@ -34,24 +34,35 @@ function formatTimestamp() {
  */
 function leadsToCSV(leads) {
   if (!leads || leads.length === 0) {
-    return "";
+    return '';
   }
 
-  const COLUMNS = ["id", "name", "email", "phone", "company", "industry", "location", "score", "source", "created_at"];
+  const COLUMNS = [
+    'id',
+    'name',
+    'email',
+    'phone',
+    'company',
+    'industry',
+    'location',
+    'score',
+    'source',
+    'created_at',
+  ];
 
-  const header = COLUMNS.join(",");
+  const header = COLUMNS.join(',');
   const rows = leads.map((lead) =>
     COLUMNS.map((col) => {
-      const val = lead[col] == null ? "" : String(lead[col]);
+      const val = lead[col] == null ? '' : String(lead[col]);
       // Escape quotes and wrap fields containing commas or quotes
-      if (val.includes(",") || val.includes('"') || val.includes("\n")) {
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
         return `"${val.replace(/"/g, '""')}"`;
       }
       return val;
-    }).join(",")
+    }).join(',')
   );
 
-  return [header, ...rows].join("\n");
+  return [header, ...rows].join('\n');
 }
 
 /**
@@ -60,7 +71,9 @@ function leadsToCSV(leads) {
  * @returns {boolean}
  */
 function isValidEmail(email) {
-  if (!email || typeof email !== "string") return false;
+  if (!email || typeof email !== 'string') {
+    return false;
+  }
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 

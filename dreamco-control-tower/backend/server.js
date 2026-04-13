@@ -8,13 +8,13 @@
  *   GET  /api/status               — overall system health
  */
 
-import express from "express";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_FILE = path.join(__dirname, "../config/bots.json");
+const BOTS_FILE = path.join(__dirname, '../config/bots.json');
 
 const app = express();
 app.use(express.json());
@@ -24,7 +24,7 @@ app.use(express.json());
 // ---------------------------------------------------------------------------
 
 function readBots() {
-  return JSON.parse(fs.readFileSync(BOTS_FILE, "utf8"));
+  return JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
 }
 
 function writeBots(bots) {
@@ -35,11 +35,11 @@ function writeBots(bots) {
 // Heartbeat endpoint
 // Bots POST here to signal they are online and operational.
 // ---------------------------------------------------------------------------
-app.post("/api/bot-heartbeat", (req, res) => {
-  const { botName, status = "active" } = req.body;
+app.post('/api/bot-heartbeat', (req, res) => {
+  const { botName, status = 'active' } = req.body;
 
   if (!botName) {
-    return res.status(400).json({ error: "botName is required" });
+    return res.status(400).json({ error: 'botName is required' });
   }
 
   const bots = readBots();
@@ -54,52 +54,52 @@ app.post("/api/bot-heartbeat", (req, res) => {
   writeBots(bots);
 
   console.log(`💓 Heartbeat received from ${botName} — status: ${status}`);
-  return res.json({ status: "updated", bot: botName, lastHeartbeat: bot.lastHeartbeat });
+  return res.json({ status: 'updated', bot: botName, lastHeartbeat: bot.lastHeartbeat });
 });
 
 // ---------------------------------------------------------------------------
 // GitHub webhook endpoint
 // Receives events from GitHub: push, pull_request, issues, workflow_run, etc.
 // ---------------------------------------------------------------------------
-app.post("/api/github-webhook", (req, res) => {
-  const event = req.headers["x-github-event"] || "unknown";
+app.post('/api/github-webhook', (req, res) => {
+  const event = req.headers['x-github-event'] || 'unknown';
   const payload = req.body;
 
   console.log(`🔔 GitHub Event: ${event}`);
 
   switch (event) {
-    case "pull_request": {
+    case 'pull_request': {
       const action = payload.action;
       const pr = payload.pull_request;
       console.log(`  PR #${pr?.number} ${action}: ${pr?.title}`);
 
-      if (action === "closed" && pr?.merged) {
-        console.log(`  ✅ PR merged — triggering dependent bot updates`);
+      if (action === 'closed' && pr?.merged) {
+        console.log('  ✅ PR merged — triggering dependent bot updates');
         // Future: trigger auto-upgrade for dependent bots
       }
       break;
     }
 
-    case "issues": {
+    case 'issues': {
       const issue = payload.issue;
       const label = payload.label?.name;
-      if (payload.action === "labeled" && label === "bug") {
+      if (payload.action === 'labeled' && label === 'bug') {
         console.log(`  🐛 Issue #${issue?.number} labeled 'bug' — scheduling auto-fix`);
         // Future: trigger auto-heal script
       }
       break;
     }
 
-    case "workflow_run": {
+    case 'workflow_run': {
       const wf = payload.workflow_run;
-      if (wf?.conclusion === "failure") {
+      if (wf?.conclusion === 'failure') {
         console.log(`  ❌ Workflow '${wf?.name}' failed — triggering self-heal`);
         // Future: trigger self-healing automation
       }
       break;
     }
 
-    case "push": {
+    case 'push': {
       const ref = payload.ref;
       const commits = payload.commits?.length ?? 0;
       console.log(`  📦 Push to ${ref}: ${commits} commit(s)`);
@@ -116,7 +116,7 @@ app.post("/api/github-webhook", (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/bots — list all bots with current status
 // ---------------------------------------------------------------------------
-app.get("/api/bots", (_req, res) => {
+app.get('/api/bots', (_req, res) => {
   const bots = readBots();
   return res.json(bots);
 });
@@ -124,21 +124,23 @@ app.get("/api/bots", (_req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/status — overall system health summary
 // ---------------------------------------------------------------------------
-app.get("/api/status", (_req, res) => {
+app.get('/api/status', (_req, res) => {
   const bots = readBots();
   const total = bots.length;
-  const active = bots.filter((b) => b.status === "active").length;
+  const active = bots.filter((b) => b.status === 'active').length;
   const stale = bots.filter((b) => {
-    if (!b.lastHeartbeat) return false;
+    if (!b.lastHeartbeat) {
+      return false;
+    }
     const age = Date.now() - new Date(b.lastHeartbeat).getTime();
     return age > 5 * 60 * 1000; // older than 5 minutes
   }).length;
 
   return res.json({
-    dashboard: "DreamCo Control Tower",
+    dashboard: 'DreamCo Control Tower',
     timestamp: new Date().toISOString(),
     bots: { total, active, stale },
-    health: stale > 0 ? "degraded" : "healthy",
+    health: stale > 0 ? 'degraded' : 'healthy',
   });
 });
 

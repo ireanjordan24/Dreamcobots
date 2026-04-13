@@ -9,14 +9,14 @@
  *   npm start
  */
 
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 
-const leadsRouter = require("./routes/leads");
-const botsRouter = require("./routes/bots");
-const { formatTimestamp } = require("./utils/helpers");
+const leadsRouter = require('./routes/leads');
+const botsRouter = require('./routes/bots');
+const { formatTimestamp } = require('./utils/helpers');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,30 +28,30 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend files from the /frontend directory
-app.use(express.static(path.join(__dirname, "..", "frontend")));
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // ---------------------------------------------------------------------------
 // API Routes
 // ---------------------------------------------------------------------------
-app.use("/api/leads", leadsRouter);
-app.use("/api/bots", botsRouter);
+app.use('/api/leads', leadsRouter);
+app.use('/api/bots', botsRouter);
 
 // Health check
-app.get("/api/health", (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({
-    status: "ok",
-    service: "DreamCo LeadGenBot API",
-    version: "1.0.0",
+    status: 'ok',
+    service: 'DreamCo LeadGenBot API',
+    version: '1.0.0',
     timestamp: formatTimestamp(),
-    powered_by: "DreamCo",
+    powered_by: 'DreamCo',
   });
 });
 
 // ---------------------------------------------------------------------------
 // Catch-all: serve the frontend index for any unknown route
 // ---------------------------------------------------------------------------
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 // ---------------------------------------------------------------------------

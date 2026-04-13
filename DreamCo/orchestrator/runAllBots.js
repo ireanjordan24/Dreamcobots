@@ -13,9 +13,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const {  addJob, runQueue, clear  } = require('../core/queue');
+const { addJob, runQueue, clear } = require('../core/queue');
 const registry = require('../core/botRegistry');
-const {  trackRevenue  } = require('../core/revenueEngine');
+const { trackRevenue } = require('../core/revenueEngine');
 const config = require('../core/config');
 
 const BOTS_DIR = path.join(__dirname, '..', 'bots');
@@ -27,14 +27,18 @@ const BOTS_DIR = path.join(__dirname, '..', 'bots');
  * @returns { string[] }
  */
 function collectBotFiles(dir) {
-  if (!fs.existsSync(dir)) { return []; }
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
 
   const results = [];
   const resolvedDir = path.resolve(dir);
   for (const entry of fs.readdirSync(dir)) {
     const full = path.resolve(dir, entry);
     // Safety: skip anything whose resolved path escapes the expected directory
-    if (!full.startsWith(resolvedDir + path.sep) && full !== resolvedDir) { continue; }
+    if (!full.startsWith(resolvedDir + path.sep) && full !== resolvedDir) {
+      continue;
+    }
     const stat = fs.statSync(full);
     if (stat.isDirectory()) {
       results.push(...collectBotFiles(full));
@@ -65,7 +69,7 @@ async function runAllBots() {
 
       // Ensure bot is registered
       if (!registry.getBot(botName)) {
-        registry.registerBot({  name: botName  });
+        registry.registerBot({ name: botName });
       }
 
       registry.updateStatus(botName, 'running');
@@ -73,24 +77,28 @@ async function runAllBots() {
       try {
         const botModule = require(botFile);
         if (typeof botModule.run !== 'function') {
-          throw new Error(`Bot "${ botName }" does not export a run() function`);
+          throw new Error(`Bot "${botName}" does not export a run() function`);
         }
 
-        console.log(`🤖 Running ${ botName }`);
+        console.log(`🤖 Running ${botName}`);
         const output = await botModule.run();
         const revenue = output && typeof output.revenue === 'number' ? output.revenue : 0;
 
-        registry.updateStatus(botName, revenue >= config.revenue.scaleThreshold ? 'scaling' : 'idle', revenue);
+        registry.updateStatus(
+          botName,
+          revenue >= config.revenue.scaleThreshold ? 'scaling' : 'idle',
+          revenue
+        );
 
         if (revenue > 0) {
           trackRevenue(botName, revenue);
         }
 
-        botResults.push({  bot: botName, output, error: null  });
+        botResults.push({ bot: botName, output, error: null });
       } catch (err) {
-        console.error(`❌ Error in ${ botName}: ${err.message }`);
+        console.error(`❌ Error in ${botName}: ${err.message}`);
         registry.updateStatus(botName, 'error');
-        botResults.push({  bot: botName, output: null, error: err.message  });
+        botResults.push({ bot: botName, output: null, error: err.message });
       }
     });
   }
@@ -98,10 +106,12 @@ async function runAllBots() {
   await runQueue();
 
   const totalRevenue = botResults.reduce(
-    (sum, r) => sum + (r.output ? (r.output.revenue || 0) : 0), 0,
+    (sum, r) => sum + (r.output ? r.output.revenue || 0 : 0),
+    0
   );
   const totalLeads = botResults.reduce(
-    (sum, r) => sum + (r.output ? (r.output.leads_generated || 0) : 0), 0,
+    (sum, r) => sum + (r.output ? r.output.leads_generated || 0 : 0),
+    0
   );
   const scalingBots = botResults
     .filter((r) => r.output && r.output.revenue >= config.revenue.scaleThreshold)
@@ -109,10 +119,12 @@ async function runAllBots() {
   const failedBots = botResults.filter((r) => r.error).map((r) => r.bot);
 
   console.log('\n─────────────────────────────────────');
-  console.log(`💰 Total Revenue:   $${ totalRevenue }`);
-  console.log(`📋 Total Leads:     ${ totalLeads }`);
-  console.log(`📈 Scaling Bots:    ${ scalingBots.length > 0 ? scalingBots.join(', ') : 'none' }`);
-  if (failedBots.length > 0) { console.log(`❌ Failed Bots:     ${failedBots.join(', ')}`); }
+  console.log(`💰 Total Revenue:   $${totalRevenue}`);
+  console.log(`📋 Total Leads:     ${totalLeads}`);
+  console.log(`📈 Scaling Bots:    ${scalingBots.length > 0 ? scalingBots.join(', ') : 'none'}`);
+  if (failedBots.length > 0) {
+    console.log(`❌ Failed Bots:     ${failedBots.join(', ')}`);
+  }
   console.log('─────────────────────────────────────\n');
 
   return {
@@ -128,4 +140,4 @@ async function runAllBots() {
   };
 }
 
-module.exports = {  runAllBots, collectBotFiles  };
+module.exports = { runAllBots, collectBotFiles };

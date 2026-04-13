@@ -17,7 +17,9 @@ const _registry = new Map();
  * @returns {Object} The registered bot record
  */
 function registerBot(bot) {
-  if (!bot || !bot.name) {throw new Error('Bot must have a "name" property');}
+  if (!bot || !bot.name) {
+    throw new Error('Bot must have a "name" property');
+  }
 
   const record = {
     name: bot.name,
@@ -41,7 +43,9 @@ function registerBot(bot) {
  */
 function updateStatus(name, status, revenue = 0) {
   const record = _registry.get(name);
-  if (!record) {throw new Error(`Bot "${name}" is not registered`);}
+  if (!record) {
+    throw new Error(`Bot "${name}" is not registered`);
+  }
 
   record.status = status;
   record.lastRun = new Date().toISOString();

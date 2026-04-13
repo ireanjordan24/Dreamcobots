@@ -17,7 +17,7 @@ function run(options = {}) {
       city,
       source: 'Facebook Marketplace',
     };
-  }).filter(f => f.profit >= minProfit);
+  }).filter((f) => f.profit >= minProfit);
   const revenue = flips.reduce((sum, f) => sum + f.profit, 0);
   return {
     bot: 'flipBot',

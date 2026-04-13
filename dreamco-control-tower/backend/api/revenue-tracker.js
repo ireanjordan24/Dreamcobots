@@ -8,12 +8,12 @@
  * from config/payments.json (keys are populated at deploy time via env vars).
  */
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PAYMENTS_CONFIG = path.join(__dirname, "../../config/payments.json");
+const PAYMENTS_CONFIG = path.join(__dirname, '../../config/payments.json');
 
 // In-memory ledger (replace with a persistent DB for production)
 const ledger = [];
@@ -23,7 +23,7 @@ const ledger = [];
 // ---------------------------------------------------------------------------
 
 export function getPaymentsConfig() {
-  return JSON.parse(fs.readFileSync(PAYMENTS_CONFIG, "utf8"));
+  return JSON.parse(fs.readFileSync(PAYMENTS_CONFIG, 'utf8'));
 }
 
 // ---------------------------------------------------------------------------
@@ -64,7 +64,8 @@ export function getRevenueSummary() {
 
   for (const entry of ledger) {
     byBot[entry.bot] = Math.round(((byBot[entry.bot] ?? 0) + entry.amountUsd) * 100) / 100;
-    bySource[entry.source] = Math.round(((bySource[entry.source] ?? 0) + entry.amountUsd) * 100) / 100;
+    bySource[entry.source] =
+      Math.round(((bySource[entry.source] ?? 0) + entry.amountUsd) * 100) / 100;
   }
 
   return {

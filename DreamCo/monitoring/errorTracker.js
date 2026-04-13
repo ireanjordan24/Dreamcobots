@@ -49,7 +49,9 @@ function getErrors() {
  * @returns {number}
  */
 function errorCount(context) {
-  if (!context) {return _errors.length;}
+  if (!context) {
+    return _errors.length;
+  }
   return _errors.filter((e) => e.context === context).length;
 }
 

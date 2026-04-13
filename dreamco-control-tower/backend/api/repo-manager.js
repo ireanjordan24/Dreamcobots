@@ -8,11 +8,11 @@
  *   - Issue counts
  */
 
-import { Octokit } from "@octokit/rest";
-import { readBots, writeBots } from "./bot-manager.js";
+import { Octokit } from '@octokit/rest';
+import { readBots, writeBots } from './bot-manager.js';
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const OWNER = process.env.GITHUB_OWNER || "ireanjordan24";
+const OWNER = process.env.GITHUB_OWNER || 'ireanjordan24';
 
 // ---------------------------------------------------------------------------
 // Pull request helpers
@@ -25,7 +25,7 @@ export async function getOpenPRs(repoName) {
   const { data } = await octokit.pulls.list({
     owner: OWNER,
     repo: repoName,
-    state: "open",
+    state: 'open',
     per_page: 10,
   });
   return data.map((pr) => ({
@@ -43,10 +43,10 @@ export async function getMergedPRs(repoName, limit = 5) {
   const { data } = await octokit.pulls.list({
     owner: OWNER,
     repo: repoName,
-    state: "closed",
+    state: 'closed',
     per_page: limit,
-    sort: "updated",
-    direction: "desc",
+    sort: 'updated',
+    direction: 'desc',
   });
   return data
     .filter((pr) => pr.merged_at)
@@ -73,7 +73,7 @@ export async function getRecentCommits(repoName, limit = 5) {
   });
   return data.map((c) => ({
     sha: c.sha.slice(0, 7),
-    message: c.commit.message.split("\n")[0],
+    message: c.commit.message.split('\n')[0],
     author: c.commit.author.name,
     date: c.commit.author.date,
     url: c.html_url,
@@ -94,7 +94,9 @@ export async function getLatestWorkflowRun(repoName) {
     per_page: 1,
   });
   const run = data.workflow_runs[0];
-  if (!run) return null;
+  if (!run) {
+    return null;
+  }
   return {
     id: run.id,
     name: run.name,
@@ -125,7 +127,7 @@ export async function getRepoSnapshot(bot) {
   const bots = readBots();
   const record = bots.find((b) => b.name === bot.name);
   if (record) {
-    record.workflowStatus = latestRun?.conclusion ?? "unknown";
+    record.workflowStatus = latestRun?.conclusion ?? 'unknown';
     writeBots(bots);
   }
 

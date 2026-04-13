@@ -5,19 +5,19 @@
  * stored in config/bots.json.
  */
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_FILE = path.join(__dirname, "../../config/bots.json");
+const BOTS_FILE = path.join(__dirname, '../../config/bots.json');
 
 // ---------------------------------------------------------------------------
 // Read / write helpers
 // ---------------------------------------------------------------------------
 
 export function readBots() {
-  return JSON.parse(fs.readFileSync(BOTS_FILE, "utf8"));
+  return JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
 }
 
 export function writeBots(bots) {
@@ -52,10 +52,10 @@ export function upsertBot(botData) {
     bots[index] = { ...bots[index], ...botData };
   } else {
     bots.push({
-      status: "idle",
+      status: 'idle',
       lastHeartbeat: null,
       lastPR: null,
-      workflowStatus: "unknown",
+      workflowStatus: 'unknown',
       ...botData,
     });
   }
@@ -66,10 +66,12 @@ export function upsertBot(botData) {
 /**
  * Update bot heartbeat timestamp and status.
  */
-export function updateHeartbeat(botName, status = "active") {
+export function updateHeartbeat(botName, status = 'active') {
   const bots = readBots();
   const bot = bots.find((b) => b.name === botName);
-  if (!bot) return null;
+  if (!bot) {
+    return null;
+  }
   bot.lastHeartbeat = new Date().toISOString();
   bot.status = status;
   writeBots(bots);
@@ -82,7 +84,9 @@ export function updateHeartbeat(botName, status = "active") {
 export function updateLastPR(botName, prUrl) {
   const bots = readBots();
   const bot = bots.find((b) => b.name === botName);
-  if (!bot) return null;
+  if (!bot) {
+    return null;
+  }
   bot.lastPR = prUrl;
   writeBots(bots);
   return bot;

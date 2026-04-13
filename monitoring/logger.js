@@ -32,8 +32,8 @@ function log(message, level = 'INFO') {
 /**
  * Shorthand helpers.
  */
-const info  = (msg) => log(msg, 'INFO');
-const warn  = (msg) => log(msg, 'WARN');
+const info = (msg) => log(msg, 'INFO');
+const warn = (msg) => log(msg, 'WARN');
 const error = (msg) => log(msg, 'ERROR');
 
 module.exports = { log, info, warn, error };

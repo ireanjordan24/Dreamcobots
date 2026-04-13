@@ -19,7 +19,7 @@ function validateEnv() {
   if (missing.length > 0) {
     throw new Error(
       `Missing required environment variable(s): ${missing.join(', ')}\n` +
-      'Please set them in your .env file or host environment.',
+        'Please set them in your .env file or host environment.'
     );
   }
 }
