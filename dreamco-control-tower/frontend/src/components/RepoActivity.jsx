@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 function PRBadge({ count, label }) {
   return (
@@ -14,7 +14,7 @@ export default function RepoActivity() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/bots")
+    fetch('/api/bots')
       .then((r) => r.json())
       .then((data) => {
         setBots(data);
@@ -23,7 +23,9 @@ export default function RepoActivity() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-slate-400">Loading activity…</p>;
+  if (loading) {
+    return <p className="text-slate-400">Loading activity…</p>;
+  }
 
   return (
     <div>
@@ -48,14 +50,14 @@ export default function RepoActivity() {
               <span className="text-slate-400">Latest workflow:</span>
               <span
                 className={`px-2 py-0.5 rounded-full font-medium ${
-                  bot.workflowStatus === "success"
-                    ? "bg-green-900 text-green-300"
-                    : bot.workflowStatus === "failure"
-                    ? "bg-red-900 text-red-300"
-                    : "bg-slate-700 text-slate-400"
+                  bot.workflowStatus === 'success'
+                    ? 'bg-green-900 text-green-300'
+                    : bot.workflowStatus === 'failure'
+                      ? 'bg-red-900 text-red-300'
+                      : 'bg-slate-700 text-slate-400'
                 }`}
               >
-                {bot.workflowStatus ?? "unknown"}
+                {bot.workflowStatus ?? 'unknown'}
               </span>
             </div>
           </div>

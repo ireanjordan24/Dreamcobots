@@ -1,18 +1,18 @@
-import { useState } from "react";
-import BotOverview from "./components/BotOverview.jsx";
-import RepoActivity from "./components/RepoActivity.jsx";
-import BotDeployment from "./components/BotDeployment.jsx";
-import Analytics from "./components/Analytics.jsx";
+import { useState } from 'react';
+import BotOverview from './components/BotOverview.jsx';
+import RepoActivity from './components/RepoActivity.jsx';
+import BotDeployment from './components/BotDeployment.jsx';
+import Analytics from './components/Analytics.jsx';
 
 const NAV_ITEMS = [
-  { id: "overview", label: "🤖 Bot Overview" },
-  { id: "activity", label: "📦 Repo Activity" },
-  { id: "deploy", label: "🚀 Bot Deployment" },
-  { id: "analytics", label: "📊 Analytics" },
+  { id: 'overview', label: '🤖 Bot Overview' },
+  { id: 'activity', label: '📦 Repo Activity' },
+  { id: 'deploy', label: '🚀 Bot Deployment' },
+  { id: 'analytics', label: '📊 Analytics' },
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,8 +34,8 @@ export default function App() {
               onClick={() => setActiveTab(item.id)}
               className={`text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === item.id
-                  ? "bg-dreamco-accent text-white"
-                  : "text-slate-400 hover:bg-slate-700 hover:text-white"
+                  ? 'bg-dreamco-accent text-white'
+                  : 'text-slate-400 hover:bg-slate-700 hover:text-white'
               }`}
             >
               {item.label}
@@ -45,10 +45,10 @@ export default function App() {
 
         {/* Main content */}
         <main className="flex-1 p-6 overflow-auto">
-          {activeTab === "overview" && <BotOverview />}
-          {activeTab === "activity" && <RepoActivity />}
-          {activeTab === "deploy" && <BotDeployment />}
-          {activeTab === "analytics" && <Analytics />}
+          {activeTab === 'overview' && <BotOverview />}
+          {activeTab === 'activity' && <RepoActivity />}
+          {activeTab === 'deploy' && <BotDeployment />}
+          {activeTab === 'analytics' && <Analytics />}
         </main>
       </div>
     </div>

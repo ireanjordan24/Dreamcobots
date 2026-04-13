@@ -154,3 +154,39 @@ The Python `bots/control_center/control_center.py` has been extended with:
 - `get_stale_bots()` — list bots with stale heartbeats
 - `handle_github_event(event, payload)` — process GitHub webhook events
 - `get_webhook_log(limit)` — retrieve recent webhook events
+
+---
+
+## Bot Language Categorization
+
+Bots are organized by implementation language under the `dreamco-control-tower/` directory.
+
+### Java Bots
+
+Java-based bots live in `dreamco-control-tower/java-bots/`. Each bot is a standalone `.java` file that can be compiled and executed independently.
+
+```
+dreamco-control-tower/
+└── java-bots/
+    └── (place .java bot files here)
+```
+
+The CI pipeline (`language-specific-lint.yml`) runs **Checkstyle** and **google-java-format** checks against `java-bots/` whenever `.java` files are changed.
+
+### Python Bots
+
+Python-based bots live in `dreamco-control-tower/python-bots/`. Each bot is a standalone `.py` file.
+
+```
+dreamco-control-tower/
+└── python-bots/
+    └── (place .py bot files here)
+```
+
+The CI pipeline runs **Flake8** and **Black** format checks against `python-bots/` whenever `.py` files are changed.
+
+| Language | Directory | Linter | Formatter |
+|----------|-----------|--------|-----------|
+| Java | `dreamco-control-tower/java-bots/` | Checkstyle | google-java-format |
+| Python | `dreamco-control-tower/python-bots/` | Flake8 | Black |
+| JS/TS | `dreamco-control-tower/frontend/` | ESLint | Prettier |
