@@ -12,6 +12,7 @@ on:
       - "CI"
       - "Bot CI"
       - "Python Tests"
+      - "Language-Specific Lint & Format"
     types:
       - completed
 
@@ -127,6 +128,50 @@ jobs:
           echo "🔧 Applying fix: $FIX_DESC"
           pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Apply fix — python-format (black + flake8 auto-fix)
+        if: env.FIX == 'python-format'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          pip install black flake8
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            black python_bots/
+            echo "✅ Black formatting applied to python_bots/"
+          else
+            echo "No Python files found in python_bots/ — skipping."
+          fi
+
+      - name: Apply fix — java-format (google-java-format auto-fix)
+        if: env.FIX == 'java-format'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          GJF_VERSION="1.22.0"
+          mkdir -p ~/.cache/gjf
+          JAR=~/.cache/gjf/google-java-format-${GJF_VERSION}-all-deps.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/google/google-java-format/releases/download/v${GJF_VERSION}/google-java-format-${GJF_VERSION}-all-deps.jar" \
+              -o "$JAR"
+          fi
+          JAVA_FILES=$(find java_bots -name "*.java" 2>/dev/null || true)
+          if [ -n "$JAVA_FILES" ]; then
+            # shellcheck disable=SC2086
+            java -jar "$JAR" --replace $JAVA_FILES
+            echo "✅ google-java-format applied to java_bots/"
+          else
+            echo "No Java files found in java_bots/ — skipping."
+          fi
+
+      - name: Apply fix — js-format (Prettier + ESLint auto-fix)
+        if: env.FIX == 'js-format'
+        run: |
+          echo "🔧 Applying fix: $FIX_DESC"
+          npm install --legacy-peer-deps
+          npm run lint -- --fix --ext .js,.ts,.jsx,.tsx 2>&1 || true
+          npx prettier --write \
+            --ignore-path .prettierignore \
+            "**/*.{js,ts,jsx,tsx}" 2>&1 || true
+          echo "✅ Prettier + ESLint auto-fix applied"
 
       - name: Escalate — unknown error (human review required)
         if: env.ESCALATE == 'true'

@@ -102,6 +102,30 @@ class TestAnalyzeLogs:
         bot = CIAutoFixBot()
         assert bot.analyze_logs("pip install failed for requirements.txt not found") == FixType.PIP_INSTALL
 
+    def test_python_format_black_error(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("would reformat bots/my_bot.py\nblack --check python_bots/ failed") == FixType.PYTHON_FORMAT
+
+    def test_python_format_black_check(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("Oh no! black --check found formatting issues") == FixType.PYTHON_FORMAT
+
+    def test_java_format_gjf_error(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("google-java-format: 3 files would be reformatted") == FixType.JAVA_FORMAT
+
+    def test_java_format_checkstyle_error(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("Checkstyle violation: line length > 100 in MyBot.java") == FixType.JAVA_FORMAT
+
+    def test_js_format_prettier_check(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("prettier --check failed: Code style issues found") == FixType.JS_FORMAT
+
+    def test_js_format_eslint_error(self):
+        bot = CIAutoFixBot()
+        assert bot.analyze_logs("eslint error: 5 problems (3 errors, 2 warnings)") == FixType.JS_FORMAT
+
     def test_unknown_error(self):
         bot = CIAutoFixBot()
         assert bot.analyze_logs("Something completely different went wrong") == FixType.UNKNOWN
@@ -197,6 +221,21 @@ class TestGetFixCommands:
         cmds = bot.get_fix_commands(FixType.PIP_INSTALL)
         assert any("pip" in c for c in cmds)
         assert any("requirements" in c for c in cmds)
+
+    def test_python_format_commands(self):
+        bot = CIAutoFixBot()
+        cmds = bot.get_fix_commands(FixType.PYTHON_FORMAT)
+        assert any("black" in c for c in cmds)
+
+    def test_java_format_commands(self):
+        bot = CIAutoFixBot()
+        cmds = bot.get_fix_commands(FixType.JAVA_FORMAT)
+        assert any("google-java-format" in c for c in cmds)
+
+    def test_js_format_commands(self):
+        bot = CIAutoFixBot()
+        cmds = bot.get_fix_commands(FixType.JS_FORMAT)
+        assert any("prettier" in c for c in cmds)
 
     def test_unknown_returns_empty(self):
         bot = CIAutoFixBot()
@@ -493,6 +532,9 @@ class TestRun:
         ("Permission denied: /etc/hosts", FixType.PERMISSIONS),
         ("No such file or directory: build/", FixType.PATH),
         ("pip install -r requirements.txt", FixType.PIP_INSTALL),
+        ("would reformat python_bots/my_bot.py", FixType.PYTHON_FORMAT),
+        ("google-java-format: file needs formatting", FixType.JAVA_FORMAT),
+        ("prettier --check: Code style issues found", FixType.JS_FORMAT),
         ("completely unknown error xyz", FixType.UNKNOWN),
     ])
     def test_all_fix_types(self, tmp_path, log, expected_fix):
