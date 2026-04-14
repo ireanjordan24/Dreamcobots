@@ -7,3 +7,6 @@ dist/
 build/
 .env
 node_modules/
+
+# Runtime upload artifacts
+uploads/

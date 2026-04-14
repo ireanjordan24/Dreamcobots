@@ -24,6 +24,9 @@ class FixType(str, Enum):
     PERMISSIONS = "permissions"
     PATH = "path"
     PIP_INSTALL = "pip-install"
+    PYTHON_FORMAT = "python-format"
+    JAVA_FORMAT = "java-format"
+    JS_FORMAT = "js-format"
     UNKNOWN = "unknown"
 
 
@@ -35,6 +38,14 @@ _ERROR_PATTERNS: list[tuple[re.Pattern, FixType]] = [
     (re.compile(r"Permission denied|EACCES|exit code 128", re.IGNORECASE), FixType.PERMISSIONS),
     (re.compile(r"No such file or directory|pathspec.*did not match|ENOENT", re.IGNORECASE), FixType.PATH),
     (re.compile(r"pip install|requirements\.txt.*not found", re.IGNORECASE), FixType.PIP_INSTALL),
+    # Lint / format failures (checked after dependency errors so those take priority)
+    # Java pattern checked before Python to prevent "reformatted" in gjf output matching Python rule
+    (re.compile(r"google-java-format|checkstyle.*violation|checkstyle.*error|Checkstyle", re.IGNORECASE),
+     FixType.JAVA_FORMAT),
+    (re.compile(r"would reformat|reformatted|black.*--check|flake8.*error|E[0-9]{3}\b", re.IGNORECASE),
+     FixType.PYTHON_FORMAT),
+    (re.compile(r"prettier.*--check|eslint.*error|[0-9]+ problems? \(", re.IGNORECASE),
+     FixType.JS_FORMAT),
 ]
 
 # Shell commands applied for each fix type
@@ -57,6 +68,18 @@ _FIX_COMMANDS: dict[FixType, list[str]] = {
         "pip install --upgrade pip",
         "pip install -r requirements.txt",
     ],
+    FixType.PYTHON_FORMAT: [
+        "pip install black flake8",
+        "black python_bots/ || true",
+        "flake8 python_bots/ --max-line-length=120 --ignore=W503 --statistics || true",
+    ],
+    FixType.JAVA_FORMAT: [
+        "java -jar ~/.cache/gjf/google-java-format-all-deps.jar --replace $(find java_bots -name '*.java') || true",
+    ],
+    FixType.JS_FORMAT: [
+        "npx prettier --write '**/*.{js,ts,jsx,tsx}' || true",
+        "npx eslint --fix '**/*.{js,ts}' || true",
+    ],
     FixType.UNKNOWN: [],
 }
 
@@ -66,6 +89,9 @@ _FIX_DESCRIPTIONS: dict[FixType, str] = {
     FixType.PERMISSIONS: "Permission error — set safe directory and fixed file permissions",
     FixType.PATH: "Path/file not found — inspected build paths",
     FixType.PIP_INSTALL: "Python dependency error — upgraded pip and reinstalled requirements",
+    FixType.PYTHON_FORMAT: "Python format/lint error — auto-formatted with black and checked with flake8",
+    FixType.JAVA_FORMAT: "Java format error — auto-formatted with google-java-format",
+    FixType.JS_FORMAT: "JS/TS format/lint error — auto-formatted with Prettier and fixed with ESLint",
     FixType.UNKNOWN: "Unknown error — escalated to human review",
 }
 

@@ -9,6 +9,15 @@
 #
 # Each language category runs in its own job so failures are isolated
 # and easy to diagnose.
+#
+# Auto-fix & Retry behaviour
+# ──────────────────────────
+# When a format check fails the job:
+#   1. Collects debug information (environment, tool versions, error context).
+#   2. Attempts an automated fix (black / google-java-format / prettier --write).
+#   3. Retries the check up to 3 times total.
+#   4. Commits and pushes any auto-applied fixes back to the branch.
+#   5. Emits a GitHub annotation (::error::) when all retries are exhausted.
 
 name: Language-Specific Lint & Format
 
@@ -78,13 +87,16 @@ jobs:
     name: Python Lint & Format (Flake8 + Black)
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     needs: detect-languages
     if: needs.detect-languages.outputs.has_python == 'true'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -94,23 +106,74 @@ jobs:
       - name: Install Python lint/format tools
         run: pip install flake8 black
 
-      - name: Flake8 — lint python_bots/
+      # ── Debug: collect environment info ───────────────────────────────────
+      - name: Collect debug information
         run: |
+          echo "::group::Debug — Python environment"
+          echo "Python version: $(python --version)"
+          echo "Black version:  $(black --version)"
+          echo "Flake8 version: $(flake8 --version)"
+          echo "OS: $(uname -a)"
+          echo "Working directory: $(pwd)"
+          echo "Python files in python_bots/:"
+          find python_bots -name "*.py" 2>/dev/null | head -30 || echo "(none)"
+          echo "::endgroup::"
+
+      # ── Lint + format with retry up to 3 attempts ─────────────────────────
+      - name: Flake8 + Black — lint & format (with auto-fix retry)
+        run: |
+          MAX_ATTEMPTS=3
+          PYTHON_DIR=""
           if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
-            flake8 python_bots/ \
-              --max-line-length=120 \
-              --ignore=W503 \
-              --statistics
-          else
-            echo "No Python files found in python_bots/ — skipping Flake8."
+            PYTHON_DIR="python_bots"
           fi
 
-      - name: Black — format check python_bots/
+          if [ -z "$PYTHON_DIR" ]; then
+            echo "No Python files found — skipping."
+            exit 0
+          fi
+
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            echo "::group::Attempt $attempt / $MAX_ATTEMPTS"
+            FLAKE8_OK=true
+            BLACK_OK=true
+
+            flake8 "$PYTHON_DIR/" \
+              --max-line-length=120 \
+              --ignore=W503 \
+              --statistics 2>&1 || FLAKE8_OK=false
+
+            black --check --diff "$PYTHON_DIR/" 2>&1 || BLACK_OK=false
+
+            if $FLAKE8_OK && $BLACK_OK; then
+              echo "✅ Python lint & format passed on attempt $attempt"
+              echo "::endgroup::"
+              exit 0
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$attempt" -lt "$MAX_ATTEMPTS" ]; then
+              echo "🔧 Auto-fix attempt $attempt: running black --quiet on $PYTHON_DIR/ ..."
+              black --quiet "$PYTHON_DIR/"
+            fi
+          done
+
+          echo "::error file=python_bots::Python lint/format failed after $MAX_ATTEMPTS attempts. Run 'black python_bots/ && flake8 python_bots/ --max-line-length=120 --ignore=W503' locally to fix."
+          exit 1
+
+      # ── Commit auto-applied fixes (if any) ────────────────────────────────
+      - name: Commit auto-formatting fixes
+        if: always()
         run: |
-          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
-            black --check --diff python_bots/
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add python_bots/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
           else
-            echo "No Python files found in python_bots/ — skipping Black."
+            git commit -m "🤖 Auto-fix: black formatting applied to python_bots/"
+            git push || echo "⚠️  Push failed — check GH_TOKEN permissions"
           fi
 
   # ── Java: Checkstyle (lint) + google-java-format (format check) ──────────
@@ -118,7 +181,7 @@ jobs:
     name: Java Lint & Format (Checkstyle + google-java-format)
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     needs: detect-languages
     if: needs.detect-languages.outputs.has_java == 'true'
 
@@ -129,6 +192,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -152,16 +218,6 @@ jobs:
               -o "$JAR"
           fi
 
-      - name: Checkstyle — lint java_bots/
-        run: |
-          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
-            java -jar ~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar \
-              -c checkstyle.xml \
-              $(find java_bots -name "*.java")
-          else
-            echo "No Java files found in java_bots/ — skipping Checkstyle."
-          fi
-
       - name: Cache google-java-format JAR
         uses: actions/cache@v4
         with:
@@ -178,14 +234,75 @@ jobs:
               -o "$JAR"
           fi
 
-      - name: google-java-format — format check java_bots/
+      # ── Debug: collect environment info ───────────────────────────────────
+      - name: Collect debug information
         run: |
-          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
-            java -jar ~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar \
-              --dry-run --set-exit-if-changed \
-              $(find java_bots -name "*.java")
+          echo "::group::Debug — Java environment"
+          echo "Java version: $(java -version 2>&1)"
+          echo "OS: $(uname -a)"
+          echo "Working directory: $(pwd)"
+          echo "Java files in java_bots/:"
+          find java_bots -name "*.java" 2>/dev/null | head -30 || echo "(none)"
+          echo "::endgroup::"
+
+      # ── Checkstyle + google-java-format with retry up to 3 attempts ───────
+      - name: Checkstyle + google-java-format (with auto-fix retry)
+        run: |
+          MAX_ATTEMPTS=3
+          GJF_JAR=~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar
+          CS_JAR=~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar
+          JAVA_FILES=$(find java_bots -name "*.java" 2>/dev/null || true)
+
+          if [ -z "$JAVA_FILES" ]; then
+            echo "No Java files found in java_bots/ — skipping."
+            exit 0
+          fi
+
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            echo "::group::Attempt $attempt / $MAX_ATTEMPTS"
+            CS_OK=true
+            GJF_OK=true
+
+            if [ -f checkstyle.xml ]; then
+              # shellcheck disable=SC2086
+              java -jar "$CS_JAR" -c checkstyle.xml $JAVA_FILES 2>&1 || CS_OK=false
+            else
+              echo "checkstyle.xml not found — skipping Checkstyle."
+            fi
+
+            # shellcheck disable=SC2086
+            java -jar "$GJF_JAR" --dry-run --set-exit-if-changed $JAVA_FILES 2>&1 || GJF_OK=false
+
+            if $CS_OK && $GJF_OK; then
+              echo "✅ Java lint & format passed on attempt $attempt"
+              echo "::endgroup::"
+              exit 0
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$attempt" -lt "$MAX_ATTEMPTS" ]; then
+              echo "🔧 Auto-fix attempt $attempt: running google-java-format --replace ..."
+              # shellcheck disable=SC2086
+              java -jar "$GJF_JAR" --replace $JAVA_FILES
+            fi
+          done
+
+          echo "::error file=java_bots::Java lint/format failed after $MAX_ATTEMPTS attempts. Run 'google-java-format --replace \$(find java_bots -name \"*.java\")' locally to fix."
+          exit 1
+
+      # ── Commit auto-applied fixes (if any) ────────────────────────────────
+      - name: Commit auto-formatting fixes
+        if: always()
+        run: |
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add java_bots/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
           else
-            echo "No Java files found in java_bots/ — skipping google-java-format."
+            git commit -m "🤖 Auto-fix: google-java-format applied to java_bots/"
+            git push || echo "⚠️  Push failed — check GH_TOKEN permissions"
           fi
 
   # ── JavaScript / TypeScript: ESLint + Prettier (JS/TS only) ─────────────
@@ -193,13 +310,16 @@ jobs:
     name: JS/TS Lint & Format (ESLint + Prettier)
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     needs: detect-languages
     if: needs.detect-languages.outputs.has_js == 'true'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -210,11 +330,64 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: ESLint — lint JS/TS files only
-        run: npm run lint -- --ext .js,.ts,.jsx,.tsx
-
-      - name: Prettier — format check JS/TS files only
+      # ── Debug: collect environment info ───────────────────────────────────
+      - name: Collect debug information
         run: |
-          npx prettier --check \
-            --ignore-path .prettierignore \
-            "**/*.{js,ts,jsx,tsx}"
+          echo "::group::Debug — Node/JS environment"
+          echo "Node version: $(node --version)"
+          echo "npm version:  $(npm --version)"
+          echo "ESLint version: $(npx eslint --version 2>/dev/null || echo 'not found')"
+          echo "Prettier version: $(npx prettier --version 2>/dev/null || echo 'not found')"
+          echo "OS: $(uname -a)"
+          echo "Working directory: $(pwd)"
+          echo "::endgroup::"
+
+      # ── ESLint + Prettier with retry up to 3 attempts ─────────────────────
+      - name: ESLint + Prettier (with auto-fix retry)
+        run: |
+          MAX_ATTEMPTS=3
+
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            echo "::group::Attempt $attempt / $MAX_ATTEMPTS"
+            ESLINT_OK=true
+            PRETTIER_OK=true
+
+            npm run lint -- --ext .js,.ts,.jsx,.tsx 2>&1 || ESLINT_OK=false
+
+            npx prettier --check \
+              --ignore-path .prettierignore \
+              "**/*.{js,ts,jsx,tsx}" 2>&1 || PRETTIER_OK=false
+
+            if $ESLINT_OK && $PRETTIER_OK; then
+              echo "✅ JS/TS lint & format passed on attempt $attempt"
+              echo "::endgroup::"
+              exit 0
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$attempt" -lt "$MAX_ATTEMPTS" ]; then
+              echo "🔧 Auto-fix attempt $attempt: running eslint --fix and prettier --write ..."
+              npm run lint -- --fix --ext .js,.ts,.jsx,.tsx 2>&1 || true
+              npx prettier --write \
+                --ignore-path .prettierignore \
+                "**/*.{js,ts,jsx,tsx}" 2>&1 || true
+            fi
+          done
+
+          echo "::error::JS/TS lint/format failed after $MAX_ATTEMPTS attempts. Run 'npm run lint -- --fix' and 'npx prettier --write **/*.{js,ts,jsx,tsx}' locally to fix."
+          exit 1
+
+      # ── Commit auto-applied fixes (if any) ────────────────────────────────
+      - name: Commit auto-formatting fixes
+        if: always()
+        run: |
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add --all "*.js" "*.ts" "*.jsx" "*.tsx" 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git commit -m "🤖 Auto-fix: Prettier + ESLint formatting applied"
+            git push || echo "⚠️  Push failed — check GH_TOKEN permissions"
+          fi
