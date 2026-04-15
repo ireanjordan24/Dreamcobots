@@ -1,0 +1,36 @@
+name: DreamCo Master System
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 minutes
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  orchestrator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run Event Bus
+        run: python BuddyAI/event_bus.py
+
+      - name: Run Revenue Engine
+        run: python ai/revenue_engine.py
+
+      - name: Run Bots
+        run: python run_all_bots.py
