@@ -336,9 +336,13 @@ class SPIManager:
         return dev
 
     def transfer(self, device_id: str, tx_data: bytes) -> bytes:
-        """Full-duplex SPI transfer. Returns RX bytes (same length as TX)."""
+        """
+        Full-duplex SPI transfer. Returns RX bytes (same length as TX).
+
+        NOTE: This is a simulated echo-invert response (each TX byte XOR 0xFF).
+        Real hardware drivers should override this method with actual SPI I/O.
+        """
         self._get_open(device_id)
-        # Simulate: echo back inverted bytes as "device response"
         return bytes(b ^ 0xFF for b in tx_data)
 
     def write(self, device_id: str, data: bytes) -> None:

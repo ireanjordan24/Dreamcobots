@@ -15,8 +15,10 @@ GLOBAL AI SOURCES FLOW: participates via buddy_os.py pipeline.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
+import secrets
 import uuid
 import zipfile
 from dataclasses import dataclass, field
@@ -380,5 +382,4 @@ class DeploymentManager:
 
 def hmac_safe_compare(a: str, b: str) -> bool:
     """Constant-time string comparison (avoid timing attacks)."""
-    import hmac as _hmac
-    return _hmac.compare_digest(a.encode(), b.encode())
+    return hmac.compare_digest(a.encode(), b.encode())

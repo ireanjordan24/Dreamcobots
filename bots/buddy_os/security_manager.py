@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
+import secrets
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
@@ -293,7 +294,7 @@ class SecurityManager:
 
     def initiate_pairing(self, device_name: str) -> PairingSession:
         """Start a secure-pairing session and generate a PIN."""
-        pin = str(int.from_bytes(os.urandom(3), "big") % 1_000_000).zfill(6)
+        pin = str(secrets.randbelow(1_000_000)).zfill(6)
         session_id = f"pair_{uuid.uuid4().hex[:8]}"
         session = PairingSession(
             session_id=session_id,

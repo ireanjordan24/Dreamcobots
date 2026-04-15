@@ -258,7 +258,7 @@ class WiFiEngine:
         if security == WiFiSecurity.OPEN:
             password = ""
         elif not password:
-            raise ValueError(f"Password required for network '{ssid}'.")
+            raise ValueError(f"Password required for {security.value} network '{ssid}'.")
 
         conn = WiFiConnection(
             connection_id=connection_id,
