@@ -1,0 +1,32 @@
+name: Self Healing System
+
+on:
+  workflow_run:
+    workflows: ["DreamCo Master System"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  fix_failures:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Auto Fix Attempt
+        run: |
+          echo "Attempting auto-repair..."
+          python ai/debug_bot.py
