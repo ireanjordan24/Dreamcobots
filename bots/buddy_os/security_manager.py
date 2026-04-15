@@ -81,7 +81,7 @@ class EncryptionKey:
 
     key_id: str
     algorithm: EncryptionAlgorithm
-    key_bytes: bytes         # raw key material (never serialised to disk)
+    key_bytes: bytes         # raw key material (never serialized to disk)
     active: bool = True
     metadata: dict = field(default_factory=dict)
 
