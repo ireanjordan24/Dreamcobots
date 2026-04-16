@@ -1,1 +1,755 @@
-log not found: 71584568062
+test	Set up job	﻿2026-04-16T05:39:28.2155548Z Current runner version: '2.333.1'
+test	Set up job	2026-04-16T05:39:28.2178103Z ##[group]Runner Image Provisioner
+test	Set up job	2026-04-16T05:39:28.2178768Z Hosted Compute Agent
+test	Set up job	2026-04-16T05:39:28.2179227Z Version: 20260213.493
+test	Set up job	2026-04-16T05:39:28.2179703Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+test	Set up job	2026-04-16T05:39:28.2180303Z Build Date: 2026-02-13T00:28:41Z
+test	Set up job	2026-04-16T05:39:28.2180787Z Worker ID: {f6aea160-3ea2-400f-990d-d71378a5876a}
+test	Set up job	2026-04-16T05:39:28.2181353Z Azure Region: westus
+test	Set up job	2026-04-16T05:39:28.2181801Z ##[endgroup]
+test	Set up job	2026-04-16T05:39:28.2182771Z ##[group]Operating System
+test	Set up job	2026-04-16T05:39:28.2183640Z Ubuntu
+test	Set up job	2026-04-16T05:39:28.2184000Z 24.04.4
+test	Set up job	2026-04-16T05:39:28.2184401Z LTS
+test	Set up job	2026-04-16T05:39:28.2184718Z ##[endgroup]
+test	Set up job	2026-04-16T05:39:28.2185171Z ##[group]Runner Image
+test	Set up job	2026-04-16T05:39:28.2185587Z Image: ubuntu-24.04
+test	Set up job	2026-04-16T05:39:28.2185985Z Version: 20260406.80.1
+test	Set up job	2026-04-16T05:39:28.2186786Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+test	Set up job	2026-04-16T05:39:28.2188161Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+test	Set up job	2026-04-16T05:39:28.2188844Z ##[endgroup]
+test	Set up job	2026-04-16T05:39:28.2189671Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-04-16T05:39:28.2191431Z Contents: read
+test	Set up job	2026-04-16T05:39:28.2191879Z Metadata: read
+test	Set up job	2026-04-16T05:39:28.2192252Z Packages: read
+test	Set up job	2026-04-16T05:39:28.2193103Z ##[endgroup]
+test	Set up job	2026-04-16T05:39:28.2194695Z Secret source: Actions
+test	Set up job	2026-04-16T05:39:28.2195422Z Prepare workflow directory
+test	Set up job	2026-04-16T05:39:28.2531043Z Prepare all required actions
+test	Set up job	2026-04-16T05:39:28.2565628Z Getting action download info
+test	Set up job	2026-04-16T05:39:28.6916715Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+test	Set up job	2026-04-16T05:39:29.2235301Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test	Set up job	2026-04-16T05:39:30.2467666Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+test	Set up job	2026-04-16T05:39:30.4805307Z Complete job name: test
+test	Debug Context	﻿2026-04-16T05:39:30.5295868Z ##[group]Run echo "Workflow: CI/CD Workflow"
+test	Debug Context	2026-04-16T05:39:30.5296278Z [36;1mecho "Workflow: CI/CD Workflow"[0m
+test	Debug Context	2026-04-16T05:39:30.5296535Z [36;1mecho "Job: test"[0m
+test	Debug Context	2026-04-16T05:39:30.5296763Z [36;1mecho "Run ID: 24494130160"[0m
+test	Debug Context	2026-04-16T05:39:30.5297010Z [36;1mecho "Actor: ireanjordan24"[0m
+test	Debug Context	2026-04-16T05:39:30.5317952Z shell: /usr/bin/bash -e {0}
+test	Debug Context	2026-04-16T05:39:30.5318405Z ##[endgroup]
+test	Debug Context	2026-04-16T05:39:30.5409193Z Workflow: CI/CD Workflow
+test	Debug Context	2026-04-16T05:39:30.5409627Z Job: test
+test	Debug Context	2026-04-16T05:39:30.5409910Z Run ID: 24494130160
+test	Debug Context	2026-04-16T05:39:30.5410200Z Actor: ireanjordan24
+test	Mask Secrets	﻿2026-04-16T05:39:30.5473953Z ##[group]Run echo "::add-mask::"
+test	Mask Secrets	2026-04-16T05:39:30.5474236Z [36;1mecho "::add-mask::"[0m
+test	Mask Secrets	2026-04-16T05:39:30.5489963Z shell: /usr/bin/bash -e {0}
+test	Mask Secrets	2026-04-16T05:39:30.5490182Z ##[endgroup]
+test	Mask Secrets	2026-04-16T05:39:30.5538339Z ##[warning]Can't add secret mask for empty string in ##[add-mask] command.
+test	Checkout code	﻿2026-04-16T05:39:30.5633614Z ##[group]Run actions/checkout@v4
+test	Checkout code	2026-04-16T05:39:30.5633915Z with:
+test	Checkout code	2026-04-16T05:39:30.5634162Z   repository: DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-16T05:39:30.5634536Z   token: ***
+test	Checkout code	2026-04-16T05:39:30.5634724Z   ssh-strict: true
+test	Checkout code	2026-04-16T05:39:30.5634911Z   ssh-user: git
+test	Checkout code	2026-04-16T05:39:30.5635101Z   persist-credentials: true
+test	Checkout code	2026-04-16T05:39:30.5635311Z   clean: true
+test	Checkout code	2026-04-16T05:39:30.5635495Z   sparse-checkout-cone-mode: true
+test	Checkout code	2026-04-16T05:39:30.5635722Z   fetch-depth: 1
+test	Checkout code	2026-04-16T05:39:30.5635915Z   fetch-tags: false
+test	Checkout code	2026-04-16T05:39:30.5636101Z   show-progress: true
+test	Checkout code	2026-04-16T05:39:30.5636281Z   lfs: false
+test	Checkout code	2026-04-16T05:39:30.5636452Z   submodules: false
+test	Checkout code	2026-04-16T05:39:30.5636631Z   set-safe-directory: true
+test	Checkout code	2026-04-16T05:39:30.5636838Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:30.6475943Z Syncing repository: DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-16T05:39:30.6477282Z ##[group]Getting Git version info
+test	Checkout code	2026-04-16T05:39:30.6477639Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
+test	Checkout code	2026-04-16T05:39:30.6478483Z [command]/usr/bin/git version
+test	Checkout code	2026-04-16T05:39:30.6558526Z git version 2.53.0
+test	Checkout code	2026-04-16T05:39:30.6578226Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:30.6589838Z Temporarily overriding HOME='/home/runner/work/_temp/9bcc3474-dc94-4451-a564-5fe365a9cd15' before making global git config changes
+test	Checkout code	2026-04-16T05:39:30.6590614Z Adding repository directory to the temporary git global config as a safe directory
+test	Checkout code	2026-04-16T05:39:30.6600134Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test	Checkout code	2026-04-16T05:39:30.6626107Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
+test	Checkout code	2026-04-16T05:39:30.6628834Z ##[group]Initializing the repository
+test	Checkout code	2026-04-16T05:39:30.6631925Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
+test	Checkout code	2026-04-16T05:39:30.6687665Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Checkout code	2026-04-16T05:39:30.6688380Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test	Checkout code	2026-04-16T05:39:30.6689093Z hint: to use in all of your new repositories, which will suppress this warning,
+test	Checkout code	2026-04-16T05:39:30.6689610Z hint: call:
+test	Checkout code	2026-04-16T05:39:30.6689875Z hint:
+test	Checkout code	2026-04-16T05:39:30.6690266Z hint: 	git config --global init.defaultBranch <name>
+test	Checkout code	2026-04-16T05:39:30.6690700Z hint:
+test	Checkout code	2026-04-16T05:39:30.6691163Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Checkout code	2026-04-16T05:39:30.6691800Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Checkout code	2026-04-16T05:39:30.6692317Z hint:
+test	Checkout code	2026-04-16T05:39:30.6692588Z hint: 	git branch -m <name>
+test	Checkout code	2026-04-16T05:39:30.6693072Z hint:
+test	Checkout code	2026-04-16T05:39:30.6693509Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Checkout code	2026-04-16T05:39:30.6694238Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
+test	Checkout code	2026-04-16T05:39:30.6698800Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-16T05:39:30.6722695Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:30.6723490Z ##[group]Disabling automatic garbage collection
+test	Checkout code	2026-04-16T05:39:30.6727036Z [command]/usr/bin/git config --local gc.auto 0
+test	Checkout code	2026-04-16T05:39:30.6749764Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:30.6750284Z ##[group]Setting up auth
+test	Checkout code	2026-04-16T05:39:30.6755618Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Checkout code	2026-04-16T05:39:30.6779862Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Checkout code	2026-04-16T05:39:30.7268407Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Checkout code	2026-04-16T05:39:30.7292278Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Checkout code	2026-04-16T05:39:30.7471090Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Checkout code	2026-04-16T05:39:30.7502263Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Checkout code	2026-04-16T05:39:30.7685998Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Checkout code	2026-04-16T05:39:30.7712633Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:30.7713373Z ##[group]Fetching the repository
+test	Checkout code	2026-04-16T05:39:30.7719780Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4701cb7ec61cebd6c85b56e421adf357fff122d0:refs/remotes/origin/main
+test	Checkout code	2026-04-16T05:39:31.5139395Z From https://github.com/DreamCo-Technologies/Dreamcobots
+test	Checkout code	2026-04-16T05:39:31.5140533Z  * [new ref]         4701cb7ec61cebd6c85b56e421adf357fff122d0 -> origin/main
+test	Checkout code	2026-04-16T05:39:31.5163947Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:31.5164444Z ##[group]Determining the checkout info
+test	Checkout code	2026-04-16T05:39:31.5165850Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:31.5170634Z [command]/usr/bin/git sparse-checkout disable
+test	Checkout code	2026-04-16T05:39:31.5215135Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Checkout code	2026-04-16T05:39:31.5224554Z ##[group]Checking out the ref
+test	Checkout code	2026-04-16T05:39:31.5227668Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test	Checkout code	2026-04-16T05:39:31.6328983Z Switched to a new branch 'main'
+test	Checkout code	2026-04-16T05:39:31.6329555Z branch 'main' set up to track 'origin/main'.
+test	Checkout code	2026-04-16T05:39:31.6338420Z ##[endgroup]
+test	Checkout code	2026-04-16T05:39:31.6371129Z [command]/usr/bin/git log -1 --format=%H
+test	Checkout code	2026-04-16T05:39:31.6390461Z 4701cb7ec61cebd6c85b56e421adf357fff122d0
+test	Validate Environment	﻿2026-04-16T05:39:31.6486698Z ##[group]Run echo "Validating environment prerequisites..."
+test	Validate Environment	2026-04-16T05:39:31.6487047Z [36;1mecho "Validating environment prerequisites..."[0m
+test	Validate Environment	2026-04-16T05:39:31.6487323Z [36;1mif ! command -v node &> /dev/null; then[0m
+test	Validate Environment	2026-04-16T05:39:31.6487565Z [36;1m  echo "::error::Node.js is not installed"[0m
+test	Validate Environment	2026-04-16T05:39:31.6487771Z [36;1m  exit 1[0m
+test	Validate Environment	2026-04-16T05:39:31.6487934Z [36;1mfi[0m
+test	Validate Environment	2026-04-16T05:39:31.6488096Z [36;1mif ! command -v npm &> /dev/null; then[0m
+test	Validate Environment	2026-04-16T05:39:31.6488326Z [36;1m  echo "::error::npm is not installed"[0m
+test	Validate Environment	2026-04-16T05:39:31.6488518Z [36;1m  exit 1[0m
+test	Validate Environment	2026-04-16T05:39:31.6488662Z [36;1mfi[0m
+test	Validate Environment	2026-04-16T05:39:31.6488821Z [36;1mecho "Environment validation passed."[0m
+test	Validate Environment	2026-04-16T05:39:31.6506731Z shell: /usr/bin/bash -e {0}
+test	Validate Environment	2026-04-16T05:39:31.6506947Z ##[endgroup]
+test	Validate Environment	2026-04-16T05:39:31.6600121Z Validating environment prerequisites...
+test	Validate Environment	2026-04-16T05:39:31.6601357Z Environment validation passed.
+test	Setup Node.js	﻿2026-04-16T05:39:31.6664052Z ##[group]Run actions/setup-node@v4
+test	Setup Node.js	2026-04-16T05:39:31.6664276Z with:
+test	Setup Node.js	2026-04-16T05:39:31.6664409Z   node-version: 20
+test	Setup Node.js	2026-04-16T05:39:31.6664562Z   cache: npm
+test	Setup Node.js	2026-04-16T05:39:31.6664701Z   always-auth: false
+test	Setup Node.js	2026-04-16T05:39:31.6664863Z   check-latest: false
+test	Setup Node.js	2026-04-16T05:39:31.6665119Z   token: ***
+test	Setup Node.js	2026-04-16T05:39:31.6665270Z ##[endgroup]
+test	Setup Node.js	2026-04-16T05:39:31.8048409Z Found in cache @ /opt/hostedtoolcache/node/20.20.2/x64
+test	Setup Node.js	2026-04-16T05:39:31.8053161Z ##[group]Environment details
+test	Setup Node.js	2026-04-16T05:39:32.0366369Z node: v20.20.2
+test	Setup Node.js	2026-04-16T05:39:32.0366777Z npm: 10.8.2
+test	Setup Node.js	2026-04-16T05:39:32.0366979Z yarn: 1.22.22
+test	Setup Node.js	2026-04-16T05:39:32.0368830Z ##[endgroup]
+test	Setup Node.js	2026-04-16T05:39:32.0386066Z [command]/opt/hostedtoolcache/node/20.20.2/x64/bin/npm config get cache
+test	Setup Node.js	2026-04-16T05:39:32.1235274Z /home/runner/.npm
+test	Setup Node.js	2026-04-16T05:39:32.4080750Z Cache hit for: node-cache-Linux-x64-npm-b0df17073605494e988e7d8ca0e44ad00ffd0c04d0804c96b92f7884c7a799ed
+test	Setup Node.js	2026-04-16T05:39:33.6996767Z Received 6022831 of 10217135 (58.9%), 5.7 MBs/sec
+test	Setup Node.js	2026-04-16T05:39:33.9015164Z Received 10217135 of 10217135 (100.0%), 8.1 MBs/sec
+test	Setup Node.js	2026-04-16T05:39:33.9034295Z Cache Size: ~10 MB (10217135 B)
+test	Setup Node.js	2026-04-16T05:39:33.9035267Z [command]/usr/bin/tar -xf /home/runner/work/_temp/bb14094c-9549-4f07-8c98-2854138ca102/cache.tzst -P -C /home/runner/work/Dreamcobots/Dreamcobots --use-compress-program unzstd
+test	Setup Node.js	2026-04-16T05:39:33.9720006Z Cache restored successfully
+test	Setup Node.js	2026-04-16T05:39:33.9729347Z Cache restored from key: node-cache-Linux-x64-npm-b0df17073605494e988e7d8ca0e44ad00ffd0c04d0804c96b92f7884c7a799ed
+test	Install dependencies	﻿2026-04-16T05:39:33.9840474Z ##[group]Run for i in 1 2 3; do
+test	Install dependencies	2026-04-16T05:39:33.9840741Z [36;1mfor i in 1 2 3; do[0m
+test	Install dependencies	2026-04-16T05:39:33.9840935Z [36;1m  npm install && break[0m
+test	Install dependencies	2026-04-16T05:39:33.9841139Z [36;1m  echo "Retry $i failed..."[0m
+test	Install dependencies	2026-04-16T05:39:33.9841363Z [36;1m  sleep $((i * 5))[0m
+test	Install dependencies	2026-04-16T05:39:33.9841562Z [36;1m  if [ $i -eq 3 ]; then[0m
+test	Install dependencies	2026-04-16T05:39:33.9841805Z [36;1m    echo "::error::npm install failed after 3 attempts"[0m
+test	Install dependencies	2026-04-16T05:39:33.9842078Z [36;1m    exit 1[0m
+test	Install dependencies	2026-04-16T05:39:33.9842272Z [36;1m  fi[0m
+test	Install dependencies	2026-04-16T05:39:33.9842428Z [36;1mdone[0m
+test	Install dependencies	2026-04-16T05:39:33.9867351Z shell: /usr/bin/bash -e {0}
+test	Install dependencies	2026-04-16T05:39:33.9867576Z ##[endgroup]
+test	Install dependencies	2026-04-16T05:39:35.1598639Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+test	Install dependencies	2026-04-16T05:39:35.2136842Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+test	Install dependencies	2026-04-16T05:39:35.2178858Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+test	Install dependencies	2026-04-16T05:39:35.2541621Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+test	Install dependencies	2026-04-16T05:39:35.2606472Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+test	Install dependencies	2026-04-16T05:39:35.6208774Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+test	Install dependencies	2026-04-16T05:39:35.7535472Z 
+test	Install dependencies	2026-04-16T05:39:35.7536640Z added 409 packages, and audited 410 packages in 2s
+test	Install dependencies	2026-04-16T05:39:35.7537132Z 
+test	Install dependencies	2026-04-16T05:39:35.7537402Z 66 packages are looking for funding
+test	Install dependencies	2026-04-16T05:39:35.7537710Z   run `npm fund` for details
+test	Install dependencies	2026-04-16T05:39:35.7566560Z 
+test	Install dependencies	2026-04-16T05:39:35.7567204Z 2 vulnerabilities (1 moderate, 1 high)
+test	Install dependencies	2026-04-16T05:39:35.7567746Z 
+test	Install dependencies	2026-04-16T05:39:35.7568088Z To address all issues, run:
+test	Install dependencies	2026-04-16T05:39:35.7568623Z   npm audit fix
+test	Install dependencies	2026-04-16T05:39:35.7568970Z 
+test	Install dependencies	2026-04-16T05:39:35.7569281Z Run `npm audit` for details.
+test	Run tests	﻿2026-04-16T05:39:35.7751108Z ##[group]Run npm test
+test	Run tests	2026-04-16T05:39:35.7751460Z [36;1mnpm test[0m
+test	Run tests	2026-04-16T05:39:35.7777382Z shell: /usr/bin/bash -e {0}
+test	Run tests	2026-04-16T05:39:35.7777694Z ##[endgroup]
+test	Run tests	2026-04-16T05:39:35.8725552Z 
+test	Run tests	2026-04-16T05:39:35.8726422Z > dreamcobots@1.0.0 test
+test	Run tests	2026-04-16T05:39:35.8726888Z > jest --passWithNoTests
+test	Run tests	2026-04-16T05:39:35.8727020Z 
+test	Run tests	2026-04-16T05:39:36.9184000Z FAIL dreamco-control-tower/__tests__/get-bots.test.js
+test	Run tests	2026-04-16T05:39:36.9184987Z   ● Test suite failed to run
+test	Run tests	2026-04-16T05:39:36.9185333Z 
+test	Run tests	2026-04-16T05:39:36.9185690Z     Jest encountered an unexpected token
+test	Run tests	2026-04-16T05:39:36.9186130Z 
+test	Run tests	2026-04-16T05:39:36.9187034Z     Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+test	Run tests	2026-04-16T05:39:36.9187905Z 
+test	Run tests	2026-04-16T05:39:36.9188559Z     Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+test	Run tests	2026-04-16T05:39:36.9189307Z 
+test	Run tests	2026-04-16T05:39:36.9189649Z     By default "node_modules" folder is ignored by transformers.
+test	Run tests	2026-04-16T05:39:36.9190058Z 
+test	Run tests	2026-04-16T05:39:36.9190288Z     Here's what you can do:
+test	Run tests	2026-04-16T05:39:36.9191256Z      • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+test	Run tests	2026-04-16T05:39:36.9192465Z      • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+test	Run tests	2026-04-16T05:39:36.9193921Z      • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+test	Run tests	2026-04-16T05:39:36.9195094Z      • If you need a custom transformation specify a "transform" option in your config.
+test	Run tests	2026-04-16T05:39:36.9196333Z      • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+test	Run tests	2026-04-16T05:39:36.9197030Z 
+test	Run tests	2026-04-16T05:39:36.9197489Z     You'll find more details and examples of these config options in the docs:
+test	Run tests	2026-04-16T05:39:36.9202483Z     https://jestjs.io/docs/configuration
+test	Run tests	2026-04-16T05:39:36.9203299Z     For information about custom transformations, see:
+test	Run tests	2026-04-16T05:39:36.9203885Z     https://jestjs.io/docs/code-transformation
+test	Run tests	2026-04-16T05:39:36.9204235Z 
+test	Run tests	2026-04-16T05:39:36.9204441Z     Details:
+test	Run tests	2026-04-16T05:39:36.9204666Z 
+test	Run tests	2026-04-16T05:39:36.9205203Z     /home/runner/work/Dreamcobots/Dreamcobots/dreamco-control-tower/__tests__/get-bots.test.js:1
+test	Run tests	2026-04-16T05:39:36.9206340Z     ({"Object.<anonymous>":function(module,exports,require,__dirname,__filename,jest){import request from 'supertest';
+test	Run tests	2026-04-16T05:39:36.9207661Z                                                                                       ^^^^^^
+test	Run tests	2026-04-16T05:39:36.9208049Z 
+test	Run tests	2026-04-16T05:39:36.9208398Z     SyntaxError: Cannot use import statement outside a module
+test	Run tests	2026-04-16T05:39:36.9208787Z 
+test	Run tests	2026-04-16T05:39:36.9209251Z       at Runtime.createScriptFromCode (node_modules/jest-runtime/build/index.js:1505:14)
+test	Run tests	2026-04-16T05:39:36.9209863Z 
+test	Run tests	2026-04-16T05:39:37.1433858Z PASS __tests__/money.test.js
+test	Run tests	2026-04-16T05:39:37.2017347Z PASS __tests__/dreamco-core.test.js
+test	Run tests	2026-04-16T05:39:37.2185914Z   ● Console
+test	Run tests	2026-04-16T05:39:37.2191999Z 
+test	Run tests	2026-04-16T05:39:37.2203959Z     console.log
+test	Run tests	2026-04-16T05:39:37.2204686Z       ◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+test	Run tests	2026-04-16T05:39:37.2205094Z 
+test	Run tests	2026-04-16T05:39:37.2205306Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2205586Z 
+test	Run tests	2026-04-16T05:39:37.2205736Z     console.log
+test	Run tests	2026-04-16T05:39:37.2206125Z       ⚙️  Bootstrapping DreamCo system...
+test	Run tests	2026-04-16T05:39:37.2206356Z 
+test	Run tests	2026-04-16T05:39:37.2206525Z       at log (DreamCo/core/bootstrap.js:17:11)
+test	Run tests	2026-04-16T05:39:37.2206775Z 
+test	Run tests	2026-04-16T05:39:37.2206869Z     console.log
+test	Run tests	2026-04-16T05:39:37.2207219Z       ⚙️  Bootstrapping DreamCo system...
+test	Run tests	2026-04-16T05:39:37.2207447Z 
+test	Run tests	2026-04-16T05:39:37.2207620Z       at log (DreamCo/core/bootstrap.js:17:11)
+test	Run tests	2026-04-16T05:39:37.2208258Z 
+test	Run tests	2026-04-16T05:39:37.2208363Z     console.log
+test	Run tests	2026-04-16T05:39:37.2208658Z       ✅ Environment validated
+test	Run tests	2026-04-16T05:39:37.2209073Z 
+test	Run tests	2026-04-16T05:39:37.2209256Z       at log (DreamCo/core/bootstrap.js:20:11)
+test	Run tests	2026-04-16T05:39:37.2209497Z 
+test	Run tests	2026-04-16T05:39:37.2209605Z     console.log
+test	Run tests	2026-04-16T05:39:37.2209947Z       ✅ Bootstrap complete — system ready
+test	Run tests	2026-04-16T05:39:37.2210194Z 
+test	Run tests	2026-04-16T05:39:37.2210358Z       at log (DreamCo/core/bootstrap.js:22:11)
+test	Run tests	2026-04-16T05:39:37.2210608Z 
+test	Run tests	2026-04-16T05:39:37.2210699Z     console.log
+test	Run tests	2026-04-16T05:39:37.2211220Z       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+test	Run tests	2026-04-16T05:39:37.2211561Z 
+test	Run tests	2026-04-16T05:39:37.2211762Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2212027Z 
+test	Run tests	2026-04-16T05:39:37.2212122Z     console.log
+test	Run tests	2026-04-16T05:39:37.2212622Z       ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+test	Run tests	2026-04-16T05:39:37.2213145Z 
+test	Run tests	2026-04-16T05:39:37.2213338Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2213613Z 
+test	Run tests	2026-04-16T05:39:37.2213717Z     console.log
+test	Run tests	2026-04-16T05:39:37.2214232Z       ◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+test	Run tests	2026-04-16T05:39:37.2214582Z 
+test	Run tests	2026-04-16T05:39:37.2214773Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2215046Z 
+test	Run tests	2026-04-16T05:39:37.2215140Z     console.log
+test	Run tests	2026-04-16T05:39:37.2215663Z       ◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+test	Run tests	2026-04-16T05:39:37.2216043Z 
+test	Run tests	2026-04-16T05:39:37.2216367Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2216624Z 
+test	Run tests	2026-04-16T05:39:37.2216730Z     console.log
+test	Run tests	2026-04-16T05:39:37.2217230Z       ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+test	Run tests	2026-04-16T05:39:37.2217568Z 
+test	Run tests	2026-04-16T05:39:37.2217756Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2218022Z 
+test	Run tests	2026-04-16T05:39:37.2218115Z     console.log
+test	Run tests	2026-04-16T05:39:37.2218556Z       💰 [RevenueEngine] realEstateBot → $250.00
+test	Run tests	2026-04-16T05:39:37.2218809Z 
+test	Run tests	2026-04-16T05:39:37.2219107Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2219461Z 
+test	Run tests	2026-04-16T05:39:37.2219564Z     console.log
+test	Run tests	2026-04-16T05:39:37.2220049Z       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+test	Run tests	2026-04-16T05:39:37.2220393Z 
+test	Run tests	2026-04-16T05:39:37.2220589Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2220864Z 
+test	Run tests	2026-04-16T05:39:37.2221164Z     console.log
+test	Run tests	2026-04-16T05:39:37.2221515Z       💰 [RevenueEngine] botA → $100.00
+test	Run tests	2026-04-16T05:39:37.2221741Z 
+test	Run tests	2026-04-16T05:39:37.2222041Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2222394Z 
+test	Run tests	2026-04-16T05:39:37.2222498Z     console.log
+test	Run tests	2026-04-16T05:39:37.2223005Z       💰 [RevenueEngine] botB → $200.00
+test	Run tests	2026-04-16T05:39:37.2223235Z 
+test	Run tests	2026-04-16T05:39:37.2223520Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2223896Z 
+test	Run tests	2026-04-16T05:39:37.2223993Z     console.log
+test	Run tests	2026-04-16T05:39:37.2224515Z       ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+test	Run tests	2026-04-16T05:39:37.2224875Z 
+test	Run tests	2026-04-16T05:39:37.2225076Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2225339Z 
+test	Run tests	2026-04-16T05:39:37.2225433Z     console.log
+test	Run tests	2026-04-16T05:39:37.2225771Z       💰 [RevenueEngine] botA → $100.00
+test	Run tests	2026-04-16T05:39:37.2226006Z 
+test	Run tests	2026-04-16T05:39:37.2226291Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2226644Z 
+test	Run tests	2026-04-16T05:39:37.2226751Z     console.log
+test	Run tests	2026-04-16T05:39:37.2227090Z       💰 [RevenueEngine] botB → $200.00
+test	Run tests	2026-04-16T05:39:37.2227308Z 
+test	Run tests	2026-04-16T05:39:37.2227580Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2227930Z 
+test	Run tests	2026-04-16T05:39:37.2228025Z     console.log
+test	Run tests	2026-04-16T05:39:37.2228512Z       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+test	Run tests	2026-04-16T05:39:37.2229024Z 
+test	Run tests	2026-04-16T05:39:37.2229228Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2229482Z 
+test	Run tests	2026-04-16T05:39:37.2229582Z     console.log
+test	Run tests	2026-04-16T05:39:37.2229917Z       💰 [RevenueEngine] botA → $100.00
+test	Run tests	2026-04-16T05:39:37.2230143Z 
+test	Run tests	2026-04-16T05:39:37.2230423Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2230776Z 
+test	Run tests	2026-04-16T05:39:37.2230871Z     console.log
+test	Run tests	2026-04-16T05:39:37.2231212Z       💰 [RevenueEngine] botA → $50.00
+test	Run tests	2026-04-16T05:39:37.2231443Z 
+test	Run tests	2026-04-16T05:39:37.2231735Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2232084Z 
+test	Run tests	2026-04-16T05:39:37.2232194Z     console.log
+test	Run tests	2026-04-16T05:39:37.2232519Z       💰 [RevenueEngine] botB → $200.00
+test	Run tests	2026-04-16T05:39:37.2232816Z 
+test	Run tests	2026-04-16T05:39:37.2233270Z       at Object.log [as trackRevenue] (DreamCo/core/revenueEngine.js:32:11)
+test	Run tests	2026-04-16T05:39:37.2233660Z 
+test	Run tests	2026-04-16T05:39:37.2233771Z     console.log
+test	Run tests	2026-04-16T05:39:37.2234308Z       ◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+test	Run tests	2026-04-16T05:39:37.2234670Z 
+test	Run tests	2026-04-16T05:39:37.2234874Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2235131Z 
+test	Run tests	2026-04-16T05:39:37.2235232Z     console.log
+test	Run tests	2026-04-16T05:39:37.2235731Z       ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+test	Run tests	2026-04-16T05:39:37.2236079Z 
+test	Run tests	2026-04-16T05:39:37.2236266Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2236549Z 
+test	Run tests	2026-04-16T05:39:37.2236642Z     console.log
+test	Run tests	2026-04-16T05:39:37.2237144Z       ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+test	Run tests	2026-04-16T05:39:37.2237491Z 
+test	Run tests	2026-04-16T05:39:37.2237690Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2237949Z 
+test	Run tests	2026-04-16T05:39:37.2238049Z     console.log
+test	Run tests	2026-04-16T05:39:37.2238563Z       ◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+test	Run tests	2026-04-16T05:39:37.2238935Z 
+test	Run tests	2026-04-16T05:39:37.2239125Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2239391Z 
+test	Run tests	2026-04-16T05:39:37.2239483Z     console.log
+test	Run tests	2026-04-16T05:39:37.2239964Z       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+test	Run tests	2026-04-16T05:39:37.2240314Z 
+test	Run tests	2026-04-16T05:39:37.2240510Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2240769Z 
+test	Run tests	2026-04-16T05:39:37.2240871Z     console.log
+test	Run tests	2026-04-16T05:39:37.2241440Z       ◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+test	Run tests	2026-04-16T05:39:37.2242009Z 
+test	Run tests	2026-04-16T05:39:37.2242198Z       at _log (node_modules/dotenv/lib/main.js:131:11)
+test	Run tests	2026-04-16T05:39:37.2242473Z 
+test	Run tests	2026-04-16T05:39:37.2242646Z FAIL __tests__/workflows.test.js
+test	Run tests	2026-04-16T05:39:37.2243398Z   ● workflows.json registry › registry has workflows array with 5 entries
+test	Run tests	2026-04-16T05:39:37.2243772Z 
+test	Run tests	2026-04-16T05:39:37.2244004Z     expect(received).toBe(expected) // Object.is equality
+test	Run tests	2026-04-16T05:39:37.2244308Z 
+test	Run tests	2026-04-16T05:39:37.2244407Z     Expected: 5
+test	Run tests	2026-04-16T05:39:37.2244646Z     Received: 11
+test	Run tests	2026-04-16T05:39:37.2244804Z 
+test	Run tests	2026-04-16T05:39:37.2245371Z     [0m [90m 61 |[39m   test([32m'registry has workflows array with 5 entries'[39m[33m,[39m () [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2246554Z      [90m 62 |[39m     expect([33mArray[39m[33m.[39misArray(registry[33m.[39mworkflows))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2247774Z     [31m[1m>[22m[39m[90m 63 |[39m     expect(registry[33m.[39mworkflows[33m.[39mlength)[33m.[39mtoBe([35m5[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2248655Z      [90m    |[39m                                       [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2249116Z      [90m 64 |[39m   })[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2249456Z      [90m 65 |[39m
+test	Run tests	2026-04-16T05:39:37.2250071Z      [90m 66 |[39m   test([32m'each registry entry has id, file, enabled, priority'[39m[33m,[39m () [33m=>[39m {[0m
+test	Run tests	2026-04-16T05:39:37.2250545Z 
+test	Run tests	2026-04-16T05:39:37.2250695Z       at Object.toBe (__tests__/workflows.test.js:63:39)
+test	Run tests	2026-04-16T05:39:37.2250892Z 
+test	Run tests	2026-04-16T05:39:37.2251179Z   ● workflows.json registry › each registry entry has id, file, enabled, priority
+test	Run tests	2026-04-16T05:39:37.2251409Z 
+test	Run tests	2026-04-16T05:39:37.2251514Z     expect(received).toHaveProperty(path)
+test	Run tests	2026-04-16T05:39:37.2251664Z 
+test	Run tests	2026-04-16T05:39:37.2251738Z     Expected path: "file"
+test	Run tests	2026-04-16T05:39:37.2251923Z     Received path: []
+test	Run tests	2026-04-16T05:39:37.2252023Z 
+test	Run tests	2026-04-16T05:39:37.2252609Z     Received value: {"action": "dealBot.run", "description": "Scans all deal sources hourly for new profitable opportunities", "enabled": true, "id": "wf-001", "name": "Hourly Deal Scanner", "trigger": "schedule:hourly"}
+test	Run tests	2026-04-16T05:39:37.2253410Z 
+test	Run tests	2026-04-16T05:39:37.2253714Z     [0m [90m 67 |[39m     registry[33m.[39mworkflows[33m.[39mforEach((entry) [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2254222Z      [90m 68 |[39m       expect(entry)[33m.[39mtoHaveProperty([32m'id'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2254918Z     [31m[1m>[22m[39m[90m 69 |[39m       expect(entry)[33m.[39mtoHaveProperty([32m'file'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2255347Z      [90m    |[39m                     [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2255841Z      [90m 70 |[39m       expect([36mtypeof[39m entry[33m.[39menabled)[33m.[39mtoBe([32m'boolean'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2256451Z      [90m 71 |[39m       expect([36mtypeof[39m entry[33m.[39mpriority)[33m.[39mtoBe([32m'number'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2256881Z      [90m 72 |[39m     })[33m;[39m[0m
+test	Run tests	2026-04-16T05:39:37.2257018Z 
+test	Run tests	2026-04-16T05:39:37.2257167Z       at toHaveProperty (__tests__/workflows.test.js:69:21)
+test	Run tests	2026-04-16T05:39:37.2257436Z           at Array.forEach (<anonymous>)
+test	Run tests	2026-04-16T05:39:37.2257703Z       at Object.forEach (__tests__/workflows.test.js:67:24)
+test	Run tests	2026-04-16T05:39:37.2257872Z 
+test	Run tests	2026-04-16T05:39:37.2258171Z   ● workflows.json registry › registry has global_settings
+test	Run tests	2026-04-16T05:39:37.2258362Z 
+test	Run tests	2026-04-16T05:39:37.2258465Z     expect(received).toHaveProperty(path)
+test	Run tests	2026-04-16T05:39:37.2258607Z 
+test	Run tests	2026-04-16T05:39:37.2258710Z     Expected path: "global_settings"
+test	Run tests	2026-04-16T05:39:37.2258914Z     Received path: []
+test	Run tests	2026-04-16T05:39:37.2259015Z 
+test	Run tests	2026-04-16T05:39:37.2265861Z     Received value: {"platform": "Make.com/Zapier", "version": "1.0.0", "workflows": [{"action": "dealBot.run", "description": "Scans all deal sources hourly for new profitable opportunities", "enabled": true, "id": "wf-001", "name": "Hourly Deal Scanner", "trigger": "schedule:hourly"}, {"action": "pennyBot.run", "description": "Scans stores for penny/clearance deals every 6 hours", "enabled": true, "id": "wf-002", "name": "Penny Scanner", "trigger": "schedule:every_6_hours"}, {"action": "receiptBot.run", "description": "Processes receipt uploads and matches cashback opportunities", "enabled": true, "id": "wf-003", "name": "Cashback Tracker", "trigger": "webhook:receipt_upload"}, {"action": "flipBot.run", "description": "Scans Facebook Marketplace and local listings for flip opportunities", "enabled": true, "id": "wf-004", "name": "Flip Finder", "trigger": "schedule:every_4_hours"}, {"action": "couponBot.run", "description": "Aggregates and stacks coupons from all sources daily", "enabled": true, "id": "wf-005", "name": "Coupon Stacker", "trigger": "schedule:daily"}, {"action": "profitEngine.calculateDeal", "description": "Auto-calculates profit for every new deal found", "enabled": true, "id": "wf-006", "name": "Profit Calculator", "trigger": "webhook:new_deal"}, {"action": "rankingAI.rank", "description": "Re-ranks all active deals by AI score every 2 hours", "enabled": true, "id": "wf-007", "name": "Deal Ranker", "trigger": "schedule:every_2_hours"}, {"action": "alertEngine.filterAlerts", "description": "Sends push notifications for HIGH urgency deals", "enabled": true, "id": "wf-008", "name": "Alert Sender", "trigger": "webhook:high_profit_deal"}, {"action": "revenueEngine.track", "description": "Tracks daily/weekly/monthly revenue across all bots", "enabled": true, "id": "wf-009", "name": "Revenue Monitor", "trigger": "schedule:daily"}, {"action": "legalMoneyBot.scan", "description": "Scans PACER/FTC for new settlement/payout opportunities weekly", "enabled": true, "id": "wf-010", "name": "Legal Payout Tracker", "trigger": "schedule:weekly"}, …]}
+test	Run tests	2026-04-16T05:39:37.2270933Z 
+test	Run tests	2026-04-16T05:39:37.2271047Z     [0m [90m 74 |[39m
+test	Run tests	2026-04-16T05:39:37.2271438Z      [90m 75 |[39m   test([32m'registry has global_settings'[39m[33m,[39m () [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2272062Z     [31m[1m>[22m[39m[90m 76 |[39m     expect(registry)[33m.[39mtoHaveProperty([32m'global_settings'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2272532Z      [90m    |[39m                      [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2273220Z      [90m 77 |[39m     expect(registry[33m.[39mglobal_settings)[33m.[39mtoHaveProperty([32m'max_concurrent_workflows'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2273977Z      [90m 78 |[39m     expect(registry[33m.[39mglobal_settings)[33m.[39mtoHaveProperty([32m'default_retry_attempts'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2274713Z      [90m 79 |[39m     expect(registry[33m.[39mglobal_settings)[33m.[39mtoHaveProperty([32m'notify_on_failure'[39m)[33m;[39m[0m
+test	Run tests	2026-04-16T05:39:37.2275053Z 
+test	Run tests	2026-04-16T05:39:37.2275224Z       at Object.toHaveProperty (__tests__/workflows.test.js:76:22)
+test	Run tests	2026-04-16T05:39:37.2275432Z 
+test	Run tests	2026-04-16T05:39:37.2275686Z   ● workflows.json registry › registry workflow IDs match the 5 expected IDs
+test	Run tests	2026-04-16T05:39:37.2275923Z 
+test	Run tests	2026-04-16T05:39:37.2276050Z     expect(received).toContain(expected) // indexOf
+test	Run tests	2026-04-16T05:39:37.2276217Z 
+test	Run tests	2026-04-16T05:39:37.2276294Z     Expected value: "fiverr"
+test	Run tests	2026-04-16T05:39:37.2276772Z     Received array: ["wf-001", "wf-002", "wf-003", "wf-004", "wf-005", "wf-006", "wf-007", "wf-008", "wf-009", "wf-010", …]
+test	Run tests	2026-04-16T05:39:37.2277053Z 
+test	Run tests	2026-04-16T05:39:37.2277434Z     [0m [90m 82 |[39m   test([32m'registry workflow IDs match the 5 expected IDs'[39m[33m,[39m () [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2278135Z      [90m 83 |[39m     [36mconst[39m ids [33m=[39m registry[33m.[39mworkflows[33m.[39mmap((w) [33m=>[39m w[33m.[39mid)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2278740Z     [31m[1m>[22m[39m[90m 84 |[39m     expect(ids)[33m.[39mtoContain([32m'fiverr'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2279138Z      [90m    |[39m                 [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2279543Z      [90m 85 |[39m     expect(ids)[33m.[39mtoContain([32m'real_estate'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2280095Z      [90m 86 |[39m     expect(ids)[33m.[39mtoContain([32m'grants'[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2280562Z      [90m 87 |[39m     expect(ids)[33m.[39mtoContain([32m'legal_money'[39m)[33m;[39m[0m
+test	Run tests	2026-04-16T05:39:37.2280784Z 
+test	Run tests	2026-04-16T05:39:37.2280939Z       at Object.toContain (__tests__/workflows.test.js:84:17)
+test	Run tests	2026-04-16T05:39:37.2281114Z 
+test	Run tests	2026-04-16T05:39:37.2281394Z   ● workflows.json registry › each registry file path points to an existing workflow file
+test	Run tests	2026-04-16T05:39:37.2281665Z 
+test	Run tests	2026-04-16T05:39:37.2281859Z     TypeError: The "paths[2]" argument must be of type string. Received undefined
+test	Run tests	2026-04-16T05:39:37.2282087Z 
+test	Run tests	2026-04-16T05:39:37.2282473Z     [0m [90m 91 |[39m   test([32m'each registry file path points to an existing workflow file'[39m[33m,[39m () [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2283140Z      [90m 92 |[39m     registry[33m.[39mworkflows[33m.[39mforEach((entry) [33m=>[39m {
+test	Run tests	2026-04-16T05:39:37.2283906Z     [31m[1m>[22m[39m[90m 93 |[39m       [36mconst[39m fullPath [33m=[39m path[33m.[39mresolve(__dirname[33m,[39m [32m'..'[39m[33m,[39m entry[33m.[39mfile)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2284481Z      [90m    |[39m                             [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2284966Z      [90m 94 |[39m       expect(fs[33m.[39mexistsSync(fullPath))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2285348Z      [90m 95 |[39m     })[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2285715Z      [90m 96 |[39m   })[33m;[39m[0m
+test	Run tests	2026-04-16T05:39:37.2285852Z 
+test	Run tests	2026-04-16T05:39:37.2285978Z       at resolve (__tests__/workflows.test.js:93:29)
+test	Run tests	2026-04-16T05:39:37.2286234Z           at Array.forEach (<anonymous>)
+test	Run tests	2026-04-16T05:39:37.2286501Z       at Object.forEach (__tests__/workflows.test.js:92:24)
+test	Run tests	2026-04-16T05:39:37.2286668Z 
+test	Run tests	2026-04-16T05:39:37.2286837Z   ● workflows.json registry › priorities are unique
+test	Run tests	2026-04-16T05:39:37.2287006Z 
+test	Run tests	2026-04-16T05:39:37.2287155Z     expect(received).toBe(expected) // Object.is equality
+test	Run tests	2026-04-16T05:39:37.2287327Z 
+test	Run tests	2026-04-16T05:39:37.2287393Z     Expected: 11
+test	Run tests	2026-04-16T05:39:37.2287555Z     Received: 1
+test	Run tests	2026-04-16T05:39:37.2287643Z 
+test	Run tests	2026-04-16T05:39:37.2288115Z     [0m [90m  99 |[39m     [36mconst[39m priorities [33m=[39m registry[33m.[39mworkflows[33m.[39mmap((w) [33m=>[39m w[33m.[39mpriority)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2288818Z      [90m 100 |[39m     [36mconst[39m uniquePriorities [33m=[39m [36mnew[39m [33mSet[39m(priorities)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2289516Z     [31m[1m>[22m[39m[90m 101 |[39m     expect(uniquePriorities[33m.[39msize)[33m.[39mtoBe(priorities[33m.[39mlength)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2290040Z      [90m     |[39m                                   [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.2290351Z      [90m 102 |[39m   })[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2290591Z      [90m 103 |[39m })[33m;[39m
+test	Run tests	2026-04-16T05:39:37.2290807Z      [90m 104 |[39m[0m
+test	Run tests	2026-04-16T05:39:37.2290914Z 
+test	Run tests	2026-04-16T05:39:37.2291042Z       at Object.toBe (__tests__/workflows.test.js:101:35)
+test	Run tests	2026-04-16T05:39:37.2291211Z 
+test	Run tests	2026-04-16T05:39:37.3103991Z PASS __tests__/api.test.js
+test	Run tests	2026-04-16T05:39:37.3131924Z   ● Console
+test	Run tests	2026-04-16T05:39:37.3132091Z 
+test	Run tests	2026-04-16T05:39:37.3132162Z     console.log
+test	Run tests	2026-04-16T05:39:37.3132535Z       ⚙️  Bootstrapping DreamCo system...
+test	Run tests	2026-04-16T05:39:37.3132766Z 
+test	Run tests	2026-04-16T05:39:37.3133067Z       at log (DreamCo/core/bootstrap.js:17:11)
+test	Run tests	2026-04-16T05:39:37.3133357Z 
+test	Run tests	2026-04-16T05:39:37.3133442Z     console.warn
+test	Run tests	2026-04-16T05:39:37.3134054Z       ⚠️  Bootstrap warning (non-production): Missing required environment variable(s): ADMIN_KEY
+test	Run tests	2026-04-16T05:39:37.3134697Z       Please set them in your .env file or host environment.
+test	Run tests	2026-04-16T05:39:37.3134971Z 
+test	Run tests	2026-04-16T05:39:37.3135325Z     [0m [90m 31 |[39m     process[33m.[39mexit([35m1[39m)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.3135793Z      [90m 32 |[39m   } [36melse[39m {
+test	Run tests	2026-04-16T05:39:37.3136751Z     [31m[1m>[22m[39m[90m 33 |[39m     console[33m.[39mwarn([32m'⚠️  Bootstrap warning (non-production):'[39m[33m,[39m err[33m.[39mmessage)[33m;[39m
+test	Run tests	2026-04-16T05:39:37.3138159Z      [90m    |[39m             [31m[1m^[22m[39m
+test	Run tests	2026-04-16T05:39:37.3138535Z      [90m 34 |[39m   }
+test	Run tests	2026-04-16T05:39:37.3138865Z      [90m 35 |[39m }
+test	Run tests	2026-04-16T05:39:37.3139163Z      [90m 36 |[39m[0m
+test	Run tests	2026-04-16T05:39:37.3139295Z 
+test	Run tests	2026-04-16T05:39:37.3139450Z       at Object.warn (index.js:33:13)
+test	Run tests	2026-04-16T05:39:37.3139843Z       at Object.require (__tests__/api.test.js:9:13)
+test	Run tests	2026-04-16T05:39:37.3140100Z 
+test	Run tests	2026-04-16T05:39:37.3314701Z 
+test	Run tests	2026-04-16T05:39:37.3318029Z Test Suites: 2 failed, 3 passed, 5 total
+test	Run tests	2026-04-16T05:39:37.3318494Z Tests:       6 failed, 192 passed, 198 total
+test	Run tests	2026-04-16T05:39:37.3318735Z Snapshots:   0 total
+test	Run tests	2026-04-16T05:39:37.3318910Z Time:        1.124 s
+test	Run tests	2026-04-16T05:39:37.3319077Z Ran all test suites.
+test	Run tests	2026-04-16T05:39:37.3482083Z ##[error]Process completed with exit code 1.
+test	Circuit Breaker — Check failure threshold	﻿2026-04-16T05:39:37.3513178Z ##[group]Run FAILURES=0
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3513426Z [36;1mFAILURES=0[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3513591Z [36;1mMAX=3[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3513788Z [36;1m# Count failures among tracked steps in this job[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3514053Z [36;1mif [ "failure" = "failure" ]; then[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3514272Z [36;1m  FAILURES=$((FAILURES+1))[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3514463Z [36;1mfi[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3514692Z [36;1mecho "Circuit breaker: $FAILURES/$MAX failures in this run."[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3514973Z [36;1mif [ $FAILURES -ge $MAX ]; then[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3515227Z [36;1m  echo "::error::Too many failures — stopping system"[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3515460Z [36;1m  exit 1[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3515609Z [36;1mfi[0m
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3533624Z shell: /usr/bin/bash -e {0}
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3533812Z ##[endgroup]
+test	Circuit Breaker — Check failure threshold	2026-04-16T05:39:37.3570334Z Circuit breaker: 1/3 failures in this run.
+test	Handle test failure	﻿2026-04-16T05:39:37.3609376Z ##[group]Run echo "::warning::Tests failed, check logs above for details."
+test	Handle test failure	2026-04-16T05:39:37.3609762Z [36;1mecho "::warning::Tests failed, check logs above for details."[0m
+test	Handle test failure	2026-04-16T05:39:37.3610024Z [36;1mexit 1[0m
+test	Handle test failure	2026-04-16T05:39:37.3626063Z shell: /usr/bin/bash -e {0}
+test	Handle test failure	2026-04-16T05:39:37.3626259Z ##[endgroup]
+test	Handle test failure	2026-04-16T05:39:37.3668132Z ##[warning]Tests failed, check logs above for details.
+test	Handle test failure	2026-04-16T05:39:37.3669266Z ##[error]Process completed with exit code 1.
+test	Upload Logs	﻿2026-04-16T05:39:37.3711750Z ##[group]Run actions/upload-artifact@v4
+test	Upload Logs	2026-04-16T05:39:37.3711973Z with:
+test	Upload Logs	2026-04-16T05:39:37.3712117Z   name: error-logs-test
+test	Upload Logs	2026-04-16T05:39:37.3712300Z   path: logs/
+test	Upload Logs	npm-debug.log*
+test	Upload Logs	
+test	Upload Logs	2026-04-16T05:39:37.3712498Z   if-no-files-found: ignore
+test	Upload Logs	2026-04-16T05:39:37.3712678Z   compression-level: 6
+test	Upload Logs	2026-04-16T05:39:37.3712983Z   overwrite: false
+test	Upload Logs	2026-04-16T05:39:37.3713151Z   include-hidden-files: false
+test	Upload Logs	2026-04-16T05:39:37.3713324Z ##[endgroup]
+test	Upload Logs	2026-04-16T05:39:37.5449572Z With the provided path, there will be 1 file uploaded
+test	Upload Logs	2026-04-16T05:39:37.5473676Z Artifact name is valid!
+test	Upload Logs	2026-04-16T05:39:37.5493664Z Root directory input is valid!
+test	Upload Logs	2026-04-16T05:39:37.8381907Z Beginning upload of artifact content to blob storage
+test	Upload Logs	2026-04-16T05:39:38.1460128Z Uploaded bytes 713
+test	Upload Logs	2026-04-16T05:39:38.2269594Z Finished uploading artifact content to blob storage!
+test	Upload Logs	2026-04-16T05:39:38.2271676Z SHA256 digest of uploaded artifact zip is 75b0f0d37aec8f56daff6469662447b62f47c3febaae447f6515a13be874782c
+test	Upload Logs	2026-04-16T05:39:38.2273263Z Finalizing artifact upload
+test	Upload Logs	2026-04-16T05:39:38.3967643Z Artifact error-logs-test.zip successfully finalized. Artifact ID 6466694179
+test	Upload Logs	2026-04-16T05:39:38.3968616Z Artifact error-logs-test has been successfully uploaded! Final size is 713 bytes. Artifact ID is 6466694179
+test	Upload Logs	2026-04-16T05:39:38.3974325Z Artifact download URL: https://github.com/DreamCo-Technologies/Dreamcobots/actions/runs/24494130160/artifacts/6466694179
+test	Post Checkout code	﻿2026-04-16T05:39:38.4090197Z Post job cleanup.
+test	Post Checkout code	2026-04-16T05:39:38.4853644Z [command]/usr/bin/git version
+test	Post Checkout code	2026-04-16T05:39:38.4884121Z git version 2.53.0
+test	Post Checkout code	2026-04-16T05:39:38.4916691Z Temporarily overriding HOME='/home/runner/work/_temp/5f40f74a-c859-4660-a5f0-5f0aa07fb3b9' before making global git config changes
+test	Post Checkout code	2026-04-16T05:39:38.4921020Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Checkout code	2026-04-16T05:39:38.4921796Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+test	Post Checkout code	2026-04-16T05:39:38.4958856Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Checkout code	2026-04-16T05:39:38.4986272Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Checkout code	2026-04-16T05:39:38.5179092Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Checkout code	2026-04-16T05:39:38.5196565Z http.https://github.com/.extraheader
+test	Post Checkout code	2026-04-16T05:39:38.5206791Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Checkout code	2026-04-16T05:39:38.5233647Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Checkout code	2026-04-16T05:39:38.5417237Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Checkout code	2026-04-16T05:39:38.5442396Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Complete job	﻿2026-04-16T05:39:38.5723348Z Cleaning up orphan processes
+test	Complete job	2026-04-16T05:39:38.5952167Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+error_handling	Set up job	﻿2026-04-16T05:39:46.2628714Z Current runner version: '2.333.1'
+error_handling	Set up job	2026-04-16T05:39:46.2654335Z ##[group]Runner Image Provisioner
+error_handling	Set up job	2026-04-16T05:39:46.2655190Z Hosted Compute Agent
+error_handling	Set up job	2026-04-16T05:39:46.2655761Z Version: 20260213.493
+error_handling	Set up job	2026-04-16T05:39:46.2656370Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+error_handling	Set up job	2026-04-16T05:39:46.2657215Z Build Date: 2026-02-13T00:28:41Z
+error_handling	Set up job	2026-04-16T05:39:46.2657959Z Worker ID: {afb43f5e-a7c0-4bcd-adcc-b0cca2ab5af6}
+error_handling	Set up job	2026-04-16T05:39:46.2658647Z Azure Region: eastus
+error_handling	Set up job	2026-04-16T05:39:46.2659237Z ##[endgroup]
+error_handling	Set up job	2026-04-16T05:39:46.2660590Z ##[group]Operating System
+error_handling	Set up job	2026-04-16T05:39:46.2661185Z Ubuntu
+error_handling	Set up job	2026-04-16T05:39:46.2661683Z 24.04.4
+error_handling	Set up job	2026-04-16T05:39:46.2662187Z LTS
+error_handling	Set up job	2026-04-16T05:39:46.2663059Z ##[endgroup]
+error_handling	Set up job	2026-04-16T05:39:46.2663632Z ##[group]Runner Image
+error_handling	Set up job	2026-04-16T05:39:46.2664246Z Image: ubuntu-24.04
+error_handling	Set up job	2026-04-16T05:39:46.2664722Z Version: 20260406.80.1
+error_handling	Set up job	2026-04-16T05:39:46.2665751Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+error_handling	Set up job	2026-04-16T05:39:46.2667434Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+error_handling	Set up job	2026-04-16T05:39:46.2668445Z ##[endgroup]
+error_handling	Set up job	2026-04-16T05:39:46.2669592Z ##[group]GITHUB_TOKEN Permissions
+error_handling	Set up job	2026-04-16T05:39:46.2671774Z Contents: read
+error_handling	Set up job	2026-04-16T05:39:46.2672648Z Metadata: read
+error_handling	Set up job	2026-04-16T05:39:46.2673168Z Packages: read
+error_handling	Set up job	2026-04-16T05:39:46.2673703Z ##[endgroup]
+error_handling	Set up job	2026-04-16T05:39:46.2675664Z Secret source: Actions
+error_handling	Set up job	2026-04-16T05:39:46.2676818Z Prepare workflow directory
+error_handling	Set up job	2026-04-16T05:39:46.3001162Z Prepare all required actions
+error_handling	Set up job	2026-04-16T05:39:46.3040113Z Getting action download info
+error_handling	Set up job	2026-04-16T05:39:46.6366680Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+error_handling	Set up job	2026-04-16T05:39:46.7865083Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+error_handling	Set up job	2026-04-16T05:39:46.9930251Z Complete job name: error_handling
+error_handling	Debug Context	﻿2026-04-16T05:39:47.0572179Z ##[group]Run echo "Workflow: CI/CD Workflow"
+error_handling	Debug Context	2026-04-16T05:39:47.0573219Z [36;1mecho "Workflow: CI/CD Workflow"[0m
+error_handling	Debug Context	2026-04-16T05:39:47.0573756Z [36;1mecho "Job: error_handling"[0m
+error_handling	Debug Context	2026-04-16T05:39:47.0574267Z [36;1mecho "Run ID: 24494130160"[0m
+error_handling	Debug Context	2026-04-16T05:39:47.0574768Z [36;1mecho "Actor: ireanjordan24"[0m
+error_handling	Debug Context	2026-04-16T05:39:47.0599748Z shell: /usr/bin/bash -e {0}
+error_handling	Debug Context	2026-04-16T05:39:47.0600535Z ##[endgroup]
+error_handling	Debug Context	2026-04-16T05:39:47.0718711Z Workflow: CI/CD Workflow
+error_handling	Debug Context	2026-04-16T05:39:47.0719634Z Job: error_handling
+error_handling	Debug Context	2026-04-16T05:39:47.0720331Z Run ID: 24494130160
+error_handling	Debug Context	2026-04-16T05:39:47.0720949Z Actor: ireanjordan24
+error_handling	Classify and Report Failure	﻿2026-04-16T05:39:47.0812130Z ##[group]Run echo "::error::One or more jobs failed in workflow run 24494130160"
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0813342Z [36;1mecho "::error::One or more jobs failed in workflow run 24494130160"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0814081Z [36;1mecho "Failed workflow: CI/CD Workflow"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0814663Z [36;1mecho "Triggered by: ireanjordan24"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0815198Z [36;1mecho "Branch: main"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0815781Z [36;1mecho "Commit: 4701cb7ec61cebd6c85b56e421adf357fff122d0"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0816415Z [36;1m[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0816810Z [36;1m# Determine which job failed[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0817342Z [36;1mif [ "failure" = "failure" ]; then[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0817975Z [36;1m  echo "::error::Test job failed — check test logs above"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0818576Z [36;1mfi[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0818988Z [36;1mif [ "skipped" = "failure" ]; then[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0819667Z [36;1m  echo "::error::Deploy job failed — check deploy logs above"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0820368Z [36;1mfi[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0820809Z [36;1mif [ "skipped" = "failure" ]; then[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0821503Z [36;1m  echo "::error::Monitor job failed — check monitor logs above"[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0822175Z [36;1mfi[0m
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0843288Z shell: /usr/bin/bash -e {0}
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0843758Z ##[endgroup]
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0917032Z ##[error]One or more jobs failed in workflow run 24494130160
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0923799Z Failed workflow: CI/CD Workflow
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0924453Z Triggered by: ireanjordan24
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0924913Z Branch: main
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0925392Z Commit: 4701cb7ec61cebd6c85b56e421adf357fff122d0
+error_handling	Classify and Report Failure	2026-04-16T05:39:47.0927113Z ##[error]Test job failed — check test logs above
+error_handling	Checkout code	﻿2026-04-16T05:39:47.1073725Z ##[group]Run actions/checkout@v4
+error_handling	Checkout code	2026-04-16T05:39:47.1074289Z with:
+error_handling	Checkout code	2026-04-16T05:39:47.1074722Z   repository: DreamCo-Technologies/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.1075429Z   token: ***
+error_handling	Checkout code	2026-04-16T05:39:47.1075803Z   ssh-strict: true
+error_handling	Checkout code	2026-04-16T05:39:47.1076195Z   ssh-user: git
+error_handling	Checkout code	2026-04-16T05:39:47.1076582Z   persist-credentials: true
+error_handling	Checkout code	2026-04-16T05:39:47.1077032Z   clean: true
+error_handling	Checkout code	2026-04-16T05:39:47.1077430Z   sparse-checkout-cone-mode: true
+error_handling	Checkout code	2026-04-16T05:39:47.1077910Z   fetch-depth: 1
+error_handling	Checkout code	2026-04-16T05:39:47.1078298Z   fetch-tags: false
+error_handling	Checkout code	2026-04-16T05:39:47.1078696Z   show-progress: true
+error_handling	Checkout code	2026-04-16T05:39:47.1079135Z   lfs: false
+error_handling	Checkout code	2026-04-16T05:39:47.1079532Z   submodules: false
+error_handling	Checkout code	2026-04-16T05:39:47.1079995Z   set-safe-directory: true
+error_handling	Checkout code	2026-04-16T05:39:47.1080483Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.2102810Z Syncing repository: DreamCo-Technologies/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.2104685Z ##[group]Getting Git version info
+error_handling	Checkout code	2026-04-16T05:39:47.2105413Z Working directory is '/home/runner/work/Dreamcobots/Dreamcobots'
+error_handling	Checkout code	2026-04-16T05:39:47.2106442Z [command]/usr/bin/git version
+error_handling	Checkout code	2026-04-16T05:39:47.2153099Z git version 2.53.0
+error_handling	Checkout code	2026-04-16T05:39:47.2179595Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.2193856Z Temporarily overriding HOME='/home/runner/work/_temp/22d9b535-9319-414c-be66-fadf350af2c7' before making global git config changes
+error_handling	Checkout code	2026-04-16T05:39:47.2195270Z Adding repository directory to the temporary git global config as a safe directory
+error_handling	Checkout code	2026-04-16T05:39:47.2207067Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.2237337Z Deleting the contents of '/home/runner/work/Dreamcobots/Dreamcobots'
+error_handling	Checkout code	2026-04-16T05:39:47.2240855Z ##[group]Initializing the repository
+error_handling	Checkout code	2026-04-16T05:39:47.2245170Z [command]/usr/bin/git init /home/runner/work/Dreamcobots/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.2346169Z hint: Using 'master' as the name for the initial branch. This default branch name
+error_handling	Checkout code	2026-04-16T05:39:47.2348120Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+error_handling	Checkout code	2026-04-16T05:39:47.2350080Z hint: to use in all of your new repositories, which will suppress this warning,
+error_handling	Checkout code	2026-04-16T05:39:47.2351638Z hint: call:
+error_handling	Checkout code	2026-04-16T05:39:47.2352874Z hint:
+error_handling	Checkout code	2026-04-16T05:39:47.2353990Z hint: 	git config --global init.defaultBranch <name>
+error_handling	Checkout code	2026-04-16T05:39:47.2355305Z hint:
+error_handling	Checkout code	2026-04-16T05:39:47.2356485Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+error_handling	Checkout code	2026-04-16T05:39:47.2358258Z hint: 'development'. The just-created branch can be renamed via this command:
+error_handling	Checkout code	2026-04-16T05:39:47.2359767Z hint:
+error_handling	Checkout code	2026-04-16T05:39:47.2360529Z hint: 	git branch -m <name>
+error_handling	Checkout code	2026-04-16T05:39:47.2362096Z hint:
+error_handling	Checkout code	2026-04-16T05:39:47.2363506Z hint: Disable this message with "git config set advice.defaultBranchName false"
+error_handling	Checkout code	2026-04-16T05:39:47.2366567Z Initialized empty Git repository in /home/runner/work/Dreamcobots/Dreamcobots/.git/
+error_handling	Checkout code	2026-04-16T05:39:47.2369936Z [command]/usr/bin/git remote add origin https://github.com/DreamCo-Technologies/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.2401266Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.2402030Z ##[group]Disabling automatic garbage collection
+error_handling	Checkout code	2026-04-16T05:39:47.2405233Z [command]/usr/bin/git config --local gc.auto 0
+error_handling	Checkout code	2026-04-16T05:39:47.2433984Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.2434675Z ##[group]Setting up auth
+error_handling	Checkout code	2026-04-16T05:39:47.2446511Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+error_handling	Checkout code	2026-04-16T05:39:47.2478616Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+error_handling	Checkout code	2026-04-16T05:39:47.2787473Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+error_handling	Checkout code	2026-04-16T05:39:47.2827363Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+error_handling	Checkout code	2026-04-16T05:39:47.3078058Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+error_handling	Checkout code	2026-04-16T05:39:47.3119225Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+error_handling	Checkout code	2026-04-16T05:39:47.3353446Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+error_handling	Checkout code	2026-04-16T05:39:47.3391607Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.3393192Z ##[group]Fetching the repository
+error_handling	Checkout code	2026-04-16T05:39:47.3401283Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4701cb7ec61cebd6c85b56e421adf357fff122d0:refs/remotes/origin/main
+error_handling	Checkout code	2026-04-16T05:39:47.6265534Z From https://github.com/DreamCo-Technologies/Dreamcobots
+error_handling	Checkout code	2026-04-16T05:39:47.6266778Z  * [new ref]         4701cb7ec61cebd6c85b56e421adf357fff122d0 -> origin/main
+error_handling	Checkout code	2026-04-16T05:39:47.6296701Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.6297921Z ##[group]Determining the checkout info
+error_handling	Checkout code	2026-04-16T05:39:47.6299490Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.6305122Z [command]/usr/bin/git sparse-checkout disable
+error_handling	Checkout code	2026-04-16T05:39:47.6343087Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+error_handling	Checkout code	2026-04-16T05:39:47.6371121Z ##[group]Checking out the ref
+error_handling	Checkout code	2026-04-16T05:39:47.6375006Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+error_handling	Checkout code	2026-04-16T05:39:47.7722016Z Switched to a new branch 'main'
+error_handling	Checkout code	2026-04-16T05:39:47.7723926Z branch 'main' set up to track 'origin/main'.
+error_handling	Checkout code	2026-04-16T05:39:47.7734855Z ##[endgroup]
+error_handling	Checkout code	2026-04-16T05:39:47.7773006Z [command]/usr/bin/git log -1 --format=%H
+error_handling	Checkout code	2026-04-16T05:39:47.7795178Z 4701cb7ec61cebd6c85b56e421adf357fff122d0
+error_handling	Upload Error Logs	﻿2026-04-16T05:39:47.8003920Z ##[group]Run actions/upload-artifact@v4
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8005132Z with:
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8005931Z   name: error-logs-24494130160
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8006959Z   path: logs/
+error_handling	Upload Error Logs	npm-debug.log*
+error_handling	Upload Error Logs	
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8007974Z   if-no-files-found: ignore
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8008945Z   compression-level: 6
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8009839Z   overwrite: false
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8010740Z   include-hidden-files: false
+error_handling	Upload Error Logs	2026-04-16T05:39:47.8011726Z ##[endgroup]
+error_handling	Upload Error Logs	2026-04-16T05:39:48.0219362Z With the provided path, there will be 1 file uploaded
+error_handling	Upload Error Logs	2026-04-16T05:39:48.0226279Z Artifact name is valid!
+error_handling	Upload Error Logs	2026-04-16T05:39:48.0227468Z Root directory input is valid!
+error_handling	Upload Error Logs	2026-04-16T05:39:48.1573131Z Beginning upload of artifact content to blob storage
+error_handling	Upload Error Logs	2026-04-16T05:39:48.2006381Z Uploaded bytes 713
+error_handling	Upload Error Logs	2026-04-16T05:39:48.2183338Z Finished uploading artifact content to blob storage!
+error_handling	Upload Error Logs	2026-04-16T05:39:48.2187275Z SHA256 digest of uploaded artifact zip is 289941463f9355778de8f2b9fa200571d15fb59655858a137a61f1e8b0615c1b
+error_handling	Upload Error Logs	2026-04-16T05:39:48.2189542Z Finalizing artifact upload
+error_handling	Upload Error Logs	2026-04-16T05:39:48.3278692Z Artifact error-logs-24494130160.zip successfully finalized. Artifact ID 6466695761
+error_handling	Upload Error Logs	2026-04-16T05:39:48.3279674Z Artifact error-logs-24494130160 has been successfully uploaded! Final size is 713 bytes. Artifact ID is 6466695761
+error_handling	Upload Error Logs	2026-04-16T05:39:48.3286243Z Artifact download URL: https://github.com/DreamCo-Technologies/Dreamcobots/actions/runs/24494130160/artifacts/6466695761
+error_handling	Notify of Failure	﻿2026-04-16T05:39:48.3447813Z ##[group]Run echo "Notifying developers of failure..."
+error_handling	Notify of Failure	2026-04-16T05:39:48.3448266Z [36;1mecho "Notifying developers of failure..."[0m
+error_handling	Notify of Failure	2026-04-16T05:39:48.3448675Z [36;1mecho "Workflow 'CI/CD Workflow' failed on run 24494130160"[0m
+error_handling	Notify of Failure	2026-04-16T05:39:48.3449281Z [36;1mecho "Review: https://github.com/DreamCo-Technologies/Dreamcobots/actions/runs/24494130160"[0m
+error_handling	Notify of Failure	2026-04-16T05:39:48.3449900Z [36;1m# Add notification service commands here (e.g., Slack, email).[0m
+error_handling	Notify of Failure	2026-04-16T05:39:48.3471998Z shell: /usr/bin/bash -e {0}
+error_handling	Notify of Failure	2026-04-16T05:39:48.3472590Z ##[endgroup]
+error_handling	Notify of Failure	2026-04-16T05:39:48.3514342Z Notifying developers of failure...
+error_handling	Notify of Failure	2026-04-16T05:39:48.3514941Z Workflow 'CI/CD Workflow' failed on run 24494130160
+error_handling	Notify of Failure	2026-04-16T05:39:48.3515490Z Review: https://github.com/DreamCo-Technologies/Dreamcobots/actions/runs/24494130160
+error_handling	Post Checkout code	﻿2026-04-16T05:39:48.3600672Z Post job cleanup.
+error_handling	Post Checkout code	2026-04-16T05:39:48.4538916Z [command]/usr/bin/git version
+error_handling	Post Checkout code	2026-04-16T05:39:48.4573806Z git version 2.53.0
+error_handling	Post Checkout code	2026-04-16T05:39:48.4617557Z Temporarily overriding HOME='/home/runner/work/_temp/1881976a-9a67-4f3e-98d7-98f52e93612e' before making global git config changes
+error_handling	Post Checkout code	2026-04-16T05:39:48.4618556Z Adding repository directory to the temporary git global config as a safe directory
+error_handling	Post Checkout code	2026-04-16T05:39:48.4623025Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Dreamcobots/Dreamcobots
+error_handling	Post Checkout code	2026-04-16T05:39:48.4656396Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+error_handling	Post Checkout code	2026-04-16T05:39:48.4687924Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+error_handling	Post Checkout code	2026-04-16T05:39:48.4909090Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+error_handling	Post Checkout code	2026-04-16T05:39:48.4928595Z http.https://github.com/.extraheader
+error_handling	Post Checkout code	2026-04-16T05:39:48.4940711Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+error_handling	Post Checkout code	2026-04-16T05:39:48.4969782Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+error_handling	Post Checkout code	2026-04-16T05:39:48.5184621Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+error_handling	Post Checkout code	2026-04-16T05:39:48.5214256Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+error_handling	Complete job	﻿2026-04-16T05:39:48.5541698Z Cleaning up orphan processes
+error_handling	Complete job	2026-04-16T05:39:48.5831771Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/upload-artifact@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
