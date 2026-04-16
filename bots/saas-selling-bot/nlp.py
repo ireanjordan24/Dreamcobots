@@ -2,6 +2,7 @@
 Simple keyword-based NLP engine for FAQ responses.
 Falls back to OpenAI API when OPENAI_API_KEY is set (optional, free-tier upgrade).
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 import re

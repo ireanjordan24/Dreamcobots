@@ -5,6 +5,7 @@ Handles authentication for multiple job application sites.
 Credentials are loaded from environment variables (preferred) or from
 the config.json file as a fallback.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 import time

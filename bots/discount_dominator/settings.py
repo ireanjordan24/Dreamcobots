@@ -14,6 +14,7 @@ functional groups:
 Each setting is stored as a typed entry in ``DISCOUNT_DOMINATOR_SETTINGS``.
 Use :func:`get_setting` and :func:`apply_settings` to read and apply them.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

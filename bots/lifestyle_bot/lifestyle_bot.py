@@ -10,6 +10,7 @@ Usage
     result = bot.track_habit("morning_run", True)
     print(result)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

@@ -9,6 +9,7 @@ to drive the real estate optimisation use-case:
 * Real estate buyer scoring (setting 592)
 * Enterprise multi-location and CRM/ERP integrations (settings 551, 571, 570)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

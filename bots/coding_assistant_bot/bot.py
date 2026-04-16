@@ -1,6 +1,7 @@
 """
 Dreamcobots CodingAssistantBot — tier-aware code completion, review, and test generation.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

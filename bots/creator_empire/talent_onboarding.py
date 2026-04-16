@@ -4,6 +4,7 @@ Talent Onboarding Engine for CreatorEmpire.
 Handles personal brand kits, media asset collection, and talent profile
 management for the DreamCo CreatorEmpire platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

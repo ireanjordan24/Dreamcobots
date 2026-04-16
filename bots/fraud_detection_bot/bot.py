@@ -1,6 +1,7 @@
 """
 Dreamcobots FraudDetectionBot — tier-aware transaction fraud detection and risk analysis.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

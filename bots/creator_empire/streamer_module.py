@@ -4,6 +4,7 @@ Streamer Module for CreatorEmpire.
 Handles launching streaming accounts on Twitch and YouTube, AI-generated
 overlay templates, and channel setup automation for the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

@@ -10,6 +10,7 @@ Usage
     response = bot.chat("Write a Twitter thread about our new product launch")
     print(response["message"])
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

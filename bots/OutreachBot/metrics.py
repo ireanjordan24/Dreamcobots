@@ -1,4 +1,5 @@
 """OutreachBot metrics — tracks outreach activity."""
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

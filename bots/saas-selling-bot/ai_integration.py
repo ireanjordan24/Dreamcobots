@@ -3,6 +3,7 @@ AI Integration module for the SaaS Selling Bot.
 Provides personalised recommendations and chatbot capabilities
 using OpenAI's GPT models (with a graceful fallback when no API key is configured).
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 import json

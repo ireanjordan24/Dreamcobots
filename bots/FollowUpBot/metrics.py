@@ -1,4 +1,5 @@
 """FollowUpBot metrics — tracks follow-up activity."""
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

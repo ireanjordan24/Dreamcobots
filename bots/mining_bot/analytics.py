@@ -12,6 +12,7 @@ Analytics depth is gated by tier:
   - PRO:        advanced (revenue + energy + ROI)
   - ENTERPRISE: full (all metrics + trend analysis)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

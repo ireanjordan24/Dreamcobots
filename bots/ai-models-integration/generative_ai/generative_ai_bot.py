@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 # Generative AI Models Bot
 # Integrates major Generative AI models:
 #   - OpenAI DALL-E 3 (text-to-image generation)

@@ -4,6 +4,7 @@ Monetization Dashboard for CreatorEmpire.
 Tracks revenue streams, service fees, subscriptions, and payment
 integration for talent managed through the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

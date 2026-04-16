@@ -20,6 +20,7 @@ Usage
     deal  = bot.car_flipping.evaluate_vehicle({"purchase_price": 8000, ...})
     sku   = bot.retail.analyse_sku({"sku": "SKU-001", "price": 29.99, ...})
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

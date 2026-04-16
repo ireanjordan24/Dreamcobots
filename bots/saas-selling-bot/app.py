@@ -16,6 +16,7 @@ Endpoints:
   POST /api/webhook/stripe     – Stripe webhook handler
   GET  /                       – Serve the frontend
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 import json

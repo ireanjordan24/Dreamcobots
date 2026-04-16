@@ -7,6 +7,7 @@ methods used by other bot modules and interoperability consumers such as
 the real estate optimisation system, the car-flipping bot, and the
 multi-layered retail intelligence network.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

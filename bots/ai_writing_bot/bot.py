@@ -1,6 +1,7 @@
 """
 Dreamcobots AIWritingBot — tier-aware AI content generation and SEO optimization.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

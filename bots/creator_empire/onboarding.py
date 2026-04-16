@@ -4,6 +4,7 @@ Talent Identity & Onboarding module for the CreatorEmpire bot.
 Guides creators through profile setup tailored to their specific role
 (streamer, rapper, athlete, etc.) and generates a personalised action plan.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

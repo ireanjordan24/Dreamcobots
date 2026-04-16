@@ -1,6 +1,7 @@
 """
 Dreamcobots RealEstateBot — tier-aware property search and investment analysis.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

@@ -9,6 +9,7 @@ The client degrades gracefully when no API key is configured: it returns
 clearly marked mock data so the bot can still demonstrate its workflow
 in development/demo environments.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import json
 import urllib.error

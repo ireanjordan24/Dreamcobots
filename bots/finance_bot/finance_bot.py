@@ -10,6 +10,7 @@ Usage
     response = bot.chat("Analyze my Q3 cash flow")
     print(response["message"])
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

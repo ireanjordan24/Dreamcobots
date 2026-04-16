@@ -4,6 +4,7 @@ Enterprise-Grade Features module for the Discount Dominator (settings 551–580)
 Provides the :class:`EnterpriseFeatures` facade used by all bots that operate
 at enterprise scale with multi-location, compliance, and integration needs.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

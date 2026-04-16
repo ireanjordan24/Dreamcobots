@@ -10,6 +10,7 @@ Usage
     course = bot.create_course("Intro to Python", ["Variables", "Loops", "Functions"])
     print(course)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

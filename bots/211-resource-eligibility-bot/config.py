@@ -2,6 +2,7 @@
 Configuration module for the 211 Resource and Eligibility Checker Bot.
 Loads settings from environment variables with sensible defaults.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 

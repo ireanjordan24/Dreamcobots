@@ -11,6 +11,7 @@ Provides:
 All checks are performed locally (no external API calls), using simulated
 heuristics suitable for demonstration and unit-testing.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

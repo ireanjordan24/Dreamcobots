@@ -1,6 +1,7 @@
 """
 Dreamcobots CRMAutomationBot — tier-aware CRM contact management and pipeline automation.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

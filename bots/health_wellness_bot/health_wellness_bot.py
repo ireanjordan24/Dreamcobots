@@ -10,6 +10,7 @@ Usage
     result = bot.calculate_bmi(70.0, 1.75)
     print(result)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

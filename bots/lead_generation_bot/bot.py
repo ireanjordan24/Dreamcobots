@@ -1,6 +1,7 @@
 """
 Dreamcobots LeadGenerationBot — tier-aware lead capture and scoring.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

@@ -28,6 +28,7 @@ Usage
     bot.record_revenue("Alex", "tip_jar", 25.00, "streamlabs")
     print(bot.get_total_revenue("Alex"))
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os
