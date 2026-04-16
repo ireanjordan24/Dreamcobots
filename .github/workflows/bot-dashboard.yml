@@ -103,15 +103,7 @@ jobs:
       - name: Run Bot Scanner (smoke tests + classification)
         id: scan
         run: |
-          python3 tools/bot_scanner.py --summary 2>/dev/null | tee /tmp/bot_scan_summary.txt
-
-          # Parse counts for outputs
-          TOTAL=$(python3 -c "
-          import sys; sys.path.insert(0,'.')
-          from tools.bot_scanner import scan_bots
-          r = scan_bots(run_smoke=False)
-          print(len(r))
-          " 2>/dev/null)
+          python3 tools/bot_scanner.py --summary 2>&1 | tee /tmp/bot_scan_summary.txt
 
           python3 -c "
           import sys; sys.path.insert(0,'.')
