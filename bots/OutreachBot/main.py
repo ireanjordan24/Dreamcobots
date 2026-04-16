@@ -23,7 +23,7 @@ from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW
 
 
 def _build_message(lead: Dict) -> str:
-    """Return a personalised outreach e-mail body for *lead*."""
+    """Return a personalized outreach e-mail body for *lead*."""
     name = lead.get("name", "Business Owner")
     business = lead.get("business", "your business")
     return (
@@ -90,6 +90,7 @@ def run(leads: List[Dict]) -> int:
 
 
 if __name__ == "__main__":
-    from bots.LeadGenBot.main import get_leads  # noqa: F401
+    from bots.LeadGenBot.main import get_leads
 
     run(get_leads())
+

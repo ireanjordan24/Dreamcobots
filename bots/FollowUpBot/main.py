@@ -55,7 +55,7 @@ def follow_up(lead: Dict, delay: float = 0) -> list:
 
 
 if __name__ == "__main__":
-    from bots.LeadGenBot.main import get_leads  # noqa: F401
+    from bots.LeadGenBot.main import get_leads
 
     for lead in get_leads():
         follow_up(lead)

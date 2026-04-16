@@ -1,6 +1,6 @@
 # OutreachBot
 
-Contacts leads via personalised e-mail using an extendable SMTP-based module.
+Contacts leads via personalized e-mail using an extendable SMTP-based module.
 
 ## Overview
 
