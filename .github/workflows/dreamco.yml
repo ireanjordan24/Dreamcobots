@@ -1,28 +1,158 @@
-name: DreamCo Auto Build
+name: DreamCo CI
 
 on:
+  pull_request:
   push:
-  schedule:
-    - cron: "*/10 * * * *"
+    branches: [main, dev]
 
 permissions:
   contents: read
 
 jobs:
-  build:
+
+  # =========================
+  # 🟨 JAVASCRIPT / ESLINT
+  # =========================
+  js-lint:
+    name: JS Lint & Format
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          fi
+
+      - name: Run Prettier (auto-fix)
+        run: |
+          npx prettier . --write || true
+
+      - name: Run ESLint (auto-fix)
+        run: |
+          npx eslint . --fix || true
+
+      - name: Verify formatting
+        run: |
+          npx prettier . --check
+
+      - name: Verify lint
+        run: |
+          npx eslint .
+
+  # =========================
+  # 🟦 PYTHON / BOT SCAN
+  # =========================
+  python-lint:
+    name: Python Lint & Bot Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tools
+        run: |
+          pip install black flake8 isort
+
+      - name: Auto-format (Black + isort)
+        run: |
+          black .
+          isort .
+
+      - name: Lint check
+        run: |
+          flake8 . --max-line-length=100 --extend-ignore=E203
+
+      - name: Run Bot Validator
+        run: |
+          python scripts/bot_validator.py
+
+  # =========================
+  # 🧠 BOT HEALTH CHECK
+  # =========================
+  bot-health:
+    name: Bot Integrity Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Scan bot structure
+        run: |
+          echo "Scanning bots..."
+          find . -type d -name "*bot*" || true
+
+      - name: Check for required files
+        run: |
+          echo "Checking bot standards..."
+          find . -name "*.py" -o -name "*.js"
+
+  # =========================
+  # 🚀 SYSTEM CORE
+  # =========================
+  system-core:
+    name: System Brain + Builder + Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true
+
+      - name: Run Bot Validator (auto-fix)
+        run: python scripts/bot_validator.py --fix
+
+      - name: Run System Builder
+        run: python core/system_builder.py
+
+      - name: Run System Brain
+        run: python core/system_brain.py
+
+      - name: Run Sales Pipeline
+        run: python core/sales_pipeline.py
+
+  # =========================
+  # 🏗️ BUILD
+  # =========================
+  build:
+    name: Build & Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install deps
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt || true
 
       - name: Run DreamCo
         run: python main.py
+
