@@ -18,7 +18,7 @@ Tier access
   FREE:       Task classification + basic routing (3 task types),
               email tool only, view-only stats.
   PRO:        Full routing (all 6 task types), all resource tools,
-              performance tracking, cost optimisation hints.
+              performance tracking, cost optimization hints.
   ENTERPRISE: Unlimited routing, multi-agent communication,
               API access, white-label, dedicated support.
 
@@ -433,7 +433,7 @@ class PerformanceTracker:
             "total_estimated_cost_usd": round(total_cost, 6),
             "cost_tier_breakdown": cost_tiers,
             "economy_ratio": round(economy_ratio, 3),
-            "optimisation_suggestions": suggestions,
+            "optimization_suggestions": suggestions,
         }
 
 
@@ -510,10 +510,10 @@ class ModelRouterBot:
             return {"error": "Performance tracking requires PRO or higher tier."}
         return self._tracker.analyze(routing_results)
 
-    def get_cost_optimisation(self) -> dict:
-        """Return cost optimisation tips based on the routing table (PRO+ only)."""
+    def get_cost_optimization(self) -> dict:
+        """Return cost optimization tips based on the routing table (PRO+ only)."""
         if not self._config.has_feature(FEATURE_COST_OPTIMIZATION):
-            return {"error": "Cost optimisation requires PRO or higher tier."}
+            return {"error": "Cost optimization requires PRO or higher tier."}
         return {
             "strategy": "Use economy providers (Mistral/Meta) for bulk and automation tasks.",
             "routing_table": self._router.list_routes(),
@@ -598,8 +598,8 @@ class ModelRouterBot:
         # Performance analysis
         report["performance_analysis"] = self.analyze_performance(routing_results)
 
-        # Cost optimisation
-        report["cost_optimisation"] = self.get_cost_optimisation()
+        # Cost optimization
+        report["cost_optimization"] = self.get_cost_optimization()
 
         # Multi-agent broadcast (ENTERPRISE)
         if self._config.has_feature(FEATURE_MULTI_AGENT):

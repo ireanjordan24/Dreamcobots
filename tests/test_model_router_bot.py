@@ -385,8 +385,8 @@ class TestPerformanceTracker:
     def test_analyze_suggestions_present(self):
         results = self._make_results(["general", "general", "general"])
         report = self.tracker.analyze(results)
-        assert isinstance(report["optimisation_suggestions"], list)
-        assert len(report["optimisation_suggestions"]) > 0
+        assert isinstance(report["optimization_suggestions"], list)
+        assert len(report["optimization_suggestions"]) > 0
 
     def test_analyze_task_types_seen(self):
         results = self._make_results(["coding", "vision"])
@@ -415,8 +415,8 @@ class TestModelRouterBot:
         assert "performance_analysis" in report
         pa = report["performance_analysis"]
         assert "error" not in pa
-        assert "cost_optimisation" in report
-        co = report["cost_optimisation"]
+        assert "cost_optimization" in report
+        co = report["cost_optimization"]
         assert "error" not in co
 
     def test_enterprise_tier_run_all_engines(self):
@@ -497,9 +497,9 @@ class TestTierGating:
         result = bot.analyze_performance([])
         assert "error" in result
 
-    def test_free_cost_optimisation_blocked(self):
+    def test_free_cost_optimization_blocked(self):
         bot = ModelRouterBot(tier=Tier.FREE)
-        result = bot.get_cost_optimisation()
+        result = bot.get_cost_optimization()
         assert "error" in result
 
     def test_free_multi_agent_blocked(self):
@@ -524,9 +524,9 @@ class TestTierGating:
         assert "error" not in report
         assert report["total_tasks"] == 1
 
-    def test_pro_cost_optimisation_allowed(self):
+    def test_pro_cost_optimization_allowed(self):
         bot = ModelRouterBot(tier=Tier.PRO)
-        result = bot.get_cost_optimisation()
+        result = bot.get_cost_optimization()
         assert "error" not in result
         assert "routing_table" in result
 
