@@ -1,0 +1,562 @@
+name: 🤖 DreamCo Bot Dashboard
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DreamCo Bot Status Dashboard
+#
+# Shows every bot in the repository:
+#   ✅  Runs Smooth  — imports cleanly, passes smoke test
+#   ❌  Has Bugs     — import error or runtime error detected
+#   📦  Coded        — 2+ Python files, not yet smoke-tested on this run
+#   ⚠️  Minimal/Stub — only 1 Python file
+#   🔲  Placeholder  — directory exists but no Python code yet
+#
+# Also provides a REAL-TIME PROMPT TESTER via workflow_dispatch inputs.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "bots/**"
+      - "tools/bot_scanner.py"
+      - ".github/workflows/bot-dashboard.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "bots/**"
+      - "tools/bot_scanner.py"
+  schedule:
+    # Run every day at 07:00 UTC to keep the dashboard fresh
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      bot_name:
+        description: >
+          Bot to interact with (directory name, e.g. buddy_bot,
+          god_mode_bot, cinecore_bot, stack_and_profit_bot, …).
+          Leave blank to skip the prompt tester and show the full dashboard.
+        required: false
+        default: ""
+      prompt:
+        description: >
+          Prompt / message to send to the selected bot for real-time testing.
+          Examples: "Hello, who are you?", "Find me leads in Austin TX",
+          "Generate a commercial script for a coffee brand".
+        required: false
+        default: ""
+      tier:
+        description: "Tier level for the bot (free / pro / enterprise)"
+        required: false
+        default: "free"
+        type: choice
+        options:
+          - free
+          - pro
+          - enterprise
+      scan_only:
+        description: "Run the dashboard scan only — skip full test suite"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Jobs
+# ─────────────────────────────────────────────────────────────────────────────
+
+jobs:
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. BOT SCAN — classify every bot directory and run smoke imports
+  # ──────────────────────────────────────────────────────────────────────────
+  scan-bots:
+    name: 📊 Scan & Classify All Bots
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    outputs:
+      total:       ${{ steps.scan.outputs.total }}
+      smooth:      ${{ steps.scan.outputs.smooth }}
+      bugs:        ${{ steps.scan.outputs.bugs }}
+      minimal:     ${{ steps.scan.outputs.minimal }}
+      placeholder: ${{ steps.scan.outputs.placeholder }}
+      coded:       ${{ steps.scan.outputs.coded }}
+      has_tests:   ${{ steps.scan.outputs.has_tests }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Bot Scanner (smoke tests + classification)
+        id: scan
+        run: |
+          python3 tools/bot_scanner.py --summary 2>/dev/null | tee /tmp/bot_scan_summary.txt
+
+          # Parse counts for outputs
+          TOTAL=$(python3 -c "
+          import sys; sys.path.insert(0,'.')
+          from tools.bot_scanner import scan_bots
+          r = scan_bots(run_smoke=False)
+          print(len(r))
+          " 2>/dev/null)
+
+          python3 -c "
+          import sys; sys.path.insert(0,'.')
+          from tools.bot_scanner import scan_bots
+          records = scan_bots(run_smoke=True)
+          smooth      = sum(1 for r in records if r.smoke_result == 'ok')
+          bugs        = sum(1 for r in records if r.smoke_result in ('import_err','runtime_err'))
+          minimal_ct  = sum(1 for r in records if r.coding_status == 'minimal')
+          placeholder = sum(1 for r in records if r.coding_status == 'placeholder')
+          coded       = sum(1 for r in records if r.coding_status == 'coded')
+          has_tests   = sum(1 for r in records if r.has_test)
+          print(f'total={len(records)}')
+          print(f'smooth={smooth}')
+          print(f'bugs={bugs}')
+          print(f'minimal={minimal_ct}')
+          print(f'placeholder={placeholder}')
+          print(f'coded={coded}')
+          print(f'has_tests={has_tests}')
+          " 2>/dev/null >> \"$GITHUB_OUTPUT\"
+
+      - name: Write GitHub Step Summary — Bot Inventory
+        run: |
+          python3 tools/bot_scanner.py --gh-summary 2>/dev/null >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save scan results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-scan-results
+          path: /tmp/bot_scan_summary.txt
+          retention-days: 30
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. TEST SUITE — run all unit tests and report per-bot pass/fail
+  # ──────────────────────────────────────────────────────────────────────────
+  run-tests:
+    name: 🧪 Run Full Bot Test Suite
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: >
+      github.event_name != 'workflow_dispatch' ||
+      github.event.inputs.scan_only != 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest pytest-json-report
+
+      - name: Run full test suite (JSON report)
+        id: pytest
+        run: |
+          python3 -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            --json-report \
+            --json-report-file=/tmp/pytest_report.json \
+            -q --tb=short 2>&1 | tee /tmp/pytest_output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: Write test summary to GitHub Step Summary
+        run: |
+          python3 - <<'PYEOF'
+          import json, sys, os
+
+          report_path = "/tmp/pytest_report.json"
+          if not os.path.exists(report_path):
+              print("## 🧪 Test Suite\n\n_No JSON report found._")
+              sys.exit(0)
+
+          with open(report_path) as f:
+              data = json.load(f)
+
+          summary = data.get("summary", {})
+          total   = summary.get("total", 0)
+          passed  = summary.get("passed", 0)
+          failed  = summary.get("failed", 0)
+          errors  = summary.get("errors", 0)
+          skipped = summary.get("skipped", 0)
+          duration = data.get("duration", 0)
+
+          badge = "✅" if failed == 0 and errors == 0 else "❌"
+
+          lines = [
+              "## 🧪 Test Suite Results\n",
+              f"| Result | Count |",
+              f"|--------|-------|",
+              f"| {badge} Total | {total} |",
+              f"| ✅ Passed | {passed} |",
+              f"| ❌ Failed | {failed} |",
+              f"| 💥 Errors | {errors} |",
+              f"| ⏭️ Skipped | {skipped} |",
+              f"| ⏱️ Duration | {duration:.1f}s |",
+              "",
+          ]
+
+          # List failed tests grouped by bot module
+          tests = data.get("tests", [])
+          failures = [t for t in tests if t.get("outcome") in ("failed", "error")]
+          if failures:
+              lines.append("### ❌ Failing Tests\n")
+              lines.append("| Test | Outcome | Error |")
+              lines.append("|------|---------|-------|")
+              for t in failures[:50]:  # cap at 50 rows
+                  node = t.get("nodeid", "")
+                  outcome = t.get("outcome", "")
+                  # Extract short error message
+                  call = t.get("call", {}) or {}
+                  longrepr = str(call.get("longrepr", "")).split("\n")
+                  short_err = next((l.strip() for l in reversed(longrepr) if l.strip()), "")[:120]
+                  short_err = short_err.replace("|", "\\|")
+                  lines.append(f"| `{node}` | {outcome} | {short_err} |")
+              lines.append("")
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY", "/dev/stdout")
+          with open(summary_path, "a") as f:
+              f.write("\n".join(lines) + "\n")
+
+          print(f"Tests: {passed} passed, {failed} failed, {errors} errors")
+          PYEOF
+
+      - name: Upload pytest report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: |
+            /tmp/pytest_report.json
+            /tmp/pytest_output.txt
+          retention-days: 30
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 3. REAL-TIME PROMPT TESTER
+  #    Send a natural-language prompt to any bot and see the response.
+  #    Only runs when workflow_dispatch provides both bot_name and prompt.
+  # ──────────────────────────────────────────────────────────────────────────
+  prompt-tester:
+    name: 💬 Real-Time Bot Prompt Tester
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.bot_name != '' &&
+      github.event.inputs.prompt != ''
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 💬 Send prompt to ${{ github.event.inputs.bot_name }}
+        env:
+          BOT_NAME:  ${{ github.event.inputs.bot_name }}
+          PROMPT:    ${{ github.event.inputs.prompt }}
+          TIER:      ${{ github.event.inputs.tier }}
+          # Pass API keys if configured — bots fall back gracefully when absent
+          OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
+          STRIPE_API_KEY:  ${{ secrets.STRIPE_API_KEY }}
+          ZILLOW_API_KEY:  ${{ secrets.ZILLOW_API_KEY }}
+          SIMULATION_MODE: "true"
+        run: |
+          python3 - <<'PYEOF'
+          import os, sys, importlib.util, json, traceback
+          from pathlib import Path
+
+          BOT_NAME = os.environ.get("BOT_NAME", "").strip()
+          PROMPT   = os.environ.get("PROMPT",   "").strip()
+          TIER     = os.environ.get("TIER", "free").strip().upper()
+
+          REPO_ROOT = Path(__file__).parent if "__file__" in dir() else Path(".")
+          REPO_ROOT = Path(os.getcwd())
+          BOTS_DIR  = REPO_ROOT / "bots"
+
+          sys.path.insert(0, str(REPO_ROOT))
+
+          print(f"╔══════════════════════════════════════════════════════════════╗")
+          print(f"║  DreamCo Real-Time Bot Prompt Tester                        ║")
+          print(f"╠══════════════════════════════════════════════════════════════╣")
+          print(f"║  Bot   : {BOT_NAME:<52s}║")
+          print(f"║  Tier  : {TIER:<52s}║")
+          print(f"║  Prompt: {PROMPT[:52]:<52s}║")
+          if len(PROMPT) > 52:
+              print(f"║          {PROMPT[52:104]:<52s}║")
+          print(f"╚══════════════════════════════════════════════════════════════╝")
+          print()
+
+          # ── locate the bot directory ──────────────────────────────────────
+          bot_dir = BOTS_DIR / BOT_NAME
+          if not bot_dir.exists():
+              # Try with hyphens replaced
+              alt = BOT_NAME.replace("_", "-")
+              bot_dir = BOTS_DIR / alt
+          if not bot_dir.exists():
+              print(f"❌  Bot directory not found: {BOT_NAME}")
+              print(f"   Available bots:")
+              for d in sorted(BOTS_DIR.iterdir()):
+                  if d.is_dir():
+                      print(f"     • {d.name}")
+              sys.exit(1)
+
+          # ── find main module ──────────────────────────────────────────────
+          slug = BOT_NAME.replace("-", "_")
+          candidates = [
+              f"{slug}.py", f"{slug}_bot.py",
+              "bot.py", "main.py",
+          ]
+          py_files = [f for f in os.listdir(bot_dir) if f.endswith(".py") and not f.startswith("__")]
+          main_file = None
+          for c in candidates:
+              if c in py_files:
+                  main_file = c
+                  break
+          if not main_file and py_files:
+              main_file = py_files[0]
+
+          if not main_file:
+              print(f"❌  No Python files found in {bot_dir}")
+              sys.exit(1)
+
+          module_path = bot_dir / main_file
+          print(f"📂  Loading module: {module_path.relative_to(REPO_ROOT)}")
+
+          # ── import the module ─────────────────────────────────────────────
+          sys.path.insert(0, str(bot_dir))
+          try:
+              spec = importlib.util.spec_from_file_location("_bot_module", module_path)
+              mod  = importlib.util.module_from_spec(spec)
+              spec.loader.exec_module(mod)
+              print(f"✅  Module loaded successfully\n")
+          except Exception as exc:
+              print(f"❌  Failed to import {main_file}: {exc}")
+              traceback.print_exc()
+              sys.exit(1)
+
+          # ── attempt to instantiate and call the bot ───────────────────────
+          response = None
+          error    = None
+
+          # Strategy 1: look for a class with matching name or ending in 'Bot'
+          bot_class = None
+          class_candidates = [
+              slug.replace("_", " ").title().replace(" ", "") + "Bot",
+              slug.replace("_", " ").title().replace(" ", ""),
+              "Bot",
+          ]
+          for attr_name in dir(mod):
+              obj = getattr(mod, attr_name)
+              if isinstance(obj, type) and attr_name not in ("BaseBot", "object"):
+                  for cc in class_candidates:
+                      if attr_name == cc or attr_name.lower() == cc.lower():
+                          bot_class = obj
+                          break
+                  if not bot_class and attr_name.endswith("Bot"):
+                      bot_class = obj
+
+          if bot_class:
+              print(f"🤖  Using class: {bot_class.__name__}")
+              # Try common constructors
+              instance = None
+              tier_map = {"FREE": 0, "PRO": 1, "ENTERPRISE": 2}
+              for constructor_args in [
+                  {"tier": TIER.lower()},
+                  {},
+              ]:
+                  try:
+                      # Check if Tier enum exists in module
+                      tier_enum = getattr(mod, "Tier", None)
+                      if tier_enum and "tier" in constructor_args:
+                          try:
+                              constructor_args["tier"] = tier_enum[TIER]
+                          except KeyError:
+                              pass
+                      instance = bot_class(**constructor_args)
+                      break
+                  except Exception:
+                      pass
+
+              if instance is None:
+                  try:
+                      instance = bot_class()
+                  except Exception as exc:
+                      error = f"Could not instantiate {bot_class.__name__}: {exc}"
+
+              if instance:
+                  # Try common chat/prompt methods
+                  method_names = ["chat", "respond", "ask", "run", "process", "handle", "generate", "execute"]
+                  for method_name in method_names:
+                      method = getattr(instance, method_name, None)
+                      if callable(method):
+                          try:
+                              if method_name == "run":
+                                  response = method()
+                              else:
+                                  response = method(PROMPT)
+                              print(f"📬  Called {bot_class.__name__}.{method_name}()")
+                              break
+                          except Exception as exc:
+                              error = f"{method_name}() error: {exc}"
+
+          # Strategy 2: fall back to module-level run()
+          if response is None and not error:
+              run_fn = getattr(mod, "run", None)
+              if callable(run_fn):
+                  try:
+                      response = run_fn()
+                      print(f"📬  Called module-level run()")
+                  except Exception as exc:
+                      error = f"module run() error: {exc}"
+
+          print()
+          print("─" * 66)
+          print("📤  RESPONSE")
+          print("─" * 66)
+          if response is not None:
+              if isinstance(response, dict):
+                  print(json.dumps(response, indent=2, default=str))
+              else:
+                  print(str(response))
+          elif error:
+              print(f"⚠️   {error}")
+              print()
+              print("  The bot module was imported successfully, but the prompt")
+              print("  method call encountered an error. This may be expected if")
+              print("  the bot requires API keys or external services at runtime.")
+          else:
+              print("ℹ️   No response method found. Bot module structure:")
+              for attr in dir(mod):
+                  obj = getattr(mod, attr)
+                  if not attr.startswith("_"):
+                      kind = "class" if isinstance(obj, type) else "fn" if callable(obj) else "var"
+                      print(f"     [{kind}] {attr}")
+          print("─" * 66)
+          PYEOF
+
+      - name: Write Prompt Test Result to Step Summary
+        if: always()
+        run: |
+          echo "## 💬 Real-Time Prompt Tester" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Setting | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Bot** | \`${{ github.event.inputs.bot_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Tier** | ${{ github.event.inputs.tier }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Prompt** | ${{ github.event.inputs.prompt }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "> See the job log above for the full bot response." >> "$GITHUB_STEP_SUMMARY"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 4. FINAL DASHBOARD SUMMARY
+  #    Aggregates outputs from scan and tests into one consolidated view.
+  # ──────────────────────────────────────────────────────────────────────────
+  dashboard-report:
+    name: 📋 Dashboard Report
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: [scan-bots]
+    if: always()
+
+    steps:
+      - name: Write consolidated dashboard to Step Summary
+        env:
+          TOTAL:       ${{ needs.scan-bots.outputs.total }}
+          SMOOTH:      ${{ needs.scan-bots.outputs.smooth }}
+          BUGS:        ${{ needs.scan-bots.outputs.bugs }}
+          MINIMAL:     ${{ needs.scan-bots.outputs.minimal }}
+          PLACEHOLDER: ${{ needs.scan-bots.outputs.placeholder }}
+          CODED:       ${{ needs.scan-bots.outputs.coded }}
+          HAS_TESTS:   ${{ needs.scan-bots.outputs.has_tests }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << 'SUMMARY'
+          ## 🤖 DreamCo Bot Dashboard — Final Report
+
+          | Legend | Meaning |
+          |--------|---------|
+          | ✅ Runs Smooth | Bot imports and smoke-tests without errors |
+          | ❌ Has Bugs | Import error or runtime error detected |
+          | 📦 Coded | 2+ Python files (not yet smoke-tested in this run) |
+          | ⚠️ Minimal/Stub | Only 1 Python file — likely a starter or scaffold |
+          | 🔲 Placeholder | Directory exists but contains no Python code |
+          | 🧪 Has Tests | Matching test file found in `tests/` |
+
+          ---
+          SUMMARY
+
+          echo "### 📊 Scan Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🤖 Total Bots | ${TOTAL} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ✅ Runs Smooth | ${SMOOTH} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ❌ Has Bugs | ${BUGS} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 📦 Coded (2+ files) | ${CODED} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ⚠️ Minimal/Stub | ${MINIMAL} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🔲 Placeholder | ${PLACEHOLDER} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🧪 Has Unit Tests | ${HAS_TESTS} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "> 📂 Full per-bot inventory is in the **scan-bots** job summary above." >> "$GITHUB_STEP_SUMMARY"
+          echo "> 🧪 Full test results are in the **run-tests** job summary." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Download scan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bot-scan-results
+          path: /tmp/artifacts
+        continue-on-error: true
+
+      - name: Print scan summary in job log
+        run: |
+          echo "=== DreamCo Bot Dashboard Summary ==="
+          echo "Total:       ${TOTAL}"
+          echo "Smooth:      ${SMOOTH}"
+          echo "Bugs:        ${BUGS}"
+          echo "Coded:       ${CODED}"
+          echo "Minimal:     ${MINIMAL}"
+          echo "Placeholder: ${PLACEHOLDER}"
+          echo "Has Tests:   ${HAS_TESTS}"
+          echo ""
+          if [ -f /tmp/artifacts/bot_scan_summary.txt ]; then
+            cat /tmp/artifacts/bot_scan_summary.txt
+          fi
+        env:
+          TOTAL:       ${{ needs.scan-bots.outputs.total }}
+          SMOOTH:      ${{ needs.scan-bots.outputs.smooth }}
+          BUGS:        ${{ needs.scan-bots.outputs.bugs }}
+          MINIMAL:     ${{ needs.scan-bots.outputs.minimal }}
+          PLACEHOLDER: ${{ needs.scan-bots.outputs.placeholder }}
+          CODED:       ${{ needs.scan-bots.outputs.coded }}
+          HAS_TESTS:   ${{ needs.scan-bots.outputs.has_tests }}
