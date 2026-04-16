@@ -246,7 +246,7 @@ _orig_usersupport_bot_init = UserSupportBot.__init__
 def _usersupport_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_usersupport_bot_init(self, tier_val.upper())
-    self.tier = Tier(tier_val)
+    # self.tier stays as string from _orig_init
 
 
 UserSupportBot.__init__ = _usersupport_bot_new_init

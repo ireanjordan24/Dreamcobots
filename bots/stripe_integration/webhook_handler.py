@@ -240,3 +240,38 @@ class StripeWebhookHandler:
     def get_registered_events(self) -> list:
         """Return event types that have at least one registered handler."""
         return [k for k, v in self._handlers.items() if v]
+
+
+import time as _time_wh
+import json as _json_wh
+
+
+@staticmethod
+def _build_event_payload(event_type: str, data: dict) -> bytes:
+    """Build a raw webhook JSON payload for testing."""
+    payload = {
+        "id": f"evt_{_time_wh.time_ns()}",
+        "type": event_type,
+        "data": {"object": data},
+        "created": int(_time_wh.time()),
+        "livemode": False,
+    }
+    return _json_wh.dumps(payload).encode()
+
+
+StripeWebhookHandler.build_event_payload = _build_event_payload
+
+
+def _dispatch(self, payload: bytes, sig_header=None, skip_verify: bool = False) -> "WebhookEvent":
+    """Dispatch a webhook event. Alias for process() with skip_verify support."""
+    if skip_verify:
+        old_mock = self._mock
+        self._mock = True
+        try:
+            return self.process(payload, sig_header)
+        finally:
+            self._mock = old_mock
+    return self.process(payload, sig_header)
+
+
+StripeWebhookHandler.dispatch = _dispatch

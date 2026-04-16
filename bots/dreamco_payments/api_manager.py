@@ -29,9 +29,10 @@ class APITierError(Exception):
 
 
 # Placeholder Stripe key — loaded from environment, never hard-coded.
-DREAMCO_STRIPE_KEY: str = os.environ.get(
-    "DREAMCO_STRIPE_KEY",
-    "sk_test_placeholder_dreamco_stripe_key",
+DREAMCO_STRIPE_KEY: str = (
+    os.environ.get("STRIPE_SECRET_KEY")
+    or os.environ.get("DREAMCO_STRIPE_KEY")
+    or "sk_test_placeholder_dreamco_stripe_key"
 )
 
 

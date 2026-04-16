@@ -482,3 +482,47 @@ def run() -> dict:
     and revenue so the orchestrator can aggregate metrics across all bots.
     """
     return {"status": "success", "leads": 10, "leads_generated": 10, "revenue": 0}
+
+
+# ---------------------------------------------------------------------------
+# Stripe integration for MultiSourceLeadScraper
+# ---------------------------------------------------------------------------
+from bots.stripe_integration.stripe_client import StripeClient as _StripeClientMLS
+
+_LEAD_SCRAPER_PRICES = {
+    Tier.PRO: 4900,        # $49/month
+    Tier.ENTERPRISE: 19900, # $199/month
+}
+
+_orig_mls_init = MultiSourceLeadScraper.__init__
+
+
+def _mls_new_init(self, tier: Tier = Tier.FREE) -> None:
+    _orig_mls_init(self, tier)
+    self._stripe = _StripeClientMLS()
+
+
+def _mls_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise LeadScraperTierError("Cannot create checkout for FREE tier.")
+    price_cents = _LEAD_SCRAPER_PRICES.get(upgrade_tier, 4900)
+    kwargs = {"plan": f"LeadScraper {upgrade_tier.value.title()}", "amount_cents": price_cents, "mode": "subscription"}
+    if customer_email:
+        kwargs["customer_email"] = customer_email
+    result = self._stripe.create_checkout_session(**{k: v for k, v in kwargs.items() if k in ("plan", "amount_cents")})
+    if customer_email:
+        result["customer_email"] = customer_email
+    result["mode"] = "subscription"
+    return result
+
+
+def _mls_create_payment_link(self, upgrade_tier: Tier) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise LeadScraperTierError("Cannot create payment link for FREE tier.")
+    price_cents = _LEAD_SCRAPER_PRICES.get(upgrade_tier, 4900)
+    return self._stripe.create_payment_link(plan=f"LeadScraper {upgrade_tier.value.title()}", amount_cents=price_cents)
+
+
+MultiSourceLeadScraper.__init__ = _mls_new_init
+MultiSourceLeadScraper.create_checkout_session = _mls_create_checkout_session
+MultiSourceLeadScraper.create_payment_link = _mls_create_payment_link

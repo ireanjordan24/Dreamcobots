@@ -125,3 +125,44 @@ class CarFlippingBot:
         output = "\n".join(lines)
         print(output)
         return output
+
+
+# ---------------------------------------------------------------------------
+# Stripe integration for CarFlippingBot
+# ---------------------------------------------------------------------------
+from bots.stripe_integration.stripe_client import StripeClient as _StripeClientCFB
+
+_CFB_PRICES = {
+    Tier.PRO: 4900,         # $49/month
+    Tier.ENTERPRISE: 29900, # $299/month
+}
+
+_orig_cfb_init = CarFlippingBot.__init__
+
+
+def _cfb_new_init(self, tier: Tier = Tier.FREE) -> None:
+    _orig_cfb_init(self, tier)
+    self._stripe = _StripeClientCFB()
+
+
+def _cfb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise CarFlippingBotTierError("Cannot create checkout for FREE tier.")
+    price_cents = _CFB_PRICES.get(upgrade_tier, 4900)
+    result = self._stripe.create_checkout_session(plan=f"CarFlipping {upgrade_tier.value.title()}", amount_cents=price_cents)
+    if customer_email:
+        result["customer_email"] = customer_email
+    result["mode"] = "subscription"
+    return result
+
+
+def _cfb_create_payment_link(self, upgrade_tier: Tier) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise CarFlippingBotTierError("Cannot create payment link for FREE tier.")
+    price_cents = _CFB_PRICES.get(upgrade_tier, 4900)
+    return self._stripe.create_payment_link(plan=f"CarFlipping {upgrade_tier.value.title()}", amount_cents=price_cents)
+
+
+CarFlippingBot.__init__ = _cfb_new_init
+CarFlippingBot.create_checkout_session = _cfb_create_checkout_session
+CarFlippingBot.create_payment_link = _cfb_create_payment_link
