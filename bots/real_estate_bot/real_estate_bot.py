@@ -658,3 +658,44 @@ def run() -> dict:
     and revenue so the orchestrator can aggregate metrics across all bots.
     """
     return {"status": "success", "leads": 5, "leads_generated": 5, "revenue": 2000}
+
+
+# ---------------------------------------------------------------------------
+# Stripe integration for RealEstateBot
+# ---------------------------------------------------------------------------
+from bots.stripe_integration.stripe_client import StripeClient as _StripeClientREB
+
+_REB_PRICES = {
+    Tier.PRO: 4900,         # $49/month
+    Tier.ENTERPRISE: 29900, # $299/month
+}
+
+_orig_reb_init = RealEstateBot.__init__
+
+
+def _reb_new_init(self, tier: Tier = Tier.FREE) -> None:
+    _orig_reb_init(self, tier)
+    self._stripe = _StripeClientREB()
+
+
+def _reb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise RealEstateBotTierError("Cannot create checkout for FREE tier.")
+    price_cents = _REB_PRICES.get(upgrade_tier, 4900)
+    result = self._stripe.create_checkout_session(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+    if customer_email:
+        result["customer_email"] = customer_email
+    result["mode"] = "subscription"
+    return result
+
+
+def _reb_create_payment_link(self, upgrade_tier: Tier) -> dict:
+    if upgrade_tier == Tier.FREE:
+        raise RealEstateBotTierError("Cannot create payment link for FREE tier.")
+    price_cents = _REB_PRICES.get(upgrade_tier, 4900)
+    return self._stripe.create_payment_link(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+
+
+RealEstateBot.__init__ = _reb_new_init
+RealEstateBot.create_checkout_session = _reb_create_checkout_session
+RealEstateBot.create_payment_link = _reb_create_payment_link

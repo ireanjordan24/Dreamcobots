@@ -189,3 +189,117 @@ if __name__ == "__main__":
     print(bot.describe_tier())
 
 ContentCreationBot = CustomerFeedbackBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class CustomerFeedbackBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_customerfeedback_bot_init = CustomerFeedbackBot.__init__
+
+
+def _customerfeedback_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_customerfeedback_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+
+
+CustomerFeedbackBot.__init__ = _customerfeedback_bot_new_init
+CustomerFeedbackBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _customerfeedback_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _customerfeedback_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _customerfeedback_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise CustomerFeedbackBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _customerfeedback_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _customerfeedback_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "CustomerFeedbackBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _customerfeedback_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "CustomerFeedbackBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+CustomerFeedbackBot.monthly_price = _customerfeedback_bot_monthly_price
+CustomerFeedbackBot.get_tier_info = _customerfeedback_bot_get_tier_info
+CustomerFeedbackBot._enforce_tier = _customerfeedback_bot_enforce_tier
+CustomerFeedbackBot.list_items = _customerfeedback_bot_list_items
+CustomerFeedbackBot.analyze = _customerfeedback_bot_analyze
+CustomerFeedbackBot.export_report = _customerfeedback_bot_export_report
+
+# ---------------------------------------------------------------------------
+# CustomerFeedbackBot extended interface: chat with sentiment detection
+# ---------------------------------------------------------------------------
+import uuid as _uuid_cfb
+
+
+def _customerfeedbackbot_full_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_customerfeedback_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+    if not hasattr(self, "bot_id"):
+        self.bot_id = str(_uuid_cfb.uuid4())
+    self.name = "Customer Feedback Bot"
+    self.category = "marketing"
+    self.domain = "customer_feedback"
+    self._feedback_counts = {"positive": 0, "negative": 0, "neutral": 0}
+
+
+def _customerfeedbackbot_chat(self, user_input: str, user_id: str = "anonymous") -> str:
+    q = user_input.lower()
+    positive_words = {"amazing", "great", "love", "excellent", "fantastic", "wonderful", "good", "happy"}
+    negative_words = {"terrible", "awful", "broken", "bad", "horrible", "worst", "hate", "poor"}
+    words = set(q.split())
+    if words & positive_words:
+        self._feedback_counts["positive"] += 1
+        return "Thank you for the positive feedback! We're glad you're happy."
+    elif words & negative_words:
+        self._feedback_counts["negative"] += 1
+        return "We're sorry to hear about your negative experience. We'll improve."
+    else:
+        self._feedback_counts["neutral"] += 1
+        return "Thank you for your neutral feedback. We value all input."
+
+
+CustomerFeedbackBot.__init__ = _customerfeedbackbot_full_init
+CustomerFeedbackBot.chat = _customerfeedbackbot_chat
+CustomerFeedbackBot.end_session = lambda self, user_id: None

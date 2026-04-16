@@ -206,3 +206,109 @@ if __name__ == "__main__":
     reminder = bot.send_overdue_reminder("INV-004")
     print(f"Reminder sent: {reminder['sent']}")
     print(bot.describe_tier())
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class InvoicingBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_invoicing_bot_init = InvoicingBot.__init__
+
+
+def _invoicing_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_invoicing_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+
+
+InvoicingBot.__init__ = _invoicing_bot_new_init
+InvoicingBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _invoicing_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _invoicing_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _invoicing_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise InvoicingBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _invoicing_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _invoicing_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "InvoicingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _invoicing_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "InvoicingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+InvoicingBot.monthly_price = _invoicing_bot_monthly_price
+InvoicingBot.get_tier_info = _invoicing_bot_get_tier_info
+InvoicingBot._enforce_tier = _invoicing_bot_enforce_tier
+InvoicingBot.list_items = _invoicing_bot_list_items
+InvoicingBot.analyze = _invoicing_bot_analyze
+InvoicingBot.export_report = _invoicing_bot_export_report
+
+# ---------------------------------------------------------------------------
+# InvoicingBot extended interface: chat with invoice counter
+# ---------------------------------------------------------------------------
+import uuid as _uuid_inv
+
+
+def _invoicingbot_full_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_invoicing_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+    if not hasattr(self, "bot_id"):
+        self.bot_id = str(_uuid_inv.uuid4())
+    self.name = "Invoicing Bot"
+    self.category = "business"
+    self.domain = "invoicing"
+    self._invoice_counter = 1000
+
+
+def _invoicingbot_chat(self, user_input: str, user_id: str = "anonymous") -> str:
+    q = user_input.lower()
+    if any(w in q for w in ("invoice", "bill", "charge", "payment")):
+        inv_num = f"INV-{self._invoice_counter}"
+        self._invoice_counter += 1
+        return f"Invoice {inv_num} created successfully."
+    return "I'm your Invoicing Bot. I can create and manage invoices."
+
+
+InvoicingBot.__init__ = _invoicingbot_full_init
+InvoicingBot.chat = _invoicingbot_chat
+InvoicingBot.end_session = lambda self, user_id: None

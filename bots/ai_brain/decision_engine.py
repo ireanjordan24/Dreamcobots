@@ -319,6 +319,17 @@ class DecisionEngine:
             return None
         return self._decision_history[-1]
 
+    def get_decision_log(self) -> List[Dict[str, Any]]:
+        """Return the full decision log history."""
+        return list(self._decision_history)
+
+    def get_decision_summary(self) -> Dict[str, Any]:
+        """Return a summary of all decisions made."""
+        return {
+            "total": len(self._decision_history),
+            "decisions": list(self._decision_history),
+        }
+
     def evaluate_for_bot_creation(self, revenue: float) -> Optional[str]:
         """Return the type of bot to create based on revenue."""
         if revenue > REVENUE_THRESHOLD_SCALE:

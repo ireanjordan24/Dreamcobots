@@ -206,3 +206,80 @@ if __name__ == "__main__":
 
 
 OnboardingBot = UserOnboardingBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class UserOnboardingBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_useronboarding_bot_init = UserOnboardingBot.__init__
+
+
+def _useronboarding_bot_new_init(self, tier=Tier.FREE):
+    if not isinstance(tier, Tier):
+        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+    _orig_useronboarding_bot_init(self, tier.value.upper())
+    self.tier = tier
+
+
+UserOnboardingBot.__init__ = _useronboarding_bot_new_init
+UserOnboardingBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _useronboarding_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _useronboarding_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _useronboarding_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise UserOnboardingBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _useronboarding_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _useronboarding_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "UserOnboardingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _useronboarding_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "UserOnboardingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+UserOnboardingBot.monthly_price = _useronboarding_bot_monthly_price
+UserOnboardingBot.get_tier_info = _useronboarding_bot_get_tier_info
+UserOnboardingBot._enforce_tier = _useronboarding_bot_enforce_tier
+UserOnboardingBot.list_items = _useronboarding_bot_list_items
+UserOnboardingBot.analyze = _useronboarding_bot_analyze
+UserOnboardingBot.export_report = _useronboarding_bot_export_report

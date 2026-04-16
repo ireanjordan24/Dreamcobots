@@ -196,3 +196,129 @@ if __name__ == "__main__":
 
 
 SocialMediaBot = SocialMediaPostingBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class SocialMediaPostingBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_socialmediaposting_bot_init = SocialMediaPostingBot.__init__
+
+
+def _socialmediaposting_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_socialmediaposting_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+
+
+SocialMediaPostingBot.__init__ = _socialmediaposting_bot_new_init
+SocialMediaPostingBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _socialmediaposting_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _socialmediaposting_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _socialmediaposting_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise SocialMediaPostingBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _socialmediaposting_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _socialmediaposting_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "SocialMediaPostingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _socialmediaposting_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "SocialMediaPostingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+SocialMediaPostingBot.monthly_price = _socialmediaposting_bot_monthly_price
+SocialMediaPostingBot.get_tier_info = _socialmediaposting_bot_get_tier_info
+SocialMediaPostingBot._enforce_tier = _socialmediaposting_bot_enforce_tier
+SocialMediaPostingBot.list_items = _socialmediaposting_bot_list_items
+SocialMediaPostingBot.analyze = _socialmediaposting_bot_analyze
+SocialMediaPostingBot.export_report = _socialmediaposting_bot_export_report
+
+
+# ---------------------------------------------------------------------------
+# BuddyAI integration: bot_id, name, category, chat, end_session for SocialMediaPostingBot
+# ---------------------------------------------------------------------------
+import uuid as _uuid_mkt1
+
+
+def _socialmediabot_new_init_full(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_socialmediaposting_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+    if not hasattr(self, "bot_id"):
+        self.bot_id = str(_uuid_mkt1.uuid4())
+    self.name = "Social Media Bot"
+    self.category = "marketing"
+    self.domain = "social_media"
+
+
+SocialMediaPostingBot.__init__ = _socialmediabot_new_init_full
+
+
+def _socialmediabot_chat(self, user_input: str, user_id: str = "anonymous") -> str:
+    q = user_input.lower()
+    if any(w in q for w in ("social", "marketing", "post", "campaign", "brand")):
+        return "I can help with social media marketing! Let's boost your online presence."
+    return "I'm your Social Media Marketing Bot. Ask me about campaigns, posts, or brand strategy."
+
+
+def _socialmediabot_end_session(self, user_id: str) -> None:
+    pass
+
+
+SocialMediaPostingBot.chat = _socialmediabot_chat
+SocialMediaPostingBot.end_session = _socialmediabot_end_session
+SocialMediaBot = SocialMediaPostingBot
+
+def _socialmediabot_status(self) -> dict:
+    return {
+        "name": self.name,
+        "category": self.category,
+        "domain": self.domain,
+        "revenue": {"total_revenue_usd": 0.0},
+        "datasets": {"datasets_available": 0, "total_sales": 0},
+        "top_intents": ["social_media", "marketing"],
+    }
+
+
+SocialMediaPostingBot.status = _socialmediabot_status
+SocialMediaBot = SocialMediaPostingBot

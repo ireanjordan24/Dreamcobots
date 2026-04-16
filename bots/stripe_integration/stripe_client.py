@@ -306,6 +306,7 @@ class StripeClient:
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             return {
                 "subscription_id": sub_id,
+                "id": sub_id,
                 "customer_id": customer_id,
                 "price_id": price_id,
                 "status": "trialing" if trial_days > 0 else "active",
@@ -374,19 +375,21 @@ class StripeClient:
         currency: str = "usd",
         quantity: int = 1,
         product_name: Optional[str] = None,
+        metadata: Optional[dict] = None,
     ) -> dict:
         """
         Create a Stripe Payment Link (shareable URL).
 
-        Returns dict with keys: link_id, url, plan, amount_cents,
+        Returns dict with keys: link_id, id, url, plan, amount_cents,
                                 currency, mock.
         """
         if self._mock:
             link_id = self._new_id("plink")
             return {
                 "link_id": link_id,
+                "id": link_id,
                 "url": f"https://buy.stripe.com/{link_id}",
-                "plan": plan,
+                "plan": plan or product_name,
                 "amount_cents": amount_cents,
                 "currency": currency,
                 "mock": True,
@@ -396,18 +399,74 @@ class StripeClient:
             price = self._stripe.Price.create(
                 currency=currency,
                 unit_amount=amount_cents,
-                product_data={"name": plan},
+                product_data={"name": plan or product_name},
             )
             link = self._stripe.PaymentLink.create(
                 line_items=[{"price": price.id, "quantity": quantity}]
             )
             return {
                 "link_id": link.id,
+                "id": link.id,
                 "url": link.url,
-                "plan": plan,
+                "plan": plan or product_name,
                 "amount_cents": amount_cents,
                 "currency": currency,
                 "mock": False,
             }
         except Exception as exc:
             raise StripeError(str(exc)) from exc
+
+
+def _create_customer(self, email: str = "", name: str = "") -> dict:
+    """Create a Stripe customer. Returns dict with 'id', 'email', 'name'."""
+    if self._mock:
+        cust_id = self._new_id("cus")
+        return {"id": cust_id, "email": email, "name": name, "mock": True}
+    try:
+        customer = self._stripe.Customer.create(email=email, name=name)
+        return {"id": customer.id, "email": email, "name": name, "mock": False}
+    except Exception as exc:
+        raise StripeError(str(exc)) from exc
+
+
+StripeClient.create_customer = _create_customer
+
+
+def _refund_payment(self, payment_intent_id: str, reason: str = "requested_by_customer") -> dict:
+    """Refund a payment intent."""
+    if self._mock:
+        refund_id = self._new_id("re")
+        return {"id": refund_id, "status": "succeeded", "payment_intent": payment_intent_id, "reason": reason}
+    try:
+        refund = self._stripe.Refund.create(payment_intent=payment_intent_id, reason=reason)
+        return {"id": refund.id, "status": refund.status, "payment_intent": payment_intent_id}
+    except Exception as exc:
+        raise StripeError(str(exc)) from exc
+
+
+def _get_balance(self) -> dict:
+    """Get Stripe account balance."""
+    if self._mock:
+        return {"available": [{"amount": 1000000, "currency": "usd"}], "pending": [{"amount": 50000, "currency": "usd"}]}
+    try:
+        balance = self._stripe.Balance.retrieve()
+        return {"available": [{"amount": a.amount, "currency": a.currency} for a in balance.available],
+                "pending": [{"amount": p.amount, "currency": p.currency} for p in balance.pending]}
+    except Exception as exc:
+        raise StripeError(str(exc)) from exc
+
+
+def _list_payouts(self, limit: int = 10) -> list:
+    """List recent payouts."""
+    if self._mock:
+        return [{"id": self._new_id("po"), "amount": 50000, "currency": "usd", "status": "paid"}]
+    try:
+        payouts = self._stripe.Payout.list(limit=limit)
+        return [{"id": p.id, "amount": p.amount, "currency": p.currency, "status": p.status} for p in payouts.data]
+    except Exception as exc:
+        raise StripeError(str(exc)) from exc
+
+
+StripeClient.refund_payment = _refund_payment
+StripeClient.get_balance = _get_balance
+StripeClient.list_payouts = _list_payouts

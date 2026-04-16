@@ -215,3 +215,138 @@ if __name__ == "__main__":
     star = bot.get_star_answer(5)
     print(f"\nSTAR Answer for Q5: {star['star_answer'][:100]}...")
     print(bot.describe_tier())
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class InterviewPrepBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_interviewprep_bot_init = InterviewPrepBot.__init__
+
+
+def _interviewprep_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_interviewprep_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+
+
+InterviewPrepBot.__init__ = _interviewprep_bot_new_init
+InterviewPrepBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _interviewprep_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _interviewprep_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _interviewprep_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise InterviewPrepBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _interviewprep_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _interviewprep_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "InterviewPrepBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _interviewprep_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "InterviewPrepBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+InterviewPrepBot.monthly_price = _interviewprep_bot_monthly_price
+InterviewPrepBot.get_tier_info = _interviewprep_bot_get_tier_info
+InterviewPrepBot._enforce_tier = _interviewprep_bot_enforce_tier
+InterviewPrepBot.list_items = _interviewprep_bot_list_items
+InterviewPrepBot.analyze = _interviewprep_bot_analyze
+InterviewPrepBot.export_report = _interviewprep_bot_export_report
+
+# ---------------------------------------------------------------------------
+# InterviewPrepBot extended interface: chat, learning
+# ---------------------------------------------------------------------------
+import uuid as _uuid_ip
+
+
+class _MockLearning:
+    def __init__(self):
+        self._weights = {}
+
+    def get_response_weight(self, key: str) -> float:
+        return self._weights.get(key, 1.0)
+
+    def update_weight(self, key: str, delta: float = 0.1) -> None:
+        self._weights[key] = self._weights.get(key, 1.0) + delta
+
+
+_INTERVIEW_QUESTIONS = [
+    "Tell me about a time you solved a difficult technical problem.",
+    "How do you handle pressure and tight deadlines?",
+    "What is your greatest professional achievement?",
+    "Describe your approach to debugging complex software issues.",
+    "How do you stay current with industry trends?",
+]
+
+
+def _interviewprepbot_full_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_interviewprep_bot_init(self, tier_val.upper())
+    # self.tier stays as string from _orig_init
+    if not hasattr(self, "bot_id"):
+        self.bot_id = str(_uuid_ip.uuid4())
+    self.name = "Interview Prep Bot"
+    self.category = "occupational"
+    self.domain = "interview_prep"
+    self.learning = _MockLearning()
+    self._question_index = 0
+    self._feedback_counts = {"positive": 0, "negative": 0}
+
+
+def _interviewprepbot_chat(self, user_input: str, user_id: str = "anonymous") -> str:
+    q = user_input.lower()
+    if any(w in q for w in ("great", "helpful", "good", "excellent", "amazing")):
+        self.learning.update_weight("interview_prep", 0.2)
+        self._feedback_counts["positive"] = self._feedback_counts.get("positive", 0) + 1
+        return "Great! I'm glad the feedback was helpful. Let me share another interview question."
+    if any(w in q for w in ("bad", "terrible", "wrong", "incorrect", "broken")):
+        self._feedback_counts["negative"] = self._feedback_counts.get("negative", 0) + 1
+        return "I'm sorry that wasn't helpful. Let me try a different approach."
+    if any(w in q for w in ("question", "ask", "interview", "give me")):
+        q_text = _INTERVIEW_QUESTIONS[self._question_index % len(_INTERVIEW_QUESTIONS)]
+        self._question_index += 1
+        return f"Interview question: {q_text}"
+    return "I'm your Interview Prep Bot. Ask me for interview questions or practice scenarios."
+
+
+InterviewPrepBot.__init__ = _interviewprepbot_full_init
+InterviewPrepBot.chat = _interviewprepbot_chat
+InterviewPrepBot.end_session = lambda self, user_id: None
