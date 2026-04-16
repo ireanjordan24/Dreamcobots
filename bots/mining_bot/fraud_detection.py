@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Fraud Detection module for the Dreamcobots Mining Bot.
 

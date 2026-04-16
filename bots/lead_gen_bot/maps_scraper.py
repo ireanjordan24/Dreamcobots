@@ -3,9 +3,7 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.lead_gen_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.lead_gen_bot.tiers import Tier, get_tier_config, get_upgrade_path, BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -21,7 +19,7 @@ class MapsScraperBot:
     without changing the public interface.
     """
 
-    PITCH_LIMITS = {Tier.FREE: 5, Tier.PRO: 50, Tier.ENTERPRISE: None}
+    PITCH_LIMITS = {"free": 5, "pro": 50, "enterprise": None}
 
     MOCK_LEADS = [
         {"name": "Elite Cuts Barbershop", "phone": "312-555-1111", "city": "Chicago"},
@@ -56,7 +54,7 @@ class MapsScraperBot:
             )
             return response.json().get("local_results", [])
         """
-        limit = self.PITCH_LIMITS[self.tier]
+        limit = self.PITCH_LIMITS[self.tier.value if hasattr(self.tier, "value") else str(self.tier).lower()]
         return self.MOCK_LEADS if limit is None else self.MOCK_LEADS[:limit]
 
     def save(self, leads: list) -> None:

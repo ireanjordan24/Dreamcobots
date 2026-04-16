@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Smart Monitoring module for the Dreamcobots Mining Bot.
 

@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Finance Bot — tier-aware personal and business finance assistant.
 

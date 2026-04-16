@@ -76,7 +76,10 @@ class EventBus:
             self._event_log.setdefault(event_type, []).append(data)
 
         for callback in callbacks:
-            callback(data)
+            try:
+                callback(data)
+            except Exception:
+                pass
 
     def get_events(self, event_type: str) -> list:
         """

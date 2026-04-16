@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Advanced Analytics module for the Discount Dominator (settings 401–450).
 

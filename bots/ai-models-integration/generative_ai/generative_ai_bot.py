@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 # Generative AI Models Bot
 # Integrates major Generative AI models:
 #   - OpenAI DALL-E 3 (text-to-image generation)

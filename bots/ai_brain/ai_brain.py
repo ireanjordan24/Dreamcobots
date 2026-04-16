@@ -134,6 +134,9 @@ class AIBrain:
 
         # Make decision
         decision = self._decision_engine.run(metrics)
+        # Normalize: strip "Decision: " prefix if present
+        if isinstance(decision, str) and decision.startswith("Decision: "):
+            decision = decision[len("Decision: "):]
 
         # Determine if bot creation is needed (ENTERPRISE)
         bot_to_create: Optional[str] = None

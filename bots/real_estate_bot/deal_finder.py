@@ -3,9 +3,7 @@ import os
 import random
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.real_estate_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.real_estate_bot.tiers import Tier, get_tier_config, get_upgrade_path, BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -21,19 +19,19 @@ class DealFinderBot:
     changing the public interface.
     """
 
-    DEAL_LIMITS = {Tier.FREE: 3, Tier.PRO: 10, Tier.ENTERPRISE: None}
+    DEAL_LIMITS = {"free": 3, "pro": 10, "enterprise": None}
 
     # Price buckets and typical spread per tier
     PRICE_RANGES = {
-        Tier.FREE: (50_000, 150_000),
-        Tier.PRO: (80_000, 400_000),
-        Tier.ENTERPRISE: (50_000, 800_000),
+        "free": (50_000, 150_000),
+        "pro": (80_000, 400_000),
+        "enterprise": (50_000, 800_000),
     }
 
     VALUE_MULTIPLIER = {
-        Tier.FREE: (1.5, 2.5),
-        Tier.PRO: (1.4, 2.8),
-        Tier.ENTERPRISE: (1.3, 3.5),
+        "free": (1.5, 2.5),
+        "pro": (1.4, 2.8),
+        "enterprise": (1.3, 3.5),
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -57,11 +55,11 @@ class DealFinderBot:
             )
             return response.json().get("results", [])
         """
-        limit = self.DEAL_LIMITS[self.tier]
+        limit = self.DEAL_LIMITS[self.tier.value if hasattr(self.tier, "value") else str(self.tier).lower()]
         count = random.randint(1, limit if limit else 5)
 
-        price_lo, price_hi = self.PRICE_RANGES[self.tier]
-        val_lo, val_hi = self.VALUE_MULTIPLIER[self.tier]
+        price_lo, price_hi = self.PRICE_RANGES[self.tier.value if hasattr(self.tier, "value") else str(self.tier).lower()]
+        val_lo, val_hi = self.VALUE_MULTIPLIER[self.tier.value if hasattr(self.tier, "value") else str(self.tier).lower()]
 
         deals = []
         for _ in range(count):

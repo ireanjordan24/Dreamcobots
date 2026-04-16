@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Creator Economy Bot — tier-aware monetization assistant for content creators.
 

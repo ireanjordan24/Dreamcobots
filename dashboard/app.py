@@ -109,9 +109,75 @@ except ImportError:  # pragma: no cover
     FLASK_AVAILABLE = False
 
 
-def create_app() -> Any:
-    """Return the Flask application instance (or None)."""
-    return app
+def create_app(leads_path: str = None) -> Any:
+    """Return the Flask application instance (or None).
+
+    Parameters
+    ----------
+    leads_path : str or None
+        Optional path to a JSONL leads file for the Empire Dashboard.
+        When provided, returns a standalone Flask app with routes for
+        the Empire-mode dashboard (/, /api/leads).
+        When None, returns the default DreamCo orchestrator dashboard app.
+    """
+    if leads_path is None:
+        return app
+
+    try:
+        from flask import Flask, jsonify, make_response  # noqa: PLC0415
+
+        _leads_path = leads_path
+
+        leads_app = Flask(__name__ + "_empire")
+
+        def _count_leads():
+            count = 0
+            try:
+                import json as _json
+                with open(_leads_path) as _f:
+                    for _line in _f:
+                        if _line.strip():
+                            _json.loads(_line)
+                            count += 1
+            except (FileNotFoundError, OSError):
+                pass
+            return count
+
+        def _load_leads():
+            leads = []
+            try:
+                import json as _json
+                with open(_leads_path) as _f:
+                    for _line in _f:
+                        _line = _line.strip()
+                        if _line:
+                            leads.append(_json.loads(_line))
+            except (FileNotFoundError, OSError):
+                pass
+            return leads
+
+        @leads_app.route("/")
+        def empire_home() -> Any:
+            n = _count_leads()
+            html = f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>DreamCo Empire Dashboard</title></head>
+<body>
+<h1>DreamCo Empire Dashboard</h1>
+<p>Leads: {n}</p>
+</body>
+</html>"""
+            resp = make_response(html)
+            resp.headers["Content-Type"] = "text/html"
+            return resp
+
+        @leads_app.route("/api/leads")
+        def empire_leads() -> Any:
+            return jsonify({"leads": _load_leads()})
+
+        return leads_app
+    except ImportError:  # pragma: no cover
+        return None
 
 
 class DashboardApp:

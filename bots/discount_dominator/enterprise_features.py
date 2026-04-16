@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Enterprise-Grade Features module for the Discount Dominator (settings 551–580).
 

@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Behavioral Settings module for the Discount Dominator (settings 581–600).
 

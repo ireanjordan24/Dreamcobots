@@ -130,6 +130,7 @@ class LearningLoop:
         underperform_threshold: int = DEFAULT_UNDERPERFORM_THRESHOLD,
         kpis: Optional[Dict[str, float]] = None,
         control_center: Any = None,
+        controller: Any = None,
     ) -> None:
         import random as _rand_ll
         self._rand_ll = _rand_ll
@@ -318,9 +319,9 @@ class LearningLoop:
         return {"bot_name": bot_name, "score": score, "status": status}
 
     def get_underperformers(self):
-        """Return underperforming bots as dict {name: score}."""
-        return {name: score for name, score in self.performance_log.items()
-                if score < self.underperform_threshold}
+        """Return list of underperforming bot names."""
+        return [name for name, score in self.performance_log.items()
+                if score < self.underperform_threshold]
 
     def get_performance_log(self):
         """Return a copy of the performance log (dict)."""
@@ -330,15 +331,17 @@ class LearningLoop:
         """Optimize underperforming bots. Returns list of created bot names."""
         print("Optimizing bots...")
         created = []
-        underperformers = self.get_underperformers()
-        if self.control_center is not None and not underperformers:
-            # Use cc.bots if performance_log is from new-API style
-            bots = getattr(self.control_center, "bots", {}) or {}
-            for name in bots:
-                score = self.performance_log.get(name, DEFAULT_SCORE_MAX)
-                if score < self.underperform_threshold:
-                    underperformers[name] = score
-        for name in underperformers:
+        # Revenue-based optimization
+        revenue = self.track_revenue()
+        if self.generator is not None:
+            if revenue < 100.0:
+                self.generator.create_bot("lead_booster_bot")
+                created.append("lead_booster_bot")
+            elif revenue > 500.0:
+                self.generator.create_bot("sales_scaler_bot")
+                created.append("sales_scaler_bot")
+        # Underperformer-based optimization
+        for name in self.get_underperformers():
             new_name = f"{name}_optimized"
             print(f"Improving {name} → {new_name}")
             if self.generator is not None:
@@ -351,6 +354,21 @@ class LearningLoop:
         return list(self._refactor_log)
 
     def track_revenue(self) -> float:
+        """Count leads from data/leads.json (JSONL) and return count × $10."""
+        import json as _json
+        try:
+            count = 0
+            with open(os.path.join("data", "leads.json")) as _f:
+                for line in _f:
+                    if line.strip():
+                        try:
+                            _json.loads(line)
+                            count += 1
+                        except Exception:
+                            pass
+            return float(count * 10)
+        except (FileNotFoundError, OSError):
+            pass
         if self.control_center is not None and hasattr(self.control_center, "get_total_revenue"):
             return float(self.control_center.get_total_revenue())
         return float(sum(r.total_revenue_usd for r in self._performance.values()))

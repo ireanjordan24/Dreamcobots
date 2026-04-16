@@ -18,9 +18,15 @@ Buddy Bot rules
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+import time
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from BuddyAI.event_bus import EventBus
+from BuddyAI.task_engine import TaskEngine
+from BuddyAI.library_manager import LibraryManager
+from BuddyAI.plugins import productivity as _productivity_plugin
+from BuddyAI.plugins import api_integrator as _api_integrator_plugin
+from BuddyAI.plugins import data_entry as _data_entry_plugin
 
 if TYPE_CHECKING:
     from bots.token_billing.billing_system import BillingSystem
@@ -41,6 +47,8 @@ class BuddyBot:
         Optional billing system for token consumption tracking.
     default_token_cost : int
         Default token cost per routed message when billing is enabled.
+    task_engine : TaskEngine
+        Core task engine with registered capabilities.
     """
 
     def __init__(self, billing: Optional["BillingSystem"] = None, default_token_cost: int = 1, enable_scheduler: bool = True) -> None:
@@ -49,6 +57,75 @@ class BuddyBot:
         self.billing: Optional["BillingSystem"] = billing
         self.default_token_cost: int = default_token_cost
         self._consumption: dict[str, dict] = {}
+        self._running: bool = False
+        self._library_manager = LibraryManager()
+
+        # Set up task engine with all plugins
+        self.task_engine = TaskEngine()
+        _productivity_plugin.register(self.task_engine)
+        _api_integrator_plugin.register(self.task_engine)
+        _data_entry_plugin.register(self.task_engine)
+        # Register install_library capability
+        self.task_engine.register_capability("install_library", self._handle_install_library)
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def start(self) -> None:
+        """Start the BuddyBot."""
+        self._running = True
+
+    def stop(self) -> None:
+        """Stop the BuddyBot."""
+        self._running = False
+
+    # ------------------------------------------------------------------
+    # Bot registry
+    # ------------------------------------------------------------------
+
+    def _handle_install_library(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle install_library capability."""
+        package = params.get("package", "")
+        return self.install_capability(package)
+
+    def chat(self, text: str) -> Dict[str, Any]:
+        """Process a user text command and return a result dict."""
+        # Publish input event
+        self.event_bus.publish("buddy.input.text", {"text": text})
+        result = self.task_engine.process_text(text)
+        if "success" not in result:
+            result["success"] = True
+        return result
+
+    def benchmark_task(self, task: str, iterations: int = 5) -> Dict[str, Any]:
+        """Run *task* *iterations* times and return benchmark results."""
+        timings: List[float] = []
+        last_result: Dict[str, Any] = {}
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            last_result = self.chat(task)
+            timings.append(time.perf_counter() - t0)
+        mean_time = sum(timings) / len(timings) if timings else 0.0
+        return {
+            "success": True,
+            "benchmark": {
+                "iterations": iterations,
+                "mean_time_ms": round(mean_time * 1000, 3),
+                "timings": timings,
+            },
+            **{k: v for k, v in last_result.items() if k != "success"},
+        }
+
+    def install_capability(self, package: str) -> Dict[str, Any]:
+        """Install a Python package as a new capability."""
+        if package in self._library_manager._BLOCKED_PACKAGES:
+            return {"success": False, "message": f"Package '{package}' is blocked for security reasons."}
+        try:
+            self._library_manager.install_library(package)
+            return {"success": True, "message": f"Package '{package}' installed successfully."}
+        except Exception as exc:
+            return {"success": False, "message": str(exc)}
 
     # ------------------------------------------------------------------
     # Bot registry

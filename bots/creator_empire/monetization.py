@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Revenue & Monetization module for the CreatorEmpire bot.
 

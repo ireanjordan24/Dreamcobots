@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Multi-Layered Retail Intelligence Network — Discount Dominator interoperability module.
 

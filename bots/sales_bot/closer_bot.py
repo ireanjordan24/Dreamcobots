@@ -3,9 +3,7 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.sales_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.sales_bot.tiers import Tier, get_tier_config, get_upgrade_path, BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -21,7 +19,7 @@ class CloserBot:
     for each one.
     """
 
-    PITCH_LIMITS = {Tier.FREE: 5, Tier.PRO: 50, Tier.ENTERPRISE: None}
+    PITCH_LIMITS = {"free": 5, "pro": 50, "enterprise": None}
 
     def __init__(self, tier: Tier = Tier.FREE):
         self.tier = tier
@@ -34,7 +32,7 @@ class CloserBot:
         if not leads:
             return "No leads available"
 
-        limit = self.PITCH_LIMITS[self.tier]
+        limit = self.PITCH_LIMITS[self.tier.value if hasattr(self.tier, "value") else str(self.tier).lower()]
         targets = leads if limit is None else leads[:limit]
 
         closed = 0

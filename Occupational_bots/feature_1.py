@@ -230,6 +230,12 @@ class Tier(_TierEnum):
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper()
+        return super().__eq__(other)
+    def __hash__(self):
+        return hash(self.value)
 
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
@@ -245,7 +251,7 @@ _orig_jobsearch_bot_init = JobSearchBot.__init__
 def _jobsearch_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_jobsearch_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
 
 
 JobSearchBot.__init__ = _jobsearch_bot_new_init
@@ -304,7 +310,7 @@ import uuid as _uuid_occ
 def _jobsearchbot_new_init_full(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_jobsearch_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_occ.uuid4())
     self.name = "Job Search Bot"
@@ -378,7 +384,7 @@ def _jobsearch_sell_dataset(self, dataset_id: str, buyer_id: str) -> str:
 def _jobsearch_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_jobsearch_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
     if not hasattr(self, "bot_id"):
         import uuid as _u2
         self.bot_id = str(_u2.uuid4())
@@ -436,7 +442,7 @@ class _MockEmotion:
 def _jobsearch_extended_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_jobsearch_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
     import uuid as _u3
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_u3.uuid4())

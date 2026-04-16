@@ -204,6 +204,12 @@ class Tier(_TierEnum):
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper()
+        return super().__eq__(other)
+    def __hash__(self):
+        return hash(self.value)
 
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
@@ -219,7 +225,7 @@ _orig_emailcampaign_bot_init = EmailCampaignBot.__init__
 def _emailcampaign_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_emailcampaign_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
 
 
 EmailCampaignBot.__init__ = _emailcampaign_bot_new_init

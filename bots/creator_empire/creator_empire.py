@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 CreatorEmpire bot — multi-functional creator economy tool.
 

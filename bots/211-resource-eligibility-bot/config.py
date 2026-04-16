@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Configuration module for the 211 Resource and Eligibility Checker Bot.
 Loads settings from environment variables with sensible defaults.

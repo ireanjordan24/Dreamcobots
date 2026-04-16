@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Mining Strategy module for the Dreamcobots Mining Bot.
 
