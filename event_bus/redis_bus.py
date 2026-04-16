@@ -10,6 +10,7 @@ REDIS_HOST   Redis hostname (default: localhost)
 REDIS_PORT   Redis port     (default: 6379)
 REDIS_DB     Redis DB index (default: 0)
 """
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
@@ -50,9 +51,6 @@ class RedisEventBus(BaseEventBus):
 
     Falls back to in-memory mode if Redis is unavailable (ImportError or
     ConnectionError), making it safe to use in all environments.
-
-    Unlike BaseEventBus, external subscribers can be notified across
-    processes by subscribing to the Redis pub/sub channels directly.
     """
 
     def __init__(self, host: str = None, port: int = None) -> None:
@@ -66,21 +64,25 @@ class RedisEventBus(BaseEventBus):
                 self._redis = None
 
     # ------------------------------------------------------------------
-    # Override publish to also push to Redis
+    # Abstract method implementations
     # ------------------------------------------------------------------
+
+    def subscribe(self, event_type: str, handler: Callable) -> None:
+        """Register handler, preventing duplicates."""
+        handlers = self._subscribers[event_type]
+        if handler not in handlers:
+            handlers.append(handler)
 
     def publish(self, event_type: str, data: Any = None) -> None:
         """
         Publish event in-memory (synchronous handlers) and to Redis.
-
-        Parameters
-        ----------
-        event_type : str
-            Channel name.
-        data : Any
-            JSON-serialisable payload.
         """
-        super().publish(event_type, data)
+        self._event_log[event_type].append(data)
+        for handler in list(self._subscribers.get(event_type, [])):
+            try:
+                handler(data)
+            except Exception:
+                pass
         if self._redis is not None:
             try:
                 payload = json.dumps({"event_type": event_type, "data": data})
@@ -88,9 +90,18 @@ class RedisEventBus(BaseEventBus):
             except Exception:
                 pass
 
+    # ------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------
+
+    @property
+    def redis_connected(self) -> bool:
+        """Return True if Redis is connected."""
+        return self._redis is not None
+
     @property
     def redis_available(self) -> bool:
-        """Return True if Redis is connected."""
+        """Alias for redis_connected (backwards compat)."""
         return self._redis is not None
 
 
@@ -102,18 +113,7 @@ _DEFAULT_QUEUE = "dreamco:bot_jobs"
 
 
 class RedisQueueBus:
-    """
-    Redis list-based job queue.
-
-    Bot jobs are pushed to a Redis list (``LPUSH``) and consumed by
-    worker processes (``BRPOP``).  Falls back to an in-memory deque
-    when Redis is unavailable.
-
-    Parameters
-    ----------
-    queue_name : str
-        Redis list key to use as the job queue.
-    """
+    """Redis list-based job queue with in-memory fallback."""
 
     def __init__(self, queue_name: str = _DEFAULT_QUEUE) -> None:
         self.queue_name = queue_name
@@ -127,19 +127,8 @@ class RedisQueueBus:
             except Exception:
                 self._redis = None
 
-    # ------------------------------------------------------------------
-    # Enqueue / dequeue
-    # ------------------------------------------------------------------
-
     def enqueue(self, job: dict) -> None:
-        """
-        Push a bot job onto the queue.
-
-        Parameters
-        ----------
-        job : dict
-            Must contain at minimum ``bot_path`` and ``bot_name`` keys.
-        """
+        """Push a bot job onto the queue."""
         if self._redis is not None:
             try:
                 self._redis.lpush(self.queue_name, json.dumps(job))
@@ -149,19 +138,7 @@ class RedisQueueBus:
         self._fallback_queue.insert(0, job)
 
     def dequeue(self, timeout: int = 0) -> Optional[dict]:
-        """
-        Pop the next job from the queue (blocking if ``timeout > 0``).
-
-        Parameters
-        ----------
-        timeout : int
-            Seconds to block waiting for a job (0 = non-blocking).
-
-        Returns
-        -------
-        dict | None
-            The job dict, or ``None`` if the queue is empty.
-        """
+        """Pop the next job from the queue."""
         if self._redis is not None:
             try:
                 if timeout > 0:
@@ -170,7 +147,6 @@ class RedisQueueBus:
                     item = self._redis.rpop(self.queue_name)
                 if item is None:
                     return None
-                # brpop returns (key, value); rpop returns value
                 raw = item[1] if isinstance(item, (list, tuple)) else item
                 return json.loads(raw)
             except Exception:

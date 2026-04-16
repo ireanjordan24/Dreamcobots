@@ -811,4 +811,40 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "god_mode",
         ],
     ),
+    BotEntry(
+        bot_id="cinecore_lead_engine",
+        display_name="CineCore Lead Engine",
+        description=(
+            "Scans local businesses in the film/media niche, scores leads, generates "
+            "outreach scripts, and exports CRM-ready contact lists."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
+        class_name="CineCoreLeadEngine",
+        capabilities=["business_scan", "script_generation", "lead_scoring", "crm_export", "bulk_generation"],
+    ),
+    BotEntry(
+        bot_id="public_lead_engine",
+        display_name="Public Lead Engine",
+        description=(
+            "Aggregates leads from public data sources like Google Places and Yelp, "
+            "filtering by rating and weak marketing signals."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.public_lead_engine.public_lead_engine",
+        class_name="PublicLeadEngine",
+        capabilities=["google_places_search", "yelp_search", "rating_filter", "weak_marketing_filter"],
+    ),
+    BotEntry(
+        bot_id="god_mode_bot",
+        display_name="God Mode Bot",
+        description=(
+            "All-in-one autonomous money machine. Orchestrates lead hunting, auto closing, "
+            "payment collection, viral engine, and full empire-mode operations."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.god_mode_bot.god_mode_bot",
+        class_name="GodModeBot",
+        capabilities=["lead_hunting", "auto_closing", "payment_collection", "viral_engine", "god_mode"],
+    ),
 ]

@@ -123,12 +123,14 @@ class MarketAnalysisBot:
         markets = sorted(self._get_markets(), key=lambda m: m["price_change_yoy_pct"], reverse=True)
         return markets[:count]
 
-    def export_report(self, city: str) -> dict:
+    def export_report(self, city: str = None) -> dict:
         """Export a full investment report for a city (ENTERPRISE only)."""
         if not self._config["export"]:
             raise PermissionError(
                 "Report export requires ENTERPRISE tier. Upgrade at dreamcobots.com/pricing"
             )
+        if city is None:
+            city = EXAMPLES[0]["city"]
         overview = self.get_market_overview(city)
         return {
             "report_type": "Investment Market Report",
@@ -202,6 +204,12 @@ class Tier(_TierEnum):
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper()
+        return super().__eq__(other)
+    def __hash__(self):
+        return hash(self.value)
 
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
@@ -217,7 +225,7 @@ _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
 def _marketanalysis_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_marketanalysis_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
 
 
 MarketAnalysisBot.__init__ = _marketanalysis_bot_new_init
@@ -258,15 +266,8 @@ def _marketanalysis_bot_analyze(self):
     return {"bot": "MarketAnalysisBot", "tier": t, "count": len(EXAMPLES)}
 
 
-def _marketanalysis_bot_export_report(self, city=None):
-    self._enforce_tier("enterprise")
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    return {"bot": "MarketAnalysisBot", "tier": t, "total_items": len(EXAMPLES), "items": EXAMPLES}
-
-
 MarketAnalysisBot.monthly_price = _marketanalysis_bot_monthly_price
 MarketAnalysisBot.get_tier_info = _marketanalysis_bot_get_tier_info
 MarketAnalysisBot._enforce_tier = _marketanalysis_bot_enforce_tier
 MarketAnalysisBot.list_items = _marketanalysis_bot_list_items
 MarketAnalysisBot.analyze = _marketanalysis_bot_analyze
-MarketAnalysisBot.export_report = _marketanalysis_bot_export_report

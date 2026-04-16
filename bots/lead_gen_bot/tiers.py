@@ -175,6 +175,7 @@ def get_bot_tier_info(tier: Tier) -> dict:
     config = get_tier_config(tier)
     return {
         "tier": tier.value,
+        "name": tier.value.upper(),
         "price_usd_monthly": config.price_usd_monthly,
         "max_leads_per_day": config.max_leads_per_day,
         "features": BOT_FEATURES[tier.value],

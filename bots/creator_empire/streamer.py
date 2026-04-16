@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Streaming Launch System module for the CreatorEmpire bot.
 

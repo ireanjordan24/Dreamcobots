@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Online Platform Optimization module for the Discount Dominator (settings 501–550).
 

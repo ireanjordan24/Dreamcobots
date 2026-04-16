@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 AI Integration module for the SaaS Selling Bot.
 Provides personalised recommendations and chatbot capabilities

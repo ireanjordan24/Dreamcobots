@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Payment gateway integration for the SaaS Selling Bot.
 Handles subscription creation, webhook processing, and revenue recording.

@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Event Planning module for the CreatorEmpire bot.
 

@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 In-Store Tactical Controls module for the Discount Dominator (settings 451–500).
 

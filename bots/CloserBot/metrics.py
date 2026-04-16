@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """CloserBot metrics — tracks closing activity."""
 
 from __future__ import annotations

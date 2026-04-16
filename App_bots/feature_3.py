@@ -191,6 +191,12 @@ class Tier(_TierEnum):
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper()
+        return super().__eq__(other)
+    def __hash__(self):
+        return hash(self.value)
 
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
@@ -204,10 +210,12 @@ _orig_featureupdate_bot_init = FeatureUpdateBot.__init__
 
 
 def _featureupdate_bot_new_init(self, tier=Tier.FREE):
-    if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
-    _orig_featureupdate_bot_init(self, tier.value.upper())
-    self.tier = tier
+    if isinstance(tier, Tier):
+        tier_str = tier.value.upper()
+    else:
+        tier_str = str(tier)
+    _orig_featureupdate_bot_init(self, tier_str)
+    self.tier = Tier(tier_str.lower())
 
 
 FeatureUpdateBot.__init__ = _featureupdate_bot_new_init

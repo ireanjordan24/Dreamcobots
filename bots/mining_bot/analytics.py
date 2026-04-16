@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Profitability Analytics module for the Dreamcobots Mining Bot.
 

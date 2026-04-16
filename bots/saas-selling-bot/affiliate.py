@@ -1,3 +1,4 @@
+# GlobalAISourcesFlow — GLOBAL AI SOURCES FLOW
 """
 Affiliate link tracking and revenue recording for the SaaS Selling Bot.
 Tracks clicks on affiliate links, records conversions, and provides
