@@ -1,26 +1,39 @@
 """Wearable Health Technology Monitoring — heart rate, glucose, vitals, and anomaly detection."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="WearableHealthMonitor")
 
 # Normal vital-sign thresholds  {metric: (low, high)}
 VITAL_THRESHOLDS = {
-    "heart_rate":       (60, 100),      # bpm
-    "glucose":          (70, 140),      # mg/dL
-    "systolic_bp":      (90, 120),      # mmHg
-    "diastolic_bp":     (60, 80),       # mmHg
-    "spo2":             (95, 100),      # %
-    "respiratory_rate": (12, 20),       # breaths/min
-    "temperature":      (36.1, 37.2),   # °C
-    "steps":            (0, 20_000),    # steps/day — upper is soft limit
+    "heart_rate": (60, 100),  # bpm
+    "glucose": (70, 140),  # mg/dL
+    "systolic_bp": (90, 120),  # mmHg
+    "diastolic_bp": (60, 80),  # mmHg
+    "spo2": (95, 100),  # %
+    "respiratory_rate": (12, 20),  # breaths/min
+    "temperature": (36.1, 37.2),  # °C
+    "steps": (0, 20_000),  # steps/day — upper is soft limit
 }
 
 # Metrics available per tier
 _FREE_METRICS = {"heart_rate", "steps", "sleep"}
-_PRO_METRICS = _FREE_METRICS | {"glucose", "systolic_bp", "diastolic_bp", "spo2", "respiratory_rate", "temperature"}
+_PRO_METRICS = _FREE_METRICS | {
+    "glucose",
+    "systolic_bp",
+    "diastolic_bp",
+    "spo2",
+    "respiratory_rate",
+    "temperature",
+}
 _ENTERPRISE_METRICS = _PRO_METRICS  # enterprise adds ML on top
 
 
@@ -32,7 +45,11 @@ class WearableHealthMonitor:
     """Tier-aware wearable health-tech monitoring system."""
 
     _PATIENT_LIMITS = {Tier.FREE: 1, Tier.PRO: 20, Tier.ENTERPRISE: None}
-    _METRIC_SETS = {Tier.FREE: _FREE_METRICS, Tier.PRO: _PRO_METRICS, Tier.ENTERPRISE: _ENTERPRISE_METRICS}
+    _METRIC_SETS = {
+        Tier.FREE: _FREE_METRICS,
+        Tier.PRO: _PRO_METRICS,
+        Tier.ENTERPRISE: _ENTERPRISE_METRICS,
+    }
 
     def __init__(self, tier: Tier = Tier.FREE):
         self.tier = tier
@@ -90,7 +107,12 @@ class WearableHealthMonitor:
         self._check_metric("heart_rate")
 
         if not readings:
-            return {"patient_id": patient_id, "metric": "heart_rate", "status": "no_data", "readings": []}
+            return {
+                "patient_id": patient_id,
+                "metric": "heart_rate",
+                "status": "no_data",
+                "readings": [],
+            }
 
         avg = sum(readings) / len(readings)
         minimum = min(readings)
@@ -110,12 +132,20 @@ class WearableHealthMonitor:
         }
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
-            result["trend"] = "increasing" if readings[-1] > readings[0] else "decreasing" if readings[-1] < readings[0] else "stable"
+            result["trend"] = (
+                "increasing"
+                if readings[-1] > readings[0]
+                else "decreasing" if readings[-1] < readings[0] else "stable"
+            )
             result["anomalous_readings"] = anomalies
 
         if self.tier == Tier.ENTERPRISE:
-            result["ml_risk_score"] = round(min(len(anomalies) / max(len(readings), 1) * 100, 100), 1)
-            result["prediction"] = "elevated_risk" if result["ml_risk_score"] > 20 else "normal_risk"
+            result["ml_risk_score"] = round(
+                min(len(anomalies) / max(len(readings), 1) * 100, 100), 1
+            )
+            result["prediction"] = (
+                "elevated_risk" if result["ml_risk_score"] > 20 else "normal_risk"
+            )
 
         self._patient_data[patient_id]["heart_rate"] = result
         return result
@@ -126,7 +156,12 @@ class WearableHealthMonitor:
         self._check_metric("glucose")
 
         if not readings:
-            return {"patient_id": patient_id, "metric": "glucose", "status": "no_data", "readings": []}
+            return {
+                "patient_id": patient_id,
+                "metric": "glucose",
+                "status": "no_data",
+                "readings": [],
+            }
 
         avg = sum(readings) / len(readings)
         anomalies = [r for r in readings if self._is_anomalous("glucose", r)]
@@ -148,11 +183,17 @@ class WearableHealthMonitor:
         }
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
-            result["trend"] = "increasing" if readings[-1] > readings[0] else "decreasing" if readings[-1] < readings[0] else "stable"
+            result["trend"] = (
+                "increasing"
+                if readings[-1] > readings[0]
+                else "decreasing" if readings[-1] < readings[0] else "stable"
+            )
             result["anomalous_readings"] = anomalies
 
         if self.tier == Tier.ENTERPRISE:
-            result["ml_risk_score"] = round(min(len(anomalies) / max(len(readings), 1) * 100, 100), 1)
+            result["ml_risk_score"] = round(
+                min(len(anomalies) / max(len(readings), 1) * 100, 100), 1
+            )
             result["diabetes_risk"] = "elevated" if avg > 126 else "normal"
 
         self._patient_data[patient_id]["glucose"] = result
@@ -181,7 +222,10 @@ class WearableHealthMonitor:
                 entry["severity"] = self._severity(metric, value)
                 alerts.append(metric)
             results[metric] = entry
-            self._patient_data[patient_id][metric] = {"value": value, "status": entry["status"]}
+            self._patient_data[patient_id][metric] = {
+                "value": value,
+                "status": entry["status"],
+            }
 
         return {
             "patient_id": patient_id,
@@ -196,7 +240,11 @@ class WearableHealthMonitor:
         self._check_patient_limit(patient_id)
 
         data = self._patient_data.get(patient_id, {})
-        alert_metrics = [m for m, v in data.items() if isinstance(v, dict) and v.get("status") == "alert"]
+        alert_metrics = [
+            m
+            for m, v in data.items()
+            if isinstance(v, dict) and v.get("status") == "alert"
+        ]
 
         report = {
             "patient_id": patient_id,
@@ -213,13 +261,20 @@ class WearableHealthMonitor:
             report["detailed_data"] = data
             report["recommendations"] = (
                 [f"Consult physician about {m}" for m in alert_metrics]
-                if alert_metrics else ["Continue current health regimen"]
+                if alert_metrics
+                else ["Continue current health regimen"]
             )
 
         if self.tier == Tier.ENTERPRISE:
             report["ml_insights"] = {
-                "risk_stratification": "high" if len(alert_metrics) > 2 else "medium" if alert_metrics else "low",
-                "predicted_trend": "deteriorating" if len(alert_metrics) > 2 else "stable",
+                "risk_stratification": (
+                    "high"
+                    if len(alert_metrics) > 2
+                    else "medium" if alert_metrics else "low"
+                ),
+                "predicted_trend": (
+                    "deteriorating" if len(alert_metrics) > 2 else "stable"
+                ),
             }
 
         return report
@@ -244,13 +299,21 @@ class WearableHealthMonitor:
             low, high = VITAL_THRESHOLDS.get(metric, (None, None))
             if low is not None and value < low:
                 alert["direction"] = "below_normal"
-                alert["message"] = f"{metric} value {value} is below the normal minimum of {low}"
+                alert["message"] = (
+                    f"{metric} value {value} is below the normal minimum of {low}"
+                )
             elif high is not None and value > high:
                 alert["direction"] = "above_normal"
-                alert["message"] = f"{metric} value {value} is above the normal maximum of {high}"
+                alert["message"] = (
+                    f"{metric} value {value} is above the normal maximum of {high}"
+                )
 
         if self.tier == Tier.ENTERPRISE and anomalous:
             alert["auto_escalate"] = True
-            alert["notify_channels"] = ["ehr_system", "attending_physician", "emergency_contact"]
+            alert["notify_channels"] = [
+                "ehr_system",
+                "attending_physician",
+                "emergency_contact",
+            ]
 
         return alert

@@ -25,8 +25,8 @@ Revenue hook output:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -35,7 +35,6 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -74,7 +73,9 @@ class RegionProfile:
     digital_adoption_rate: float  # 0–1
     competition_density: float  # 0–1 (1 = very competitive)
     notes: str = ""
-    registered_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    registered_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -100,7 +101,9 @@ class ExpansionScore:
     projected_revenue: float
     confidence: float  # 0–1
     rationale: str
-    scored_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    scored_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -259,8 +262,12 @@ class PredictiveExpansion:
         else:
             phase = ExpansionPhase.LEAD_GENERATION
 
-        projected_revenue = round(region.population * score * self._REVENUE_MULTIPLIER, 2)
-        confidence = min(digital_norm * 0.5 + (1 - region.competition_density) * 0.5, 1.0)
+        projected_revenue = round(
+            region.population * score * self._REVENUE_MULTIPLIER, 2
+        )
+        confidence = min(
+            digital_norm * 0.5 + (1 - region.competition_density) * 0.5, 1.0
+        )
 
         rationale = (
             f"Score {score:.1f}/100. "
@@ -351,5 +358,5 @@ class PredictiveExpansion:
             "leads_generated": len(self._regions),
             "conversion_rate": round(avg_confidence, 4),
             "action": f"Predictive expansion: {len(self._regions)} regions scored. "
-                      f"Total projected revenue ${total_projected:,.2f}",
+            f"Total projected revenue ${total_projected:,.2f}",
         }

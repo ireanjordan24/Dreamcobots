@@ -10,21 +10,23 @@ Run:
     python examples/referral_bot_example.py
 """
 
-import sys
-import os
 import json
+import os
+import sys
 
 # Allow imports from the bots directory
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "referral-bot"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "bots", "referral-bot")
+)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "hustle-bot"))
 
-from referral_bot import ReferralBot
 from hustle_bot import HustleBot
-
+from referral_bot import ReferralBot
 
 # ---------------------------------------------------------------------------
 # Example 1: User Referral and Earnings Tracking
 # ---------------------------------------------------------------------------
+
 
 def example_referral_earnings():
     print("=" * 55)
@@ -56,6 +58,7 @@ def example_referral_earnings():
 # ---------------------------------------------------------------------------
 # Example 2: Bot-to-Bot Interaction
 # ---------------------------------------------------------------------------
+
 
 def example_bot_to_bot():
     print("\n" + "=" * 55)

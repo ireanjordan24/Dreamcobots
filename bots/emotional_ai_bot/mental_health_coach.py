@@ -1,7 +1,13 @@
 """Mental Health Coach — mental health support, productivity coaching, and emotional care."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="MentalHealthCoach")
@@ -100,18 +106,36 @@ class MentalHealthCoach:
             )
         if not isinstance(responses, list):
             raise ValueError("responses must be a list")
-        positive = sum(1 for r in responses if isinstance(r, str) and
-                       any(w in r.lower() for w in ["good", "great", "happy", "well", "fine", "okay"]))
-        negative = sum(1 for r in responses if isinstance(r, str) and
-                       any(w in r.lower() for w in ["bad", "sad", "tired", "anxious", "stressed", "worried"]))
+        positive = sum(
+            1
+            for r in responses
+            if isinstance(r, str)
+            and any(
+                w in r.lower()
+                for w in ["good", "great", "happy", "well", "fine", "okay"]
+            )
+        )
+        negative = sum(
+            1
+            for r in responses
+            if isinstance(r, str)
+            and any(
+                w in r.lower()
+                for w in ["bad", "sad", "tired", "anxious", "stressed", "worried"]
+            )
+        )
         total = len(responses) if responses else 1
-        wellness_score = round(max(0.0, min(1.0, (positive - negative * 0.5) / total + 0.5)), 2)
+        wellness_score = round(
+            max(0.0, min(1.0, (positive - negative * 0.5) / total + 0.5)), 2
+        )
         if wellness_score >= 0.7:
             state = "positive"
             recommendation = "Keep up your healthy habits and celebrate your wins."
         elif wellness_score >= 0.4:
             state = "neutral"
-            recommendation = "Consider adding self-care practices to your daily routine."
+            recommendation = (
+                "Consider adding self-care practices to your daily routine."
+            )
         else:
             state = "needs_attention"
             recommendation = "We recommend speaking with a mental health professional for personalized support."
@@ -137,7 +161,9 @@ class MentalHealthCoach:
             selected = all_strategies[:count]
         else:
             selected = all_strategies
-        urgency = "high" if intensity >= 0.8 else "moderate" if intensity >= 0.5 else "low"
+        urgency = (
+            "high" if intensity >= 0.8 else "moderate" if intensity >= 0.5 else "low"
+        )
         return {
             "emotion": emotion,
             "intensity": intensity,
@@ -158,12 +184,14 @@ class MentalHealthCoach:
             raise ValueError("goals must be a list")
         plan_items = []
         for goal in goals[:5]:
-            plan_items.append({
-                "goal": goal,
-                "action": f"Break '{goal}' into 3 small weekly milestones.",
-                "frequency": "daily check-in",
-                "support_resource": "Journaling and mindfulness practices",
-            })
+            plan_items.append(
+                {
+                    "goal": goal,
+                    "action": f"Break '{goal}' into 3 small weekly milestones.",
+                    "frequency": "daily check-in",
+                    "support_resource": "Journaling and mindfulness practices",
+                }
+            )
         return {
             "user_id": user_id,
             "goals": goals,
@@ -187,7 +215,11 @@ class MentalHealthCoach:
         history = self._progress_store[user_id]
         mood_scores = [e.get("mood_score", 5) for e in history]
         avg_mood = round(sum(mood_scores) / len(mood_scores), 2) if mood_scores else 5.0
-        trend = "improving" if len(mood_scores) >= 2 and mood_scores[-1] >= mood_scores[0] else "needs_attention"
+        trend = (
+            "improving"
+            if len(mood_scores) >= 2 and mood_scores[-1] >= mood_scores[0]
+            else "needs_attention"
+        )
         return {
             "user_id": user_id,
             "check_ins_total": len(history),
@@ -224,7 +256,11 @@ class ProductivityCoach:
         tasks_planned = activity_data.get("tasks_planned", 1)
         hours_worked = activity_data.get("hours_worked", 0)
         completion_rate = round(min(1.0, tasks_completed / max(tasks_planned, 1)), 2)
-        efficiency = round(min(1.0, tasks_completed / max(hours_worked, 1) / 3), 2) if hours_worked else 0.0
+        efficiency = (
+            round(min(1.0, tasks_completed / max(hours_worked, 1) / 3), 2)
+            if hours_worked
+            else 0.0
+        )
         return {
             "user_id": user_id,
             "completion_rate": completion_rate,
@@ -232,7 +268,11 @@ class ProductivityCoach:
             "tasks_completed": tasks_completed,
             "tasks_planned": tasks_planned,
             "hours_worked": hours_worked,
-            "productivity_level": "high" if completion_rate >= 0.75 else "moderate" if completion_rate >= 0.5 else "low",
+            "productivity_level": (
+                "high"
+                if completion_rate >= 0.75
+                else "moderate" if completion_rate >= 0.5 else "low"
+            ),
             "tier": self.tier.value,
         }
 
@@ -247,32 +287,56 @@ class ProductivityCoach:
             focus_area = "motivation"
         session_templates = {
             "time_management": {
-                "exercises": ["Time audit", "Priority matrix (Eisenhower)", "Time-blocking schedule"],
+                "exercises": [
+                    "Time audit",
+                    "Priority matrix (Eisenhower)",
+                    "Time-blocking schedule",
+                ],
                 "duration_min": 45,
                 "homework": "Track every 30-minute block for one week.",
             },
             "motivation": {
-                "exercises": ["Values clarification", "Why journaling", "Vision statement draft"],
+                "exercises": [
+                    "Values clarification",
+                    "Why journaling",
+                    "Vision statement draft",
+                ],
                 "duration_min": 30,
                 "homework": "Write your top 3 motivators and display them visibly.",
             },
             "stress_reduction": {
-                "exercises": ["Stress inventory", "4-7-8 breathing practice", "Boundary-setting role play"],
+                "exercises": [
+                    "Stress inventory",
+                    "4-7-8 breathing practice",
+                    "Boundary-setting role play",
+                ],
                 "duration_min": 40,
                 "homework": "Practice one relaxation technique daily for 7 days.",
             },
             "goal_setting": {
-                "exercises": ["SMART goal framework", "Obstacle mapping", "Accountability partner setup"],
+                "exercises": [
+                    "SMART goal framework",
+                    "Obstacle mapping",
+                    "Accountability partner setup",
+                ],
                 "duration_min": 50,
                 "homework": "Write 3 SMART goals and share with your accountability partner.",
             },
             "habit_formation": {
-                "exercises": ["Habit stacking", "Cue-routine-reward loop design", "Habit tracker setup"],
+                "exercises": [
+                    "Habit stacking",
+                    "Cue-routine-reward loop design",
+                    "Habit tracker setup",
+                ],
                 "duration_min": 35,
                 "homework": "Implement one new habit using the stacking technique.",
             },
             "work_life_balance": {
-                "exercises": ["Wheel of life assessment", "Boundary identification", "Recovery rituals"],
+                "exercises": [
+                    "Wheel of life assessment",
+                    "Boundary identification",
+                    "Recovery rituals",
+                ],
                 "duration_min": 45,
                 "homework": "Identify and schedule one non-work activity per day.",
             },
@@ -302,10 +366,22 @@ class ProductivityCoach:
             "I trust the journey I am on.",
         ]
         mood_affirmations = {
-            "sad": ["I give myself permission to heal at my own pace.", "This feeling is temporary."],
-            "anxious": ["I am safe and in control.", "I breathe in calm and release tension."],
-            "angry": ["I choose to respond thoughtfully rather than react.", "I release what I cannot control."],
-            "happy": ["I radiate positivity and share it with others.", "I am grateful for this moment."],
+            "sad": [
+                "I give myself permission to heal at my own pace.",
+                "This feeling is temporary.",
+            ],
+            "anxious": [
+                "I am safe and in control.",
+                "I breathe in calm and release tension.",
+            ],
+            "angry": [
+                "I choose to respond thoughtfully rather than react.",
+                "I release what I cannot control.",
+            ],
+            "happy": [
+                "I radiate positivity and share it with others.",
+                "I am grateful for this moment.",
+            ],
         }
         affirmations = base_affirmations[:3]
         for key, extra in mood_affirmations.items():

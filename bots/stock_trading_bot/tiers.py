@@ -2,24 +2,38 @@
 Tier configuration for the Dreamcobots Stock Trading Bot.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import (
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # Bot-specific features per tier
 STOCK_TRADING_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: ["5 watchlist stocks", "daily signals", "basic indicators"],
-    Tier.PRO.value: ["100 stocks", "real-time signals", "20+ technical indicators", "backtesting"],
-    Tier.ENTERPRISE.value: ["unlimited stocks", "algorithmic strategies", "options flow", "institutional data", "API trading"],
+    Tier.PRO.value: [
+        "100 stocks",
+        "real-time signals",
+        "20+ technical indicators",
+        "backtesting",
+    ],
+    Tier.ENTERPRISE.value: [
+        "unlimited stocks",
+        "algorithmic strategies",
+        "options flow",
+        "institutional data",
+        "API trading",
+    ],
 }
 
 

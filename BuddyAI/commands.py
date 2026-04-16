@@ -51,7 +51,11 @@ class CommandHandler:
     def pause_bot(self, bot_id):
         """Pause a running bot by ID."""
         if bot_id not in self.bots:
-            result = {"command": "/pause-bot", "bot_id": bot_id, "error": "Bot not found"}
+            result = {
+                "command": "/pause-bot",
+                "bot_id": bot_id,
+                "error": "Bot not found",
+            }
             print(f"[/pause-bot] Bot '{bot_id}' not found.")
             return result
         self.bots[bot_id]["status"] = "paused"
@@ -90,7 +94,9 @@ class CommandHandler:
             "targets": targets,
             "delivered": len(targets),
         }
-        print(f"[/broadcast-message] '{message}' sent to {len(targets)} bot(s): {targets}")
+        print(
+            f"[/broadcast-message] '{message}' sent to {len(targets)} bot(s): {targets}"
+        )
         return result
 
     # ------------------------------------------------------------------

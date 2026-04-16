@@ -34,44 +34,53 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 import time
 from datetime import datetime
 from typing import Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
 from bots.god_mode_bot.tiers import (
+    FEATURE_API_ACCESS,
+    FEATURE_AUTO_CLOSER,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_LEAD_HUNTING,
+    FEATURE_PAYMENT_COLLECTION,
+    FEATURE_SELF_IMPROVING_AI,
+    FEATURE_VIRAL_ENGINE,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_LEAD_HUNTING,
-    FEATURE_AUTO_CLOSER,
-    FEATURE_PAYMENT_COLLECTION,
-    FEATURE_VIRAL_ENGINE,
-    FEATURE_SELF_IMPROVING_AI,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
 )
-
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # AutoClientHunter engine
 # ---------------------------------------------------------------------------
 
-_NICHES = ["ecommerce", "real_estate", "health_wellness", "tech_startups", "local_business"]
+_NICHES = [
+    "ecommerce",
+    "real_estate",
+    "health_wellness",
+    "tech_startups",
+    "local_business",
+]
 
 _NICHE_PAIN_POINTS = {
     "ecommerce": ["low conversion rate", "high cart abandonment", "poor ROAS"],
     "real_estate": ["too few leads", "low listing visibility", "slow follow-up"],
     "health_wellness": ["hard to stand out", "booking friction", "low retention"],
     "tech_startups": ["not enough users", "high churn", "unclear positioning"],
-    "local_business": ["no online presence", "poor Google ranking", "no referral system"],
+    "local_business": [
+        "no online presence",
+        "poor Google ranking",
+        "no referral system",
+    ],
 }
 
 _LEAD_SCORES = ["hot", "warm", "cold"]
@@ -95,17 +104,19 @@ class AutoClientHunter:
         for i in range(count):
             score_label = random.choice(_LEAD_SCORES)
             niche_match = random.random() > 0.3
-            leads.append({
-                "id": f"LEAD-{int(time.time() * 1000)}-{i}",
-                "niche": niche,
-                "company": f"{niche.replace('_', ' ').title()} Venture {i + 1} LLC",
-                "contact_name": f"Contact {i + 1}",
-                "email": f"contact{i + 1}@{niche.replace('_', '')}.example.com",
-                "pain_point": random.choice(pain_points),
-                "score": score_label,
-                "niche_match": niche_match,
-                "qualified": score_label in ("hot", "warm") and niche_match,
-            })
+            leads.append(
+                {
+                    "id": f"LEAD-{int(time.time() * 1000)}-{i}",
+                    "niche": niche,
+                    "company": f"{niche.replace('_', ' ').title()} Venture {i + 1} LLC",
+                    "contact_name": f"Contact {i + 1}",
+                    "email": f"contact{i + 1}@{niche.replace('_', '')}.example.com",
+                    "pain_point": random.choice(pain_points),
+                    "score": score_label,
+                    "niche_match": niche_match,
+                    "qualified": score_label in ("hot", "warm") and niche_match,
+                }
+            )
         return leads
 
 
@@ -150,14 +161,16 @@ class AutoCloser:
             stage_index = random.randint(3, len(_STAGES) - 1)
             final_stage = _STAGES[stage_index]
             won = final_stage == "booked" and random.random() > 0.35
-            closed_deals.append({
-                "lead_id": lead["id"],
-                "company": lead["company"],
-                "final_stage": final_stage,
-                "won": won,
-                "deal_value": random.randint(1000, 8000) if won else 0,
-                "stages_traversed": _STAGES[: stage_index + 1],
-            })
+            closed_deals.append(
+                {
+                    "lead_id": lead["id"],
+                    "company": lead["company"],
+                    "final_stage": final_stage,
+                    "won": won,
+                    "deal_value": random.randint(1000, 8000) if won else 0,
+                    "stages_traversed": _STAGES[: stage_index + 1],
+                }
+            )
         return closed_deals
 
 
@@ -244,9 +257,24 @@ class PaymentAutoCollector:
 _PLATFORMS = ["tiktok", "instagram", "twitter", "facebook", "linkedin", "youtube"]
 
 _TRENDS_BY_NICHE = {
-    "business": ["AI automation", "solopreneur tools", "no-code launch", "building in public"],
-    "fitness": ["zone 2 cardio", "protein-first meals", "12-week challenge", "home gym setup"],
-    "finance": ["dividend stacking", "HYSA rates", "passive income", "index fund compounding"],
+    "business": [
+        "AI automation",
+        "solopreneur tools",
+        "no-code launch",
+        "building in public",
+    ],
+    "fitness": [
+        "zone 2 cardio",
+        "protein-first meals",
+        "12-week challenge",
+        "home gym setup",
+    ],
+    "finance": [
+        "dividend stacking",
+        "HYSA rates",
+        "passive income",
+        "index fund compounding",
+    ],
     "tech": ["vibe coding", "local LLMs", "API monetisation", "edge AI"],
     "lifestyle": ["digital nomad", "slow living", "micro-habits", "travel hacking"],
 }
@@ -276,21 +304,24 @@ class ViralEngine:
         top_trend = random.choice(trends)
         posts = []
         for platform in _PLATFORMS:
-            posts.append({
-                "platform": platform,
-                "content": f"🔥 {top_trend} — the {niche} playbook you need | Follow for daily tips",
-                "trend": top_trend,
-                "optimal_post_time": _POST_TIMES[platform],
-                "engagement_score": round(random.uniform(6.0, 9.8), 1),
-                "estimated_reach": random.randint(5000, 75000),
-                "scheduled": True,
-            })
+            posts.append(
+                {
+                    "platform": platform,
+                    "content": f"🔥 {top_trend} — the {niche} playbook you need | Follow for daily tips",
+                    "trend": top_trend,
+                    "optimal_post_time": _POST_TIMES[platform],
+                    "engagement_score": round(random.uniform(6.0, 9.8), 1),
+                    "estimated_reach": random.randint(5000, 75000),
+                    "scheduled": True,
+                }
+            )
         return posts
 
 
 # ---------------------------------------------------------------------------
 # SelfImprovingAI engine
 # ---------------------------------------------------------------------------
+
 
 class SelfImprovingAI:
     """Analyses cycle results and generates optimisation recommendations."""
@@ -308,11 +339,15 @@ class SelfImprovingAI:
         recommendations = []
 
         if total_revenue < 5000:
-            recommendations.append("Increase auto-closer conversion rate by refining objection scripts.")
+            recommendations.append(
+                "Increase auto-closer conversion rate by refining objection scripts."
+            )
         if total_leads < 20:
             recommendations.append("Expand lead hunting to 3+ niches per cycle.")
         recommendations.append("A/B test viral content hooks on TikTok and Instagram.")
-        recommendations.append("Upsell warm leads from Starter to Pro plan automatically.")
+        recommendations.append(
+            "Upsell warm leads from Starter to Pro plan automatically."
+        )
 
         # Auto-prioritise services by revenue contribution
         service_scores = {
@@ -335,6 +370,7 @@ class SelfImprovingAI:
 # ---------------------------------------------------------------------------
 # GodModeBot — main orchestrator
 # ---------------------------------------------------------------------------
+
 
 class GodModeBot:
     """Autonomous business operator — orchestrates all five God Mode engines.
@@ -436,7 +472,12 @@ class GodModeBot:
         if winning_clients:
             payment_stats = self.collect_payments(winning_clients)
         else:
-            payment_stats = {"mrr": 0, "arr": 0, "total_collected": 0, "payments_collected": 0}
+            payment_stats = {
+                "mrr": 0,
+                "arr": 0,
+                "total_collected": 0,
+                "payments_collected": 0,
+            }
         report["payment_stats"] = payment_stats
 
         # Viral content

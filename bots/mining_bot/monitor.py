@@ -10,6 +10,7 @@ Detects and reports:
 Alerts are generated as structured dicts and optionally routed to registered
 callback handlers.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -28,8 +29,8 @@ class MonitoringDisabledError(Exception):
 class Alert:
     """A single monitoring alert."""
 
-    level: str          # "info" | "warning" | "critical"
-    category: str       # e.g. "downtime", "sub_optimal", "unusual_activity"
+    level: str  # "info" | "warning" | "critical"
+    category: str  # e.g. "downtime", "sub_optimal", "unusual_activity"
     message: str
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     metadata: Dict = field(default_factory=dict)

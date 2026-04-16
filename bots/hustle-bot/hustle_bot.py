@@ -1,11 +1,14 @@
 """Hustle Bot - Revenue goal tracking and task optimization."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from datetime import datetime
+
 from core.base_bot import BaseBot
 
 
@@ -49,15 +52,21 @@ class HustleBot(BaseBot):
         progress = []
         for goal in self._goals:
             if goal["status"] == "active":
-                pct = (self.revenue / goal["target_revenue"] * 100) if goal["target_revenue"] > 0 else 0
-                progress.append({
-                    "goal": goal["goal"],
-                    "target": goal["target_revenue"],
-                    "current": self.revenue,
-                    "percent_complete": round(min(pct, 100), 1),
-                    "remaining": max(0, goal["target_revenue"] - self.revenue),
-                    "on_track": pct >= 50,
-                })
+                pct = (
+                    (self.revenue / goal["target_revenue"] * 100)
+                    if goal["target_revenue"] > 0
+                    else 0
+                )
+                progress.append(
+                    {
+                        "goal": goal["goal"],
+                        "target": goal["target_revenue"],
+                        "current": self.revenue,
+                        "percent_complete": round(min(pct, 100), 1),
+                        "remaining": max(0, goal["target_revenue"] - self.revenue),
+                        "on_track": pct >= 50,
+                    }
+                )
         return {
             "total_goals": len(self._goals),
             "active_goals": len(progress),

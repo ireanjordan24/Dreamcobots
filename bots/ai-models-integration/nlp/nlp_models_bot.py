@@ -41,7 +41,9 @@ class NLPModelsBot:
     def select_model(self, model_name):
         """Select the active NLP model by name."""
         if model_name not in self.SUPPORTED_MODELS:
-            print(f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}")
+            print(
+                f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}"
+            )
             return
         self.active_model = model_name
         print(f"Active NLP model set to: {model_name}")
@@ -119,7 +121,9 @@ class NLPModelsBot:
             Headers: x-api-key: <ANTHROPIC_API_KEY>, anthropic-version: 2023-06-01
         """
         print(f"[Anthropic Claude] Max tokens: {max_tokens} | Prompt: {prompt}")
-        return f"[Anthropic Claude Response] Analyzed prompt with max_tokens={max_tokens}"
+        return (
+            f"[Anthropic Claude Response] Analyzed prompt with max_tokens={max_tokens}"
+        )
 
     # ------------------------------------------------------------------
     # Meta LLaMA
@@ -170,18 +174,24 @@ class NLPModelsBot:
             POST https://api-inference.huggingface.co/models/<model_id>
             Headers: Authorization: Bearer <HUGGINGFACE_TOKEN>
         """
-        print(f"[HuggingFace] Pipeline: {pipeline} | Model: {model_id} | Prompt: {prompt}")
+        print(
+            f"[HuggingFace] Pipeline: {pipeline} | Model: {model_id} | Prompt: {prompt}"
+        )
         return f"[HuggingFace Response] Pipeline '{pipeline}' on model '{model_id}': {prompt}"
 
     def run(self):
         self.start()
         self.run_openai_gpt4("What are the latest trends in NLP?")
-        self.run_google_palm2("Classify this text: 'Dreamcobots is amazing!'",
-                              task="classification")
+        self.run_google_palm2(
+            "Classify this text: 'Dreamcobots is amazing!'", task="classification"
+        )
         self.run_anthropic_claude("Summarize the state of AI in 2025.")
         self.run_meta_llama("Explain transformers in simple terms.")
-        self.run_huggingface("Dreamcobots is a great platform!", pipeline="sentiment-analysis",
-                             model_id="distilbert-base-uncased-finetuned-sst-2-english")
+        self.run_huggingface(
+            "Dreamcobots is a great platform!",
+            pipeline="sentiment-analysis",
+            model_id="distilbert-base-uncased-finetuned-sst-2-english",
+        )
 
 
 # If this module is run directly, start the bot

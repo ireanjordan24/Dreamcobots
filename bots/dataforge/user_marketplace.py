@@ -1,4 +1,5 @@
 """User Marketplace: allows users to contribute and monetize their data."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import uuid
@@ -39,7 +40,12 @@ class UserMarketplace:
             "joined_at": datetime.utcnow().isoformat(),
         }
         self._contributions[user_id] = []
-        self._payouts[user_id] = {"total_earned": 0.0, "pending": 0.0, "paid": 0.0, "history": []}
+        self._payouts[user_id] = {
+            "total_earned": 0.0,
+            "pending": 0.0,
+            "paid": 0.0,
+            "history": [],
+        }
         logger.info("User signed up: %s (%s)", name, user_id)
         return self._users[user_id]
 
@@ -88,7 +94,11 @@ class UserMarketplace:
             "status": "pending_review",
         }
         self._contributions[user_id].append(submission)
-        logger.info("Data submitted by user %s, submission %s", user_id, submission["submission_id"])
+        logger.info(
+            "Data submitted by user %s, submission %s",
+            user_id,
+            submission["submission_id"],
+        )
         return submission
 
     def calculate_revenue_share(self, sale_amount: float) -> tuple:
@@ -102,7 +112,9 @@ class UserMarketplace:
         """
         user_share = round(sale_amount * REVENUE_SPLIT_USER, 2)
         platform_share = round(sale_amount * REVENUE_SPLIT_PLATFORM, 2)
-        logger.info("Revenue split: user=%.2f platform=%.2f", user_share, platform_share)
+        logger.info(
+            "Revenue split: user=%.2f platform=%.2f", user_share, platform_share
+        )
         return user_share, platform_share
 
     def get_dashboard(self, user_id: str) -> dict:
@@ -149,9 +161,11 @@ class UserMarketplace:
         amount = payout["pending"]
         payout["paid"] += amount
         payout["pending"] = 0.0
-        payout["history"].append({
-            "amount": amount,
-            "processed_at": datetime.utcnow().isoformat(),
-        })
+        payout["history"].append(
+            {
+                "amount": amount,
+                "processed_at": datetime.utcnow().isoformat(),
+            }
+        )
         logger.info("Payout processed for user %s: $%.2f", user_id, amount)
         return {"user_id": user_id, "amount_paid": amount, "status": "processed"}

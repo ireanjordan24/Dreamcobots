@@ -1,4 +1,5 @@
 """Stripe payments API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,10 +29,14 @@ class StripeConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.post(f"{self.BASE_URL}/payment_intents",
+            response = requests.post(
+                f"{self.BASE_URL}/payment_intents",
                 data={"amount": amount, "currency": currency},
-                auth=(self.api_key, ""), timeout=30)
+                auth=(self.api_key, ""),
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Stripe payment intent created: amount=%d %s", amount, currency)
             return {"status": "success", "data": response.json()}
@@ -49,11 +54,15 @@ class StripeConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/customers/{customer_id}", auth=(self.api_key, ""), timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/customers/{customer_id}",
+                auth=(self.api_key, ""),
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Stripe retrieve_customer error: %s", e)
             return {"status": "error", "message": str(e)}
-

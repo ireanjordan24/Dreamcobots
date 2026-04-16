@@ -5,12 +5,14 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations
-import sys, os
-import random
-from enum import Enum
-from typing import Optional, List, Dict, Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import random
+import sys
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -33,7 +35,188 @@ class OrderCompletionBot:
     # String-keyed to avoid cross-module enum identity issues
     RESULT_LIMITS: Dict[str, int] = {"free": 5, "pro": 25, "enterprise": 100}
 
-    MOCK_DATA: List[Dict[str, Any]] = [{'id': 'GIG001', 'title': 'Service 1', 'price_usd': 40, 'rating': 4.04, 'reviews': 22, 'score': 52.3, 'category': 'Writing'}, {'id': 'GIG002', 'title': 'Service 2', 'price_usd': 55, 'rating': 4.08, 'reviews': 34, 'score': 54.6, 'category': 'SEO'}, {'id': 'GIG003', 'title': 'Service 3', 'price_usd': 70, 'rating': 4.12, 'reviews': 46, 'score': 56.9, 'category': 'Video'}, {'id': 'GIG004', 'title': 'Service 4', 'price_usd': 85, 'rating': 4.16, 'reviews': 58, 'score': 59.2, 'category': 'Tech'}, {'id': 'GIG005', 'title': 'Service 5', 'price_usd': 100, 'rating': 4.2, 'reviews': 70, 'score': 61.5, 'category': 'Design'}, {'id': 'GIG006', 'title': 'Service 6', 'price_usd': 115, 'rating': 4.24, 'reviews': 82, 'score': 63.8, 'category': 'Writing'}, {'id': 'GIG007', 'title': 'Service 7', 'price_usd': 130, 'rating': 4.28, 'reviews': 94, 'score': 66.1, 'category': 'SEO'}, {'id': 'GIG008', 'title': 'Service 8', 'price_usd': 145, 'rating': 4.32, 'reviews': 106, 'score': 68.4, 'category': 'Video'}, {'id': 'GIG009', 'title': 'Service 9', 'price_usd': 160, 'rating': 4.36, 'reviews': 118, 'score': 70.7, 'category': 'Tech'}, {'id': 'GIG010', 'title': 'Service 10', 'price_usd': 175, 'rating': 4.4, 'reviews': 130, 'score': 73.0, 'category': 'Design'}, {'id': 'GIG011', 'title': 'Service 11', 'price_usd': 190, 'rating': 4.44, 'reviews': 142, 'score': 75.3, 'category': 'Writing'}, {'id': 'GIG012', 'title': 'Service 12', 'price_usd': 205, 'rating': 4.48, 'reviews': 154, 'score': 77.6, 'category': 'SEO'}, {'id': 'GIG013', 'title': 'Service 13', 'price_usd': 220, 'rating': 4.52, 'reviews': 166, 'score': 79.9, 'category': 'Video'}, {'id': 'GIG014', 'title': 'Service 14', 'price_usd': 235, 'rating': 4.56, 'reviews': 178, 'score': 82.2, 'category': 'Tech'}, {'id': 'GIG015', 'title': 'Service 15', 'price_usd': 250, 'rating': 4.6, 'reviews': 190, 'score': 84.5, 'category': 'Design'}, {'id': 'GIG016', 'title': 'Service 16', 'price_usd': 265, 'rating': 4.64, 'reviews': 202, 'score': 86.8, 'category': 'Writing'}, {'id': 'GIG017', 'title': 'Service 17', 'price_usd': 280, 'rating': 4.68, 'reviews': 214, 'score': 89.1, 'category': 'SEO'}, {'id': 'GIG018', 'title': 'Service 18', 'price_usd': 295, 'rating': 4.72, 'reviews': 226, 'score': 91.4, 'category': 'Video'}, {'id': 'GIG019', 'title': 'Service 19', 'price_usd': 310, 'rating': 4.76, 'reviews': 238, 'score': 93.7, 'category': 'Tech'}, {'id': 'GIG020', 'title': 'Service 20', 'price_usd': 325, 'rating': 4.8, 'reviews': 250, 'score': 96.0, 'category': 'Design'}]
+    MOCK_DATA: List[Dict[str, Any]] = [
+        {
+            "id": "GIG001",
+            "title": "Service 1",
+            "price_usd": 40,
+            "rating": 4.04,
+            "reviews": 22,
+            "score": 52.3,
+            "category": "Writing",
+        },
+        {
+            "id": "GIG002",
+            "title": "Service 2",
+            "price_usd": 55,
+            "rating": 4.08,
+            "reviews": 34,
+            "score": 54.6,
+            "category": "SEO",
+        },
+        {
+            "id": "GIG003",
+            "title": "Service 3",
+            "price_usd": 70,
+            "rating": 4.12,
+            "reviews": 46,
+            "score": 56.9,
+            "category": "Video",
+        },
+        {
+            "id": "GIG004",
+            "title": "Service 4",
+            "price_usd": 85,
+            "rating": 4.16,
+            "reviews": 58,
+            "score": 59.2,
+            "category": "Tech",
+        },
+        {
+            "id": "GIG005",
+            "title": "Service 5",
+            "price_usd": 100,
+            "rating": 4.2,
+            "reviews": 70,
+            "score": 61.5,
+            "category": "Design",
+        },
+        {
+            "id": "GIG006",
+            "title": "Service 6",
+            "price_usd": 115,
+            "rating": 4.24,
+            "reviews": 82,
+            "score": 63.8,
+            "category": "Writing",
+        },
+        {
+            "id": "GIG007",
+            "title": "Service 7",
+            "price_usd": 130,
+            "rating": 4.28,
+            "reviews": 94,
+            "score": 66.1,
+            "category": "SEO",
+        },
+        {
+            "id": "GIG008",
+            "title": "Service 8",
+            "price_usd": 145,
+            "rating": 4.32,
+            "reviews": 106,
+            "score": 68.4,
+            "category": "Video",
+        },
+        {
+            "id": "GIG009",
+            "title": "Service 9",
+            "price_usd": 160,
+            "rating": 4.36,
+            "reviews": 118,
+            "score": 70.7,
+            "category": "Tech",
+        },
+        {
+            "id": "GIG010",
+            "title": "Service 10",
+            "price_usd": 175,
+            "rating": 4.4,
+            "reviews": 130,
+            "score": 73.0,
+            "category": "Design",
+        },
+        {
+            "id": "GIG011",
+            "title": "Service 11",
+            "price_usd": 190,
+            "rating": 4.44,
+            "reviews": 142,
+            "score": 75.3,
+            "category": "Writing",
+        },
+        {
+            "id": "GIG012",
+            "title": "Service 12",
+            "price_usd": 205,
+            "rating": 4.48,
+            "reviews": 154,
+            "score": 77.6,
+            "category": "SEO",
+        },
+        {
+            "id": "GIG013",
+            "title": "Service 13",
+            "price_usd": 220,
+            "rating": 4.52,
+            "reviews": 166,
+            "score": 79.9,
+            "category": "Video",
+        },
+        {
+            "id": "GIG014",
+            "title": "Service 14",
+            "price_usd": 235,
+            "rating": 4.56,
+            "reviews": 178,
+            "score": 82.2,
+            "category": "Tech",
+        },
+        {
+            "id": "GIG015",
+            "title": "Service 15",
+            "price_usd": 250,
+            "rating": 4.6,
+            "reviews": 190,
+            "score": 84.5,
+            "category": "Design",
+        },
+        {
+            "id": "GIG016",
+            "title": "Service 16",
+            "price_usd": 265,
+            "rating": 4.64,
+            "reviews": 202,
+            "score": 86.8,
+            "category": "Writing",
+        },
+        {
+            "id": "GIG017",
+            "title": "Service 17",
+            "price_usd": 280,
+            "rating": 4.68,
+            "reviews": 214,
+            "score": 89.1,
+            "category": "SEO",
+        },
+        {
+            "id": "GIG018",
+            "title": "Service 18",
+            "price_usd": 295,
+            "rating": 4.72,
+            "reviews": 226,
+            "score": 91.4,
+            "category": "Video",
+        },
+        {
+            "id": "GIG019",
+            "title": "Service 19",
+            "price_usd": 310,
+            "rating": 4.76,
+            "reviews": 238,
+            "score": 93.7,
+            "category": "Tech",
+        },
+        {
+            "id": "GIG020",
+            "title": "Service 20",
+            "price_usd": 325,
+            "rating": 4.8,
+            "reviews": 250,
+            "score": 96.0,
+            "category": "Design",
+        },
+    ]
 
     def __init__(self, tier: Tier = Tier.FREE):
         # Normalize cross-module Tier enum instances by value string
@@ -109,4 +292,3 @@ class OrderCompletionBot:
             "items": self.MOCK_DATA,
             "generated_by": "GLOBAL AI SOURCES FLOW",
         }
-

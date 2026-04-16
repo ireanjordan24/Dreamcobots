@@ -1,4 +1,5 @@
 """Reddit public JSON API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -29,9 +30,15 @@ class RedditConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": query, "limit": limit, "sort": "relevance"}
         try:
-            response = requests.get(f"{self.BASE_URL}/r/{subreddit}/search.json", params=params, headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/r/{subreddit}/search.json",
+                params=params,
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Reddit search completed for: %s in r/%s", query, subreddit)
             return {"status": "success", "data": response.json()}
@@ -49,11 +56,15 @@ class RedditConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/comments/{post_id}.json", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/comments/{post_id}.json",
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Reddit get_comments error: %s", e)
             return {"status": "error", "message": str(e)}
-

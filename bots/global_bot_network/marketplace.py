@@ -19,8 +19,8 @@ Phase 2 hooks:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -30,10 +30,10 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class ListingType(Enum):
     BOT = "bot"
@@ -58,6 +58,7 @@ class SubscriptionInterval(Enum):
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
 class MarketplaceError(Exception):
     """Base exception for marketplace errors."""
 
@@ -77,6 +78,7 @@ class ListingUnavailable(MarketplaceError):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MarketplaceListing:
@@ -114,8 +116,7 @@ class MarketplaceListing:
             "status": self.status.value,
             "tags": list(self.tags),
             "subscription_interval": (
-                self.subscription_interval.value
-                if self.subscription_interval else None
+                self.subscription_interval.value if self.subscription_interval else None
             ),
             "requires_verification": self.requires_verification,
             "total_sales": self.total_sales,
@@ -148,8 +149,7 @@ class Purchase:
             "amount_usd": self.amount_usd,
             "type": self.listing_type.value,
             "subscription_interval": (
-                self.subscription_interval.value
-                if self.subscription_interval else None
+                self.subscription_interval.value if self.subscription_interval else None
             ),
             "timestamp": self.timestamp,
         }
@@ -183,6 +183,7 @@ class UserWallet:
 # ---------------------------------------------------------------------------
 # Marketplace
 # ---------------------------------------------------------------------------
+
 
 class BotMarketplace:
     """
@@ -285,8 +286,7 @@ class BotMarketplace:
     ) -> list[dict]:
         """Browse active listings with optional filters."""
         results = [
-            l for l in self._listings.values()
-            if l.status == ListingStatus.ACTIVE
+            l for l in self._listings.values() if l.status == ListingStatus.ACTIVE
         ]
         if listing_type:
             results = [l for l in results if l.listing_type == listing_type]
@@ -295,8 +295,10 @@ class BotMarketplace:
         if query:
             q = query.lower()
             results = [
-                l for l in results
-                if q in l.title.lower() or q in l.description.lower()
+                l
+                for l in results
+                if q in l.title.lower()
+                or q in l.description.lower()
                 or any(q in t.lower() for t in l.tags)
             ]
         return [l.to_dict() for l in results]
@@ -379,19 +381,17 @@ class BotMarketplace:
 
     def get_purchase_history(self, user_id: str) -> list[dict]:
         """Return purchases made by *user_id*."""
-        return [
-            p.to_dict() for p in self._purchases if p.buyer_id == user_id
-        ]
+        return [p.to_dict() for p in self._purchases if p.buyer_id == user_id]
 
     def get_sales_history(self, seller_id: str) -> list[dict]:
         """Return sales made by *seller_id*."""
-        return [
-            p.to_dict() for p in self._purchases if p.seller_id == seller_id
-        ]
+        return [p.to_dict() for p in self._purchases if p.seller_id == seller_id]
 
     def get_stats(self) -> dict:
         """Return marketplace statistics."""
-        active = sum(1 for l in self._listings.values() if l.status == ListingStatus.ACTIVE)
+        active = sum(
+            1 for l in self._listings.values() if l.status == ListingStatus.ACTIVE
+        )
         return {
             "total_listings": len(self._listings),
             "active_listings": active,

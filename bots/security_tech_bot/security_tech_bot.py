@@ -10,18 +10,25 @@ Usage
     result = bot.scan_vulnerabilities("example.com")
     print(result)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
-import os
 import math
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_security_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_security_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _security_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_security_tiers)
 SECURITY_FEATURES = _security_tiers.SECURITY_FEATURES
@@ -94,12 +101,14 @@ class SecurityTechBot:
             }
         ]
         if scan_type == "full":
-            findings.append({
-                "cve_id": "CVE-2024-MOCK2",
-                "severity": "high",
-                "description": f"Advanced vulnerability detected in {target}",
-                "remediation": "Upgrade affected component to version 2.0+.",
-            })
+            findings.append(
+                {
+                    "cve_id": "CVE-2024-MOCK2",
+                    "severity": "high",
+                    "description": f"Advanced vulnerability detected in {target}",
+                    "remediation": "Upgrade affected component to version 2.0+.",
+                }
+            )
         return {
             "target": target,
             "scan_type": scan_type,
@@ -189,13 +198,15 @@ class SecurityTechBot:
         vulnerable = []
         for dep in dependencies:
             if dep.get("version", "").startswith("1."):
-                vulnerable.append({
-                    "name": dep["name"],
-                    "version": dep["version"],
-                    "cve_id": "CVE-2024-MOCK-DEP",
-                    "severity": "high",
-                    "fix_version": "2.0.0",
-                })
+                vulnerable.append(
+                    {
+                        "name": dep["name"],
+                        "version": dep["version"],
+                        "cve_id": "CVE-2024-MOCK-DEP",
+                        "severity": "high",
+                        "fix_version": "2.0.0",
+                    }
+                )
         return {
             "total_checked": len(dependencies),
             "vulnerable": vulnerable,
@@ -263,9 +274,7 @@ class SecurityTechBot:
             else f"{info['requests_per_month']:,}"
         )
         scan_limit = (
-            "Unlimited"
-            if info["scan_limit"] is None
-            else str(info["scan_limit"])
+            "Unlimited" if info["scan_limit"] is None else str(info["scan_limit"])
         )
         lines = [
             f"=== {info['name']} Security Tech Bot Tier ===",
@@ -290,7 +299,9 @@ class SecurityTechBot:
             print(msg)
             return msg
         current_feats = set(SECURITY_FEATURES[self.tier.value])
-        new_feats = [f for f in SECURITY_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f for f in SECURITY_FEATURES[next_cfg.tier.value] if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

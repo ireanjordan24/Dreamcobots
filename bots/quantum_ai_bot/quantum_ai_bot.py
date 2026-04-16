@@ -1,24 +1,29 @@
 """Quantum AI Bot — main entry point for quantum computing simulation and optimization."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.quantum_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from framework import GlobalAISourcesFlow  # noqa: F401
 
-from bots.quantum_ai_bot.quantum_simulator import (
-    QuantumCircuitSimulator,
-    QuantumCircuitSimulatorError,
-    HybridQuantumAIModel,
-    HybridQuantumAIModelError,
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
 )
+from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.quantum_ai_bot.optimization_engine import (
+    PROBLEM_TYPES,
+    PROVIDERS,
     QuantumOptimizer,
     QuantumOptimizerError,
     QuantumPartnershipManager,
     QuantumPartnershipManagerError,
-    PROBLEM_TYPES,
-    PROVIDERS,
 )
+from bots.quantum_ai_bot.quantum_simulator import (
+    HybridQuantumAIModel,
+    HybridQuantumAIModelError,
+    QuantumCircuitSimulator,
+    QuantumCircuitSimulatorError,
+)
+from bots.quantum_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="QuantumAIBot")
 
@@ -91,8 +96,12 @@ class QuantumAIBot:
             If the problem type is not available on the current tier.
         """
         try:
-            result = self.optimizer.solve_optimization(problem_type, constraints, variables)
-            self._activity_log.append({"action": "solve_optimization", "problem_type": problem_type})
+            result = self.optimizer.solve_optimization(
+                problem_type, constraints, variables
+            )
+            self._activity_log.append(
+                {"action": "solve_optimization", "problem_type": problem_type}
+            )
             return result
         except QuantumOptimizerError as exc:
             raise QuantumAIBotError(str(exc)) from exc
@@ -118,7 +127,9 @@ class QuantumAIBot:
         """
         try:
             result = self.optimizer.simulate_physics(system_type, parameters)
-            self._activity_log.append({"action": "physics_simulation", "system_type": system_type})
+            self._activity_log.append(
+                {"action": "physics_simulation", "system_type": system_type}
+            )
             return result
         except QuantumOptimizerError as exc:
             raise QuantumAIBotError(str(exc)) from exc
@@ -142,7 +153,9 @@ class QuantumAIBot:
         """
         try:
             result = self.partnership_manager.connect_quantum_provider(provider)
-            self._activity_log.append({"action": "connect_provider", "provider": provider})
+            self._activity_log.append(
+                {"action": "connect_provider", "provider": provider}
+            )
             return result
         except QuantumPartnershipManagerError as exc:
             raise QuantumAIBotError(str(exc)) from exc

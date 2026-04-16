@@ -1,4 +1,5 @@
 """Open Food Facts nutrition data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,8 +26,13 @@ class OpenFoodFactsConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/product/{barcode}.json", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/product/{barcode}.json",
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Open Food Facts product fetched for barcode: %s", barcode)
             return {"status": "success", "data": response.json()}
@@ -45,12 +51,17 @@ class OpenFoodFactsConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"search_terms": query, "search_simple": 1, "json": 1, "page": page}
         try:
-            response = requests.get("https://world.openfoodfacts.org/cgi/search.pl", params=params, headers=self.headers, timeout=30)
+            response = requests.get(
+                "https://world.openfoodfacts.org/cgi/search.pl",
+                params=params,
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Open Food Facts search_products error: %s", e)
             return {"status": "error", "message": str(e)}
-

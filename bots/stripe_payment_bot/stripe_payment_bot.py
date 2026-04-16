@@ -46,34 +46,31 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
+import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-import sys
-import os
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.stripe_payment_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_CHECKOUT,
+    FEATURE_CONNECT,
+    FEATURE_COUPONS,
+    FEATURE_FRAUD_RADAR,
+    FEATURE_INVOICES,
+    FEATURE_REFUNDS,
+    FEATURE_SPLIT_PAYMENTS,
+    FEATURE_SUBSCRIPTIONS,
+    FEATURE_WEBHOOKS,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_CHECKOUT,
-    FEATURE_SUBSCRIPTIONS,
-    FEATURE_WEBHOOKS,
-    FEATURE_REFUNDS,
-    FEATURE_COUPONS,
-    FEATURE_INVOICES,
-    FEATURE_CONNECT,
-    FEATURE_SPLIT_PAYMENTS,
-    FEATURE_ANALYTICS,
-    FEATURE_FRAUD_RADAR,
 )
-
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -114,6 +111,7 @@ PLAN_CATALOGUE: dict[str, float] = {
 # Custom exceptions
 # ---------------------------------------------------------------------------
 
+
 class StripePaymentBotError(Exception):
     """Base exception for StripePaymentBot errors."""
 
@@ -129,6 +127,7 @@ class StripeValidationError(StripePaymentBotError):
 # ---------------------------------------------------------------------------
 # Main bot class
 # ---------------------------------------------------------------------------
+
 
 class StripePaymentBot:
     """
@@ -760,7 +759,11 @@ class StripePaymentBot:
             "ip": ip,
             "risk_score": score,
             "risk_level": level,
-            "recommendation": "block" if level == "high" else "review" if level == "elevated" else "allow",
+            "recommendation": (
+                "block"
+                if level == "high"
+                else "review" if level == "elevated" else "allow"
+            ),
             "assessed_at": self._now(),
         }
 
@@ -783,7 +786,9 @@ class StripePaymentBot:
         for sub in self._subscriptions.values():
             plan_id = sub.get("plan_id", "unknown")
             if sub.get("status") == "active":
-                plan_revenue[plan_id] = plan_revenue.get(plan_id, 0) + sub.get("amount_usd", 0)
+                plan_revenue[plan_id] = plan_revenue.get(plan_id, 0) + sub.get(
+                    "amount_usd", 0
+                )
 
         return {
             "total_revenue_usd": round(self._revenue_usd, 2),
@@ -829,7 +834,10 @@ class StripePaymentBot:
             }
         if "revenue" in msg or "summary" in msg or "analytics" in msg:
             if self._config.has_feature(FEATURE_ANALYTICS):
-                return {"message": "Revenue summary retrieved.", "data": self.get_revenue_summary()}
+                return {
+                    "message": "Revenue summary retrieved.",
+                    "data": self.get_revenue_summary(),
+                }
             return {"message": "Analytics available on GROWTH tier and above."}
         if "refund" in msg:
             return {"message": "To refund, call create_refund(checkout_id) directly."}

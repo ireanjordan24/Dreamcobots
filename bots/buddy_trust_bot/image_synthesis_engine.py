@@ -25,10 +25,10 @@ from typing import Optional
 
 
 class AvatarType(Enum):
-    PHOTO = "photo"             # Static image
+    PHOTO = "photo"  # Static image
     ANIMATED_GIF = "animated_gif"
     VIDEO_AVATAR = "video_avatar"
-    HOLOGRAPHIC = "holographic" # AR/VR overlay
+    HOLOGRAPHIC = "holographic"  # AR/VR overlay
 
 
 class AvatarStatus(Enum):
@@ -49,11 +49,11 @@ class ImageAvatar:
     owner_user_id: str
     display_name: str
     avatar_type: AvatarType
-    image_data_ref: str     # Encrypted reference to stored image/video
+    image_data_ref: str  # Encrypted reference to stored image/video
     consent_token: str
     status: AvatarStatus = AvatarStatus.ACTIVE
     resolution: str = "1920x1080"
-    duration_seconds: float = 0.0    # For video/animated types
+    duration_seconds: float = 0.0  # For video/animated types
     created_at: float = 0.0
     tags: list = field(default_factory=list)
 
@@ -82,8 +82,8 @@ class SynthesisJob:
 
     job_id: str
     avatar_id: str
-    prompt: str             # Creative/professional description for synthesis
-    output_ref: str         # Reference to generated output
+    prompt: str  # Creative/professional description for synthesis
+    output_ref: str  # Reference to generated output
     consent_token: str
     completed: bool = False
     error: str = ""
@@ -137,6 +137,7 @@ class ImageSynthesisEngine:
         Requires active IMAGE_SYNTHESIS consent for *owner_user_id*.
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         consent = self._consent_manager.require_consent(
             owner_user_id, ConsentType.IMAGE_SYNTHESIS
         )
@@ -147,6 +148,7 @@ class ImageSynthesisEngine:
             )
 
         import time
+
         avatar_id = str(uuid.uuid4())
         avatar = ImageAvatar(
             avatar_id=avatar_id,
@@ -199,6 +201,7 @@ class ImageSynthesisEngine:
         Requires active IMAGE_SYNTHESIS consent for *requester_user_id*.
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         consent = self._consent_manager.require_consent(
             requester_user_id, ConsentType.IMAGE_SYNTHESIS
         )
@@ -215,7 +218,7 @@ class ImageSynthesisEngine:
             prompt=prompt,
             output_ref=f"output:{job_id}",
             consent_token=consent.acknowledgment_token,
-            completed=True,   # Simulated immediate completion
+            completed=True,  # Simulated immediate completion
         )
         self._jobs[job_id] = job
         return job
@@ -261,6 +264,7 @@ class ImageSynthesisEngine:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class ImageSynthesisError(Exception):
     """General image synthesis error."""

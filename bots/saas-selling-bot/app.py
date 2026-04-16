@@ -16,18 +16,19 @@ Endpoints:
   POST /api/webhook/stripe     – Stripe webhook handler
   GET  /                       – Serve the frontend
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import os
 import json
+import os
 
-from flask import Flask, request, jsonify, redirect, send_from_directory, abort
+from affiliate import get_revenue_dashboard, mark_conversion, track_click
+from ai_integration import chatbot_response, get_recommendations
+from flask import Flask, abort, jsonify, redirect, request, send_from_directory
 from flask_cors import CORS
+from payment import create_checkout_session, get_plans, handle_webhook
 
 import database as db
-from ai_integration import get_recommendations, chatbot_response
-from payment import create_checkout_session, handle_webhook, get_plans
-from affiliate import track_click, get_revenue_dashboard, mark_conversion
 
 app = Flask(__name__, static_folder="frontend")
 CORS(app)
@@ -35,6 +36,7 @@ CORS(app)
 # ─────────────────────────────────────────────────────────────
 # Frontend
 # ─────────────────────────────────────────────────────────────
+
 
 @app.route("/")
 def index():
@@ -54,6 +56,7 @@ def static_files(filename):
 # ─────────────────────────────────────────────────────────────
 # Tools API
 # ─────────────────────────────────────────────────────────────
+
 
 @app.route("/api/tools", methods=["GET"])
 def list_tools():
@@ -101,6 +104,7 @@ def add_tool():
 # Categories & Search
 # ─────────────────────────────────────────────────────────────
 
+
 @app.route("/api/categories", methods=["GET"])
 def list_categories():
     categories = db.get_categories()
@@ -119,6 +123,7 @@ def search():
 # ─────────────────────────────────────────────────────────────
 # Subscriptions & Plans
 # ─────────────────────────────────────────────────────────────
+
 
 @app.route("/api/plans", methods=["GET"])
 def plans():
@@ -145,6 +150,7 @@ def subscribe():
 # ─────────────────────────────────────────────────────────────
 # AI Recommendations & Chatbot
 # ─────────────────────────────────────────────────────────────
+
 
 @app.route("/api/recommend", methods=["POST"])
 def recommend():
@@ -175,6 +181,7 @@ def chat():
 # Affiliate Tracking
 # ─────────────────────────────────────────────────────────────
 
+
 @app.route("/api/affiliate/click/<int:tool_id>", methods=["GET"])
 def affiliate_click(tool_id):
     session_id = request.args.get("sid") or request.cookies.get("saasbot_sid")
@@ -203,6 +210,7 @@ def revenue():
 # Stripe Webhook
 # ─────────────────────────────────────────────────────────────
 
+
 @app.route("/api/webhook/stripe", methods=["POST"])
 def stripe_webhook():
     payload = request.get_data()
@@ -216,6 +224,7 @@ def stripe_webhook():
 # ─────────────────────────────────────────────────────────────
 # Payment redirect pages
 # ─────────────────────────────────────────────────────────────
+
 
 @app.route("/payment/success")
 def payment_success():
@@ -260,6 +269,7 @@ if __name__ == "__main__":
 # Additional routes for test compatibility
 # ---------------------------------------------------------------------------
 
+
 @app.route("/pricing")
 def pricing_page():
     return """<html><body>
@@ -286,7 +296,13 @@ def lead_gen():
         email = data.get("email", "").strip()
         if not name:
             return """<html><body><h1>Get a Quote</h1><p>Please enter your name.</p></body></html>"""
-        db.save_lead(name=name, email=email, company=data.get("company", ""), service=data.get("service", ""), message=data.get("message", ""))
+        db.save_lead(
+            name=name,
+            email=email,
+            company=data.get("company", ""),
+            service=data.get("service", ""),
+            message=data.get("message", ""),
+        )
         return """<html><body><h1>Thank you!</h1><p>We'll be in touch soon.</p></body></html>"""
     return """<html><body><h1>Get a Quote</h1><p>Fill out this form for a custom quote.</p></body></html>"""
 
@@ -296,14 +312,21 @@ def demo_custom_bot():
     if request.method == "POST":
         task = request.form.get("task", "")
         import sys as _sys_app
+
         _sys_app.path.insert(0, app.root_path)
         try:
             from bot import run_custom_bot_demo
+
             result = run_custom_bot_demo(task)
         except Exception:
-            result = {"steps": ["Parsing task", "Processing", "Executing"], "result": f"Task processed: {task}"}
+            result = {
+                "steps": ["Parsing task", "Processing", "Executing"],
+                "result": f"Task processed: {task}",
+            }
         db.record_demo("custom_bot", task)
-        steps_html = "".join(f"<li>Pipeline Step: {s}</li>" for s in result.get("steps", []))
+        steps_html = "".join(
+            f"<li>Pipeline Step: {s}</li>" for s in result.get("steps", [])
+        )
         return f"""<html><body><h1>Custom Bot Demo</h1>
         <ul>{steps_html}</ul>
         <p>{result.get('result', '')}</p></body></html>"""
@@ -315,6 +338,7 @@ def demo_nlp_bot():
     if request.method == "POST":
         message = request.form.get("message", "")
         from nlp import get_faq_response
+
         reply = get_faq_response(message)
         db.record_chat(message, reply)
         return f"""<html><body><h1>NLP Bot</h1><p>{reply}</p><p>$99/mo starting price</p></body></html>"""
@@ -335,14 +359,18 @@ def demo_contracts():
     if request.method == "POST":
         keyword = request.form.get("keyword", "")
         import sys as _sys_app2
+
         _sys_app2.path.insert(0, app.root_path)
         try:
             from bot import run_contract_search
+
             results = run_contract_search(keyword)
         except Exception:
             results = []
         db.record_demo("contracts", keyword)
-        results_html = "".join(f"<li>{r['title']} ({r.get('agency','')})</li>" for r in results)
+        results_html = "".join(
+            f"<li>{r['title']} ({r.get('agency','')})</li>" for r in results
+        )
         return f"""<html><body><h1>Contracts: {keyword}</h1><ul>{results_html}</ul></body></html>"""
     return """<html><body><h1>Contract Search</h1><form method="post"><input name="keyword" /><button>Search</button></form></body></html>"""
 
@@ -372,7 +400,13 @@ def submit_lead():
     email = data.get("email", "").strip() if data else ""
     if not name or not email:
         return jsonify({"error": "name and email required"}), 400
-    lead_id = db.save_lead(name=name, email=email, company=data.get("company", ""), service=data.get("service", ""), message=data.get("message", ""))
+    lead_id = db.save_lead(
+        name=name,
+        email=email,
+        company=data.get("company", ""),
+        service=data.get("service", ""),
+        message=data.get("message", ""),
+    )
     return jsonify({"success": True, "lead_id": lead_id})
 
 

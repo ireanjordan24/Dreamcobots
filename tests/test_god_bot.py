@@ -156,9 +156,7 @@ class TestJobBotRun:
     def _import_job_bot(self):
         import importlib.util as _util
 
-        path = os.path.join(
-            REPO_ROOT, "bots", "selenium-job-application-bot", "bot.py"
-        )
+        path = os.path.join(REPO_ROOT, "bots", "selenium-job-application-bot", "bot.py")
         spec = _util.spec_from_file_location("job_bot_test_mod", path)
         assert spec and spec.loader
         mod = _util.module_from_spec(spec)
@@ -193,7 +191,7 @@ class TestJobBotRun:
 
 class TestGodBotInit:
     def test_default_registry_has_four_bots(self):
-        from bots.god_bot.god_bot import GodBot, BOT_REGISTRY
+        from bots.god_bot.god_bot import BOT_REGISTRY, GodBot
 
         god = GodBot()
         assert len(god.registry) == 4
@@ -231,10 +229,12 @@ class TestGodBotRunAll:
     def test_run_all_aggregates_revenue(self):
         from bots.god_bot.god_bot import GodBot
 
-        reg = self._make_registry_with_mocks([
-            ("bot_a", 500, 5),
-            ("bot_b", 300, 3),
-        ])
+        reg = self._make_registry_with_mocks(
+            [
+                ("bot_a", 500, 5),
+                ("bot_b", 300, 3),
+            ]
+        )
         god = GodBot(registry=reg)
         result = god.run_all()
         assert result["total_revenue"] == 800
@@ -242,10 +242,12 @@ class TestGodBotRunAll:
     def test_run_all_aggregates_leads(self):
         from bots.god_bot.god_bot import GodBot
 
-        reg = self._make_registry_with_mocks([
-            ("bot_a", 500, 5),
-            ("bot_b", 300, 3),
-        ])
+        reg = self._make_registry_with_mocks(
+            [
+                ("bot_a", 500, 5),
+                ("bot_b", 300, 3),
+            ]
+        )
         god = GodBot(registry=reg)
         result = god.run_all()
         assert result["total_leads"] == 8
@@ -253,11 +255,13 @@ class TestGodBotRunAll:
     def test_run_all_bots_run_count(self):
         from bots.god_bot.god_bot import GodBot
 
-        reg = self._make_registry_with_mocks([
-            ("bot_a", 100, 1),
-            ("bot_b", 200, 2),
-            ("bot_c", 300, 3),
-        ])
+        reg = self._make_registry_with_mocks(
+            [
+                ("bot_a", 100, 1),
+                ("bot_b", 200, 2),
+                ("bot_c", 300, 3),
+            ]
+        )
         god = GodBot(registry=reg)
         result = god.run_all()
         assert result["bots_run"] == 3

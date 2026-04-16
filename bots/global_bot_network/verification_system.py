@@ -17,8 +17,8 @@ Each level unlocks additional capabilities on the network
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -28,10 +28,10 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class VerificationLevel(Enum):
     NONE = "none"
@@ -53,13 +53,17 @@ _LEVEL_REQUIREMENTS: dict[VerificationLevel, list[VerificationMethod]] = {
     VerificationLevel.NONE: [],
     VerificationLevel.BASIC: [VerificationMethod.EMAIL],
     VerificationLevel.VERIFIED: [VerificationMethod.OWNER_CONFIRM],
-    VerificationLevel.TRUSTED: [VerificationMethod.WALLET, VerificationMethod.ADMIN_GRANT],
+    VerificationLevel.TRUSTED: [
+        VerificationMethod.WALLET,
+        VerificationMethod.ADMIN_GRANT,
+    ],
 }
 
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class VerificationError(Exception):
     """Base exception for the Verification System."""
@@ -76,6 +80,7 @@ class BotNotRegistered(VerificationError):
 # ---------------------------------------------------------------------------
 # Verification record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class VerificationRecord:
@@ -138,6 +143,7 @@ class VerificationRecord:
 # ---------------------------------------------------------------------------
 # Verification System
 # ---------------------------------------------------------------------------
+
 
 class VerificationSystem:
     """

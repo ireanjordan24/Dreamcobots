@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 299.0, ["tax-loss harvesting engine", "capital gains deferral"]),
-    "enterprise": TierConfig("Enterprise", 599.0, ["tax-loss harvesting engine", "capital gains deferral", "wash sale monitoring", "multi-account optimization"]),
+    "pro": TierConfig(
+        "Pro", 299.0, ["tax-loss harvesting engine", "capital gains deferral"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        599.0,
+        [
+            "tax-loss harvesting engine",
+            "capital gains deferral",
+            "wash sale monitoring",
+            "multi-account optimization",
+        ],
+    ),
 }

@@ -9,6 +9,23 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 499.0, ["ESG scoring framework", "carbon footprint tracking", "impact measurement dashboard"]),
-    "elite": TierConfig("Elite", 2500.0, ["ESG scoring framework", "carbon footprint tracking", "impact measurement dashboard", "third-party ESG data feeds"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "ESG scoring framework",
+            "carbon footprint tracking",
+            "impact measurement dashboard",
+        ],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "ESG scoring framework",
+            "carbon footprint tracking",
+            "impact measurement dashboard",
+            "third-party ESG data feeds",
+        ],
+    ),
 }

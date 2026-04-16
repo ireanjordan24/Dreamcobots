@@ -7,8 +7,9 @@ Covers: tiers, package_catalog, modular_builder, enterprise_scaler,
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -17,42 +18,42 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 # Imports
 # ---------------------------------------------------------------------------
 
-from bots.saas_packages_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    list_tiers,
-    get_upgrade_path,
-    FEATURE_BASIC_PACKAGES,
-    FEATURE_ADVANCED_TEMPLATES,
-    FEATURE_USAGE_ANALYTICS,
-    FEATURE_ECOMMERCE_MODULE,
-    FEATURE_CRM_MODULE,
-    FEATURE_HR_MODULE,
-    FEATURE_CUSTOM_BUILDER,
-    FEATURE_FORTUNE500_INTEGRATIONS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
-)
-from bots.saas_packages_bot.package_catalog import PackageCatalog, Industry, SaaSPackage
+from bots.saas_packages_bot.enterprise_scaler import EnterpriseScaler, ScaleTier
 from bots.saas_packages_bot.modular_builder import (
-    ModularSaaSBuilder,
     AVAILABLE_MODULES,
     MODULE_COSTS,
     AvailableModule,
+    ModularSaaSBuilder,
 )
-from bots.saas_packages_bot.enterprise_scaler import EnterpriseScaler, ScaleTier
+from bots.saas_packages_bot.package_catalog import Industry, PackageCatalog, SaaSPackage
 from bots.saas_packages_bot.saas_packages_bot import (
     SaaSPackagesBot,
     SaaSPackagesBotError,
     SaaSPackagesTierError,
 )
-
+from bots.saas_packages_bot.tiers import (
+    FEATURE_ADVANCED_TEMPLATES,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_PACKAGES,
+    FEATURE_CRM_MODULE,
+    FEATURE_CUSTOM_BUILDER,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_ECOMMERCE_MODULE,
+    FEATURE_FORTUNE500_INTEGRATIONS,
+    FEATURE_HR_MODULE,
+    FEATURE_USAGE_ANALYTICS,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # tiers.py
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -132,6 +133,7 @@ class TestTiers:
 # package_catalog.py
 # ===========================================================================
 
+
 class TestPackageCatalog:
     @pytest.fixture
     def catalog(self):
@@ -179,29 +181,53 @@ class TestPackageCatalog:
     def test_pricing_summary_has_required_keys(self, catalog):
         summary = catalog.get_pricing_summary()
         for item in summary:
-            for key in ["package_id", "name", "industry", "monthly_price_usd", "setup_fee_usd"]:
+            for key in [
+                "package_id",
+                "name",
+                "industry",
+                "monthly_price_usd",
+                "setup_fee_usd",
+            ]:
                 assert key in item
 
     def test_saas_package_to_dict(self, catalog):
         pkg = catalog.get_package("crm-001")
         assert pkg is not None
         d = pkg.to_dict()
-        for key in ["package_id", "name", "industry", "description", "modules",
-                    "monthly_price_usd", "setup_fee_usd", "users_included", "features"]:
+        for key in [
+            "package_id",
+            "name",
+            "industry",
+            "description",
+            "modules",
+            "monthly_price_usd",
+            "setup_fee_usd",
+            "users_included",
+            "features",
+        ]:
             assert key in d
 
     def test_industries_covered(self, catalog):
         industries = {p.industry for p in catalog.list_packages()}
-        expected = {Industry.E_COMMERCE, Industry.CRM, Industry.HR_AUTOMATION,
-                    Industry.FINANCE, Industry.HEALTHCARE, Industry.EDUCATION,
-                    Industry.LEGAL, Industry.MARKETING, Industry.LOGISTICS,
-                    Industry.REAL_ESTATE}
+        expected = {
+            Industry.E_COMMERCE,
+            Industry.CRM,
+            Industry.HR_AUTOMATION,
+            Industry.FINANCE,
+            Industry.HEALTHCARE,
+            Industry.EDUCATION,
+            Industry.LEGAL,
+            Industry.MARKETING,
+            Industry.LOGISTICS,
+            Industry.REAL_ESTATE,
+        }
         assert expected.issubset(industries)
 
 
 # ===========================================================================
 # modular_builder.py
 # ===========================================================================
+
 
 class TestModularBuilder:
     @pytest.fixture
@@ -271,7 +297,9 @@ class TestModularBuilder:
         builder.add_module(pid, AvailableModule.AUTH)
         builder.add_module(pid, AvailableModule.PAYMENTS)
         cost = builder.calculate_plan_cost(pid)
-        expected_modules_cost = MODULE_COSTS[AvailableModule.AUTH] + MODULE_COSTS[AvailableModule.PAYMENTS]
+        expected_modules_cost = (
+            MODULE_COSTS[AvailableModule.AUTH] + MODULE_COSTS[AvailableModule.PAYMENTS]
+        )
         assert cost["modules_cost"] == expected_modules_cost
         assert cost["total_monthly"] == 29.0 + expected_modules_cost
 
@@ -308,6 +336,7 @@ class TestModularBuilder:
 # enterprise_scaler.py
 # ===========================================================================
 
+
 class TestEnterpriseScaler:
     @pytest.fixture
     def scaler(self):
@@ -338,8 +367,15 @@ class TestEnterpriseScaler:
 
     def test_generate_scaling_plan_keys(self, scaler):
         plan = scaler.generate_scaling_plan("plan-1", 10, 500)
-        for key in ["plan_id", "current_tier", "projected_tier", "infrastructure_recommendations",
-                    "current_monthly_cost_usd", "projected_monthly_cost_usd", "cost_increase_usd"]:
+        for key in [
+            "plan_id",
+            "current_tier",
+            "projected_tier",
+            "infrastructure_recommendations",
+            "current_monthly_cost_usd",
+            "projected_monthly_cost_usd",
+            "cost_increase_usd",
+        ]:
             assert key in plan
 
     def test_generate_scaling_plan_cost_increases(self, scaler):
@@ -348,13 +384,24 @@ class TestEnterpriseScaler:
 
     def test_estimate_infrastructure_cost_keys(self, scaler):
         cost = scaler.estimate_infrastructure_cost(50, [])
-        for key in ["compute_usd", "storage_usd", "bandwidth_usd", "support_usd", "total_monthly_usd"]:
+        for key in [
+            "compute_usd",
+            "storage_usd",
+            "bandwidth_usd",
+            "support_usd",
+            "total_monthly_usd",
+        ]:
             assert key in cost
 
     def test_estimate_infrastructure_cost_modules_add_overhead(self, scaler):
         cost_no_modules = scaler.estimate_infrastructure_cost(50, [])
-        cost_with_modules = scaler.estimate_infrastructure_cost(50, ["AUTH", "PAYMENTS"])
-        assert cost_with_modules["total_monthly_usd"] > cost_no_modules["total_monthly_usd"]
+        cost_with_modules = scaler.estimate_infrastructure_cost(
+            50, ["AUTH", "PAYMENTS"]
+        )
+        assert (
+            cost_with_modules["total_monthly_usd"]
+            > cost_no_modules["total_monthly_usd"]
+        )
 
     def test_generate_fortune500_salesforce(self, scaler):
         result = scaler.generate_fortune500_integration("Acme Corp", "SALESFORCE")
@@ -368,7 +415,15 @@ class TestEnterpriseScaler:
         assert "supported_types" in result
 
     def test_generate_fortune500_all_types(self, scaler):
-        for itype in ["ERP", "SALESFORCE", "SAP", "ORACLE", "MICROSOFT_365", "SLACK", "JIRA"]:
+        for itype in [
+            "ERP",
+            "SALESFORCE",
+            "SAP",
+            "ORACLE",
+            "MICROSOFT_365",
+            "SLACK",
+            "JIRA",
+        ]:
             result = scaler.generate_fortune500_integration("TestCorp", itype)
             assert "error" not in result, f"Integration '{itype}' returned error"
 
@@ -376,6 +431,7 @@ class TestEnterpriseScaler:
 # ===========================================================================
 # saas_packages_bot.py (main orchestrator)
 # ===========================================================================
+
 
 class TestSaaSPackagesBotFree:
     @pytest.fixture

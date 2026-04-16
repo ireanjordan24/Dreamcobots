@@ -1,13 +1,17 @@
 """Tests for bots/lead_generator_bot/lead_generator_bot.py"""
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.lead_generator_bot.lead_generator_bot import LeadGeneratorBot
 
 
@@ -80,15 +84,27 @@ class TestSearchLeads:
 class TestScoreLead:
     def test_returns_dict(self):
         bot = LeadGeneratorBot(tier=Tier.PRO)
-        lead = {"id": "L001", "industry": "tech", "company_size": "large",
-                "revenue_estimate": 5_000_000, "verified": True, "score": 85}
+        lead = {
+            "id": "L001",
+            "industry": "tech",
+            "company_size": "large",
+            "revenue_estimate": 5_000_000,
+            "verified": True,
+            "score": 85,
+        }
         result = bot.score_lead(lead)
         assert isinstance(result, dict)
 
     def test_score_in_range(self):
         bot = LeadGeneratorBot(tier=Tier.PRO)
-        lead = {"id": "L001", "industry": "tech", "company_size": "mid",
-                "revenue_estimate": 2_000_000, "verified": True, "score": 75}
+        lead = {
+            "id": "L001",
+            "industry": "tech",
+            "company_size": "mid",
+            "revenue_estimate": 2_000_000,
+            "verified": True,
+            "score": 75,
+        }
         result = bot.score_lead(lead)
         assert 0 <= result.get("score", result.get("lead_score", 0)) <= 100
 

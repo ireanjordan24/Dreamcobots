@@ -22,7 +22,6 @@ from typing import List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
@@ -74,10 +73,7 @@ class SMSSender:
     ) -> None:
         self.account_sid = account_sid or os.environ.get("TWILIO_SID", "")
         self.auth_token = auth_token or os.environ.get("TWILIO_AUTH", "")
-        self.from_number = (
-            from_number
-            or os.environ.get("TWILIO_FROM", "+10000000000")
-        )
+        self.from_number = from_number or os.environ.get("TWILIO_FROM", "+10000000000")
         self._mock = mock or not (self.account_sid and self.auth_token)
         self._sent: List[SMSRecord] = []
 

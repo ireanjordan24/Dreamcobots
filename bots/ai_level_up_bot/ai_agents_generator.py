@@ -9,8 +9,9 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from dataclasses import dataclass, field
@@ -62,14 +63,22 @@ _AGENT_TEMPLATES: dict = {
         "name": "Real Estate Marketing Agent",
         "purpose": "Automate real estate marketing using AI tools",
         "tools": ["ChatGPT", "DALL-E", "ElevenLabs", "HubSpot CRM"],
-        "automation_hooks": ["Email drip campaigns", "Social media scheduling", "Lead scoring"],
+        "automation_hooks": [
+            "Email drip campaigns",
+            "Social media scheduling",
+            "Lead scoring",
+        ],
         "description": "Generates listings, creates ad images, records voiceovers, and manages leads.",
     },
     "content_creator": {
         "name": "Content Creator Agent",
         "purpose": "Produce blog posts, social content, and videos at scale",
         "tools": ["Jasper AI", "Midjourney", "Runway", "ElevenLabs"],
-        "automation_hooks": ["Blog scheduling", "Social posting", "Newsletter generation"],
+        "automation_hooks": [
+            "Blog scheduling",
+            "Social posting",
+            "Newsletter generation",
+        ],
         "description": "Writes, illustrates, and publishes content across all channels.",
     },
     "customer_support": {

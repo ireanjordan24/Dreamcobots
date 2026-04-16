@@ -3,34 +3,39 @@ Tests for bots/lawsuit_finder_bot/tiers.py and
 bots/lawsuit_finder_bot/lawsuit_finder_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.lawsuit_finder_bot.tiers import (
-    get_lf_tier_info,
-    LF_EXTRA_FEATURES,
-    LF_TOOLS,
-)
+
 from bots.lawsuit_finder_bot.lawsuit_finder_bot import (
     LawsuitFinderBot,
-    LawsuitFinderTierError,
     LawsuitFinderRequestLimitError,
+    LawsuitFinderTierError,
 )
+from bots.lawsuit_finder_bot.tiers import LF_EXTRA_FEATURES, LF_TOOLS, get_lf_tier_info
 
 
 class TestLFTierInfo:
     def test_tier_info_keys(self):
         info = get_lf_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "lf_features", "tools", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "lf_features",
+            "tools",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -76,8 +81,14 @@ class TestLawsuitFinderBot:
     def test_chat_result_keys(self):
         bot = LawsuitFinderBot(tier=Tier.FREE)
         result = bot.chat("Find cases")
-        for key in ("message", "tool", "tier", "disclaimer",
-                    "requests_used", "requests_remaining"):
+        for key in (
+            "message",
+            "tool",
+            "tier",
+            "disclaimer",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_disclaimer_present_in_response(self):

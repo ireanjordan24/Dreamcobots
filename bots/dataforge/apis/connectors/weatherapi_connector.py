@@ -1,4 +1,5 @@
 """WeatherAPI.com connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,8 +28,13 @@ class WeatherAPIConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/current.json", params={"key": self.api_key, "q": location}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/current.json",
+                params={"key": self.api_key, "q": location},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("WeatherAPI current weather fetched for %s.", location)
             return {"status": "success", "data": response.json()}
@@ -47,12 +53,15 @@ class WeatherAPIConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/forecast.json",
-                params={"key": self.api_key, "q": location, "days": days}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/forecast.json",
+                params={"key": self.api_key, "q": location, "days": days},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("WeatherAPI get_forecast error: %s", e)
             return {"status": "error", "message": str(e)}
-

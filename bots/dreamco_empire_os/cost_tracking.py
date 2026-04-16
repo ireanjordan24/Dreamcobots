@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -27,6 +28,7 @@ class CostCategory(Enum):
 @dataclass
 class CostEntry:
     """A single cost record."""
+
     cost_id: str
     name: str
     amount_usd: float
@@ -34,7 +36,9 @@ class CostEntry:
     bot_name: Optional[str] = None
     division: Optional[str] = None
     recurring_monthly: bool = False
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class CostTracking:
@@ -85,15 +89,21 @@ class CostTracking:
             cat = e.category.value
             by_category[cat] = round(by_category.get(cat, 0.0) + e.amount_usd, 2)
             if e.bot_name:
-                by_bot[e.bot_name] = round(by_bot.get(e.bot_name, 0.0) + e.amount_usd, 2)
+                by_bot[e.bot_name] = round(
+                    by_bot.get(e.bot_name, 0.0) + e.amount_usd, 2
+                )
             if e.division:
-                by_division[e.division] = round(by_division.get(e.division, 0.0) + e.amount_usd, 2)
+                by_division[e.division] = round(
+                    by_division.get(e.division, 0.0) + e.amount_usd, 2
+                )
 
         over_budget = self._monthly_budget_usd > 0 and total > self._monthly_budget_usd
         return {
             "total_cost_usd": round(total, 2),
             "monthly_budget_usd": self._monthly_budget_usd,
-            "budget_remaining_usd": round(max(0.0, self._monthly_budget_usd - total), 2),
+            "budget_remaining_usd": round(
+                max(0.0, self._monthly_budget_usd - total), 2
+            ),
             "over_budget": over_budget,
             "by_category": by_category,
             "by_bot": by_bot,
@@ -106,7 +116,12 @@ class CostTracking:
         """Return top N cost entries by amount."""
         sorted_entries = sorted(self._entries, key=lambda e: e.amount_usd, reverse=True)
         return [
-            {"cost_id": e.cost_id, "name": e.name, "amount_usd": e.amount_usd, "category": e.category.value}
+            {
+                "cost_id": e.cost_id,
+                "name": e.name,
+                "amount_usd": e.amount_usd,
+                "category": e.category.value,
+            }
             for e in sorted_entries[:n]
         ]
 

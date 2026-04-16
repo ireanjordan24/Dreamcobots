@@ -24,7 +24,6 @@ from typing import List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Pricing tiers  (amounts in USD cents)
 # ---------------------------------------------------------------------------
@@ -50,7 +49,9 @@ class PaymentRecord:
     currency: str
     description: str
     status: str  # "succeeded" | "mock" | "failed"
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -73,7 +74,9 @@ class SubscriptionRecord:
     plan: str
     price_cents: int
     status: str  # "active" | "mock" | "failed"
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -128,7 +131,9 @@ class PaymentsClient:
         """
         plan_upper = plan.upper()
         if plan_upper not in SUBSCRIPTION_PLANS:
-            raise ValueError(f"Unknown plan '{plan}'. Valid: {list(SUBSCRIPTION_PLANS)}")
+            raise ValueError(
+                f"Unknown plan '{plan}'. Valid: {list(SUBSCRIPTION_PLANS)}"
+            )
 
         plan_info = SUBSCRIPTION_PLANS[plan_upper]
 
@@ -160,7 +165,11 @@ class PaymentsClient:
     # ------------------------------------------------------------------
 
     def create_charge(
-        self, email: str, amount_cents: int, description: str = "", currency: str = "usd"
+        self,
+        email: str,
+        amount_cents: int,
+        description: str = "",
+        currency: str = "usd",
     ) -> PaymentRecord:
         """Create a one-time charge (mock or live via Stripe)."""
         if self._mock:
@@ -190,14 +199,10 @@ class PaymentsClient:
 
     def get_revenue_summary(self) -> dict:
         total_mrr = sum(
-            s.price_cents
-            for s in self._subscriptions
-            if s.status in ("active", "mock")
+            s.price_cents for s in self._subscriptions if s.status in ("active", "mock")
         )
         total_one_time = sum(
-            p.amount_cents
-            for p in self._payments
-            if p.status in ("succeeded", "mock")
+            p.amount_cents for p in self._payments if p.status in ("succeeded", "mock")
         )
         return {
             "active_subscriptions": len(
@@ -214,7 +219,9 @@ class PaymentsClient:
     # Stripe internals (only reached when not mock)
     # ------------------------------------------------------------------
 
-    def _stripe_subscribe(self, email: str, plan: str, plan_info: dict) -> SubscriptionRecord:  # pragma: no cover
+    def _stripe_subscribe(
+        self, email: str, plan: str, plan_info: dict
+    ) -> SubscriptionRecord:  # pragma: no cover
         import stripe  # type: ignore[import]
 
         stripe.api_key = self._api_key

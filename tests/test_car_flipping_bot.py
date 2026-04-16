@@ -1,15 +1,21 @@
 """Tests for bots/car_flipping_bot/tiers.py and bots/car_flipping_bot/car_flipping_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.car_flipping_bot.car_flipping_bot import CarFlippingBot, CarFlippingBotTierError
+
+from bots.car_flipping_bot.car_flipping_bot import (
+    CarFlippingBot,
+    CarFlippingBotTierError,
+)
 
 
 class TestCarFlippingBotInstantiation:
@@ -69,30 +75,62 @@ class TestSearchCars:
 class TestEvaluateCar:
     def test_returns_dict(self):
         bot = CarFlippingBot(tier=Tier.FREE)
-        car = {"id": "c001", "year": 2018, "make": "Toyota", "model": "Camry",
-               "buy_price": 10000, "market_value": 16000, "condition": "Good", "repair_cost": 500}
+        car = {
+            "id": "c001",
+            "year": 2018,
+            "make": "Toyota",
+            "model": "Camry",
+            "buy_price": 10000,
+            "market_value": 16000,
+            "condition": "Good",
+            "repair_cost": 500,
+        }
         result = bot.evaluate_car(car)
         assert isinstance(result, dict)
 
     def test_has_required_keys(self):
         bot = CarFlippingBot(tier=Tier.FREE)
-        car = {"id": "c001", "year": 2018, "make": "Toyota", "model": "Camry",
-               "buy_price": 10000, "market_value": 16000, "condition": "Good", "repair_cost": 500}
+        car = {
+            "id": "c001",
+            "year": 2018,
+            "make": "Toyota",
+            "model": "Camry",
+            "buy_price": 10000,
+            "market_value": 16000,
+            "condition": "Good",
+            "repair_cost": 500,
+        }
         result = bot.evaluate_car(car)
         for key in ("condition_score", "flip_potential", "estimated_flip_profit"):
             assert key in result
 
     def test_pro_has_vehicle_history(self):
         bot = CarFlippingBot(tier=Tier.PRO)
-        car = {"id": "c001", "year": 2018, "make": "Toyota", "model": "Camry",
-               "buy_price": 10000, "market_value": 16000, "condition": "Good", "repair_cost": 500}
+        car = {
+            "id": "c001",
+            "year": 2018,
+            "make": "Toyota",
+            "model": "Camry",
+            "buy_price": 10000,
+            "market_value": 16000,
+            "condition": "Good",
+            "repair_cost": 500,
+        }
         result = bot.evaluate_car(car)
         assert "vehicle_history" in result
 
     def test_enterprise_has_market_prediction(self):
         bot = CarFlippingBot(tier=Tier.ENTERPRISE)
-        car = {"id": "c001", "year": 2018, "make": "Toyota", "model": "Camry",
-               "buy_price": 10000, "market_value": 16000, "condition": "Good", "repair_cost": 500}
+        car = {
+            "id": "c001",
+            "year": 2018,
+            "make": "Toyota",
+            "model": "Camry",
+            "buy_price": 10000,
+            "market_value": 16000,
+            "condition": "Good",
+            "repair_cost": 500,
+        }
         result = bot.evaluate_car(car)
         assert "market_prediction_90d" in result
 

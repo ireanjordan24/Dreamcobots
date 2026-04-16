@@ -15,10 +15,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
-
 # ---------------------------------------------------------------------------
 # Knowledge domains
 # ---------------------------------------------------------------------------
+
 
 class KnowledgeDomain(Enum):
     AI_TOOLS = "ai_tools"
@@ -38,6 +38,7 @@ class KnowledgeDomain(Enum):
 # ---------------------------------------------------------------------------
 # Pattern — a discovered knowledge item
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class KnowledgePattern:
@@ -95,6 +96,7 @@ class KnowledgePattern:
 # ---------------------------------------------------------------------------
 # Study module (a pluggable crawler / scanner)
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class StudyModule:
@@ -218,6 +220,7 @@ BUILTIN_MODULES: list[dict] = [
 # ---------------------------------------------------------------------------
 # Continuous Study Engine
 # ---------------------------------------------------------------------------
+
 
 class ContinuousStudyError(Exception):
     """Raised when a study operation fails."""

@@ -3,6 +3,7 @@ Unit tests for Dreamcobot modules.
 Each test class is grouped by bot category to support incremental,
 per-category test runs (e.g. ``pytest -k app_bot``).
 """
+
 import importlib.util
 import os
 import sys
@@ -23,7 +24,9 @@ _GOV_BOT_PATH = os.path.join(
     "government-contract-grant-bot",
     "government_contract_grant_bot.py",
 )
-_spec = importlib.util.spec_from_file_location("government_contract_grant_bot", _GOV_BOT_PATH)
+_spec = importlib.util.spec_from_file_location(
+    "government_contract_grant_bot", _GOV_BOT_PATH
+)
 _gov_bot_module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_gov_bot_module)
 GovernmentContractGrantBot = _gov_bot_module.GovernmentContractGrantBot
@@ -32,6 +35,7 @@ GovernmentContractGrantBot = _gov_bot_module.GovernmentContractGrantBot
 # ---------------------------------------------------------------------------
 # Government Contract & Grant Bot
 # ---------------------------------------------------------------------------
+
 
 class TestGovernmentContractGrantBot:
     """Tests for the GovernmentContractGrantBot (bots/government-contract-grant-bot)."""
@@ -74,6 +78,7 @@ class TestGovernmentContractGrantBot:
 # App Bots (app_bot marker enables incremental filtering)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.app_bot
 class TestAppBots:
     """Smoke tests for App_bots category."""
@@ -88,6 +93,7 @@ class TestAppBots:
 # ---------------------------------------------------------------------------
 # Business Bots
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.business_bot
 class TestBusinessBots:
@@ -104,6 +110,7 @@ class TestBusinessBots:
 # Fiverr Bots
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.fiverr_bot
 class TestFiverrBots:
     """Smoke tests for Fiverr_bots category."""
@@ -115,6 +122,7 @@ class TestFiverrBots:
 # ---------------------------------------------------------------------------
 # Marketing Bots
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.marketing_bot
 class TestMarketingBots:
@@ -128,6 +136,7 @@ class TestMarketingBots:
 # Occupational Bots
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.occupational_bot
 class TestOccupationalBots:
     """Smoke tests for Occupational_bots category."""
@@ -139,6 +148,7 @@ class TestOccupationalBots:
 # ---------------------------------------------------------------------------
 # Real Estate Bots
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.real_estate_bot
 class TestRealEstateBots:

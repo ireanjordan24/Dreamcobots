@@ -13,18 +13,22 @@ Usage
     print(response["message"])
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
 
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from models.registry import get_model_info
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.ai_chatbot.tiers import (
     CHATBOT_EXTRA_FEATURES,
     CHATBOT_MODELS,
     get_chatbot_tier_info,
 )
-from models.registry import get_model_info
 from framework import GlobalAISourcesFlow
 
 
@@ -93,9 +97,7 @@ class Chatbot:
 
         self._request_count += 1
         model_info = get_model_info(active_model)
-        response_text = (
-            f"[{model_info.display_name}] Mock response to: {message!r}"
-        )
+        response_text = f"[{model_info.display_name}] Mock response to: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
         self._trim_history()
@@ -162,7 +164,8 @@ class Chatbot:
 
         current_extras = set(CHATBOT_EXTRA_FEATURES[self.tier.value])
         new_extras = [
-            f for f in CHATBOT_EXTRA_FEATURES[next_cfg.tier.value]
+            f
+            for f in CHATBOT_EXTRA_FEATURES[next_cfg.tier.value]
             if f not in current_extras
         ]
         current_models = set(CHATBOT_MODELS[self.tier.value])

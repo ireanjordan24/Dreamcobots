@@ -1,4 +1,5 @@
 """What3Words location API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,9 +28,12 @@ class What3WordsConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"words": words, "key": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/convert-to-coordinates", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/convert-to-coordinates", params=params, timeout=30
+            )
             response.raise_for_status()
             logger.info("What3Words converted words to coordinates: %s", words)
             return {"status": "success", "data": response.json()}
@@ -48,12 +52,14 @@ class What3WordsConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"coordinates": f"{lat},{lng}", "key": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/convert-to-3wa", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/convert-to-3wa", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("What3Words convert_to_3wa error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -22,6 +22,7 @@ from typing import Optional
 @dataclass
 class MemberRow:
     """A single row in the member table."""
+
     user_id: str
     name: str
     contribution_usd: float
@@ -34,6 +35,7 @@ class MemberRow:
 @dataclass
 class ProposalRow:
     """A summary row for a governance proposal."""
+
     proposal_id: str
     title: str
     proposal_type: str
@@ -80,9 +82,21 @@ class WealthHubScreen:
         self.treasury_usd = treasury_usd
         self.reinvestment_rate_pct = reinvestment_rate_pct
         self.allocation = allocation or {
-            "wealth_protection": {"pct": 40.0, "usd": treasury_usd * 0.4, "assets": ["Gold", "Silver"]},
-            "growth": {"pct": 40.0, "usd": treasury_usd * 0.4, "assets": ["Stocks", "Real Estate"]},
-            "high_growth": {"pct": 20.0, "usd": treasury_usd * 0.2, "assets": ["Crypto", "Startups"]},
+            "wealth_protection": {
+                "pct": 40.0,
+                "usd": treasury_usd * 0.4,
+                "assets": ["Gold", "Silver"],
+            },
+            "growth": {
+                "pct": 40.0,
+                "usd": treasury_usd * 0.4,
+                "assets": ["Stocks", "Real Estate"],
+            },
+            "high_growth": {
+                "pct": 20.0,
+                "usd": treasury_usd * 0.2,
+                "assets": ["Crypto", "Startups"],
+            },
         }
         self.active_bots: list[str] = active_bots or []
         self._members: list[MemberRow] = []
@@ -206,14 +220,24 @@ class WealthHubScreen:
             reinvestment_rate_pct=20.0,
             active_bots=["money_finder", "referral", "trading"],
         )
-        screen.add_member(MemberRow("alice", "Alice Johnson", 3_000.0, 35.3, 420.50, True, 3))
-        screen.add_member(MemberRow("bob", "Bob Williams", 2_500.0, 29.4, 350.25, True, 2))
-        screen.add_member(MemberRow("carol", "Carol Davis", 2_000.0, 23.5, 280.00, True, 1))
-        screen.add_member(MemberRow("dave", "Dave Miller", 1_000.0, 11.8, 140.00, False, 0))
-        screen.add_proposal(ProposalRow(
-            "prop-1", "Allocate 10% to Bitcoin", "investment", 3, 1, "open"
-        ))
-        screen.add_proposal(ProposalRow(
-            "prop-2", "Monthly dividend payout schedule", "payout", 4, 0, "open"
-        ))
+        screen.add_member(
+            MemberRow("alice", "Alice Johnson", 3_000.0, 35.3, 420.50, True, 3)
+        )
+        screen.add_member(
+            MemberRow("bob", "Bob Williams", 2_500.0, 29.4, 350.25, True, 2)
+        )
+        screen.add_member(
+            MemberRow("carol", "Carol Davis", 2_000.0, 23.5, 280.00, True, 1)
+        )
+        screen.add_member(
+            MemberRow("dave", "Dave Miller", 1_000.0, 11.8, 140.00, False, 0)
+        )
+        screen.add_proposal(
+            ProposalRow("prop-1", "Allocate 10% to Bitcoin", "investment", 3, 1, "open")
+        )
+        screen.add_proposal(
+            ProposalRow(
+                "prop-2", "Monthly dividend payout schedule", "payout", 4, 0, "open"
+            )
+        )
         return screen

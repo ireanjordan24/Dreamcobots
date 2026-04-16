@@ -16,11 +16,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from datetime import datetime, timezone
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 _DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 _DEFAULT_LEADS_PATH = os.path.join(_DATA_DIR, "leads.json")

@@ -32,27 +32,30 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from typing import Optional
+
+from bots.bot_wars_bot.challenge_manager import ChallengeManager, ChallengeManagerError
+from bots.bot_wars_bot.competition_engine import (
+    CompetitionEngine,
+    CompetitionEngineError,
+)
+from bots.bot_wars_bot.drag_drop_builder import DragDropBuilder, DragDropBuilderError
 from bots.bot_wars_bot.tiers import (
+    FEATURE_COMMUNITY_LEADERBOARD,
+    FEATURE_DRAG_DROP_BUILDER,
+    FEATURE_HOST_PRIVATE_TOURNAMENTS,
+    FEATURE_JOIN_COMPETITIONS,
+    FEATURE_VIEW_COMPETITIONS,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_VIEW_COMPETITIONS,
-    FEATURE_COMMUNITY_LEADERBOARD,
-    FEATURE_JOIN_COMPETITIONS,
-    FEATURE_DRAG_DROP_BUILDER,
-    FEATURE_HOST_PRIVATE_TOURNAMENTS,
 )
-from bots.bot_wars_bot.competition_engine import CompetitionEngine, CompetitionEngineError
-from bots.bot_wars_bot.challenge_manager import ChallengeManager, ChallengeManagerError
-from bots.bot_wars_bot.drag_drop_builder import DragDropBuilder, DragDropBuilderError
-
-from typing import Optional
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -102,7 +105,9 @@ class BotWarsBot:
     ) -> dict:
         """Create a new competition (PRO+)."""
         self._require_tier(Tier.PRO)
-        return self.competition_engine.create_competition(name, category, description, prize_usd)
+        return self.competition_engine.create_competition(
+            name, category, description, prize_usd
+        )
 
     def list_competitions(self, category: Optional[str] = None) -> list:
         """List all competitions (FREE+)."""

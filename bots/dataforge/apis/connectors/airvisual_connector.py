@@ -1,4 +1,5 @@
 """AirVisual air quality data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -29,6 +30,7 @@ class AirVisualConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"city": city, "state": state, "country": country, "key": self.api_key}
         try:
             response = requests.get(f"{self.BASE_URL}/city", params=params, timeout=30)
@@ -46,11 +48,15 @@ class AirVisualConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/nearest_city", params={"key": self.api_key}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/nearest_city",
+                params={"key": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("AirVisual get_nearest_city error: %s", e)
             return {"status": "error", "message": str(e)}
-

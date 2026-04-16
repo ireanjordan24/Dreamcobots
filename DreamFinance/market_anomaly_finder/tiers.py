@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 499.0, ["anomaly pattern recognition", "dark pool print alerts"]),
-    "elite": TierConfig("Elite", 2500.0, ["anomaly pattern recognition", "dark pool print alerts", "unusual options activity", "real-time feeds"]),
+    "enterprise": TierConfig(
+        "Enterprise", 499.0, ["anomaly pattern recognition", "dark pool print alerts"]
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "anomaly pattern recognition",
+            "dark pool print alerts",
+            "unusual options activity",
+            "real-time feeds",
+        ],
+    ),
 }

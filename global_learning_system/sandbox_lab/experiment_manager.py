@@ -66,7 +66,10 @@ class ExperimentManager:
                 f"Unknown experiment type '{experiment.experiment_type}'. "
                 f"Valid types: {sorted(self.VALID_TYPES)}"
             )
-        if self.max_experiments is not None and len(self._experiments) >= self.max_experiments:
+        if (
+            self.max_experiments is not None
+            and len(self._experiments) >= self.max_experiments
+        ):
             raise ValueError(
                 f"Maximum experiment capacity ({self.max_experiments}) reached."
             )
@@ -78,7 +81,9 @@ class ExperimentManager:
             raise KeyError(f"Experiment '{name}' not found.")
         return self._experiments[name]
 
-    def list_experiments(self, experiment_type: Optional[str] = None) -> List[Experiment]:
+    def list_experiments(
+        self, experiment_type: Optional[str] = None
+    ) -> List[Experiment]:
         """List registered experiments, optionally filtered by *experiment_type*."""
         exps = list(self._experiments.values())
         if experiment_type is not None:

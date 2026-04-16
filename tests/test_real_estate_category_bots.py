@@ -1,41 +1,45 @@
 """Tests for all 30 Real Estate bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from Real_Estate_bots.auction_finder_bot import AuctionFinderBot
+from Real_Estate_bots.cash_flow_bot import CashFlowBot
+from Real_Estate_bots.commercial_analyzer_bot import CommercialAnalyzerBot
+from Real_Estate_bots.comparable_sales_bot import ComparableSalesBot
+from Real_Estate_bots.deal_analyzer_bot import DealAnalyzerBot
 from Real_Estate_bots.feature_1 import PropertyListingsBot
 from Real_Estate_bots.feature_2 import ViewingSchedulerBot
 from Real_Estate_bots.feature_3 import MarketAnalysisBot
-from Real_Estate_bots.mortgage_calculator_bot import MortgageCalculatorBot
-from Real_Estate_bots.property_valuation_bot import PropertyValuationBot
-from Real_Estate_bots.flip_profit_calculator_bot import FlipProfitCalculatorBot
-from Real_Estate_bots.rental_income_bot import RentalIncomeBot
-from Real_Estate_bots.foreclosure_finder_bot import ForeclosureFinderBot
-from Real_Estate_bots.lease_generator_bot import LeaseGeneratorBot
-from Real_Estate_bots.tenant_screening_bot import TenantScreeningBot
-from Real_Estate_bots.neighborhood_scorer_bot import NeighborhoodScorerBot
-from Real_Estate_bots.deal_analyzer_bot import DealAnalyzerBot
-from Real_Estate_bots.cash_flow_bot import CashFlowBot
-from Real_Estate_bots.property_alert_bot import PropertyAlertBot
-from Real_Estate_bots.auction_finder_bot import AuctionFinderBot
 from Real_Estate_bots.fix_and_flip_bot import FixAndFlipBot
-from Real_Estate_bots.roi_tracker_bot import ROITrackerBot
-from Real_Estate_bots.comparable_sales_bot import ComparableSalesBot
-from Real_Estate_bots.zoning_research_bot import ZoningResearchBot
-from Real_Estate_bots.tax_lien_bot import TaxLienBot
-from Real_Estate_bots.commercial_analyzer_bot import CommercialAnalyzerBot
-from Real_Estate_bots.multifamily_analyzer_bot import MultifamilyAnalyzerBot
-from Real_Estate_bots.short_sale_finder_bot import ShortSaleFinderBot
-from Real_Estate_bots.property_management_bot import PropertyManagementBot
+from Real_Estate_bots.flip_profit_calculator_bot import FlipProfitCalculatorBot
+from Real_Estate_bots.foreclosure_finder_bot import ForeclosureFinderBot
 from Real_Estate_bots.insurance_estimator_bot import InsuranceEstimatorBot
-from Real_Estate_bots.renovation_cost_bot import RenovationCostBot
-from Real_Estate_bots.wholesaler_bot import WholesalerBot
-from Real_Estate_bots.off_market_finder_bot import OffMarketFinderBot
 from Real_Estate_bots.investor_matchmaker_bot import InvestorMatchmakerBot
 from Real_Estate_bots.land_analyzer_bot import LandAnalyzerBot
+from Real_Estate_bots.lease_generator_bot import LeaseGeneratorBot
+from Real_Estate_bots.mortgage_calculator_bot import MortgageCalculatorBot
+from Real_Estate_bots.multifamily_analyzer_bot import MultifamilyAnalyzerBot
+from Real_Estate_bots.neighborhood_scorer_bot import NeighborhoodScorerBot
+from Real_Estate_bots.off_market_finder_bot import OffMarketFinderBot
+from Real_Estate_bots.property_alert_bot import PropertyAlertBot
+from Real_Estate_bots.property_management_bot import PropertyManagementBot
+from Real_Estate_bots.property_valuation_bot import PropertyValuationBot
+from Real_Estate_bots.renovation_cost_bot import RenovationCostBot
+from Real_Estate_bots.rental_income_bot import RentalIncomeBot
+from Real_Estate_bots.roi_tracker_bot import ROITrackerBot
+from Real_Estate_bots.short_sale_finder_bot import ShortSaleFinderBot
+from Real_Estate_bots.tax_lien_bot import TaxLienBot
+from Real_Estate_bots.tenant_screening_bot import TenantScreeningBot
+from Real_Estate_bots.wholesaler_bot import WholesalerBot
+from Real_Estate_bots.zoning_research_bot import ZoningResearchBot
 
 ALL_BOTS = [
     ("PropertyListingsBot", PropertyListingsBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

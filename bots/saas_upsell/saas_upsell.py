@@ -22,8 +22,8 @@ Revenue hook output:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -32,7 +32,6 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Tier definitions
@@ -76,7 +75,9 @@ class Subscriber:
     onboarding_complete: bool = False
     upsell_offers_accepted: int = 0
     upsell_offers_declined: int = 0
-    joined_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    joined_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     upgraded_at: Optional[str] = None
 
     @property
@@ -105,7 +106,9 @@ class MicroBusiness:
     monthly_revenue: float
     revenue_share_pct: float = 0.10  # DreamCo takes 10%
     active: bool = True
-    registered_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    registered_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     @property
     def dreamco_share(self) -> float:
@@ -263,7 +266,9 @@ class SaaSUpsell:
             b.dreamco_share for b in self._micro_businesses.values() if b.active
         )
         total_revenue = round(mrr + network_share, 2)
-        new_subs = len([s for s in self._subscribers.values() if s.tier != SubscriptionTier.FREE])
+        new_subs = len(
+            [s for s in self._subscribers.values() if s.tier != SubscriptionTier.FREE]
+        )
         conversion_rate = (
             round(self._upsell_accepted / self._upsell_count, 4)
             if self._upsell_count
@@ -274,7 +279,7 @@ class SaaSUpsell:
             "leads_generated": new_subs,
             "conversion_rate": conversion_rate,
             "action": f"SaaS subscriptions + micro-business network. MRR=${mrr:.2f}, "
-                      f"network_share=${network_share:.2f}",
+            f"network_share=${network_share:.2f}",
         }
 
     # ------------------------------------------------------------------

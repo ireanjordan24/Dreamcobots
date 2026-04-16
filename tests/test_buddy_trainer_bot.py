@@ -11,8 +11,8 @@ Covers:
   7. BuddyTrainerBot main class (integration + chat)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -20,91 +20,15 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 # ---------------------------------------------------------------------------
-# Tier imports
-# ---------------------------------------------------------------------------
-from bots.buddy_trainer_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_AI_TRAINING,
-    FEATURE_AI_VERSIONING,
-    FEATURE_AI_DEPLOYMENT,
-    FEATURE_ROBOT_TRAINING,
-    FEATURE_ADAPTIVE_LOOPS,
-    FEATURE_SENSOR_FEEDBACK,
-    FEATURE_HUMAN_COACHING,
-    FEATURE_DATA_LABELING,
-    FEATURE_DATASET_MANAGEMENT,
-    FEATURE_GUIDED_WORKFLOWS,
-    FEATURE_GITHUB_BUDDY,
-    FEATURE_MULTI_MODEL,
-    FEATURE_API_ACCESS,
-    FEATURE_OWNERSHIP,
-)
-
-# ---------------------------------------------------------------------------
 # AI Trainer imports
 # ---------------------------------------------------------------------------
 from bots.buddy_trainer_bot.ai_trainer import (
     AITrainer,
     Dataset,
+    ModelType,
     ModelVersion,
     TrainingSession,
-    ModelType,
     TrainingStatus,
-)
-
-# ---------------------------------------------------------------------------
-# Robot Trainer imports
-# ---------------------------------------------------------------------------
-from bots.buddy_trainer_bot.robot_trainer import (
-    RobotTrainer,
-    Robot,
-    RobotCategory,
-    SensorType,
-    TrainingPhase,
-    RobotTrainingCycle,
-)
-
-# ---------------------------------------------------------------------------
-# Human Trainer imports
-# ---------------------------------------------------------------------------
-from bots.buddy_trainer_bot.human_trainer import (
-    HumanTrainer,
-    LearnerProfile,
-    ManagedDataset,
-    LabeledSample,
-    WorkflowType,
-    SkillLevel,
-    LearningGoal,
-    get_workflow,
-)
-
-# ---------------------------------------------------------------------------
-# GitHub Buddy System imports
-# ---------------------------------------------------------------------------
-from bots.buddy_trainer_bot.github_buddy_system import (
-    GitHubBuddySystem,
-    BuddySystem,
-    BuddySystemStatus,
-    BuddyFocusArea,
-    BuddySystemConfig,
-)
-
-# ---------------------------------------------------------------------------
-# Ownership System imports
-# ---------------------------------------------------------------------------
-from bots.buddy_trainer_bot.ownership_system import (
-    OwnershipSystem,
-    License,
-    Transaction,
-    Sponsorship,
-    PaymentMethod,
-    LicenseStatus,
-    TransactionType,
 )
 
 # ---------------------------------------------------------------------------
@@ -116,10 +40,86 @@ from bots.buddy_trainer_bot.buddy_trainer_bot import (
     BuddyTrainerTierError,
 )
 
+# ---------------------------------------------------------------------------
+# GitHub Buddy System imports
+# ---------------------------------------------------------------------------
+from bots.buddy_trainer_bot.github_buddy_system import (
+    BuddyFocusArea,
+    BuddySystem,
+    BuddySystemConfig,
+    BuddySystemStatus,
+    GitHubBuddySystem,
+)
+
+# ---------------------------------------------------------------------------
+# Human Trainer imports
+# ---------------------------------------------------------------------------
+from bots.buddy_trainer_bot.human_trainer import (
+    HumanTrainer,
+    LabeledSample,
+    LearnerProfile,
+    LearningGoal,
+    ManagedDataset,
+    SkillLevel,
+    WorkflowType,
+    get_workflow,
+)
+
+# ---------------------------------------------------------------------------
+# Ownership System imports
+# ---------------------------------------------------------------------------
+from bots.buddy_trainer_bot.ownership_system import (
+    License,
+    LicenseStatus,
+    OwnershipSystem,
+    PaymentMethod,
+    Sponsorship,
+    Transaction,
+    TransactionType,
+)
+
+# ---------------------------------------------------------------------------
+# Robot Trainer imports
+# ---------------------------------------------------------------------------
+from bots.buddy_trainer_bot.robot_trainer import (
+    Robot,
+    RobotCategory,
+    RobotTrainer,
+    RobotTrainingCycle,
+    SensorType,
+    TrainingPhase,
+)
+
+# ---------------------------------------------------------------------------
+# Tier imports
+# ---------------------------------------------------------------------------
+from bots.buddy_trainer_bot.tiers import (
+    FEATURE_ADAPTIVE_LOOPS,
+    FEATURE_AI_DEPLOYMENT,
+    FEATURE_AI_TRAINING,
+    FEATURE_AI_VERSIONING,
+    FEATURE_API_ACCESS,
+    FEATURE_DATA_LABELING,
+    FEATURE_DATASET_MANAGEMENT,
+    FEATURE_GITHUB_BUDDY,
+    FEATURE_GUIDED_WORKFLOWS,
+    FEATURE_HUMAN_COACHING,
+    FEATURE_MULTI_MODEL,
+    FEATURE_OWNERSHIP,
+    FEATURE_ROBOT_TRAINING,
+    FEATURE_SENSOR_FEEDBACK,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # 1. Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_all_tiers_present(self):
@@ -204,6 +204,7 @@ class TestTiers:
 # 2. AI Trainer tests
 # ===========================================================================
 
+
 class TestAITrainer:
     def setup_method(self):
         self.trainer = AITrainer()
@@ -234,31 +235,43 @@ class TestAITrainer:
 
     def test_start_training_returns_session(self):
         ds = self.trainer.register_dataset("train_ds", 5000, ["cat", "dog"])
-        session = self.trainer.start_training("MyCNN", ModelType.COMPUTER_VISION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "MyCNN", ModelType.COMPUTER_VISION, ds.dataset_id
+        )
         assert session.model_name == "MyCNN"
         assert session.status == TrainingStatus.COMPLETED
 
     def test_training_creates_version(self):
         ds = self.trainer.register_dataset("v_ds", 2000, ["a", "b"])
-        session = self.trainer.start_training("ModelV", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "ModelV", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         versions = self.trainer.list_versions("ModelV")
         assert len(versions) == 1
 
     def test_training_feedback_populated(self):
         ds = self.trainer.register_dataset("fb_ds", 1000, ["pos", "neg"])
-        session = self.trainer.start_training("SentimentModel", ModelType.NLP, ds.dataset_id)
+        session = self.trainer.start_training(
+            "SentimentModel", ModelType.NLP, ds.dataset_id
+        )
         assert len(session.feedback) > 0
 
     def test_training_accuracy_in_range(self):
         ds = self.trainer.register_dataset("acc_ds", 10000, ["label"])
-        session = self.trainer.start_training("AccModel", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "AccModel", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         assert 0.0 <= session.accuracy <= 1.0
         assert session.loss > 0.0
 
     def test_multiple_training_versions(self):
         ds = self.trainer.register_dataset("multi_ds", 3000, ["a", "b"])
-        self.trainer.start_training("MultiModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5)
-        self.trainer.start_training("MultiModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=30)
+        self.trainer.start_training(
+            "MultiModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5
+        )
+        self.trainer.start_training(
+            "MultiModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=30
+        )
         versions = self.trainer.list_versions("MultiModel")
         assert len(versions) == 2
         assert versions[0].version_number == 1
@@ -266,15 +279,21 @@ class TestAITrainer:
 
     def test_get_best_version(self):
         ds = self.trainer.register_dataset("best_ds", 5000, ["x", "y"])
-        self.trainer.start_training("BestModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5)
-        self.trainer.start_training("BestModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=50)
+        self.trainer.start_training(
+            "BestModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5
+        )
+        self.trainer.start_training(
+            "BestModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=50
+        )
         best = self.trainer.get_best_version("BestModel")
         assert best is not None
         assert best.version_number == 2  # more epochs → higher accuracy
 
     def test_deploy_version(self):
         ds = self.trainer.register_dataset("deploy_ds", 4000, ["a", "b"])
-        session = self.trainer.start_training("DeployModel", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "DeployModel", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         versions = self.trainer.list_versions("DeployModel")
         result = self.trainer.deploy_version("DeployModel", versions[0].version_id)
         assert result["status"] == "deployed"
@@ -285,8 +304,12 @@ class TestAITrainer:
 
     def test_rollback(self):
         ds = self.trainer.register_dataset("rb_ds", 3000, ["a", "b"])
-        self.trainer.start_training("RBModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5)
-        session2 = self.trainer.start_training("RBModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=20)
+        self.trainer.start_training(
+            "RBModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=5
+        )
+        session2 = self.trainer.start_training(
+            "RBModel", ModelType.CLASSIFICATION, ds.dataset_id, epochs=20
+        )
         versions = self.trainer.list_versions("RBModel")
         # Deploy v2 first
         self.trainer.deploy_version("RBModel", versions[1].version_id)
@@ -296,7 +319,9 @@ class TestAITrainer:
 
     def test_get_deployed_version(self):
         ds = self.trainer.register_dataset("dep_ds", 2000, ["a"])
-        session = self.trainer.start_training("DepModel", ModelType.REGRESSION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "DepModel", ModelType.REGRESSION, ds.dataset_id
+        )
         versions = self.trainer.list_versions("DepModel")
         self.trainer.deploy_version("DepModel", versions[0].version_id)
         deployed = self.trainer.get_deployed_version("DepModel")
@@ -318,12 +343,16 @@ class TestAITrainer:
     def test_all_model_types(self):
         ds = self.trainer.register_dataset("all_types_ds", 1000, ["a", "b"])
         for mt in ModelType:
-            session = self.trainer.start_training(f"model_{mt.value}", mt, ds.dataset_id)
+            session = self.trainer.start_training(
+                f"model_{mt.value}", mt, ds.dataset_id
+            )
             assert session.status == TrainingStatus.COMPLETED
 
     def test_session_dict(self):
         ds = self.trainer.register_dataset("dict_ds", 500, ["a"])
-        session = self.trainer.start_training("DictModel", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = self.trainer.start_training(
+            "DictModel", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         d = session.to_dict()
         assert "session_id" in d
         assert "accuracy" in d
@@ -348,6 +377,7 @@ class TestAITrainer:
 # 3. Robot Trainer tests
 # ===========================================================================
 
+
 class TestRobotTrainer:
     def setup_method(self):
         self.trainer = RobotTrainer()
@@ -360,16 +390,22 @@ class TestRobotTrainer:
         assert robot.category == RobotCategory.INDUSTRIAL
 
     def test_robot_id_generated(self):
-        robot = self.trainer.register_robot("R1", RobotCategory.CONSUMER, "iRobot", "Roomba")
+        robot = self.trainer.register_robot(
+            "R1", RobotCategory.CONSUMER, "iRobot", "Roomba"
+        )
         assert robot.robot_id.startswith("robot_")
 
     def test_list_robots(self):
         self.trainer.register_robot("R1", RobotCategory.DRONE, "DJI", "Phantom")
-        self.trainer.register_robot("R2", RobotCategory.MEDICAL, "Intuitive", "Da Vinci")
+        self.trainer.register_robot(
+            "R2", RobotCategory.MEDICAL, "Intuitive", "Da Vinci"
+        )
         assert len(self.trainer.list_robots()) == 2
 
     def test_get_robot_found(self):
-        robot = self.trainer.register_robot("TestBot", RobotCategory.RESEARCH, "MIT", "Cheetah")
+        robot = self.trainer.register_robot(
+            "TestBot", RobotCategory.RESEARCH, "MIT", "Cheetah"
+        )
         found = self.trainer.get_robot(robot.robot_id)
         assert found.name == "TestBot"
 
@@ -378,32 +414,45 @@ class TestRobotTrainer:
             self.trainer.get_robot("nonexistent")
 
     def test_run_training_cycle(self):
-        robot = self.trainer.register_robot("CycleBot", RobotCategory.HUMANOID, "Boston Dynamics", "Atlas")
+        robot = self.trainer.register_robot(
+            "CycleBot", RobotCategory.HUMANOID, "Boston Dynamics", "Atlas"
+        )
         cycle = self.trainer.run_training_cycle(robot.robot_id)
         assert cycle.robot_id == robot.robot_id
         assert cycle.completed is True
         assert 0.0 <= cycle.performance_score <= 1.0
 
     def test_training_cycle_has_feedback(self):
-        robot = self.trainer.register_robot("FBBot", RobotCategory.AGRICULTURAL, "John Deere", "AutoTractor")
-        cycle = self.trainer.run_training_cycle(robot.robot_id, ["scan_field", "avoid_obstacle"])
+        robot = self.trainer.register_robot(
+            "FBBot", RobotCategory.AGRICULTURAL, "John Deere", "AutoTractor"
+        )
+        cycle = self.trainer.run_training_cycle(
+            robot.robot_id, ["scan_field", "avoid_obstacle"]
+        )
         assert len(cycle.feedback) > 0
 
     def test_training_cycle_sensor_readings(self):
         robot = self.trainer.register_robot(
-            "SensorBot", RobotCategory.INDUSTRIAL, "KUKA", "KR10",
-            sensors=[SensorType.PROXIMITY, SensorType.VISION, SensorType.IMU]
+            "SensorBot",
+            RobotCategory.INDUSTRIAL,
+            "KUKA",
+            "KR10",
+            sensors=[SensorType.PROXIMITY, SensorType.VISION, SensorType.IMU],
         )
         cycle = self.trainer.run_training_cycle(robot.robot_id)
         assert len(cycle.sensor_readings) == 3
 
     def test_run_adaptive_loop(self):
-        robot = self.trainer.register_robot("LoopBot", RobotCategory.AUTONOMOUS_VEHICLE, "Waymo", "GXV")
+        robot = self.trainer.register_robot(
+            "LoopBot", RobotCategory.AUTONOMOUS_VEHICLE, "Waymo", "GXV"
+        )
         cycles = self.trainer.run_adaptive_loop(robot.robot_id, num_cycles=5)
         assert len(cycles) == 5
 
     def test_adaptive_loop_phases_advance(self):
-        robot = self.trainer.register_robot("PhaseBot", RobotCategory.RESEARCH, "MIT", "Spot")
+        robot = self.trainer.register_robot(
+            "PhaseBot", RobotCategory.RESEARCH, "MIT", "Spot"
+        )
         cycles = self.trainer.run_adaptive_loop(
             robot.robot_id, num_cycles=5, starting_phase=TrainingPhase.CALIBRATION
         )
@@ -412,19 +461,25 @@ class TestRobotTrainer:
         assert len(set(phases)) >= 1
 
     def test_get_control_policy(self):
-        robot = self.trainer.register_robot("PolicyBot", RobotCategory.CONSUMER, "iRobot", "Braava")
+        robot = self.trainer.register_robot(
+            "PolicyBot", RobotCategory.CONSUMER, "iRobot", "Braava"
+        )
         self.trainer.run_training_cycle(robot.robot_id)
         policy = self.trainer.get_control_policy(robot.robot_id)
         assert "best_performance" in policy
         assert "total_cycles" in policy
 
     def test_control_policy_missing_raises(self):
-        robot = self.trainer.register_robot("NoCycleBot", RobotCategory.CONSUMER, "X", "Y")
+        robot = self.trainer.register_robot(
+            "NoCycleBot", RobotCategory.CONSUMER, "X", "Y"
+        )
         with pytest.raises(KeyError):
             self.trainer.get_control_policy(robot.robot_id)
 
     def test_list_cycles(self):
-        robot = self.trainer.register_robot("ListBot", RobotCategory.DRONE, "DJI", "Mini 3")
+        robot = self.trainer.register_robot(
+            "ListBot", RobotCategory.DRONE, "DJI", "Mini 3"
+        )
         self.trainer.run_training_cycle(robot.robot_id)
         self.trainer.run_training_cycle(robot.robot_id)
         assert len(self.trainer.list_cycles(robot.robot_id)) == 2
@@ -435,13 +490,17 @@ class TestRobotTrainer:
         assert "total_cycles" in s
 
     def test_robot_dict(self):
-        robot = self.trainer.register_robot("DictBot", RobotCategory.INDUSTRIAL, "Fanuc", "LR Mate")
+        robot = self.trainer.register_robot(
+            "DictBot", RobotCategory.INDUSTRIAL, "Fanuc", "LR Mate"
+        )
         d = robot.to_dict()
         assert "robot_id" in d
         assert "category" in d
 
     def test_cycle_dict(self):
-        robot = self.trainer.register_robot("CycleDictBot", RobotCategory.CONSUMER, "X", "Y")
+        robot = self.trainer.register_robot(
+            "CycleDictBot", RobotCategory.CONSUMER, "X", "Y"
+        )
         cycle = self.trainer.run_training_cycle(robot.robot_id)
         d = cycle.to_dict()
         assert "cycle_id" in d
@@ -454,9 +513,13 @@ class TestRobotTrainer:
             assert cycle.completed is True
 
     def test_training_with_instructions(self):
-        robot = self.trainer.register_robot("InstrBot", RobotCategory.INDUSTRIAL, "ABB", "IRB")
+        robot = self.trainer.register_robot(
+            "InstrBot", RobotCategory.INDUSTRIAL, "ABB", "IRB"
+        )
         instructions = ["calibrate_arm", "move_to_home", "pick_object", "place_object"]
-        cycle = self.trainer.run_training_cycle(robot.robot_id, instructions=instructions, phase=TrainingPhase.EXPLOITATION)
+        cycle = self.trainer.run_training_cycle(
+            robot.robot_id, instructions=instructions, phase=TrainingPhase.EXPLOITATION
+        )
         assert cycle.instructions == instructions
 
 
@@ -464,12 +527,15 @@ class TestRobotTrainer:
 # 4. Human Trainer tests
 # ===========================================================================
 
+
 class TestHumanTrainer:
     def setup_method(self):
         self.trainer = HumanTrainer()
 
     def test_enroll_learner(self):
-        learner = self.trainer.enroll_learner("Alice", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.trainer.enroll_learner(
+            "Alice", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         assert learner.name == "Alice"
         assert learner.learning_goal == LearningGoal.TRAIN_IMAGE_CLASSIFIER
         assert learner.skill_level == SkillLevel.BEGINNER
@@ -493,7 +559,9 @@ class TestHumanTrainer:
             self.trainer.get_learner("bad_id")
 
     def test_learning_path_not_empty(self):
-        learner = self.trainer.enroll_learner("Dave", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.trainer.enroll_learner(
+            "Dave", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         path = self.trainer.get_learning_path(learner.learner_id)
         assert len(path) > 0
 
@@ -504,18 +572,24 @@ class TestHumanTrainer:
             assert len(section["steps"]) > 0
 
     def test_complete_step_awards_xp(self):
-        learner = self.trainer.enroll_learner("Frank", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.trainer.enroll_learner(
+            "Frank", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         result = self.trainer.complete_step(learner.learner_id, "dl_01")
         assert result["xp_earned"] > 0
         assert result["total_xp"] > 0
 
     def test_complete_step_adds_to_completed(self):
-        learner = self.trainer.enroll_learner("Grace", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.trainer.enroll_learner(
+            "Grace", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         self.trainer.complete_step(learner.learner_id, "dl_01")
         assert "dl_01" in learner.completed_steps
 
     def test_complete_step_idempotent(self):
-        learner = self.trainer.enroll_learner("Hank", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.trainer.enroll_learner(
+            "Hank", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         result1 = self.trainer.complete_step(learner.learner_id, "dl_01")
         result2 = self.trainer.complete_step(learner.learner_id, "dl_01")
         assert result2["xp_earned"] == 0 or "already" in result2.get("message", "")
@@ -523,8 +597,19 @@ class TestHumanTrainer:
     def test_xp_upgrades_skill_level(self):
         learner = self.trainer.enroll_learner("Iris", LearningGoal.GENERAL_AI_LITERACY)
         # Complete many steps to accumulate XP
-        for step_id in ["dl_01", "dl_02", "dl_03", "dl_04", "dm_01", "dm_02", "dm_03",
-                         "mc_01", "mc_02", "mc_03", "mc_04"]:
+        for step_id in [
+            "dl_01",
+            "dl_02",
+            "dl_03",
+            "dl_04",
+            "dm_01",
+            "dm_02",
+            "dm_03",
+            "mc_01",
+            "mc_02",
+            "mc_03",
+            "mc_04",
+        ]:
             self.trainer.complete_step(learner.learner_id, step_id)
         # Should have advanced from BEGINNER
         assert learner.skill_level != SkillLevel.BEGINNER
@@ -602,6 +687,7 @@ class TestHumanTrainer:
 # ===========================================================================
 # 5. GitHub Buddy System tests
 # ===========================================================================
+
 
 class TestGitHubBuddySystem:
     def setup_method(self):
@@ -711,13 +797,16 @@ class TestGitHubBuddySystem:
 
     def test_all_focus_areas(self):
         for i, fa in enumerate(BuddyFocusArea):
-            system = self.manager.provision_buddy(f"fa_user_{i}", f"Buddy_{fa.value}", focus_area=fa)
+            system = self.manager.provision_buddy(
+                f"fa_user_{i}", f"Buddy_{fa.value}", focus_area=fa
+            )
             assert system.config.focus_area == fa
 
 
 # ===========================================================================
 # 6. Ownership System tests
 # ===========================================================================
+
 
 class TestOwnershipSystem:
     def setup_method(self):
@@ -842,6 +931,7 @@ class TestOwnershipSystem:
 # 7. BuddyTrainerBot integration tests
 # ===========================================================================
 
+
 class TestBuddyTrainerBot:
     def setup_method(self):
         self.bot = BuddyTrainerBot(tier=Tier.PRO, owner_id="test_owner")
@@ -851,7 +941,9 @@ class TestBuddyTrainerBot:
     def test_free_tier_can_train_ai(self):
         free_bot = BuddyTrainerBot(tier=Tier.FREE, owner_id="free_user")
         ds = free_bot.register_training_dataset("FreeDS", 500, ["a", "b"])
-        session = free_bot.train_ai_model("FreeModel", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = free_bot.train_ai_model(
+            "FreeModel", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         assert session.status == TrainingStatus.COMPLETED
 
     def test_free_tier_session_limit(self):
@@ -868,11 +960,15 @@ class TestBuddyTrainerBot:
             free_bot.register_robot("R1", RobotCategory.INDUSTRIAL, "ABB", "IRB")
 
     def test_pro_tier_robot_training(self):
-        robot = self.bot.register_robot("ProBot", RobotCategory.INDUSTRIAL, "ABB", "IRB 1200")
+        robot = self.bot.register_robot(
+            "ProBot", RobotCategory.INDUSTRIAL, "ABB", "IRB 1200"
+        )
         assert robot is not None
 
     def test_pro_tier_adaptive_loop(self):
-        robot = self.bot.register_robot("LoopBot", RobotCategory.DRONE, "DJI", "Phantom")
+        robot = self.bot.register_robot(
+            "LoopBot", RobotCategory.DRONE, "DJI", "Phantom"
+        )
         cycles = self.bot.run_adaptive_loop(robot.robot_id, num_cycles=3)
         assert len(cycles) == 3
 
@@ -893,12 +989,16 @@ class TestBuddyTrainerBot:
 
     def test_register_dataset_and_train(self):
         ds = self.bot.register_training_dataset("MyDS", 3000, ["cat", "dog"])
-        session = self.bot.train_ai_model("MyCNN", ModelType.COMPUTER_VISION, ds.dataset_id)
+        session = self.bot.train_ai_model(
+            "MyCNN", ModelType.COMPUTER_VISION, ds.dataset_id
+        )
         assert session.accuracy > 0.0
 
     def test_deploy_model(self):
         ds = self.bot.register_training_dataset("DepDS", 2000, ["a", "b"])
-        session = self.bot.train_ai_model("DepModel", ModelType.CLASSIFICATION, ds.dataset_id)
+        session = self.bot.train_ai_model(
+            "DepModel", ModelType.CLASSIFICATION, ds.dataset_id
+        )
         versions = self.bot.ai_trainer.list_versions("DepModel")
         result = self.bot.deploy_model("DepModel", versions[0].version_id)
         assert result["status"] == "deployed"
@@ -916,7 +1016,9 @@ class TestBuddyTrainerBot:
     # --- Human training ---
 
     def test_enroll_human_learner(self):
-        learner = self.bot.enroll_human_learner("Alice", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.bot.enroll_human_learner(
+            "Alice", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         assert learner.name == "Alice"
 
     def test_get_learning_path(self):
@@ -925,7 +1027,9 @@ class TestBuddyTrainerBot:
         assert len(path) > 0
 
     def test_complete_learning_step(self):
-        learner = self.bot.enroll_human_learner("Carol", LearningGoal.TRAIN_IMAGE_CLASSIFIER)
+        learner = self.bot.enroll_human_learner(
+            "Carol", LearningGoal.TRAIN_IMAGE_CLASSIFIER
+        )
         result = self.bot.complete_learning_step(learner.learner_id, "dl_01")
         assert result["xp_earned"] > 0
 
@@ -1019,6 +1123,7 @@ class TestBuddyTrainerBot:
         class FakeBuddy:
             def __init__(self):
                 self.bots = {}
+
             def register_bot(self, name, bot):
                 self.bots[name] = bot
 

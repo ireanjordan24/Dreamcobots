@@ -1,15 +1,20 @@
 """Tests for bots/email_campaign_manager_bot"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.email_campaign_manager_bot.email_campaign_manager_bot import EmailCampaignManagerBot
+
+from bots.email_campaign_manager_bot.email_campaign_manager_bot import (
+    EmailCampaignManagerBot,
+)
 from bots.email_campaign_manager_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 
@@ -62,7 +67,9 @@ class TestCreateCampaign:
 
     def test_campaign_has_required_fields(self):
         bot = EmailCampaignManagerBot()
-        camp = bot.create_campaign("Newsletter", "Monthly Update", "subscribers", goal="awareness")
+        camp = bot.create_campaign(
+            "Newsletter", "Monthly Update", "subscribers", goal="awareness"
+        )
         assert camp["goal"] == "awareness"
         assert camp["status"] == "draft"
 
@@ -85,7 +92,9 @@ class TestEmailContent:
 
     def test_email_word_count_positive(self):
         bot = EmailCampaignManagerBot()
-        result = bot.generate_email_content({"name": "Test", "subject": "Hello", "goal": "engagement"})
+        result = bot.generate_email_content(
+            {"name": "Test", "subject": "Hello", "goal": "engagement"}
+        )
         assert result["word_count"] > 0
 
 

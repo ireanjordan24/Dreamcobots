@@ -8,12 +8,12 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass

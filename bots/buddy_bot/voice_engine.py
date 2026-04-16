@@ -23,10 +23,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Voice profiles
 # ---------------------------------------------------------------------------
+
 
 class VoiceTone(Enum):
     WARM = "warm"
@@ -79,14 +79,15 @@ VOICE_BACKENDS: list[str] = [
 @dataclass
 class VoiceProfile:
     """A reusable voice configuration."""
+
     profile_id: str
     display_name: str
     tone: VoiceTone
     accent: AccentStyle
-    pitch_semitones: float = 0.0      # offset from baseline; negative = lower
-    speed_wpm: int = 140              # words per minute
-    warmth: float = 0.7               # 0.0 (cold) → 1.0 (very warm)
-    pause_probability: float = 0.2    # probability of inserting a natural pause
+    pitch_semitones: float = 0.0  # offset from baseline; negative = lower
+    speed_wpm: int = 140  # words per minute
+    warmth: float = 0.7  # 0.0 (cold) → 1.0 (very warm)
+    pause_probability: float = 0.2  # probability of inserting a natural pause
     backend: str = "DreamCo Voice Engine (proprietary)"
     is_cloned: bool = False
     clone_source_user: Optional[str] = None
@@ -110,6 +111,7 @@ class VoiceProfile:
 @dataclass
 class SpeechOutput:
     """Result of a voice synthesis operation."""
+
     text: str
     ssml: str
     profile: VoiceProfile
@@ -191,7 +193,7 @@ class VoiceEngine:
             p.profile_id: p for p in DEFAULT_PROFILES
         }
         self._active_profile_id = active_profile_id
-        self._consent_records: dict[str, dict] = {}   # user_id → consent info
+        self._consent_records: dict[str, dict] = {}  # user_id → consent info
         self._synthesis_history: list[SpeechOutput] = []
 
     # ------------------------------------------------------------------
@@ -385,6 +387,7 @@ class VoiceEngine:
         dict with the new profile_id and consent details.
         """
         import time as _time
+
         self._consent_records[user_id] = {
             "feature": "voice_clone",
             "granted": True,
@@ -425,7 +428,9 @@ class VoiceEngine:
     # Multi-speaker simulation
     # ------------------------------------------------------------------
 
-    def simulate_group_conversation(self, speakers: list[str], lines: list[str]) -> list[dict]:
+    def simulate_group_conversation(
+        self, speakers: list[str], lines: list[str]
+    ) -> list[dict]:
         """
         Simulate a group conversation with multiple voice personas.
 

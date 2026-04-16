@@ -1,4 +1,5 @@
 """CrashGuard watchdog for monitoring and protecting running bots."""
+
 import threading
 import time
 from datetime import datetime
@@ -99,7 +100,9 @@ class WatchDog:
                     priority = getattr(bot, "priority", "low")
                     if priority == "low" and hasattr(bot, "stop"):
                         bot.stop()
-                        self._write_log(f"Paused low-priority bot {name} due to high RAM ({ram:.1f}%)")
+                        self._write_log(
+                            f"Paused low-priority bot {name} due to high RAM ({ram:.1f}%)"
+                        )
                 except Exception:
                     pass
 

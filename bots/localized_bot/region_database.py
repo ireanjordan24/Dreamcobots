@@ -11,8 +11,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -25,7 +25,13 @@ _REGIONS: list[dict] = [
         "country_code": "US",
         "language_code": "en",
         "language_name": "English",
-        "industries": ["Technology", "Finance", "Healthcare", "Retail", "Manufacturing"],
+        "industries": [
+            "Technology",
+            "Finance",
+            "Healthcare",
+            "Retail",
+            "Manufacturing",
+        ],
         "population_millions": 331.0,
         "timezone": "America/New_York",
         "currency_code": "USD",
@@ -69,7 +75,13 @@ _REGIONS: list[dict] = [
         "country_code": "FR",
         "language_code": "fr",
         "language_name": "French",
-        "industries": ["Luxury Goods", "Tourism", "Aerospace", "Agriculture", "Finance"],
+        "industries": [
+            "Luxury Goods",
+            "Tourism",
+            "Aerospace",
+            "Agriculture",
+            "Finance",
+        ],
         "population_millions": 67.0,
         "timezone": "Europe/Paris",
         "currency_code": "EUR",
@@ -80,7 +92,13 @@ _REGIONS: list[dict] = [
         "country_code": "DE",
         "language_code": "de",
         "language_name": "German",
-        "industries": ["Automotive", "Manufacturing", "Technology", "Finance", "Healthcare"],
+        "industries": [
+            "Automotive",
+            "Manufacturing",
+            "Technology",
+            "Finance",
+            "Healthcare",
+        ],
         "population_millions": 83.0,
         "timezone": "Europe/Berlin",
         "currency_code": "EUR",
@@ -113,7 +131,13 @@ _REGIONS: list[dict] = [
         "country_code": "IN",
         "language_code": "hi",
         "language_name": "Hindi",
-        "industries": ["IT Services", "Agriculture", "Manufacturing", "Finance", "Pharmaceuticals"],
+        "industries": [
+            "IT Services",
+            "Agriculture",
+            "Manufacturing",
+            "Finance",
+            "Pharmaceuticals",
+        ],
         "population_millions": 1380.0,
         "timezone": "Asia/Kolkata",
         "currency_code": "INR",
@@ -179,7 +203,13 @@ _REGIONS: list[dict] = [
         "country_code": "KR",
         "language_code": "ko",
         "language_name": "Korean",
-        "industries": ["Electronics", "Automotive", "Finance", "Technology", "Entertainment"],
+        "industries": [
+            "Electronics",
+            "Automotive",
+            "Finance",
+            "Technology",
+            "Entertainment",
+        ],
         "population_millions": 52.0,
         "timezone": "Asia/Seoul",
         "currency_code": "KRW",
@@ -190,7 +220,13 @@ _REGIONS: list[dict] = [
         "country_code": "RU",
         "language_code": "ru",
         "language_name": "Russian",
-        "industries": ["Energy", "Mining", "Manufacturing", "Agriculture", "Technology"],
+        "industries": [
+            "Energy",
+            "Mining",
+            "Manufacturing",
+            "Agriculture",
+            "Technology",
+        ],
         "population_millions": 144.0,
         "timezone": "Europe/Moscow",
         "currency_code": "RUB",
@@ -245,7 +281,13 @@ _REGIONS: list[dict] = [
         "country_code": "EG",
         "language_code": "ar",
         "language_name": "Arabic",
-        "industries": ["Tourism", "Oil & Gas", "Agriculture", "Manufacturing", "Finance"],
+        "industries": [
+            "Tourism",
+            "Oil & Gas",
+            "Agriculture",
+            "Manufacturing",
+            "Finance",
+        ],
         "population_millions": 102.0,
         "timezone": "Africa/Cairo",
         "currency_code": "EGP",
@@ -267,7 +309,13 @@ _REGIONS: list[dict] = [
         "country_code": "TH",
         "language_code": "th",
         "language_name": "Thai",
-        "industries": ["Tourism", "Manufacturing", "Agriculture", "Electronics", "Finance"],
+        "industries": [
+            "Tourism",
+            "Manufacturing",
+            "Agriculture",
+            "Electronics",
+            "Finance",
+        ],
         "population_millions": 70.0,
         "timezone": "Asia/Bangkok",
         "currency_code": "THB",
@@ -278,7 +326,13 @@ _REGIONS: list[dict] = [
         "country_code": "VN",
         "language_code": "vi",
         "language_name": "Vietnamese",
-        "industries": ["Manufacturing", "Agriculture", "Tourism", "Technology", "Retail"],
+        "industries": [
+            "Manufacturing",
+            "Agriculture",
+            "Tourism",
+            "Technology",
+            "Retail",
+        ],
         "population_millions": 97.0,
         "timezone": "Asia/Ho_Chi_Minh",
         "currency_code": "VND",
@@ -289,7 +343,13 @@ _REGIONS: list[dict] = [
         "country_code": "PL",
         "language_code": "pl",
         "language_name": "Polish",
-        "industries": ["Manufacturing", "IT Services", "Agriculture", "Finance", "Energy"],
+        "industries": [
+            "Manufacturing",
+            "IT Services",
+            "Agriculture",
+            "Finance",
+            "Energy",
+        ],
         "population_millions": 38.0,
         "timezone": "Europe/Warsaw",
         "currency_code": "PLN",
@@ -333,7 +393,13 @@ _REGIONS: list[dict] = [
         "country_code": "PK",
         "language_code": "ur",
         "language_name": "Urdu",
-        "industries": ["Agriculture", "Textile", "Manufacturing", "Finance", "IT Services"],
+        "industries": [
+            "Agriculture",
+            "Textile",
+            "Manufacturing",
+            "Finance",
+            "IT Services",
+        ],
         "population_millions": 220.0,
         "timezone": "Asia/Karachi",
         "currency_code": "PKR",
@@ -344,7 +410,13 @@ _REGIONS: list[dict] = [
         "country_code": "BD",
         "language_code": "bn",
         "language_name": "Bengali",
-        "industries": ["Textile", "Agriculture", "Manufacturing", "Finance", "IT Services"],
+        "industries": [
+            "Textile",
+            "Agriculture",
+            "Manufacturing",
+            "Finance",
+            "IT Services",
+        ],
         "population_millions": 166.0,
         "timezone": "Asia/Dhaka",
         "currency_code": "BDT",
@@ -375,7 +447,8 @@ class RegionDatabase:
         """Return regions that list *industry* among their dominant industries (case-insensitive)."""
         industry_lower = industry.lower()
         return [
-            r for r in _REGIONS
+            r
+            for r in _REGIONS
             if any(ind.lower() == industry_lower for ind in r["industries"])
         ]
 
@@ -383,7 +456,8 @@ class RegionDatabase:
         """Return regions whose name or language name contains *query* (case-insensitive)."""
         query_lower = query.lower()
         return [
-            r for r in _REGIONS
+            r
+            for r in _REGIONS
             if query_lower in r["region_name"].lower()
             or query_lower in r["language_name"].lower()
         ]

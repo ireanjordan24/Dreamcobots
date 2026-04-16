@@ -1,4 +1,5 @@
 """Together AI API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,14 +29,22 @@ class TogetherAIConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"model": model, "prompt": prompt}
         try:
-            response = requests.post(f"{self.BASE_URL}/completions", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/completions",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Together AI completion done with model %s.", model)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Together AI error: %s", e)
             return {"status": "error", "message": str(e)}
-

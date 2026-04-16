@@ -1,4 +1,5 @@
 """Best Buy products API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,12 @@ class BestBuyConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"format": "json", "apiKey": self.api_key, "pageSize": pageSize}
         try:
-            response = requests.get(f"{self.BASE_URL}/products((search={query}))", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/products((search={query}))", params=params, timeout=30
+            )
             response.raise_for_status()
             logger.info("Best Buy product search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -48,12 +52,14 @@ class BestBuyConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"format": "json", "apiKey": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/products/{sku}.json", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/products/{sku}.json", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Best Buy get_product error: %s", e)
             return {"status": "error", "message": str(e)}
-

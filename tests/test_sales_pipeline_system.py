@@ -24,7 +24,6 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-
 # ===========================================================================
 # core/ai_brain
 # ===========================================================================
@@ -32,50 +31,60 @@ import pytest
 
 class TestAIBrain:
     def setup_method(self):
-        from core.ai_brain import MARKETS, BOT_TYPE_MAP
+        from core.ai_brain import BOT_TYPE_MAP, MARKETS
+
         self.MARKETS = MARKETS
         self.BOT_TYPE_MAP = BOT_TYPE_MAP
 
     def test_find_opportunity_returns_known_market(self):
         from core.ai_brain import find_opportunity
+
         result = find_opportunity()
         assert result in self.MARKETS
 
     def test_decide_bot_type_known_market(self):
         from core.ai_brain import decide_bot_type
+
         assert decide_bot_type("real estate") == "LeadGenBot_RealEstate"
 
     def test_decide_bot_type_auto_repair(self):
         from core.ai_brain import decide_bot_type
+
         assert decide_bot_type("auto repair") == "LeadGenBot_Auto"
 
     def test_decide_bot_type_unknown_market(self):
         from core.ai_brain import decide_bot_type
+
         result = decide_bot_type("unknown market")
         assert "LeadGenBot" in result
 
     def test_analyze_market_returns_dict(self):
         from core.ai_brain import analyze_market
+
         result = analyze_market("real estate")
         assert isinstance(result, dict)
 
     def test_analyze_market_keys(self):
         from core.ai_brain import analyze_market
+
         result = analyze_market("auto repair")
         assert {"market", "bot_type", "score", "recommendation"} <= result.keys()
 
     def test_analyze_market_score_in_range(self):
         from core.ai_brain import analyze_market
+
         result = analyze_market("restaurants")
         assert 0 <= result["score"] <= 100
 
     def test_analyze_market_recommendation_values(self):
         from core.ai_brain import analyze_market
+
         result = analyze_market("HVAC")
         assert result["recommendation"] in ("build", "monitor")
 
     def test_analyze_market_no_args_selects_random(self):
         from core.ai_brain import analyze_market
+
         result = analyze_market()
         assert result["market"] in self.MARKETS
 
@@ -94,7 +103,9 @@ class TestAIBrain:
 class TestSystemBrain:
     def setup_method(self):
         import importlib
+
         import core.system_brain as sb
+
         importlib.reload(sb)
         self.sb = sb
 
@@ -179,11 +190,13 @@ class TestSystemBrain:
 class TestSystemBuilder:
     def test_create_bot_creates_directory(self, tmp_path):
         from core.system_builder import create_bot
+
         create_bot("TestGenBot", bots_dir=str(tmp_path))
         assert (tmp_path / "TestGenBot").is_dir()
 
     def test_create_bot_creates_required_files(self, tmp_path):
         from core.system_builder import create_bot
+
         create_bot("TestGenBot", bots_dir=str(tmp_path))
         bot_path = tmp_path / "TestGenBot"
         for fname in ("config.json", "main.py", "metrics.py", "README.md"):
@@ -191,6 +204,7 @@ class TestSystemBuilder:
 
     def test_create_bot_replaces_name_in_config(self, tmp_path):
         from core.system_builder import create_bot
+
         create_bot("MyBot", bots_dir=str(tmp_path))
         with open(tmp_path / "MyBot" / "config.json") as fh:
             config = json.load(fh)
@@ -198,12 +212,14 @@ class TestSystemBuilder:
 
     def test_create_bot_is_idempotent(self, tmp_path):
         from core.system_builder import create_bot
+
         create_bot("IdempotentBot", bots_dir=str(tmp_path))
         create_bot("IdempotentBot", bots_dir=str(tmp_path))
         assert (tmp_path / "IdempotentBot").is_dir()
 
     def test_generate_from_gap_returns_string(self, tmp_path):
         from core.system_builder import generate_from_gap
+
         result = generate_from_gap(bots_dir=str(tmp_path))
         assert isinstance(result, str)
         assert "LeadGenBot" in result
@@ -223,15 +239,18 @@ class TestSystemBuilder:
 class TestLeadGenBot:
     def test_get_leads_returns_list(self):
         from bots.LeadGenBot.main import get_leads
+
         leads = get_leads()
         assert isinstance(leads, list)
 
     def test_get_leads_nonempty(self):
         from bots.LeadGenBot.main import get_leads
+
         assert len(get_leads()) > 0
 
     def test_lead_has_required_keys(self):
         from bots.LeadGenBot.main import get_leads
+
         for lead in get_leads():
             assert "name" in lead
             assert "email" in lead
@@ -251,18 +270,21 @@ class TestLeadGenBot:
 class TestEnrichmentBot:
     def test_enrich_adds_score(self):
         from bots.EnrichmentBot.main import enrich
+
         lead = {"name": "Test", "email": "t@t.com", "business": "HVAC"}
         enriched = enrich(lead)
         assert "score" in enriched
 
     def test_enrich_adds_needs(self):
         from bots.EnrichmentBot.main import enrich
+
         lead = {"name": "Test", "email": "t@t.com", "business": "HVAC"}
         enriched = enrich(lead)
         assert "needs" in enriched
 
     def test_enrich_returns_same_object(self):
         from bots.EnrichmentBot.main import enrich
+
         lead = {"name": "Test", "email": "t@t.com"}
         result = enrich(lead)
         assert result is lead
@@ -282,20 +304,23 @@ class TestEnrichmentBot:
 class TestOutreachBot:
     def test_outreach_returns_true(self, capsys):
         from bots.OutreachBot.main import outreach
+
         lead = {"name": "John", "email": "john@test.com", "business": "Auto"}
         result = outreach(lead)
         assert result is True
 
     def test_outreach_prints_email(self, capsys):
         from bots.OutreachBot.main import outreach
+
         lead = {"name": "John", "email": "john@test.com", "business": "Auto"}
         outreach(lead)
         captured = capsys.readouterr()
         assert "john@test.com" in captured.out
 
     def test_run_returns_sent_count(self, capsys):
-        from bots.OutreachBot.main import run
         from bots.LeadGenBot.main import get_leads
+        from bots.OutreachBot.main import run
+
         count = run(get_leads())
         assert count == len(get_leads())
 
@@ -314,18 +339,21 @@ class TestOutreachBot:
 class TestFollowUpBot:
     def test_follow_up_returns_list(self):
         from bots.FollowUpBot.main import follow_up
+
         lead = {"email": "test@test.com"}
         result = follow_up(lead)
         assert isinstance(result, list)
 
     def test_follow_up_sends_messages(self):
-        from bots.FollowUpBot.main import follow_up, _MESSAGES
+        from bots.FollowUpBot.main import _MESSAGES, follow_up
+
         lead = {"email": "test@test.com"}
         sent = follow_up(lead)
         assert len(sent) == len(_MESSAGES)
 
     def test_follow_up_prints_messages(self, capsys):
         from bots.FollowUpBot.main import follow_up
+
         lead = {"email": "test@test.com"}
         follow_up(lead)
         captured = capsys.readouterr()
@@ -346,26 +374,31 @@ class TestFollowUpBot:
 class TestCloserBot:
     def test_qualify_lead_high_score(self):
         from bots.CloserBot.main import qualify_lead
+
         lead = {"name": "Test", "score": 90}
         assert qualify_lead(lead) == "high"
 
     def test_qualify_lead_low_score(self):
         from bots.CloserBot.main import qualify_lead
+
         lead = {"name": "Test", "score": 30}
         assert qualify_lead(lead) == "medium"
 
     def test_qualify_lead_auto_heuristic(self):
         from bots.CloserBot.main import qualify_lead
+
         lead = {"name": "Auto Shop", "score": 0}
         assert qualify_lead(lead) == "high"
 
     def test_attempt_close_high_returns_true(self, capsys):
         from bots.CloserBot.main import attempt_close
+
         lead = {"name": "High Value", "score": 95}
         assert attempt_close(lead) is True
 
     def test_attempt_close_medium_returns_false(self, capsys):
         from bots.CloserBot.main import attempt_close
+
         lead = {"name": "Low Value", "score": 20}
         assert attempt_close(lead) is False
 
@@ -384,21 +417,25 @@ class TestCloserBot:
 class TestSalesPipeline:
     def test_run_pipeline_returns_dict(self):
         from core.sales_pipeline import run_pipeline
+
         result = run_pipeline()
         assert isinstance(result, dict)
 
     def test_run_pipeline_keys(self):
         from core.sales_pipeline import run_pipeline
+
         result = run_pipeline()
         assert {"leads_total", "closed", "nurtured"} <= result.keys()
 
     def test_run_pipeline_totals_match(self):
         from core.sales_pipeline import run_pipeline
+
         result = run_pipeline()
         assert result["closed"] + result["nurtured"] == result["leads_total"]
 
     def test_run_pipeline_leads_total_positive(self):
         from core.sales_pipeline import run_pipeline
+
         result = run_pipeline()
         assert result["leads_total"] > 0
 
@@ -426,20 +463,24 @@ class TestBotValidator:
 
     def test_is_bot_folder_true(self):
         from scripts.bot_validator import _is_bot_folder
+
         assert _is_bot_folder("./bots/MyBot") is True
 
     def test_is_bot_folder_false(self):
         from scripts.bot_validator import _is_bot_folder
+
         assert _is_bot_folder("./core/engine") is False
 
     def test_validate_passes_complete_bot(self, tmp_path):
         from scripts.bot_validator import _validate
+
         self._make_valid_bot(tmp_path)
         errors = _validate(str(tmp_path / "TestBot"))
         assert errors == []
 
     def test_validate_fails_missing_config(self, tmp_path):
         from scripts.bot_validator import _validate
+
         bot_dir = tmp_path / "IncompleteBot"
         bot_dir.mkdir()
         (bot_dir / "main.py").write_text("print('hi')")
@@ -450,12 +491,14 @@ class TestBotValidator:
 
     def test_scan_repo_returns_false_for_valid_tree(self, tmp_path):
         from scripts.bot_validator import scan_repo
+
         self._make_valid_bot(tmp_path)
         failed = scan_repo(root=str(tmp_path), auto_fix=False)
         assert failed is False
 
     def test_scan_repo_returns_true_for_invalid_tree(self, tmp_path):
         from scripts.bot_validator import scan_repo
+
         bot_dir = tmp_path / "BrokenBot"
         bot_dir.mkdir()
         # Only main.py — missing config, metrics, README
@@ -465,6 +508,7 @@ class TestBotValidator:
 
     def test_auto_fix_creates_missing_files(self, tmp_path):
         from scripts.bot_validator import scan_repo
+
         bot_dir = tmp_path / "FixedBot"
         bot_dir.mkdir()
         failed = scan_repo(root=str(tmp_path), auto_fix=True)

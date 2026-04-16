@@ -1,12 +1,14 @@
 """Tests for all 25 DreamFinance bots."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 DF_ROOT = os.path.join(REPO_ROOT, "DreamFinance")
 sys.path.insert(0, REPO_ROOT)
 
 import importlib
+
 import pytest
 
 
@@ -28,7 +30,11 @@ def _load_bot(subdir, module_name, class_name):
 class TestMarketSentimentAnalyzer:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("market_sentiment_analyzer", "market_sentiment_analyzer", "MarketSentimentAnalyzer")
+        cls = _load_bot(
+            "market_sentiment_analyzer",
+            "market_sentiment_analyzer",
+            "MarketSentimentAnalyzer",
+        )
         self.bot = cls(tier="pro")
 
     def test_instantiation(self):
@@ -45,7 +51,9 @@ class TestMarketSentimentAnalyzer:
         assert "pulse" in result
 
     def test_analyze_filing_returns_dict(self):
-        result = self.bot.analyze_filing("Company reported strong profit and revenue growth.")
+        result = self.bot.analyze_filing(
+            "Company reported strong profit and revenue growth."
+        )
         assert isinstance(result, dict)
         assert "keywords_found" in result
 
@@ -59,7 +67,9 @@ class TestMarketSentimentAnalyzer:
 class TestMarketAnomalyFinder:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("market_anomaly_finder", "market_anomaly_finder", "MarketAnomalyFinder")
+        cls = _load_bot(
+            "market_anomaly_finder", "market_anomaly_finder", "MarketAnomalyFinder"
+        )
         self.bot = cls(tier="enterprise")
 
     def test_instantiation(self):
@@ -96,12 +106,16 @@ class TestCreditUnderwriter:
         assert self.bot.tier == "enterprise"
 
     def test_score_credit_in_range(self):
-        result = self.bot.score_credit({"income": 80000, "credit_history_years": 10, "debt_ratio": 0.2})
+        result = self.bot.score_credit(
+            {"income": 80000, "credit_history_years": 10, "debt_ratio": 0.2}
+        )
         assert isinstance(result, dict)
         assert 300 <= result["credit_score"] <= 850
 
     def test_estimate_default_probability(self):
-        result = self.bot.estimate_default({"debt_ratio": 0.4, "credit_history_years": 2})
+        result = self.bot.estimate_default(
+            {"debt_ratio": 0.4, "credit_history_years": 2}
+        )
         assert 0.0 <= result["default_probability"] <= 1.0
 
     def test_detect_fraud(self):
@@ -118,7 +132,11 @@ class TestCreditUnderwriter:
 class TestInsuranceFraudDetector:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("insurance_fraud_detector", "insurance_fraud_detector", "InsuranceFraudDetector")
+        cls = _load_bot(
+            "insurance_fraud_detector",
+            "insurance_fraud_detector",
+            "InsuranceFraudDetector",
+        )
         self.bot = cls(tier="enterprise")
 
     def test_instantiation(self):
@@ -130,11 +148,15 @@ class TestInsuranceFraudDetector:
         assert "fraud_score" in result
 
     def test_analyze_network(self):
-        result = self.bot.analyze_network({"connections": [{"suspicious": True}, {"suspicious": False}]})
+        result = self.bot.analyze_network(
+            {"connections": [{"suspicious": True}, {"suspicious": False}]}
+        )
         assert result["flagged_nodes"] == 1
 
     def test_verify_document_all_pass(self):
-        result = self.bot.verify_document({"signature": "yes", "date": "2024-01-01", "issuer": "hospital"})
+        result = self.bot.verify_document(
+            {"signature": "yes", "date": "2024-01-01", "issuer": "hospital"}
+        )
         assert result["verified"] is True
 
     def test_run_returns_string(self):
@@ -154,7 +176,9 @@ class TestESGOptimizer:
         assert self.bot.tier == "enterprise"
 
     def test_score_esg_returns_dict(self):
-        result = self.bot.score_esg({"environmental_score": 80, "social_score": 70, "governance_score": 90})
+        result = self.bot.score_esg(
+            {"environmental_score": 80, "social_score": 70, "governance_score": 90}
+        )
         assert isinstance(result, dict)
         assert "total_esg" in result
         assert result["grade"] == "A"
@@ -186,14 +210,19 @@ class TestETFRotator:
         assert self.bot.tier == "pro"
 
     def test_score_momentum_returns_dict(self):
-        etfs = [{"ticker": "SPY", "return_1m": 0.02, "return_3m": 0.05, "return_6m": 0.08},
-                {"ticker": "QQQ", "return_1m": 0.03, "return_3m": 0.06, "return_6m": 0.10}]
+        etfs = [
+            {"ticker": "SPY", "return_1m": 0.02, "return_3m": 0.05, "return_6m": 0.08},
+            {"ticker": "QQQ", "return_1m": 0.03, "return_3m": 0.06, "return_6m": 0.10},
+        ]
         result = self.bot.score_momentum(etfs)
         assert "ranked" in result
         assert len(result["ranked"]) == 2
 
     def test_generate_signal(self):
-        portfolio = {"current": {"SPY": 0.55, "QQQ": 0.45}, "targets": {"SPY": 0.60, "QQQ": 0.40}}
+        portfolio = {
+            "current": {"SPY": 0.55, "QQQ": 0.45},
+            "targets": {"SPY": 0.60, "QQQ": 0.40},
+        }
         result = self.bot.generate_signal(portfolio)
         assert result["signal"] in ("rebalance", "hold")
 
@@ -215,8 +244,9 @@ class TestBondIncomeBot:
 
     def test_screen_bonds_returns_list(self):
         criteria = {
-            "min_yield": 3.0, "max_duration": 10,
-            "universe": [{"yield": 4.0, "duration": 7}, {"yield": 1.5, "duration": 5}]
+            "min_yield": 3.0,
+            "max_duration": 10,
+            "universe": [{"yield": 4.0, "duration": 7}, {"yield": 1.5, "duration": 5}],
         }
         result = self.bot.screen_bonds(criteria)
         assert isinstance(result, list)
@@ -248,14 +278,18 @@ class TestDividendInvestor:
         assert self.bot.tier == "pro"
 
     def test_screen_aristocrats(self):
-        stocks = [{"ticker": "JNJ", "consecutive_dividend_years": 60},
-                  {"ticker": "XYZ", "consecutive_dividend_years": 5}]
+        stocks = [
+            {"ticker": "JNJ", "consecutive_dividend_years": 60},
+            {"ticker": "XYZ", "consecutive_dividend_years": 5},
+        ]
         result = self.bot.screen_aristocrats(stocks)
         assert len(result) == 1
         assert result[0]["ticker"] == "JNJ"
 
     def test_score_sustainability(self):
-        result = self.bot.score_sustainability({"payout_ratio": 0.4, "fcf_coverage": 2.0})
+        result = self.bot.score_sustainability(
+            {"payout_ratio": 0.4, "fcf_coverage": 2.0}
+        )
         assert result["safe"] is True
 
     def test_automate_drip(self):
@@ -273,7 +307,11 @@ class TestDividendInvestor:
 class TestCryptoStakingOptimizer:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("crypto_staking_optimizer", "crypto_staking_optimizer", "CryptoStakingOptimizer")
+        cls = _load_bot(
+            "crypto_staking_optimizer",
+            "crypto_staking_optimizer",
+            "CryptoStakingOptimizer",
+        )
         self.bot = cls(tier="pro")
 
     def test_instantiation(self):
@@ -285,13 +323,18 @@ class TestCryptoStakingOptimizer:
         assert len(result) == 3
 
     def test_select_validator(self):
-        validators = [{"name": "V1", "uptime": 0.99, "commission": 0.05},
-                      {"name": "V2", "uptime": 0.95, "commission": 0.10}]
+        validators = [
+            {"name": "V1", "uptime": 0.99, "commission": 0.05},
+            {"name": "V2", "uptime": 0.95, "commission": 0.10},
+        ]
         result = self.bot.select_validator("ETH", validators)
         assert "selected" in result
 
     def test_compound_rewards(self):
-        stakes = [{"chain": "ETH", "pending_rewards": 0.5}, {"chain": "SOL", "pending_rewards": 1.0}]
+        stakes = [
+            {"chain": "ETH", "pending_rewards": 0.5},
+            {"chain": "SOL", "pending_rewards": 1.0},
+        ]
         result = self.bot.compound_rewards(stakes)
         assert result["total_compounded"] == pytest.approx(1.5, rel=1e-5)
 
@@ -312,7 +355,9 @@ class TestDeFiYieldFarmer:
         assert self.bot.tier == "pro"
 
     def test_manage_position(self):
-        result = self.bot.manage_position({"name": "ETH-USDC", "tvl": 1_000_000, "apy": 0.12})
+        result = self.bot.manage_position(
+            {"name": "ETH-USDC", "tvl": 1_000_000, "apy": 0.12}
+        )
         assert result["status"] == "active"
 
     def test_calculate_il_no_change(self):
@@ -337,7 +382,9 @@ class TestDeFiYieldFarmer:
 class TestPortfolioRebalancer:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("portfolio_rebalancer", "portfolio_rebalancer", "PortfolioRebalancer")
+        cls = _load_bot(
+            "portfolio_rebalancer", "portfolio_rebalancer", "PortfolioRebalancer"
+        )
         self.bot = cls(tier="pro")
 
     def test_instantiation(self):
@@ -383,7 +430,9 @@ class TestRoboAdvisor:
         assert self.bot.tier == "enterprise"
 
     def test_profile_risk_returns_dict(self):
-        result = self.bot.profile_risk({"risk_tolerance": 5, "time_horizon": 5, "income_volatility": 1})
+        result = self.bot.profile_risk(
+            {"risk_tolerance": 5, "time_horizon": 5, "income_volatility": 1}
+        )
         assert "profile" in result
         assert result["profile"] in ("aggressive", "moderate", "conservative")
 
@@ -453,12 +502,16 @@ class TestAlgoTradingBot:
         assert "order_id" in result
 
     def test_backtest_returns_summary(self):
-        result = self.bot.backtest({"name": "sma_cross", "edge": 0.05}, list(range(100)))
+        result = self.bot.backtest(
+            {"name": "sma_cross", "edge": 0.05}, list(range(100))
+        )
         assert "win_rate" in result
         assert "total_trades" in result
 
     def test_size_position(self):
-        result = self.bot.size_position({"stop_distance": 2.0}, {"capital": 100000, "risk_pct": 0.01})
+        result = self.bot.size_position(
+            {"stop_distance": 2.0}, {"capital": 100000, "risk_pct": 0.01}
+        )
         assert result["position_size"] == pytest.approx(500.0, rel=1e-3)
 
     def test_run_returns_string(self):
@@ -471,20 +524,30 @@ class TestAlgoTradingBot:
 class TestHedgeFundStrategy:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("hedge_fund_strategy", "hedge_fund_strategy", "HedgeFundStrategy")
+        cls = _load_bot(
+            "hedge_fund_strategy", "hedge_fund_strategy", "HedgeFundStrategy"
+        )
         self.bot = cls(tier="elite")
 
     def test_instantiation(self):
         assert self.bot.tier == "elite"
 
     def test_generate_long_short(self):
-        universe = [{"ticker": "AAPL"}, {"ticker": "MSFT"}, {"ticker": "TSLA"}, {"ticker": "AMZN"}]
+        universe = [
+            {"ticker": "AAPL"},
+            {"ticker": "MSFT"},
+            {"ticker": "TSLA"},
+            {"ticker": "AMZN"},
+        ]
         result = self.bot.generate_long_short(universe)
         assert "long" in result
         assert "short" in result
 
     def test_find_alpha_returns_list(self):
-        events = [{"type": "earnings", "ticker": "AAPL"}, {"type": "merger", "ticker": "MSFT"}]
+        events = [
+            {"type": "earnings", "ticker": "AAPL"},
+            {"type": "merger", "ticker": "MSFT"},
+        ]
         result = self.bot.find_alpha(events)
         assert isinstance(result, list)
         assert len(result) == 2
@@ -520,7 +583,10 @@ class TestHFTMarketMaker:
         assert "optimal_spread" in result
 
     def test_detect_latency_arb(self):
-        feeds = [{"exchange": "NYSE", "price": 150.0}, {"exchange": "NASDAQ", "price": 150.1}]
+        feeds = [
+            {"exchange": "NYSE", "price": 150.0},
+            {"exchange": "NASDAQ", "price": 150.1},
+        ]
         result = self.bot.detect_latency_arb(feeds)
         assert isinstance(result, list)
 
@@ -534,27 +600,41 @@ class TestHFTMarketMaker:
 class TestDerivativesStrategy:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("derivatives_strategy", "derivatives_strategy", "DerivativesStrategy")
+        cls = _load_bot(
+            "derivatives_strategy", "derivatives_strategy", "DerivativesStrategy"
+        )
         self.bot = cls(tier="elite")
 
     def test_instantiation(self):
         assert self.bot.tier == "elite"
 
     def test_price_option_returns_dict(self):
-        result = self.bot.price_option({"spot": 100, "strike": 105, "time_to_expiry": 0.25, "rate": 0.05, "vol": 0.2})
+        result = self.bot.price_option(
+            {
+                "spot": 100,
+                "strike": 105,
+                "time_to_expiry": 0.25,
+                "rate": 0.05,
+                "vol": 0.2,
+            }
+        )
         assert "call_price" in result
         assert "put_price" in result
 
     def test_calculate_greeks(self):
-        result = self.bot.calculate_greeks({"vol": 0.2, "time_to_expiry": 0.25, "spot": 100})
+        result = self.bot.calculate_greeks(
+            {"vol": 0.2, "time_to_expiry": 0.25, "spot": 100}
+        )
         assert "delta" in result
         assert "gamma" in result
         assert "theta" in result
         assert "vega" in result
 
     def test_build_vol_surface(self):
-        data = [{"expiry": "1m", "strike": 100, "implied_vol": 0.2},
-                {"expiry": "3m", "strike": 105, "implied_vol": 0.22}]
+        data = [
+            {"expiry": "1m", "strike": 100, "implied_vol": 0.2},
+            {"expiry": "3m", "strike": 105, "implied_vol": 0.22},
+        ]
         result = self.bot.build_vol_surface(data)
         assert "surface" in result
         assert "1m" in result["tenors"]
@@ -585,7 +665,9 @@ class TestFXArbitrageBot:
         assert isinstance(result, list)
 
     def test_execute_arb(self):
-        result = self.bot.execute_arb({"profit_factor": 1.002, "path": ["EURUSD", "GBPUSD", "EURGBP"]})
+        result = self.bot.execute_arb(
+            {"profit_factor": 1.002, "path": ["EURUSD", "GBPUSD", "EURGBP"]}
+        )
         assert result["executed"] is True
 
     def test_run_returns_string(self):
@@ -642,11 +724,15 @@ class TestOptionsTrader:
         assert len(result) > 0
 
     def test_build_iron_condor(self):
-        result = self.bot.build_iron_condor("SPX", {"center_strike": 4500, "width": 50, "credit": 5.0})
+        result = self.bot.build_iron_condor(
+            "SPX", {"center_strike": 4500, "width": 50, "credit": 5.0}
+        )
         assert len(result["legs"]) == 4
 
     def test_build_spread(self):
-        result = self.bot.build_spread("AAPL", "call_debit", {"strike1": 150, "strike2": 160})
+        result = self.bot.build_spread(
+            "AAPL", "call_debit", {"strike1": 150, "strike2": 160}
+        )
         assert len(result["legs"]) == 2
 
     def test_run_returns_string(self):
@@ -688,7 +774,9 @@ class TestForexTrader:
 class TestPennyStockScanner:
     @pytest.fixture(autouse=True)
     def setup(self):
-        cls = _load_bot("penny_stock_scanner", "penny_stock_scanner", "PennyStockScanner")
+        cls = _load_bot(
+            "penny_stock_scanner", "penny_stock_scanner", "PennyStockScanner"
+        )
         self.bot = cls(tier="pro")
 
     def test_instantiation(self):
@@ -696,11 +784,12 @@ class TestPennyStockScanner:
 
     def test_screen_stocks_filters_correctly(self):
         criteria = {
-            "max_price": 5.0, "min_volume": 100000,
+            "max_price": 5.0,
+            "min_volume": 100000,
             "universe": [
                 {"ticker": "ABCD", "price": 1.5, "volume": 500000},
                 {"ticker": "XYZ", "price": 10.0, "volume": 1000000},
-            ]
+            ],
         }
         result = self.bot.screen_stocks(criteria)
         assert len(result) == 1
@@ -732,7 +821,9 @@ class TestCryptoTradingBot:
         assert self.bot.tier == "pro"
 
     def test_execute_trade_returns_dict(self):
-        result = self.bot.execute_trade("binance", {"symbol": "BTC/USDT", "price": 50000, "qty": 0.01})
+        result = self.bot.execute_trade(
+            "binance", {"symbol": "BTC/USDT", "price": 50000, "qty": 0.01}
+        )
         assert result["status"] == "filled"
 
     def test_dca_buy_returns_intervals(self):
@@ -741,7 +832,9 @@ class TestCryptoTradingBot:
         assert all(r["action"] == "buy" for r in result)
 
     def test_setup_grid(self):
-        result = self.bot.setup_grid("BTC/USDT", {"lower": 40000, "upper": 50000, "grids": 10})
+        result = self.bot.setup_grid(
+            "BTC/USDT", {"lower": 40000, "upper": 50000, "grids": 10}
+        )
         assert len(result["levels"]) == 11
         assert result["grids"] == 10
 
@@ -762,11 +855,19 @@ class TestTreasuryAnalyzer:
         assert self.bot.tier == "enterprise"
 
     def test_forecast_cash(self):
-        result = self.bot.forecast_cash({"opening_balance": 1_000_000, "inflows": [500_000, 300_000], "outflows": [200_000, 100_000]})
+        result = self.bot.forecast_cash(
+            {
+                "opening_balance": 1_000_000,
+                "inflows": [500_000, 300_000],
+                "outflows": [200_000, 100_000],
+            }
+        )
         assert result["forecast_balance"] == pytest.approx(1_500_000.0, rel=1e-5)
 
     def test_analyze_liquidity(self):
-        result = self.bot.analyze_liquidity({"current_assets": 2_000_000, "current_liabilities": 1_000_000})
+        result = self.bot.analyze_liquidity(
+            {"current_assets": 2_000_000, "current_liabilities": 1_000_000}
+        )
         assert result["current_ratio"] == pytest.approx(2.0, rel=1e-5)
         assert result["adequate"] is True
 
@@ -794,12 +895,19 @@ class TestVentureDealflow:
         assert self.bot.tier == "enterprise"
 
     def test_source_deals_returns_list(self):
-        result = self.bot.source_deals({"stage": "series_a", "sector": "fintech", "limit": 3})
+        result = self.bot.source_deals(
+            {"stage": "series_a", "sector": "fintech", "limit": 3}
+        )
         assert isinstance(result, list)
         assert len(result) == 3
 
     def test_screen_deal_proceed(self):
-        company = {"name": "FinTech Co", "revenue_growth": 50, "team_score": 9, "market_size_bn": 10}
+        company = {
+            "name": "FinTech Co",
+            "revenue_growth": 50,
+            "team_score": 9,
+            "market_size_bn": 10,
+        }
         result = self.bot.screen_deal(company)
         assert result["proceed"] is True
 

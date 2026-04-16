@@ -2,12 +2,13 @@
 # Functionality: Helps content creators plan, produce, and monetise digital content.
 # Use Cases: YouTubers, podcasters, bloggers scaling their side income.
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from framework import BaseBot
-from framework.monetization import PricingPlan, PricingModel
+from framework.monetization import PricingModel, PricingPlan
 
 
 class ContentCreatorBot(BaseBot):
@@ -19,10 +20,20 @@ class ContentCreatorBot(BaseBot):
     """
 
     _CONTENT_IDEAS = {
-        "youtube":  ["Tutorial series", "Day-in-the-life vlog", "Product review", "Interview"],
-        "podcast":  ["Expert interview", "Solo deep-dive", "Q&A episode", "Case study"],
-        "blog":     ["How-to guide", "Top-10 list", "Opinion piece", "Case study"],
-        "tiktok":   ["Behind-the-scenes", "Quick tip", "Trending audio skit", "Challenge"],
+        "youtube": [
+            "Tutorial series",
+            "Day-in-the-life vlog",
+            "Product review",
+            "Interview",
+        ],
+        "podcast": ["Expert interview", "Solo deep-dive", "Q&A episode", "Case study"],
+        "blog": ["How-to guide", "Top-10 list", "Opinion piece", "Case study"],
+        "tiktok": [
+            "Behind-the-scenes",
+            "Quick tip",
+            "Trending audio skit",
+            "Challenge",
+        ],
     }
 
     def __init__(self):
@@ -46,14 +57,21 @@ class ContentCreatorBot(BaseBot):
 
     def _setup_plans(self):
         super()._setup_plans()
-        self.monetization.add_plan(PricingPlan(
-            plan_id="creator_pro",
-            name="Creator Pro",
-            model=PricingModel.SUBSCRIPTION,
-            price_usd=19.99,
-            description="Unlimited content ideas, scheduling, and analytics.",
-            features=["Unlimited ideas", "Content calendar", "Monetisation tips", "Dataset access"],
-        ))
+        self.monetization.add_plan(
+            PricingPlan(
+                plan_id="creator_pro",
+                name="Creator Pro",
+                model=PricingModel.SUBSCRIPTION,
+                price_usd=19.99,
+                description="Unlimited content ideas, scheduling, and analytics.",
+                features=[
+                    "Unlimited ideas",
+                    "Content calendar",
+                    "Monetisation tips",
+                    "Dataset access",
+                ],
+            )
+        )
 
     def _build_response(self, nlp_result, user_id):
         intent = nlp_result["intent"]

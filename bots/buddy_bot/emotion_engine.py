@@ -20,10 +20,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Emotion taxonomy
 # ---------------------------------------------------------------------------
+
 
 class EmotionLabel(Enum):
     JOY = "joy"
@@ -59,44 +59,121 @@ class EmotionSource(Enum):
 
 EMOTION_KEYWORDS: dict[EmotionLabel, list[str]] = {
     EmotionLabel.JOY: [
-        "happy", "joy", "great", "wonderful", "amazing", "love", "excited",
-        "fantastic", "awesome", "yay", "thrilled", "delighted", "😊", "😄", "🎉",
+        "happy",
+        "joy",
+        "great",
+        "wonderful",
+        "amazing",
+        "love",
+        "excited",
+        "fantastic",
+        "awesome",
+        "yay",
+        "thrilled",
+        "delighted",
+        "😊",
+        "😄",
+        "🎉",
     ],
     EmotionLabel.SADNESS: [
-        "sad", "unhappy", "depressed", "miss", "lonely", "cry", "tears",
-        "heartbroken", "grief", "lost", "disappointed", "😢", "😞",
+        "sad",
+        "unhappy",
+        "depressed",
+        "miss",
+        "lonely",
+        "cry",
+        "tears",
+        "heartbroken",
+        "grief",
+        "lost",
+        "disappointed",
+        "😢",
+        "😞",
     ],
     EmotionLabel.ANGER: [
-        "angry", "furious", "mad", "rage", "hate", "annoyed", "frustrated",
-        "livid", "fed up", "infuriated", "😠", "😡",
+        "angry",
+        "furious",
+        "mad",
+        "rage",
+        "hate",
+        "annoyed",
+        "frustrated",
+        "livid",
+        "fed up",
+        "infuriated",
+        "😠",
+        "😡",
     ],
     EmotionLabel.FEAR: [
-        "scared", "afraid", "terrified", "worried", "nervous", "dread",
-        "panic", "frightened", "anxious", "😨", "😰",
+        "scared",
+        "afraid",
+        "terrified",
+        "worried",
+        "nervous",
+        "dread",
+        "panic",
+        "frightened",
+        "anxious",
+        "😨",
+        "😰",
     ],
     EmotionLabel.STRESS: [
-        "stressed", "overwhelmed", "exhausted", "burned out", "too much",
-        "can't cope", "breaking point", "no energy",
+        "stressed",
+        "overwhelmed",
+        "exhausted",
+        "burned out",
+        "too much",
+        "can't cope",
+        "breaking point",
+        "no energy",
     ],
     EmotionLabel.ANXIETY: [
-        "anxious", "uneasy", "apprehensive", "on edge", "restless",
-        "worried", "nervous",
+        "anxious",
+        "uneasy",
+        "apprehensive",
+        "on edge",
+        "restless",
+        "worried",
+        "nervous",
     ],
     EmotionLabel.LOVE: [
-        "love", "adore", "cherish", "affection", "fond", "care deeply",
-        "❤️", "💕", "💖",
+        "love",
+        "adore",
+        "cherish",
+        "affection",
+        "fond",
+        "care deeply",
+        "❤️",
+        "💕",
+        "💖",
     ],
     EmotionLabel.GRATITUDE: [
-        "thank", "grateful", "appreciate", "thankful", "blessed",
-        "means a lot", "🙏",
+        "thank",
+        "grateful",
+        "appreciate",
+        "thankful",
+        "blessed",
+        "means a lot",
+        "🙏",
     ],
     EmotionLabel.EXCITEMENT: [
-        "excited", "can't wait", "pumped", "hyped", "thrilled", "stoked",
-        "🚀", "🔥",
+        "excited",
+        "can't wait",
+        "pumped",
+        "hyped",
+        "thrilled",
+        "stoked",
+        "🚀",
+        "🔥",
     ],
     EmotionLabel.LONELINESS: [
-        "alone", "lonely", "no one", "isolated", "by myself",
-        "nobody cares", "left out",
+        "alone",
+        "lonely",
+        "no one",
+        "isolated",
+        "by myself",
+        "nobody cares",
+        "left out",
     ],
 }
 
@@ -148,19 +225,22 @@ MOOD_BOOST_RESPONSES: dict[EmotionLabel, list[str]] = {
 
 WELLNESS_MUSIC_RECS: dict[EmotionLabel, list[str]] = {
     EmotionLabel.SADNESS: [
-        "\"Fix You\" — Coldplay", "\"Here Comes the Sun\" — The Beatles",
-        "\"Rainbow\" — Kacey Musgraves",
+        '"Fix You" — Coldplay',
+        '"Here Comes the Sun" — The Beatles',
+        '"Rainbow" — Kacey Musgraves',
     ],
     EmotionLabel.STRESS: [
-        "Lo-fi Chill Beats playlist", "\"Weightless\" — Marconi Union",
+        "Lo-fi Chill Beats playlist",
+        '"Weightless" — Marconi Union',
         "Ocean sounds / nature ambience",
     ],
     EmotionLabel.JOY: [
-        "\"Happy\" — Pharrell Williams", "\"Can't Stop the Feeling\" — Justin Timberlake",
+        '"Happy" — Pharrell Williams',
+        '"Can\'t Stop the Feeling" — Justin Timberlake',
         "Your personal hype playlist",
     ],
     EmotionLabel.ANGER: [
-        "\"Fighter\" — Christina Aguilera",
+        '"Fighter" — Christina Aguilera',
         "High-energy workout playlist",
     ],
 }
@@ -169,6 +249,7 @@ WELLNESS_MUSIC_RECS: dict[EmotionLabel, list[str]] = {
 @dataclass
 class EmotionReading:
     """A single emotional assessment reading."""
+
     label: EmotionLabel
     confidence: float
     source: EmotionSource
@@ -357,10 +438,14 @@ class EmotionEngine:
             Buddy's synchronised response.
         """
         self._current_mood = detected_emotion
-        responses = MOOD_BOOST_RESPONSES.get(detected_emotion, [
-            "I'm right here with you. How can I help?",
-        ])
+        responses = MOOD_BOOST_RESPONSES.get(
+            detected_emotion,
+            [
+                "I'm right here with you. How can I help?",
+            ],
+        )
         import random
+
         return random.choice(responses)
 
     def boost_mood(self, current_emotion: EmotionLabel) -> dict:
@@ -376,10 +461,13 @@ class EmotionEngine:
         dict with keys: ``message``, ``music_recommendation``
         """
         import random
+
         message = random.choice(
             MOOD_BOOST_RESPONSES.get(current_emotion, ["You've got this! 💙"])
         )
-        music = WELLNESS_MUSIC_RECS.get(current_emotion, ["Whatever makes your heart sing 🎵"])
+        music = WELLNESS_MUSIC_RECS.get(
+            current_emotion, ["Whatever makes your heart sing 🎵"]
+        )
         return {
             "message": message,
             "music_recommendation": random.choice(music),

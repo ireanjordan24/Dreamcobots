@@ -1,4 +1,5 @@
 """Spotify Web API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,15 +26,30 @@ class SpotifyConnector:
         Returns:
             Dict with access_token or error.
         """
-        import requests
         import base64
-        credentials = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
-        headers = {"Authorization": f"Basic {credentials}", "Content-Type": "application/x-www-form-urlencoded"}
+
+        import requests
+
+        credentials = base64.b64encode(
+            f"{self.client_id}:{self.client_secret}".encode()
+        ).decode()
+        headers = {
+            "Authorization": f"Basic {credentials}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
         try:
-            response = requests.post(self.AUTH_URL, data={"grant_type": "client_credentials"}, headers=headers, timeout=30)
+            response = requests.post(
+                self.AUTH_URL,
+                data={"grant_type": "client_credentials"},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Spotify access token obtained.")
-            return {"status": "success", "access_token": response.json().get("access_token")}
+            return {
+                "status": "success",
+                "access_token": response.json().get("access_token"),
+            }
         except requests.RequestException as e:
             logger.error("Spotify get_access_token error: %s", e)
             return {"status": "error", "message": str(e)}
@@ -50,17 +66,19 @@ class SpotifyConnector:
             API response dict or error dict.
         """
         import requests
+
         token_result = self.get_access_token()
         if token_result.get("status") != "success":
             return token_result
         headers = {"Authorization": f"Bearer {token_result['access_token']}"}
         params = {"q": query, "type": type, "limit": limit}
         try:
-            response = requests.get(f"{self.BASE_URL}/search", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search", params=params, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("Spotify search completed for: %s", query)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Spotify search error: %s", e)
             return {"status": "error", "message": str(e)}
-

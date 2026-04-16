@@ -9,17 +9,16 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Pricing constants
@@ -35,14 +34,13 @@ USAGE_RATE_USD = 0.05  # per billable action (enterprise)
 
 
 def _default_revenue_path() -> str:
-    return os.path.join(
-        os.path.dirname(__file__), "..", "..", "data", "revenue.json"
-    )
+    return os.path.join(os.path.dirname(__file__), "..", "..", "data", "revenue.json")
 
 
 # ---------------------------------------------------------------------------
 # Revenue Tracker
 # ---------------------------------------------------------------------------
+
 
 class RevenueTrackerError(Exception):
     """Raised when a revenue operation fails."""
@@ -158,14 +156,13 @@ class RevenueTracker:
 
     def list_bots(self) -> List[dict]:
         """Return revenue data for all tracked bots."""
-        return [
-            self.get_report(name) for name in self._bots
-        ]
+        return [self.get_report(name) for name in self._bots]
 
     def get_underperformers(self, threshold_usd: float = 100.0) -> List[str]:
         """Return bot names whose total revenue is below *threshold_usd*."""
         return [
-            name for name, entry in self._bots.items()
+            name
+            for name, entry in self._bots.items()
             if entry["revenue_usd"] < threshold_usd
         ]
 

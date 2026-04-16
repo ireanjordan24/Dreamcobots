@@ -1,4 +1,5 @@
 """Semantic Scholar API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,10 +27,20 @@ class SemanticScholarConnector:
             API response dict or error dict.
         """
         import requests
-        params = {"query": query, "limit": limit, "fields": "title,authors,year,abstract"}
+
+        params = {
+            "query": query,
+            "limit": limit,
+            "fields": "title,authors,year,abstract",
+        }
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         try:
-            response = requests.get(f"{self.BASE_URL}/paper/search", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/paper/search",
+                params=params,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Semantic Scholar search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -47,12 +58,14 @@ class SemanticScholarConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         try:
-            response = requests.get(f"{self.BASE_URL}/paper/{paper_id}", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/paper/{paper_id}", headers=headers, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Semantic Scholar get_paper error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -1,6 +1,7 @@
 """Tests for bots/emotional_ai_bot/ — Emotionally Intelligent AI."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,27 +11,29 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.emotional_ai_bot.emotional_ai_bot import EmotionalAIBot, EmotionalAIBotError
+
 from bots.emotional_ai_bot.emotion_engine import (
+    EMOTIONS,
+    TONES,
     EmotionRecognizer,
     EmotionRecognizerError,
     PersonalityAdapter,
     PersonalityAdapterError,
-    EMOTIONS,
-    TONES,
 )
+from bots.emotional_ai_bot.emotional_ai_bot import EmotionalAIBot, EmotionalAIBotError
 from bots.emotional_ai_bot.mental_health_coach import (
+    FOCUS_AREAS,
+    STRATEGIES,
     MentalHealthCoach,
     MentalHealthCoachError,
     ProductivityCoach,
     ProductivityCoachError,
-    STRATEGIES,
-    FOCUS_AREAS,
 )
 
 # ===========================================================================
 # EmotionRecognizer
 # ===========================================================================
+
 
 class TestEmotionRecognizer:
 
@@ -113,7 +116,9 @@ class TestEmotionRecognizer:
 
     def test_analyze_environmental_shift_enterprise_works(self):
         er = EmotionRecognizer(Tier.ENTERPRISE)
-        result = er.analyze_environmental_shift({"changes": ["temperature_drop", "noise_increase"]})
+        result = er.analyze_environmental_shift(
+            {"changes": ["temperature_drop", "noise_increase"]}
+        )
         assert "shift_detected" in result
         assert result["shift_detected"] is True
 
@@ -150,6 +155,7 @@ class TestEmotionRecognizer:
 # PersonalityAdapter
 # ===========================================================================
 
+
 class TestPersonalityAdapter:
 
     def test_instantiate_free(self):
@@ -179,7 +185,9 @@ class TestPersonalityAdapter:
 
     def test_calibrate_personality_pro_works(self):
         pa = PersonalityAdapter(Tier.PRO)
-        result = pa.calibrate_personality({"preferred_tone": "motivational", "personality_type": "analytical"})
+        result = pa.calibrate_personality(
+            {"preferred_tone": "motivational", "personality_type": "analytical"}
+        )
         assert result["calibrated"] is True
         assert result["preferred_tone"] == "motivational"
 
@@ -208,6 +216,7 @@ class TestPersonalityAdapter:
 # ===========================================================================
 # MentalHealthCoach
 # ===========================================================================
+
 
 class TestMentalHealthCoach:
 
@@ -300,6 +309,7 @@ class TestMentalHealthCoach:
 # ProductivityCoach
 # ===========================================================================
 
+
 class TestProductivityCoach:
 
     def test_instantiate(self):
@@ -313,18 +323,24 @@ class TestProductivityCoach:
 
     def test_analyze_productivity_pro_works(self):
         pc = ProductivityCoach(Tier.PRO)
-        result = pc.analyze_productivity("u1", {"tasks_completed": 8, "tasks_planned": 10, "hours_worked": 6})
+        result = pc.analyze_productivity(
+            "u1", {"tasks_completed": 8, "tasks_planned": 10, "hours_worked": 6}
+        )
         assert "completion_rate" in result
         assert "productivity_level" in result
 
     def test_analyze_productivity_high(self):
         pc = ProductivityCoach(Tier.PRO)
-        result = pc.analyze_productivity("u1", {"tasks_completed": 9, "tasks_planned": 10, "hours_worked": 5})
+        result = pc.analyze_productivity(
+            "u1", {"tasks_completed": 9, "tasks_planned": 10, "hours_worked": 5}
+        )
         assert result["productivity_level"] == "high"
 
     def test_analyze_productivity_low(self):
         pc = ProductivityCoach(Tier.PRO)
-        result = pc.analyze_productivity("u1", {"tasks_completed": 2, "tasks_planned": 10, "hours_worked": 8})
+        result = pc.analyze_productivity(
+            "u1", {"tasks_completed": 2, "tasks_planned": 10, "hours_worked": 8}
+        )
         assert result["productivity_level"] == "low"
 
     def test_create_coaching_session_free_raises(self):
@@ -370,6 +386,7 @@ class TestProductivityCoach:
 # EmotionalAIBot — main class
 # ===========================================================================
 
+
 class TestEmotionalAIBot:
 
     def test_instantiate_free(self):
@@ -396,7 +413,9 @@ class TestEmotionalAIBot:
 
     def test_provide_mental_health_support(self):
         bot = EmotionalAIBot(Tier.FREE)
-        result = bot.provide_mental_health_support("user1", "I am feeling very sad today")
+        result = bot.provide_mental_health_support(
+            "user1", "I am feeling very sad today"
+        )
         assert "emotion_analysis" in result
         assert "coping_support" in result
         assert result["user_id"] == "user1"
@@ -418,12 +437,16 @@ class TestEmotionalAIBot:
 
     def test_generate_wellness_report_pro_works(self):
         bot = EmotionalAIBot(Tier.PRO)
-        result = bot.generate_wellness_report("user1", ["reduce stress", "sleep better"])
+        result = bot.generate_wellness_report(
+            "user1", ["reduce stress", "sleep better"]
+        )
         assert "plan" in result
 
     def test_get_daily_affirmations(self):
         bot = EmotionalAIBot(Tier.FREE)
-        result = bot.get_daily_affirmations({"current_mood": "happy", "goals": ["grow"]})
+        result = bot.get_daily_affirmations(
+            {"current_mood": "happy", "goals": ["grow"]}
+        )
         assert "affirmations" in result
 
     def test_get_emotional_dashboard(self):

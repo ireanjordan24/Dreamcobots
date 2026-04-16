@@ -1,24 +1,25 @@
 """Tests for bots/multi_channel_marketing/multi_channel_marketing.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from bots.multi_channel_marketing.multi_channel_marketing import (
-    MultiChannelMarketing,
+    AudienceSegment,
     Campaign,
     CampaignChannel,
     CampaignStatus,
-    AudienceSegment,
+    MultiChannelMarketing,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_campaign(mcm=None, channels=None):
     mcm = mcm or MultiChannelMarketing()
@@ -30,6 +31,7 @@ def _make_campaign(mcm=None, channels=None):
 # ---------------------------------------------------------------------------
 # create_campaign
 # ---------------------------------------------------------------------------
+
 
 class TestCreateCampaign:
     def test_returns_campaign(self):
@@ -59,6 +61,7 @@ class TestCreateCampaign:
 # add_segment
 # ---------------------------------------------------------------------------
 
+
 class TestAddSegment:
     def test_returns_audience_segment(self):
         mcm, campaign = _make_campaign()
@@ -85,6 +88,7 @@ class TestAddSegment:
 # ---------------------------------------------------------------------------
 # launch_campaign
 # ---------------------------------------------------------------------------
+
 
 class TestLaunchCampaign:
     def test_campaign_status_active_after_launch(self):
@@ -122,6 +126,7 @@ class TestLaunchCampaign:
 # get_revenue_output
 # ---------------------------------------------------------------------------
 
+
 class TestGetRevenueOutput:
     def test_revenue_output_keys(self):
         mcm, campaign = _make_campaign()
@@ -143,6 +148,7 @@ class TestGetRevenueOutput:
 # pause / complete
 # ---------------------------------------------------------------------------
 
+
 class TestPauseComplete:
     def test_pause_campaign(self):
         mcm, campaign = _make_campaign()
@@ -158,6 +164,7 @@ class TestPauseComplete:
 # ---------------------------------------------------------------------------
 # get_total_revenue
 # ---------------------------------------------------------------------------
+
 
 class TestGetTotalRevenue:
     def test_total_revenue_sums_campaigns(self):

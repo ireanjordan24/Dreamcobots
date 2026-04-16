@@ -12,97 +12,88 @@ Covers all Buddy Core System modules:
   8. BuddyCore (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.buddy_core.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    list_tiers,
-    get_upgrade_path,
-    FEATURE_INTENT_PARSER,
-    FEATURE_TOOL_INJECTION,
-    FEATURE_BOT_GENERATOR,
-    FEATURE_FEEDBACK_LOOP,
-    FEATURE_PRIVACY_VAULT,
-    FEATURE_LEAD_ENGINE,
-    FEATURE_ADVANCED_AI,
-    FEATURE_WHITE_LABEL,
-    FEATURE_CUSTOM_ENCRYPTION,
-    FEATURE_ENTERPRISE_LOGS,
-)
-from bots.buddy_core.intent_parser import (
-    IntentParser,
-    IntentParserError,
-    IntentType,
-    Industry,
-    ParsedIntent,
-)
-from bots.buddy_core.tool_db import (
-    ToolDB,
-    ToolDBError,
-    ToolCategory,
-    Tool,
-)
+from bots.buddy_core import Tier as PublicTier
 from bots.buddy_core.bot_generator import (
+    BotDNA,
     BotGenerator,
     BotGeneratorError,
     BotStatus,
-    BotDNA,
     GeneratedBot,
 )
+from bots.buddy_core.buddy_core import BuddyCore, BuddyCoreError, BuddyCoreTierError
 from bots.buddy_core.feedback_loop import (
+    AutoOptimizer,
     FeedbackLoop,
+    MetricType,
+    Optimization,
+    PerformanceMetric,
     PerformanceTracker,
     RevenueTracker,
-    AutoOptimizer,
-    MetricType,
-    PerformanceMetric,
-    Optimization,
 )
-from bots.buddy_core.privacy_engine import (
-    PrivacyEngine,
-    PermissionManager,
-    ActivityLogger,
-    DataVault,
-    DataVaultError,
-    SafetyGuardrail,
-    PermissionLevel,
-    ActionCategory,
-    PrivacyEngineError,
-    UserPermission,
-    ActivityLog,
+from bots.buddy_core.intent_parser import (
+    Industry,
+    IntentParser,
+    IntentParserError,
+    IntentType,
+    ParsedIntent,
 )
 from bots.buddy_core.lead_engine import (
+    Lead,
     LeadEngine,
     LeadEngineError,
-    LeadScraper,
     LeadScorer,
-    MonetizationEngine,
+    LeadScraper,
     LeadSource,
     LeadStatus,
     LeadTier,
+    MonetizationEngine,
     MonetizationStrategy,
-    Lead,
     Revenue,
 )
-from bots.buddy_core.buddy_core import (
-    BuddyCore,
-    BuddyCoreError,
-    BuddyCoreTierError,
+from bots.buddy_core.privacy_engine import (
+    ActionCategory,
+    ActivityLog,
+    ActivityLogger,
+    DataVault,
+    DataVaultError,
+    PermissionLevel,
+    PermissionManager,
+    PrivacyEngine,
+    PrivacyEngineError,
+    SafetyGuardrail,
+    UserPermission,
 )
-from bots.buddy_core import Tier as PublicTier
-
+from bots.buddy_core.tiers import (
+    FEATURE_ADVANCED_AI,
+    FEATURE_BOT_GENERATOR,
+    FEATURE_CUSTOM_ENCRYPTION,
+    FEATURE_ENTERPRISE_LOGS,
+    FEATURE_FEEDBACK_LOOP,
+    FEATURE_INTENT_PARSER,
+    FEATURE_LEAD_ENGINE,
+    FEATURE_PRIVACY_VAULT,
+    FEATURE_TOOL_INJECTION,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
+from bots.buddy_core.tool_db import Tool, ToolCategory, ToolDB, ToolDBError
 
 # ===========================================================================
 # 1. TestBuddyCoreTiers
 # ===========================================================================
+
 
 class TestBuddyCoreTiers:
 
@@ -188,6 +179,7 @@ class TestBuddyCoreTiers:
 # ===========================================================================
 # 2. TestIntentParser
 # ===========================================================================
+
 
 class TestIntentParser:
 
@@ -280,6 +272,7 @@ class TestIntentParser:
 # 3. TestToolDB
 # ===========================================================================
 
+
 class TestToolDB:
 
     def setup_method(self):
@@ -350,6 +343,7 @@ class TestToolDB:
 # ===========================================================================
 # 4. TestBotGenerator
 # ===========================================================================
+
 
 class TestBotGenerator:
 
@@ -441,6 +435,7 @@ class TestBotGenerator:
 # 5. TestFeedbackLoop
 # ===========================================================================
 
+
 class TestFeedbackLoop:
 
     def setup_method(self):
@@ -502,7 +497,9 @@ class TestFeedbackLoop:
 
     def test_apply_optimization_creates_record(self):
         self.tracker.record("opt_bot", MetricType.PERFORMANCE, 0.2)
-        opt = self.optimizer.apply_optimization("opt_bot", "boost_performance", self.tracker)
+        opt = self.optimizer.apply_optimization(
+            "opt_bot", "boost_performance", self.tracker
+        )
         assert isinstance(opt, Optimization)
         assert opt.bot_id == "opt_bot"
 
@@ -531,6 +528,7 @@ class TestFeedbackLoop:
 # ===========================================================================
 # 6. TestPrivacyEngine
 # ===========================================================================
+
 
 class TestPrivacyEngine:
 
@@ -631,17 +629,23 @@ class TestPrivacyEngine:
         assert self.vault.delete("nonexistent", "any_user") is False
 
     def test_guardrail_low_risk_approved(self):
-        result = self.guardrail.check_action("read data", ActionCategory.DATA_ACCESS, "u1")
+        result = self.guardrail.check_action(
+            "read data", ActionCategory.DATA_ACCESS, "u1"
+        )
         assert result["approved"] is True
         assert result["requires_confirmation"] is False
 
     def test_guardrail_financial_requires_confirmation(self):
-        result = self.guardrail.check_action("transfer funds", ActionCategory.FINANCIAL, "u1")
+        result = self.guardrail.check_action(
+            "transfer funds", ActionCategory.FINANCIAL, "u1"
+        )
         assert result["requires_confirmation"] is True
         assert result["approved"] is False
 
     def test_guardrail_confirm_action(self):
-        result = self.guardrail.check_action("delete system", ActionCategory.SYSTEM, "admin")
+        result = self.guardrail.check_action(
+            "delete system", ActionCategory.SYSTEM, "admin"
+        )
         action_id = result["action_id"]
         assert self.guardrail.confirm_action(action_id) is True
 
@@ -668,6 +672,7 @@ class TestPrivacyEngine:
 # ===========================================================================
 # 7. TestLeadEngine
 # ===========================================================================
+
 
 class TestLeadEngine:
 
@@ -791,6 +796,7 @@ class TestLeadEngine:
 # 8. TestBuddyCore (integration)
 # ===========================================================================
 
+
 class TestBuddyCore:
 
     def setup_method(self):
@@ -898,11 +904,15 @@ class TestBuddyCore:
         assert "intent" in result
 
     def test_process_create_bot_command(self):
-        result = self.buddy_pro.process({"command": "create_bot", "name": "ProcessBot", "industry": "finance"})
+        result = self.buddy_pro.process(
+            {"command": "create_bot", "name": "ProcessBot", "industry": "finance"}
+        )
         assert result["status"] == "created"
 
     def test_process_run_lead_campaign(self):
-        result = self.buddy_pro.process({"command": "run_lead_campaign", "industry": "health", "count": 5})
+        result = self.buddy_pro.process(
+            {"command": "run_lead_campaign", "industry": "health", "count": 5}
+        )
         assert "total_leads" in result
 
     def test_process_dashboard_command(self):
@@ -919,6 +929,8 @@ class TestBuddyCore:
 
     def test_enterprise_has_all_features(self):
         for feature in [
-            FEATURE_WHITE_LABEL, FEATURE_CUSTOM_ENCRYPTION, FEATURE_ENTERPRISE_LOGS
+            FEATURE_WHITE_LABEL,
+            FEATURE_CUSTOM_ENCRYPTION,
+            FEATURE_ENTERPRISE_LOGS,
         ]:
             assert self.buddy_ent.can_access(feature)

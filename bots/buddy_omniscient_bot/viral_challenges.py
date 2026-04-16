@@ -20,22 +20,23 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+import copy
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Dict
-import uuid
-import copy
+from typing import Dict, List, Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ===========================================================================
 # Enums
 # ===========================================================================
+
 
 class ChallengeCategory(Enum):
     CAR_REPAIR = "car_repair"
@@ -102,6 +103,7 @@ class LearningGameType(Enum):
 # ===========================================================================
 # Data classes
 # ===========================================================================
+
 
 @dataclass
 class ViralChallenge:
@@ -343,7 +345,11 @@ _PRESET_CHALLENGES: List[ViralChallenge] = [
         ],
         difficulty="Beginner",
         share_hashtags=["#BuddyChef", "#DreamCoCooks", "#AIRecipe"],
-        platforms=[SocialPlatform.INSTAGRAM, SocialPlatform.TIKTOK, SocialPlatform.YOUTUBE],
+        platforms=[
+            SocialPlatform.INSTAGRAM,
+            SocialPlatform.TIKTOK,
+            SocialPlatform.YOUTUBE,
+        ],
         points=300,
         badge_reward="AI Chef",
     ),
@@ -533,7 +539,11 @@ _PRESET_GAMES: List[LearningGame] = [
         multiplayer=True,
         buddy_guidance=True,
         levels=12,
-        skills_taught=["Stock analysis", "Portfolio diversification", "Risk management"],
+        skills_taught=[
+            "Stock analysis",
+            "Portfolio diversification",
+            "Risk management",
+        ],
     ),
     LearningGame(
         game_id="GAME-003",
@@ -567,6 +577,7 @@ _PRESET_GAMES: List[LearningGame] = [
 # Engine classes
 # ===========================================================================
 
+
 class ViralChallengesEngine:
     """
     Manages viral challenges, Buddy Badges, and user points.
@@ -583,7 +594,9 @@ class ViralChallengesEngine:
         self._user_points: int = 0
         self._earned_badges: List[str] = []
 
-    def list_challenges(self, category: Optional[ChallengeCategory] = None) -> List[ViralChallenge]:
+    def list_challenges(
+        self, category: Optional[ChallengeCategory] = None
+    ) -> List[ViralChallenge]:
         challenges = [c for c in self._challenges.values() if c.active]
         if category:
             challenges = [c for c in challenges if c.category == category]
@@ -619,9 +632,7 @@ class ViralChallengesEngine:
         for badge in self._badges.values():
             if badge.name == badge_name and not badge.earned:
                 badge.earned = True
-                badge.share_url = (
-                    f"https://dreamcobots.com/badges/{badge.badge_id}"
-                )
+                badge.share_url = f"https://dreamcobots.com/badges/{badge.badge_id}"
                 self._earned_badges.append(badge.badge_id)
                 return badge
         return None
@@ -632,11 +643,17 @@ class ViralChallengesEngine:
         if not badge:
             return {"error": f"Badge '{badge_id}' not found."}
         if badge.earned:
-            return {"message": f"Badge '{badge.name}' already earned.", "badge": badge.to_dict()}
+            return {
+                "message": f"Badge '{badge.name}' already earned.",
+                "badge": badge.to_dict(),
+            }
         badge.earned = True
         badge.share_url = f"https://dreamcobots.com/badges/{badge_id}"
         self._earned_badges.append(badge_id)
-        return {"message": f"Badge unlocked: {badge.icon} {badge.name}!", "badge": badge.to_dict()}
+        return {
+            "message": f"Badge unlocked: {badge.icon} {badge.name}!",
+            "badge": badge.to_dict(),
+        }
 
     def get_user_points(self) -> int:
         return self._user_points
@@ -851,7 +868,12 @@ class AISocialCreatorEngine:
         platform: SocialPlatform,
         topic: str = "",
     ) -> SocialContent:
-        topic = topic or self._TREND_TOPICS[len(self._generated_content) % len(self._TREND_TOPICS)]
+        topic = (
+            topic
+            or self._TREND_TOPICS[
+                len(self._generated_content) % len(self._TREND_TOPICS)
+            ]
+        )
         bodies = {
             ContentType.VIDEO_IDEA: (
                 f"Video Idea: '{topic}' — Show Buddy solving the challenge in 60 seconds, "
@@ -887,7 +909,9 @@ class AISocialCreatorEngine:
             title=topic,
             body=bodies.get(content_type, f"AI-generated content for '{topic}'."),
             hashtags=[
-                "#DreamCoAI", "#BuddyBot", "#AICreator",
+                "#DreamCoAI",
+                "#BuddyBot",
+                "#AICreator",
                 f"#{platform.value.capitalize()}Creator",
             ],
             trend_score=round(7.5 + (len(self._generated_content) % 3) * 0.5, 1),
@@ -908,9 +932,7 @@ class DynamicLearningEngine:
     """
 
     def __init__(self) -> None:
-        self._games: Dict[str, LearningGame] = {
-            g.game_id: g for g in _PRESET_GAMES
-        }
+        self._games: Dict[str, LearningGame] = {g.game_id: g for g in _PRESET_GAMES}
         self._active_sessions: Dict[str, dict] = {}
 
     def list_games(

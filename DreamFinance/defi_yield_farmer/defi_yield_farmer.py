@@ -1,16 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """DeFi Yield Farming Bot — financial intelligence bot."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
 _tiers_spec = importlib.util.spec_from_file_location(
-    '_local_tiers_defi_yield_farmer', os.path.join(_TOOL_DIR, 'tiers.py'))
+    "_local_tiers_defi_yield_farmer", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -34,7 +38,13 @@ class DeFiYieldFarmer:
         tvl = pool.get("tvl", 0)
         apy = pool.get("apy", 0)
         est_daily = round(tvl * apy / 365, 2)
-        return {"pool": pool.get("name", "unknown"), "tvl": tvl, "daily_yield_est": est_daily, "status": "active", "disclaimer": DISCLAIMER}
+        return {
+            "pool": pool.get("name", "unknown"),
+            "tvl": tvl,
+            "daily_yield_est": est_daily,
+            "status": "active",
+            "disclaimer": DISCLAIMER,
+        }
 
     def calculate_il(self, entry: dict, current: dict) -> dict:
         """Calculate il — DeFi Yield Farming Bot."""
@@ -43,13 +53,22 @@ class DeFiYieldFarmer:
         ratio_a = p1_a / p0_a if p0_a else 1
         ratio_b = p1_b / p0_b if p0_b else 1
         il = round(2 * (ratio_a * ratio_b) ** 0.5 / (ratio_a + ratio_b) - 1, 6)
-        return {"impermanent_loss": il, "il_pct": round(il * 100, 4), "disclaimer": DISCLAIMER}
+        return {
+            "impermanent_loss": il,
+            "il_pct": round(il * 100, 4),
+            "disclaimer": DISCLAIMER,
+        }
 
     def schedule_harvest(self, positions: list) -> list:
         """Schedule harvest — DeFi Yield Farming Bot."""
-        return [{"pool": p.get("name", ""), "harvest_in_hours": max(1, int(100 / max(p.get("apy", 1), 0.01)))} for p in positions]
+        return [
+            {
+                "pool": p.get("name", ""),
+                "harvest_in_hours": max(1, int(100 / max(p.get("apy", 1), 0.01))),
+            }
+            for p in positions
+        ]
 
     def run(self) -> str:
         """Return running status string."""
         return f"DeFiYieldFarmer running: {self.tier} tier"
-

@@ -15,11 +15,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Default state path
@@ -33,6 +32,7 @@ _DEFAULT_STATE_PATH = os.path.join(
 # ---------------------------------------------------------------------------
 # Module-level helpers (as described in problem statement)
 # ---------------------------------------------------------------------------
+
 
 def save_state(data: dict, path: str = _DEFAULT_STATE_PATH) -> None:
     """
@@ -71,6 +71,7 @@ def load_state(path: str = _DEFAULT_STATE_PATH) -> dict:
 # ---------------------------------------------------------------------------
 # StateManager class
 # ---------------------------------------------------------------------------
+
 
 class StateManager:
     """
@@ -153,10 +154,12 @@ class StateManager:
     def record_decision(self, decision: str) -> None:
         """Append a decision to the decisions log."""
         decisions: list = list(self._state.get("decisions", []))
-        decisions.append({
-            "decision": decision,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        decisions.append(
+            {
+                "decision": decision,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         self._state["decisions"] = decisions
         self._state["updated_at"] = datetime.now(timezone.utc).isoformat()
         self._persist()

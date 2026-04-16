@@ -16,43 +16,42 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
+from bots.auto_bot_factory.competitor_analyzer import AnalysisReport, CompetitorAnalyzer
+from bots.auto_bot_factory.safety_controller import MAX_BOTS, SafetyController
+from bots.auto_bot_factory.strategy_framework import StrategyCategory, StrategyFramework
 from bots.auto_bot_factory.tiers import (
+    FEATURE_AUTO_DEPLOY,
+    FEATURE_BOT_GENERATION,
+    FEATURE_COMPETITOR_ANALYSIS,
+    FEATURE_DECISION_ENGINE,
+    FEATURE_FULL_AUTONOMY,
+    FEATURE_GITHUB_DEPLOY,
+    FEATURE_PERSISTENT_MEMORY,
+    FEATURE_REAL_METRICS,
+    FEATURE_SAFETY_CONTROLLER,
+    FEATURE_SELF_HEALING,
+    FEATURE_STRATEGY_FRAMEWORK,
+    FEATURE_USAGE_BILLING,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BOT_GENERATION,
-    FEATURE_COMPETITOR_ANALYSIS,
-    FEATURE_STRATEGY_FRAMEWORK,
-    FEATURE_AUTO_DEPLOY,
-    FEATURE_SAFETY_CONTROLLER,
-    FEATURE_SELF_HEALING,
-    FEATURE_PERSISTENT_MEMORY,
-    FEATURE_REAL_METRICS,
-    FEATURE_DECISION_ENGINE,
-    FEATURE_USAGE_BILLING,
-    FEATURE_FULL_AUTONOMY,
-    FEATURE_GITHUB_DEPLOY,
 )
-from bots.auto_bot_factory.competitor_analyzer import CompetitorAnalyzer, AnalysisReport
-from bots.auto_bot_factory.strategy_framework import StrategyFramework, StrategyCategory
-from bots.auto_bot_factory.safety_controller import SafetyController, MAX_BOTS
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class AutoBotFactoryError(Exception):
     """Base exception for Auto-Bot Factory errors."""
@@ -66,9 +65,11 @@ class AutoBotFactoryTierError(AutoBotFactoryError):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BotBlueprint:
     """Blueprint for a generated bot."""
+
     bot_id: str
     name: str
     category: str
@@ -102,6 +103,7 @@ class BotBlueprint:
 @dataclass
 class DeploymentRecord:
     """Record of a deployed bot."""
+
     bot_id: str
     name: str
     status: str
@@ -125,6 +127,7 @@ class DeploymentRecord:
 # ---------------------------------------------------------------------------
 # Auto-Bot Generator Factory
 # ---------------------------------------------------------------------------
+
 
 class AutoBotFactory:
     """
@@ -294,7 +297,9 @@ class AutoBotFactory:
             deployment_target="github",
             metrics={
                 "speed_target_ms": blueprint.benchmark_targets.get("speed_ms", 200),
-                "uptime_target_pct": blueprint.benchmark_targets.get("uptime_pct", 99.9),
+                "uptime_target_pct": blueprint.benchmark_targets.get(
+                    "uptime_pct", 99.9
+                ),
             },
         )
         self._deployments.append(record)

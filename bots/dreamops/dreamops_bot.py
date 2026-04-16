@@ -18,26 +18,37 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
-from framework import GlobalAISourcesFlow  # noqa: F401
 
-from bots.dreamops.tiers import BOT_FEATURES, WORKFLOW_LIMITS, BOT_LIMITS, get_bot_tier_info
-from bots.dreamops.anomaly_detection import AnomalyDetector, WorkflowMetrics, AnomalyAlert
-from bots.dreamops.auto_scaling import ScalingEngine, LoadMetrics, ScalingAction
-from bots.dreamops.ops_commander import OpsCommander
-from bots.dreamops.bottleneck_detector import BottleneckDetector, WorkflowStage
+from bots.dreamops.anomaly_detection import (
+    AnomalyAlert,
+    AnomalyDetector,
+    WorkflowMetrics,
+)
 from bots.dreamops.auto_failover import AutoFailover
-from bots.dreamops.cost_reduction import CostReductionEngine, CostData
-from bots.dreamops.throughput_maximizer import ThroughputMaximizer, FlowStage
-from bots.dreamops.resilience_scorer import ResilienceScorer, ResilienceMetrics
-from bots.dreamops.task_delegation import TaskDelegationAI, Task
+from bots.dreamops.auto_scaling import LoadMetrics, ScalingAction, ScalingEngine
+from bots.dreamops.bottleneck_detector import BottleneckDetector, WorkflowStage
+from bots.dreamops.cost_reduction import CostData, CostReductionEngine
 from bots.dreamops.dashboard import render_full_dashboard
+from bots.dreamops.ops_commander import OpsCommander
+from bots.dreamops.resilience_scorer import ResilienceMetrics, ResilienceScorer
+from bots.dreamops.task_delegation import Task, TaskDelegationAI
+from bots.dreamops.throughput_maximizer import FlowStage, ThroughputMaximizer
+from bots.dreamops.tiers import (
+    BOT_FEATURES,
+    BOT_LIMITS,
+    WORKFLOW_LIMITS,
+    get_bot_tier_info,
+)
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class DreamOpsTierError(Exception):
@@ -162,7 +173,9 @@ class DreamOpsBot:
     def manage_failover(self, primary_id: str, backup_id: str, config: dict = None):
         """Configure auto-failover for a system pair. Requires ENTERPRISE."""
         self._require_enterprise("auto_failover")
-        return self._auto_failover.configure_failover(primary_id, backup_id, config or {})
+        return self._auto_failover.configure_failover(
+            primary_id, backup_id, config or {}
+        )
 
     def analyze_costs(self, dept_id: str, cost_data: CostData):
         """Analyze departmental costs and identify waste. Requires ENTERPRISE."""

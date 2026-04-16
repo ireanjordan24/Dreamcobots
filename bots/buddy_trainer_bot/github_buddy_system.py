@@ -25,10 +25,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
+
 
 class BuddySystemStatus(Enum):
     PROVISIONING = "provisioning"
@@ -49,9 +49,11 @@ class BuddyFocusArea(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BuddySystemConfig:
     """Configuration written into the user's personal Buddy repository."""
+
     owner_id: str
     buddy_name: str
     focus_area: BuddyFocusArea
@@ -81,6 +83,7 @@ class BuddySystemConfig:
 @dataclass
 class BuddySystemFile:
     """A file that will be committed into the user's Buddy repository."""
+
     path: str
     content: str
     description: str = ""
@@ -89,6 +92,7 @@ class BuddySystemFile:
 @dataclass
 class BuddySystem:
     """A personal GitHub-hosted Buddy bot system provisioned for a user."""
+
     system_id: str
     owner_id: str
     buddy_name: str
@@ -118,8 +122,12 @@ class BuddySystem:
 # Scaffold templates
 # ---------------------------------------------------------------------------
 
+
 def _generate_readme(config: BuddySystemConfig) -> str:
-    greeting = config.custom_greeting or f"Hi! I'm {config.buddy_name}, your personal AI training companion."
+    greeting = (
+        config.custom_greeting
+        or f"Hi! I'm {config.buddy_name}, your personal AI training companion."
+    )
     return f"""# {config.buddy_name} — Personal Buddy Bot
 
 > {greeting}
@@ -248,12 +256,14 @@ jobs:
 
 def _generate_config_json(config: BuddySystemConfig) -> str:
     import json
+
     return json.dumps(config.to_dict(), indent=2)
 
 
 # ---------------------------------------------------------------------------
 # Core class
 # ---------------------------------------------------------------------------
+
 
 class GitHubBuddySystem:
     """
@@ -277,8 +287,8 @@ class GitHubBuddySystem:
     ) -> None:
         self.system_manager_id = system_manager_id
         self.github_org = github_org
-        self._systems: dict[str, BuddySystem] = {}   # system_id -> BuddySystem
-        self._owner_systems: dict[str, str] = {}     # owner_id -> system_id
+        self._systems: dict[str, BuddySystem] = {}  # system_id -> BuddySystem
+        self._owner_systems: dict[str, str] = {}  # owner_id -> system_id
 
     # ------------------------------------------------------------------
     # Provisioning
@@ -315,7 +325,9 @@ class GitHubBuddySystem:
             custom_greeting=custom_greeting,
         )
 
-        repo_slug = f"buddy-{buddy_name.lower().replace(' ', '-')}-{uuid.uuid4().hex[:6]}"
+        repo_slug = (
+            f"buddy-{buddy_name.lower().replace(' ', '-')}-{uuid.uuid4().hex[:6]}"
+        )
         github_repo_url = f"https://github.com/{self.github_org}/{repo_slug}"
         system_id = f"sys_{uuid.uuid4().hex[:12]}"
 
@@ -330,7 +342,9 @@ class GitHubBuddySystem:
             config=config,
             files=files,
         )
-        system.runtime_logs.append(f"[{time.time():.0f}] Buddy '{buddy_name}' provisioned.")
+        system.runtime_logs.append(
+            f"[{time.time():.0f}] Buddy '{buddy_name}' provisioned."
+        )
 
         self._systems[system_id] = system
         self._owner_systems[owner_id] = system_id
@@ -340,8 +354,12 @@ class GitHubBuddySystem:
         """Generate the full set of repository files for a personal Buddy."""
         return [
             BuddySystemFile("README.md", _generate_readme(config), "Project README"),
-            BuddySystemFile("buddy_main.py", _generate_main_script(config), "Main entry point"),
-            BuddySystemFile("requirements.txt", _generate_requirements(), "Python dependencies"),
+            BuddySystemFile(
+                "buddy_main.py", _generate_main_script(config), "Main entry point"
+            ),
+            BuddySystemFile(
+                "requirements.txt", _generate_requirements(), "Python dependencies"
+            ),
             BuddySystemFile(
                 "buddy_config.json", _generate_config_json(config), "Bot configuration"
             ),
@@ -372,14 +390,22 @@ class GitHubBuddySystem:
         system.status = BuddySystemStatus.ACTIVE
         system.last_updated = time.time()
         system.runtime_logs.append(f"[{time.time():.0f}] Buddy started.")
-        return {"status": "active", "system_id": system.system_id, "message": f"'{system.buddy_name}' is now running."}
+        return {
+            "status": "active",
+            "system_id": system.system_id,
+            "message": f"'{system.buddy_name}' is now running.",
+        }
 
     def stop_buddy(self, owner_id: str) -> dict:
         system = self.get_system_for_owner(owner_id)
         system.status = BuddySystemStatus.STOPPED
         system.last_updated = time.time()
         system.runtime_logs.append(f"[{time.time():.0f}] Buddy stopped.")
-        return {"status": "stopped", "system_id": system.system_id, "message": f"'{system.buddy_name}' has been stopped."}
+        return {
+            "status": "stopped",
+            "system_id": system.system_id,
+            "message": f"'{system.buddy_name}' has been stopped.",
+        }
 
     def restart_buddy(self, owner_id: str) -> dict:
         self.stop_buddy(owner_id)
@@ -396,7 +422,9 @@ class GitHubBuddySystem:
         system.files = self._generate_scaffold(system.config)
         system.status = BuddySystemStatus.ACTIVE
         system.last_updated = time.time()
-        system.runtime_logs.append(f"[{time.time():.0f}] Buddy updated: {list(kwargs.keys())}.")
+        system.runtime_logs.append(
+            f"[{time.time():.0f}] Buddy updated: {list(kwargs.keys())}."
+        )
         return system
 
     def list_systems(self) -> list[BuddySystem]:
@@ -407,7 +435,9 @@ class GitHubBuddySystem:
     # ------------------------------------------------------------------
 
     def summary(self) -> dict:
-        active = sum(1 for s in self._systems.values() if s.status == BuddySystemStatus.ACTIVE)
+        active = sum(
+            1 for s in self._systems.values() if s.status == BuddySystemStatus.ACTIVE
+        )
         return {
             "system_manager_id": self.system_manager_id,
             "github_org": self.github_org,

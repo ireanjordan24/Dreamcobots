@@ -44,9 +44,9 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -54,25 +54,24 @@ from typing import Any, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow
 from bots.advertising_marketing_bot.tiers import (
+    FEATURE_AI_AGENTS,
+    FEATURE_APPOINTMENT,
+    FEATURE_AUTOMATION,
+    FEATURE_CLOSE,
+    FEATURE_CRM_INTEGRATION,
+    FEATURE_FUNNEL,
+    FEATURE_LEAD_SCRAPER,
+    FEATURE_LEAD_VALIDATOR,
+    FEATURE_OUTREACH,
+    FEATURE_PAYMENT,
+    FEATURE_TRAFFIC_GENERATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_TRAFFIC_GENERATION,
-    FEATURE_LEAD_SCRAPER,
-    FEATURE_LEAD_VALIDATOR,
-    FEATURE_OUTREACH,
-    FEATURE_FUNNEL,
-    FEATURE_APPOINTMENT,
-    FEATURE_CLOSE,
-    FEATURE_PAYMENT,
-    FEATURE_CRM_INTEGRATION,
-    FEATURE_AUTOMATION,
-    FEATURE_AI_AGENTS,
 )
-
+from framework import GlobalAISourcesFlow
 
 # ---------------------------------------------------------------------------
 # Pipeline simulation constants
@@ -94,6 +93,7 @@ PAYMENT_DEFAULT_RATE: float = 0.2
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
 class AdvertisingMarketingError(Exception):
     """Base exception for Advertising & Marketing Bot errors."""
 
@@ -106,18 +106,23 @@ class AdvertisingMarketingTierError(AdvertisingMarketingError):
 # Pipeline stage data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TrafficResult:
     """Output from the Traffic Generation stage."""
+
     source: str
     visitors: int
     cost_usd: float
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 @dataclass
 class Lead:
     """A qualified lead produced by the Lead Scraper stage."""
+
     lead_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     email: str = ""
@@ -126,12 +131,15 @@ class Lead:
     score: float = 0.0
     status: str = "raw"
     campaign: str = ""
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 @dataclass
 class OutreachResult:
     """Result of an outreach sequence."""
+
     lead_id: str
     channel: str
     message_sent: bool = True
@@ -142,6 +150,7 @@ class OutreachResult:
 @dataclass
 class AppointmentResult:
     """Appointment booking result."""
+
     lead_id: str
     scheduled_at: str = ""
     confirmed: bool = False
@@ -151,6 +160,7 @@ class AppointmentResult:
 @dataclass
 class DealResult:
     """Deal close result."""
+
     lead_id: str
     closed: bool = False
     deal_value_usd: float = 0.0
@@ -160,6 +170,7 @@ class DealResult:
 @dataclass
 class PaymentResult:
     """Payment collection result."""
+
     lead_id: str
     amount_usd: float = 0.0
     payment_link: str = ""
@@ -170,15 +181,19 @@ class PaymentResult:
 @dataclass
 class CRMRecord:
     """CRM contact / deal record."""
+
     lead_id: str
     crm_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     synced: bool = True
-    synced_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    synced_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # ---------------------------------------------------------------------------
 # Main Bot
 # ---------------------------------------------------------------------------
+
 
 class AdvertisingMarketingBot:
     """
@@ -189,7 +204,9 @@ class AdvertisingMarketingBot:
     Appointment → Close → Payment → CRM → AI Agents.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE, bot_name: str = "AdvertisingMarketingBot") -> None:
+    def __init__(
+        self, tier: Tier = Tier.FREE, bot_name: str = "AdvertisingMarketingBot"
+    ) -> None:
         self.tier = tier
         self.tier_config: TierConfig = get_tier_config(tier)
         self.bot_name = bot_name
@@ -310,7 +327,9 @@ class AdvertisingMarketingBot:
             raw_data={"campaign": campaign_name, "leads": len(valid_leads)},
             learning_method="supervised",
         )
-        result["flow_pipeline"] = {"pipeline_complete": flow_result.get("pipeline_complete", True)}
+        result["flow_pipeline"] = {
+            "pipeline_complete": flow_result.get("pipeline_complete", True)
+        }
         result["pipeline_complete"] = True
 
         self._pipeline_runs.append(result)
@@ -320,9 +339,17 @@ class AdvertisingMarketingBot:
     # Stage implementations
     # ------------------------------------------------------------------
 
-    def _generate_traffic(self, target_audience: str, budget_usd: float) -> TrafficResult:
+    def _generate_traffic(
+        self, target_audience: str, budget_usd: float
+    ) -> TrafficResult:
         """Stage 1 — generate traffic via ads and organic channels."""
-        visitors = max(1, int(budget_usd * random.uniform(MIN_VISITORS_PER_DOLLAR, MAX_VISITORS_PER_DOLLAR)))
+        visitors = max(
+            1,
+            int(
+                budget_usd
+                * random.uniform(MIN_VISITORS_PER_DOLLAR, MAX_VISITORS_PER_DOLLAR)
+            ),
+        )
         return TrafficResult(
             source="multi_channel",
             visitors=visitors,
@@ -365,13 +392,15 @@ class AdvertisingMarketingBot:
         for lead in leads:
             opened = random.random() > OUTREACH_OPEN_RATE
             replied = opened and random.random() > OUTREACH_REPLY_RATE
-            results.append(OutreachResult(
-                lead_id=lead.lead_id,
-                channel="email",
-                message_sent=True,
-                opened=opened,
-                replied=replied,
-            ))
+            results.append(
+                OutreachResult(
+                    lead_id=lead.lead_id,
+                    channel="email",
+                    message_sent=True,
+                    opened=opened,
+                    replied=replied,
+                )
+            )
         return results
 
     def _run_funnel(self, leads: list[Lead]) -> dict[str, Any]:
@@ -386,11 +415,13 @@ class AdvertisingMarketingBot:
         results = []
         for lead in leads:
             confirmed = random.random() > APPOINTMENT_CONFIRMATION_RATE
-            results.append(AppointmentResult(
-                lead_id=lead.lead_id,
-                scheduled_at=datetime.now(timezone.utc).isoformat(),
-                confirmed=confirmed,
-            ))
+            results.append(
+                AppointmentResult(
+                    lead_id=lead.lead_id,
+                    scheduled_at=datetime.now(timezone.utc).isoformat(),
+                    confirmed=confirmed,
+                )
+            )
         return results
 
     def _close_deals(self, leads: list[Lead]) -> list[DealResult]:
@@ -398,12 +429,18 @@ class AdvertisingMarketingBot:
         results = []
         for lead in leads:
             closed = random.random() > DEAL_CLOSE_RATE
-            results.append(DealResult(
-                lead_id=lead.lead_id,
-                closed=closed,
-                deal_value_usd=round(random.uniform(DEAL_MIN_VALUE_USD, DEAL_MAX_VALUE_USD), 2) if closed else 0.0,
-                close_reason="signed" if closed else "no_response",
-            ))
+            results.append(
+                DealResult(
+                    lead_id=lead.lead_id,
+                    closed=closed,
+                    deal_value_usd=(
+                        round(random.uniform(DEAL_MIN_VALUE_USD, DEAL_MAX_VALUE_USD), 2)
+                        if closed
+                        else 0.0
+                    ),
+                    close_reason="signed" if closed else "no_response",
+                )
+            )
         return results
 
     def _collect_payments(self, deals: list[DealResult]) -> list[PaymentResult]:
@@ -412,12 +449,14 @@ class AdvertisingMarketingBot:
         for deal in deals:
             if deal.closed:
                 paid = random.random() > PAYMENT_DEFAULT_RATE
-                results.append(PaymentResult(
-                    lead_id=deal.lead_id,
-                    amount_usd=deal.deal_value_usd,
-                    payment_link=f"https://pay.dreamcobots.com/{deal.lead_id}",
-                    paid=paid,
-                ))
+                results.append(
+                    PaymentResult(
+                        lead_id=deal.lead_id,
+                        amount_usd=deal.deal_value_usd,
+                        payment_link=f"https://pay.dreamcobots.com/{deal.lead_id}",
+                        paid=paid,
+                    )
+                )
         return results
 
     def _sync_crm(self, leads: list[Lead]) -> list[CRMRecord]:
@@ -504,7 +543,10 @@ class AdvertisingMarketingBot:
                     "message": f"Upgrade to {next_tier.name} for ${next_tier.price_usd_monthly}/mo to unlock more features.",
                     "action": "suggest_upgrade",
                 }
-            return {"message": "You're already on the ENTERPRISE tier!", "action": "already_max"}
+            return {
+                "message": "You're already on the ENTERPRISE tier!",
+                "action": "already_max",
+            }
         return {
             "message": (
                 "I'm your Advertising & Marketing Team Bot. "

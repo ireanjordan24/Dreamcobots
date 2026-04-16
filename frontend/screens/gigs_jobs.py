@@ -17,7 +17,9 @@ class GigsJobsScreen:
             f"Gig Revenue: ${total_gig_revenue:.2f}",
         ]
         for g in self.gigs[:2]:
-            lines.append(f"  [Gig] {g.get('title', '?')} — ${g.get('price', 0):.2f}/order")
+            lines.append(
+                f"  [Gig] {g.get('title', '?')} — ${g.get('price', 0):.2f}/order"
+            )
         for j in self.jobs[:2]:
             lines.append(f"  [Job] {j.get('title', '?')} — ${j.get('rate', 0):.2f}/hr")
         return "\n".join(lines)

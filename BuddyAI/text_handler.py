@@ -41,6 +41,7 @@ class ParsedCommand:
 # Each entry is (intent_name, compiled_regex, param_extractor_fn | None)
 # The extractor receives the re.Match object and returns a dict of params.
 
+
 def _extract_schedule_params(m: re.Match) -> Dict[str, Any]:
     return {
         "task": (m.group("task") or "").strip(),

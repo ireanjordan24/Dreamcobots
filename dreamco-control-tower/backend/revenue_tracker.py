@@ -18,10 +18,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-
 # ---------------------------------------------------------------------------
 # Provider protocol
 # ---------------------------------------------------------------------------
+
 
 class PaymentProvider(ABC):
     """Abstract base class for payment-provider adapters."""
@@ -32,7 +32,9 @@ class PaymentProvider(ABC):
         """Human-readable provider name, e.g. ``stripe``."""
 
     @abstractmethod
-    def fetch_payments(self, limit: int = 100) -> List[Dict[str, Any]]:  # pragma: no cover
+    def fetch_payments(
+        self, limit: int = 100
+    ) -> List[Dict[str, Any]]:  # pragma: no cover
         """Return a list of payment records as plain dicts.
 
         Each record must include at least:
@@ -46,6 +48,7 @@ class PaymentProvider(ABC):
 # ---------------------------------------------------------------------------
 # Stub providers (replace with real SDK calls in production)
 # ---------------------------------------------------------------------------
+
 
 class StripeProvider(PaymentProvider):
     """Stub Stripe provider.
@@ -91,6 +94,7 @@ class SquareProvider(PaymentProvider):
 # ---------------------------------------------------------------------------
 # Revenue Tracker
 # ---------------------------------------------------------------------------
+
 
 class RevenueTracker:
     """Aggregates and analyses revenue data from multiple payment providers.
@@ -214,5 +218,7 @@ class RevenueTracker:
         summary = self.get_summary()
         return [
             {"provider": prov, "revenue_usd": rev}
-            for prov, rev in sorted(summary["by_provider"].items(), key=lambda kv: kv[1], reverse=True)
+            for prov, rev in sorted(
+                summary["by_provider"].items(), key=lambda kv: kv[1], reverse=True
+            )
         ]

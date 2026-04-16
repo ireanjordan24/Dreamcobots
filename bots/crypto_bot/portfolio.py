@@ -6,21 +6,23 @@ GLOBAL AI SOURCES FLOW: participates via crypto_bot.py pipeline.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from bots.crypto_bot.crypto_database import get_coin
 from bots.crypto_bot.price_feed import get_prices
 
-
 # ---------------------------------------------------------------------------
 # Transaction types
 # ---------------------------------------------------------------------------
+
 
 class TransactionType:
     BUY = "buy"
@@ -36,9 +38,11 @@ class TransactionType:
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Transaction:
     """A single portfolio transaction record."""
+
     tx_id: str
     tx_type: str
     symbol: str
@@ -66,9 +70,10 @@ class Transaction:
 @dataclass
 class Holding:
     """Aggregate holding for one coin."""
+
     symbol: str
     total_amount: float = 0.0
-    cost_basis_usd: float = 0.0    # total USD spent acquiring the holding
+    cost_basis_usd: float = 0.0  # total USD spent acquiring the holding
     realised_pnl_usd: float = 0.0  # profit/loss already locked in by sells
 
     @property
@@ -103,6 +108,7 @@ class Holding:
 # ---------------------------------------------------------------------------
 # Portfolio
 # ---------------------------------------------------------------------------
+
 
 class PortfolioError(Exception):
     """Raised on invalid portfolio operations."""
@@ -232,7 +238,12 @@ class Portfolio:
         holding.cost_basis_usd = round(holding.cost_basis_usd + gross_usd, 8)
 
         tx = self._record(
-            TransactionType.BUY, symbol, amount, price_usd, total_usd, fee_usd,
+            TransactionType.BUY,
+            symbol,
+            amount,
+            price_usd,
+            total_usd,
+            fee_usd,
             notes=f"Bought {amount} {symbol.upper()} @ ${price_usd:.4f}",
         )
         return {
@@ -287,9 +298,7 @@ class Portfolio:
 
         # Update holding
         holding.total_amount = round(holding.total_amount - amount, 8)
-        holding.cost_basis_usd = round(
-            holding.cost_basis_usd - cost_of_sold, 8
-        )
+        holding.cost_basis_usd = round(holding.cost_basis_usd - cost_of_sold, 8)
         if holding.cost_basis_usd < 0:
             holding.cost_basis_usd = 0.0
         holding.realised_pnl_usd = round(holding.realised_pnl_usd + realised, 8)
@@ -297,7 +306,12 @@ class Portfolio:
         self.usd_balance = round(self.usd_balance + net_usd, 8)
 
         tx = self._record(
-            TransactionType.SELL, symbol, amount, price_usd, gross_usd, fee_usd,
+            TransactionType.SELL,
+            symbol,
+            amount,
+            price_usd,
+            gross_usd,
+            fee_usd,
             notes=f"Sold {amount} {sym} @ ${price_usd:.4f} | P&L: ${realised:.4f}",
         )
         return {
@@ -327,7 +341,12 @@ class Portfolio:
         holding.total_amount = round(holding.total_amount + amount, 8)
         holding.cost_basis_usd = round(holding.cost_basis_usd + cost_usd, 8)
         tx = self._record(
-            TransactionType.MINE, symbol, amount, 0.0, cost_usd, 0.0,
+            TransactionType.MINE,
+            symbol,
+            amount,
+            0.0,
+            cost_usd,
+            0.0,
             notes=f"Mined {amount} {symbol.upper()} (cost: ${cost_usd:.4f})",
         )
         return {"tx": tx.to_dict(), "holding": holding.to_dict()}

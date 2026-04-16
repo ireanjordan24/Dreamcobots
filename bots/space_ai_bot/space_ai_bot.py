@@ -1,12 +1,17 @@
 """Space AI Bot — tier-aware space mission planning and satellite monitoring."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.space_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from framework import GlobalAISourcesFlow  # noqa: F401
 
 from bots.space_ai_bot.mission_planner import MissionPlanner, MissionPlannerError
 from bots.space_ai_bot.satellite_monitor import SatelliteMonitor, SatelliteMonitorError
+from bots.space_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="SpaceAIBot")
 
@@ -33,8 +38,12 @@ class SpaceAIBot:
         """Plan a space mission (PRO/ENTERPRISE only)."""
         crew_size = kwargs.get("crew_size", 0)
         try:
-            result = self.mission_planner.plan_mission(mission_type, destination, crew_size)
-            self._activity_log.append({"action": "plan_mission", "mission_type": mission_type})
+            result = self.mission_planner.plan_mission(
+                mission_type, destination, crew_size
+            )
+            self._activity_log.append(
+                {"action": "plan_mission", "mission_type": mission_type}
+            )
             return result
         except MissionPlannerError as exc:
             raise SpaceAIBotError(str(exc)) from exc

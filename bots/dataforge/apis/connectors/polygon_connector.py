@@ -1,4 +1,5 @@
 """Polygon.io stock market data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,9 +28,13 @@ class PolygonConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"https://api.polygon.io/v3/reference/tickers/{ticker}",
-                params={"apiKey": self.api_key}, timeout=30)
+            response = requests.get(
+                f"https://api.polygon.io/v3/reference/tickers/{ticker}",
+                params={"apiKey": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Polygon ticker details fetched for %s.", ticker)
             return {"status": "success", "data": response.json()}
@@ -49,13 +54,15 @@ class PolygonConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             response = requests.get(
                 f"{self.BASE_URL}/aggs/ticker/{ticker}/range/1/day/{from_date}/{to_date}",
-                params={"apiKey": self.api_key}, timeout=30)
+                params={"apiKey": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Polygon get_aggregates error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -53,7 +53,11 @@ describe('affiliateEngine', () => {
   });
 
   test('registerProgram overwrites existing program', () => {
-    engine.registerProgram('amazon', { displayName: 'Updated', baseUrl: 'https://x.com/', commissionRate: 0.05 });
+    engine.registerProgram('amazon', {
+      displayName: 'Updated',
+      baseUrl: 'https://x.com/',
+      commissionRate: 0.05,
+    });
     const earnings = engine.getEarnings('amazon');
     expect(earnings.program).toBe('amazon');
   });
@@ -153,7 +157,11 @@ describe('leadSeller', () => {
   });
 
   test('captureLead creates a lead with correct fields', () => {
-    const lead = seller.captureLead({ name: 'Alice', email: 'alice@test.com', category: 'real_estate' });
+    const lead = seller.captureLead({
+      name: 'Alice',
+      email: 'alice@test.com',
+      category: 'real_estate',
+    });
     expect(lead).toHaveProperty('leadId');
     expect(lead.name).toBe('Alice');
     expect(lead.email).toBe('alice@test.com');
@@ -170,15 +178,31 @@ describe('leadSeller', () => {
   });
 
   test('scoreLead returns score 0-100', () => {
-    const lead = seller.captureLead({ name: 'Bob', email: 'bob@test.com', phone: '555-0001', source: 'linkedin', category: 'crypto' });
+    const lead = seller.captureLead({
+      name: 'Bob',
+      email: 'bob@test.com',
+      phone: '555-0001',
+      source: 'linkedin',
+      category: 'crypto',
+    });
     const { score } = seller.scoreLead(lead.leadId);
     expect(score).toBeGreaterThanOrEqual(0);
     expect(score).toBeLessThanOrEqual(100);
   });
 
   test('scoreLead high-value category scores higher', () => {
-    const realEstate = seller.captureLead({ email: 'a@a.com', category: 'real_estate', name: 'X', phone: '555-1' });
-    const general = seller.captureLead({ email: 'b@b.com', category: 'general', name: 'Y', phone: '555-2' });
+    const realEstate = seller.captureLead({
+      email: 'a@a.com',
+      category: 'real_estate',
+      name: 'X',
+      phone: '555-1',
+    });
+    const general = seller.captureLead({
+      email: 'b@b.com',
+      category: 'general',
+      name: 'Y',
+      phone: '555-2',
+    });
     const { score: s1 } = seller.scoreLead(realEstate.leadId);
     const { score: s2 } = seller.scoreLead(general.leadId);
     expect(s1).toBeGreaterThan(s2);

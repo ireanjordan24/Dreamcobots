@@ -1,41 +1,45 @@
 """Tests for all 30 Occupational bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from Occupational_bots.benefits_analyzer_bot import BenefitsAnalyzerBot
+from Occupational_bots.career_path_bot import CareerPathBot
+from Occupational_bots.certification_advisor_bot import CertificationAdvisorBot
+from Occupational_bots.company_culture_bot import CompanyCultureBot
+from Occupational_bots.contractor_rate_bot import ContractorRateBot
+from Occupational_bots.cover_letter_bot import CoverLetterBot
+from Occupational_bots.diversity_inclusion_bot import DiversityInclusionBot
 from Occupational_bots.feature_1 import JobSearchBot
 from Occupational_bots.feature_2 import ResumeBuilderBot
 from Occupational_bots.feature_3 import InterviewPrepBot
-from Occupational_bots.salary_negotiator_bot import SalaryNegotiatorBot
-from Occupational_bots.career_path_bot import CareerPathBot
-from Occupational_bots.skills_gap_bot import SkillsGapBot
-from Occupational_bots.networking_bot import NetworkingBot
-from Occupational_bots.linkedin_optimizer_bot import LinkedInOptimizerBot
-from Occupational_bots.cover_letter_bot import CoverLetterBot
-from Occupational_bots.job_application_tracker_bot import JobApplicationTrackerBot
 from Occupational_bots.freelance_rate_bot import FreelanceRateBot
-from Occupational_bots.certification_advisor_bot import CertificationAdvisorBot
-from Occupational_bots.portfolio_builder_bot import PortfolioBuilderBot
-from Occupational_bots.reference_checker_bot import ReferenceCheckerBot
-from Occupational_bots.performance_review_bot import PerformanceReviewBot
-from Occupational_bots.remote_job_finder_bot import RemoteJobFinderBot
-from Occupational_bots.side_hustle_finder_bot import SideHustleFinderBot
-from Occupational_bots.upskill_recommender_bot import UpskillRecommenderBot
-from Occupational_bots.industry_trend_bot import IndustryTrendBot
-from Occupational_bots.company_culture_bot import CompanyCultureBot
-from Occupational_bots.benefits_analyzer_bot import BenefitsAnalyzerBot
-from Occupational_bots.work_life_balance_bot import WorkLifeBalanceBot
-from Occupational_bots.contractor_rate_bot import ContractorRateBot
-from Occupational_bots.job_board_aggregator_bot import JobBoardAggregatorBot
-from Occupational_bots.headhunter_bot import HeadhunterBot
-from Occupational_bots.promotion_readiness_bot import PromotionReadinessBot
-from Occupational_bots.mentor_finder_bot import MentorFinderBot
 from Occupational_bots.gig_economy_bot import GigEconomyBot
+from Occupational_bots.headhunter_bot import HeadhunterBot
+from Occupational_bots.industry_trend_bot import IndustryTrendBot
+from Occupational_bots.job_application_tracker_bot import JobApplicationTrackerBot
+from Occupational_bots.job_board_aggregator_bot import JobBoardAggregatorBot
+from Occupational_bots.linkedin_optimizer_bot import LinkedInOptimizerBot
+from Occupational_bots.mentor_finder_bot import MentorFinderBot
+from Occupational_bots.networking_bot import NetworkingBot
+from Occupational_bots.performance_review_bot import PerformanceReviewBot
+from Occupational_bots.portfolio_builder_bot import PortfolioBuilderBot
+from Occupational_bots.promotion_readiness_bot import PromotionReadinessBot
+from Occupational_bots.reference_checker_bot import ReferenceCheckerBot
 from Occupational_bots.relocation_advisor_bot import RelocationAdvisorBot
-from Occupational_bots.diversity_inclusion_bot import DiversityInclusionBot
+from Occupational_bots.remote_job_finder_bot import RemoteJobFinderBot
+from Occupational_bots.salary_negotiator_bot import SalaryNegotiatorBot
+from Occupational_bots.side_hustle_finder_bot import SideHustleFinderBot
+from Occupational_bots.skills_gap_bot import SkillsGapBot
+from Occupational_bots.upskill_recommender_bot import UpskillRecommenderBot
+from Occupational_bots.work_life_balance_bot import WorkLifeBalanceBot
 
 ALL_BOTS = [
     ("JobSearchBot", JobSearchBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

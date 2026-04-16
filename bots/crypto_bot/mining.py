@@ -10,13 +10,16 @@ GLOBAL AI SOURCES FLOW: participates via crypto_bot.py pipeline.
 
 from __future__ import annotations
 
-import time
 import random
+import time
 from typing import Optional
 
-from bots.crypto_bot.crypto_database import CRYPTO_DATABASE, get_coin, list_mineable_coins
+from bots.crypto_bot.crypto_database import (
+    CRYPTO_DATABASE,
+    get_coin,
+    list_mineable_coins,
+)
 from bots.crypto_bot.price_feed import get_price
-
 
 # ---------------------------------------------------------------------------
 # Mining profiles (hardware / hashrate / power stats per coin)
@@ -287,7 +290,9 @@ def mining_leaderboard(
     results = []
     for sym in symbols:
         try:
-            result = simulate_mining(sym, duration_hours=24.0, use_live_price=use_live_price)
+            result = simulate_mining(
+                sym, duration_hours=24.0, use_live_price=use_live_price
+            )
             result["daily_profit_usd"] = result["net_profit_usd"]
             results.append(result)
         except (ValueError, KeyError):

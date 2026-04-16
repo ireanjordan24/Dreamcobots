@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -34,6 +35,7 @@ class StepStatus(Enum):
 @dataclass
 class PipelineStep:
     """A single step within an orchestration pipeline."""
+
     step_id: str
     bot_name: str
     action: str
@@ -47,12 +49,15 @@ class PipelineStep:
 @dataclass
 class Pipeline:
     """An ordered collection of bot pipeline steps."""
+
     pipeline_id: str
     name: str
     description: str
     steps: list = field(default_factory=list)
     status: PipelineStatus = PipelineStatus.DRAFT
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     started_at: Optional[str] = None
     finished_at: Optional[str] = None
     run_count: int = 0
@@ -74,7 +79,9 @@ class Orchestration:
     # Pipeline management
     # ------------------------------------------------------------------
 
-    def create_pipeline(self, pipeline_id: str, name: str, description: str = "") -> dict:
+    def create_pipeline(
+        self, pipeline_id: str, name: str, description: str = ""
+    ) -> dict:
         """Create a new (empty) pipeline."""
         pipeline = Pipeline(pipeline_id=pipeline_id, name=name, description=description)
         self._pipelines[pipeline_id] = pipeline
@@ -97,7 +104,12 @@ class Orchestration:
             depends_on=depends_on or [],
         )
         pipeline.steps.append(step)
-        return {"pipeline_id": pipeline_id, "step_id": step_id, "bot_name": bot_name, "action": action}
+        return {
+            "pipeline_id": pipeline_id,
+            "step_id": step_id,
+            "bot_name": bot_name,
+            "action": action,
+        }
 
     def activate_pipeline(self, pipeline_id: str) -> dict:
         """Mark pipeline as active and ready to run."""
@@ -128,19 +140,35 @@ class Orchestration:
             deps_met = all(dep in completed_steps for dep in step.depends_on)
             if not deps_met:
                 step.status = StepStatus.SKIPPED
-                step_results.append({"step_id": step.step_id, "status": StepStatus.SKIPPED.value})
+                step_results.append(
+                    {"step_id": step.step_id, "status": StepStatus.SKIPPED.value}
+                )
                 continue
 
             step.status = StepStatus.RUNNING
             step.started_at = datetime.now(timezone.utc).isoformat()
-            step.result = {"bot": step.bot_name, "action": step.action, "output": "success"}
+            step.result = {
+                "bot": step.bot_name,
+                "action": step.action,
+                "output": "success",
+            }
             step.status = StepStatus.DONE
             step.finished_at = datetime.now(timezone.utc).isoformat()
             completed_steps.add(step.step_id)
-            step_results.append({"step_id": step.step_id, "status": StepStatus.DONE.value, "bot": step.bot_name})
+            step_results.append(
+                {
+                    "step_id": step.step_id,
+                    "status": StepStatus.DONE.value,
+                    "bot": step.bot_name,
+                }
+            )
 
-        all_done = all(s.status in (StepStatus.DONE, StepStatus.SKIPPED) for s in pipeline.steps)
-        pipeline.status = PipelineStatus.COMPLETED if all_done else PipelineStatus.FAILED
+        all_done = all(
+            s.status in (StepStatus.DONE, StepStatus.SKIPPED) for s in pipeline.steps
+        )
+        pipeline.status = (
+            PipelineStatus.COMPLETED if all_done else PipelineStatus.FAILED
+        )
         pipeline.finished_at = datetime.now(timezone.utc).isoformat()
 
         run_entry = {
@@ -172,7 +200,9 @@ class Orchestration:
         return {
             "total_pipelines": len(pipelines),
             "active": sum(1 for p in pipelines if p.status == PipelineStatus.ACTIVE),
-            "completed": sum(1 for p in pipelines if p.status == PipelineStatus.COMPLETED),
+            "completed": sum(
+                1 for p in pipelines if p.status == PipelineStatus.COMPLETED
+            ),
             "total_runs": sum(p.run_count for p in pipelines),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }

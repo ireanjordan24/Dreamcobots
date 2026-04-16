@@ -8,15 +8,17 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from datetime import datetime
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 def render_anomaly_summary(detector) -> str:
@@ -59,7 +61,9 @@ def render_bottleneck_map(detector) -> str:
     lines = ["── Bottleneck Detector ─────────────────"]
     lines.append(f"  Detected       : {len(bottlenecks)}")
     for b in bottlenecks[:3]:
-        lines.append(f"  [{b.severity_score:.1f}] Stage {b.stage_id} in {b.workflow_id}")
+        lines.append(
+            f"  [{b.severity_score:.1f}] Stage {b.stage_id} in {b.workflow_id}"
+        )
     return "\n".join(lines)
 
 
@@ -80,8 +84,12 @@ def render_cost_summary(engine) -> str:
     savings = engine.estimate_savings()
     lines = ["── Cost Reduction ──────────────────────"]
     lines.append(f"  Departments    : {savings['total_departments']}")
-    lines.append(f"  Monthly Savings: ${savings['total_estimated_monthly_savings_usd']:,.2f}")
-    lines.append(f"  Annual Savings : ${savings['total_estimated_annual_savings_usd']:,.2f}")
+    lines.append(
+        f"  Monthly Savings: ${savings['total_estimated_monthly_savings_usd']:,.2f}"
+    )
+    lines.append(
+        f"  Annual Savings : ${savings['total_estimated_annual_savings_usd']:,.2f}"
+    )
     return "\n".join(lines)
 
 

@@ -14,12 +14,12 @@ from __future__ import annotations
 from datetime import date
 from typing import Optional
 
-from bots.token_billing.tiers import Tier, TierConfig, get_tier_config
-from bots.token_billing.token_manager import TokenManager, InsufficientTokensError
 from bots.token_billing.subscription_manager import (
-    SubscriptionManager,
     SubscriptionError,
+    SubscriptionManager,
 )
+from bots.token_billing.tiers import Tier, TierConfig, get_tier_config
+from bots.token_billing.token_manager import InsufficientTokensError, TokenManager
 
 # Pre-defined token credit packs (amount: price_usd)
 TOKEN_PACKS: dict[int, float] = {
@@ -97,7 +97,9 @@ class BillingSystem:
     # Token credits
     # ------------------------------------------------------------------
 
-    def purchase_tokens(self, user_id: str, amount: int, description: str = "Token purchase") -> int:
+    def purchase_tokens(
+        self, user_id: str, amount: int, description: str = "Token purchase"
+    ) -> int:
         """Add purchased (non-expiring) token credits to *user_id*.
 
         Parameters
@@ -214,7 +216,9 @@ class BillingSystem:
                 {
                     "tier": r.tier.value,
                     "activated_at": r.activated_at.isoformat(),
-                    "cancelled_at": r.cancelled_at.isoformat() if r.cancelled_at else None,
+                    "cancelled_at": (
+                        r.cancelled_at.isoformat() if r.cancelled_at else None
+                    ),
                 }
                 for r in self._subs.get_history(user_id)
             ],

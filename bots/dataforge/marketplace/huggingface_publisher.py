@@ -1,4 +1,5 @@
 """HuggingFace dataset publisher for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import json
 import logging
@@ -30,14 +31,23 @@ class HuggingFacePublisher:
             Result dict with status and message.
         """
         import requests
+
         auth_token = token or self.token
         if not auth_token:
             logger.error("HuggingFace upload failed: no token provided.")
             return {"status": "error", "message": "No HuggingFace token provided."}
-        headers = {"Authorization": f"Bearer {auth_token}", "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {auth_token}",
+            "Content-Type": "application/json",
+        }
         payload = {"type": "dataset", "name": dataset_name, "private": False}
         try:
-            response = requests.post(f"{self.BASE_URL}/repos/create", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/repos/create",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Dataset %s uploaded to HuggingFace.", dataset_name)
             return {"status": "success", "dataset": dataset_name, "records": len(data)}
@@ -55,8 +65,11 @@ class HuggingFacePublisher:
             Result dict with status and datasets list.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/datasets?author={owner}", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/datasets?author={owner}", timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "datasets": response.json()}
         except requests.RequestException as e:

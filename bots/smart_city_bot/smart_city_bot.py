@@ -1,22 +1,27 @@
 """Smart City Bot — tier-aware smart city management and government AI services."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.smart_city_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from framework import GlobalAISourcesFlow  # noqa: F401
 
 from bots.smart_city_bot.city_infrastructure import (
-    TrafficManagementSystem,
     EnergyManagementSystem,
     PublicSafetyMonitor,
     SmartCityInfrastructureError,
+    TrafficManagementSystem,
 )
 from bots.smart_city_bot.government_ai import (
-    TaxSystemAI,
     CensusCollector,
-    PolicyModelingBot,
     GovernmentAIError,
+    PolicyModelingBot,
+    TaxSystemAI,
 )
+from bots.smart_city_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="SmartCityBot")
 
@@ -110,11 +115,15 @@ class SmartCityBot:
             elif service_type == "census_collect":
                 return self.census.collect_census(data.get("region", "city_center"))
             elif service_type == "census_demographics":
-                return self.census.analyze_demographics(data.get("region", "city_center"))
+                return self.census.analyze_demographics(
+                    data.get("region", "city_center")
+                )
             elif service_type == "policy_model":
                 return self.policy.model_policy(data)
             elif service_type == "policy_recommend":
-                return self.policy.recommend_policy(data.get("domain", "transportation"))
+                return self.policy.recommend_policy(
+                    data.get("domain", "transportation")
+                )
             else:
                 raise SmartCityBotError(
                     f"Unknown government service: '{service_type}'. "

@@ -9,21 +9,21 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Strategy categories (8 pillars)
 # ---------------------------------------------------------------------------
+
 
 class StrategyCategory(Enum):
     SPEED = "speed"
@@ -39,6 +39,7 @@ class StrategyCategory(Enum):
 @dataclass
 class Strategy:
     """A single strategy in the 200-strategy framework."""
+
     id: int
     name: str
     category: StrategyCategory
@@ -60,6 +61,7 @@ class Strategy:
 # ---------------------------------------------------------------------------
 # 200-Strategy catalogue
 # ---------------------------------------------------------------------------
+
 
 def _build_strategy_catalogue() -> list[Strategy]:
     """Build the full 200-strategy catalogue."""
@@ -97,8 +99,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in speed_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.SPEED,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.SPEED,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -118,7 +123,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
         ("Voice Bot Automation", "Auto-dial and deliver voice messages", 7),
         ("Social Media Monitoring", "Monitor social signals for lead triggers", 7),
         ("Auto-Respond to Inquiries", "Reply to inbound inquiries automatically", 9),
-        ("Pipeline Stage Automation", "Move leads through pipeline stages automatically", 8),
+        (
+            "Pipeline Stage Automation",
+            "Move leads through pipeline stages automatically",
+            8,
+        ),
         ("Data Enrichment", "Auto-enrich lead data from public sources", 7),
         ("Document Generation", "Auto-generate proposals and contracts", 7),
         ("Calendar Scheduling", "Auto-book meetings based on availability", 8),
@@ -135,8 +144,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in automation_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.AUTOMATION,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.AUTOMATION,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -173,8 +185,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in integration_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.INTEGRATIONS,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.INTEGRATIONS,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -211,8 +226,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in ux_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.UX,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.UX,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -249,8 +267,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in resilience_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.RESILIENCE,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.RESILIENCE,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -287,8 +308,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in monetization_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.MONETIZATION,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.MONETIZATION,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -325,8 +349,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in testing_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.TESTING,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.TESTING,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -336,7 +363,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     intelligence_strategies = [
         ("Continuous Learning Loop", "Improve bot performance from every run", 10),
         ("Competitive Analysis", "Analyze and outperform competitors automatically", 9),
-        ("Performance-Based Decisions", "Make decisions based on real performance data", 10),
+        (
+            "Performance-Based Decisions",
+            "Make decisions based on real performance data",
+            10,
+        ),
         ("Market Trend Detection", "Detect market trends from scraped data", 8),
         ("Sentiment Analysis", "Analyze reply sentiment to adjust strategy", 8),
         ("Predictive Lead Scoring", "Predict lead conversion probability via ML", 9),
@@ -363,8 +394,11 @@ def _build_strategy_catalogue() -> list[Strategy]:
     for name, desc, priority in intelligence_strategies:
         strategies.append(
             Strategy(
-                id=sid, name=name, category=StrategyCategory.INTELLIGENCE,
-                description=desc, priority=priority,
+                id=sid,
+                name=name,
+                category=StrategyCategory.INTELLIGENCE,
+                description=desc,
+                priority=priority,
                 applicable_categories=["all"],
             )
         )
@@ -376,6 +410,7 @@ def _build_strategy_catalogue() -> list[Strategy]:
 # ---------------------------------------------------------------------------
 # Strategy Framework
 # ---------------------------------------------------------------------------
+
 
 class StrategyFramework:
     """
@@ -397,13 +432,11 @@ class StrategyFramework:
 
     def get_by_category(self, category: StrategyCategory) -> list[dict]:
         """Return all strategies for a given category."""
-        return [
-            s.to_dict()
-            for s in self._strategies
-            if s.category == category
-        ]
+        return [s.to_dict() for s in self._strategies if s.category == category]
 
-    def get_top_strategies(self, n: int = 20, category: Optional[StrategyCategory] = None) -> list[dict]:
+    def get_top_strategies(
+        self, n: int = 20, category: Optional[StrategyCategory] = None
+    ) -> list[dict]:
         """Return the top N strategies by priority, optionally filtered by category."""
         pool = self._strategies
         if category is not None:

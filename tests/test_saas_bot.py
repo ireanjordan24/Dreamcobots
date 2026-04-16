@@ -6,41 +6,36 @@ and Stripe integration.
 """
 
 import json
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.saas_bot.saas_bot import SaasBot, SaasBotError, SaasBotTierError, Subscription
 from bots.saas_bot.tiers import (
+    FEATURE_ANNUAL_BILLING,
+    FEATURE_CORE_SAAS,
+    FEATURE_MULTI_USER,
+    FEATURE_STRIPE_SUBSCRIPTIONS,
+    FEATURE_SUBSCRIPTION_WEBHOOKS,
+    FEATURE_TRIAL_PERIOD,
+    FEATURE_USAGE_ANALYTICS,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_CORE_SAAS,
-    FEATURE_STRIPE_SUBSCRIPTIONS,
-    FEATURE_SUBSCRIPTION_WEBHOOKS,
-    FEATURE_ANNUAL_BILLING,
-    FEATURE_TRIAL_PERIOD,
-    FEATURE_USAGE_ANALYTICS,
-    FEATURE_MULTI_USER,
-    FEATURE_WHITE_LABEL,
-)
-from bots.saas_bot.saas_bot import (
-    SaasBot,
-    SaasBotError,
-    SaasBotTierError,
-    Subscription,
 )
 from bots.stripe_integration.webhook_handler import StripeWebhookHandler
-
 
 # ===========================================================================
 # Tier configuration
 # ===========================================================================
+
 
 class TestSaasBotTiers:
     def test_three_tiers(self):
@@ -71,10 +66,14 @@ class TestSaasBotTiers:
         assert get_tier_config(Tier.BASIC).has_feature(FEATURE_STRIPE_SUBSCRIPTIONS)
 
     def test_basic_lacks_webhooks(self):
-        assert not get_tier_config(Tier.BASIC).has_feature(FEATURE_SUBSCRIPTION_WEBHOOKS)
+        assert not get_tier_config(Tier.BASIC).has_feature(
+            FEATURE_SUBSCRIPTION_WEBHOOKS
+        )
 
     def test_professional_has_webhooks(self):
-        assert get_tier_config(Tier.PROFESSIONAL).has_feature(FEATURE_SUBSCRIPTION_WEBHOOKS)
+        assert get_tier_config(Tier.PROFESSIONAL).has_feature(
+            FEATURE_SUBSCRIPTION_WEBHOOKS
+        )
 
     def test_enterprise_has_white_label(self):
         assert get_tier_config(Tier.ENTERPRISE).has_feature(FEATURE_WHITE_LABEL)
@@ -96,6 +95,7 @@ class TestSaasBotTiers:
 # ===========================================================================
 # Instantiation
 # ===========================================================================
+
 
 class TestSaasBotInstantiation:
     def test_default_tier_basic(self):
@@ -123,6 +123,7 @@ class TestSaasBotInstantiation:
 # ===========================================================================
 # Subscription management
 # ===========================================================================
+
 
 class TestSubscriptionManagement:
     def test_create_subscription_returns_subscription(self):
@@ -226,6 +227,7 @@ class TestSubscriptionManagement:
 # Webhook processing
 # ===========================================================================
 
+
 class TestWebhookProcessing:
     def test_process_webhook_requires_professional(self):
         bot = SaasBot(tier=Tier.BASIC)
@@ -283,6 +285,7 @@ class TestWebhookProcessing:
 # Usage analytics
 # ===========================================================================
 
+
 class TestUsageAnalytics:
     def test_analytics_requires_professional(self):
         bot = SaasBot(tier=Tier.BASIC)
@@ -322,6 +325,7 @@ class TestUsageAnalytics:
 # Tier description
 # ===========================================================================
 
+
 class TestSaasBotDescribeTier:
     def test_returns_string(self):
         bot = SaasBot()
@@ -339,6 +343,7 @@ class TestSaasBotDescribeTier:
 # ===========================================================================
 # Chat interface
 # ===========================================================================
+
 
 class TestSaasBotChat:
     def test_chat_returns_dict(self):
@@ -369,14 +374,23 @@ class TestSaasBotChat:
     def test_chat_webhook_query_basic(self):
         bot = SaasBot(tier=Tier.BASIC)
         result = bot.chat("tell me about webhooks")
-        assert "Professional" in result["response"] or "professional" in result["response"].lower()
+        assert (
+            "Professional" in result["response"]
+            or "professional" in result["response"].lower()
+        )
 
     def test_chat_webhook_query_professional(self):
         bot = SaasBot(tier=Tier.PROFESSIONAL)
         result = bot.chat("webhook processing")
-        assert "webhook" in result["response"].lower() or "active" in result["response"].lower()
+        assert (
+            "webhook" in result["response"].lower()
+            or "active" in result["response"].lower()
+        )
 
     def test_chat_stripe_query(self):
         bot = SaasBot()
         result = bot.chat("how does Stripe work?")
-        assert "stripe" in result["response"].lower() or "subscription" in result["response"].lower()
+        assert (
+            "stripe" in result["response"].lower()
+            or "subscription" in result["response"].lower()
+        )

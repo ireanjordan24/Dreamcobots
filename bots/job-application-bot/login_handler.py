@@ -5,15 +5,17 @@ Handles authentication for multiple job application sites.
 Credentials are loaded from environment variables (preferred) or from
 the config.json file as a fallback.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
 import time
+
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class LoginHandler:
@@ -84,7 +86,9 @@ class LoginHandler:
             self.driver.get(url)
             wait = WebDriverWait(self.driver, 15)
 
-            user_el = wait.until(EC.presence_of_element_located(selectors["username_field"]))
+            user_el = wait.until(
+                EC.presence_of_element_located(selectors["username_field"])
+            )
             user_el.clear()
             user_el.send_keys(username)
 
@@ -101,7 +105,9 @@ class LoginHandler:
             return True
 
         except TimeoutException:
-            print(f"[LoginHandler] Timed out waiting for login page elements on '{site}'.")
+            print(
+                f"[LoginHandler] Timed out waiting for login page elements on '{site}'."
+            )
         except NoSuchElementException as exc:
             print(f"[LoginHandler] Login form element not found on '{site}': {exc}")
         except Exception as exc:  # pylint: disable=broad-except

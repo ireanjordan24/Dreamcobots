@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Predictive Engagement Tool - score and predict customer engagement and churn risk."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -43,8 +48,12 @@ class PredictiveEngagementTool:
         email_score = email_open * 100
         ticket_penalty = min(30, tickets * 10)
 
-        raw = (recency_score * 0.3 + frequency_score * 0.25 +
-               session_score * 0.2 + email_score * 0.25) - ticket_penalty
+        raw = (
+            recency_score * 0.3
+            + frequency_score * 0.25
+            + session_score * 0.2
+            + email_score * 0.25
+        ) - ticket_penalty
         score = round(max(0, min(100, raw)), 1)
 
         segment = "dormant"
@@ -68,8 +77,12 @@ class PredictiveEngagementTool:
         score = score_result["engagement_score"]
         recency = customer.get("recency_days", 90)
 
-        churn_prob = round(max(0, min(1, (100 - score) / 100 * 0.7 + (recency / 365) * 0.3)), 3)
-        risk_level = "high" if churn_prob > 0.6 else "medium" if churn_prob > 0.3 else "low"
+        churn_prob = round(
+            max(0, min(1, (100 - score) / 100 * 0.7 + (recency / 365) * 0.3)), 3
+        )
+        risk_level = (
+            "high" if churn_prob > 0.6 else "medium" if churn_prob > 0.3 else "low"
+        )
 
         return {
             "customer_id": customer.get("customer_id", "unknown"),

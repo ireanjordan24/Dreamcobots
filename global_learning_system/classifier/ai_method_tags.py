@@ -26,17 +26,55 @@ class MethodTag:
 # ---------------------------------------------------------------------------
 
 _BUILTIN_TAGS: List[MethodTag] = [
-    MethodTag("supervised_learning", "learning_paradigm", "Training with labelled data.", ["SL"]),
-    MethodTag("unsupervised_learning", "learning_paradigm", "Training without labels.", ["UL"]),
-    MethodTag("reinforcement_learning", "learning_paradigm", "Agent learns via reward signals.", ["RL"]),
-    MethodTag("self_supervised_learning", "learning_paradigm", "Labels derived from the data itself.", ["SSL"]),
-    MethodTag("transfer_learning", "learning_paradigm", "Reusing models pre-trained on related tasks.", ["TL"]),
-    MethodTag("neural_network", "architecture", "Multi-layer perceptron or deep network."),
-    MethodTag("transformer", "architecture", "Attention-based sequence model.", ["attention", "bert", "gpt"]),
-    MethodTag("convolutional", "architecture", "Convolutional neural network.", ["CNN"]),
-    MethodTag("recurrent", "architecture", "Recurrent or LSTM network.", ["RNN", "LSTM", "GRU"]),
+    MethodTag(
+        "supervised_learning",
+        "learning_paradigm",
+        "Training with labelled data.",
+        ["SL"],
+    ),
+    MethodTag(
+        "unsupervised_learning", "learning_paradigm", "Training without labels.", ["UL"]
+    ),
+    MethodTag(
+        "reinforcement_learning",
+        "learning_paradigm",
+        "Agent learns via reward signals.",
+        ["RL"],
+    ),
+    MethodTag(
+        "self_supervised_learning",
+        "learning_paradigm",
+        "Labels derived from the data itself.",
+        ["SSL"],
+    ),
+    MethodTag(
+        "transfer_learning",
+        "learning_paradigm",
+        "Reusing models pre-trained on related tasks.",
+        ["TL"],
+    ),
+    MethodTag(
+        "neural_network", "architecture", "Multi-layer perceptron or deep network."
+    ),
+    MethodTag(
+        "transformer",
+        "architecture",
+        "Attention-based sequence model.",
+        ["attention", "bert", "gpt"],
+    ),
+    MethodTag(
+        "convolutional", "architecture", "Convolutional neural network.", ["CNN"]
+    ),
+    MethodTag(
+        "recurrent",
+        "architecture",
+        "Recurrent or LSTM network.",
+        ["RNN", "LSTM", "GRU"],
+    ),
     MethodTag("generative_adversarial", "architecture", "GAN-based model.", ["GAN"]),
-    MethodTag("diffusion_model", "architecture", "Score-based generative model.", ["DDPM"]),
+    MethodTag(
+        "diffusion_model", "architecture", "Score-based generative model.", ["DDPM"]
+    ),
     MethodTag("nlp", "domain", "Natural language processing."),
     MethodTag("computer_vision", "domain", "Image or video understanding."),
     MethodTag("robotics", "domain", "Physical robot control and perception."),
@@ -59,7 +97,7 @@ class AIMethodTagger:
         self._tags: Dict[str, MethodTag] = {}
         for tag in _BUILTIN_TAGS:
             self._register(tag)
-        for tag in (custom_tags or []):
+        for tag in custom_tags or []:
             self._register(tag)
 
     # ------------------------------------------------------------------

@@ -12,24 +12,25 @@ Provides a ``DatasetManager`` for bots to:
 import json
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Dataset:
     """Represents a dataset available for sale or distribution."""
+
     dataset_id: str
     name: str
     description: str
-    domain: str                    # e.g. "healthcare", "legal", "engineering"
+    domain: str  # e.g. "healthcare", "legal", "engineering"
     size_mb: float
     price_usd: float
-    license: str                   # e.g. "CC-BY-4.0", "MIT", "Proprietary"
+    license: str  # e.g. "CC-BY-4.0", "MIT", "Proprietary"
     tags: List[str] = field(default_factory=list)
     ethical_review_passed: bool = False
     created_at: float = field(default_factory=time.time)
@@ -42,6 +43,7 @@ class Dataset:
 @dataclass
 class SaleRecord:
     """Immutable record of a completed dataset sale."""
+
     sale_id: str
     dataset_id: str
     buyer_id: str
@@ -52,6 +54,7 @@ class SaleRecord:
 # ---------------------------------------------------------------------------
 # Manager
 # ---------------------------------------------------------------------------
+
 
 class DatasetManager:
     """
@@ -164,7 +167,9 @@ class DatasetManager:
 
         Replace with a real payment gateway in production.
         """
-        print(f"[Payment] Processing ${amount_usd:.2f} from buyer '{buyer_id}' … OK (stub)")
+        print(
+            f"[Payment] Processing ${amount_usd:.2f} from buyer '{buyer_id}' … OK (stub)"
+        )
         return True
 
     # ------------------------------------------------------------------

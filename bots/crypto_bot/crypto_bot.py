@@ -33,55 +33,57 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
-from framework import GlobalAISourcesFlow  # noqa: F401
 
-from bots.crypto_bot.tiers import (
-    BOT_FEATURES,
-    COIN_LIMITS,
-    MINING_COIN_LIMITS,
-    get_bot_tier_info,
-)
 from bots.crypto_bot.crypto_database import (
     CRYPTO_DATABASE,
     get_coin,
+    list_categories,
     list_coins,
     list_mineable_coins,
     search_coins,
-    list_categories,
 )
-from bots.crypto_bot.price_feed import (
-    get_price,
-    get_prices,
-    get_price_change_24h,
-    get_market_summary,
+from bots.crypto_bot.dashboard import (
+    render_full_dashboard,
+    render_market_overview,
+    render_mining_stats,
+    render_portfolio,
+    render_transactions,
 )
-from bots.crypto_bot.portfolio import Portfolio, PortfolioError
-from bots.crypto_bot.trading import TradingEngine, TradingError
 from bots.crypto_bot.mining import (
-    simulate_mining,
-    mining_leaderboard,
     calculate_break_even,
     get_mining_profile,
+    mining_leaderboard,
+    simulate_mining,
+)
+from bots.crypto_bot.portfolio import Portfolio, PortfolioError
+from bots.crypto_bot.price_feed import (
+    get_market_summary,
+    get_price,
+    get_price_change_24h,
+    get_prices,
 )
 from bots.crypto_bot.prospectus import (
     get_coin_prospectus,
     list_all_prospectuses,
     prospectus_text,
 )
-from bots.crypto_bot.dashboard import (
-    render_portfolio,
-    render_market_overview,
-    render_transactions,
-    render_mining_stats,
-    render_full_dashboard,
+from bots.crypto_bot.tiers import (
+    BOT_FEATURES,
+    COIN_LIMITS,
+    MINING_COIN_LIMITS,
+    get_bot_tier_info,
 )
+from bots.crypto_bot.trading import TradingEngine, TradingError
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class CryptoBotError(Exception):
@@ -321,9 +323,7 @@ class CryptoBot:
         """
         allowed = MINING_COIN_LIMITS[self.tier]
         symbols = (
-            [c["symbol"] for c in list_mineable_coins()]
-            if allowed is None
-            else allowed
+            [c["symbol"] for c in list_mineable_coins()] if allowed is None else allowed
         )
         return mining_leaderboard(
             symbols=symbols, use_live_price=self.use_live, top_n=top_n
@@ -373,7 +373,9 @@ class CryptoBot:
         self._require_tier(Tier.PRO, "dashboard")
         return render_full_dashboard(
             self._portfolio,
-            mining_results=self._mining_sessions[-5:] if self._mining_sessions else None,
+            mining_results=(
+                self._mining_sessions[-5:] if self._mining_sessions else None
+            ),
             market_symbols=market_symbols or self._tracked_coins,
             use_live=self.use_live,
         )

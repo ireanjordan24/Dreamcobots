@@ -31,10 +31,10 @@ _AI_MODELS_DIR = os.path.join(_REPO_ROOT, "bots", "ai-models-integration")
 if _AI_MODELS_DIR not in sys.path:
     sys.path.insert(0, _AI_MODELS_DIR)
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-from bots.control_center.controller import Controller
-from bots.bot_generator_bot.generator import Generator
 from bots.ai_learning_system.learning_loop import LearningLoop
+from bots.bot_generator_bot.generator import Generator
+from bots.control_center.controller import Controller
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 logging.basicConfig(
     level=logging.INFO,

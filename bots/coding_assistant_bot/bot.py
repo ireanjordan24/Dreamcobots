@@ -1,16 +1,25 @@
 """
 Dreamcobots CodingAssistantBot — tier-aware code completion, review, and test generation.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.coding_assistant_bot.tiers import CODING_ASSISTANT_FEATURES, get_coding_assistant_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.coding_assistant_bot.tiers import (
+    CODING_ASSISTANT_FEATURES,
+    get_coding_assistant_tier_info,
+)
 
 
 class CodingAssistantBotTierError(Exception):
@@ -26,9 +35,26 @@ class CodingAssistantBot:
 
     FREE_LANGUAGES = ["python", "javascript", "html"]
     PRO_LANGUAGES = [
-        "python", "javascript", "html", "java", "typescript", "go", "rust",
-        "c++", "c#", "ruby", "php", "swift", "kotlin", "scala", "r",
-        "matlab", "sql", "bash", "dart", "elixir",
+        "python",
+        "javascript",
+        "html",
+        "java",
+        "typescript",
+        "go",
+        "rust",
+        "c++",
+        "c#",
+        "ruby",
+        "php",
+        "swift",
+        "kotlin",
+        "scala",
+        "r",
+        "matlab",
+        "sql",
+        "bash",
+        "dart",
+        "elixir",
     ]
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -144,7 +170,10 @@ class CodingAssistantBot:
         self._check_language(language)
 
         if self.tier == Tier.FREE:
-            issues = ["Check for potential null reference errors.", "Verify input validation."]
+            issues = [
+                "Check for potential null reference errors.",
+                "Verify input validation.",
+            ]
             suggestions = ["Add comments to improve readability."]
             score = 0.6
 

@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class SkillPack:
     pack_id: str
@@ -11,6 +12,7 @@ class SkillPack:
     price_usd: float
     industry: str
 
+
 class SkillPackRegistry:
     def __init__(self):
         self._packs: dict = {}
@@ -18,30 +20,63 @@ class SkillPackRegistry:
 
     def _init_packs(self):
         defaults = [
-            SkillPack("ecommerce_pack", "E-Commerce Pack",
-                      "Complete e-commerce toolkit for online sellers",
-                      ["inventory_manager", "deal_alert_pro", "receipt_scanner_pro", "coupon_stacker"],
-                      19.0, "e-commerce"),
-            SkillPack("marketing_pack", "Marketing Pack",
-                      "Boost your marketing with AI-powered tools",
-                      ["seo_optimizer", "deal_alert_pro"],
-                      15.0, "marketing"),
-            SkillPack("finance_pack", "Finance Pack",
-                      "Track crypto and calculate flip profits",
-                      ["crypto_price_tracker", "flip_profit_calculator"],
-                      19.0, "finance"),
-            SkillPack("logistics_pack", "Logistics Pack",
-                      "Optimize routes and manage inventory",
-                      ["route_optimizer", "inventory_manager"],
-                      15.0, "logistics"),
-            SkillPack("integration_pack", "Integration Pack",
-                      "Connect to Slack, Telegram, and Discord",
-                      ["slack_workspace_plugin", "telegram_bot_connector", "discord_server_bot"],
-                      25.0, "integration"),
-            SkillPack("ai_performance_pack", "AI Performance Pack",
-                      "Route AI models and track performance analytics",
-                      ["ai_model_router"],
-                      29.0, "ai"),
+            SkillPack(
+                "ecommerce_pack",
+                "E-Commerce Pack",
+                "Complete e-commerce toolkit for online sellers",
+                [
+                    "inventory_manager",
+                    "deal_alert_pro",
+                    "receipt_scanner_pro",
+                    "coupon_stacker",
+                ],
+                19.0,
+                "e-commerce",
+            ),
+            SkillPack(
+                "marketing_pack",
+                "Marketing Pack",
+                "Boost your marketing with AI-powered tools",
+                ["seo_optimizer", "deal_alert_pro"],
+                15.0,
+                "marketing",
+            ),
+            SkillPack(
+                "finance_pack",
+                "Finance Pack",
+                "Track crypto and calculate flip profits",
+                ["crypto_price_tracker", "flip_profit_calculator"],
+                19.0,
+                "finance",
+            ),
+            SkillPack(
+                "logistics_pack",
+                "Logistics Pack",
+                "Optimize routes and manage inventory",
+                ["route_optimizer", "inventory_manager"],
+                15.0,
+                "logistics",
+            ),
+            SkillPack(
+                "integration_pack",
+                "Integration Pack",
+                "Connect to Slack, Telegram, and Discord",
+                [
+                    "slack_workspace_plugin",
+                    "telegram_bot_connector",
+                    "discord_server_bot",
+                ],
+                25.0,
+                "integration",
+            ),
+            SkillPack(
+                "ai_performance_pack",
+                "AI Performance Pack",
+                "Route AI models and track performance analytics",
+                ["ai_model_router"],
+                29.0,
+                "ai",
+            ),
         ]
         for p in defaults:
             self._packs[p.pack_id] = p

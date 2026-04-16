@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class MediaTrack:
     """Represents a recognised media track."""
+
     title: str
     artist: str
     album: str
@@ -29,8 +30,9 @@ class MediaTrack:
 @dataclass
 class RecognitionResult:
     """Result returned from a media recognition attempt."""
+
     success: bool
-    confidence: float          # 0.0 – 1.0
+    confidence: float  # 0.0 – 1.0
     track: Optional[MediaTrack] = None
     message: str = ""
 
@@ -104,12 +106,16 @@ class MediaRecognition:
             RecognitionResult with track metadata when a match is found.
         """
         if not audio_bytes:
-            return RecognitionResult(success=False, confidence=0.0, message="Empty audio input")
+            return RecognitionResult(
+                success=False, confidence=0.0, message="Empty audio input"
+            )
 
         fingerprint = self.compute_fingerprint(audio_bytes)
         track = self._catalogue.get(fingerprint)
         if track:
-            return RecognitionResult(success=True, confidence=1.0, track=track, message="Exact match found")
+            return RecognitionResult(
+                success=True, confidence=1.0, track=track, message="Exact match found"
+            )
 
         # Simulate partial matching via prefix similarity
         for fp, candidate in self._catalogue.items():
@@ -150,7 +156,10 @@ class MediaRecognition:
         return [
             {"app": "Spotify", "url": f"spotify://track/{track.track_id}"},
             {"app": "Apple Music", "url": f"music://track/{track.track_id}"},
-            {"app": "YouTube Music", "url": f"https://music.youtube.com/watch?v={track.track_id}"},
+            {
+                "app": "YouTube Music",
+                "url": f"https://music.youtube.com/watch?v={track.track_id}",
+            },
             {"app": "Direct Download", "url": track.download_url},
         ]
 

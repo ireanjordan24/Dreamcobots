@@ -25,8 +25,8 @@ import sys
 from datetime import datetime, timezone
 from typing import Any
 
-
 # ── Custom JSON formatter ─────────────────────────────────────────────────────
+
 
 class _JsonFormatter(logging.Formatter):
     """Emit log records as single-line JSON objects."""
@@ -52,6 +52,7 @@ class _JsonFormatter(logging.Formatter):
 
 # ── BotLogger wrapper ─────────────────────────────────────────────────────────
 
+
 class BotLogger:
     """Thin wrapper around :class:`logging.Logger` with structured context.
 
@@ -66,10 +67,7 @@ class BotLogger:
 
     def __init__(self, bot_name: str, level: str | None = None) -> None:
         self.bot_name = bot_name
-        effective_level = (
-            level
-            or os.environ.get("LOG_LEVEL", "INFO")
-        ).upper()
+        effective_level = (level or os.environ.get("LOG_LEVEL", "INFO")).upper()
 
         self._logger = logging.getLogger(f"dreamco.{bot_name}")
         if not self._logger.handlers:
@@ -106,6 +104,7 @@ class BotLogger:
 
 
 # ── Module-level convenience factory ─────────────────────────────────────────
+
 
 def get_logger(bot_name: str, level: str | None = None) -> BotLogger:
     """Return a :class:`BotLogger` for *bot_name*.

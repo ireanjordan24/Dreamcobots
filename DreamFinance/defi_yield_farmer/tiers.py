@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 99.0, ["LP position management", "impermanent loss calculator"]),
-    "enterprise": TierConfig("Enterprise", 299.0, ["LP position management", "impermanent loss calculator", "auto-harvest scheduling", "gas optimization"]),
+    "pro": TierConfig(
+        "Pro", 99.0, ["LP position management", "impermanent loss calculator"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        299.0,
+        [
+            "LP position management",
+            "impermanent loss calculator",
+            "auto-harvest scheduling",
+            "gas optimization",
+        ],
+    ),
 }

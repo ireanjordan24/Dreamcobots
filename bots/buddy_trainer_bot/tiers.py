@@ -33,10 +33,10 @@ class TierConfig:
     name: str
     tier: Tier
     price_usd_monthly: float
-    price_usd_one_time: float          # non-zero for OWNER tier
-    max_ai_sessions_per_day: Optional[int]   # None = unlimited
-    max_robot_targets: Optional[int]         # None = unlimited
-    max_human_learners: Optional[int]        # None = unlimited
+    price_usd_one_time: float  # non-zero for OWNER tier
+    max_ai_sessions_per_day: Optional[int]  # None = unlimited
+    max_robot_targets: Optional[int]  # None = unlimited
+    max_human_learners: Optional[int]  # None = unlimited
     github_buddy_included: bool
     features: list
     support_level: str

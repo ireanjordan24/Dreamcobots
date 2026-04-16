@@ -8,18 +8,18 @@ no real Stripe credentials are stored or transmitted).
 Key generation uses hashlib.sha256; no external crypto libraries required.
 """
 
+import datetime
 import hashlib
 import hmac
 import os
 import uuid
-import datetime
 from typing import Optional
 
 from bots.dreamco_payments.tiers import (
+    FEATURE_API_KEY_MANAGEMENT,
     Tier,
     TierConfig,
     get_tier_config,
-    FEATURE_API_KEY_MANAGEMENT,
 )
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -67,7 +67,9 @@ class APIManager:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     @staticmethod
     def _generate_raw_key() -> str:
@@ -179,9 +181,7 @@ class APIManager:
             True if the key matches an active record, False otherwise.
         """
         for record in self._keys.values():
-            if record["status"] == "active" and hmac.compare_digest(
-                record["key"], key
-            ):
+            if record["status"] == "active" and hmac.compare_digest(record["key"], key):
                 return True
         return False
 

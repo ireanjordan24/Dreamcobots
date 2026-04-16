@@ -15,8 +15,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -24,7 +24,6 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Partnership tiers
@@ -335,7 +334,8 @@ class InfluencerDatabase:
         """Search influencers by name or specialty (case-insensitive)."""
         q = query.lower()
         return [
-            i for i in self._influencers.values()
+            i
+            for i in self._influencers.values()
             if q in i.name.lower() or q in i.specialty.lower()
         ]
 
@@ -345,7 +345,11 @@ class InfluencerDatabase:
 
     def get_celebrities(self) -> List[Influencer]:
         """Return influencers with CELEBRITY partnership tier."""
-        return [i for i in self._influencers.values() if i.partnership_tier == PARTNERSHIP_CELEBRITY]
+        return [
+            i
+            for i in self._influencers.values()
+            if i.partnership_tier == PARTNERSHIP_CELEBRITY
+        ]
 
     def count(self) -> int:
         return len(self._influencers)

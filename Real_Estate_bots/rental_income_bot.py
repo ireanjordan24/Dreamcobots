@@ -5,12 +5,14 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations
-import sys, os
-import random
-from enum import Enum
-from typing import Optional, List, Dict, Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import random
+import sys
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -33,7 +35,208 @@ class RentalIncomeBot:
     # String-keyed to avoid cross-module enum identity issues
     RESULT_LIMITS: Dict[str, int] = {"free": 5, "pro": 25, "enterprise": 100}
 
-    MOCK_DATA: List[Dict[str, Any]] = [{'id': 'RE001', 'address': '313 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 168000, 'roi_pct': 4.9, 'score': 52.4, 'type': 'Condo'}, {'id': 'RE002', 'address': '326 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 186000, 'roi_pct': 5.3, 'score': 54.8, 'type': 'Duplex'}, {'id': 'RE003', 'address': '339 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 204000, 'roi_pct': 5.7, 'score': 57.2, 'type': 'Townhouse'}, {'id': 'RE004', 'address': '352 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 222000, 'roi_pct': 6.1, 'score': 59.6, 'type': 'Land'}, {'id': 'RE005', 'address': '365 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 240000, 'roi_pct': 6.5, 'score': 62.0, 'type': 'SFH'}, {'id': 'RE006', 'address': '378 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 258000, 'roi_pct': 6.9, 'score': 64.4, 'type': 'Condo'}, {'id': 'RE007', 'address': '391 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 276000, 'roi_pct': 7.3, 'score': 66.8, 'type': 'Duplex'}, {'id': 'RE008', 'address': '404 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 294000, 'roi_pct': 7.7, 'score': 69.2, 'type': 'Townhouse'}, {'id': 'RE009', 'address': '417 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 312000, 'roi_pct': 8.1, 'score': 71.6, 'type': 'Land'}, {'id': 'RE010', 'address': '430 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 330000, 'roi_pct': 8.5, 'score': 74.0, 'type': 'SFH'}, {'id': 'RE011', 'address': '443 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 348000, 'roi_pct': 8.9, 'score': 76.4, 'type': 'Condo'}, {'id': 'RE012', 'address': '456 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 366000, 'roi_pct': 9.3, 'score': 78.8, 'type': 'Duplex'}, {'id': 'RE013', 'address': '469 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 384000, 'roi_pct': 9.7, 'score': 81.2, 'type': 'Townhouse'}, {'id': 'RE014', 'address': '482 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 402000, 'roi_pct': 10.1, 'score': 83.6, 'type': 'Land'}, {'id': 'RE015', 'address': '495 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 420000, 'roi_pct': 10.5, 'score': 86.0, 'type': 'SFH'}, {'id': 'RE016', 'address': '508 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 438000, 'roi_pct': 10.9, 'score': 88.4, 'type': 'Condo'}, {'id': 'RE017', 'address': '521 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 456000, 'roi_pct': 11.3, 'score': 90.8, 'type': 'Duplex'}, {'id': 'RE018', 'address': '534 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 474000, 'roi_pct': 11.7, 'score': 93.2, 'type': 'Townhouse'}, {'id': 'RE019', 'address': '547 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 492000, 'roi_pct': 12.1, 'score': 95.6, 'type': 'Land'}, {'id': 'RE020', 'address': '560 Pine', 'city': 'Dallas', 'state': 'TX', 'value': 510000, 'roi_pct': 12.5, 'score': 98.0, 'type': 'SFH'}]
+    MOCK_DATA: List[Dict[str, Any]] = [
+        {
+            "id": "RE001",
+            "address": "313 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 168000,
+            "roi_pct": 4.9,
+            "score": 52.4,
+            "type": "Condo",
+        },
+        {
+            "id": "RE002",
+            "address": "326 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 186000,
+            "roi_pct": 5.3,
+            "score": 54.8,
+            "type": "Duplex",
+        },
+        {
+            "id": "RE003",
+            "address": "339 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 204000,
+            "roi_pct": 5.7,
+            "score": 57.2,
+            "type": "Townhouse",
+        },
+        {
+            "id": "RE004",
+            "address": "352 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 222000,
+            "roi_pct": 6.1,
+            "score": 59.6,
+            "type": "Land",
+        },
+        {
+            "id": "RE005",
+            "address": "365 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 240000,
+            "roi_pct": 6.5,
+            "score": 62.0,
+            "type": "SFH",
+        },
+        {
+            "id": "RE006",
+            "address": "378 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 258000,
+            "roi_pct": 6.9,
+            "score": 64.4,
+            "type": "Condo",
+        },
+        {
+            "id": "RE007",
+            "address": "391 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 276000,
+            "roi_pct": 7.3,
+            "score": 66.8,
+            "type": "Duplex",
+        },
+        {
+            "id": "RE008",
+            "address": "404 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 294000,
+            "roi_pct": 7.7,
+            "score": 69.2,
+            "type": "Townhouse",
+        },
+        {
+            "id": "RE009",
+            "address": "417 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 312000,
+            "roi_pct": 8.1,
+            "score": 71.6,
+            "type": "Land",
+        },
+        {
+            "id": "RE010",
+            "address": "430 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 330000,
+            "roi_pct": 8.5,
+            "score": 74.0,
+            "type": "SFH",
+        },
+        {
+            "id": "RE011",
+            "address": "443 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 348000,
+            "roi_pct": 8.9,
+            "score": 76.4,
+            "type": "Condo",
+        },
+        {
+            "id": "RE012",
+            "address": "456 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 366000,
+            "roi_pct": 9.3,
+            "score": 78.8,
+            "type": "Duplex",
+        },
+        {
+            "id": "RE013",
+            "address": "469 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 384000,
+            "roi_pct": 9.7,
+            "score": 81.2,
+            "type": "Townhouse",
+        },
+        {
+            "id": "RE014",
+            "address": "482 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 402000,
+            "roi_pct": 10.1,
+            "score": 83.6,
+            "type": "Land",
+        },
+        {
+            "id": "RE015",
+            "address": "495 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 420000,
+            "roi_pct": 10.5,
+            "score": 86.0,
+            "type": "SFH",
+        },
+        {
+            "id": "RE016",
+            "address": "508 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 438000,
+            "roi_pct": 10.9,
+            "score": 88.4,
+            "type": "Condo",
+        },
+        {
+            "id": "RE017",
+            "address": "521 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 456000,
+            "roi_pct": 11.3,
+            "score": 90.8,
+            "type": "Duplex",
+        },
+        {
+            "id": "RE018",
+            "address": "534 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 474000,
+            "roi_pct": 11.7,
+            "score": 93.2,
+            "type": "Townhouse",
+        },
+        {
+            "id": "RE019",
+            "address": "547 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 492000,
+            "roi_pct": 12.1,
+            "score": 95.6,
+            "type": "Land",
+        },
+        {
+            "id": "RE020",
+            "address": "560 Pine",
+            "city": "Dallas",
+            "state": "TX",
+            "value": 510000,
+            "roi_pct": 12.5,
+            "score": 98.0,
+            "type": "SFH",
+        },
+    ]
 
     def __init__(self, tier: Tier = Tier.FREE):
         # Normalize cross-module Tier enum instances by value string
@@ -109,4 +312,3 @@ class RentalIncomeBot:
             "items": self.MOCK_DATA,
             "generated_by": "GLOBAL AI SOURCES FLOW",
         }
-

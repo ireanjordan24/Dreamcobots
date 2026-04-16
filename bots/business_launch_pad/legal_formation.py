@@ -1,8 +1,8 @@
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """Legal Formation module for Business Launch Pad."""
 
-import uuid
 import random
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -68,16 +68,56 @@ _COMPLIANCE_BASE: dict[str, list[str]] = {
 }
 
 _STATE_REQUIREMENTS: dict[str, dict] = {
-    "CA": {"filing_fee": 70, "annual_report": True, "annual_fee": 800, "processing_days": 15},
-    "DE": {"filing_fee": 90, "annual_report": True, "annual_fee": 300, "processing_days": 3},
-    "NY": {"filing_fee": 200, "annual_report": True, "annual_fee": 25, "processing_days": 7},
-    "TX": {"filing_fee": 300, "annual_report": False, "annual_fee": 0, "processing_days": 5},
-    "FL": {"filing_fee": 100, "annual_report": True, "annual_fee": 138, "processing_days": 5},
-    "WA": {"filing_fee": 200, "annual_report": True, "annual_fee": 60, "processing_days": 5},
-    "NV": {"filing_fee": 75, "annual_report": True, "annual_fee": 200, "processing_days": 3},
+    "CA": {
+        "filing_fee": 70,
+        "annual_report": True,
+        "annual_fee": 800,
+        "processing_days": 15,
+    },
+    "DE": {
+        "filing_fee": 90,
+        "annual_report": True,
+        "annual_fee": 300,
+        "processing_days": 3,
+    },
+    "NY": {
+        "filing_fee": 200,
+        "annual_report": True,
+        "annual_fee": 25,
+        "processing_days": 7,
+    },
+    "TX": {
+        "filing_fee": 300,
+        "annual_report": False,
+        "annual_fee": 0,
+        "processing_days": 5,
+    },
+    "FL": {
+        "filing_fee": 100,
+        "annual_report": True,
+        "annual_fee": 138,
+        "processing_days": 5,
+    },
+    "WA": {
+        "filing_fee": 200,
+        "annual_report": True,
+        "annual_fee": 60,
+        "processing_days": 5,
+    },
+    "NV": {
+        "filing_fee": 75,
+        "annual_report": True,
+        "annual_fee": 200,
+        "processing_days": 3,
+    },
 }
 
-_DEFAULT_FILING = {"filing_fee": 100, "annual_report": True, "annual_fee": 50, "processing_days": 7}
+_DEFAULT_FILING = {
+    "filing_fee": 100,
+    "annual_report": True,
+    "annual_fee": 50,
+    "processing_days": 7,
+}
 
 
 class LegalFormation:
@@ -90,7 +130,9 @@ class LegalFormation:
     # Public API
     # ------------------------------------------------------------------
 
-    def form_entity(self, business_name: str, entity_type: EntityType, state: str) -> LegalEntity:
+    def form_entity(
+        self, business_name: str, entity_type: EntityType, state: str
+    ) -> LegalEntity:
         """Create a new legal entity in DRAFT status."""
         compliance = self.get_compliance_checklist(entity_type, state)
         entity = LegalEntity(
@@ -127,7 +169,9 @@ class LegalFormation:
         entity.ein = ein
         return ein
 
-    def get_compliance_checklist(self, entity_type: EntityType, state: str) -> list[str]:
+    def get_compliance_checklist(
+        self, entity_type: EntityType, state: str
+    ) -> list[str]:
         """Return state-specific compliance checklist for the entity type."""
         base = list(_COMPLIANCE_BASE.get(entity_type.value, []))
         reqs = _STATE_REQUIREMENTS.get(state.upper(), _DEFAULT_FILING)

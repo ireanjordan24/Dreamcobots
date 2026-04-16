@@ -19,64 +19,69 @@ Covers all Empire OS modules:
   13. DreamCoEmpireOS main class (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.dreamco_empire_os.ai_leaders import AILeaders, LeaderRole, LeaderStatus
+from bots.dreamco_empire_os.bot_fleet import BotFleet, BotSpeed, BotStatus
+from bots.dreamco_empire_os.cost_tracking import CostCategory, CostTracking
+from bots.dreamco_empire_os.deal_analyzer import DealAnalyzer, DealType, RiskLevel
+from bots.dreamco_empire_os.empire_hq import EmpireHQ
+from bots.dreamco_empire_os.empire_os import DreamCoEmpireOS, DreamCoTierError
+from bots.dreamco_empire_os.formula_vault import FormulaCategory, FormulaVault
+from bots.dreamco_empire_os.learning_matrix import LearningDomain, LearningMatrix
+from bots.dreamco_empire_os.marketplace import (
+    ListingCategory,
+    ListingStatus,
+    Marketplace,
+)
+from bots.dreamco_empire_os.modules import (
+    AIEcosystem,
+    AIModelsHub,
+    AutonomyControl,
+    AutonomyMode,
+    BizLaunch,
+    CodeLab,
+    Connections,
+    CryptoTracker,
+    DebugIntel,
+    DebugLevel,
+    Divisions,
+    LoansDeals,
+    PaymentsHub,
+    PaymentStatus,
+    PricingEngine,
+    TimeCapsule,
+)
+from bots.dreamco_empire_os.orchestration import Orchestration, PipelineStatus
+from bots.dreamco_empire_os.revenue_tracker import RevenueTracker
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.dreamco_empire_os.tiers import (
+    FEATURE_BOT_FLEET,
+    FEATURE_EMPIRE_HQ,
+    FEATURE_LEARNING_MATRIX,
+    FEATURE_ORCHESTRATION,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_EMPIRE_HQ,
-    FEATURE_BOT_FLEET,
-    FEATURE_LEARNING_MATRIX,
-    FEATURE_ORCHESTRATION,
-    FEATURE_WHITE_LABEL,
 )
-from bots.dreamco_empire_os.empire_hq import EmpireHQ
-from bots.dreamco_empire_os.bot_fleet import BotFleet, BotSpeed, BotStatus
-from bots.dreamco_empire_os.deal_analyzer import DealAnalyzer, DealType, RiskLevel
-from bots.dreamco_empire_os.formula_vault import FormulaVault, FormulaCategory
-from bots.dreamco_empire_os.learning_matrix import LearningMatrix, LearningDomain
-from bots.dreamco_empire_os.ai_leaders import AILeaders, LeaderRole, LeaderStatus
-from bots.dreamco_empire_os.orchestration import Orchestration, PipelineStatus
-from bots.dreamco_empire_os.marketplace import Marketplace, ListingCategory, ListingStatus
-from bots.dreamco_empire_os.revenue_tracker import RevenueTracker
-from bots.dreamco_empire_os.cost_tracking import CostTracking, CostCategory
-from bots.dreamco_empire_os.modules import (
-    Divisions,
-    AIModelsHub,
-    AIEcosystem,
-    CryptoTracker,
-    PaymentsHub,
-    PaymentStatus,
-    BizLaunch,
-    CodeLab,
-    LoansDeals,
-    DebugIntel,
-    DebugLevel,
-    PricingEngine,
-    Connections,
-    TimeCapsule,
-    AutonomyControl,
-    AutonomyMode,
-)
-from bots.dreamco_empire_os.empire_os import DreamCoEmpireOS, DreamCoTierError
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -126,6 +131,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Empire HQ
 # ===========================================================================
+
 
 class TestEmpireHQ:
     def setup_method(self):
@@ -186,7 +192,15 @@ class TestEmpireHQ:
 
     def test_snapshot_has_required_keys(self):
         snap = self.hq.snapshot()
-        for key in ("module", "timestamp", "active_bots", "revenue_usd", "cost_usd", "profit_usd", "empire_level"):
+        for key in (
+            "module",
+            "timestamp",
+            "active_bots",
+            "revenue_usd",
+            "cost_usd",
+            "profit_usd",
+            "empire_level",
+        ):
             assert key in snap
 
 
@@ -194,12 +208,15 @@ class TestEmpireHQ:
 # 3. Bot Fleet
 # ===========================================================================
 
+
 class TestBotFleet:
     def setup_method(self):
         self.fleet = BotFleet()
 
     def test_register_bot(self):
-        bot = self.fleet.register_bot("Lead Scraper", category="marketing", profit_per_day_usd=180)
+        bot = self.fleet.register_bot(
+            "Lead Scraper", category="marketing", profit_per_day_usd=180
+        )
         assert bot.name == "Lead Scraper"
 
     def test_register_multiple_bots(self):
@@ -279,6 +296,7 @@ class TestBotFleet:
 # 4. Deal Analyzer
 # ===========================================================================
 
+
 class TestDealAnalyzer:
     def setup_method(self):
         self.analyzer = DealAnalyzer()
@@ -306,12 +324,18 @@ class TestDealAnalyzer:
     def test_analyze_deal_verdict(self):
         self._add_deal()
         result = self.analyzer.analyze_deal("d001")
-        assert result["verdict"] in ("Strong Buy", "Good Opportunity", "Proceed with Caution", "Pass")
+        assert result["verdict"] in (
+            "Strong Buy",
+            "Good Opportunity",
+            "Proceed with Caution",
+            "Pass",
+        )
 
     def test_rank_deals(self):
         self._add_deal("d1")
-        self.analyzer.add_deal("d2", "Risky Deal", DealType.INVESTMENT,
-                               50000, 100, RiskLevel.CRITICAL)
+        self.analyzer.add_deal(
+            "d2", "Risky Deal", DealType.INVESTMENT, 50000, 100, RiskLevel.CRITICAL
+        )
         ranked = self.analyzer.rank_deals()
         assert len(ranked) == 2
         assert ranked[0]["score"] >= ranked[1]["score"]
@@ -338,6 +362,7 @@ class TestDealAnalyzer:
 # 5. Formula Vault
 # ===========================================================================
 
+
 class TestFormulaVault:
     def setup_method(self):
         self.vault = FormulaVault()
@@ -351,11 +376,15 @@ class TestFormulaVault:
         assert result["result"] == 50.0
 
     def test_execute_profit_margin(self):
-        result = self.vault.execute("profit_margin", {"revenue": 5000.0, "expenses": 3500.0})
+        result = self.vault.execute(
+            "profit_margin", {"revenue": 5000.0, "expenses": 3500.0}
+        )
         assert result["result"] == 30.0
 
     def test_execute_compound_growth(self):
-        result = self.vault.execute("compound_growth", {"principal": 1000.0, "rate": 0.0, "periods": 12})
+        result = self.vault.execute(
+            "compound_growth", {"principal": 1000.0, "rate": 0.0, "periods": 12}
+        )
         assert result["result"] == 1000.0
 
     def test_execute_missing_variable_raises(self):
@@ -405,6 +434,7 @@ class TestFormulaVault:
 # 6. Learning Matrix
 # ===========================================================================
 
+
 class TestLearningMatrix:
     def setup_method(self):
         self.matrix = LearningMatrix()
@@ -448,8 +478,15 @@ class TestLearningMatrix:
         assert result["lesson_id"] == "custom_l1"
 
     def test_level_advances_with_xp(self):
-        for lesson_id in ["lesson_001", "lesson_002", "lesson_003",
-                          "lesson_004", "lesson_005", "lesson_006", "lesson_007"]:
+        for lesson_id in [
+            "lesson_001",
+            "lesson_002",
+            "lesson_003",
+            "lesson_004",
+            "lesson_005",
+            "lesson_006",
+            "lesson_007",
+        ]:
             self.matrix.complete_lesson("learner_1", lesson_id)
         profile = self.matrix.get_learner("learner_1")
         assert profile["level"] > 1
@@ -466,6 +503,7 @@ class TestLearningMatrix:
 # ===========================================================================
 # 7. AI Leaders
 # ===========================================================================
+
 
 class TestAILeaders:
     def setup_method(self):
@@ -485,14 +523,20 @@ class TestAILeaders:
         assert result["status"] == LeaderStatus.TRAINING.value
 
     def test_record_decision_success(self):
-        result = self.leaders.record_decision("l1", "Launch product", "Revenue +20%",
-                                              revenue_impact_usd=5000.0, success=True)
+        result = self.leaders.record_decision(
+            "l1",
+            "Launch product",
+            "Revenue +20%",
+            revenue_impact_usd=5000.0,
+            success=True,
+        )
         assert result["success"] is True
         assert result["revenue_impact_usd"] == 5000.0
 
     def test_record_decision_failure(self):
-        result = self.leaders.record_decision("l1", "Bad call", "Revenue flat",
-                                              revenue_impact_usd=0.0, success=False)
+        result = self.leaders.record_decision(
+            "l1", "Bad call", "Revenue flat", revenue_impact_usd=0.0, success=False
+        )
         assert result["success"] is False
 
     def test_leaderboard_returns_sorted(self):
@@ -517,6 +561,7 @@ class TestAILeaders:
 # ===========================================================================
 # 8. Orchestration
 # ===========================================================================
+
 
 class TestOrchestration:
     def setup_method(self):
@@ -570,11 +615,17 @@ class TestOrchestration:
 # 9. Marketplace
 # ===========================================================================
 
+
 class TestMarketplace:
     def setup_method(self):
         self.market = Marketplace()
-        self.market.add_listing("bot_001", "Lead Gen Bot", ListingCategory.BOT,
-                                "Scrapes leads 24/7.", price_usd=99.0)
+        self.market.add_listing(
+            "bot_001",
+            "Lead Gen Bot",
+            ListingCategory.BOT,
+            "Scrapes leads 24/7.",
+            price_usd=99.0,
+        )
 
     def test_add_listing(self):
         listings = self.market.search()
@@ -587,6 +638,7 @@ class TestMarketplace:
 
     def test_purchase_unavailable_raises(self):
         from bots.dreamco_empire_os.marketplace import ListingStatus
+
         listing = self.market._listings["bot_001"]
         listing.status = ListingStatus.SOLD_OUT
         with pytest.raises(ValueError):
@@ -601,8 +653,13 @@ class TestMarketplace:
             self.market.rate_listing("bot_001", 6.0)
 
     def test_search_by_query(self):
-        self.market.add_listing("tool_1", "Crypto Analyzer Tool", ListingCategory.TOOL,
-                                "Analyzes crypto.", price_usd=49.0)
+        self.market.add_listing(
+            "tool_1",
+            "Crypto Analyzer Tool",
+            ListingCategory.TOOL,
+            "Analyzes crypto.",
+            price_usd=49.0,
+        )
         results = self.market.search(query="crypto")
         assert len(results) == 1
 
@@ -618,6 +675,7 @@ class TestMarketplace:
 # ===========================================================================
 # 10. Revenue Tracker
 # ===========================================================================
+
 
 class TestRevenueTracker:
     def setup_method(self):
@@ -662,6 +720,7 @@ class TestRevenueTracker:
 # 11. Cost Tracking
 # ===========================================================================
 
+
 class TestCostTracking:
     def setup_method(self):
         self.costs = CostTracking(monthly_budget_usd=1000.0)
@@ -701,6 +760,7 @@ class TestCostTracking:
 # ===========================================================================
 # 12. Additional Modules
 # ===========================================================================
+
 
 class TestDivisions:
     def test_create_and_list(self):
@@ -957,6 +1017,7 @@ class TestAutonomyControl:
 # ===========================================================================
 # 13. DreamCoEmpireOS Integration
 # ===========================================================================
+
 
 class TestDreamCoEmpireOSIntegration:
     def setup_method(self):

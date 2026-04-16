@@ -24,14 +24,15 @@ Example::
     dream.handle_user_message("Hello!")
     dream.assign_task({"type": "goal_setting", "user": "Alex"})
 """
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from BuddyAI.buddy_bot import BuddyBot, BuddyBotError
 from BuddyAI.auth import AuthError
+from BuddyAI.buddy_bot import BuddyBot, BuddyBotError
 
 
 class DreamCobotError(Exception):
@@ -135,7 +136,9 @@ class DreamCobot:
         """
         self._require_running()
         self._message_log.append(message)
-        self._buddy.publish_event("user.message", {"bot": self._bot_id, "text": message})
+        self._buddy.publish_event(
+            "user.message", {"bot": self._bot_id, "text": message}
+        )
         response = f"[{self._bot_id}] Received: {message}"
         return response
 
@@ -217,7 +220,9 @@ class DreamCobot:
         print(f"[{self._bot_id}] New user joined: {user_id}")
 
     def _on_task_queued(self, payload: Any) -> None:
-        task_type = payload.get("type", "unknown") if isinstance(payload, dict) else payload
+        task_type = (
+            payload.get("type", "unknown") if isinstance(payload, dict) else payload
+        )
         print(f"[{self._bot_id}] Task queued: {task_type}")
 
     def _on_bot_registered(self, payload: Any) -> None:
@@ -231,16 +236,16 @@ class DreamCobot:
 
     def _require_running(self) -> None:
         if not self._running:
-            raise DreamCobotError(
-                "DreamCobot is not running. Call start() first."
-            )
+            raise DreamCobotError("DreamCobot is not running. Call start() first.")
 
     # ------------------------------------------------------------------
     # Entry point
     # ------------------------------------------------------------------
 
     @classmethod
-    def create_and_start(cls, buddy: BuddyBot, bot_id: str = "dreamcobot") -> "DreamCobot":
+    def create_and_start(
+        cls, buddy: BuddyBot, bot_id: str = "dreamcobot"
+    ) -> "DreamCobot":
         """Convenience factory: create a DreamCobot, start it, and return it."""
         bot = cls(buddy, bot_id=bot_id)
         bot.start()

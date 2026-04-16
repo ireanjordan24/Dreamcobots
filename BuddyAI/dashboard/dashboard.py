@@ -4,9 +4,9 @@
 
 from typing import List, Optional
 
-from .metrics import MetricsCollector, TaskRecord, ComputeSnapshot
-from .stress_test import StressTestResult, StressTestRunner
 from ..financial.models import Account, Transaction
+from .metrics import ComputeSnapshot, MetricsCollector, TaskRecord
+from .stress_test import StressTestResult, StressTestRunner
 
 
 class ClientDashboard:
@@ -89,12 +89,20 @@ class ClientDashboard:
         print("=" * 60)
 
         bal = data["account_balance"]
-        print(f"  Account Balance   : ${bal:.2f}" if bal is not None else "  Account Balance   : N/A")
+        print(
+            f"  Account Balance   : ${bal:.2f}"
+            if bal is not None
+            else "  Account Balance   : N/A"
+        )
         print(f"  Total Earnings    : ${data['profitability']['total_earnings']:.2f}")
         print(f"  Tasks Completed   : {data['tasks']['completed']}")
         print(f"  Avg Task Duration : {data['tasks']['average_duration_seconds']:.2f}s")
-        print(f"  Avg CPU Usage     : {data['compute_usage']['average_cpu_percent']:.1f}%")
-        print(f"  Avg Memory Usage  : {data['compute_usage']['average_memory_percent']:.1f}%")
+        print(
+            f"  Avg CPU Usage     : {data['compute_usage']['average_cpu_percent']:.1f}%"
+        )
+        print(
+            f"  Avg Memory Usage  : {data['compute_usage']['average_memory_percent']:.1f}%"
+        )
         print(f"  Stress Tests Run  : {len(data['stress_tests'])}")
         print("-" * 60)
 

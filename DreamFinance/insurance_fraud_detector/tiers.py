@@ -9,6 +9,19 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["claim anomaly scoring", "network fraud analysis", "document verification AI"]),
-    "elite": TierConfig("Elite", 2500.0, ["claim anomaly scoring", "network fraud analysis", "document verification AI", "real-time alerts"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        ["claim anomaly scoring", "network fraud analysis", "document verification AI"],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "claim anomaly scoring",
+            "network fraud analysis",
+            "document verification AI",
+            "real-time alerts",
+        ],
+    ),
 }

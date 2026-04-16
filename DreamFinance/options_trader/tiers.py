@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 299.0, ["options chain scanner", "iron condor automation"]),
-    "enterprise": TierConfig("Enterprise", 599.0, ["options chain scanner", "iron condor automation", "spread strategy builder", "Greeks dashboard"]),
+    "pro": TierConfig(
+        "Pro", 299.0, ["options chain scanner", "iron condor automation"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        599.0,
+        [
+            "options chain scanner",
+            "iron condor automation",
+            "spread strategy builder",
+            "Greeks dashboard",
+        ],
+    ),
 }

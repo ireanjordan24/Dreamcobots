@@ -2,10 +2,11 @@
 """Modular evolution engine for tracking AI model lifecycle stages."""
 
 from __future__ import annotations
+
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
-import uuid
 
 
 class EvolutionStage(Enum):
@@ -54,7 +55,9 @@ class EvolutionEngine:
         model = self.get_model(model_id)
         current_index = _STAGE_ORDER.index(model.stage)
         if current_index >= len(_STAGE_ORDER) - 1:
-            raise ValueError(f"Model '{model_id}' is already at final stage '{model.stage.value}'.")
+            raise ValueError(
+                f"Model '{model_id}' is already at final stage '{model.stage.value}'."
+            )
         model.stage = _STAGE_ORDER[current_index + 1]
         model.iterations += 1
         # Bump minor version on each advance
@@ -74,7 +77,9 @@ class EvolutionEngine:
             raise KeyError(f"Model '{model_id}' not found.")
         return self._models[model_id]
 
-    def list_models(self, stage: Optional[EvolutionStage] = None) -> list[ModelEvolution]:
+    def list_models(
+        self, stage: Optional[EvolutionStage] = None
+    ) -> list[ModelEvolution]:
         models = list(self._models.values())
         if stage is not None:
             models = [m for m in models if m.stage == stage]
@@ -95,10 +100,14 @@ class EvolutionEngine:
             "total_models": len(models),
             "stage_distribution": stage_counts,
             "avg_performance_score": round(avg_perf, 2),
-            "top_model": {
-                "model_id": top_model.model_id,
-                "name": top_model.name,
-                "performance_score": top_model.performance_score,
-                "stage": top_model.stage.value,
-            } if top_model else None,
+            "top_model": (
+                {
+                    "model_id": top_model.model_id,
+                    "name": top_model.name,
+                    "performance_score": top_model.performance_score,
+                    "stage": top_model.stage.value,
+                }
+                if top_model
+                else None
+            ),
         }

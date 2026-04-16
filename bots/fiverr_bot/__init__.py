@@ -1,16 +1,16 @@
 from bots.fiverr_bot.fiverr_bot import (
+    ClientProfile,
     FiverrBot,
     FiverrBotError,
     FiverrBotTierError,
-    GigCategory,
-    OrderStatus,
-    ProposalStatus,
-    MilestoneStatus,
     FreelancerProfile,
-    ClientProfile,
+    GigCategory,
     JobPosting,
-    Proposal,
     Milestone,
+    MilestoneStatus,
+    OrderStatus,
+    Proposal,
+    ProposalStatus,
 )
 from bots.fiverr_bot.tiers import Tier
 

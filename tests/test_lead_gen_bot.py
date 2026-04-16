@@ -13,20 +13,20 @@ from __future__ import annotations
 
 import os
 import sys
-import types
 import tempfile
+import types
 import unittest
 from unittest.mock import MagicMock, patch
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-from bots.lead_gen_bot.lead_scraper import LeadScraperBot, Bot
-
+from bots.lead_gen_bot.lead_scraper import Bot, LeadScraperBot
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_html(businesses: list[tuple[str, str]]) -> str:
     """Return minimal HTML with .business divs."""
@@ -41,6 +41,7 @@ def _make_html(businesses: list[tuple[str, str]]) -> str:
 # ---------------------------------------------------------------------------
 # 1. Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestLeadScraperBotInit:
     def test_default_name(self):
@@ -64,6 +65,7 @@ class TestLeadScraperBotInit:
 # 2. scrape()
 # ---------------------------------------------------------------------------
 
+
 class TestLeadScraperBotScrape:
     def test_scrape_returns_list(self):
         bot = LeadScraperBot()
@@ -78,6 +80,7 @@ class TestLeadScraperBotScrape:
         with patch("bots.lead_gen_bot.lead_scraper.requests") as mock_req:
             mock_req.get.return_value.text = html
             import bots.lead_gen_bot.lead_scraper as mod
+
             orig_bs = mod.BeautifulSoup
             # Use the real BeautifulSoup
             leads = bot.scrape()
@@ -93,6 +96,7 @@ class TestLeadScraperBotScrape:
 
     def test_scrape_returns_empty_when_requests_none(self):
         import bots.lead_gen_bot.lead_scraper as mod
+
         original = mod.requests
         try:
             mod.requests = None  # type: ignore[assignment]
@@ -107,6 +111,7 @@ class TestLeadScraperBotScrape:
 # 3. save()
 # ---------------------------------------------------------------------------
 
+
 class TestLeadScraperBotSave:
     def test_save_creates_file(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -118,7 +123,10 @@ class TestLeadScraperBotSave:
     def test_save_appends_lead_lines(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             bot = LeadScraperBot(data_dir=tmpdir)
-            leads = [{"name": "Acme", "phone": "555-0001"}, {"name": "Beta", "phone": "555-0002"}]
+            leads = [
+                {"name": "Acme", "phone": "555-0001"},
+                {"name": "Beta", "phone": "555-0002"},
+            ]
             bot.save(leads)
             with open(os.path.join(tmpdir, "leads.txt"), encoding="utf-8") as fh:
                 lines = fh.readlines()
@@ -143,6 +151,7 @@ class TestLeadScraperBotSave:
 # ---------------------------------------------------------------------------
 # 4. run()
 # ---------------------------------------------------------------------------
+
 
 class TestLeadScraperBotRun:
     def test_run_returns_string(self):
@@ -171,6 +180,7 @@ class TestLeadScraperBotRun:
 # ---------------------------------------------------------------------------
 # 5. Bot alias
 # ---------------------------------------------------------------------------
+
 
 class TestBotAlias:
     def test_bot_alias_is_subclass(self):

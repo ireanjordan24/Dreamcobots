@@ -4,13 +4,16 @@ Detects, diagnoses, and fixes GitHub Actions CI failures automatically.
 Supports: npm errors, missing modules, permission issues, path errors, and pip install errors.
 Logs all applied fixes for documentation and escalates unknown errors for human review.
 """
+
 import os
 import re
 import sys
 from datetime import datetime, timezone
 from enum import Enum
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 # GlobalAISourcesFlow is imported for framework compliance registration side-effects
 # (required by all DreamCo bots — see tools/check_bot_framework.py).
@@ -19,6 +22,7 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 
 class FixType(str, Enum):
     """Enumeration of fix types the bot can apply."""
+
     INSTALL_DEPS = "install-deps"
     MISSING_MODULE = "missing-module"
     PERMISSIONS = "permissions"
@@ -33,19 +37,50 @@ class FixType(str, Enum):
 # Error pattern → fix type mapping (checked in priority order, first match wins)
 _ERROR_PATTERNS: list[tuple[re.Pattern, FixType]] = [
     (re.compile(r"npm ERR!", re.IGNORECASE), FixType.INSTALL_DEPS),
-    (re.compile(r"Module not found|Cannot find module", re.IGNORECASE), FixType.MISSING_MODULE),
-    (re.compile(r"ModuleNotFoundError|ImportError", re.IGNORECASE), FixType.MISSING_MODULE),
-    (re.compile(r"Permission denied|EACCES|exit code 128", re.IGNORECASE), FixType.PERMISSIONS),
-    (re.compile(r"No such file or directory|pathspec.*did not match|ENOENT", re.IGNORECASE), FixType.PATH),
-    (re.compile(r"pip install|requirements\.txt.*not found", re.IGNORECASE), FixType.PIP_INSTALL),
+    (
+        re.compile(r"Module not found|Cannot find module", re.IGNORECASE),
+        FixType.MISSING_MODULE,
+    ),
+    (
+        re.compile(r"ModuleNotFoundError|ImportError", re.IGNORECASE),
+        FixType.MISSING_MODULE,
+    ),
+    (
+        re.compile(r"Permission denied|EACCES|exit code 128", re.IGNORECASE),
+        FixType.PERMISSIONS,
+    ),
+    (
+        re.compile(
+            r"No such file or directory|pathspec.*did not match|ENOENT", re.IGNORECASE
+        ),
+        FixType.PATH,
+    ),
+    (
+        re.compile(r"pip install|requirements\.txt.*not found", re.IGNORECASE),
+        FixType.PIP_INSTALL,
+    ),
     # Lint / format failures (checked after dependency errors so those take priority)
     # Java pattern checked before Python to prevent "reformatted" in gjf output matching Python rule
-    (re.compile(r"google-java-format|checkstyle.*violation|checkstyle.*error|Checkstyle", re.IGNORECASE),
-     FixType.JAVA_FORMAT),
-    (re.compile(r"would reformat|reformatted|black.*--check|flake8.*error|E[0-9]{3}\b", re.IGNORECASE),
-     FixType.PYTHON_FORMAT),
-    (re.compile(r"prettier.*--check|eslint.*error|[0-9]+ problems? \(", re.IGNORECASE),
-     FixType.JS_FORMAT),
+    (
+        re.compile(
+            r"google-java-format|checkstyle.*violation|checkstyle.*error|Checkstyle",
+            re.IGNORECASE,
+        ),
+        FixType.JAVA_FORMAT,
+    ),
+    (
+        re.compile(
+            r"would reformat|reformatted|black.*--check|flake8.*error|E[0-9]{3}\b",
+            re.IGNORECASE,
+        ),
+        FixType.PYTHON_FORMAT,
+    ),
+    (
+        re.compile(
+            r"prettier.*--check|eslint.*error|[0-9]+ problems? \(", re.IGNORECASE
+        ),
+        FixType.JS_FORMAT,
+    ),
 ]
 
 # Shell commands applied for each fix type
@@ -177,26 +212,32 @@ class CIAutoFixBot:
 
     def get_retrigger_command(self, workflow_name: str) -> str:
         """Return the GitHub CLI command to re-trigger *workflow_name*."""
-        return f'gh workflow run "{workflow_name}" || echo "Could not re-trigger workflow"'
+        return (
+            f'gh workflow run "{workflow_name}" || echo "Could not re-trigger workflow"'
+        )
 
     # ------------------------------------------------------------------
     # Logging
     # ------------------------------------------------------------------
 
-    def log_fix(self, fix_type: FixType, run_id: str = "", workflow_name: str = "") -> str:
+    def log_fix(
+        self, fix_type: FixType, run_id: str = "", workflow_name: str = ""
+    ) -> str:
         """Append a line to the fix-history log and return the log entry string."""
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         entry = (
             f"{timestamp} | Run ID: {run_id} | Workflow: {workflow_name} | "
             f"Fix: {fix_type} | {_FIX_DESCRIPTIONS[fix_type]}"
         )
-        self._fix_history.append({
-            "timestamp": timestamp,
-            "run_id": run_id,
-            "workflow_name": workflow_name,
-            "fix_type": fix_type,
-            "description": _FIX_DESCRIPTIONS[fix_type],
-        })
+        self._fix_history.append(
+            {
+                "timestamp": timestamp,
+                "run_id": run_id,
+                "workflow_name": workflow_name,
+                "fix_type": fix_type,
+                "description": _FIX_DESCRIPTIONS[fix_type],
+            }
+        )
         os.makedirs(self._log_dir, exist_ok=True)
         log_path = os.path.join(self._log_dir, "fix-history.log")
         with open(log_path, "a", encoding="utf-8") as fh:
@@ -229,8 +270,13 @@ class CIAutoFixBot:
     # Convenience: full auto-fix pipeline (returns action plan)
     # ------------------------------------------------------------------
 
-    def run(self, log_content: str, run_id: str = "", workflow_name: str = "",
-            html_url: str = "") -> dict:
+    def run(
+        self,
+        log_content: str,
+        run_id: str = "",
+        workflow_name: str = "",
+        html_url: str = "",
+    ) -> dict:
         """Run the complete auto-fix pipeline and return an action plan dict.
 
         This method does not execute shell commands; it returns the commands

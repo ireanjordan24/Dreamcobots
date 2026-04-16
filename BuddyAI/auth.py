@@ -106,9 +106,7 @@ class AuthModule:
         if entry is None:
             raise AuthError(f"Bot '{bot_id}' is not registered")
         if permission not in entry["permissions"]:
-            raise AuthError(
-                f"Bot '{bot_id}' does not have permission '{permission}'"
-            )
+            raise AuthError(f"Bot '{bot_id}' does not have permission '{permission}'")
 
     def has_permission(self, bot_id: str, permission: str) -> bool:
         """Return ``True`` when *bot_id* holds *permission*."""

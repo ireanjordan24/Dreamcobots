@@ -10,18 +10,19 @@ Usage
     response = bot.chat("Find class action lawsuits against pharmaceutical companies")
     print(response["message"])
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.lawsuit_finder_bot.tiers import (
-    LF_EXTRA_FEATURES,
-    LF_TOOLS,
-    get_lf_tier_info,
-)
+
+from bots.lawsuit_finder_bot.tiers import LF_EXTRA_FEATURES, LF_TOOLS, get_lf_tier_info
 
 
 class LawsuitFinderTierError(Exception):
@@ -88,9 +89,7 @@ class LawsuitFinderBot:
         self._check_tool_access(active_tool)
 
         self._request_count += 1
-        response_text = (
-            f"[LawsuitFinderBot/{active_tool}] Processed: {message!r}"
-        )
+        response_text = f"[LawsuitFinderBot/{active_tool}] Processed: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
 

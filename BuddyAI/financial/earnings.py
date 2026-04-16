@@ -10,7 +10,6 @@ from typing import Dict, List, Tuple
 
 from .models import Account, Earning, Transaction, TransactionType
 
-
 # The split ratio applied to all earnings in both modes.
 BUDDY_SHARE_RATIO = 0.50
 CLIENT_SHARE_RATIO = 0.50

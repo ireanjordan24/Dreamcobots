@@ -1,21 +1,23 @@
 """Tests for bots/ai_learning_system/learning_loop.py"""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.ai_learning_system.learning_loop import (
-    LearningLoop,
-    BotPerformanceRecord,
-    DEFAULT_KPIS,
-)
 
+from bots.ai_learning_system.learning_loop import (
+    DEFAULT_KPIS,
+    BotPerformanceRecord,
+    LearningLoop,
+)
 
 # ---------------------------------------------------------------------------
 # BotPerformanceRecord
 # ---------------------------------------------------------------------------
+
 
 class TestBotPerformanceRecord:
     def test_instantiates(self):
@@ -59,14 +61,23 @@ class TestBotPerformanceRecord:
     def test_to_dict_contains_expected_keys(self):
         rec = BotPerformanceRecord("bot")
         d = rec.to_dict()
-        for key in ("bot_name", "total_runs", "successful_runs", "failed_runs",
-                    "efficiency", "total_revenue_usd", "revenue_per_run", "last_updated"):
+        for key in (
+            "bot_name",
+            "total_runs",
+            "successful_runs",
+            "failed_runs",
+            "efficiency",
+            "total_revenue_usd",
+            "revenue_per_run",
+            "last_updated",
+        ):
             assert key in d
 
 
 # ---------------------------------------------------------------------------
 # LearningLoop instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestLearningLoopInstantiation:
     def test_instantiates(self):
@@ -94,6 +105,7 @@ class TestLearningLoopInstantiation:
 # ---------------------------------------------------------------------------
 # Performance tracking
 # ---------------------------------------------------------------------------
+
 
 class TestPerformanceTracking:
     def test_record_run_creates_record(self):
@@ -138,6 +150,7 @@ class TestPerformanceTracking:
 # Analysis
 # ---------------------------------------------------------------------------
 
+
 class TestAnalysis:
     def test_analyse_returns_dict(self):
         ll = LearningLoop()
@@ -151,8 +164,14 @@ class TestAnalysis:
             assert key in result
 
     def test_healthy_bot_classified_correctly(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.5, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.9, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.5,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.9,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("good_bot", success=True)
         ll.record_run("good_bot", success=True)
         result = ll.analyse()
@@ -160,8 +179,14 @@ class TestAnalysis:
         assert "good_bot" in healthy_names
 
     def test_underperforming_bot_classified_correctly(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.9, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.95, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.9,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.95,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("bad_bot", success=False)
         ll.record_run("bad_bot", success=False)
         result = ll.analyse()
@@ -169,8 +194,14 @@ class TestAnalysis:
         assert "bad_bot" in under_names
 
     def test_underperforming_bot_has_issues_field(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.9, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.95, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.9,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.95,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("bad_bot", success=False)
         result = ll.analyse()
         under = result["underperforming"][0]
@@ -178,8 +209,14 @@ class TestAnalysis:
         assert len(under["issues"]) > 0
 
     def test_suggestions_generated_for_underperforming(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.9, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.95, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.9,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.95,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("bad_bot", success=False)
         result = ll.analyse()
         suggestion_types = [s["type"] for s in result["suggestions"]]
@@ -193,8 +230,14 @@ class TestAnalysis:
         assert "new_bot" in suggestion_types
 
     def test_no_new_bot_suggestion_when_sufficient_healthy(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.0, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.9, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.0,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.9,
+                "target_revenue_usd": 100.0,
+            }
+        )
         for name in ("bot_1", "bot_2", "bot_3"):
             ll.record_run(name, success=True)
         result = ll.analyse()
@@ -206,6 +249,7 @@ class TestAnalysis:
 # Refactor underperforming
 # ---------------------------------------------------------------------------
 
+
 class TestRefactorUnderperforming:
     def test_refactor_returns_list(self):
         ll = LearningLoop()
@@ -213,8 +257,14 @@ class TestRefactorUnderperforming:
         assert isinstance(actions, list)
 
     def test_refactor_logs_action(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.9, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.95, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.9,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.95,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("slow_bot", success=False)
         actions = ll.refactor_underperforming()
         assert len(actions) == 1
@@ -222,8 +272,14 @@ class TestRefactorUnderperforming:
         assert actions[0]["action"] == "refactor"
 
     def test_refactor_log_updated(self):
-        ll = LearningLoop(kpis={"min_efficiency": 0.9, "min_revenue_usd": 0.0,
-                                 "target_efficiency": 0.95, "target_revenue_usd": 100.0})
+        ll = LearningLoop(
+            kpis={
+                "min_efficiency": 0.9,
+                "min_revenue_usd": 0.0,
+                "target_efficiency": 0.95,
+                "target_revenue_usd": 100.0,
+            }
+        )
         ll.record_run("slow_bot", success=False)
         ll.refactor_underperforming()
         assert len(ll._refactor_log) == 1
@@ -232,6 +288,7 @@ class TestRefactorUnderperforming:
 # ---------------------------------------------------------------------------
 # KPI updates
 # ---------------------------------------------------------------------------
+
 
 class TestKPIUpdates:
     def test_update_kpi(self):
@@ -256,6 +313,7 @@ class TestKPIUpdates:
 # Performance report
 # ---------------------------------------------------------------------------
 
+
 class TestPerformanceReport:
     def test_report_returns_dict(self):
         ll = LearningLoop()
@@ -265,7 +323,14 @@ class TestPerformanceReport:
     def test_report_has_expected_keys(self):
         ll = LearningLoop()
         report = ll.get_performance_report()
-        for key in ("cycle_count", "kpis", "bots", "refactor_log", "suggestions", "timestamp"):
+        for key in (
+            "cycle_count",
+            "kpis",
+            "bots",
+            "refactor_log",
+            "suggestions",
+            "timestamp",
+        ):
             assert key in report
 
     def test_report_includes_tracked_bots(self):
@@ -278,6 +343,7 @@ class TestPerformanceReport:
 # ---------------------------------------------------------------------------
 # run_cycle (no controller, no generator)
 # ---------------------------------------------------------------------------
+
 
 class TestRunCycle:
     def test_run_cycle_returns_dict(self):

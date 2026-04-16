@@ -11,7 +11,6 @@ import os
 import zipfile
 from typing import Generator, List, Optional, Tuple
 
-
 # Default chunk size: 8 MB (optimised for large file throughput)
 DEFAULT_CHUNK_SIZE = 8 * 1024 * 1024
 
@@ -114,7 +113,9 @@ class FileUtils:
             h.update(chunk)
         return h.hexdigest()
 
-    def verify_integrity(self, file_path: str, expected_checksum: str, algorithm: str = "sha256") -> bool:
+    def verify_integrity(
+        self, file_path: str, expected_checksum: str, algorithm: str = "sha256"
+    ) -> bool:
         """
         Return True if the file checksum matches *expected_checksum*.
         """
@@ -165,4 +166,4 @@ class FileUtils:
     @staticmethod
     def split_bytes(data: bytes, chunk_size: int = DEFAULT_CHUNK_SIZE) -> List[bytes]:
         """Split *data* into a list of chunks of at most *chunk_size* bytes."""
-        return [data[i: i + chunk_size] for i in range(0, len(data), chunk_size)]
+        return [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]

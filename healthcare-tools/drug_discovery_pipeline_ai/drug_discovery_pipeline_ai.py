@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Drug Discovery Pipeline AI - computational drug discovery screening tool."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -77,9 +82,13 @@ class DrugDiscoveryPipelineAI:
         return {
             "compound": compound.get("name", "Unknown"),
             "oral_bioavailability": ADMET_RULES["oral_bioavailability"](mw, logp),
-            "blood_brain_barrier_penetration": ADMET_RULES["blood_brain_barrier"](mw, tpsa),
+            "blood_brain_barrier_penetration": ADMET_RULES["blood_brain_barrier"](
+                mw, tpsa
+            ),
             "renal_clearance_risk": ADMET_RULES["renal_clearance_risk"](mw),
-            "solubility_estimate": "low" if logp > 4 else "moderate" if logp > 2 else "high",
+            "solubility_estimate": (
+                "low" if logp > 4 else "moderate" if logp > 2 else "high"
+            ),
             "disclaimer": "Computational prediction only. Requires wet-lab validation.",
         }
 
@@ -94,7 +103,9 @@ class DrugDiscoveryPipelineAI:
             "compound": compound.get("name", "Unknown"),
             "target": target,
             "docking_score_kcal_mol": score,
-            "interpretation": "favorable" if score <= -6 else "moderate" if score <= -4 else "weak",
+            "interpretation": (
+                "favorable" if score <= -6 else "moderate" if score <= -4 else "weak"
+            ),
             "disclaimer": "Simulated score. Real docking requires molecular simulation software.",
         }
 
@@ -104,9 +115,15 @@ class DrugDiscoveryPipelineAI:
             raise PermissionError("Lead optimization requires Pro tier or higher.")
         suggestions = []
         if not screen_result.get("drug_like"):
-            suggestions.append("Reduce molecular weight below 500 Da by removing bulky substituents.")
-            suggestions.append("Adjust logP to the 1-3 range for better bioavailability.")
+            suggestions.append(
+                "Reduce molecular weight below 500 Da by removing bulky substituents."
+            )
+            suggestions.append(
+                "Adjust logP to the 1-3 range for better bioavailability."
+            )
         else:
-            suggestions.append("Compound is drug-like. Consider bioisosteric replacements to improve potency.")
+            suggestions.append(
+                "Compound is drug-like. Consider bioisosteric replacements to improve potency."
+            )
             suggestions.append("Evaluate metabolic stability via CYP enzyme profiling.")
         return suggestions

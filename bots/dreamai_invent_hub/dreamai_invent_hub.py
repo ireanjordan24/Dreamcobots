@@ -20,56 +20,56 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from bots.dreamai_invent_hub.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    FEATURE_BASIC_MATCHMAKING,
-    FEATURE_ADVANCED_MATCHMAKING,
-    FEATURE_INVENTOR_TOOLKIT,
-    FEATURE_DESIGN_BOT,
-    FEATURE_FINANCIAL_PROJECTION,
-    FEATURE_MANUFACTURING_SIMULATOR,
-    FEATURE_PATENT_SUPPORT,
-    FEATURE_FORUMS,
-    FEATURE_MARKETPLACE_LISTING,
-    FEATURE_MARKETPLACE_BROWSE,
-    FEATURE_LICENSING_TEMPLATES,
-    FEATURE_REVENUE_SHARING,
-    FEATURE_IOT_MATCHMAKING,
-    FEATURE_PROTOTYPING_LAB,
-    FEATURE_PARTNERSHIP_ANALYTICS,
-    FEATURE_API_ACCESS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_IOT_LAB,
-)
-from bots.dreamai_invent_hub.matchmaking import (
-    MatchmakingEngine,
-    Profile,
-    ProfileType,
-    CollaborationType,
-    MatchStatus,
-)
 from bots.dreamai_invent_hub.inventor_toolkit import (
-    InventorToolkit,
     DesignDomain,
     DesignStage,
+    InventorToolkit,
     ManufacturingMethod,
     PatentType,
 )
 from bots.dreamai_invent_hub.marketplace import (
-    RDMarketplace,
     DirectoryCategory,
-    ServiceType,
     ForumCategory,
-    PostType,
     ListingStatus,
+    PostType,
+    RDMarketplace,
+    ServiceType,
+)
+from bots.dreamai_invent_hub.matchmaking import (
+    CollaborationType,
+    MatchmakingEngine,
+    MatchStatus,
+    Profile,
+    ProfileType,
+)
+from bots.dreamai_invent_hub.tiers import (
+    FEATURE_ADVANCED_MATCHMAKING,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_MATCHMAKING,
+    FEATURE_DESIGN_BOT,
+    FEATURE_FINANCIAL_PROJECTION,
+    FEATURE_FORUMS,
+    FEATURE_INVENTOR_TOOLKIT,
+    FEATURE_IOT_LAB,
+    FEATURE_IOT_MATCHMAKING,
+    FEATURE_LICENSING_TEMPLATES,
+    FEATURE_MANUFACTURING_SIMULATOR,
+    FEATURE_MARKETPLACE_BROWSE,
+    FEATURE_MARKETPLACE_LISTING,
+    FEATURE_PARTNERSHIP_ANALYTICS,
+    FEATURE_PATENT_SUPPORT,
+    FEATURE_PROTOTYPING_LAB,
+    FEATURE_REVENUE_SHARING,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
 )
 from framework import GlobalAISourcesFlow  # noqa: F401  — GLOBAL AI SOURCES FLOW
 
@@ -353,8 +353,12 @@ class DreamAIInventHub:
         match_stats = {
             "total": len(all_matches),
             "pending": sum(1 for m in all_matches if m.status == MatchStatus.PENDING),
-            "in_progress": sum(1 for m in all_matches if m.status == MatchStatus.IN_PROGRESS),
-            "completed": sum(1 for m in all_matches if m.status == MatchStatus.COMPLETED),
+            "in_progress": sum(
+                1 for m in all_matches if m.status == MatchStatus.IN_PROGRESS
+            ),
+            "completed": sum(
+                1 for m in all_matches if m.status == MatchStatus.COMPLETED
+            ),
         }
 
         return {

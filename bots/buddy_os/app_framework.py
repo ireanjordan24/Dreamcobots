@@ -22,10 +22,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ===========================================================================
 # App Registry
 # ===========================================================================
+
 
 class AppCategory(Enum):
     PRODUCTIVITY = "productivity"
@@ -123,7 +123,8 @@ class AppRegistry:
             apps = [a for a in apps if a.category == category]
         if platform is not None:
             apps = [
-                a for a in apps
+                a
+                for a in apps
                 if platform in a.platforms or AppPlatform.UNIVERSAL in a.platforms
             ]
         if enabled_only:
@@ -142,6 +143,7 @@ class AppRegistry:
 # ===========================================================================
 # Browser Toolkit
 # ===========================================================================
+
 
 @dataclass
 class BrowserTool:
@@ -173,9 +175,7 @@ class BrowserToolkit:
     def add_tool(self, name: str, url: str, description: str = "") -> BrowserTool:
         self._counter += 1
         tool_id = f"btool_{self._counter:04d}"
-        tool = BrowserTool(
-            tool_id=tool_id, name=name, url=url, description=description
-        )
+        tool = BrowserTool(tool_id=tool_id, name=name, url=url, description=description)
         self._tools[tool_id] = tool
         return tool
 
@@ -197,6 +197,7 @@ class BrowserToolkit:
 # ===========================================================================
 # Smart Device Hub
 # ===========================================================================
+
 
 class SmartDeviceProtocol(Enum):
     IFTTT = "ifttt"
@@ -354,10 +355,7 @@ class NvidiaToolsHub:
 
     def list_tools(self) -> list[dict]:
         """Return all known NVIDIA tools with their resale prices."""
-        return [
-            {**tool, "markup_pct": NVIDIA_MARKUP_PCT}
-            for tool in NVIDIA_TOOLS
-        ]
+        return [{**tool, "markup_pct": NVIDIA_MARKUP_PCT} for tool in NVIDIA_TOOLS]
 
     def activate_tool(self, tool_id: str) -> dict:
         """Activate an NVIDIA tool by ID."""
@@ -479,10 +477,14 @@ class StarlinkManager:
         if plan not in STARLINK_PLANS:
             raise ValueError(f"Unknown Starlink plan '{plan}'.")
         base = STARLINK_PLANS[plan]["base_monthly_usd"]
-        monthly = custom_monthly_override if custom_monthly_override else round(
-            base * (1 + STARLINK_MARKUP_PCT / 100), 2
+        monthly = (
+            custom_monthly_override
+            if custom_monthly_override
+            else round(base * (1 + STARLINK_MARKUP_PCT / 100), 2)
         )
-        hardware = round(STARLINK_HARDWARE_BASE_USD * (1 + STARLINK_MARKUP_PCT / 100), 2)
+        hardware = round(
+            STARLINK_HARDWARE_BASE_USD * (1 + STARLINK_MARKUP_PCT / 100), 2
+        )
         self._counter += 1
         subscription_id = f"sl_{self._counter:04d}"
         sub = StarlinkSubscription(
@@ -501,7 +503,9 @@ class StarlinkManager:
         sub.active = False
         return sub
 
-    def list_subscriptions(self, active_only: bool = False) -> list[StarlinkSubscription]:
+    def list_subscriptions(
+        self, active_only: bool = False
+    ) -> list[StarlinkSubscription]:
         subs = list(self._subscriptions.values())
         if active_only:
             subs = [s for s in subs if s.active]

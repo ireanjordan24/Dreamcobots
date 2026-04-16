@@ -31,11 +31,11 @@ from typing import Optional
 
 
 class SecretType(Enum):
-    SSN = "ssn"                         # Social Security Number
+    SSN = "ssn"  # Social Security Number
     BANK_ACCOUNT = "bank_account"
     ROUTING_NUMBER = "routing_number"
     EMAIL_PASSWORD = "email_password"
-    BOT_SECRET = "bot_secret"           # API keys, webhook tokens
+    BOT_SECRET = "bot_secret"  # API keys, webhook tokens
     MEDICAL_RECORD = "medical_record"
     PASSPORT = "passport"
     CREDIT_CARD = "credit_card"
@@ -44,7 +44,7 @@ class SecretType(Enum):
 
 class VaultStatus(Enum):
     UNLOCKED = "unlocked"
-    LOCKED = "locked"       # Vault Mode active
+    LOCKED = "locked"  # Vault Mode active
 
 
 @dataclass
@@ -58,16 +58,16 @@ class VaultSecret:
 
     secret_id: str
     owner_user_id: str
-    label: str              # Human-readable name, e.g. "Chase Checking Account"
+    label: str  # Human-readable name, e.g. "Chase Checking Account"
     secret_type: SecretType
-    ciphertext: str         # Encrypted/hashed value (not reversible in simulation)
-    fingerprint: str        # HMAC fingerprint for integrity verification
-    consent_token: str      # Token from the consent that authorised storage
+    ciphertext: str  # Encrypted/hashed value (not reversible in simulation)
+    fingerprint: str  # HMAC fingerprint for integrity verification
+    consent_token: str  # Token from the consent that authorised storage
     created_at: float
     last_accessed_at: Optional[float] = None
     access_count: int = 0
     notes: str = ""
-    is_deleted: bool = False    # Soft delete
+    is_deleted: bool = False  # Soft delete
 
     def to_dict(self, include_ciphertext: bool = False) -> dict:
         d = {
@@ -94,10 +94,10 @@ class VaultLockRecord:
 
     event_id: str
     user_id: str
-    action: str             # "lock" | "unlock"
+    action: str  # "lock" | "unlock"
     timestamp: float
-    duration_seconds: Optional[float]   # How long the lock is valid
-    unlock_at: Optional[float]          # Computed unlock timestamp
+    duration_seconds: Optional[float]  # How long the lock is valid
+    unlock_at: Optional[float]  # Computed unlock timestamp
 
     def to_dict(self) -> dict:
         return {
@@ -172,6 +172,7 @@ class VaultEngine:
         Requires active VAULT_UNLOCK consent (ensures the lock is intentional).
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         self._consent_manager.require_consent(user_id, ConsentType.VAULT_UNLOCK)
         self._vault_status = VaultStatus.LOCKED
         unlock_at = time.time() + duration_seconds if duration_seconds else None
@@ -193,6 +194,7 @@ class VaultEngine:
         Deactivate Vault Mode — requires VAULT_UNLOCK consent.
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         self._consent_manager.require_consent(user_id, ConsentType.VAULT_UNLOCK)
         self._vault_status = VaultStatus.UNLOCKED
         self._lock_until = None
@@ -230,6 +232,7 @@ class VaultEngine:
         """
         self._check_vault_unlocked()
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         consent = self._consent_manager.require_consent(
             owner_user_id, ConsentType.SENSITIVE_DATA_STORAGE
         )
@@ -267,6 +270,7 @@ class VaultEngine:
         """
         self._check_vault_unlocked()
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         self._consent_manager.require_consent(
             requester_user_id, ConsentType.SENSITIVE_DATA_ACCESS
         )
@@ -371,6 +375,7 @@ class VaultEngine:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class VaultError(Exception):
     """General vault error."""

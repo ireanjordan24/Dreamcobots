@@ -1,32 +1,35 @@
 """Tests for bots/stack_and_profit_bot/tiers.py and bots/stack_and_profit_bot/stack_and_profit_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.stack_and_profit_bot.stack_and_profit_bot import (
-    StackAndProfitBot,
-    StackAndProfitBotTierError,
+    AlertEngine,
+    CouponBot,
+    DealBot,
+    FlipBot,
+    PennyBot,
     ProfitEngine,
     RankingAI,
-    AlertEngine,
-    DealBot,
-    PennyBot,
     ReceiptBot,
-    FlipBot,
-    CouponBot,
+    StackAndProfitBot,
+    StackAndProfitBotTierError,
     _load_deals,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def deals():
@@ -51,6 +54,7 @@ def enterprise_bot():
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestStackAndProfitBotInstantiation:
     def test_default_tier_is_free(self):
@@ -85,13 +89,27 @@ class TestStackAndProfitBotInstantiation:
 # Data loading
 # ---------------------------------------------------------------------------
 
+
 class TestDealsData:
     def test_loads_50_deals(self, deals):
         assert len(deals) == 50
 
     def test_deals_have_required_keys(self, deals):
-        required = {"id", "name", "source", "type", "category", "price", "current",
-                    "resale", "coupon", "cashback", "profit", "effort", "fast_payout"}
+        required = {
+            "id",
+            "name",
+            "source",
+            "type",
+            "category",
+            "price",
+            "current",
+            "resale",
+            "coupon",
+            "cashback",
+            "profit",
+            "effort",
+            "fast_payout",
+        }
         for deal in deals:
             assert required.issubset(deal.keys()), f"Deal {deal.get('id')} missing keys"
 
@@ -113,25 +131,36 @@ class TestDealsData:
 # ProfitEngine
 # ---------------------------------------------------------------------------
 
+
 class TestProfitEngine:
     def test_returns_dict(self):
-        result = ProfitEngine.calculate({"current": 25, "coupon": 5, "cashback": 3, "resale": 70})
+        result = ProfitEngine.calculate(
+            {"current": 25, "coupon": 5, "cashback": 3, "resale": 70}
+        )
         assert isinstance(result, dict)
 
     def test_final_cost_formula(self):
-        result = ProfitEngine.calculate({"current": 25, "coupon": 5, "cashback": 3, "resale": 70})
+        result = ProfitEngine.calculate(
+            {"current": 25, "coupon": 5, "cashback": 3, "resale": 70}
+        )
         assert result["final_cost"] == 17.00
 
     def test_profit_formula(self):
-        result = ProfitEngine.calculate({"current": 25, "coupon": 5, "cashback": 3, "resale": 70})
+        result = ProfitEngine.calculate(
+            {"current": 25, "coupon": 5, "cashback": 3, "resale": 70}
+        )
         assert result["profit"] == 53.00
 
     def test_zero_resale_returns_savings(self):
-        result = ProfitEngine.calculate({"current": 10, "coupon": 3, "cashback": 2, "resale": 0})
+        result = ProfitEngine.calculate(
+            {"current": 10, "coupon": 3, "cashback": 2, "resale": 0}
+        )
         assert result["profit"] == 5.00
 
     def test_final_cost_never_negative(self):
-        result = ProfitEngine.calculate({"current": 5, "coupon": 10, "cashback": 5, "resale": 0})
+        result = ProfitEngine.calculate(
+            {"current": 5, "coupon": 10, "cashback": 5, "resale": 0}
+        )
         assert result["final_cost"] == 0.0
 
     def test_handles_missing_coupon_cashback(self):
@@ -144,18 +173,34 @@ class TestProfitEngine:
 # RankingAI
 # ---------------------------------------------------------------------------
 
+
 class TestRankingAI:
     def test_score_returns_int(self):
-        deal = {"profit": 80, "effort": 1, "fast_payout": True, "category": "electronics"}
+        deal = {
+            "profit": 80,
+            "effort": 1,
+            "fast_payout": True,
+            "category": "electronics",
+        }
         assert isinstance(RankingAI.score(deal), int)
 
     def test_score_in_range(self):
-        deal = {"profit": 80, "effort": 1, "fast_payout": True, "category": "electronics"}
+        deal = {
+            "profit": 80,
+            "effort": 1,
+            "fast_payout": True,
+            "category": "electronics",
+        }
         score = RankingAI.score(deal)
         assert 0 <= score <= 100
 
     def test_high_profit_scores_higher(self):
-        high = {"profit": 150, "effort": 1, "fast_payout": True, "category": "electronics"}
+        high = {
+            "profit": 150,
+            "effort": 1,
+            "fast_payout": True,
+            "category": "electronics",
+        }
         low = {"profit": 5, "effort": 3, "fast_payout": False, "category": "clothing"}
         assert RankingAI.score(high) > RankingAI.score(low)
 
@@ -171,8 +216,18 @@ class TestRankingAI:
             assert "rank_score" in d
 
     def test_electronics_gets_bonus(self):
-        elec = {"profit": 30, "effort": 2, "fast_payout": False, "category": "electronics"}
-        clothing = {"profit": 30, "effort": 2, "fast_payout": False, "category": "clothing"}
+        elec = {
+            "profit": 30,
+            "effort": 2,
+            "fast_payout": False,
+            "category": "electronics",
+        }
+        clothing = {
+            "profit": 30,
+            "effort": 2,
+            "fast_payout": False,
+            "category": "clothing",
+        }
         assert RankingAI.score(elec) > RankingAI.score(clothing)
 
 
@@ -180,9 +235,15 @@ class TestRankingAI:
 # AlertEngine
 # ---------------------------------------------------------------------------
 
+
 class TestAlertEngine:
     def test_should_alert_high_profit(self):
-        deal = {"profit": 50, "effort": 1, "fast_payout": True, "category": "electronics"}
+        deal = {
+            "profit": 50,
+            "effort": 1,
+            "fast_payout": True,
+            "category": "electronics",
+        }
         assert AlertEngine.should_alert(deal) is True
 
     def test_should_not_alert_low_profit(self):
@@ -202,6 +263,7 @@ class TestAlertEngine:
 # ---------------------------------------------------------------------------
 # DealBot
 # ---------------------------------------------------------------------------
+
 
 class TestDealBot:
     def test_run_returns_list(self, deals):
@@ -237,6 +299,7 @@ class TestDealBot:
 # PennyBot
 # ---------------------------------------------------------------------------
 
+
 class TestPennyBot:
     def test_run_returns_list(self, deals):
         bot = PennyBot(Tier.FREE, deals)
@@ -262,6 +325,7 @@ class TestPennyBot:
 # ---------------------------------------------------------------------------
 # ReceiptBot
 # ---------------------------------------------------------------------------
+
 
 class TestReceiptBot:
     def test_free_raises_tier_error(self, deals):
@@ -289,12 +353,15 @@ class TestReceiptBot:
     def test_free_gets_fewer_sources(self, deals):
         free_bot = ReceiptBot(Tier.FREE, deals)
         pro_bot = ReceiptBot(Tier.PRO, deals)
-        assert len(free_bot.get_cashback_sources()) <= len(pro_bot.get_cashback_sources())
+        assert len(free_bot.get_cashback_sources()) <= len(
+            pro_bot.get_cashback_sources()
+        )
 
 
 # ---------------------------------------------------------------------------
 # FlipBot
 # ---------------------------------------------------------------------------
+
 
 class TestFlipBot:
     def test_free_raises_tier_error(self, deals):
@@ -337,6 +404,7 @@ class TestFlipBot:
 # CouponBot
 # ---------------------------------------------------------------------------
 
+
 class TestCouponBot:
     def test_run_returns_list(self, deals):
         bot = CouponBot(Tier.FREE, deals)
@@ -363,12 +431,15 @@ class TestCouponBot:
     def test_pro_has_more_sources_than_free(self, deals):
         free_bot = CouponBot(Tier.FREE, deals)
         pro_bot = CouponBot(Tier.PRO, deals)
-        assert len(pro_bot.get_available_sources()) >= len(free_bot.get_available_sources())
+        assert len(pro_bot.get_available_sources()) >= len(
+            free_bot.get_available_sources()
+        )
 
 
 # ---------------------------------------------------------------------------
 # StackAndProfitBot orchestration
 # ---------------------------------------------------------------------------
+
 
 class TestRunAllBots:
     def test_returns_dict(self, free_bot):
@@ -500,25 +571,35 @@ class TestDescribeTier:
 # Bot library registration
 # ---------------------------------------------------------------------------
 
+
 class TestBotLibraryRegistration:
     def test_stack_and_profit_bot_in_library(self):
-        import sys, os
-        sys.path.insert(0, os.path.join(REPO_ROOT, 'bots', 'global_bot_network'))
+        import os
+        import sys
+
+        sys.path.insert(0, os.path.join(REPO_ROOT, "bots", "global_bot_network"))
         from bot_library import _DREAMCO_BOTS
+
         ids = [e.bot_id for e in _DREAMCO_BOTS]
         assert "stack_and_profit_bot" in ids
 
     def test_bot_has_correct_class_name(self):
-        import sys, os
-        sys.path.insert(0, os.path.join(REPO_ROOT, 'bots', 'global_bot_network'))
+        import os
+        import sys
+
+        sys.path.insert(0, os.path.join(REPO_ROOT, "bots", "global_bot_network"))
         from bot_library import _DREAMCO_BOTS
+
         entry = next(e for e in _DREAMCO_BOTS if e.bot_id == "stack_and_profit_bot")
         assert entry.class_name == "StackAndProfitBot"
 
     def test_bot_has_required_capabilities(self):
-        import sys, os
-        sys.path.insert(0, os.path.join(REPO_ROOT, 'bots', 'global_bot_network'))
+        import os
+        import sys
+
+        sys.path.insert(0, os.path.join(REPO_ROOT, "bots", "global_bot_network"))
         from bot_library import _DREAMCO_BOTS
+
         entry = next(e for e in _DREAMCO_BOTS if e.bot_id == "stack_and_profit_bot")
         for cap in ["deal_scanning", "penny_deals", "flip_finding", "coupon_stacking"]:
             assert cap in entry.capabilities
@@ -527,6 +608,7 @@ class TestBotLibraryRegistration:
 # ---------------------------------------------------------------------------
 # Additional tests — 25 new test methods reaching 105 total
 # ---------------------------------------------------------------------------
+
 
 class TestProfitEngineEdgeCases:
     """ProfitEngine edge cases: zero price, no resale, large numbers."""
@@ -540,7 +622,14 @@ class TestProfitEngineEdgeCases:
         assert result["profit"] == 8.0
 
     def test_large_numbers_precision(self):
-        result = ProfitEngine.calculate({"price": 9999.99, "coupon": 1000.00, "cashback": 500.00, "resale": 15000.00})
+        result = ProfitEngine.calculate(
+            {
+                "price": 9999.99,
+                "coupon": 1000.00,
+                "cashback": 500.00,
+                "resale": 15000.00,
+            }
+        )
         assert result["final_cost"] == 8499.99
         assert result["profit"] == round(15000.00 - 8499.99, 2)
 
@@ -549,7 +638,9 @@ class TestProfitEngineEdgeCases:
         assert result["final_cost"] == 0.0
 
     def test_resale_zero_falls_back_to_coupon_cashback(self):
-        result = ProfitEngine.calculate({"current": 20, "coupon": 4, "cashback": 2, "resale": 0})
+        result = ProfitEngine.calculate(
+            {"current": 20, "coupon": 4, "cashback": 2, "resale": 0}
+        )
         assert result["profit"] == 6.0
 
 
@@ -557,7 +648,12 @@ class TestRankingAIEdgeCases:
     """RankingAI score ranges: capped at 100, zero-profit deals."""
 
     def test_score_capped_at_100(self):
-        deal = {"profit": 200, "effort": 1, "fast_payout": True, "category": "electronics"}
+        deal = {
+            "profit": 200,
+            "effort": 1,
+            "fast_payout": True,
+            "category": "electronics",
+        }
         assert RankingAI.score(deal) == 100
 
     def test_zero_profit_deal_scores_above_zero_with_fast_payout(self):
@@ -572,7 +668,12 @@ class TestRankingAIEdgeCases:
     def test_rank_returns_sorted_descending(self):
         deals = [
             {"profit": 10, "effort": 3},
-            {"profit": 200, "effort": 1, "fast_payout": True, "category": "electronics"},
+            {
+                "profit": 200,
+                "effort": 1,
+                "fast_payout": True,
+                "category": "electronics",
+            },
             {"profit": 30, "effort": 2},
         ]
         ranked = RankingAI.rank(deals)
@@ -655,7 +756,9 @@ class TestCouponBotSources:
     def test_pro_tier_more_sources_than_free(self):
         free_bot = StackAndProfitBot(Tier.FREE)
         pro_bot = StackAndProfitBot(Tier.PRO)
-        assert len(pro_bot.coupon_bot.get_available_sources()) > len(free_bot.coupon_bot.get_available_sources())
+        assert len(pro_bot.coupon_bot.get_available_sources()) > len(
+            free_bot.coupon_bot.get_available_sources()
+        )
 
     def test_sources_returns_list(self):
         bot = StackAndProfitBot(Tier.PRO)

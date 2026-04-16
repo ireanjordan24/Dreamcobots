@@ -5,48 +5,52 @@ Covers PaymentProcessor, APIManager, AccountManager, ReportingDashboard,
 DreamcoPaymentsBot, and BuddyBot with ~80 test cases.
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.dreamco_payments.account_manager import AccountManager, AccountTierError
+from bots.dreamco_payments.api_manager import (
+    DREAMCO_STRIPE_KEY,
+    APIManager,
+    APITierError,
+)
+from bots.dreamco_payments.dreamco_payments import DreamcoPaymentsBot
+from bots.dreamco_payments.payment_processor import (
+    SUPPORTED_CURRENCIES,
+    PaymentProcessor,
+    PaymentTierError,
+)
+from bots.dreamco_payments.reporting_dashboard import (
+    _DD_GROUPS,
+    DashboardTierError,
+    ReportingDashboard,
+)
 from bots.dreamco_payments.tiers import (
+    FEATURE_ADVANCED_REPORTING,
+    FEATURE_CURRENCY_CONVERSION,
+    FEATURE_CUSTOM_LIMITS,
+    FEATURE_DISCOUNT_DOMINATOR,
+    FEATURE_FRAUD_DETECTION,
+    FEATURE_PAYMENT_PROCESSING,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_PAYMENT_PROCESSING,
-    FEATURE_CURRENCY_CONVERSION,
-    FEATURE_FRAUD_DETECTION,
-    FEATURE_CUSTOM_LIMITS,
-    FEATURE_ADVANCED_REPORTING,
-    FEATURE_DISCOUNT_DOMINATOR,
 )
-from bots.dreamco_payments.payment_processor import (
-    PaymentProcessor,
-    PaymentTierError,
-    SUPPORTED_CURRENCIES,
-)
-from bots.dreamco_payments.api_manager import APIManager, APITierError, DREAMCO_STRIPE_KEY
-from bots.dreamco_payments.account_manager import AccountManager, AccountTierError
-from bots.dreamco_payments.reporting_dashboard import (
-    ReportingDashboard,
-    DashboardTierError,
-    _DD_GROUPS,
-)
-from bots.dreamco_payments.dreamco_payments import DreamcoPaymentsBot
-from BuddyAI.event_bus import EventBus
 from BuddyAI.buddy_bot import BuddyBot
-
+from BuddyAI.event_bus import EventBus
 
 # ===========================================================================
 # Tier configuration tests
 # ===========================================================================
+
 
 class TestTierConfig:
     """Tests for tiers.py configuration."""
@@ -101,7 +105,9 @@ class TestTierConfig:
 
     def test_starter_missing_currency_conversion(self):
         """STARTER does not include currency conversion."""
-        assert not get_tier_config(Tier.STARTER).has_feature(FEATURE_CURRENCY_CONVERSION)
+        assert not get_tier_config(Tier.STARTER).has_feature(
+            FEATURE_CURRENCY_CONVERSION
+        )
 
     def test_growth_has_currency_conversion(self):
         """GROWTH includes currency conversion."""
@@ -117,6 +123,7 @@ class TestTierConfig:
 # ===========================================================================
 # PaymentProcessor tests
 # ===========================================================================
+
 
 class TestPaymentProcessor:
     """Tests for payment_processor.PaymentProcessor."""
@@ -280,12 +287,15 @@ class TestPaymentProcessor:
         proc = PaymentProcessor(Tier.STARTER)
         proc.process_payment(10.0, "USD", "card", "cust_A")
         proc.process_payment(20.0, "USD", "card", "cust_B")
-        assert all(t["customer_id"] == "cust_A" for t in proc.list_transactions("cust_A"))
+        assert all(
+            t["customer_id"] == "cust_A" for t in proc.list_transactions("cust_A")
+        )
 
 
 # ===========================================================================
 # APIManager tests
 # ===========================================================================
+
 
 class TestAPIManager:
     """Tests for api_manager.APIManager."""
@@ -383,14 +393,15 @@ class TestAPIManager:
     def test_dreamco_stripe_key_is_not_real(self):
         """DREAMCO_STRIPE_KEY should not be a live Stripe secret key."""
         # A live key starts with 'sk_live_' – that must never be committed
-        assert not DREAMCO_STRIPE_KEY.startswith("sk_live_"), (
-            "DREAMCO_STRIPE_KEY must not be a live Stripe secret key"
-        )
+        assert not DREAMCO_STRIPE_KEY.startswith(
+            "sk_live_"
+        ), "DREAMCO_STRIPE_KEY must not be a live Stripe secret key"
 
 
 # ===========================================================================
 # AccountManager tests
 # ===========================================================================
+
 
 class TestAccountManager:
     """Tests for account_manager.AccountManager."""
@@ -509,6 +520,7 @@ class TestAccountManager:
 # ===========================================================================
 # ReportingDashboard tests
 # ===========================================================================
+
 
 class TestReportingDashboard:
     """Tests for reporting_dashboard.ReportingDashboard."""
@@ -647,6 +659,7 @@ class TestReportingDashboard:
 # DreamcoPaymentsBot integration tests
 # ===========================================================================
 
+
 class TestDreamcoPaymentsBot:
     """End-to-end tests for DreamcoPaymentsBot."""
 
@@ -759,6 +772,7 @@ class TestDreamcoPaymentsBot:
 # ===========================================================================
 # BuddyBot tests
 # ===========================================================================
+
 
 class TestBuddyBot:
     """Tests for BuddyAI.buddy_bot.BuddyBot and EventBus."""

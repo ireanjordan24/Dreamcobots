@@ -2,31 +2,33 @@
 Tests for bots/revenue_growth_bot/tiers.py and bots/revenue_growth_bot/revenue_growth_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'revenue_growth_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "revenue_growth_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.revenue_growth_bot.revenue_growth_bot import (
     RevenueGrowthBot,
-    RevenueGrowthBotTierError,
     RevenueGrowthBotRequestLimitError,
+    RevenueGrowthBotTierError,
 )
-
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestRevenueGrowthBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_rev_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -37,8 +39,14 @@ class TestRevenueGrowthBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_revenue_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "revenue_features", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "revenue_features",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -58,6 +66,7 @@ class TestRevenueGrowthBotTierInfo:
 # -----------------------------------------------------------------------
 # RevenueGrowthBot tests
 # -----------------------------------------------------------------------
+
 
 class TestRevenueGrowthBot:
     def test_default_tier_free(self):

@@ -62,7 +62,9 @@ class GeneticOptimizer:
     # Public interface
     # ------------------------------------------------------------------
 
-    def initialise(self, genome_factory: Callable[[], Dict[str, Any]]) -> List[Individual]:
+    def initialise(
+        self, genome_factory: Callable[[], Dict[str, Any]]
+    ) -> List[Individual]:
         """
         Create the initial population using *genome_factory*.
 
@@ -148,7 +150,9 @@ class GeneticOptimizer:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _tournament_select(self, population: List[Individual], k: int = 3) -> Individual:
+    def _tournament_select(
+        self, population: List[Individual], k: int = 3
+    ) -> Individual:
         """Return the fittest individual from a random *k*-subset."""
         contestants = self._rng.sample(population, min(k, len(population)))
         return max(contestants, key=lambda x: x.fitness)
@@ -170,7 +174,9 @@ class GeneticOptimizer:
         """Apply random mutations to numeric genes."""
         result = dict(genome)
         for key, val in result.items():
-            if self._rng.random() < self.mutation_rate and isinstance(val, (int, float)):
+            if self._rng.random() < self.mutation_rate and isinstance(
+                val, (int, float)
+            ):
                 delta = val * 0.1 * (self._rng.random() * 2 - 1)
                 # Always use float arithmetic to avoid truncation when val is int.
                 result[key] = float(val) + delta

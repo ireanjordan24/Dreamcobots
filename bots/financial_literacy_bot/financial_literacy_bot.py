@@ -15,10 +15,10 @@ Adheres to the DreamCo bots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
-import uuid
 import random
+import sys
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -26,32 +26,31 @@ from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from bots.financial_literacy_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_AUTOMATED_REMINDERS,
+    FEATURE_BANK_INTEGRATION,
+    FEATURE_COMMUNITY_POST,
+    FEATURE_COMMUNITY_READ,
+    FEATURE_CREDIT_ALERTS,
+    FEATURE_CREDIT_TIPS,
+    FEATURE_EDUCATION_PATHS,
+    FEATURE_INVESTMENT_CALCULATOR,
+    FEATURE_OPM_STRATEGIES,
+    FEATURE_PRODUCT_MATCHING,
+    FEATURE_STRIPE_BILLING,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_CREDIT_TIPS,
-    FEATURE_CREDIT_ALERTS,
-    FEATURE_OPM_STRATEGIES,
-    FEATURE_INVESTMENT_CALCULATOR,
-    FEATURE_BANK_INTEGRATION,
-    FEATURE_AUTOMATED_REMINDERS,
-    FEATURE_EDUCATION_PATHS,
-    FEATURE_COMMUNITY_READ,
-    FEATURE_COMMUNITY_POST,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_STRIPE_BILLING,
-    FEATURE_PRODUCT_MATCHING,
 )
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class FinancialLiteracyBotError(Exception):
     """Base exception for Financial Literacy Bot errors."""
@@ -69,6 +68,7 @@ class FinancialLiteracyBotNotFoundError(FinancialLiteracyBotError):
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class InvestmentType(Enum):
     REAL_ESTATE = "real_estate"
     STOCKS = "stocks"
@@ -78,10 +78,10 @@ class InvestmentType(Enum):
 
 
 class CreditScoreRange(Enum):
-    POOR = "poor"           # 300–579
-    FAIR = "fair"           # 580–669
-    GOOD = "good"           # 670–739
-    VERY_GOOD = "very_good" # 740–799
+    POOR = "poor"  # 300–579
+    FAIR = "fair"  # 580–669
+    GOOD = "good"  # 670–739
+    VERY_GOOD = "very_good"  # 740–799
     EXCEPTIONAL = "exceptional"  # 800–850
 
 
@@ -101,6 +101,7 @@ class ReminderType(Enum):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CreditProfile:
@@ -193,11 +194,11 @@ class CommunityPost:
 class FinancialProduct:
     product_id: str
     name: str
-    product_type: str           # credit_card | personal_loan | heloc
+    product_type: str  # credit_card | personal_loan | heloc
     apr_pct: float
     credit_score_min: int
     credit_limit_max: Optional[float]
-    promotional_apr_pct: Optional[float]   # e.g. 0% intro APR
+    promotional_apr_pct: Optional[float]  # e.g. 0% intro APR
     promotional_months: Optional[int]
     description: str
 
@@ -452,6 +453,7 @@ OPM_STRATEGIES: list[dict] = [
 # Main Bot
 # ---------------------------------------------------------------------------
 
+
 class FinancialLiteracyBot:
     """
     Tier-aware financial literacy and credit automation bot.
@@ -512,9 +514,7 @@ class FinancialLiteracyBot:
         """
         self._require_feature(FEATURE_CREDIT_TIPS)
         if not (300 <= credit_score <= 850):
-            raise FinancialLiteracyBotError(
-                "credit_score must be between 300 and 850."
-            )
+            raise FinancialLiteracyBotError("credit_score must be between 300 and 850.")
         if total_credit_limit < 0 or total_balance < 0:
             raise FinancialLiteracyBotError(
                 "total_credit_limit and total_balance must be non-negative."
@@ -553,7 +553,9 @@ class FinancialLiteracyBot:
         if oldest_account_years < 2:
             advice.append("Your credit history is short. Avoid closing old accounts.")
         if credit_score < 670:
-            advice.append("Consider a secured card or credit-builder loan to improve your score faster.")
+            advice.append(
+                "Consider a secured card or credit-builder loan to improve your score faster."
+            )
 
         return {
             "profile_id": profile_id,
@@ -576,38 +578,46 @@ class FinancialLiteracyBot:
         alerts = []
 
         if profile.utilization_rate > 0.30:
-            alerts.append({
-                "type": "utilization_warning",
-                "message": (
-                    f"Utilization at {profile.utilization_rate:.0%}. "
-                    "Pay down balances before your next statement to protect your score."
-                ),
-                "severity": "high",
-            })
+            alerts.append(
+                {
+                    "type": "utilization_warning",
+                    "message": (
+                        f"Utilization at {profile.utilization_rate:.0%}. "
+                        "Pay down balances before your next statement to protect your score."
+                    ),
+                    "severity": "high",
+                }
+            )
         if profile.missed_payments > 0:
-            alerts.append({
-                "type": "missed_payment",
-                "message": (
-                    f"{profile.missed_payments} missed payment(s) on record. "
-                    "Dispute if incorrect, or establish consistent autopay."
-                ),
-                "severity": "critical",
-            })
+            alerts.append(
+                {
+                    "type": "missed_payment",
+                    "message": (
+                        f"{profile.missed_payments} missed payment(s) on record. "
+                        "Dispute if incorrect, or establish consistent autopay."
+                    ),
+                    "severity": "critical",
+                }
+            )
         if profile.credit_score < 620:
-            alerts.append({
-                "type": "score_at_risk",
-                "message": (
-                    "Credit score below 620. You may be denied for most credit products. "
-                    "Focus on on-time payments and reducing balances."
-                ),
-                "severity": "critical",
-            })
+            alerts.append(
+                {
+                    "type": "score_at_risk",
+                    "message": (
+                        "Credit score below 620. You may be denied for most credit products. "
+                        "Focus on on-time payments and reducing balances."
+                    ),
+                    "severity": "critical",
+                }
+            )
         if not alerts:
-            alerts.append({
-                "type": "all_clear",
-                "message": "No urgent alerts. Your credit profile looks healthy.",
-                "severity": "info",
-            })
+            alerts.append(
+                {
+                    "type": "all_clear",
+                    "message": "No urgent alerts. Your credit profile looks healthy.",
+                    "severity": "info",
+                }
+            )
         return alerts
 
     # ------------------------------------------------------------------
@@ -622,8 +632,7 @@ class FinancialLiteracyBot:
         if not (300 <= credit_score <= 850):
             raise FinancialLiteracyBotError("credit_score must be between 300 and 850.")
         eligible = [
-            s for s in OPM_STRATEGIES
-            if credit_score >= s["required_credit_score"]
+            s for s in OPM_STRATEGIES if credit_score >= s["required_credit_score"]
         ]
         return eligible
 
@@ -797,18 +806,24 @@ class FinancialLiteracyBot:
         for rem in self._reminders:
             if not rem.sent:
                 rem.sent = True
-                sent.append({
-                    "reminder_id": rem.reminder_id,
-                    "type": rem.reminder_type.value,
-                    "message": rem.message,
-                    "sent_at": datetime.now(timezone.utc).isoformat(),
-                })
+                sent.append(
+                    {
+                        "reminder_id": rem.reminder_id,
+                        "type": rem.reminder_type.value,
+                        "message": rem.message,
+                        "sent_at": datetime.now(timezone.utc).isoformat(),
+                    }
+                )
         return sent
 
     def get_reminders(self, unsent_only: bool = False) -> list[dict]:
         """Return stored reminders (PRO+)."""
         self._require_feature(FEATURE_AUTOMATED_REMINDERS)
-        items = self._reminders if not unsent_only else [r for r in self._reminders if not r.sent]
+        items = (
+            self._reminders
+            if not unsent_only
+            else [r for r in self._reminders if not r.sent]
+        )
         return [
             {
                 "reminder_id": r.reminder_id,
@@ -899,9 +914,7 @@ class FinancialLiteracyBot:
         }
         remaining_sorted = sorted(
             remaining,
-            key=lambda x: level_order.get(
-                EducationLevel(x["level"]), 99
-            ),
+            key=lambda x: level_order.get(EducationLevel(x["level"]), 99),
         )
         return {
             "completed_modules": list(completed_ids),
@@ -1012,11 +1025,17 @@ class FinancialLiteracyBot:
         """Natural-language routing for the bot."""
         msg = message.lower()
 
-        if any(kw in msg for kw in ("tip", "improve credit", "credit score", "credit advice")):
+        if any(
+            kw in msg
+            for kw in ("tip", "improve credit", "credit score", "credit advice")
+        ):
             tips = self.get_credit_tips(3)
             return {"message": "Here are 3 credit tips for you.", "data": tips}
 
-        if any(kw in msg for kw in ("opm", "leverage", "other people", "invest with credit")):
+        if any(
+            kw in msg
+            for kw in ("opm", "leverage", "other people", "invest with credit")
+        ):
             if not self.config.has_feature(FEATURE_OPM_STRATEGIES):
                 return {
                     "message": (
@@ -1080,6 +1099,7 @@ class FinancialLiteracyBot:
 # ---------------------------------------------------------------------------
 # Module-level run() helper
 # ---------------------------------------------------------------------------
+
 
 def run(tier: Tier = Tier.FREE) -> None:  # pragma: no cover
     """Quick demo of the Financial Literacy Bot."""

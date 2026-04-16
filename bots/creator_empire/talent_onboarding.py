@@ -4,15 +4,21 @@ Talent Onboarding Engine for CreatorEmpire.
 Handles personal brand kits, media asset collection, and talent profile
 management for the DreamCo CreatorEmpire platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -23,7 +29,8 @@ class OnboardingError(Exception):
 @dataclass
 class MediaAsset:
     """Represents a single media asset attached to a talent profile."""
-    asset_type: str          # e.g. "headshot", "demo_reel", "logo", "banner"
+
+    asset_type: str  # e.g. "headshot", "demo_reel", "logo", "banner"
     url: str
     description: str = ""
 
@@ -31,6 +38,7 @@ class MediaAsset:
 @dataclass
 class BrandKit:
     """Personal brand kit for a talent."""
+
     primary_color: str = "#000000"
     secondary_color: str = "#FFFFFF"
     font: str = "Montserrat"
@@ -43,9 +51,10 @@ class BrandKit:
 @dataclass
 class TalentProfile:
     """Full talent profile including brand kit and media assets."""
+
     talent_id: str
     name: str
-    category: str          # e.g. "streamer", "rapper", "athlete", "general"
+    category: str  # e.g. "streamer", "rapper", "athlete", "general"
     email: str
     brand_kit: BrandKit = field(default_factory=BrandKit)
     media_assets: list[MediaAsset] = field(default_factory=list)
@@ -220,7 +229,9 @@ class TalentOnboardingEngine:
         profile.brand_kit = template
         return template
 
-    def add_media_asset(self, talent_id: str, asset_type: str, url: str, description: str = "") -> MediaAsset:
+    def add_media_asset(
+        self, talent_id: str, asset_type: str, url: str, description: str = ""
+    ) -> MediaAsset:
         """Attach a media asset to a talent profile."""
         profile = self.get_profile(talent_id)
         asset = MediaAsset(asset_type=asset_type, url=url, description=description)

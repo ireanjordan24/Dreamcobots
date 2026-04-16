@@ -9,25 +9,27 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401
+
 
 @dataclass
 class FailoverConfig:
     primary_id: str
     backup_id: str
-    health_check_interval: int   # seconds
+    health_check_interval: int  # seconds
     auto_restore: bool = True
 
 
@@ -45,11 +47,13 @@ class AutoFailover:
 
     def __init__(self) -> None:
         self._configs: Dict[str, FailoverConfig] = {}
-        self._health: Dict[str, float] = {}     # system_id -> health 0-100
-        self._active: Dict[str, str] = {}       # primary_id -> currently active id
+        self._health: Dict[str, float] = {}  # system_id -> health 0-100
+        self._active: Dict[str, str] = {}  # primary_id -> currently active id
         self._events: List[FailoverEvent] = []
 
-    def configure_failover(self, primary_id: str, backup_id: str, config: dict) -> FailoverConfig:
+    def configure_failover(
+        self, primary_id: str, backup_id: str, config: dict
+    ) -> FailoverConfig:
         """Configure failover pairing between primary and backup."""
         fc = FailoverConfig(
             primary_id=primary_id,
@@ -78,7 +82,9 @@ class AutoFailover:
             result["recommendation"] = "trigger_failover"
         return result
 
-    def trigger_failover(self, system_id: str, reason: str = "health_threshold_breached") -> FailoverEvent:
+    def trigger_failover(
+        self, system_id: str, reason: str = "health_threshold_breached"
+    ) -> FailoverEvent:
         """Trigger failover from primary to backup."""
         config = self._configs.get(system_id)
         if not config:
@@ -113,12 +119,16 @@ class AutoFailover:
         """Return current failover status across all configured pairs."""
         pairs = []
         for primary_id, config in self._configs.items():
-            pairs.append({
-                "primary_id": primary_id,
-                "backup_id": config.backup_id,
-                "currently_active": self._active.get(primary_id, primary_id),
-                "primary_health": self._health.get(primary_id, 0.0),
-                "backup_health": self._health.get(config.backup_id, 0.0),
-                "failover_events": sum(1 for e in self._events if e.system_id == primary_id),
-            })
+            pairs.append(
+                {
+                    "primary_id": primary_id,
+                    "backup_id": config.backup_id,
+                    "currently_active": self._active.get(primary_id, primary_id),
+                    "primary_health": self._health.get(primary_id, 0.0),
+                    "backup_health": self._health.get(config.backup_id, 0.0),
+                    "failover_events": sum(
+                        1 for e in self._events if e.system_id == primary_id
+                    ),
+                }
+            )
         return {"failover_pairs": pairs, "total_events": len(self._events)}

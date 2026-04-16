@@ -22,6 +22,7 @@ def _now() -> str:
 # Base helper
 # ---------------------------------------------------------------------------
 
+
 class Base:
     """Lightweight metaclass placeholder mirroring SQLAlchemy's Base."""
 
@@ -41,18 +42,19 @@ class Base:
 # ORM models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ResearchPaper(Base):
     """Persisted record for an ingested research paper."""
 
     id: Optional[int] = None
     title: str = ""
-    authors: str = ""          # comma-separated
+    authors: str = ""  # comma-separated
     abstract: str = ""
     source: str = ""
     url: str = ""
     published_date: Optional[str] = None
-    tags: str = ""             # comma-separated
+    tags: str = ""  # comma-separated
     created_at: str = field(default_factory=_now)
 
     # -- column definitions (informational for documentation purposes) --
@@ -79,7 +81,7 @@ class ExperimentResult(Base):
     run_id: str = ""
     experiment_name: str = ""
     status: str = "pending"
-    metrics: str = ""          # JSON string
+    metrics: str = ""  # JSON string
     duration_ms: float = 0.0
     started_at: Optional[str] = None
     completed_at: Optional[str] = None

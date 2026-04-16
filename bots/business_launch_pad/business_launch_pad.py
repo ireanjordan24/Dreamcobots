@@ -5,36 +5,37 @@ Provides a unified interface for launching a business: plan generation,
 market research, legal formation, brand identity, and website setup.
 """
 
-from framework import GlobalAISourcesFlow  # GLOBAL AI SOURCES FLOW — framework compliance
-
+from bots.business_launch_pad.brand_identity import BrandIdentity
+from bots.business_launch_pad.legal_formation import EntityType, LegalFormation
+from bots.business_launch_pad.market_research import MarketResearch
+from bots.business_launch_pad.plan_generator import PlanGenerator
 from bots.business_launch_pad.tiers import (
+    FEATURE_API_ACCESS,
+    FEATURE_BRAND_IDENTITY,
+    FEATURE_COMPLIANCE_MONITORING,
+    FEATURE_FINANCIAL_PROJECTIONS,
+    FEATURE_LEGAL_FORMATION,
+    FEATURE_MARKET_RESEARCH,
+    FEATURE_PITCH_DECK,
+    FEATURE_PLAN_GENERATOR,
+    FEATURE_SWOT_ANALYSIS,
+    FEATURE_TAM_ANALYSIS,
+    FEATURE_WEBSITE_SETUP,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     list_tiers,
-    FEATURE_PLAN_GENERATOR,
-    FEATURE_MARKET_RESEARCH,
-    FEATURE_LEGAL_FORMATION,
-    FEATURE_BRAND_IDENTITY,
-    FEATURE_WEBSITE_SETUP,
-    FEATURE_FINANCIAL_PROJECTIONS,
-    FEATURE_PITCH_DECK,
-    FEATURE_TAM_ANALYSIS,
-    FEATURE_SWOT_ANALYSIS,
-    FEATURE_COMPLIANCE_MONITORING,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
 )
-from bots.business_launch_pad.plan_generator import PlanGenerator
-from bots.business_launch_pad.market_research import MarketResearch
-from bots.business_launch_pad.legal_formation import LegalFormation, EntityType
-from bots.business_launch_pad.brand_identity import BrandIdentity
 from bots.business_launch_pad.website_setup import WebsiteSetup, WebsiteTemplate
-
+from framework import (
+    GlobalAISourcesFlow,
+)  # GLOBAL AI SOURCES FLOW — framework compliance
 
 # ---------------------------------------------------------------------------
 # Custom exceptions
 # ---------------------------------------------------------------------------
+
 
 class BusinessLaunchPadError(Exception):
     """Base exception for BusinessLaunchPad errors."""
@@ -47,6 +48,7 @@ class BusinessLaunchPadTierError(BusinessLaunchPadError):
 # ---------------------------------------------------------------------------
 # Main bot class
 # ---------------------------------------------------------------------------
+
 
 class BusinessLaunchPad:
     """All-in-one business launch assistant."""
@@ -83,7 +85,9 @@ class BusinessLaunchPad:
     # Core tools
     # ------------------------------------------------------------------
 
-    def create_business_plan(self, business_name: str, industry: str, description: str) -> dict:
+    def create_business_plan(
+        self, business_name: str, industry: str, description: str
+    ) -> dict:
         """Generate a business plan (PRO+ unlocks financial projections and pitch deck)."""
         self._require_feature(FEATURE_PLAN_GENERATOR)
         self._check_plan_quota()
@@ -114,11 +118,22 @@ class BusinessLaunchPad:
             "report_id": report.report_id,
             "industry": report.industry,
             "competitors": [
-                {"name": c.name, "market_share": c.market_share, "strengths": c.strengths, "weaknesses": c.weaknesses}
+                {
+                    "name": c.name,
+                    "market_share": c.market_share,
+                    "strengths": c.strengths,
+                    "weaknesses": c.weaknesses,
+                }
                 for c in report.competitors
             ],
             "personas": [
-                {"name": p.name, "age_range": p.age_range, "pain_points": p.pain_points, "goals": p.goals, "channels": p.channels}
+                {
+                    "name": p.name,
+                    "age_range": p.age_range,
+                    "pain_points": p.pain_points,
+                    "goals": p.goals,
+                    "channels": p.channels,
+                }
                 for p in report.personas
             ],
             "trends": report.trends,
@@ -127,7 +142,9 @@ class BusinessLaunchPad:
             result["swot"] = report.swot
         return result
 
-    def form_legal_entity(self, business_name: str, entity_type_str: str, state: str) -> dict:
+    def form_legal_entity(
+        self, business_name: str, entity_type_str: str, state: str
+    ) -> dict:
         """Form a legal entity (PRO+)."""
         self._require_feature(FEATURE_LEGAL_FORMATION)
         try:
@@ -200,7 +217,11 @@ class BusinessLaunchPad:
     def dashboard(self) -> str:
         """Return a summary of usage stats and available tools by tier."""
         cfg = self._tier_config
-        limit = cfg.max_plans_per_month if cfg.max_plans_per_month is not None else "Unlimited"
+        limit = (
+            cfg.max_plans_per_month
+            if cfg.max_plans_per_month is not None
+            else "Unlimited"
+        )
         plans_remaining = (
             (cfg.max_plans_per_month - self._plan_count)
             if cfg.max_plans_per_month is not None

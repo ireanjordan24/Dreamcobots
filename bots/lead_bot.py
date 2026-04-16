@@ -7,8 +7,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -28,11 +28,13 @@ def run_leads() -> list[dict]:
     # Example: mock leads (replace with real API integrations later)
     # Upgrade path: Google Maps scraping, LinkedIn, Craigslist, business directories
     for i in range(5):
-        leads.append({
-            "name": f"Business {i}",
-            "email": f"test{i}@email.com",
-            "need": "marketing",
-        })
+        leads.append(
+            {
+                "name": f"Business {i}",
+                "email": f"test{i}@email.com",
+                "need": "marketing",
+            }
+        )
 
     return leads
 

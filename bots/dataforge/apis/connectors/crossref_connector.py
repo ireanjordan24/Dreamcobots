@@ -1,4 +1,5 @@
 """CrossRef scholarly metadata API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,6 +27,7 @@ class CrossRefConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"query": query, "rows": rows, "mailto": self.mailto}
         try:
             response = requests.get(f"{self.BASE_URL}/works", params=params, timeout=30)
@@ -46,6 +48,7 @@ class CrossRefConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             response = requests.get(f"{self.BASE_URL}/works/{doi}", timeout=30)
             response.raise_for_status()
@@ -53,4 +56,3 @@ class CrossRefConnector:
         except requests.RequestException as e:
             logger.error("CrossRef get_work error: %s", e)
             return {"status": "error", "message": str(e)}
-

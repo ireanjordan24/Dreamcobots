@@ -1,44 +1,46 @@
 """Tests for bots/cinecore_bot — DreamCo CineCore AI Commercial System."""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.cinecore_bot.cinecore_bot import (
-    CineCoreBot,
-    CineCoreBotTierError,
-    CineCoreBotError,
-    CommercialScript,
-    VideoAsset,
-    LeadRecord,
-    AnalyticsRecord,
-    ScriptEngine,
-    VideoEngine,
-    VoiceEngine,
-    PlatformOptimizer,
-    LeadEngine,
-    BusinessScorer,
-    ClosingAgent,
-    BillingEngine,
-    AnalyticsEngine,
-    BulkGenerator,
-    SelfHeal,
     CRM,
+    SUPPORTED_GENRES,
     SUPPORTED_PLATFORMS,
     SUPPORTED_VOICE_TONES,
-    SUPPORTED_GENRES,
+    AnalyticsEngine,
+    AnalyticsRecord,
+    BillingEngine,
+    BulkGenerator,
+    BusinessScorer,
+    CineCoreBot,
+    CineCoreBotError,
+    CineCoreBotTierError,
+    ClosingAgent,
+    CommercialScript,
+    LeadEngine,
+    LeadRecord,
+    PlatformOptimizer,
+    ScriptEngine,
+    SelfHeal,
+    VideoAsset,
+    VideoEngine,
+    VoiceEngine,
 )
 from bots.cinecore_bot.tiers import BOT_FEATURES, get_bot_tier_info
-
 
 # ===========================================================================
 # Tier definitions
 # ===========================================================================
+
 
 class TestTierDefinitions:
     def test_all_tiers_have_features(self):
@@ -46,7 +48,9 @@ class TestTierDefinitions:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_pro(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.PRO.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.PRO.value]
+        )
 
     def test_pro_has_more_features_than_free(self):
         assert len(BOT_FEATURES[Tier.PRO.value]) > len(BOT_FEATURES[Tier.FREE.value])
@@ -69,7 +73,9 @@ class TestTierDefinitions:
     def test_get_bot_tier_info_enterprise(self):
         info = get_bot_tier_info(Tier.ENTERPRISE)
         assert info["tier"] == "enterprise"
-        assert info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        assert (
+            info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        )
 
     def test_tier_info_has_support_level(self):
         for tier in Tier:
@@ -81,6 +87,7 @@ class TestTierDefinitions:
 # ===========================================================================
 # CineCoreBot instantiation
 # ===========================================================================
+
 
 class TestCineCoreBotInstantiation:
     def test_default_tier_is_free(self):
@@ -118,6 +125,7 @@ class TestCineCoreBotInstantiation:
 # ===========================================================================
 # ScriptEngine
 # ===========================================================================
+
 
 class TestScriptEngine:
     def test_generate_basic_script_free(self):
@@ -229,6 +237,7 @@ class TestScriptEngine:
 # VideoEngine
 # ===========================================================================
 
+
 class TestVideoEngine:
     def test_free_tier_no_providers(self):
         engine = VideoEngine(Tier.FREE)
@@ -262,7 +271,9 @@ class TestVideoEngine:
 
     def test_pro_generate_runway(self):
         engine = VideoEngine(Tier.PRO)
-        asset = engine.generate("Commercial script here", provider="runway", duration=15)
+        asset = engine.generate(
+            "Commercial script here", provider="runway", duration=15
+        )
         assert isinstance(asset, VideoAsset)
         assert asset.provider == "runway"
         assert asset.status == "ready"
@@ -309,6 +320,7 @@ class TestVideoEngine:
 # ===========================================================================
 # VoiceEngine
 # ===========================================================================
+
 
 class TestVoiceEngine:
     def test_free_neutral_tone_only(self):
@@ -369,13 +381,17 @@ class TestVoiceEngine:
     def test_duration_estimate_scales_with_script(self):
         engine = VoiceEngine(Tier.PRO)
         short = engine.generate("Short script", tone="neutral")
-        long = engine.generate("A much longer script with many words that should take more time to speak aloud", tone="neutral")
+        long = engine.generate(
+            "A much longer script with many words that should take more time to speak aloud",
+            tone="neutral",
+        )
         assert long["duration_estimate_seconds"] >= short["duration_estimate_seconds"]
 
 
 # ===========================================================================
 # PlatformOptimizer
 # ===========================================================================
+
 
 class TestPlatformOptimizer:
     def _make_asset(self):
@@ -441,6 +457,7 @@ class TestPlatformOptimizer:
 # ===========================================================================
 # LeadEngine
 # ===========================================================================
+
 
 class TestLeadEngine:
     def test_search_returns_leads(self):
@@ -508,22 +525,29 @@ class TestLeadEngine:
 # BusinessScorer
 # ===========================================================================
 
+
 class TestBusinessScorer:
     def test_low_rating_high_score(self):
         scorer = BusinessScorer()
-        lead = LeadRecord(name="Biz", business_type="restaurant", location="downtown", rating=2.5)
+        lead = LeadRecord(
+            name="Biz", business_type="restaurant", location="downtown", rating=2.5
+        )
         score = scorer.score(lead)
         assert score > 150
 
     def test_high_rating_lower_score(self):
         scorer = BusinessScorer()
         low = LeadRecord(name="Biz1", business_type="tech", location="city", rating=2.5)
-        high = LeadRecord(name="Biz2", business_type="tech", location="city", rating=4.9)
+        high = LeadRecord(
+            name="Biz2", business_type="tech", location="city", rating=4.9
+        )
         assert scorer.score(low) > scorer.score(high)
 
     def test_high_value_type_bonus(self):
         scorer = BusinessScorer()
-        high = LeadRecord(name="Biz1", business_type="restaurant", location="city", rating=3.5)
+        high = LeadRecord(
+            name="Biz1", business_type="restaurant", location="city", rating=3.5
+        )
         low = LeadRecord(name="Biz2", business_type="tech", location="city", rating=3.5)
         assert scorer.score(high) > scorer.score(low)
 
@@ -531,8 +555,12 @@ class TestBusinessScorer:
         scorer = BusinessScorer()
         leads = [
             LeadRecord(name="Biz1", business_type="tech", location="city", rating=4.5),
-            LeadRecord(name="Biz2", business_type="restaurant", location="city", rating=2.5),
-            LeadRecord(name="Biz3", business_type="plumbing", location="city", rating=3.0),
+            LeadRecord(
+                name="Biz2", business_type="restaurant", location="city", rating=2.5
+            ),
+            LeadRecord(
+                name="Biz3", business_type="plumbing", location="city", rating=3.0
+            ),
         ]
         ranked = scorer.rank(leads)
         for i in range(len(ranked) - 1):
@@ -540,14 +568,18 @@ class TestBusinessScorer:
 
     def test_score_cap_at_200(self):
         scorer = BusinessScorer()
-        lead = LeadRecord(name="Biz", business_type="restaurant", location="city", rating=1.0)
+        lead = LeadRecord(
+            name="Biz", business_type="restaurant", location="city", rating=1.0
+        )
         score = scorer.score(lead)
         assert score <= 200
 
     def test_rank_sets_opportunity_score(self):
         scorer = BusinessScorer()
         leads = [
-            LeadRecord(name="Biz", business_type="restaurant", location="city", rating=3.0)
+            LeadRecord(
+                name="Biz", business_type="restaurant", location="city", rating=3.0
+            )
         ]
         ranked = scorer.rank(leads)
         assert ranked[0].opportunity_score > 0
@@ -556,6 +588,7 @@ class TestBusinessScorer:
 # ===========================================================================
 # ClosingAgent
 # ===========================================================================
+
 
 class TestClosingAgent:
     def _make_lead(self):
@@ -637,6 +670,7 @@ class TestClosingAgent:
 # BillingEngine
 # ===========================================================================
 
+
 class TestBillingEngine:
     def test_list_plans_always_available(self):
         engine = BillingEngine(Tier.FREE)
@@ -706,6 +740,7 @@ class TestBillingEngine:
 # AnalyticsEngine
 # ===========================================================================
 
+
 class TestAnalyticsEngine:
     def test_track_returns_analytics_record(self):
         engine = AnalyticsEngine(Tier.PRO)
@@ -772,6 +807,7 @@ class TestAnalyticsEngine:
 # BulkGenerator
 # ===========================================================================
 
+
 class TestBulkGenerator:
     def _make_bulk_generator(self, tier: Tier) -> BulkGenerator:
         se = ScriptEngine(tier)
@@ -792,7 +828,9 @@ class TestBulkGenerator:
 
     def test_bulk_run_single(self):
         gen = self._make_bulk_generator(Tier.PRO)
-        businesses = [{"name": "Cafe", "product": "coffee", "target_audience": "adults"}]
+        businesses = [
+            {"name": "Cafe", "product": "coffee", "target_audience": "adults"}
+        ]
         results = gen.run(businesses)
         assert len(results) == 1
         assert "script" in results[0]
@@ -831,6 +869,7 @@ class TestBulkGenerator:
 # ===========================================================================
 # SelfHeal
 # ===========================================================================
+
 
 class TestSelfHeal:
     def test_monitor_healthy(self):
@@ -878,9 +917,12 @@ class TestSelfHeal:
 # CRM
 # ===========================================================================
 
+
 class TestCRM:
     def _make_lead(self, name="Biz"):
-        return LeadRecord(name=name, business_type="restaurant", location="downtown", rating=3.0)
+        return LeadRecord(
+            name=name, business_type="restaurant", location="downtown", rating=3.0
+        )
 
     def test_add_lead(self):
         crm = CRM()
@@ -945,6 +987,7 @@ class TestCRM:
 # ===========================================================================
 # CineCoreBot (full integration)
 # ===========================================================================
+
 
 class TestCineCoreBotIntegration:
     def test_generate_script(self):

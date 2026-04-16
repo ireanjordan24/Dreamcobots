@@ -1,22 +1,26 @@
 """Tests for Business_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from Business_bots.feature_1 import MeetingSchedulerBot, EXAMPLES as BS1_EXAMPLES
-from Business_bots.feature_2 import ProjectManagementBot, EXAMPLES as BS2_EXAMPLES
-from Business_bots.feature_3 import InvoicingBot, EXAMPLES as BS3_EXAMPLES
-
+from Business_bots.feature_1 import EXAMPLES as BS1_EXAMPLES
+from Business_bots.feature_1 import MeetingSchedulerBot
+from Business_bots.feature_2 import EXAMPLES as BS2_EXAMPLES
+from Business_bots.feature_2 import ProjectManagementBot
+from Business_bots.feature_3 import EXAMPLES as BS3_EXAMPLES
+from Business_bots.feature_3 import InvoicingBot
 
 # ===========================================================================
 # Feature 1: MeetingSchedulerBot
 # ===========================================================================
+
 
 class TestMeetingSchedulerBotInstantiation:
     def test_default_tier_is_free(self):
@@ -122,6 +126,7 @@ class TestMeetingSchedulerBotMethods:
 # Feature 2: ProjectManagementBot
 # ===========================================================================
 
+
 class TestProjectManagementBotInstantiation:
     def test_default_tier_is_free(self):
         bot = ProjectManagementBot()
@@ -164,7 +169,9 @@ class TestProjectManagementBotMethods:
         at_risk = bot.get_at_risk_projects(threshold_pct=50)
         assert isinstance(at_risk, list)
         for p in at_risk:
-            assert p["progress_pct"] < 50 or p.get("at_risk") is True or True  # flexible check
+            assert (
+                p["progress_pct"] < 50 or p.get("at_risk") is True or True
+            )  # flexible check
 
     def test_get_overdue_projects_returns_list(self):
         bot = ProjectManagementBot(tier="PRO")
@@ -216,6 +223,7 @@ class TestProjectManagementBotMethods:
 # ===========================================================================
 # Feature 3: InvoicingBot
 # ===========================================================================
+
 
 class TestInvoicingBotInstantiation:
     def test_default_tier_is_free(self):

@@ -1,6 +1,7 @@
 """Tests for EventBus."""
 
 import pytest
+
 from BuddyAI.event_bus import EventBus
 
 

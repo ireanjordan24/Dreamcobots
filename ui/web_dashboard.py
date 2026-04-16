@@ -41,13 +41,15 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 try:
-    from flask import Flask, jsonify, request, Response
+    from flask import Flask, Response, jsonify, request
+
     _FLASK_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _FLASK_AVAILABLE = False
 
 try:
     import requests as _requests
+
     _REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _requests = None  # type: ignore[assignment]
@@ -55,7 +57,6 @@ except ImportError:  # pragma: no cover
 
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
-
 
 # ---------------------------------------------------------------------------
 # GitHub Actions helpers (read-only)
@@ -76,7 +77,10 @@ _QUANTUM_CACHE_TTL_S = 60
 def _github_headers() -> dict:
     """Return HTTP headers for GitHub API calls, including auth if available."""
     token = os.environ.get("GITHUB_TOKEN", "")
-    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
@@ -90,7 +94,11 @@ def _fetch_github_workflows(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
     payload so the dashboard always renders.
     """
     if not _REQUESTS_AVAILABLE:
-        return {"runs": [], "source": "unavailable", "reason": "requests library not installed"}
+        return {
+            "runs": [],
+            "source": "unavailable",
+            "reason": "requests library not installed",
+        }
 
     per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, per_page))
     url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/runs"
@@ -118,14 +126,22 @@ def _fetch_github_workflows(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
                 }
                 for r in data.get("workflow_runs", [])
             ]
-            return {"runs": runs, "total_count": data.get("total_count", len(runs)), "source": "github_api"}
+            return {
+                "runs": runs,
+                "total_count": data.get("total_count", len(runs)),
+                "source": "github_api",
+            }
         return {
             "runs": [],
             "source": "unavailable",
             "reason": f"GitHub API returned HTTP {resp.status_code}",
         }
     except Exception:  # noqa: BLE001
-        return {"runs": [], "source": "unavailable", "reason": "GitHub API request failed"}
+        return {
+            "runs": [],
+            "source": "unavailable",
+            "reason": "GitHub API request failed",
+        }
 
 
 def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> dict:
@@ -134,7 +150,11 @@ def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
     Returns a dict with ``artifacts`` (list) and ``source``.  Never raises.
     """
     if not _REQUESTS_AVAILABLE:
-        return {"artifacts": [], "source": "unavailable", "reason": "requests library not installed"}
+        return {
+            "artifacts": [],
+            "source": "unavailable",
+            "reason": "requests library not installed",
+        }
 
     per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, per_page))
     url = f"{_GITHUB_API_BASE}/repos/{repo}/actions/artifacts"
@@ -159,14 +179,22 @@ def _fetch_github_artifacts(repo: str = _DEFAULT_REPO, per_page: int = 10) -> di
                 }
                 for a in data.get("artifacts", [])
             ]
-            return {"artifacts": artifacts, "total_count": data.get("total_count", len(artifacts)), "source": "github_api"}
+            return {
+                "artifacts": artifacts,
+                "total_count": data.get("total_count", len(artifacts)),
+                "source": "github_api",
+            }
         return {
             "artifacts": [],
             "source": "unavailable",
             "reason": f"GitHub API returned HTTP {resp.status_code}",
         }
     except Exception:  # noqa: BLE001
-        return {"artifacts": [], "source": "unavailable", "reason": "GitHub API request failed"}
+        return {
+            "artifacts": [],
+            "source": "unavailable",
+            "reason": "GitHub API request failed",
+        }
 
 
 def _check_quantum_bot_status() -> dict:
@@ -180,19 +208,25 @@ def _check_quantum_bot_status() -> dict:
     import time as _time
 
     now = _time.monotonic()
-    if _quantum_cache and now - _quantum_cache.get("_cached_at", 0) < _QUANTUM_CACHE_TTL_S:
+    if (
+        _quantum_cache
+        and now - _quantum_cache.get("_cached_at", 0) < _QUANTUM_CACHE_TTL_S
+    ):
         result = {k: v for k, v in _quantum_cache.items() if not k.startswith("_")}
         result["checked_at"] = datetime.now(timezone.utc).isoformat()
         return result
 
     try:
-        _ai_models_dir = os.path.join(os.path.dirname(__file__), "..", "bots", "ai-models-integration")
+        _ai_models_dir = os.path.join(
+            os.path.dirname(__file__), "..", "bots", "ai-models-integration"
+        )
         import sys as _sys  # noqa: PLC0415
+
         if _ai_models_dir not in _sys.path:
             _sys.path.insert(0, _ai_models_dir)
 
-        from bots.quantum_ai_bot.quantum_ai_bot import QuantumAIBot  # noqa: PLC0415
         from bots.ai_learning_system.tiers import Tier  # noqa: PLC0415
+        from bots.quantum_ai_bot.quantum_ai_bot import QuantumAIBot  # noqa: PLC0415
 
         bot = QuantumAIBot(tier=Tier.FREE)
         result = {
@@ -761,6 +795,7 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
 # App factory
 # ---------------------------------------------------------------------------
 
+
 def create_app(
     control_center: Optional["ControlCenter"] = None,
     db: Optional[BotPerformanceDB] = None,
@@ -805,11 +840,13 @@ def create_app(
     def api_status() -> Response:
         monitoring = cc.get_monitoring_dashboard()
         db_stats = perf_db.get_stats()
-        return jsonify({
-            **monitoring,
-            "avg_composite_kpi": db_stats["avg_composite_score"],
-            "underperformers": db_stats["underperformers_below_30"],
-        })
+        return jsonify(
+            {
+                **monitoring,
+                "avg_composite_kpi": db_stats["avg_composite_score"],
+                "underperformers": db_stats["underperformers_below_30"],
+            }
+        )
 
     # ---------------------------------------------------------------
     # Bots
@@ -847,8 +884,10 @@ def create_app(
 
         class _Stub:
             """Minimal stub registered when no real bot instance is provided."""
+
             def __init__(self, tier_str: str):
                 from bots.ai_learning_system.tiers import Tier as LSTier
+
                 try:
                     self.tier = LSTier(tier_str)
                 except ValueError:
@@ -887,8 +926,10 @@ def create_app(
 
         class _LiveStub:
             """Minimal live bot stub."""
+
             def __init__(self, t: str):
                 from bots.ai_learning_system.tiers import Tier as LSTier
+
                 try:
                     self.tier = LSTier(t)
                 except ValueError:
@@ -938,10 +979,12 @@ def create_app(
     @app.route("/api/underperformers")
     def api_underperformers() -> Response:
         threshold = request.args.get("threshold", 30.0, type=float)
-        return jsonify({
-            "threshold": threshold,
-            "underperformers": perf_db.get_underperformers(threshold=threshold),
-        })
+        return jsonify(
+            {
+                "threshold": threshold,
+                "underperformers": perf_db.get_underperformers(threshold=threshold),
+            }
+        )
 
     # ---------------------------------------------------------------
     # Record run
@@ -979,7 +1022,10 @@ def create_app(
     def api_github_workflows() -> Response:
         """Return recent GitHub Actions workflow runs (read-only)."""
         repo = os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO)
-        per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)))
+        per_page = max(
+            _GITHUB_PER_PAGE_MIN,
+            min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)),
+        )
         data = _fetch_github_workflows(repo=repo, per_page=per_page)
         return jsonify(data)
 
@@ -987,7 +1033,10 @@ def create_app(
     def api_github_artifacts() -> Response:
         """Return recent GitHub Actions artifacts (read-only)."""
         repo = os.environ.get("GITHUB_REPOSITORY", _DEFAULT_REPO)
-        per_page = max(_GITHUB_PER_PAGE_MIN, min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)))
+        per_page = max(
+            _GITHUB_PER_PAGE_MIN,
+            min(_GITHUB_PER_PAGE_MAX, request.args.get("per_page", 10, type=int)),
+        )
         data = _fetch_github_artifacts(repo=repo, per_page=per_page)
         return jsonify(data)
 
@@ -1003,4 +1052,10 @@ def create_app(
     return app
 
 
-__all__ = ["create_app", "_BOT_CATALOG", "_fetch_github_workflows", "_fetch_github_artifacts", "_check_quantum_bot_status"]
+__all__ = [
+    "create_app",
+    "_BOT_CATALOG",
+    "_fetch_github_workflows",
+    "_fetch_github_artifacts",
+    "_check_quantum_bot_status",
+]

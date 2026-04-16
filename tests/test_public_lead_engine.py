@@ -11,48 +11,48 @@ Covers:
   7. Bot library registration
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.public_lead_engine.public_lead_engine import (
+    BusinessCategory,
+    DataSource,
+    LeadStatus,
+    PublicBusinessLead,
+    PublicLeadEngine,
+    PublicLeadEngineError,
+    PublicLeadEngineTierError,
+)
 from bots.public_lead_engine.tiers import (
+    FEATURE_AD_SCORE,
+    FEATURE_AI_OPPORTUNITY_SCORE,
+    FEATURE_ANALYTICS,
+    FEATURE_BULK_SEARCH,
+    FEATURE_CRM_EXPORT,
+    FEATURE_GOOGLE_PLACES_SEARCH,
+    FEATURE_MULTI_API,
+    FEATURE_OUTREACH_DRAFT,
+    FEATURE_RATING_FILTER,
+    FEATURE_SCRIPT_GENERATION,
+    FEATURE_WEAK_MARKETING_FILTER,
+    FEATURE_WHITE_LABEL,
+    FEATURE_YELP_SEARCH,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_GOOGLE_PLACES_SEARCH,
-    FEATURE_YELP_SEARCH,
-    FEATURE_RATING_FILTER,
-    FEATURE_WEAK_MARKETING_FILTER,
-    FEATURE_AD_SCORE,
-    FEATURE_SCRIPT_GENERATION,
-    FEATURE_OUTREACH_DRAFT,
-    FEATURE_CRM_EXPORT,
-    FEATURE_MULTI_API,
-    FEATURE_AI_OPPORTUNITY_SCORE,
-    FEATURE_BULK_SEARCH,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.public_lead_engine.public_lead_engine import (
-    PublicLeadEngine,
-    PublicLeadEngineError,
-    PublicLeadEngineTierError,
-    PublicBusinessLead,
-    DataSource,
-    BusinessCategory,
-    LeadStatus,
-)
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestPublicLeadEngineTiers:
     def test_three_tiers(self):
@@ -107,7 +107,9 @@ class TestPublicLeadEngineTiers:
         assert get_tier_config(Tier.ENTERPRISE).has_feature(FEATURE_MULTI_API)
 
     def test_enterprise_has_ai_opportunity_score(self):
-        assert get_tier_config(Tier.ENTERPRISE).has_feature(FEATURE_AI_OPPORTUNITY_SCORE)
+        assert get_tier_config(Tier.ENTERPRISE).has_feature(
+            FEATURE_AI_OPPORTUNITY_SCORE
+        )
 
     def test_enterprise_has_bulk_search(self):
         assert get_tier_config(Tier.ENTERPRISE).has_feature(FEATURE_BULK_SEARCH)
@@ -140,6 +142,7 @@ class TestPublicLeadEngineTiers:
 # ===========================================================================
 # 2. Business Search
 # ===========================================================================
+
 
 class TestPublicLeadEngineSearch:
     def setup_method(self):
@@ -217,6 +220,7 @@ class TestPublicLeadEngineSearch:
 # 3. Filtering
 # ===========================================================================
 
+
 class TestPublicLeadEngineFiltering:
     def setup_method(self):
         self.engine = PublicLeadEngine(tier=Tier.PRO)
@@ -263,6 +267,7 @@ class TestPublicLeadEngineFiltering:
 # 4. Opportunity Scoring
 # ===========================================================================
 
+
 class TestPublicLeadEngineScoring:
     def setup_method(self):
         self.engine = PublicLeadEngine(tier=Tier.ENTERPRISE)
@@ -297,6 +302,7 @@ class TestPublicLeadEngineScoring:
 # 5. Script Generation
 # ===========================================================================
 
+
 class TestPublicLeadEngineScripts:
     def setup_method(self):
         self.engine = PublicLeadEngine(tier=Tier.PRO)
@@ -328,12 +334,17 @@ class TestPublicLeadEngineScripts:
         scripted = [l for l in leads if l["generated_script"]]
         for lead in scripted:
             script = lead["generated_script"]
-            assert lead["location"] in script or lead["name"] in script or lead["category"] in script
+            assert (
+                lead["location"] in script
+                or lead["name"] in script
+                or lead["category"] in script
+            )
 
 
 # ===========================================================================
 # 6. Outreach Drafts
 # ===========================================================================
+
 
 class TestPublicLeadEngineOutreach:
     def setup_method(self):
@@ -380,6 +391,7 @@ class TestPublicLeadEngineOutreach:
 # 7. Bulk Search
 # ===========================================================================
 
+
 class TestPublicLeadEngineBulkSearch:
     def setup_method(self):
         self.engine = PublicLeadEngine(tier=Tier.ENTERPRISE)
@@ -403,6 +415,7 @@ class TestPublicLeadEngineBulkSearch:
 # ===========================================================================
 # 8. CRM Export
 # ===========================================================================
+
 
 class TestPublicLeadEngineCRM:
     def setup_method(self):
@@ -436,6 +449,7 @@ class TestPublicLeadEngineCRM:
 # ===========================================================================
 # 9. Analytics & Summary
 # ===========================================================================
+
 
 class TestPublicLeadEngineAnalytics:
     def setup_method(self):
@@ -497,6 +511,7 @@ class TestPublicLeadEngineAnalytics:
 # ===========================================================================
 # 10. Chat & Process Interfaces
 # ===========================================================================
+
 
 class TestPublicLeadEngineChatInterface:
     def setup_method(self):
@@ -568,9 +583,11 @@ class TestPublicLeadEngineChatInterface:
 # 11. Bot Library Registration
 # ===========================================================================
 
+
 class TestPublicLeadEngineBotLibrary:
     def test_registered_in_library(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("public_lead_engine")
@@ -578,7 +595,8 @@ class TestPublicLeadEngineBotLibrary:
         assert entry.display_name == "Public Lead Engine"
 
     def test_bot_category_is_lead_gen(self):
-        from bots.global_bot_network.bot_library import BotLibrary, BotCategory
+        from bots.global_bot_network.bot_library import BotCategory, BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("public_lead_engine")
@@ -586,6 +604,7 @@ class TestPublicLeadEngineBotLibrary:
 
     def test_bot_has_expected_capabilities(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("public_lead_engine")
@@ -596,6 +615,7 @@ class TestPublicLeadEngineBotLibrary:
 
     def test_bot_module_path(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("public_lead_engine")
@@ -604,6 +624,7 @@ class TestPublicLeadEngineBotLibrary:
 
     def test_both_lead_bots_registered(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         cinecore = lib.get_bot("cinecore_lead_engine")
@@ -613,6 +634,7 @@ class TestPublicLeadEngineBotLibrary:
 
     def test_lead_gen_bots_searchable(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         results = lib.search("lead engine")

@@ -1,13 +1,23 @@
 """Tier configuration for the Health & Wellness Bot."""
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers
 
-__all__ = ["Tier", "TierConfig", "get_tier_config", "get_upgrade_path", "list_tiers",
-           "HEALTH_FEATURES", "get_health_tier_info"]
+__all__ = [
+    "Tier",
+    "TierConfig",
+    "get_tier_config",
+    "get_upgrade_path",
+    "list_tiers",
+    "HEALTH_FEATURES",
+    "get_health_tier_info",
+]
 
 HEALTH_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: [

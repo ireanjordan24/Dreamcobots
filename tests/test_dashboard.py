@@ -1,19 +1,20 @@
 """Tests for dashboard/app.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from dashboard.app import DashboardApp
-from core.dreamco_orchestrator import DreamCoOrchestrator
 
+from core.dreamco_orchestrator import DreamCoOrchestrator
+from dashboard.app import DashboardApp
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_dashboard(revenues=None):
     revenues = revenues or [100.0, 200.0, 50.0]
@@ -35,11 +36,18 @@ def _make_dashboard(revenues=None):
 # get_view
 # ---------------------------------------------------------------------------
 
+
 class TestGetView:
     def test_returns_dict_with_required_keys(self):
         dash = _make_dashboard()
         view = dash.get_view()
-        for key in ("bots", "total_revenue", "top_performers", "scaling_events", "timestamp"):
+        for key in (
+            "bots",
+            "total_revenue",
+            "top_performers",
+            "scaling_events",
+            "timestamp",
+        ):
             assert key in view
 
     def test_total_revenue_correct(self):
@@ -66,7 +74,12 @@ class TestGetView:
     def test_error_bots_excluded_from_revenue(self):
         orch = DreamCoOrchestrator()
         orch.run_all_bots = lambda: [
-            {"bot_name": "ok", "output": {"revenue": 300}, "validation": {}, "error": None},
+            {
+                "bot_name": "ok",
+                "output": {"revenue": 300},
+                "validation": {},
+                "error": None,
+            },
             {"bot_name": "err", "output": {}, "validation": {}, "error": "failed"},
         ]
         dash = DashboardApp(orchestrator=orch)
@@ -77,6 +90,7 @@ class TestGetView:
 # ---------------------------------------------------------------------------
 # get_summary_stats
 # ---------------------------------------------------------------------------
+
 
 class TestGetSummaryStats:
     def test_returns_dict(self):

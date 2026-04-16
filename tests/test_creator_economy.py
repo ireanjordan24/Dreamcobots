@@ -3,34 +3,39 @@ Tests for bots/creator_economy/tiers.py and
 bots/creator_economy/creator_economy_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.creator_economy.tiers import (
-    get_ce_tier_info,
-    CE_EXTRA_FEATURES,
-    CE_TOOLS,
-)
+
 from bots.creator_economy.creator_economy_bot import (
     CreatorEconomyBot,
-    CreatorEconomyTierError,
     CreatorEconomyRequestLimitError,
+    CreatorEconomyTierError,
 )
+from bots.creator_economy.tiers import CE_EXTRA_FEATURES, CE_TOOLS, get_ce_tier_info
 
 
 class TestCETierInfo:
     def test_tier_info_keys(self):
         info = get_ce_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "ce_features", "tools", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "ce_features",
+            "tools",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):

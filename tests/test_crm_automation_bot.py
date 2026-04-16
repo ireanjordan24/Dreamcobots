@@ -2,29 +2,39 @@
 Tests for bots/crm_automation_bot/tiers.py and bots/crm_automation_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.crm_automation_bot.tiers import CRM_AUTOMATION_FEATURES, get_crm_automation_tier_info
+
 from bots.crm_automation_bot.bot import (
     CRMAutomationBot,
-    CRMAutomationBotTierError,
     CRMAutomationBotRequestLimitError,
+    CRMAutomationBotTierError,
+)
+from bots.crm_automation_bot.tiers import (
+    CRM_AUTOMATION_FEATURES,
+    get_crm_automation_tier_info,
 )
 
 
 class TestCRMAutomationTierInfo:
     def test_free_tier_info_keys(self):
         info = get_crm_automation_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -59,7 +69,9 @@ class TestCRMAutomationBot:
 
     def test_add_contact_with_company(self):
         bot = CRMAutomationBot(tier=Tier.PRO)
-        result = bot.add_contact({"name": "Carol", "email": "carol@corp.com", "company": "Corp Inc"})
+        result = bot.add_contact(
+            {"name": "Carol", "email": "carol@corp.com", "company": "Corp Inc"}
+        )
         assert "contact_id" in result
 
     def test_contact_limit_free_tier(self):

@@ -52,7 +52,9 @@ _DEFAULTS: dict[str, str] = {
 
 def _is_bot_folder(path: str) -> bool:
     """Return True when any segment of *path* ends with 'bot'."""
-    return any(part.lower().endswith("bot") for part in path.replace("\\", "/").split("/"))
+    return any(
+        part.lower().endswith("bot") for part in path.replace("\\", "/").split("/")
+    )
 
 
 def _validate(bot_path: str) -> list[str]:
@@ -113,7 +115,10 @@ def scan_repo(root: str = ".", auto_fix: bool = False) -> bool:
     for dirpath, _dirs, _files in os.walk(root):
         # Skip hidden directories and virtual environments
         parts = dirpath.replace("\\", "/").split("/")
-        if any(p.startswith(".") or p in ("node_modules", "__pycache__", "venv", ".venv") for p in parts):
+        if any(
+            p.startswith(".") or p in ("node_modules", "__pycache__", "venv", ".venv")
+            for p in parts
+        ):
             continue
 
         if not _is_bot_folder(dirpath):

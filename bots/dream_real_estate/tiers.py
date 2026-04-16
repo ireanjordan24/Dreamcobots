@@ -8,6 +8,7 @@ Pricing tiers for DreamRealEstate bots:
 Tiers map directly to the per-bot tier labels in bots.json so callers can
 filter and gate features consistently.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations

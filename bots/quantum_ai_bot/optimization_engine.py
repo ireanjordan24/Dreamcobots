@@ -1,11 +1,17 @@
 """Quantum Optimization Engine and Partnership Manager for the Quantum AI Bot."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config
-from framework import GlobalAISourcesFlow  # noqa: F401
 
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 import random
 import uuid
+
+from tiers import Tier, get_tier_config
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="QuantumOptimizationEngine")
 
@@ -61,7 +67,9 @@ class QuantumOptimizer:
         self.tier = tier
         self.config = get_tier_config(tier)
 
-    def solve_optimization(self, problem_type: str, constraints: dict, variables: list) -> dict:
+    def solve_optimization(
+        self, problem_type: str, constraints: dict, variables: list
+    ) -> dict:
         """Solve a quantum optimization problem.
 
         Parameters
@@ -92,7 +100,10 @@ class QuantumOptimizer:
             "variables_count": n_vars,
             "constraints_applied": len(constraints),
             "objective_value": round(random.uniform(100.0, 10000.0), 4),
-            "optimal_solution": {v: round(random.uniform(0.0, 1.0), 4) for v in (variables[:5] if variables else ["x0", "x1", "x2"])},
+            "optimal_solution": {
+                v: round(random.uniform(0.0, 1.0), 4)
+                for v in (variables[:5] if variables else ["x0", "x1", "x2"])
+            },
             "iterations": random.randint(50, 500),
             "convergence": True,
             "algorithm": "QAOA" if self.tier != Tier.ENTERPRISE else "VQE+QAOA",
@@ -130,7 +141,9 @@ class QuantumOptimizer:
         result = {
             "system_type": system_type,
             "parameters": merged,
-            "energy_spectrum": [round(-13.6 / (n * n), 4) for n in range(1, energy_levels + 1)],
+            "energy_spectrum": [
+                round(-13.6 / (n * n), 4) for n in range(1, energy_levels + 1)
+            ],
             "ground_state_energy": round(random.uniform(-20.0, -1.0), 4),
             "simulation_steps": random.randint(100, 10000),
             "hamiltonian_terms": random.randint(5, 50),
@@ -158,9 +171,7 @@ class QuantumOptimizer:
             If global simulations are not available on the current tier.
         """
         if self.tier != Tier.ENTERPRISE:
-            raise QuantumOptimizerError(
-                "Global simulations require ENTERPRISE tier."
-            )
+            raise QuantumOptimizerError("Global simulations require ENTERPRISE tier.")
         defaults = self._GLOBAL_DOMAINS.get(domain, {"resolution_km": 100})
         merged = {**defaults, **parameters}
 
@@ -194,6 +205,7 @@ class QuantumOptimizer:
 # ---------------------------------------------------------------------------
 # Quantum Partnership Manager
 # ---------------------------------------------------------------------------
+
 
 class QuantumPartnershipManagerError(Exception):
     """Raised when a tier restriction is violated in QuantumPartnershipManager."""
@@ -291,7 +303,9 @@ class QuantumPartnershipManager:
                 backends[provider] = {
                     "backends": [],
                     "accessible": False,
-                    "required_tier": "pro" if provider in _PRO_PROVIDERS else "enterprise",
+                    "required_tier": (
+                        "pro" if provider in _PRO_PROVIDERS else "enterprise"
+                    ),
                 }
         return {
             "tier": self.tier.value,
@@ -325,7 +339,9 @@ class QuantumPartnershipManager:
             "circuit": circuit,
             "backend": backend,
             "estimated_gate_time_us": round(gates * random.uniform(0.1, 1.0), 3),
-            "total_circuit_time_ms": round(qubits * gates * random.uniform(0.01, 0.5), 3),
+            "total_circuit_time_ms": round(
+                qubits * gates * random.uniform(0.01, 0.5), 3
+            ),
             "estimated_queue_wait_min": round(random.uniform(0.5, 30.0), 1),
             "estimated_cost_usd": round(shots * qubits * 0.0001, 4),
             "qubit_fidelity": round(random.uniform(0.95, 0.9999), 4),

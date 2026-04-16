@@ -1,4 +1,5 @@
 """Mapbox geolocation API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,13 +27,17 @@ class MapboxConnector:
         Returns:
             API response dict or error dict.
         """
-        import requests
         import urllib.parse
+
+        import requests
+
         encoded = urllib.parse.quote(search_text)
         try:
             response = requests.get(
                 f"{self.BASE_URL}/geocoding/v5/mapbox.places/{encoded}.json",
-                params={"access_token": self.access_token}, timeout=30)
+                params={"access_token": self.access_token},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Mapbox forward geocoding completed for: %s", search_text)
             return {"status": "success", "data": response.json()}
@@ -54,4 +59,3 @@ class MapboxConnector:
         url = f"{self.BASE_URL}/styles/v1/mapbox/streets-v11/static/{lon},{lat},{zoom}/600x400?access_token={self.access_token}"
         logger.info("Mapbox static map URL generated for lon=%s lat=%s.", lon, lat)
         return {"status": "success", "url": url, "lon": lon, "lat": lat, "zoom": zoom}
-

@@ -31,32 +31,31 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
+from bots.localized_bot.global_leaderboard import GlobalLeaderboard
+from bots.localized_bot.localization_engine import LocalizationEngine
+from bots.localized_bot.region_database import RegionDatabase
 from bots.localized_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_TRANSLATION,
+    FEATURE_CUSTOM_LOCALE,
+    FEATURE_FULL_TRANSLATION,
+    FEATURE_GLOBAL_LEADERBOARD_VOTE,
+    FEATURE_INDUSTRY_ADAPTION,
+    FEATURE_PRIVATE_REGIONAL_BOTS,
+    FEATURE_REGIONAL_CHALLENGES,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BASIC_TRANSLATION,
-    FEATURE_FULL_TRANSLATION,
-    FEATURE_INDUSTRY_ADAPTION,
-    FEATURE_REGIONAL_CHALLENGES,
-    FEATURE_GLOBAL_LEADERBOARD_VOTE,
-    FEATURE_CUSTOM_LOCALE,
-    FEATURE_PRIVATE_REGIONAL_BOTS,
-    FEATURE_API_ACCESS,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.localized_bot.region_database import RegionDatabase
-from bots.localized_bot.localization_engine import LocalizationEngine
-from bots.localized_bot.global_leaderboard import GlobalLeaderboard
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class LocalizedBotError(Exception):
@@ -103,7 +102,11 @@ class LocalizedBot:
     def _check_region_limit(self, region_id: str, regions_used: list[str]) -> None:
         """Raise LocalizedBotTierError if adding *region_id* would exceed the tier limit."""
         max_r = self._config.max_regions
-        if max_r is not None and region_id not in regions_used and len(regions_used) >= max_r:
+        if (
+            max_r is not None
+            and region_id not in regions_used
+            and len(regions_used) >= max_r
+        ):
             raise LocalizedBotTierError(
                 "additional_regions",
                 "Pro" if self._tier == Tier.FREE else "Enterprise",

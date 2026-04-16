@@ -1,15 +1,21 @@
 """Tests for bots/foreclosure_finder_bot/tiers.py and bots/foreclosure_finder_bot/foreclosure_finder_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.foreclosure_finder_bot.foreclosure_finder_bot import ForeclosureFinderBot, ForeclosureFinderBotTierError
+
+from bots.foreclosure_finder_bot.foreclosure_finder_bot import (
+    ForeclosureFinderBot,
+    ForeclosureFinderBotTierError,
+)
 from bots.foreclosure_finder_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 
@@ -51,7 +57,9 @@ class TestTiersModule:
             assert key in info
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
 
 class TestSearchForeclosures:
@@ -86,8 +94,16 @@ class TestSearchForeclosures:
 
     def test_enterprise_unlimited_counties(self):
         bot = ForeclosureFinderBot(tier=Tier.ENTERPRISE)
-        counties = ["cook", "maricopa", "harris", "wayne", "hillsborough",
-                    "mecklenburg", "cuyahoga", "clark"]
+        counties = [
+            "cook",
+            "maricopa",
+            "harris",
+            "wayne",
+            "hillsborough",
+            "mecklenburg",
+            "cuyahoga",
+            "clark",
+        ]
         for county in counties:
             result = bot.search_foreclosures(county)
             assert isinstance(result, list)
@@ -129,8 +145,13 @@ class TestEvaluateForeclosure:
     def test_has_required_keys(self):
         bot = ForeclosureFinderBot(tier=Tier.FREE)
         result = bot.evaluate_foreclosure("FC001")
-        for key in ("listing_price_usd", "market_value_usd", "discount_from_market_pct",
-                    "potential_gross_profit_usd", "risk_level"):
+        for key in (
+            "listing_price_usd",
+            "market_value_usd",
+            "discount_from_market_pct",
+            "potential_gross_profit_usd",
+            "risk_level",
+        ):
             assert key in result
 
     def test_discount_calculation_correct(self):
@@ -212,7 +233,12 @@ class TestCheckTitleRisks:
     def test_has_required_keys(self):
         bot = ForeclosureFinderBot(tier=Tier.PRO)
         result = bot.check_title_risks("FC001")
-        for key in ("overall_title_risk", "liens_count", "risk_factors", "estimated_title_clearance_cost_usd"):
+        for key in (
+            "overall_title_risk",
+            "liens_count",
+            "risk_factors",
+            "estimated_title_clearance_cost_usd",
+        ):
             assert key in result
 
     def test_risk_factors_is_list(self):

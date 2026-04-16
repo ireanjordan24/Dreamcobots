@@ -11,43 +11,43 @@ Covers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.stripe_payment_bot.stripe_payment_bot import (
+    PLAN_CATALOGUE,
+    Bot,
+    StripePaymentBot,
+    StripeTierError,
+    StripeValidationError,
+)
 from bots.stripe_payment_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_CHECKOUT,
+    FEATURE_CONNECT,
+    FEATURE_COUPONS,
+    FEATURE_FRAUD_RADAR,
+    FEATURE_INVOICES,
+    FEATURE_REFUNDS,
+    FEATURE_SPLIT_PAYMENTS,
+    FEATURE_SUBSCRIPTIONS,
+    FEATURE_WEBHOOKS,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_CHECKOUT,
-    FEATURE_SUBSCRIPTIONS,
-    FEATURE_WEBHOOKS,
-    FEATURE_REFUNDS,
-    FEATURE_COUPONS,
-    FEATURE_INVOICES,
-    FEATURE_CONNECT,
-    FEATURE_SPLIT_PAYMENTS,
-    FEATURE_ANALYTICS,
-    FEATURE_FRAUD_RADAR,
 )
-from bots.stripe_payment_bot.stripe_payment_bot import (
-    StripePaymentBot,
-    StripeTierError,
-    StripeValidationError,
-    Bot,
-    PLAN_CATALOGUE,
-)
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -123,6 +123,7 @@ class TestTiers:
 # 2. Checkout
 # ===========================================================================
 
+
 class TestCheckout:
     @pytest.fixture
     def starter(self):
@@ -134,7 +135,8 @@ class TestCheckout:
 
     def test_create_checkout_returns_session(self, starter):
         s = starter.create_checkout_session(
-            amount=99.0, currency="USD",
+            amount=99.0,
+            currency="USD",
             product_name="Test Product",
             customer_email="test@example.com",
         )
@@ -201,6 +203,7 @@ class TestCheckout:
 # 3. Subscriptions (GROWTH+)
 # ===========================================================================
 
+
 class TestSubscriptions:
     @pytest.fixture
     def growth(self):
@@ -224,8 +227,12 @@ class TestSubscriptions:
         assert sub["amount_usd"] == PLAN_CATALOGUE["lead_generator_pro"]
 
     def test_annual_subscription_discounted(self, growth):
-        monthly = growth.create_subscription("cus_1", "lead_generator_pro", interval="monthly")
-        annual = growth.create_subscription("cus_2", "lead_generator_pro", interval="yearly")
+        monthly = growth.create_subscription(
+            "cus_1", "lead_generator_pro", interval="monthly"
+        )
+        annual = growth.create_subscription(
+            "cus_2", "lead_generator_pro", interval="yearly"
+        )
         # Annual = monthly * 10 (2 months free)
         assert annual["amount_usd"] == pytest.approx(monthly["amount_usd"] * 10)
 
@@ -259,6 +266,7 @@ class TestSubscriptions:
 # 4. Coupons (GROWTH+)
 # ===========================================================================
 
+
 class TestCoupons:
     @pytest.fixture
     def growth(self):
@@ -288,7 +296,9 @@ class TestCoupons:
 
     def test_coupon_applied_to_subscription(self, growth):
         no_coupon = growth.create_subscription("cus_1", "lead_generator_pro")
-        with_coupon = growth.create_subscription("cus_2", "lead_generator_pro", coupon_id="DREAMCO10")
+        with_coupon = growth.create_subscription(
+            "cus_2", "lead_generator_pro", coupon_id="DREAMCO10"
+        )
         assert with_coupon["amount_usd"] < no_coupon["amount_usd"]
 
     def test_launch_50_coupon(self, growth):
@@ -299,6 +309,7 @@ class TestCoupons:
 # ===========================================================================
 # 5. Invoices (GROWTH+)
 # ===========================================================================
+
 
 class TestInvoices:
     @pytest.fixture
@@ -324,7 +335,10 @@ class TestInvoices:
     def test_invoice_total_is_sum_of_line_items(self, growth):
         inv = growth.create_invoice(
             "cus_1",
-            [{"description": "A", "amount": 100.0}, {"description": "B", "amount": 50.0}],
+            [
+                {"description": "A", "amount": 100.0},
+                {"description": "B", "amount": 50.0},
+            ],
         )
         assert inv["total_amount"] == 150.0
 
@@ -345,7 +359,9 @@ class TestInvoices:
 
     def test_invoice_invalid_currency_raises(self, growth):
         with pytest.raises(StripeValidationError):
-            growth.create_invoice("cus_1", [{"description": "x", "amount": 100}], currency="XYZ")
+            growth.create_invoice(
+                "cus_1", [{"description": "x", "amount": 100}], currency="XYZ"
+            )
 
     def test_invoice_zero_total_raises(self, growth):
         with pytest.raises(StripeValidationError):
@@ -355,6 +371,7 @@ class TestInvoices:
 # ===========================================================================
 # 6. Webhooks (GROWTH+)
 # ===========================================================================
+
 
 class TestWebhooks:
     @pytest.fixture
@@ -370,54 +387,76 @@ class TestWebhooks:
             starter.process_webhook({"type": "payment_intent.succeeded"})
 
     def test_payment_succeeded_event(self, growth):
-        result = growth.process_webhook({
-            "type": "payment_intent.succeeded",
-            "data": {"object": {"amount": 9900}},
-        })
+        result = growth.process_webhook(
+            {
+                "type": "payment_intent.succeeded",
+                "data": {"object": {"amount": 9900}},
+            }
+        )
         assert result["handled"] is True
         assert result["action"] == "revenue_recorded"
 
     def test_payment_failed_event(self, growth):
-        result = growth.process_webhook({"type": "payment_intent.payment_failed", "data": {"object": {}}})
+        result = growth.process_webhook(
+            {"type": "payment_intent.payment_failed", "data": {"object": {}}}
+        )
         assert result["action"] == "payment_failed_logged"
 
     def test_subscription_created_event(self, growth):
-        result = growth.process_webhook({"type": "customer.subscription.created", "data": {"object": {}}})
+        result = growth.process_webhook(
+            {"type": "customer.subscription.created", "data": {"object": {}}}
+        )
         assert result["action"] == "subscription_activated"
 
     def test_subscription_deleted_event(self, growth):
-        result = growth.process_webhook({"type": "customer.subscription.deleted", "data": {"object": {}}})
+        result = growth.process_webhook(
+            {"type": "customer.subscription.deleted", "data": {"object": {}}}
+        )
         assert result["action"] == "subscription_deactivated"
 
     def test_invoice_payment_succeeded_event(self, growth):
-        result = growth.process_webhook({
-            "type": "invoice.payment_succeeded",
-            "data": {"object": {"amount_paid": 4900}},
-        })
+        result = growth.process_webhook(
+            {
+                "type": "invoice.payment_succeeded",
+                "data": {"object": {"amount_paid": 4900}},
+            }
+        )
         assert result["action"] == "invoice_paid"
 
     def test_invoice_payment_failed_event(self, growth):
-        result = growth.process_webhook({"type": "invoice.payment_failed", "data": {"object": {}}})
+        result = growth.process_webhook(
+            {"type": "invoice.payment_failed", "data": {"object": {}}}
+        )
         assert result["action"] == "invoice_payment_failed_logged"
 
     def test_unknown_event_not_handled(self, growth):
-        result = growth.process_webhook({"type": "mystery.event", "data": {"object": {}}})
+        result = growth.process_webhook(
+            {"type": "mystery.event", "data": {"object": {}}}
+        )
         assert result["handled"] is False
 
     def test_webhook_log_stores_events(self, growth):
-        growth.process_webhook({"type": "payment_intent.succeeded", "data": {"object": {"amount": 100}}})
+        growth.process_webhook(
+            {"type": "payment_intent.succeeded", "data": {"object": {"amount": 100}}}
+        )
         log = growth.get_webhook_log()
         assert len(log) == 1
 
     def test_multiple_webhooks_logged(self, growth):
         for _ in range(5):
-            growth.process_webhook({"type": "payment_intent.succeeded", "data": {"object": {"amount": 1000}}})
+            growth.process_webhook(
+                {
+                    "type": "payment_intent.succeeded",
+                    "data": {"object": {"amount": 1000}},
+                }
+            )
         assert len(growth.get_webhook_log()) == 5
 
 
 # ===========================================================================
 # 7. Refunds (all tiers)
 # ===========================================================================
+
 
 class TestRefunds:
     @pytest.fixture
@@ -459,6 +498,7 @@ class TestRefunds:
 # ===========================================================================
 # 8. Stripe Connect (ENTERPRISE)
 # ===========================================================================
+
 
 class TestConnect:
     @pytest.fixture
@@ -504,6 +544,7 @@ class TestConnect:
 # 9. Fraud Radar (ENTERPRISE)
 # ===========================================================================
 
+
 class TestFraudRadar:
     @pytest.fixture
     def enterprise(self):
@@ -535,6 +576,7 @@ class TestFraudRadar:
 # 10. Analytics (GROWTH+)
 # ===========================================================================
 
+
 class TestAnalytics:
     @pytest.fixture
     def growth(self):
@@ -550,7 +592,12 @@ class TestAnalytics:
 
     def test_revenue_summary_keys(self, growth):
         summary = growth.get_revenue_summary()
-        for key in ("total_revenue_usd", "total_checkouts", "total_subscriptions", "tier"):
+        for key in (
+            "total_revenue_usd",
+            "total_checkouts",
+            "total_subscriptions",
+            "tier",
+        ):
             assert key in summary
 
     def test_revenue_tracks_checkouts(self, growth):
@@ -574,6 +621,7 @@ class TestAnalytics:
 # 11. Monthly cap enforcement
 # ===========================================================================
 
+
 class TestMonthlyCap:
     def test_cap_enforced_on_starter(self):
         bot = StripePaymentBot(tier=Tier.STARTER)
@@ -592,6 +640,7 @@ class TestMonthlyCap:
 # 12. Chat & process interfaces
 # ===========================================================================
 
+
 class TestChatProcess:
     @pytest.fixture
     def growth(self):
@@ -599,11 +648,16 @@ class TestChatProcess:
 
     def test_chat_checkout_trigger(self, growth):
         result = growth.chat("I want to create a checkout for a new product")
-        assert "url" in result.get("data", {}) or "checkout" in result["message"].lower()
+        assert (
+            "url" in result.get("data", {}) or "checkout" in result["message"].lower()
+        )
 
     def test_chat_subscribe_trigger(self, growth):
         result = growth.chat("I want to subscribe to a plan")
-        assert "sub_" in result.get("data", {}).get("id", "") or "subscription" in result["message"].lower()
+        assert (
+            "sub_" in result.get("data", {}).get("id", "")
+            or "subscription" in result["message"].lower()
+        )
 
     def test_chat_revenue_trigger(self, growth):
         result = growth.chat("show me the revenue summary")
@@ -615,7 +669,9 @@ class TestChatProcess:
 
     def test_chat_default_response(self, growth):
         result = growth.chat("hello there")
-        assert "tier" in result["message"].lower() or "stripe" in result["message"].lower()
+        assert (
+            "tier" in result["message"].lower() or "stripe" in result["message"].lower()
+        )
 
     def test_process_delegates_to_chat(self, growth):
         result = growth.process({"command": "check revenue"})
@@ -628,6 +684,7 @@ class TestChatProcess:
 # ===========================================================================
 # 13. Plan catalogue
 # ===========================================================================
+
 
 class TestPlanCatalogue:
     def test_all_dreamco_plans_present(self):
@@ -649,5 +706,11 @@ class TestPlanCatalogue:
             assert price > 0, f"Plan '{name}' has non-positive price"
 
     def test_enterprise_plans_cost_more(self):
-        assert PLAN_CATALOGUE["lead_generator_enterprise"] > PLAN_CATALOGUE["lead_generator_pro"]
-        assert PLAN_CATALOGUE["lead_generator_pro"] > PLAN_CATALOGUE["lead_generator_starter"]
+        assert (
+            PLAN_CATALOGUE["lead_generator_enterprise"]
+            > PLAN_CATALOGUE["lead_generator_pro"]
+        )
+        assert (
+            PLAN_CATALOGUE["lead_generator_pro"]
+            > PLAN_CATALOGUE["lead_generator_starter"]
+        )

@@ -39,52 +39,52 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
+from typing import Optional
 
+from bots.open_claw_bot.ai_models import (
+    AIModel,
+    AIModelHub,
+    InferenceResult,
+    ModelFamily,
+)
+from bots.open_claw_bot.client_manager import (
+    ClientManager,
+    ClientPreferences,
+    ClientProfile,
+    ClientStatus,
+    GoalType,
+)
+from bots.open_claw_bot.strategy_engine import (
+    STRATEGY_RULE_TEMPLATES,
+    DataPoint,
+    RiskLevel,
+    Strategy,
+    StrategyEngine,
+    StrategyStatus,
+    StrategyType,
+)
 from bots.open_claw_bot.tiers import (
+    FEATURE_ADVANCED_ML,
+    FEATURE_AI_MODELS,
+    FEATURE_BOT_STRATEGIES,
+    FEATURE_CLIENT_MANAGER,
+    FEATURE_CUSTOM_RULES,
+    FEATURE_DATA_ANALYSIS,
+    FEATURE_ML_ENSEMBLE,
+    FEATURE_REALTIME_SIGNALS,
+    FEATURE_SCENARIO_SIM,
+    FEATURE_STRATEGY_ENGINE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_STRATEGY_ENGINE,
-    FEATURE_AI_MODELS,
-    FEATURE_CLIENT_MANAGER,
-    FEATURE_DATA_ANALYSIS,
-    FEATURE_CUSTOM_RULES,
-    FEATURE_ML_ENSEMBLE,
-    FEATURE_REALTIME_SIGNALS,
-    FEATURE_BOT_STRATEGIES,
-    FEATURE_SCENARIO_SIM,
-    FEATURE_ADVANCED_ML,
 )
-from bots.open_claw_bot.strategy_engine import (
-    StrategyEngine,
-    Strategy,
-    StrategyType,
-    StrategyStatus,
-    RiskLevel,
-    DataPoint,
-    STRATEGY_RULE_TEMPLATES,
-)
-from bots.open_claw_bot.ai_models import (
-    AIModelHub,
-    AIModel,
-    ModelFamily,
-    InferenceResult,
-)
-from bots.open_claw_bot.client_manager import (
-    ClientManager,
-    ClientProfile,
-    ClientPreferences,
-    ClientStatus,
-    GoalType,
-)
-from typing import Optional
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class OpenClawBotError(Exception):
@@ -297,9 +297,7 @@ class OpenClawBot:
     # Scenario simulation
     # ------------------------------------------------------------------
 
-    def simulate_scenario(
-        self, strategy_id: str, market_conditions: dict
-    ) -> dict:
+    def simulate_scenario(self, strategy_id: str, market_conditions: dict) -> dict:
         """Simulate a strategy under given market conditions."""
         self._require_feature(FEATURE_SCENARIO_SIM)
         return self.strategy_engine.simulate_scenario(strategy_id, market_conditions)
@@ -308,7 +306,9 @@ class OpenClawBot:
     # Data ingestion
     # ------------------------------------------------------------------
 
-    def ingest_data(self, metric: str, value: float, source: str = "", timestamp: str = "") -> None:
+    def ingest_data(
+        self, metric: str, value: float, source: str = "", timestamp: str = ""
+    ) -> None:
         """Feed a data point into the strategy engine analysis buffer."""
         self._require_feature(FEATURE_DATA_ANALYSIS)
         dp = DataPoint(

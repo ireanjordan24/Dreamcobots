@@ -1,27 +1,32 @@
 """DataForge AI Bot - main orchestrator for dataset generation and selling."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.bot_base import BotBase
-from bots.dataforge.dataset_generators.voice_dataset import VoiceDatasetGenerator
+from bots.dataforge.dataset_generators.behavioral_dataset import (
+    BehavioralDatasetGenerator,
+)
+from bots.dataforge.dataset_generators.emotion_engine_dataset import (
+    EmotionEngineDatasetGenerator,
+)
 from bots.dataforge.dataset_generators.facial_dataset import FacialDatasetGenerator
 from bots.dataforge.dataset_generators.item_dataset import ItemDatasetGenerator
-from bots.dataforge.dataset_generators.behavioral_dataset import BehavioralDatasetGenerator
-from bots.dataforge.dataset_generators.emotion_engine_dataset import EmotionEngineDatasetGenerator
-from bots.dataforge.packaging.json_packager import JSONPackager
-from bots.dataforge.packaging.csv_packager import CSVPackager
-from bots.dataforge.packaging.wav_packager import WAVPackager
-from bots.dataforge.packaging.coco_packager import COCOPackager
-from bots.dataforge.packaging.jsonl_packager import JSONLPackager
-from bots.dataforge.sales_channels import SalesChannels
-from bots.dataforge.marketplace.huggingface_publisher import HuggingFacePublisher
-from bots.dataforge.marketplace.kaggle_publisher import KagglePublisher
+from bots.dataforge.dataset_generators.voice_dataset import VoiceDatasetGenerator
 from bots.dataforge.marketplace.aws_publisher import AWSMarketplacePublisher
 from bots.dataforge.marketplace.direct_api_seller import DirectAPISeller
+from bots.dataforge.marketplace.huggingface_publisher import HuggingFacePublisher
+from bots.dataforge.marketplace.kaggle_publisher import KagglePublisher
+from bots.dataforge.packaging.coco_packager import COCOPackager
+from bots.dataforge.packaging.csv_packager import CSVPackager
+from bots.dataforge.packaging.json_packager import JSONPackager
+from bots.dataforge.packaging.jsonl_packager import JSONLPackager
+from bots.dataforge.packaging.wav_packager import WAVPackager
+from bots.dataforge.sales_channels import SalesChannels
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +78,15 @@ class DataForgeBot(BotBase):
         collected = {}
         try:
             import importlib.util
+
             spec = importlib.util.spec_from_file_location(
                 "government_contract_grant_bot",
-                os.path.join(os.path.dirname(__file__), "..", "government-contract-grant-bot",
-                             "government_contract_grant_bot.py")
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "government-contract-grant-bot",
+                    "government_contract_grant_bot.py",
+                ),
             )
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
@@ -85,7 +95,11 @@ class DataForgeBot(BotBase):
             logger.info("Collected data from GovernmentContractGrantBot.")
         except Exception as e:
             logger.warning("Could not collect from GovernmentContractGrantBot: %s", e)
-            collected["government_contract_grant_bot"] = {"type": "government", "content": [], "error": str(e)}
+            collected["government_contract_grant_bot"] = {
+                "type": "government",
+                "content": [],
+                "error": str(e),
+            }
         return collected
 
     def generate_synthetic_data(self) -> dict:
@@ -109,7 +123,11 @@ class DataForgeBot(BotBase):
         }
         logger.info(
             "Generated: voice=%d facial=%d items=%d behavioral=%d emotion=%d",
-            len(voice_data), len(facial_data), len(item_data), len(behavioral_data), len(emotion_data)
+            len(voice_data),
+            len(facial_data),
+            len(item_data),
+            len(behavioral_data),
+            len(emotion_data),
         )
         return self._datasets
 
@@ -123,6 +141,7 @@ class DataForgeBot(BotBase):
             Dict mapping package type to output file path.
         """
         import tempfile
+
         if datasets is None:
             datasets = self._datasets
         output_dir = tempfile.mkdtemp(prefix="dataforge_")
@@ -133,7 +152,9 @@ class DataForgeBot(BotBase):
             packaged["voice_wav"] = path
         facial = datasets.get("facial", [])
         if facial:
-            path = self.coco_packager.pack(facial, os.path.join(output_dir, "facial_coco.json"))
+            path = self.coco_packager.pack(
+                facial, os.path.join(output_dir, "facial_coco.json")
+            )
             packaged["facial_coco"] = path
         items = datasets.get("items", [])
         if items:
@@ -141,11 +162,15 @@ class DataForgeBot(BotBase):
             packaged["items_csv"] = path
         behavioral = datasets.get("behavioral", [])
         if behavioral:
-            path = self.jsonl_packager.pack(behavioral, os.path.join(output_dir, "behavioral.jsonl"))
+            path = self.jsonl_packager.pack(
+                behavioral, os.path.join(output_dir, "behavioral.jsonl")
+            )
             packaged["behavioral_jsonl"] = path
         emotion = datasets.get("emotion", [])
         if emotion:
-            path = self.json_packager.pack(emotion, os.path.join(output_dir, "emotion.json"))
+            path = self.json_packager.pack(
+                emotion, os.path.join(output_dir, "emotion.json")
+            )
             packaged["emotion_json"] = path
         logger.info("Packaged %d datasets to %s", len(packaged), output_dir)
         return packaged
@@ -160,13 +185,27 @@ class DataForgeBot(BotBase):
         facial = self._datasets.get("facial", [])
         behavioral = self._datasets.get("behavioral", [])
         results = {}
-        results["huggingface_voice"] = self.sales.push_to_huggingface("voice-emotion-dataset", voice)
-        results["huggingface_facial"] = self.sales.push_to_huggingface("facial-expression-dataset", facial)
-        results["kaggle_behavioral"] = self.sales.push_to_kaggle("behavioral-ai-conversations", behavioral)
-        results["aws_voice_bundle"] = self.sales.push_to_aws_marketplace("Voice Dataset Bundle", "voice_dataset_bundle")
-        results["aws_facial"] = self.sales.push_to_aws_marketplace("Facial Synthetic Set", "facial_synthetic_set")
-        results["aws_behavioral"] = self.sales.push_to_aws_marketplace("Behavioral AI Pack", "behavioral_ai_pack")
-        results["direct_api"] = self.sales.sell_direct_api("emotion-engine-dataset", "api_subscription_monthly", "platform")
+        results["huggingface_voice"] = self.sales.push_to_huggingface(
+            "voice-emotion-dataset", voice
+        )
+        results["huggingface_facial"] = self.sales.push_to_huggingface(
+            "facial-expression-dataset", facial
+        )
+        results["kaggle_behavioral"] = self.sales.push_to_kaggle(
+            "behavioral-ai-conversations", behavioral
+        )
+        results["aws_voice_bundle"] = self.sales.push_to_aws_marketplace(
+            "Voice Dataset Bundle", "voice_dataset_bundle"
+        )
+        results["aws_facial"] = self.sales.push_to_aws_marketplace(
+            "Facial Synthetic Set", "facial_synthetic_set"
+        )
+        results["aws_behavioral"] = self.sales.push_to_aws_marketplace(
+            "Behavioral AI Pack", "behavioral_ai_pack"
+        )
+        results["direct_api"] = self.sales.sell_direct_api(
+            "emotion-engine-dataset", "api_subscription_monthly", "platform"
+        )
         logger.info("Listed datasets for sale on %d channels.", len(results))
         return results
 

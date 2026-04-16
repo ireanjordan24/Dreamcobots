@@ -1,15 +1,16 @@
 """FastAPI backend: exposes endpoints to control FiverrBot and LeadGenBot."""
+
 import os
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from bots.lead_gen_bot.lead_gen_bot import LeadGenBot
 from core.dream_core import DreamCore
 from core.monetization_hooks import MonetizationHooks
 from core.revenue_engine import RevenueEngine
 from Fiverr_bots.fiverr_bot import FiverrBot
-from bots.lead_gen_bot.lead_gen_bot import LeadGenBot
 
 app = FastAPI(title="DreamCo Bot API", version="1.0.0")
 
@@ -17,6 +18,7 @@ app = FastAPI(title="DreamCo Bot API", version="1.0.0")
 _revenue_engine = RevenueEngine()
 _monetization_hooks = MonetizationHooks()
 _dream_core = DreamCore()
+
 
 # Bot instances (created on-demand per request for statelessness)
 def _make_fiverr_bot() -> FiverrBot:
@@ -39,6 +41,7 @@ def _make_lead_gen_bot() -> LeadGenBot:
 # ---------------------------------------------------------------------------
 # Request / Response schemas
 # ---------------------------------------------------------------------------
+
 
 class GigRequest(BaseModel):
     title: str
@@ -74,6 +77,7 @@ class RevenueResponse(BaseModel):
 # Health
 # ---------------------------------------------------------------------------
 
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
@@ -82,6 +86,7 @@ def health() -> dict:
 # ---------------------------------------------------------------------------
 # FiverrBot endpoints
 # ---------------------------------------------------------------------------
+
 
 @app.post("/fiverr/generate-gig", response_model=GigResponse)
 def generate_gig(request: GigRequest) -> GigResponse:
@@ -117,6 +122,7 @@ def run_fiverr_batch(gigs: List[GigRequest]) -> dict:
 # ---------------------------------------------------------------------------
 # LeadGenBot endpoints
 # ---------------------------------------------------------------------------
+
 
 @app.post("/leads/scrape", response_model=List[LeadResponse])
 def scrape_leads(request: LeadScrapeRequest) -> List[LeadResponse]:
@@ -157,6 +163,7 @@ def export_leads_csv(html: Optional[str] = None) -> dict:
 # ---------------------------------------------------------------------------
 # Revenue endpoint
 # ---------------------------------------------------------------------------
+
 
 @app.get("/revenue", response_model=RevenueResponse)
 def get_revenue() -> RevenueResponse:

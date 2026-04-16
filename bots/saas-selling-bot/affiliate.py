@@ -3,15 +3,17 @@ Affiliate link tracking and revenue recording for the SaaS Selling Bot.
 Tracks clicks on affiliate links, records conversions, and provides
 revenue analytics.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import uuid
+
 from database import (
-    record_affiliate_click,
-    record_conversion,
+    get_connection,
     get_revenue_summary,
     get_tool_by_id,
-    get_connection,
+    record_affiliate_click,
+    record_conversion,
 )
 
 

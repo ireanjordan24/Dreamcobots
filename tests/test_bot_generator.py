@@ -23,38 +23,38 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.ai_learning_system.learning_loop import LearningLoop, LearningLoopError
+from bots.bot_generator.benchmarking_engine import (
+    COMPETITOR_BASELINES,
+    BenchmarkingEngine,
+    BenchmarkingEngineError,
+)
+from bots.bot_generator.code_generator import CodeGenerator, CodeGeneratorError
+from bots.bot_generator.competitor_analyzer import (
+    SIMULATED_COMPETITORS,
+    CompetitorAnalyzer,
+    CompetitorAnalyzerError,
+)
+from bots.bot_generator.feature_optimizer import (
+    DREAMCO_CORE_OPTIMIZATIONS,
+    FeatureOptimizer,
+    FeatureOptimizerError,
+)
 from bots.bot_generator.request_interface import (
     BotRequest,
     RequestInterface,
     RequestInterfaceError,
 )
-from bots.bot_generator.feature_optimizer import (
-    FeatureOptimizer,
-    FeatureOptimizerError,
-    DREAMCO_CORE_OPTIMIZATIONS,
-)
-from bots.bot_generator.code_generator import CodeGenerator, CodeGeneratorError
-from bots.bot_generator.competitor_analyzer import (
-    CompetitorAnalyzer,
-    CompetitorAnalyzerError,
-    SIMULATED_COMPETITORS,
-)
-from bots.bot_generator.benchmarking_engine import (
-    BenchmarkingEngine,
-    BenchmarkingEngineError,
-    COMPETITOR_BASELINES,
-)
 from bots.bot_generator.revenue_tracker import (
+    TIER_PRICES_USD,
     RevenueTracker,
     RevenueTrackerError,
-    TIER_PRICES_USD,
 )
-from bots.ai_learning_system.learning_loop import LearningLoop, LearningLoopError
-
 
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
 # ---------------------------------------------------------------------------
+
 
 def _tmp_path():
     return tempfile.mkdtemp()
@@ -96,6 +96,7 @@ class _FakeControlCenter:
 # Framework compliance
 # ===========================================================================
 
+
 class TestFrameworkCompliance:
     def test_request_interface_has_global_ai_marker(self):
         path = os.path.join(REPO_ROOT, "bots", "bot_generator", "request_interface.py")
@@ -110,11 +111,15 @@ class TestFrameworkCompliance:
         assert "GLOBAL AI SOURCES FLOW" in open(path).read()
 
     def test_competitor_analyzer_has_global_ai_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "bot_generator", "competitor_analyzer.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "bot_generator", "competitor_analyzer.py"
+        )
         assert "GLOBAL AI SOURCES FLOW" in open(path).read()
 
     def test_benchmarking_engine_has_global_ai_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "bot_generator", "benchmarking_engine.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "bot_generator", "benchmarking_engine.py"
+        )
         assert "GLOBAL AI SOURCES FLOW" in open(path).read()
 
     def test_revenue_tracker_has_global_ai_marker(self):
@@ -130,6 +135,7 @@ class TestFrameworkCompliance:
 # BotRequest
 # ===========================================================================
 
+
 class TestBotRequest:
     def test_basic_construction(self):
         req = _make_request()
@@ -143,8 +149,15 @@ class TestBotRequest:
     def test_to_dict_has_required_keys(self):
         req = _make_request()
         d = req.to_dict()
-        for key in ("category", "purpose", "features", "target_audience",
-                    "bot_name", "pricing_model", "priority"):
+        for key in (
+            "category",
+            "purpose",
+            "features",
+            "target_audience",
+            "bot_name",
+            "pricing_model",
+            "priority",
+        ):
             assert key in d
 
     def test_empty_category_raises(self):
@@ -163,6 +176,7 @@ class TestBotRequest:
 # ===========================================================================
 # RequestInterface
 # ===========================================================================
+
 
 class TestRequestInterface:
     def test_submit_returns_bot_request(self):
@@ -230,13 +244,20 @@ class TestRequestInterface:
 # FeatureOptimizer
 # ===========================================================================
 
+
 class TestFeatureOptimizer:
     def test_optimize_returns_dict_with_required_keys(self):
         opt = FeatureOptimizer()
         req = _make_request()
         result = opt.optimize(req)
-        for key in ("optimized_features", "dreamco_additions", "competitor_gaps",
-                    "priority_score", "category", "total_features"):
+        for key in (
+            "optimized_features",
+            "dreamco_additions",
+            "competitor_gaps",
+            "priority_score",
+            "category",
+            "total_features",
+        ):
             assert key in result
 
     def test_dreamco_additions_are_always_present(self):
@@ -279,9 +300,7 @@ class TestFeatureOptimizer:
 
     def test_set_competitor_data_updates_gaps(self):
         opt = FeatureOptimizer()
-        opt.set_competitor_data([
-            {"category": "Analytics", "weak_points": ["gap_a"]}
-        ])
+        opt.set_competitor_data([{"category": "Analytics", "weak_points": ["gap_a"]}])
         req = _make_request(category="Analytics")
         result = opt.optimize(req)
         assert "gap_a" in result["competitor_gaps"]
@@ -312,6 +331,7 @@ class TestFeatureOptimizer:
 # ===========================================================================
 # CodeGenerator
 # ===========================================================================
+
 
 class TestCodeGenerator:
     def test_generate_returns_required_keys(self):
@@ -387,6 +407,7 @@ class TestCodeGenerator:
 # CompetitorAnalyzer
 # ===========================================================================
 
+
 class TestCompetitorAnalyzer:
     def test_analyze_known_category(self):
         analyzer = CompetitorAnalyzer(simulated=True)
@@ -397,8 +418,15 @@ class TestCompetitorAnalyzer:
     def test_analyze_returns_required_keys(self):
         analyzer = CompetitorAnalyzer(simulated=True)
         report = analyzer.analyze("Marketing")
-        for key in ("category", "competitors", "avg_rating", "avg_price_usd",
-                    "gaps", "pricing_benchmark", "analyzed_at"):
+        for key in (
+            "category",
+            "competitors",
+            "avg_rating",
+            "avg_price_usd",
+            "gaps",
+            "pricing_benchmark",
+            "analyzed_at",
+        ):
             assert key in report
 
     def test_analyze_unknown_category_returns_empty(self):
@@ -462,13 +490,22 @@ class TestCompetitorAnalyzer:
 # BenchmarkingEngine
 # ===========================================================================
 
+
 class TestBenchmarkingEngine:
     def test_run_benchmark_returns_required_keys(self):
         tmp = _tmp_json()
         engine = BenchmarkingEngine(results_path=tmp)
         result = engine.run_benchmark("test_bot", "Lead Generation")
-        for key in ("bot_name", "category", "scores", "baseline", "delta",
-                    "passed", "verdict", "tested_at"):
+        for key in (
+            "bot_name",
+            "category",
+            "scores",
+            "baseline",
+            "delta",
+            "passed",
+            "verdict",
+            "tested_at",
+        ):
             assert key in result
         if os.path.exists(tmp):
             os.unlink(tmp)
@@ -530,6 +567,7 @@ class TestBenchmarkingEngine:
 # RevenueTracker
 # ===========================================================================
 
+
 class TestRevenueTracker:
     def test_record_subscription_basic(self):
         tracker = RevenueTracker(revenue_path=_tmp_json())
@@ -557,8 +595,13 @@ class TestRevenueTracker:
         tracker = RevenueTracker(revenue_path=_tmp_json())
         tracker.record_subscription("bot_a", tier="pro")
         report = tracker.get_report("bot_a")
-        for key in ("bot_name", "tier", "subscriptions", "billable_actions",
-                    "total_revenue_usd"):
+        for key in (
+            "bot_name",
+            "tier",
+            "subscriptions",
+            "billable_actions",
+            "total_revenue_usd",
+        ):
             assert key in report
 
     def test_get_report_unknown_bot_returns_zero(self):
@@ -596,7 +639,9 @@ class TestRevenueTracker:
         tracker.record_subscription("bot_a", tier="pro")
         # Re-load
         tracker2 = RevenueTracker(revenue_path=tmp)
-        assert tracker2.get_report("bot_a")["total_revenue_usd"] == TIER_PRICES_USD["pro"]
+        assert (
+            tracker2.get_report("bot_a")["total_revenue_usd"] == TIER_PRICES_USD["pro"]
+        )
         os.unlink(tmp)
 
     def test_list_bots_returns_all(self):
@@ -614,6 +659,7 @@ class TestRevenueTracker:
 # ===========================================================================
 # LearningLoop
 # ===========================================================================
+
 
 class TestLearningLoop:
     def _make_loop(self, threshold=30):
@@ -724,6 +770,7 @@ class TestLearningLoop:
 # Integration: full pipeline
 # ===========================================================================
 
+
 class TestAutoFactoryPipeline:
     """End-to-end test simulating the complete Auto-Bot Factory workflow."""
 
@@ -751,7 +798,9 @@ class TestAutoFactoryPipeline:
 
         # 4. Generate code
         gen = CodeGenerator(output_dir=_tmp_path())
-        gen_result = gen.generate(req, optimized_features=opt_result["optimized_features"])
+        gen_result = gen.generate(
+            req, optimized_features=opt_result["optimized_features"]
+        )
         assert "GLOBAL AI SOURCES FLOW" in gen_result["modules"]["bot_main"]
 
         # 5. Benchmark

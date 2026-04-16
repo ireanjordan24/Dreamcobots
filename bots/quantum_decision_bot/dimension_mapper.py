@@ -130,7 +130,9 @@ class DimensionMapper:
         # Higher scale = higher ceiling
         scale_component = scale
 
-        raw = (time_component + capital_component + risk_component + scale_component) / 4.0
+        raw = (
+            time_component + capital_component + risk_component + scale_component
+        ) / 4.0
         return round(raw * 10, 2)  # scale to 0–100
 
     # ------------------------------------------------------------------
@@ -149,9 +151,7 @@ class DimensionMapper:
         scored = []
         for path in paths:
             profile = path.get("profile", {})
-            distance = sum(
-                abs(profile.get(k, 5.0) - v) for k, v in ideal.items()
-            )
+            distance = sum(abs(profile.get(k, 5.0) - v) for k, v in ideal.items())
             scored.append({**path, "_dim_distance": round(distance, 4)})
         return sorted(scored, key=lambda p: p["_dim_distance"])
 

@@ -10,5 +10,14 @@ class TierConfig:
 
 TIERS = {
     "pro": TierConfig("Pro", 199.0, ["bond screening filters", "yield curve analysis"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["bond screening filters", "yield curve analysis", "duration matching", "credit spread analysis"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "bond screening filters",
+            "yield curve analysis",
+            "duration matching",
+            "credit spread analysis",
+        ],
+    ),
 }

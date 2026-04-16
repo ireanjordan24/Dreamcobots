@@ -32,44 +32,48 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
+from bots.buddy_core.bot_generator import BotGenerator, BotStatus, GeneratedBot
+from bots.buddy_core.feedback_loop import FeedbackLoop, MetricType
+from bots.buddy_core.intent_parser import (
+    Industry,
+    IntentParser,
+    IntentType,
+    ParsedIntent,
+)
+from bots.buddy_core.lead_engine import LeadEngine, LeadSource
+from bots.buddy_core.privacy_engine import (
+    ActionCategory,
+    PermissionLevel,
+    PrivacyEngine,
+)
 from bots.buddy_core.tiers import (
+    FEATURE_ADVANCED_AI,
+    FEATURE_BOT_GENERATOR,
+    FEATURE_CUSTOM_ENCRYPTION,
+    FEATURE_ENTERPRISE_LOGS,
+    FEATURE_FEEDBACK_LOOP,
+    FEATURE_INTENT_PARSER,
+    FEATURE_LEAD_ENGINE,
+    FEATURE_PRIVACY_VAULT,
+    FEATURE_TOOL_INJECTION,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_INTENT_PARSER,
-    FEATURE_TOOL_INJECTION,
-    FEATURE_BOT_GENERATOR,
-    FEATURE_FEEDBACK_LOOP,
-    FEATURE_PRIVACY_VAULT,
-    FEATURE_LEAD_ENGINE,
-    FEATURE_ADVANCED_AI,
-    FEATURE_WHITE_LABEL,
-    FEATURE_CUSTOM_ENCRYPTION,
-    FEATURE_ENTERPRISE_LOGS,
 )
-from bots.buddy_core.intent_parser import IntentParser, IntentType, Industry, ParsedIntent
-from bots.buddy_core.tool_db import ToolDB, Tool
-from bots.buddy_core.bot_generator import BotGenerator, GeneratedBot, BotStatus
-from bots.buddy_core.feedback_loop import FeedbackLoop, MetricType
-from bots.buddy_core.privacy_engine import (
-    PrivacyEngine,
-    PermissionLevel,
-    ActionCategory,
-)
-from bots.buddy_core.lead_engine import LeadEngine, LeadSource
-
+from bots.buddy_core.tool_db import Tool, ToolDB
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class BuddyCoreError(Exception):
     """General Buddy Core error."""
@@ -82,6 +86,7 @@ class BuddyCoreTierError(BuddyCoreError):
 # ---------------------------------------------------------------------------
 # BuddyCore
 # ---------------------------------------------------------------------------
+
 
 class BuddyCore:
     """
@@ -154,7 +159,9 @@ class BuddyCore:
     ) -> dict:
         """Create a new bot using the BotGenerator."""
         self._require(FEATURE_BOT_GENERATOR)
-        bot = self._bot_generator.create_bot(name=name, purpose=purpose, industry=industry)
+        bot = self._bot_generator.create_bot(
+            name=name, purpose=purpose, industry=industry
+        )
         return {
             "status": "created",
             "bot_id": bot.bot_id,
@@ -203,7 +210,9 @@ class BuddyCore:
             lead_source = LeadSource(source.lower())
         except ValueError:
             lead_source = LeadSource.LINKEDIN
-        return self._lead_engine.run_campaign(industry=industry, source=lead_source, count=count)
+        return self._lead_engine.run_campaign(
+            industry=industry, source=lead_source, count=count
+        )
 
     # ------------------------------------------------------------------
     # Feedback Loop
@@ -249,9 +258,7 @@ class BuddyCore:
             "status": entry.status,
         }
 
-    def check_action_safety(
-        self, action: str, category: str, user_id: str
-    ) -> dict:
+    def check_action_safety(self, action: str, category: str, user_id: str) -> dict:
         """Check whether an action passes safety guardrails."""
         try:
             cat = ActionCategory(category.lower())

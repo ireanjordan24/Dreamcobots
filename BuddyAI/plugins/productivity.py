@@ -57,12 +57,9 @@ class TodoList:
             The updated item dict, or ``None`` if not found.
         """
         for item in self._items:
-            match = (
-                (isinstance(identifier, int) and item["id"] == identifier)
-                or (
-                    isinstance(identifier, str)
-                    and identifier.lower() in item["text"].lower()
-                )
+            match = (isinstance(identifier, int) and item["id"] == identifier) or (
+                isinstance(identifier, str)
+                and identifier.lower() in item["text"].lower()
             )
             if match and not item["done"]:
                 item["done"] = True
@@ -126,16 +123,14 @@ def handle_add_todo(params: Dict[str, Any]) -> Dict[str, Any]:
     if not item_text:
         return {"success": False, "message": "No todo text provided."}
     item = _todo_list.add(item_text)
-    return {"success": True, "message": f"Added: \"{item_text}\"", "item": item}
+    return {"success": True, "message": f'Added: "{item_text}"', "item": item}
 
 
 def handle_list_todos(params: Dict[str, Any]) -> Dict[str, Any]:
     items = _todo_list.list_items()
     if not items:
         return {"success": True, "message": "Your todo list is empty.", "items": []}
-    lines = [
-        f"[{'x' if i['done'] else ' '}] {i['id']}. {i['text']}" for i in items
-    ]
+    lines = [f"[{'x' if i['done'] else ' '}] {i['id']}. {i['text']}" for i in items]
     return {
         "success": True,
         "message": "\n".join(lines),
@@ -154,12 +149,14 @@ def handle_complete_todo(params: Dict[str, Any]) -> Dict[str, Any]:
     if item is None:
         return {
             "success": False,
-            "message": f"No pending todo matching \"{identifier}\".",
+            "message": f'No pending todo matching "{identifier}".',
         }
     return {"success": True, "message": f"Completed: \"{item['text']}\"", "item": item}
 
 
-def handle_schedule_task(params: Dict[str, Any], scheduler: Any = None) -> Dict[str, Any]:
+def handle_schedule_task(
+    params: Dict[str, Any], scheduler: Any = None
+) -> Dict[str, Any]:
     task_name = params.get("task", "unnamed task")
     when = params.get("when", "")
 
@@ -180,7 +177,9 @@ def handle_schedule_task(params: Dict[str, Any], scheduler: Any = None) -> Dict[
     }
 
 
-def handle_set_reminder(params: Dict[str, Any], scheduler: Any = None) -> Dict[str, Any]:
+def handle_set_reminder(
+    params: Dict[str, Any], scheduler: Any = None
+) -> Dict[str, Any]:
     message = params.get("message", "reminder")
     when = params.get("when", "")
     full_message = f"Reminder: {message}"
@@ -209,7 +208,7 @@ def handle_enqueue_workflow(params: Dict[str, Any]) -> Dict[str, Any]:
     _workflow_queue.enqueue(step)
     return {
         "success": True,
-        "message": f"Workflow step enqueued: \"{step}\".",
+        "message": f'Workflow step enqueued: "{step}".',
         "queue": _workflow_queue.all_steps(),
     }
 

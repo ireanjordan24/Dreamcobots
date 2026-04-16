@@ -9,6 +9,23 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["cash position forecasting", "liquidity gap analysis", "FX exposure management"]),
-    "elite": TierConfig("Elite", 2500.0, ["cash position forecasting", "liquidity gap analysis", "FX exposure management", "investment policy monitoring"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        [
+            "cash position forecasting",
+            "liquidity gap analysis",
+            "FX exposure management",
+        ],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "cash position forecasting",
+            "liquidity gap analysis",
+            "FX exposure management",
+            "investment policy monitoring",
+        ],
+    ),
 }

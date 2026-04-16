@@ -20,7 +20,6 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-
 _DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), "..", "config", "bots.json")
 
 # Valid lifecycle statuses
@@ -30,7 +29,13 @@ STATUS_CONFLICT = "conflict"
 STATUS_OFFLINE = "offline"
 STATUS_ONBOARDING = "onboarding"
 
-VALID_STATUSES = {STATUS_ACTIVE, STATUS_UPDATING, STATUS_CONFLICT, STATUS_OFFLINE, STATUS_ONBOARDING}
+VALID_STATUSES = {
+    STATUS_ACTIVE,
+    STATUS_UPDATING,
+    STATUS_CONFLICT,
+    STATUS_OFFLINE,
+    STATUS_ONBOARDING,
+}
 
 
 class BotManager:

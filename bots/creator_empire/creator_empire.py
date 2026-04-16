@@ -28,23 +28,23 @@ Usage
     bot.record_revenue("Alex", "tip_jar", 25.00, "streamlabs")
     print(bot.get_total_revenue("Alex"))
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-from .tiers import (
-    get_creator_tier_info,
-    CREATOR_FEATURES_BY_TIER,
-    CREATOR_ROLES,
-)
-from .onboarding import OnboardingEngine, CreatorProfile, OnboardingError
-from .streamer import StreamerEngine, StreamConfig, StreamerError
-from .event_planning import EventPlanningEngine, Event, EventError
-from .monetization import MonetizationEngine, RevenueEntry, MonetizationError
+from .event_planning import Event, EventError, EventPlanningEngine
+from .monetization import MonetizationEngine, MonetizationError, RevenueEntry
+from .onboarding import CreatorProfile, OnboardingEngine, OnboardingError
+from .streamer import StreamConfig, StreamerEngine, StreamerError
+from .tiers import CREATOR_FEATURES_BY_TIER, CREATOR_ROLES, get_creator_tier_info
 
 
 class CreatorEmpireBot:
@@ -109,7 +109,8 @@ class CreatorEmpireBot:
 
         current_feats = set(CREATOR_FEATURES_BY_TIER[self.tier.value])
         new_feats = [
-            f for f in CREATOR_FEATURES_BY_TIER[next_cfg.tier.value]
+            f
+            for f in CREATOR_FEATURES_BY_TIER[next_cfg.tier.value]
             if f not in current_feats
         ]
 

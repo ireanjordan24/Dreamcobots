@@ -1,31 +1,33 @@
 """Tests for bots/revenue_engine_bot/tiers.py and bots/revenue_engine_bot/revenue_engine_bot.py"""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.revenue_engine_bot.revenue_engine_bot import (
+    AffiliateEngine,
+    PaymentEngine,
+    ProductEngine,
+    ProductListing,
+    RealEstatePipeline,
     RevenueEngineBot,
     RevenueEngineBotTierError,
     RevenueRecord,
-    ProductListing,
-    PaymentEngine,
-    AffiliateEngine,
-    ProductEngine,
-    RealEstatePipeline,
     RevenueTracker,
 )
 from bots.revenue_engine_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
-
 # ---------------------------------------------------------------------------
 # Tier definitions
 # ---------------------------------------------------------------------------
+
 
 class TestTierDefinitions:
     def test_all_tiers_have_features(self):
@@ -33,7 +35,9 @@ class TestTierDefinitions:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_pro(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.PRO.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.PRO.value]
+        )
 
     def test_pro_has_more_features_than_free(self):
         assert len(BOT_FEATURES[Tier.PRO.value]) > len(BOT_FEATURES[Tier.FREE.value])
@@ -55,12 +59,15 @@ class TestTierDefinitions:
     def test_get_bot_tier_info_enterprise(self):
         info = get_bot_tier_info(Tier.ENTERPRISE)
         assert info["tier"] == "enterprise"
-        assert info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        assert (
+            info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        )
 
 
 # ---------------------------------------------------------------------------
 # RevenueEngineBot instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestRevenueEngineBotInstantiation:
     def test_default_tier_is_free(self):
@@ -83,6 +90,7 @@ class TestRevenueEngineBotInstantiation:
 # ---------------------------------------------------------------------------
 # PaymentEngine
 # ---------------------------------------------------------------------------
+
 
 class TestPaymentEngine:
     def test_free_tier_has_stripe_only(self):
@@ -131,6 +139,7 @@ class TestPaymentEngine:
 # ---------------------------------------------------------------------------
 # AffiliateEngine
 # ---------------------------------------------------------------------------
+
 
 class TestAffiliateEngine:
     def test_promote_returns_list(self):
@@ -183,12 +192,16 @@ class TestAffiliateEngine:
         pro_engine.promote("shopify")
         pro_income = pro_engine.estimate_passive_income(100)
 
-        assert pro_income["estimated_monthly_passive_income_usd"] > free_income["estimated_monthly_passive_income_usd"]
+        assert (
+            pro_income["estimated_monthly_passive_income_usd"]
+            > free_income["estimated_monthly_passive_income_usd"]
+        )
 
 
 # ---------------------------------------------------------------------------
 # ProductEngine
 # ---------------------------------------------------------------------------
+
 
 class TestProductEngine:
     def test_add_product_returns_product_listing(self):
@@ -252,6 +265,7 @@ class TestProductEngine:
 # RealEstatePipeline
 # ---------------------------------------------------------------------------
 
+
 class TestRealEstatePipeline:
     def test_free_tier_raises_on_find_deals(self):
         pipeline = RealEstatePipeline(Tier.FREE)
@@ -306,6 +320,7 @@ class TestRealEstatePipeline:
 # RevenueTracker
 # ---------------------------------------------------------------------------
 
+
 class TestRevenueTracker:
     def test_track_creates_record(self):
         tracker = RevenueTracker()
@@ -350,6 +365,7 @@ class TestRevenueTracker:
 # ---------------------------------------------------------------------------
 # RevenueEngineBot integration
 # ---------------------------------------------------------------------------
+
 
 class TestRevenueEngineBotIntegration:
     def test_create_payment_intent(self):
@@ -469,6 +485,7 @@ class TestRevenueEngineBotIntegration:
 # run_all_engines
 # ---------------------------------------------------------------------------
 
+
 class TestRunAllEngines:
     def test_free_tier_runs_core_engines(self):
         bot = RevenueEngineBot(tier=Tier.FREE)
@@ -509,6 +526,7 @@ class TestRunAllEngines:
 # describe_tier
 # ---------------------------------------------------------------------------
 
+
 class TestDescribeTier:
     def test_describe_tier_free(self, capsys):
         bot = RevenueEngineBot(tier=Tier.FREE)
@@ -540,9 +558,11 @@ class TestDescribeTier:
 # Bot library registration
 # ---------------------------------------------------------------------------
 
+
 class TestBotLibraryRegistration:
     def test_revenue_engine_bot_registered(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         bot_entry = lib.get_bot("revenue_engine_bot")
@@ -551,6 +571,7 @@ class TestBotLibraryRegistration:
 
     def test_revenue_engine_bot_capabilities(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         bot_entry = lib.get_bot("revenue_engine_bot")

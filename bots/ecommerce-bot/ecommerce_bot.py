@@ -1,8 +1,10 @@
 """Ecommerce Bot - Listing optimization, pricing strategy, and sales analytics."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -25,9 +27,17 @@ class EcommerceBot(BaseBot):
         self.start()
         return self.get_status()
 
-    def optimize_listing(self, product_title: str, description: str, category: str) -> dict:
+    def optimize_listing(
+        self, product_title: str, description: str, category: str
+    ) -> dict:
         """Generate an SEO-optimized product listing."""
-        keywords = [product_title.lower(), category.lower(), "best", "premium", "buy online"]
+        keywords = [
+            product_title.lower(),
+            category.lower(),
+            "best",
+            "premium",
+            "buy online",
+        ]
         optimized_title = f"{product_title} | Premium {category.title()} | Best {keywords[0].title()} Online"
         return {
             "original_title": product_title,
@@ -39,7 +49,8 @@ class EcommerceBot(BaseBot):
                 "✅ MONEY-BACK GUARANTEE: 30-day hassle-free returns",
                 "✅ CUSTOMER LOVED: Join 10,000+ satisfied customers",
             ],
-            "seo_keywords": keywords + [f"{category} for sale", f"buy {product_title.lower()}"],
+            "seo_keywords": keywords
+            + [f"{category} for sale", f"buy {product_title.lower()}"],
             "backend_keywords": f"{product_title} {category} best premium quality online",
             "recommended_images": [
                 "Main product on white background (1500x1500px)",
@@ -52,7 +63,9 @@ class EcommerceBot(BaseBot):
             "seo_score": 87,
         }
 
-    def suggest_pricing(self, cost: float, market_price: float, competitor_price: float) -> dict:
+    def suggest_pricing(
+        self, cost: float, market_price: float, competitor_price: float
+    ) -> dict:
         """Suggest optimal pricing strategy based on cost, market, and competitors."""
         minimum_price = cost * 2.0
         competitive_price = min(market_price, competitor_price) * 0.95
@@ -71,7 +84,11 @@ class EcommerceBot(BaseBot):
             },
             "recommended_price": round(recommended, 2),
             "profit_margin_percent": round(margin, 1),
-            "strategy": "Competitive pricing" if recommended <= competitor_price else "Value pricing",
+            "strategy": (
+                "Competitive pricing"
+                if recommended <= competitor_price
+                else "Value pricing"
+            ),
             "tip": "A/B test your pricing monthly and track conversion rates",
         }
 
@@ -88,14 +105,18 @@ class EcommerceBot(BaseBot):
                 alerts.append(f"🚨 {product}: OUT OF STOCK - reorder immediately")
             elif quantity <= reorder_point:
                 status = "LOW STOCK"
-                alerts.append(f"⚠️ {product}: Low stock ({quantity} units) - reorder soon")
-            analysis.append({
-                "product": product,
-                "quantity": quantity,
-                "status": status,
-                "reorder_point": reorder_point,
-                "reorder_quantity_suggested": 100,
-            })
+                alerts.append(
+                    f"⚠️ {product}: Low stock ({quantity} units) - reorder soon"
+                )
+            analysis.append(
+                {
+                    "product": product,
+                    "quantity": quantity,
+                    "status": status,
+                    "reorder_point": reorder_point,
+                    "reorder_quantity_suggested": 100,
+                }
+            )
         if not alerts:
             recommendations.append("All inventory levels are healthy")
         recommendations.append("Set up automated reorder triggers at 20% of max stock")
@@ -137,8 +158,24 @@ class EcommerceBot(BaseBot):
 
     def analyze_reviews(self, reviews_list: list) -> dict:
         """Perform sentiment analysis on product reviews."""
-        positive_words = ["great", "love", "excellent", "perfect", "amazing", "best", "wonderful"]
-        negative_words = ["bad", "terrible", "awful", "broken", "disappointed", "worst", "poor"]
+        positive_words = [
+            "great",
+            "love",
+            "excellent",
+            "perfect",
+            "amazing",
+            "best",
+            "wonderful",
+        ]
+        negative_words = [
+            "bad",
+            "terrible",
+            "awful",
+            "broken",
+            "disappointed",
+            "worst",
+            "poor",
+        ]
         positive_count = 0
         negative_count = 0
         themes = []
@@ -165,7 +202,11 @@ class EcommerceBot(BaseBot):
             "neutral_reviews": total - positive_count - negative_count,
             "sentiment_score": round(sentiment_score, 1),
             "common_themes": list(set(themes)),
-            "recommendation": "Focus on reducing negatives about: " + ", ".join(set(themes)[:3]) if themes else "Maintain current quality",
+            "recommendation": (
+                "Focus on reducing negatives about: " + ", ".join(set(themes)[:3])
+                if themes
+                else "Maintain current quality"
+            ),
         }
 
     def track_competitor(self, competitor_name: str, product: str) -> dict:
@@ -193,8 +234,19 @@ class EcommerceBot(BaseBot):
 
     def forecast_sales(self, historical_data: dict, season: str) -> dict:
         """Forecast sales based on historical data and seasonal trends."""
-        avg_monthly = sum(historical_data.values()) / len(historical_data) if historical_data else 1000
-        seasonality = {"Q4": 1.4, "Q1": 0.8, "Q2": 1.0, "Q3": 1.1, "holiday": 1.6, "summer": 1.2}
+        avg_monthly = (
+            sum(historical_data.values()) / len(historical_data)
+            if historical_data
+            else 1000
+        )
+        seasonality = {
+            "Q4": 1.4,
+            "Q1": 0.8,
+            "Q2": 1.0,
+            "Q3": 1.1,
+            "holiday": 1.6,
+            "summer": 1.2,
+        }
         multiplier = seasonality.get(season, 1.0)
         forecast = avg_monthly * multiplier
         return {
@@ -217,7 +269,10 @@ class EcommerceBot(BaseBot):
                 "top_pick": "Shopify",
                 "reason": "Easiest setup, 100+ apps, scales with you",
                 "monthly_cost": "$39-$105/month",
-                "alternatives": ["WooCommerce (free + hosting)", "Squarespace Commerce"],
+                "alternatives": [
+                    "WooCommerce (free + hosting)",
+                    "Squarespace Commerce",
+                ],
             },
             "medium": {
                 "top_pick": "Shopify Plus or WooCommerce",
@@ -232,8 +287,14 @@ class EcommerceBot(BaseBot):
                 "alternatives": ["SAP Commerce", "Custom build"],
             },
         }
-        size_key = "small" if "small" in business_size.lower() else "medium" if "medium" in business_size.lower() else "large"
+        size_key = (
+            "small"
+            if "small" in business_size.lower()
+            else "medium" if "medium" in business_size.lower() else "large"
+        )
         rec = recommendations.get(size_key, recommendations["small"])
         if "digital" in products_type.lower():
-            rec["additional_note"] = "For digital products, also consider Gumroad or Podia"
+            rec["additional_note"] = (
+                "For digital products, also consider Gumroad or Podia"
+            )
         return {"business_size": business_size, "products_type": products_type, **rec}

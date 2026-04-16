@@ -2,38 +2,38 @@
 Tests for bots/discount_dominator — settings 401–600 and interoperability modules.
 """
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pytest
 
-from bots.discount_dominator.settings import (
-    Setting,
-    DISCOUNT_DOMINATOR_SETTINGS,
-    SETTINGS_BY_GROUP,
-    ALL_GROUPS,
-    GROUP_ANALYTICS,
-    GROUP_INSTORE,
-    GROUP_ONLINE,
-    GROUP_ENTERPRISE,
-    GROUP_BEHAVIORAL,
-    get_setting,
-    apply_settings,
-    get_group_settings,
-    reset_all,
-    as_dict,
-)
 from bots.discount_dominator.analytics import AdvancedAnalytics
+from bots.discount_dominator.behavioral_settings import BehavioralSettings
+from bots.discount_dominator.car_flipping_bot import CarFlippingBot
+from bots.discount_dominator.discount_dominator import DiscountDominator
+from bots.discount_dominator.enterprise_features import EnterpriseFeatures
 from bots.discount_dominator.in_store_controls import InStoreTacticalControls
 from bots.discount_dominator.online_optimization import OnlinePlatformOptimization
-from bots.discount_dominator.enterprise_features import EnterpriseFeatures
-from bots.discount_dominator.behavioral_settings import BehavioralSettings
 from bots.discount_dominator.real_estate_optimizer import RealEstateOptimizer
-from bots.discount_dominator.car_flipping_bot import CarFlippingBot
 from bots.discount_dominator.retail_intelligence import RetailIntelligenceNetwork
-from bots.discount_dominator.discount_dominator import DiscountDominator
+from bots.discount_dominator.settings import (
+    ALL_GROUPS,
+    DISCOUNT_DOMINATOR_SETTINGS,
+    GROUP_ANALYTICS,
+    GROUP_BEHAVIORAL,
+    GROUP_ENTERPRISE,
+    GROUP_INSTORE,
+    GROUP_ONLINE,
+    SETTINGS_BY_GROUP,
+    Setting,
+    apply_settings,
+    as_dict,
+    get_group_settings,
+    get_setting,
+    reset_all,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -47,6 +47,7 @@ def reset_settings():
 # ---------------------------------------------------------------------------
 # Settings registry tests
 # ---------------------------------------------------------------------------
+
 
 class TestSettingsRegistry:
     def test_total_setting_count(self):
@@ -173,6 +174,7 @@ class TestSettingsRegistry:
 # Advanced Analytics tests
 # ---------------------------------------------------------------------------
 
+
 class TestAdvancedAnalytics:
     def test_instantiation(self):
         a = AdvancedAnalytics()
@@ -242,6 +244,7 @@ class TestAdvancedAnalytics:
 # ---------------------------------------------------------------------------
 # In-Store Tactical Controls tests
 # ---------------------------------------------------------------------------
+
 
 class TestInStoreTacticalControls:
     def test_instantiation(self):
@@ -315,6 +318,7 @@ class TestInStoreTacticalControls:
 # ---------------------------------------------------------------------------
 # Online Platform Optimization tests
 # ---------------------------------------------------------------------------
+
 
 class TestOnlinePlatformOptimization:
     def test_instantiation(self):
@@ -390,6 +394,7 @@ class TestOnlinePlatformOptimization:
 # Enterprise Features tests
 # ---------------------------------------------------------------------------
 
+
 class TestEnterpriseFeatures:
     def test_instantiation(self):
         e = EnterpriseFeatures()
@@ -462,6 +467,7 @@ class TestEnterpriseFeatures:
 # Behavioral Settings tests
 # ---------------------------------------------------------------------------
 
+
 class TestBehavioralSettings:
     def test_instantiation(self):
         b = BehavioralSettings()
@@ -485,22 +491,26 @@ class TestBehavioralSettings:
 
     def test_score_customer_high_value(self):
         b = BehavioralSettings()
-        result = b.score_customer({
-            "recency_days": 5,
-            "frequency": 20,
-            "monetary_value": 500,
-        })
+        result = b.score_customer(
+            {
+                "recency_days": 5,
+                "frequency": 20,
+                "monetary_value": 500,
+            }
+        )
         assert result["segment"] == "high_value"
         assert "churn_risk" in result
         assert "intent_score" in result
 
     def test_score_customer_low_value(self):
         b = BehavioralSettings()
-        result = b.score_customer({
-            "recency_days": 300,
-            "frequency": 1,
-            "monetary_value": 10,
-        })
+        result = b.score_customer(
+            {
+                "recency_days": 300,
+                "frequency": 1,
+                "monetary_value": 10,
+            }
+        )
         assert result["segment"] == "low_value"
 
     def test_score_customer_includes_model(self):
@@ -542,6 +552,7 @@ class TestBehavioralSettings:
 # RealEstateOptimizer tests
 # ---------------------------------------------------------------------------
 
+
 class TestRealEstateOptimizer:
     def test_instantiation(self):
         r = RealEstateOptimizer()
@@ -549,33 +560,44 @@ class TestRealEstateOptimizer:
 
     def test_score_property_strong_buy(self):
         r = RealEstateOptimizer()
-        result = r.score_property({
-            "price": 100_000,
-            "sqft": 2_000,
-            "days_on_market": 5,
-        })
+        result = r.score_property(
+            {
+                "price": 100_000,
+                "sqft": 2_000,
+                "days_on_market": 5,
+            }
+        )
         assert result["recommendation"] in ("strong_buy", "consider")
         assert 0.0 <= result["investment_score"] <= 1.0
 
     def test_score_property_pass(self):
         r = RealEstateOptimizer()
-        result = r.score_property({
-            "price": 5_000_000,
-            "sqft": 500,
-            "days_on_market": 175,
-        })
+        result = r.score_property(
+            {
+                "price": 5_000_000,
+                "sqft": 500,
+                "days_on_market": 175,
+            }
+        )
         assert result["recommendation"] == "pass"
 
     def test_score_property_has_required_keys(self):
         r = RealEstateOptimizer()
         result = r.score_property({"price": 200_000, "sqft": 1_000})
-        for key in ("investment_score", "recommendation", "price_per_sqft",
-                    "days_on_market", "analytics_enabled"):
+        for key in (
+            "investment_score",
+            "recommendation",
+            "price_per_sqft",
+            "days_on_market",
+            "analytics_enabled",
+        ):
             assert key in result
 
     def test_score_buyer(self):
         r = RealEstateOptimizer()
-        result = r.score_buyer({"recency_days": 7, "frequency": 10, "monetary_value": 200})
+        result = r.score_buyer(
+            {"recency_days": 7, "frequency": 10, "monetary_value": 200}
+        )
         assert "segment" in result
         assert "churn_risk" in result
 
@@ -601,6 +623,7 @@ class TestRealEstateOptimizer:
 # CarFlippingBot tests
 # ---------------------------------------------------------------------------
 
+
 class TestCarFlippingBot:
     def test_instantiation(self):
         b = CarFlippingBot()
@@ -608,53 +631,68 @@ class TestCarFlippingBot:
 
     def test_evaluate_vehicle_buy(self):
         b = CarFlippingBot()
-        result = b.evaluate_vehicle({
-            "purchase_price": 8_000,
-            "estimated_sale_price": 12_000,
-            "repair_cost": 500,
-            "days_to_flip": 30,
-        })
+        result = b.evaluate_vehicle(
+            {
+                "purchase_price": 8_000,
+                "estimated_sale_price": 12_000,
+                "repair_cost": 500,
+                "days_to_flip": 30,
+            }
+        )
         assert result["recommendation"] == "buy"
         assert result["gross_profit"] == 3500.0
 
     def test_evaluate_vehicle_pass(self):
         b = CarFlippingBot()
-        result = b.evaluate_vehicle({
-            "purchase_price": 10_000,
-            "estimated_sale_price": 10_100,
-            "repair_cost": 1_000,
-            "days_to_flip": 60,
-        })
+        result = b.evaluate_vehicle(
+            {
+                "purchase_price": 10_000,
+                "estimated_sale_price": 10_100,
+                "repair_cost": 1_000,
+                "days_to_flip": 60,
+            }
+        )
         assert result["recommendation"] == "pass"
 
     def test_evaluate_vehicle_has_required_keys(self):
         b = CarFlippingBot()
-        result = b.evaluate_vehicle({
-            "purchase_price": 5_000,
-            "estimated_sale_price": 7_000,
-        })
-        for key in ("gross_profit", "roi_pct", "days_to_flip",
-                    "recommendation", "competitor_monitoring",
-                    "dynamic_pricing"):
+        result = b.evaluate_vehicle(
+            {
+                "purchase_price": 5_000,
+                "estimated_sale_price": 7_000,
+            }
+        )
+        for key in (
+            "gross_profit",
+            "roi_pct",
+            "days_to_flip",
+            "recommendation",
+            "competitor_monitoring",
+            "dynamic_pricing",
+        ):
             assert key in result
 
     def test_evaluate_part_profitable(self):
         b = CarFlippingBot()
-        result = b.evaluate_part({
-            "buy_price": 40.0,
-            "sell_price": 90.0,
-            "platform_fee_pct": 10,
-        })
+        result = b.evaluate_part(
+            {
+                "buy_price": 40.0,
+                "sell_price": 90.0,
+                "platform_fee_pct": 10,
+            }
+        )
         assert result["recommendation"] == "buy"
         assert result["net_profit"] > 0
 
     def test_evaluate_part_unprofitable(self):
         b = CarFlippingBot()
-        result = b.evaluate_part({
-            "buy_price": 100.0,
-            "sell_price": 80.0,
-            "platform_fee_pct": 10,
-        })
+        result = b.evaluate_part(
+            {
+                "buy_price": 100.0,
+                "sell_price": 80.0,
+                "platform_fee_pct": 10,
+            }
+        )
         assert result["recommendation"] == "pass"
         assert result["net_profit"] < 0
 
@@ -683,6 +721,7 @@ class TestCarFlippingBot:
 # RetailIntelligenceNetwork tests
 # ---------------------------------------------------------------------------
 
+
 class TestRetailIntelligenceNetwork:
     def test_instantiation(self):
         n = RetailIntelligenceNetwork()
@@ -690,35 +729,41 @@ class TestRetailIntelligenceNetwork:
 
     def test_analyse_sku_returns_actions(self):
         n = RetailIntelligenceNetwork()
-        result = n.analyse_sku({
-            "sku": "SKU-001",
-            "price": 29.99,
-            "stock_pct": 10,
-            "sales_velocity": 0.02,
-            "competitor_price": 24.99,
-        })
+        result = n.analyse_sku(
+            {
+                "sku": "SKU-001",
+                "price": 29.99,
+                "stock_pct": 10,
+                "sales_velocity": 0.02,
+                "competitor_price": 24.99,
+            }
+        )
         assert "recommended_actions" in result
         assert isinstance(result["recommended_actions"], list)
 
     def test_analyse_sku_clearance_triggered(self):
         n = RetailIntelligenceNetwork()
-        result = n.analyse_sku({
-            "sku": "SKU-002",
-            "price": 15.0,
-            "stock_pct": 5,
-            "sales_velocity": 0.5,
-        })
+        result = n.analyse_sku(
+            {
+                "sku": "SKU-002",
+                "price": 15.0,
+                "stock_pct": 5,
+                "sales_velocity": 0.5,
+            }
+        )
         assert "trigger_clearance_pricing" in result["recommended_actions"]
 
     def test_analyse_sku_social_proof(self):
         n = RetailIntelligenceNetwork()
-        result = n.analyse_sku({
-            "sku": "SKU-003",
-            "price": 50.0,
-            "stock_pct": 80,
-            "sales_velocity": 2.0,
-            "competitor_price": 55.0,
-        })
+        result = n.analyse_sku(
+            {
+                "sku": "SKU-003",
+                "price": 50.0,
+                "stock_pct": 80,
+                "sales_velocity": 2.0,
+                "competitor_price": 55.0,
+            }
+        )
         assert "inject_social_proof" in result["recommended_actions"]
 
     def test_analyse_customer(self):
@@ -728,9 +773,7 @@ class TestRetailIntelligenceNetwork:
 
     def test_get_clearance_candidates(self):
         n = RetailIntelligenceNetwork()
-        candidates = n.get_clearance_candidates(
-            {"A": 15, "B": 50, "C": 20}
-        )
+        candidates = n.get_clearance_candidates({"A": 15, "B": 50, "C": 20})
         assert "A" in candidates
         assert "B" not in candidates
 
@@ -748,8 +791,7 @@ class TestRetailIntelligenceNetwork:
     def test_list_active_features_all_modules(self):
         n = RetailIntelligenceNetwork()
         feats = n.list_active_features()
-        for module in ("analytics", "in_store", "online",
-                       "enterprise", "behavioral"):
+        for module in ("analytics", "in_store", "online", "enterprise", "behavioral"):
             assert module in feats
             assert isinstance(feats[module], list)
 
@@ -757,8 +799,7 @@ class TestRetailIntelligenceNetwork:
         n = RetailIntelligenceNetwork()
         s = n.summary()
         assert s["module"] == "retail_intelligence_network"
-        for key in ("analytics", "in_store", "online",
-                    "enterprise", "behavioral"):
+        for key in ("analytics", "in_store", "online", "enterprise", "behavioral"):
             assert key in s
 
     def test_behavioral_preset_applied(self):
@@ -769,6 +810,7 @@ class TestRetailIntelligenceNetwork:
 # ---------------------------------------------------------------------------
 # DiscountDominator main bot tests
 # ---------------------------------------------------------------------------
+
 
 class TestDiscountDominator:
     def test_instantiation(self):
@@ -808,8 +850,13 @@ class TestDiscountDominator:
         s = bot.summary()
         assert s["bot"] == "DiscountDominator"
         assert s["total_settings"] == 200
-        for key in ("analytics_summary", "in_store_summary", "online_summary",
-                    "enterprise_summary", "behavioral_summary"):
+        for key in (
+            "analytics_summary",
+            "in_store_summary",
+            "online_summary",
+            "enterprise_summary",
+            "behavioral_summary",
+        ):
             assert key in s
 
     def test_domain_modules_accessible(self):

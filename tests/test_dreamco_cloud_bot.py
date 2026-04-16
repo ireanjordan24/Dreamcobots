@@ -1,28 +1,30 @@
 """Tests for bots/dreamco_cloud_bot — DreamCo AWS competitor."""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.dreamco_cloud_bot.dreamco_cloud_bot import (
-    DreamCoCloudBot,
-    DreamCoCloudBotTierError,
-    DreamCoCloudBotError,
-    ServerInstance,
-    DatabaseInstance,
-)
-from bots.dreamco_cloud_bot.tiers import get_bot_tier_info, BOT_FEATURES
 
+from bots.dreamco_cloud_bot.dreamco_cloud_bot import (
+    DatabaseInstance,
+    DreamCoCloudBot,
+    DreamCoCloudBotError,
+    DreamCoCloudBotTierError,
+    ServerInstance,
+)
+from bots.dreamco_cloud_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestDreamCoCloudBotTiers:
     def test_three_tiers_have_features(self):
@@ -30,7 +32,9 @@ class TestDreamCoCloudBotTiers:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
     def test_get_bot_tier_info_returns_dict(self):
         info = get_bot_tier_info(Tier.FREE)
@@ -46,6 +50,7 @@ class TestDreamCoCloudBotTiers:
 # ===========================================================================
 # Instantiation tests
 # ===========================================================================
+
 
 class TestDreamCoCloudBotInstantiation:
     def test_default_tier_is_free(self):
@@ -72,6 +77,7 @@ class TestDreamCoCloudBotInstantiation:
 # ===========================================================================
 # Server instance tests
 # ===========================================================================
+
 
 class TestServerInstances:
     def test_launch_instance_returns_server(self):
@@ -145,13 +151,21 @@ class TestServerInstances:
         bot = DreamCoCloudBot(tier=Tier.FREE)
         inst = bot.launch_instance("Server")
         d = inst.to_dict()
-        for key in ("instance_id", "name", "region", "instance_type", "status", "ip_address"):
+        for key in (
+            "instance_id",
+            "name",
+            "region",
+            "instance_type",
+            "status",
+            "ip_address",
+        ):
             assert key in d
 
 
 # ===========================================================================
 # Instance retrieval / lifecycle tests
 # ===========================================================================
+
 
 class TestInstanceLifecycle:
     def test_get_instance_by_id(self):
@@ -193,6 +207,7 @@ class TestInstanceLifecycle:
 # Region and instance type tests
 # ===========================================================================
 
+
 class TestRegionsAndInstanceTypes:
     def test_free_has_1_region(self):
         bot = DreamCoCloudBot(tier=Tier.FREE)
@@ -219,6 +234,7 @@ class TestRegionsAndInstanceTypes:
 # Static site hosting tests
 # ===========================================================================
 
+
 class TestStaticSiteHosting:
     def test_deploy_static_site(self):
         bot = DreamCoCloudBot(tier=Tier.FREE)
@@ -241,6 +257,7 @@ class TestStaticSiteHosting:
 # ===========================================================================
 # Managed database tests
 # ===========================================================================
+
 
 class TestManagedDatabases:
     def test_free_cannot_create_database(self):
@@ -308,6 +325,7 @@ class TestManagedDatabases:
 # Load balancer tests
 # ===========================================================================
 
+
 class TestLoadBalancer:
     def test_free_cannot_create_load_balancer(self):
         bot = DreamCoCloudBot(tier=Tier.FREE)
@@ -332,6 +350,7 @@ class TestLoadBalancer:
 # Serverless functions tests
 # ===========================================================================
 
+
 class TestServerlessFunctions:
     def test_free_cannot_deploy_function(self):
         bot = DreamCoCloudBot(tier=Tier.FREE)
@@ -345,7 +364,9 @@ class TestServerlessFunctions:
 
     def test_enterprise_can_deploy_function(self):
         bot = DreamCoCloudBot(tier=Tier.ENTERPRISE)
-        fn = bot.deploy_function("my_handler", "python3.11", "def my_handler(): return 'ok'")
+        fn = bot.deploy_function(
+            "my_handler", "python3.11", "def my_handler(): return 'ok'"
+        )
         assert "function_id" in fn
         assert fn["status"] == "deployed"
         assert "invoke_url" in fn
@@ -359,6 +380,7 @@ class TestServerlessFunctions:
 # ===========================================================================
 # Cloud stats tests
 # ===========================================================================
+
 
 class TestCloudStats:
     def test_initial_stats(self):
@@ -381,12 +403,16 @@ class TestCloudStats:
     def test_regions_available_count(self):
         bot_free = DreamCoCloudBot(tier=Tier.FREE)
         bot_ent = DreamCoCloudBot(tier=Tier.ENTERPRISE)
-        assert bot_ent.get_cloud_stats()["regions_available"] > bot_free.get_cloud_stats()["regions_available"]
+        assert (
+            bot_ent.get_cloud_stats()["regions_available"]
+            > bot_free.get_cloud_stats()["regions_available"]
+        )
 
 
 # ===========================================================================
 # Chat interface tests
 # ===========================================================================
+
 
 class TestChatInterface:
     def test_default_chat_response(self):

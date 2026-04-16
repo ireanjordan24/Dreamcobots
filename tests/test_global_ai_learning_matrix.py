@@ -1,51 +1,51 @@
 """Tests for bots/global_ai_learning_matrix/ — Global AI Learning Matrix bot."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.global_ai_learning_matrix.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    list_tiers,
-    BOT_FEATURES,
-    FEATURE_EVOLUTION_ENGINE,
-    FEATURE_GOVERNANCE,
-    FEATURE_CUSTOM_MODELS,
-    FEATURE_COUNTRY_TRACKING,
-    FEATURE_LEARNING_BENCHMARKS,
-    FEATURE_DASHBOARD,
-    FEATURE_API_ACCESS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_FEDERATED_LEARNING,
-    FEATURE_REAL_TIME_MONITORING,
-)
 from bots.global_ai_learning_matrix.country_monitor import Country, CountryMonitor
-from bots.global_ai_learning_matrix.learning_benchmarks import (
-    LearningMethod,
-    BenchmarkResult,
-    LearningBenchmarks,
-)
 from bots.global_ai_learning_matrix.evolution_engine import (
+    EvolutionEngine,
     EvolutionStage,
     ModelEvolution,
-    EvolutionEngine,
-)
-from bots.global_ai_learning_matrix.governance import (
-    GovernancePolicy,
-    GovernanceAlert,
-    GovernanceLayer,
 )
 from bots.global_ai_learning_matrix.global_ai_learning_matrix import (
     GlobalAILearningMatrix,
     GlobalAILearningMatrixError,
     GlobalAILearningMatrixTierError,
 )
-
+from bots.global_ai_learning_matrix.governance import (
+    GovernanceAlert,
+    GovernanceLayer,
+    GovernancePolicy,
+)
+from bots.global_ai_learning_matrix.learning_benchmarks import (
+    BenchmarkResult,
+    LearningBenchmarks,
+    LearningMethod,
+)
+from bots.global_ai_learning_matrix.tiers import (
+    BOT_FEATURES,
+    FEATURE_API_ACCESS,
+    FEATURE_COUNTRY_TRACKING,
+    FEATURE_CUSTOM_MODELS,
+    FEATURE_DASHBOARD,
+    FEATURE_EVOLUTION_ENGINE,
+    FEATURE_FEDERATED_LEARNING,
+    FEATURE_GOVERNANCE,
+    FEATURE_LEARNING_BENCHMARKS,
+    FEATURE_REAL_TIME_MONITORING,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    list_tiers,
+)
 
 # ---------------------------------------------------------------------------
 # Tiers
@@ -294,8 +294,13 @@ class TestLearningMethodEnum:
     def test_all_methods_present(self):
         methods = {m.value for m in LearningMethod}
         expected = {
-            "supervised", "unsupervised", "transfer",
-            "self_supervised", "reinforcement", "federated", "semi_supervised",
+            "supervised",
+            "unsupervised",
+            "transfer",
+            "self_supervised",
+            "reinforcement",
+            "federated",
+            "semi_supervised",
         }
         assert methods == expected
 
@@ -367,7 +372,9 @@ class TestLearningBenchmarksGetBest:
 class TestLearningBenchmarksCompare:
     def test_compare_returns_dict(self):
         lb = LearningBenchmarks()
-        result = lb.compare_methods([LearningMethod.SUPERVISED, LearningMethod.FEDERATED])
+        result = lb.compare_methods(
+            [LearningMethod.SUPERVISED, LearningMethod.FEDERATED]
+        )
         assert isinstance(result, dict)
 
     def test_compare_has_expected_keys(self):
@@ -409,7 +416,14 @@ class TestLearningBenchmarksRank:
 class TestEvolutionStageEnum:
     def test_all_stages(self):
         stages = {s.value for s in EvolutionStage}
-        assert stages == {"init", "training", "testing", "optimizing", "deployed", "retired"}
+        assert stages == {
+            "init",
+            "training",
+            "testing",
+            "optimizing",
+            "deployed",
+            "retired",
+        }
 
 
 class TestEvolutionEngineRegister:
@@ -516,7 +530,12 @@ class TestEvolutionEngineReport:
     def test_report_keys(self):
         ee = EvolutionEngine()
         report = ee.get_evolution_report()
-        for key in ("total_models", "stage_distribution", "avg_performance_score", "top_model"):
+        for key in (
+            "total_models",
+            "stage_distribution",
+            "avg_performance_score",
+            "top_model",
+        ):
             assert key in report
 
     def test_report_empty(self):
@@ -663,8 +682,13 @@ class TestGovernanceAuditReport:
         gl = GovernanceLayer()
         report = gl.audit_report()
         for key in (
-            "total_policies", "enabled_policies", "total_alerts",
-            "open_alerts", "resolved_alerts", "open_by_severity", "governance_score",
+            "total_policies",
+            "enabled_policies",
+            "total_alerts",
+            "open_alerts",
+            "resolved_alerts",
+            "open_by_severity",
+            "governance_score",
         ):
             assert key in report
 
@@ -743,7 +767,14 @@ class TestGlobalAILearningMatrixCountryTracking:
     def test_track_country_dict_fields(self):
         bot = GlobalAILearningMatrix()
         result = bot.track_country("AA", "Alpha", "Americas", 10, 20, 80.0)
-        for key in ("code", "name", "region", "lab_count", "active_models", "health_score"):
+        for key in (
+            "code",
+            "name",
+            "region",
+            "lab_count",
+            "active_models",
+            "health_score",
+        ):
             assert key in result
 
     def test_free_limit_5_countries(self):
@@ -775,7 +806,14 @@ class TestGlobalAILearningMatrixCountryTracking:
     def test_get_country_stats_keys(self):
         bot = GlobalAILearningMatrix()
         stats = bot.get_country_stats("JP")
-        for key in ("code", "name", "region", "lab_count", "active_models", "health_score"):
+        for key in (
+            "code",
+            "name",
+            "region",
+            "lab_count",
+            "active_models",
+            "health_score",
+        ):
             assert key in stats
 
 
@@ -867,9 +905,14 @@ class TestGlobalAILearningMatrixGlobalHealth:
         bot = GlobalAILearningMatrix()
         result = bot.get_global_health()
         for key in (
-            "health_score", "total_countries", "total_labs",
-            "top_region", "open_alerts", "governance_score",
-            "top_countries", "benchmarks_summary",
+            "health_score",
+            "total_countries",
+            "total_labs",
+            "top_region",
+            "open_alerts",
+            "governance_score",
+            "top_countries",
+            "benchmarks_summary",
         ):
             assert key in result
 

@@ -16,48 +16,17 @@ Covers:
   5. DreamAIInventHub main class (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-# ---------------------------------------------------------------------------
-# Imports
-# ---------------------------------------------------------------------------
-from bots.dreamai_invent_hub.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_BASIC_MATCHMAKING,
-    FEATURE_ADVANCED_MATCHMAKING,
-    FEATURE_INVENTOR_TOOLKIT,
-    FEATURE_DESIGN_BOT,
-    FEATURE_FINANCIAL_PROJECTION,
-    FEATURE_MANUFACTURING_SIMULATOR,
-    FEATURE_PATENT_SUPPORT,
-    FEATURE_FORUMS,
-    FEATURE_MARKETPLACE_BROWSE,
-    FEATURE_MARKETPLACE_LISTING,
-    FEATURE_API_ACCESS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_LICENSING_TEMPLATES,
-    FEATURE_REVENUE_SHARING,
-    FEATURE_IOT_LAB,
-    FEATURE_PROTOTYPING_LAB,
-)
-from bots.dreamai_invent_hub.matchmaking import (
-    MatchmakingEngine,
-    Profile,
-    ProfileType,
-    CollaborationType,
-    MatchStatus,
-    Match,
+from bots.dreamai_invent_hub.dreamai_invent_hub import (
+    DreamAIInventHub,
+    DreamAIInventHubTierError,
 )
 from bots.dreamai_invent_hub.inventor_toolkit import (
     DesignBot,
@@ -65,33 +34,65 @@ from bots.dreamai_invent_hub.inventor_toolkit import (
     DesignStage,
     FinancialProjectionBot,
     HardwareCostBreakdown,
-    ManufacturingSimulator,
+    InventorToolkit,
     ManufacturingMethod,
+    ManufacturingSimulator,
+    PatentStatus,
     PatentSupportAI,
     PatentType,
-    PatentStatus,
-    InventorToolkit,
 )
 from bots.dreamai_invent_hub.marketplace import (
-    RDMarketplace,
     DirectoryCategory,
     DirectoryListing,
-    ServiceType,
-    ListingStatus,
     ForumCategory,
     ForumPost,
+    ListingStatus,
     PostType,
     PrototypingTool,
+    RDMarketplace,
+    ServiceType,
 )
-from bots.dreamai_invent_hub.dreamai_invent_hub import (
-    DreamAIInventHub,
-    DreamAIInventHubTierError,
+from bots.dreamai_invent_hub.matchmaking import (
+    CollaborationType,
+    Match,
+    MatchmakingEngine,
+    MatchStatus,
+    Profile,
+    ProfileType,
 )
 
+# ---------------------------------------------------------------------------
+# Imports
+# ---------------------------------------------------------------------------
+from bots.dreamai_invent_hub.tiers import (
+    FEATURE_ADVANCED_MATCHMAKING,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_MATCHMAKING,
+    FEATURE_DESIGN_BOT,
+    FEATURE_FINANCIAL_PROJECTION,
+    FEATURE_FORUMS,
+    FEATURE_INVENTOR_TOOLKIT,
+    FEATURE_IOT_LAB,
+    FEATURE_LICENSING_TEMPLATES,
+    FEATURE_MANUFACTURING_SIMULATOR,
+    FEATURE_MARKETPLACE_BROWSE,
+    FEATURE_MARKETPLACE_LISTING,
+    FEATURE_PATENT_SUPPORT,
+    FEATURE_PROTOTYPING_LAB,
+    FEATURE_REVENUE_SHARING,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -184,6 +185,7 @@ class TestTiers:
 # 2. Matchmaking Engine
 # ===========================================================================
 
+
 class TestMatchmakingEngine:
     def _make_engine(self):
         return MatchmakingEngine()
@@ -240,7 +242,10 @@ class TestMatchmakingEngine:
             collaboration_type=CollaborationType.IOT_COLLABORATION,
         )
         for m in matches:
-            assert CollaborationType.IOT_COLLABORATION.value in m["profile"]["collaboration_types"]
+            assert (
+                CollaborationType.IOT_COLLABORATION.value
+                in m["profile"]["collaboration_types"]
+            )
 
     def test_find_matches_empty_for_unknown_profile(self):
         engine = self._make_engine()
@@ -289,8 +294,10 @@ class TestMatchmakingEngine:
     def test_send_message(self):
         engine = self._make_engine()
         match = engine.create_match(
-            "SEED-INV-001", "SEED-AI-001",
-            CollaborationType.CO_DEVELOPMENT, "Joint dev project",
+            "SEED-INV-001",
+            "SEED-AI-001",
+            CollaborationType.CO_DEVELOPMENT,
+            "Joint dev project",
         )
         result = engine.send_message(match.match_id, "SEED-INV-001", "Hello!")
         assert result is True
@@ -303,12 +310,16 @@ class TestMatchmakingEngine:
     def test_list_matches_by_profile(self):
         engine = self._make_engine()
         engine.create_match(
-            "SEED-INV-001", "SEED-AI-001",
-            CollaborationType.CO_DEVELOPMENT, "Project A",
+            "SEED-INV-001",
+            "SEED-AI-001",
+            CollaborationType.CO_DEVELOPMENT,
+            "Project A",
         )
         engine.create_match(
-            "SEED-ROB-001", "SEED-ELEC-001",
-            CollaborationType.CONTRACT_MANUFACTURING, "Project B",
+            "SEED-ROB-001",
+            "SEED-ELEC-001",
+            CollaborationType.CONTRACT_MANUFACTURING,
+            "Project B",
         )
         inv_matches = engine.list_matches(profile_id="SEED-INV-001")
         assert all(
@@ -353,8 +364,10 @@ class TestMatchmakingEngine:
     def test_match_to_dict(self):
         engine = self._make_engine()
         match = engine.create_match(
-            "SEED-INV-001", "SEED-AI-001",
-            CollaborationType.EQUITY_PARTNERSHIP, "Equity deal",
+            "SEED-INV-001",
+            "SEED-AI-001",
+            CollaborationType.EQUITY_PARTNERSHIP,
+            "Equity deal",
         )
         d = match.to_dict()
         assert d["collaboration_type"] == "equity_partnership"
@@ -369,8 +382,10 @@ class TestMatchmakingEngine:
         engine = self._make_engine()
         terms = {"royalty_rate_pct": 7.5, "license_duration_years": 5}
         match = engine.create_match(
-            "SEED-INV-001", "SEED-AI-001",
-            CollaborationType.LICENSING, "License deal",
+            "SEED-INV-001",
+            "SEED-AI-001",
+            CollaborationType.LICENSING,
+            "License deal",
             proposed_terms=terms,
         )
         assert match.proposed_terms["royalty_rate_pct"] == 7.5
@@ -380,19 +395,24 @@ class TestMatchmakingEngine:
 # 3a. DesignBot
 # ===========================================================================
 
+
 class TestDesignBot:
     def _bot(self):
         return DesignBot()
 
     def test_start_session_returns_session(self):
         bot = self._bot()
-        session = bot.start_session("Smart Glove", DesignDomain.IOT, DesignStage.PROTOTYPE)
+        session = bot.start_session(
+            "Smart Glove", DesignDomain.IOT, DesignStage.PROTOTYPE
+        )
         assert session.session_id.startswith("DESIGN-")
         assert session.product_name == "Smart Glove"
 
     def test_session_has_suggestions(self):
         bot = self._bot()
-        session = bot.start_session("Robot Arm", DesignDomain.ROBOTICS, DesignStage.CONCEPT)
+        session = bot.start_session(
+            "Robot Arm", DesignDomain.ROBOTICS, DesignStage.CONCEPT
+        )
         assert len(session.suggestions) > 0
 
     def test_session_has_components(self):
@@ -428,7 +448,9 @@ class TestDesignBot:
 
     def test_session_to_dict(self):
         bot = self._bot()
-        session = bot.start_session("Medical Patch", DesignDomain.MEDICAL_DEVICES, DesignStage.MVP)
+        session = bot.start_session(
+            "Medical Patch", DesignDomain.MEDICAL_DEVICES, DesignStage.MVP
+        )
         d = session.to_dict()
         assert d["domain"] == "medical_devices"
         assert d["stage"] == "mvp"
@@ -445,7 +467,9 @@ class TestDesignBot:
 
     def test_production_ready_stage(self):
         bot = self._bot()
-        session = bot.start_session("Final", DesignDomain.AUTOMOTIVE, DesignStage.PRODUCTION_READY)
+        session = bot.start_session(
+            "Final", DesignDomain.AUTOMOTIVE, DesignStage.PRODUCTION_READY
+        )
         assert len(session.suggestions) > 0
 
     def test_aerospace_components(self):
@@ -457,6 +481,7 @@ class TestDesignBot:
 # ===========================================================================
 # 3b. FinancialProjectionBot
 # ===========================================================================
+
 
 class TestFinancialProjectionBot:
     def _bot(self):
@@ -537,6 +562,7 @@ class TestFinancialProjectionBot:
 # 3c. ManufacturingSimulator
 # ===========================================================================
 
+
 class TestManufacturingSimulator:
     def _sim(self):
         return ManufacturingSimulator()
@@ -605,25 +631,32 @@ class TestManufacturingSimulator:
 # 3d. PatentSupportAI
 # ===========================================================================
 
+
 class TestPatentSupportAI:
     def _ai(self):
         return PatentSupportAI()
 
     def test_create_provisional_dossier(self):
         ai = self._ai()
-        dossier = ai.create_dossier("Smart Sensor", "An IoT sensor array.", PatentType.PROVISIONAL)
+        dossier = ai.create_dossier(
+            "Smart Sensor", "An IoT sensor array.", PatentType.PROVISIONAL
+        )
         assert dossier.dossier_id.startswith("PAT-")
         assert dossier.patent_type == PatentType.PROVISIONAL
         assert dossier.status == PatentStatus.IDEA
 
     def test_create_utility_dossier(self):
         ai = self._ai()
-        dossier = ai.create_dossier("Robot Arm", "Robotic arm mechanism.", PatentType.UTILITY)
+        dossier = ai.create_dossier(
+            "Robot Arm", "Robotic arm mechanism.", PatentType.UTILITY
+        )
         assert dossier.patent_type == PatentType.UTILITY
 
     def test_dossier_has_filing_guidance(self):
         ai = self._ai()
-        dossier = ai.create_dossier("Wearable", "A wearable device.", PatentType.PROVISIONAL)
+        dossier = ai.create_dossier(
+            "Wearable", "A wearable device.", PatentType.PROVISIONAL
+        )
         assert len(dossier.filing_guidance) > 0
 
     def test_dossier_estimated_cost_positive(self):
@@ -648,7 +681,9 @@ class TestPatentSupportAI:
     def test_draft_claims(self):
         ai = self._ai()
         dossier = ai.create_dossier("Invention", "desc", PatentType.UTILITY)
-        claims = ai.draft_claims(dossier.dossier_id, ["a sensor module", "a wireless transmitter"])
+        claims = ai.draft_claims(
+            dossier.dossier_id, ["a sensor module", "a wireless transmitter"]
+        )
         assert len(claims) == 2
         assert "Claim 1" in claims[0]
         assert "Claim 2" in claims[1]
@@ -692,6 +727,7 @@ class TestPatentSupportAI:
 # 3e. InventorToolkit aggregator
 # ===========================================================================
 
+
 class TestInventorToolkit:
     def test_toolkit_has_all_four_tools(self):
         tk = InventorToolkit()
@@ -714,6 +750,7 @@ class TestInventorToolkit:
 # ===========================================================================
 # 4a. Marketplace — Directory
 # ===========================================================================
+
 
 class TestMarketplaceDirectory:
     def _market(self):
@@ -780,9 +817,7 @@ class TestMarketplaceDirectory:
         m = self._market()
         results = m.search_directory()
         # Featured listings should be at the top
-        statuses = [
-            m.get_listing(r["listing_id"]).status for r in results[:3]
-        ]
+        statuses = [m.get_listing(r["listing_id"]).status for r in results[:3]]
         assert ListingStatus.FEATURED in statuses
 
     def test_search_no_results_for_nonexistent(self):
@@ -794,6 +829,7 @@ class TestMarketplaceDirectory:
 # ===========================================================================
 # 4b. Marketplace — Forum
 # ===========================================================================
+
 
 class TestMarketplaceForum:
     def _market(self):
@@ -915,6 +951,7 @@ class TestMarketplaceForum:
 # 4c. Marketplace — Prototyping Tools
 # ===========================================================================
 
+
 class TestMarketplaceTools:
     def _market(self):
         return RDMarketplace()
@@ -984,6 +1021,7 @@ class TestMarketplaceTools:
 # ===========================================================================
 # 5. DreamAIInventHub — Integration Tests
 # ===========================================================================
+
 
 class TestDreamAIInventHubIntegration:
     def test_free_tier_initialises(self):
@@ -1086,7 +1124,9 @@ class TestDreamAIInventHubIntegration:
 
     def test_patent_dossier_pro_allowed(self):
         hub = DreamAIInventHub(tier=Tier.PRO)
-        dossier = hub.create_patent_dossier("Smart Widget", "An IoT widget.", "provisional")
+        dossier = hub.create_patent_dossier(
+            "Smart Widget", "An IoT widget.", "provisional"
+        )
         assert dossier.dossier_id.startswith("PAT-")
 
     def test_search_directory_free_allowed(self):
@@ -1135,7 +1175,8 @@ class TestDreamAIInventHubIntegration:
     def test_create_match_returns_match(self):
         hub = DreamAIInventHub(tier=Tier.PRO)
         match = hub.create_match(
-            "SEED-INV-001", "SEED-AI-001",
+            "SEED-INV-001",
+            "SEED-AI-001",
             CollaborationType.CO_DEVELOPMENT,
             "Build AI-powered wearable together",
         )
@@ -1151,7 +1192,12 @@ class TestDreamAIInventHubIntegration:
 
     def test_register_and_match_new_profile(self):
         hub = DreamAIInventHub(tier=Tier.PRO)
-        from bots.dreamai_invent_hub.matchmaking import Profile, ProfileType, CollaborationType
+        from bots.dreamai_invent_hub.matchmaking import (
+            CollaborationType,
+            Profile,
+            ProfileType,
+        )
+
         profile = Profile(
             profile_id="NEW-001",
             name="My Startup",

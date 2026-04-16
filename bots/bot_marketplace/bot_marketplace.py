@@ -29,32 +29,31 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.bot_marketplace.integration_hub import IntegrationHub
+from bots.bot_marketplace.marketplace_catalog import MarketplaceCatalog
+from bots.bot_marketplace.monetization_engine import MonetizationEngine
 from bots.bot_marketplace.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_BROWSE,
+    FEATURE_BUY_BOTS,
+    FEATURE_CUSTOM_STOREFRONT,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_FORTUNE500_INTEGRATION,
+    FEATURE_MONETIZE,
+    FEATURE_SELL_BOTS,
+    FEATURE_UPSELL,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BROWSE,
-    FEATURE_BUY_BOTS,
-    FEATURE_SELL_BOTS,
-    FEATURE_MONETIZE,
-    FEATURE_UPSELL,
-    FEATURE_ANALYTICS,
-    FEATURE_CUSTOM_STOREFRONT,
-    FEATURE_FORTUNE500_INTEGRATION,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
 )
-from bots.bot_marketplace.marketplace_catalog import MarketplaceCatalog
-from bots.bot_marketplace.monetization_engine import MonetizationEngine
-from bots.bot_marketplace.integration_hub import IntegrationHub
-
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -114,7 +113,9 @@ class BotMarketplace:
     ) -> list:
         """Full-text search over active listings."""
         self._require_feature(FEATURE_BROWSE)
-        return self.catalog.search_listings(query=query, category=category, max_price=max_price)
+        return self.catalog.search_listings(
+            query=query, category=category, max_price=max_price
+        )
 
     # ------------------------------------------------------------------
     # Buying
@@ -220,7 +221,9 @@ class BotMarketplace:
     # Integrations
     # ------------------------------------------------------------------
 
-    def register_integration(self, listing_id: str, partner: str, config: dict | None = None) -> dict:
+    def register_integration(
+        self, listing_id: str, partner: str, config: dict | None = None
+    ) -> dict:
         """Register a Fortune 500 integration for a listing."""
         self._require_feature(FEATURE_FORTUNE500_INTEGRATION)
         return self.integration_hub.register_integration(listing_id, partner, config)
@@ -273,7 +276,9 @@ class BotMarketplace:
             return "You are already on the highest tier."
         if "tier" in msg or "plan" in msg:
             info = self.get_tier_info()
-            return f"You are on the {info['name']} tier (${info['price_usd_monthly']}/mo)."
+            return (
+                f"You are on the {info['name']} tier (${info['price_usd_monthly']}/mo)."
+            )
         if "sell" in msg or "list" in msg:
             return "Use list_bot() to create a new listing in the marketplace."
         if "buy" in msg or "purchase" in msg:

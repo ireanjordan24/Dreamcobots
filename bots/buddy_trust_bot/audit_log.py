@@ -63,10 +63,10 @@ class AuditEntry:
     user_id: str
     description: str
     timestamp: float
-    consent_token: str          # May be empty for non-consent-gated events
-    resource_id: str            # ID of the affected resource (profile, secret, etc.)
-    previous_hash: str          # Hash of the previous entry (integrity chain)
-    entry_hash: str             # Hash of this entry's content
+    consent_token: str  # May be empty for non-consent-gated events
+    resource_id: str  # ID of the affected resource (profile, secret, etc.)
+    previous_hash: str  # Hash of the previous entry (integrity chain)
+    entry_hash: str  # Hash of this entry's content
     is_suspicious: bool = False
     metadata: dict = field(default_factory=dict)
 
@@ -96,7 +96,7 @@ class AuditLog:
         Number of entries visible on the current tier (None = all).
     """
 
-    GENESIS_HASH = "0" * 64   # Sentinel hash for first entry
+    GENESIS_HASH = "0" * 64  # Sentinel hash for first entry
 
     def __init__(self, max_visible: Optional[int] = None) -> None:
         self._entries: list[AuditEntry] = []
@@ -262,6 +262,7 @@ class AuditLog:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class AuditLogError(Exception):
     """General audit log error."""

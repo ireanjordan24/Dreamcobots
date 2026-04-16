@@ -10,22 +10,22 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 import json
 import time
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Benchmark data model
 # ---------------------------------------------------------------------------
+
 
 def _default_results_path() -> str:
     return os.path.join(
@@ -35,14 +35,62 @@ def _default_results_path() -> str:
 
 # Competitor benchmark baselines (scores out of 100)
 COMPETITOR_BASELINES: dict = {
-    "Lead Generation": {"speed": 65, "scalability": 60, "ux": 70, "revenue": 55, "reliability": 68},
-    "Sales Automation": {"speed": 70, "scalability": 65, "ux": 72, "revenue": 60, "reliability": 70},
-    "Customer Support": {"speed": 75, "scalability": 68, "ux": 78, "revenue": 50, "reliability": 72},
-    "Data Scraping":    {"speed": 80, "scalability": 72, "ux": 60, "revenue": 55, "reliability": 65},
-    "Revenue Optimization": {"speed": 68, "scalability": 70, "ux": 75, "revenue": 72, "reliability": 68},
-    "Marketing":        {"speed": 72, "scalability": 70, "ux": 80, "revenue": 65, "reliability": 74},
-    "Analytics":        {"speed": 78, "scalability": 74, "ux": 76, "revenue": 60, "reliability": 76},
-    "default":          {"speed": 70, "scalability": 65, "ux": 70, "revenue": 58, "reliability": 68},
+    "Lead Generation": {
+        "speed": 65,
+        "scalability": 60,
+        "ux": 70,
+        "revenue": 55,
+        "reliability": 68,
+    },
+    "Sales Automation": {
+        "speed": 70,
+        "scalability": 65,
+        "ux": 72,
+        "revenue": 60,
+        "reliability": 70,
+    },
+    "Customer Support": {
+        "speed": 75,
+        "scalability": 68,
+        "ux": 78,
+        "revenue": 50,
+        "reliability": 72,
+    },
+    "Data Scraping": {
+        "speed": 80,
+        "scalability": 72,
+        "ux": 60,
+        "revenue": 55,
+        "reliability": 65,
+    },
+    "Revenue Optimization": {
+        "speed": 68,
+        "scalability": 70,
+        "ux": 75,
+        "revenue": 72,
+        "reliability": 68,
+    },
+    "Marketing": {
+        "speed": 72,
+        "scalability": 70,
+        "ux": 80,
+        "revenue": 65,
+        "reliability": 74,
+    },
+    "Analytics": {
+        "speed": 78,
+        "scalability": 74,
+        "ux": 76,
+        "revenue": 60,
+        "reliability": 76,
+    },
+    "default": {
+        "speed": 70,
+        "scalability": 65,
+        "ux": 70,
+        "revenue": 58,
+        "reliability": 68,
+    },
 }
 
 # DreamCo bots are expected to beat the baseline by this margin
@@ -52,6 +100,7 @@ DREAMCO_IMPROVEMENT_PCT = 15
 # ---------------------------------------------------------------------------
 # Benchmarking Engine
 # ---------------------------------------------------------------------------
+
 
 class BenchmarkingEngineError(Exception):
     """Raised when benchmarking fails."""
@@ -115,14 +164,19 @@ class BenchmarkingEngine:
         if not bot_name.strip():
             raise BenchmarkingEngineError("bot_name must not be empty")
 
-        baseline = dict(COMPETITOR_BASELINES.get(category, COMPETITOR_BASELINES["default"]))
+        baseline = dict(
+            COMPETITOR_BASELINES.get(category, COMPETITOR_BASELINES["default"])
+        )
         scores = self._measure(bot_name, category, iterations)
         delta = {
-            metric: round(scores[metric] - baseline[metric], 2)
-            for metric in baseline
+            metric: round(scores[metric] - baseline[metric], 2) for metric in baseline
         }
         passed = all(scores[m] >= baseline[m] for m in baseline)
-        verdict = "PASS — beats competitor baseline" if passed else "FAIL — below baseline on some metrics"
+        verdict = (
+            "PASS — beats competitor baseline"
+            if passed
+            else "FAIL — below baseline on some metrics"
+        )
 
         result: dict = {
             "bot_name": bot_name,

@@ -1,16 +1,22 @@
 """
 Dreamcobots AIWritingBot — tier-aware AI content generation and SEO optimization.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.ai_writing_bot.tiers import AI_WRITING_FEATURES, get_ai_writing_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.ai_writing_bot.tiers import AI_WRITING_FEATURES, get_ai_writing_tier_info
 
 
 class AIWritingBotTierError(Exception):
@@ -169,16 +175,28 @@ class AIWritingBot:
         else:  # ENTERPRISE
             count = 100
 
-        template_types = ["blog post", "product description", "email", "social media", "landing page",
-                          "press release", "case study", "whitepaper", "newsletter", "ad copy"]
+        template_types = [
+            "blog post",
+            "product description",
+            "email",
+            "social media",
+            "landing page",
+            "press release",
+            "case study",
+            "whitepaper",
+            "newsletter",
+            "ad copy",
+        ]
 
         templates = []
         for i in range(count):
             template_type = template_types[i % len(template_types)]
-            templates.append({
-                "name": f"Template {i + 1}: {template_type.title()}",
-                "type": template_type,
-            })
+            templates.append(
+                {
+                    "name": f"Template {i + 1}: {template_type.title()}",
+                    "type": template_type,
+                }
+            )
         return templates
 
     def get_stats(self) -> dict:

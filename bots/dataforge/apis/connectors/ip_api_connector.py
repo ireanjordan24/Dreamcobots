@@ -1,4 +1,5 @@
 """IP-API geolocation connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,6 +26,7 @@ class IPAPIConnector:
             API response dict or error dict.
         """
         import requests
+
         target = ip_address if ip_address else ""
         try:
             response = requests.get(f"{self.BASE_URL}/json/{target}", timeout=30)
@@ -45,6 +47,7 @@ class IPAPIConnector:
             API response dict with list of results or error dict.
         """
         import requests
+
         try:
             response = requests.post(f"{self.BASE_URL}/batch", json=ip_list, timeout=30)
             response.raise_for_status()
@@ -52,4 +55,3 @@ class IPAPIConnector:
         except requests.RequestException as e:
             logger.error("IP-API batch_lookup error: %s", e)
             return {"status": "error", "message": str(e)}
-

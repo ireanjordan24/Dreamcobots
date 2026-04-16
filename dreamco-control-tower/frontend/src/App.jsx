@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import BotOverview from './components/BotOverview.jsx';
 import RepoActivity from './components/RepoActivity.jsx';

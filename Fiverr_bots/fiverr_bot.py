@@ -1,4 +1,5 @@
 """FiverrBot: automates SEO content gig generation and delivery."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 import io
@@ -51,7 +52,10 @@ class FiverrBot(BotBase):
         )
         self.monetization_hooks.track(
             "bot_stopped",
-            {"completed": len(self._completed_gigs), "revenue": self.revenue_engine.total()},
+            {
+                "completed": len(self._completed_gigs),
+                "revenue": self.revenue_engine.total(),
+            },
         )
 
     def execute(self) -> None:
@@ -110,7 +114,9 @@ class FiverrBot(BotBase):
             "pdf_output": pdf_output,
             "revenue": self.GIG_PRICE_USD,
         }
-        self.logger.info("Gig completed: '%s' | $%.2f recorded", title, self.GIG_PRICE_USD)
+        self.logger.info(
+            "Gig completed: '%s' | $%.2f recorded", title, self.GIG_PRICE_USD
+        )
         return result
 
     def _generate_seo_content(

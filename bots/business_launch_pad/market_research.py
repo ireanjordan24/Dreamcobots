@@ -27,41 +27,136 @@ class MarketReport:
     report_id: str
     industry: str
     competitors: list  # list[Competitor]
-    personas: list    # list[CustomerPersona]
+    personas: list  # list[CustomerPersona]
     swot: dict
     trends: list[str]
 
 
 _INDUSTRY_COMPETITORS: dict[str, list[dict]] = {
     "technology": [
-        {"name": "TechGiant Corp", "market_share": 0.32, "strengths": ["brand recognition", "R&D budget"], "weaknesses": ["slow innovation", "high prices"]},
-        {"name": "Innovate Inc", "market_share": 0.18, "strengths": ["agile team", "modern UX"], "weaknesses": ["limited support", "small market"]},
-        {"name": "Digital Solutions LLC", "market_share": 0.12, "strengths": ["enterprise clients", "integrations"], "weaknesses": ["legacy codebase", "complex onboarding"]},
+        {
+            "name": "TechGiant Corp",
+            "market_share": 0.32,
+            "strengths": ["brand recognition", "R&D budget"],
+            "weaknesses": ["slow innovation", "high prices"],
+        },
+        {
+            "name": "Innovate Inc",
+            "market_share": 0.18,
+            "strengths": ["agile team", "modern UX"],
+            "weaknesses": ["limited support", "small market"],
+        },
+        {
+            "name": "Digital Solutions LLC",
+            "market_share": 0.12,
+            "strengths": ["enterprise clients", "integrations"],
+            "weaknesses": ["legacy codebase", "complex onboarding"],
+        },
     ],
     "retail": [
-        {"name": "MegaMart", "market_share": 0.28, "strengths": ["supply chain", "low prices"], "weaknesses": ["poor service", "thin margins"]},
-        {"name": "StyleHub", "market_share": 0.15, "strengths": ["brand loyalty", "curated products"], "weaknesses": ["high cost", "limited SKUs"]},
-        {"name": "QuickShop Online", "market_share": 0.10, "strengths": ["fast delivery", "mobile app"], "weaknesses": ["returns policy", "product quality"]},
+        {
+            "name": "MegaMart",
+            "market_share": 0.28,
+            "strengths": ["supply chain", "low prices"],
+            "weaknesses": ["poor service", "thin margins"],
+        },
+        {
+            "name": "StyleHub",
+            "market_share": 0.15,
+            "strengths": ["brand loyalty", "curated products"],
+            "weaknesses": ["high cost", "limited SKUs"],
+        },
+        {
+            "name": "QuickShop Online",
+            "market_share": 0.10,
+            "strengths": ["fast delivery", "mobile app"],
+            "weaknesses": ["returns policy", "product quality"],
+        },
     ],
     "healthcare": [
-        {"name": "HealthFirst Group", "market_share": 0.25, "strengths": ["network size", "trust"], "weaknesses": ["bureaucratic", "slow tech adoption"]},
-        {"name": "MedConnect", "market_share": 0.14, "strengths": ["telehealth platform", "NPS"], "weaknesses": ["rural coverage", "data privacy concerns"]},
-        {"name": "WellnessAI", "market_share": 0.08, "strengths": ["AI diagnostics", "cost efficiency"], "weaknesses": ["regulatory risk", "nascent brand"]},
+        {
+            "name": "HealthFirst Group",
+            "market_share": 0.25,
+            "strengths": ["network size", "trust"],
+            "weaknesses": ["bureaucratic", "slow tech adoption"],
+        },
+        {
+            "name": "MedConnect",
+            "market_share": 0.14,
+            "strengths": ["telehealth platform", "NPS"],
+            "weaknesses": ["rural coverage", "data privacy concerns"],
+        },
+        {
+            "name": "WellnessAI",
+            "market_share": 0.08,
+            "strengths": ["AI diagnostics", "cost efficiency"],
+            "weaknesses": ["regulatory risk", "nascent brand"],
+        },
     ],
 }
 
 _DEFAULT_COMPETITORS = [
-    {"name": "Market Leader A", "market_share": 0.30, "strengths": ["established brand", "resources"], "weaknesses": ["innovation lag", "high cost"]},
-    {"name": "Challenger B", "market_share": 0.15, "strengths": ["agile", "pricing"], "weaknesses": ["limited reach", "support gaps"]},
-    {"name": "Niche Player C", "market_share": 0.08, "strengths": ["specialization", "community"], "weaknesses": ["scale", "feature gaps"]},
+    {
+        "name": "Market Leader A",
+        "market_share": 0.30,
+        "strengths": ["established brand", "resources"],
+        "weaknesses": ["innovation lag", "high cost"],
+    },
+    {
+        "name": "Challenger B",
+        "market_share": 0.15,
+        "strengths": ["agile", "pricing"],
+        "weaknesses": ["limited reach", "support gaps"],
+    },
+    {
+        "name": "Niche Player C",
+        "market_share": 0.08,
+        "strengths": ["specialization", "community"],
+        "weaknesses": ["scale", "feature gaps"],
+    },
 ]
 
 _INDUSTRY_TRENDS: dict[str, list[str]] = {
-    "technology": ["AI/ML adoption accelerating", "Edge computing growth", "Zero-trust security models", "Low-code/no-code platforms", "Sustainability in tech", "API-first architecture"],
-    "retail": ["Social commerce expansion", "Buy-now-pay-later growth", "Omnichannel experiences", "Sustainable packaging", "AR try-on tools", "Hyper-personalization"],
-    "healthcare": ["Telehealth normalization", "AI-assisted diagnostics", "Value-based care models", "Wearable health devices", "Mental health awareness", "Genomic medicine"],
-    "education": ["Micro-credentialing rise", "AI tutoring adoption", "Gamified learning", "Corporate upskilling demand", "Global online platforms", "Competency-based education"],
-    "finance": ["Embedded finance growth", "DeFi maturation", "ESG investing", "Real-time payments", "Open banking APIs", "RegTech automation"],
+    "technology": [
+        "AI/ML adoption accelerating",
+        "Edge computing growth",
+        "Zero-trust security models",
+        "Low-code/no-code platforms",
+        "Sustainability in tech",
+        "API-first architecture",
+    ],
+    "retail": [
+        "Social commerce expansion",
+        "Buy-now-pay-later growth",
+        "Omnichannel experiences",
+        "Sustainable packaging",
+        "AR try-on tools",
+        "Hyper-personalization",
+    ],
+    "healthcare": [
+        "Telehealth normalization",
+        "AI-assisted diagnostics",
+        "Value-based care models",
+        "Wearable health devices",
+        "Mental health awareness",
+        "Genomic medicine",
+    ],
+    "education": [
+        "Micro-credentialing rise",
+        "AI tutoring adoption",
+        "Gamified learning",
+        "Corporate upskilling demand",
+        "Global online platforms",
+        "Competency-based education",
+    ],
+    "finance": [
+        "Embedded finance growth",
+        "DeFi maturation",
+        "ESG investing",
+        "Real-time payments",
+        "Open banking APIs",
+        "RegTech automation",
+    ],
 }
 
 _DEFAULT_TRENDS = [
@@ -112,22 +207,38 @@ class MarketResearch:
             CustomerPersona(
                 name="Early Adopter Alex",
                 age_range="25-35",
-                pain_points=[f"High cost of existing {industry} solutions", "Lack of integration", "Poor support"],
+                pain_points=[
+                    f"High cost of existing {industry} solutions",
+                    "Lack of integration",
+                    "Poor support",
+                ],
                 goals=["Save time", "Reduce costs", "Grow business"],
                 channels=["LinkedIn", "Twitter", "Podcasts"],
             ),
             CustomerPersona(
                 name="Pragmatic Pat",
                 age_range="35-50",
-                pain_points=[f"Complexity in {industry} tools", "Training burden", "Vendor lock-in"],
+                pain_points=[
+                    f"Complexity in {industry} tools",
+                    "Training burden",
+                    "Vendor lock-in",
+                ],
                 goals=["Reliability", "ROI proof", "Easy onboarding"],
                 channels=["Industry blogs", "Email newsletters", "Referrals"],
             ),
             CustomerPersona(
                 name="Enterprise Emma",
                 age_range="40-55",
-                pain_points=["Compliance requirements", "Scalability concerns", "Security gaps"],
-                goals=["Enterprise-grade security", "Compliance automation", "Strategic partnerships"],
+                pain_points=[
+                    "Compliance requirements",
+                    "Scalability concerns",
+                    "Security gaps",
+                ],
+                goals=[
+                    "Enterprise-grade security",
+                    "Compliance automation",
+                    "Strategic partnerships",
+                ],
                 channels=["Analyst reports", "Conferences", "Direct sales"],
             ),
         ]

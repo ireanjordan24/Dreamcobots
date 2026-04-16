@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,42 +22,387 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "address": "123 Oak St, Austin TX",         "price": 340000, "beds": 3, "baths": 2, "sqft": 1500, "type": "single_family", "source": "MLS",     "monthly_rent": 2400, "city": "Austin"},
-    {"id": 2,  "address": "456 Maple Ave, Austin TX",      "price": 210000, "beds": 2, "baths": 1, "sqft": 950,  "type": "condo",         "source": "Zillow",  "monthly_rent": 1600, "city": "Austin"},
-    {"id": 3,  "address": "789 Pine Rd, Phoenix AZ",       "price": 290000, "beds": 3, "baths": 2, "sqft": 1600, "type": "single_family", "source": "Redfin",  "monthly_rent": 2100, "city": "Phoenix"},
-    {"id": 4,  "address": "321 Elm Dr, Phoenix AZ",        "price": 175000, "beds": 2, "baths": 2, "sqft": 1000, "type": "condo",         "source": "MLS",     "monthly_rent": 1450, "city": "Phoenix"},
-    {"id": 5,  "address": "654 Cedar Ln, Nashville TN",    "price": 420000, "beds": 4, "baths": 3, "sqft": 2100, "type": "single_family", "source": "Zillow",  "monthly_rent": 3000, "city": "Nashville"},
-    {"id": 6,  "address": "987 Birch Blvd, Nashville TN",  "price": 315000, "beds": 2, "baths": 2, "sqft": 1100, "type": "condo",         "source": "Redfin",  "monthly_rent": 2400, "city": "Nashville"},
-    {"id": 7,  "address": "147 Walnut St, Denver CO",      "price": 275000, "beds": 1, "baths": 1, "sqft": 780,  "type": "condo",         "source": "MLS",     "monthly_rent": 2000, "city": "Denver"},
-    {"id": 8,  "address": "258 Spruce Ave, Denver CO",     "price": 455000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "source": "Zillow",  "monthly_rent": 3100, "city": "Denver"},
-    {"id": 9,  "address": "369 Aspen Ct, Tampa FL",        "price": 320000, "beds": 3, "baths": 2, "sqft": 1600, "type": "single_family", "source": "Redfin",  "monthly_rent": 2300, "city": "Tampa"},
-    {"id": 10, "address": "741 Palm Dr, Tampa FL",         "price": 225000, "beds": 2, "baths": 2, "sqft": 1100, "type": "condo",         "source": "MLS",     "monthly_rent": 1900, "city": "Tampa"},
-    {"id": 11, "address": "852 Peachtree Rd, Atlanta GA",  "price": 385000, "beds": 3, "baths": 2, "sqft": 1750, "type": "single_family", "source": "Zillow",  "monthly_rent": 2700, "city": "Atlanta"},
-    {"id": 12, "address": "963 Magnolia St, Atlanta GA",   "price": 295000, "beds": 2, "baths": 2, "sqft": 1250, "type": "condo",         "source": "Redfin",  "monthly_rent": 2200, "city": "Atlanta"},
-    {"id": 13, "address": "159 Mesquite Way, Dallas TX",   "price": 360000, "beds": 4, "baths": 3, "sqft": 1900, "type": "single_family", "source": "MLS",     "monthly_rent": 2600, "city": "Dallas"},
-    {"id": 14, "address": "267 Bluebonnet St, Dallas TX",  "price": 215000, "beds": 1, "baths": 1, "sqft": 800,  "type": "condo",         "source": "Zillow",  "monthly_rent": 1750, "city": "Dallas"},
-    {"id": 15, "address": "375 Live Oak Blvd, Houston TX", "price": 295000, "beds": 3, "baths": 2, "sqft": 1550, "type": "single_family", "source": "Redfin",  "monthly_rent": 2050, "city": "Houston"},
-    {"id": 16, "address": "483 Bayou Dr, Houston TX",      "price": 180000, "beds": 2, "baths": 2, "sqft": 1000, "type": "condo",         "source": "MLS",     "monthly_rent": 1500, "city": "Houston"},
-    {"id": 17, "address": "591 Desert Rose, Las Vegas NV", "price": 325000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "source": "Zillow",  "monthly_rent": 2200, "city": "Las Vegas"},
-    {"id": 18, "address": "628 Cactus Ave, Las Vegas NV",  "price": 190000, "beds": 2, "baths": 2, "sqft": 1050, "type": "condo",         "source": "Redfin",  "monthly_rent": 1600, "city": "Las Vegas"},
-    {"id": 19, "address": "714 Lakeside Dr, Charlotte NC", "price": 300000, "beds": 3, "baths": 2, "sqft": 1500, "type": "single_family", "source": "MLS",     "monthly_rent": 2150, "city": "Charlotte"},
-    {"id": 20, "address": "836 Uptown Blvd, Charlotte NC", "price": 250000, "beds": 2, "baths": 1, "sqft": 900,  "type": "townhouse",     "source": "Zillow",  "monthly_rent": 1850, "city": "Charlotte"},
-    {"id": 21, "address": "922 Mission St, San Antonio TX","price": 265000, "beds": 3, "baths": 2, "sqft": 1400, "type": "single_family", "source": "Redfin",  "monthly_rent": 1900, "city": "San Antonio"},
-    {"id": 22, "address": "1014 River Rd, San Antonio TX", "price": 155000, "beds": 2, "baths": 1, "sqft": 850,  "type": "condo",         "source": "MLS",     "monthly_rent": 1350, "city": "San Antonio"},
-    {"id": 23, "address": "1126 Sunset Blvd, Orlando FL",  "price": 310000, "beds": 3, "baths": 2, "sqft": 1600, "type": "single_family", "source": "Zillow",  "monthly_rent": 2200, "city": "Orlando"},
-    {"id": 24, "address": "1238 Harbor View, Orlando FL",  "price": 195000, "beds": 2, "baths": 2, "sqft": 1000, "type": "condo",         "source": "Redfin",  "monthly_rent": 1650, "city": "Orlando"},
-    {"id": 25, "address": "1344 Magnolia Pkwy, Raleigh NC","price": 355000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "source": "MLS",     "monthly_rent": 2400, "city": "Raleigh"},
-    {"id": 26, "address": "1456 Glenwood Ave, Raleigh NC", "price": 270000, "beds": 2, "baths": 2, "sqft": 1150, "type": "townhouse",     "source": "Zillow",  "monthly_rent": 1950, "city": "Raleigh"},
-    {"id": 27, "address": "1562 Broadway, Salt Lake City UT","price": 395000,"beds": 4,"baths": 3, "sqft": 2000, "type": "single_family", "source": "Redfin",  "monthly_rent": 2700, "city": "Salt Lake City"},
-    {"id": 28, "address": "1674 Main St, Salt Lake City UT","price": 240000,"beds": 2,"baths": 1, "sqft": 980,  "type": "condo",         "source": "MLS",     "monthly_rent": 1700, "city": "Salt Lake City"},
-    {"id": 29, "address": "1786 Garden Way, Indianapolis IN","price": 230000,"beds": 3,"baths": 2, "sqft": 1350, "type": "single_family", "source": "Zillow",  "monthly_rent": 1650, "city": "Indianapolis"},
-    {"id": 30, "address": "1892 Canal Blvd, Indianapolis IN","price": 145000,"beds": 2,"baths": 1, "sqft": 820,  "type": "condo",         "source": "Redfin",  "monthly_rent": 1150, "city": "Indianapolis"},
+    {
+        "id": 1,
+        "address": "123 Oak St, Austin TX",
+        "price": 340000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1500,
+        "type": "single_family",
+        "source": "MLS",
+        "monthly_rent": 2400,
+        "city": "Austin",
+    },
+    {
+        "id": 2,
+        "address": "456 Maple Ave, Austin TX",
+        "price": 210000,
+        "beds": 2,
+        "baths": 1,
+        "sqft": 950,
+        "type": "condo",
+        "source": "Zillow",
+        "monthly_rent": 1600,
+        "city": "Austin",
+    },
+    {
+        "id": 3,
+        "address": "789 Pine Rd, Phoenix AZ",
+        "price": 290000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1600,
+        "type": "single_family",
+        "source": "Redfin",
+        "monthly_rent": 2100,
+        "city": "Phoenix",
+    },
+    {
+        "id": 4,
+        "address": "321 Elm Dr, Phoenix AZ",
+        "price": 175000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1000,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 1450,
+        "city": "Phoenix",
+    },
+    {
+        "id": 5,
+        "address": "654 Cedar Ln, Nashville TN",
+        "price": 420000,
+        "beds": 4,
+        "baths": 3,
+        "sqft": 2100,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 3000,
+        "city": "Nashville",
+    },
+    {
+        "id": 6,
+        "address": "987 Birch Blvd, Nashville TN",
+        "price": 315000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1100,
+        "type": "condo",
+        "source": "Redfin",
+        "monthly_rent": 2400,
+        "city": "Nashville",
+    },
+    {
+        "id": 7,
+        "address": "147 Walnut St, Denver CO",
+        "price": 275000,
+        "beds": 1,
+        "baths": 1,
+        "sqft": 780,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 2000,
+        "city": "Denver",
+    },
+    {
+        "id": 8,
+        "address": "258 Spruce Ave, Denver CO",
+        "price": 455000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1700,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 3100,
+        "city": "Denver",
+    },
+    {
+        "id": 9,
+        "address": "369 Aspen Ct, Tampa FL",
+        "price": 320000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1600,
+        "type": "single_family",
+        "source": "Redfin",
+        "monthly_rent": 2300,
+        "city": "Tampa",
+    },
+    {
+        "id": 10,
+        "address": "741 Palm Dr, Tampa FL",
+        "price": 225000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1100,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 1900,
+        "city": "Tampa",
+    },
+    {
+        "id": 11,
+        "address": "852 Peachtree Rd, Atlanta GA",
+        "price": 385000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1750,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 2700,
+        "city": "Atlanta",
+    },
+    {
+        "id": 12,
+        "address": "963 Magnolia St, Atlanta GA",
+        "price": 295000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1250,
+        "type": "condo",
+        "source": "Redfin",
+        "monthly_rent": 2200,
+        "city": "Atlanta",
+    },
+    {
+        "id": 13,
+        "address": "159 Mesquite Way, Dallas TX",
+        "price": 360000,
+        "beds": 4,
+        "baths": 3,
+        "sqft": 1900,
+        "type": "single_family",
+        "source": "MLS",
+        "monthly_rent": 2600,
+        "city": "Dallas",
+    },
+    {
+        "id": 14,
+        "address": "267 Bluebonnet St, Dallas TX",
+        "price": 215000,
+        "beds": 1,
+        "baths": 1,
+        "sqft": 800,
+        "type": "condo",
+        "source": "Zillow",
+        "monthly_rent": 1750,
+        "city": "Dallas",
+    },
+    {
+        "id": 15,
+        "address": "375 Live Oak Blvd, Houston TX",
+        "price": 295000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1550,
+        "type": "single_family",
+        "source": "Redfin",
+        "monthly_rent": 2050,
+        "city": "Houston",
+    },
+    {
+        "id": 16,
+        "address": "483 Bayou Dr, Houston TX",
+        "price": 180000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1000,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 1500,
+        "city": "Houston",
+    },
+    {
+        "id": 17,
+        "address": "591 Desert Rose, Las Vegas NV",
+        "price": 325000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1700,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 2200,
+        "city": "Las Vegas",
+    },
+    {
+        "id": 18,
+        "address": "628 Cactus Ave, Las Vegas NV",
+        "price": 190000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1050,
+        "type": "condo",
+        "source": "Redfin",
+        "monthly_rent": 1600,
+        "city": "Las Vegas",
+    },
+    {
+        "id": 19,
+        "address": "714 Lakeside Dr, Charlotte NC",
+        "price": 300000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1500,
+        "type": "single_family",
+        "source": "MLS",
+        "monthly_rent": 2150,
+        "city": "Charlotte",
+    },
+    {
+        "id": 20,
+        "address": "836 Uptown Blvd, Charlotte NC",
+        "price": 250000,
+        "beds": 2,
+        "baths": 1,
+        "sqft": 900,
+        "type": "townhouse",
+        "source": "Zillow",
+        "monthly_rent": 1850,
+        "city": "Charlotte",
+    },
+    {
+        "id": 21,
+        "address": "922 Mission St, San Antonio TX",
+        "price": 265000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1400,
+        "type": "single_family",
+        "source": "Redfin",
+        "monthly_rent": 1900,
+        "city": "San Antonio",
+    },
+    {
+        "id": 22,
+        "address": "1014 River Rd, San Antonio TX",
+        "price": 155000,
+        "beds": 2,
+        "baths": 1,
+        "sqft": 850,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 1350,
+        "city": "San Antonio",
+    },
+    {
+        "id": 23,
+        "address": "1126 Sunset Blvd, Orlando FL",
+        "price": 310000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1600,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 2200,
+        "city": "Orlando",
+    },
+    {
+        "id": 24,
+        "address": "1238 Harbor View, Orlando FL",
+        "price": 195000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1000,
+        "type": "condo",
+        "source": "Redfin",
+        "monthly_rent": 1650,
+        "city": "Orlando",
+    },
+    {
+        "id": 25,
+        "address": "1344 Magnolia Pkwy, Raleigh NC",
+        "price": 355000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1700,
+        "type": "single_family",
+        "source": "MLS",
+        "monthly_rent": 2400,
+        "city": "Raleigh",
+    },
+    {
+        "id": 26,
+        "address": "1456 Glenwood Ave, Raleigh NC",
+        "price": 270000,
+        "beds": 2,
+        "baths": 2,
+        "sqft": 1150,
+        "type": "townhouse",
+        "source": "Zillow",
+        "monthly_rent": 1950,
+        "city": "Raleigh",
+    },
+    {
+        "id": 27,
+        "address": "1562 Broadway, Salt Lake City UT",
+        "price": 395000,
+        "beds": 4,
+        "baths": 3,
+        "sqft": 2000,
+        "type": "single_family",
+        "source": "Redfin",
+        "monthly_rent": 2700,
+        "city": "Salt Lake City",
+    },
+    {
+        "id": 28,
+        "address": "1674 Main St, Salt Lake City UT",
+        "price": 240000,
+        "beds": 2,
+        "baths": 1,
+        "sqft": 980,
+        "type": "condo",
+        "source": "MLS",
+        "monthly_rent": 1700,
+        "city": "Salt Lake City",
+    },
+    {
+        "id": 29,
+        "address": "1786 Garden Way, Indianapolis IN",
+        "price": 230000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1350,
+        "type": "single_family",
+        "source": "Zillow",
+        "monthly_rent": 1650,
+        "city": "Indianapolis",
+    },
+    {
+        "id": 30,
+        "address": "1892 Canal Blvd, Indianapolis IN",
+        "price": 145000,
+        "beds": 2,
+        "baths": 1,
+        "sqft": 820,
+        "type": "condo",
+        "source": "Redfin",
+        "monthly_rent": 1150,
+        "city": "Indianapolis",
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_listings": 5,    "sources": ["MLS"],                "ai_scoring": False},
-    "PRO":        {"price_usd": 49,  "max_listings": 50,   "sources": ["MLS", "Zillow"],      "ai_scoring": True},
-    "ENTERPRISE": {"price_usd": 199, "max_listings": None, "sources": ["MLS", "Zillow", "Redfin"], "ai_scoring": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_listings": 5,
+        "sources": ["MLS"],
+        "ai_scoring": False,
+    },
+    "PRO": {
+        "price_usd": 49,
+        "max_listings": 50,
+        "sources": ["MLS", "Zillow"],
+        "ai_scoring": True,
+    },
+    "ENTERPRISE": {
+        "price_usd": 199,
+        "max_listings": None,
+        "sources": ["MLS", "Zillow", "Redfin"],
+        "ai_scoring": True,
+    },
 }
 
 
@@ -81,8 +426,14 @@ class PropertyListingAggregatorBot:
     # Core search methods
     # ------------------------------------------------------------------
 
-    def search(self, *, city: str | None = None, max_price: float | None = None,
-               min_beds: int | None = None, property_type: str | None = None) -> list[dict]:
+    def search(
+        self,
+        *,
+        city: str | None = None,
+        max_price: float | None = None,
+        min_beds: int | None = None,
+        property_type: str | None = None,
+    ) -> list[dict]:
         """Return listings matching the given filters.
 
         Returns at most ``max_listings`` results based on the current tier.
@@ -107,8 +458,11 @@ class PropertyListingAggregatorBot:
 
         if self._config["ai_scoring"]:
             results = [
-                {**prop, "ai_deal_score": self._score_deal(prop),
-                 "estimated_roi_pct": self._calculate_roi(prop)}
+                {
+                    **prop,
+                    "ai_deal_score": self._score_deal(prop),
+                    "estimated_roi_pct": self._calculate_roi(prop),
+                }
                 for prop in results
             ]
 
@@ -137,7 +491,11 @@ class PropertyListingAggregatorBot:
                 "Upgrade at dreamcobots.com/pricing"
             )
         scored = [
-            {**p, "estimated_roi_pct": self._calculate_roi(p), "ai_deal_score": self._score_deal(p)}
+            {
+                **p,
+                "estimated_roi_pct": self._calculate_roi(p),
+                "ai_deal_score": self._score_deal(p),
+            }
             for p in EXAMPLES
             if p["source"] in self._config["sources"]
         ]
@@ -231,7 +589,9 @@ if __name__ == "__main__":
     top = bot.get_top_deals(5)
     print(f"Top 5 deals:")
     for deal in top:
-        print(f"  {deal['address']} — ROI {deal['estimated_roi_pct']}% — Score {deal['ai_deal_score']}")
+        print(
+            f"  {deal['address']} — ROI {deal['estimated_roi_pct']}% — Score {deal['ai_deal_score']}"
+        )
     print(bot.describe_tier())
 
 
@@ -298,17 +658,32 @@ def _propertylistingaggregator_bot_list_items(self, limit=None):
 
 def _propertylistingaggregator_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "PropertyListingAggregatorBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {
+        "bot": "PropertyListingAggregatorBot",
+        "tier": self.tier.value,
+        "count": len(EXAMPLES),
+    }
 
 
 def _propertylistingaggregator_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "PropertyListingAggregatorBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "PropertyListingAggregatorBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
-PropertyListingAggregatorBot.monthly_price = _propertylistingaggregator_bot_monthly_price
-PropertyListingAggregatorBot.get_tier_info = _propertylistingaggregator_bot_get_tier_info
+PropertyListingAggregatorBot.monthly_price = (
+    _propertylistingaggregator_bot_monthly_price
+)
+PropertyListingAggregatorBot.get_tier_info = (
+    _propertylistingaggregator_bot_get_tier_info
+)
 PropertyListingAggregatorBot._enforce_tier = _propertylistingaggregator_bot_enforce_tier
 PropertyListingAggregatorBot.list_items = _propertylistingaggregator_bot_list_items
 PropertyListingAggregatorBot.analyze = _propertylistingaggregator_bot_analyze
-PropertyListingAggregatorBot.export_report = _propertylistingaggregator_bot_export_report
+PropertyListingAggregatorBot.export_report = (
+    _propertylistingaggregator_bot_export_report
+)

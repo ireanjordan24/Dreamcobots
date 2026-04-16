@@ -1,11 +1,15 @@
 """DreamCo Cloud Bot — AWS competitor for hosting and server management."""
-import sys
-import os
-import uuid
-import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import os
+import sys
+import time
+import uuid
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.dreamco_cloud_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -21,8 +25,14 @@ class DreamCoCloudBotError(Exception):
 class ServerInstance:
     """Represents a managed server/compute instance."""
 
-    def __init__(self, instance_id: str, name: str, region: str,
-                 instance_type: str, user_id: str = "user"):
+    def __init__(
+        self,
+        instance_id: str,
+        name: str,
+        region: str,
+        instance_type: str,
+        user_id: str = "user",
+    ):
         self.instance_id = instance_id
         self.name = name
         self.region = region
@@ -50,8 +60,15 @@ class ServerInstance:
 class DatabaseInstance:
     """Represents a managed database instance."""
 
-    def __init__(self, db_id: str, name: str, engine: str,
-                 version: str, storage_gb: int, user_id: str = "user"):
+    def __init__(
+        self,
+        db_id: str,
+        name: str,
+        engine: str,
+        version: str,
+        storage_gb: int,
+        user_id: str = "user",
+    ):
         self.db_id = db_id
         self.name = name
         self.engine = engine
@@ -107,9 +124,16 @@ class DreamCoCloudBot:
         Tier.FREE: ["us-east-1"],
         Tier.PRO: ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
         Tier.ENTERPRISE: [
-            "us-east-1", "us-east-2", "us-west-1", "us-west-2",
-            "eu-west-1", "eu-central-1", "ap-southeast-1",
-            "ap-northeast-1", "sa-east-1", "ca-central-1",
+            "us-east-1",
+            "us-east-2",
+            "us-west-1",
+            "us-west-2",
+            "eu-west-1",
+            "eu-central-1",
+            "ap-southeast-1",
+            "ap-northeast-1",
+            "sa-east-1",
+            "ca-central-1",
         ],
     }
 
@@ -117,9 +141,15 @@ class DreamCoCloudBot:
         Tier.FREE: ["dc1.nano"],
         Tier.PRO: ["dc1.nano", "dc1.small", "dc1.medium", "dc1.large", "dc2.xlarge"],
         Tier.ENTERPRISE: [
-            "dc1.nano", "dc1.small", "dc1.medium", "dc1.large",
-            "dc2.xlarge", "dc2.2xlarge", "dc2.4xlarge",
-            "gpu1.small", "gpu1.large",
+            "dc1.nano",
+            "dc1.small",
+            "dc1.medium",
+            "dc1.large",
+            "dc2.xlarge",
+            "dc2.2xlarge",
+            "dc2.4xlarge",
+            "gpu1.small",
+            "gpu1.large",
         ],
     }
 
@@ -171,8 +201,9 @@ class DreamCoCloudBot:
     # Server management
     # ------------------------------------------------------------------
 
-    def launch_instance(self, name: str, instance_type: str = "dc1.nano",
-                        region: str = "us-east-1") -> ServerInstance:
+    def launch_instance(
+        self, name: str, instance_type: str = "dc1.nano", region: str = "us-east-1"
+    ) -> ServerInstance:
         """
         Launch a new server instance.
 
@@ -277,8 +308,9 @@ class DreamCoCloudBot:
     # Managed databases (PRO+)
     # ------------------------------------------------------------------
 
-    def create_database(self, name: str, engine: str = "postgresql",
-                        storage_gb: int = 10) -> DatabaseInstance:
+    def create_database(
+        self, name: str, engine: str = "postgresql", storage_gb: int = 10
+    ) -> DatabaseInstance:
         """
         Create a managed database instance.
         Requires PRO tier or higher.
@@ -375,7 +407,9 @@ class DreamCoCloudBot:
         return {
             "instances_used": len(self._instances),
             "instances_limit": inst_limit,
-            "instances_remaining": (inst_limit - len(self._instances)) if inst_limit is not None else None,
+            "instances_remaining": (
+                (inst_limit - len(self._instances)) if inst_limit is not None else None
+            ),
             "databases_used": len(self._databases),
             "databases_limit": db_limit if db_limit != 0 else None,
             "functions_deployed": len(self._functions),
@@ -400,7 +434,9 @@ class DreamCoCloudBot:
         """Unified natural-language chat interface."""
         msg = message.lower()
 
-        if any(kw in msg for kw in ("launch", "new server", "create instance", "provision")):
+        if any(
+            kw in msg for kw in ("launch", "new server", "create instance", "provision")
+        ):
             inst = self.launch_instance("My Server")
             return {
                 "message": f"Server '{inst.name}' launched in {inst.region}. IP: {inst.ip_address}",
@@ -416,7 +452,10 @@ class DreamCoCloudBot:
 
         if any(kw in msg for kw in ("regions", "available regions")):
             regions = self.list_regions()
-            return {"message": f"Available regions: {', '.join(regions)}", "data": regions}
+            return {
+                "message": f"Available regions: {', '.join(regions)}",
+                "data": regions,
+            }
 
         if any(kw in msg for kw in ("database", "create db", "new database")):
             if self.tier == Tier.FREE:
@@ -436,7 +475,10 @@ class DreamCoCloudBot:
 
         if "tier" in msg or "features" in msg or "upgrade" in msg:
             info = self.get_tier_info()
-            return {"message": f"Current tier: {info['tier']}. Features: {info['features']}", "data": info}
+            return {
+                "message": f"Current tier: {info['tier']}. Features: {info['features']}",
+                "data": info,
+            }
 
         return {
             "message": (

@@ -78,7 +78,9 @@ class ROITracker:
         """
         if revenue < 0 or cost < 0:
             raise ValueError("revenue and cost must be non-negative.")
-        rec = ROIRecord(strategy_id=strategy_id, period=period, revenue=revenue, cost=cost)
+        rec = ROIRecord(
+            strategy_id=strategy_id, period=period, revenue=revenue, cost=cost
+        )
         self._records.append(rec)
         return rec
 
@@ -95,7 +97,12 @@ class ROITracker:
         if strategy_id is not None:
             records = [r for r in records if r.strategy_id == strategy_id]
         if not records:
-            return {"total_revenue": 0.0, "total_cost": 0.0, "total_profit": 0.0, "roi": 0.0}
+            return {
+                "total_revenue": 0.0,
+                "total_cost": 0.0,
+                "total_profit": 0.0,
+                "roi": 0.0,
+            }
 
         total_revenue = sum(r.revenue for r in records)
         total_cost = sum(r.cost for r in records)
@@ -127,6 +134,8 @@ class ROITracker:
         ranked = []
         for sid in strategy_ids:
             s = self.summary(sid)
-            ranked.append({"strategy_id": sid, "roi": s["roi"], "total_profit": s["total_profit"]})
+            ranked.append(
+                {"strategy_id": sid, "roi": s["roi"], "total_profit": s["total_profit"]}
+            )
         ranked.sort(key=lambda x: x["roi"], reverse=True)
         return ranked[:top_n]

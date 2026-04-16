@@ -1,14 +1,17 @@
 """Tests for bots/social_media_manager_bot"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.social_media_manager_bot.social_media_manager_bot import SocialMediaManagerBot
 from bots.social_media_manager_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
@@ -51,7 +54,16 @@ class TestCreatePost:
     def test_post_has_required_keys(self):
         bot = SocialMediaManagerBot()
         result = bot.create_post("instagram", "sale")
-        for key in ["platform", "topic", "caption", "hashtags", "estimated_reach", "best_time_to_post", "media_suggestion", "tier_used"]:
+        for key in [
+            "platform",
+            "topic",
+            "caption",
+            "hashtags",
+            "estimated_reach",
+            "best_time_to_post",
+            "media_suggestion",
+            "tier_used",
+        ]:
             assert key in result
 
     def test_hashtags_included_by_default(self):

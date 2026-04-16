@@ -11,43 +11,43 @@ Covers:
   7. Bot library registration
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.cinecore_lead_engine.cinecore_lead_engine import (
+    BusinessLead,
+    BusinessNiche,
+    CineCoreLeadEngine,
+    CineCoreLeadEngineError,
+    CineCoreLeadEngineTierError,
+    LeadStatus,
+)
 from bots.cinecore_lead_engine.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_BULK_GENERATION,
+    FEATURE_BUSINESS_SCAN,
+    FEATURE_CRM_EXPORT,
+    FEATURE_LEAD_SCORING,
+    FEATURE_NICHE_FILTER,
+    FEATURE_OUTREACH_DRAFT,
+    FEATURE_SCRIPT_GENERATION,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_BUSINESS_SCAN,
-    FEATURE_SCRIPT_GENERATION,
-    FEATURE_LEAD_SCORING,
-    FEATURE_OUTREACH_DRAFT,
-    FEATURE_CRM_EXPORT,
-    FEATURE_BULK_GENERATION,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_NICHE_FILTER,
 )
-from bots.cinecore_lead_engine.cinecore_lead_engine import (
-    CineCoreLeadEngine,
-    CineCoreLeadEngineError,
-    CineCoreLeadEngineTierError,
-    BusinessLead,
-    BusinessNiche,
-    LeadStatus,
-)
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestCineCoreLeadEngineTiers:
     def test_three_tiers(self):
@@ -127,6 +127,7 @@ class TestCineCoreLeadEngineTiers:
 # 2. Business Scanning
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineScanning:
     def setup_method(self):
         self.engine = CineCoreLeadEngine(tier=Tier.FREE)
@@ -182,6 +183,7 @@ class TestCineCoreLeadEngineScanning:
 # 3. Lead Scoring
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineScoring:
     def setup_method(self):
         self.engine = CineCoreLeadEngine(tier=Tier.PRO)
@@ -196,7 +198,13 @@ class TestCineCoreLeadEngineScoring:
         self.engine.score_leads()
         leads = self.engine.get_leads()
         for lead in leads:
-            assert lead["status"] in ("scored", "raw", "script_ready", "outreach_ready", "exported")
+            assert lead["status"] in (
+                "scored",
+                "raw",
+                "script_ready",
+                "outreach_ready",
+                "exported",
+            )
 
     def test_free_tier_cannot_score(self):
         engine = CineCoreLeadEngine(tier=Tier.FREE)
@@ -215,6 +223,7 @@ class TestCineCoreLeadEngineScoring:
 # ===========================================================================
 # 4. Script Generation
 # ===========================================================================
+
 
 class TestCineCoreLeadEngineScripts:
     def setup_method(self):
@@ -246,12 +255,16 @@ class TestCineCoreLeadEngineScripts:
         leads = self.engine.get_leads()
         scripted = [l for l in leads if l["generated_script"]]
         for lead in scripted:
-            assert lead["name"] in lead["generated_script"] or lead["location"] in lead["generated_script"]
+            assert (
+                lead["name"] in lead["generated_script"]
+                or lead["location"] in lead["generated_script"]
+            )
 
 
 # ===========================================================================
 # 5. Outreach Drafts
 # ===========================================================================
+
 
 class TestCineCoreLeadEngineOutreach:
     def setup_method(self):
@@ -291,6 +304,7 @@ class TestCineCoreLeadEngineOutreach:
 # 6. Ad Packages
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineAdPackages:
     def setup_method(self):
         self.engine = CineCoreLeadEngine(tier=Tier.PRO)
@@ -307,7 +321,11 @@ class TestCineCoreLeadEngineAdPackages:
         leads = self.engine.get_leads()
         for lead in leads:
             if lead.get("ad_package") is not None:
-                pkg = lead["ad_package"] if isinstance(lead.get("ad_package"), dict) else {}
+                pkg = (
+                    lead["ad_package"]
+                    if isinstance(lead.get("ad_package"), dict)
+                    else {}
+                )
                 # packages are stored on lead object, check via engine
                 break
 
@@ -323,12 +341,15 @@ class TestCineCoreLeadEngineAdPackages:
 # 7. Bulk Generation
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineBulk:
     def setup_method(self):
         self.engine = CineCoreLeadEngine(tier=Tier.ENTERPRISE)
 
     def test_bulk_generate_returns_results(self):
-        result = self.engine.bulk_generate(["Tony's Pizza", "Downtown Gym", "City Dental"])
+        result = self.engine.bulk_generate(
+            ["Tony's Pizza", "Downtown Gym", "City Dental"]
+        )
         assert result["bulk_generated"] == 3
         assert len(result["results"]) == 3
 
@@ -352,6 +373,7 @@ class TestCineCoreLeadEngineBulk:
 # ===========================================================================
 # 8. CRM Export
 # ===========================================================================
+
 
 class TestCineCoreLeadEngineCRM:
     def setup_method(self):
@@ -386,6 +408,7 @@ class TestCineCoreLeadEngineCRM:
 # ===========================================================================
 # 9. Analytics & Summary
 # ===========================================================================
+
 
 class TestCineCoreLeadEngineAnalytics:
     def setup_method(self):
@@ -443,6 +466,7 @@ class TestCineCoreLeadEngineAnalytics:
 # 10. Chat & Process Interfaces
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineChatInterface:
     def setup_method(self):
         self.engine = CineCoreLeadEngine(tier=Tier.PRO)
@@ -499,9 +523,11 @@ class TestCineCoreLeadEngineChatInterface:
 # 11. Bot Library Registration
 # ===========================================================================
 
+
 class TestCineCoreLeadEngineBotLibrary:
     def test_registered_in_library(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("cinecore_lead_engine")
@@ -509,7 +535,8 @@ class TestCineCoreLeadEngineBotLibrary:
         assert entry.display_name == "CineCore Lead Engine"
 
     def test_bot_category_is_lead_gen(self):
-        from bots.global_bot_network.bot_library import BotLibrary, BotCategory
+        from bots.global_bot_network.bot_library import BotCategory, BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("cinecore_lead_engine")
@@ -517,6 +544,7 @@ class TestCineCoreLeadEngineBotLibrary:
 
     def test_bot_has_expected_capabilities(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("cinecore_lead_engine")
@@ -526,6 +554,7 @@ class TestCineCoreLeadEngineBotLibrary:
 
     def test_bot_module_path(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("cinecore_lead_engine")

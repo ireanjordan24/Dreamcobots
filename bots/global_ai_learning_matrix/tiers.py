@@ -8,6 +8,7 @@ Tiers:
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -45,7 +46,11 @@ FEATURE_API_ACCESS = "api_access"
 FEATURE_FEDERATED_LEARNING = "federated_learning"
 FEATURE_REAL_TIME_MONITORING = "real_time_monitoring"
 
-FREE_FEATURES = [FEATURE_COUNTRY_TRACKING, FEATURE_LEARNING_BENCHMARKS, FEATURE_DASHBOARD]
+FREE_FEATURES = [
+    FEATURE_COUNTRY_TRACKING,
+    FEATURE_LEARNING_BENCHMARKS,
+    FEATURE_DASHBOARD,
+]
 PRO_FEATURES = FREE_FEATURES + [
     FEATURE_EVOLUTION_ENGINE,
     FEATURE_GOVERNANCE,

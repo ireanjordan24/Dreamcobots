@@ -196,9 +196,7 @@ class Scheduler:
         try:
             task.callback(**task.params)
         except Exception as exc:  # pylint: disable=broad-except
-            logger.error(
-                "Task '%s' raised an exception: %s", task.name, exc
-            )
+            logger.error("Task '%s' raised an exception: %s", task.name, exc)
         finally:
             with self._lock:
                 self._tasks.pop(task.task_id, None)

@@ -7,8 +7,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -202,16 +202,12 @@ class CompetitionEngine:
 
     def _get_competition(self, competition_id: str) -> dict:
         if competition_id not in self._competitions:
-            raise CompetitionEngineError(
-                f"Competition '{competition_id}' not found."
-            )
+            raise CompetitionEngineError(f"Competition '{competition_id}' not found.")
         return self._competitions[competition_id]
 
     def _get_submission(self, submission_id: str, competition_id: str) -> dict:
         if submission_id not in self._submissions:
-            raise CompetitionEngineError(
-                f"Submission '{submission_id}' not found."
-            )
+            raise CompetitionEngineError(f"Submission '{submission_id}' not found.")
         sub = self._submissions[submission_id]
         if sub["competition_id"] != competition_id:
             raise CompetitionEngineError(

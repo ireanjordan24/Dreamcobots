@@ -14,8 +14,8 @@ Covers:
   10. Bot Library registration
 """
 
-import sys
 import os
+import sys
 import time
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -23,112 +23,113 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-# ---------------------------------------------------------------------------
-# Tier imports
-# ---------------------------------------------------------------------------
-from bots.buddy_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_CONVERSATIONAL_AI,
-    FEATURE_EMOTION_DETECTION,
-    FEATURE_BASIC_MEMORY,
-    FEATURE_MULTILINGUAL,
-    FEATURE_HUMOR_ENGINE,
-    FEATURE_EMPATHY_ENGINE,
-    FEATURE_AVATAR_2D,
-    FEATURE_AVATAR_3D,
-    FEATURE_VOICE_SYNTHESIS,
-    FEATURE_VOICE_CLONING,
-    FEATURE_GAN_IMAGE_MIMICRY,
-    FEATURE_HOLOGRAPHIC_PROJECTION,
-    FEATURE_MILESTONE_TRACKER,
-    FEATURE_CONFLICT_RESOLUTION,
-    FEATURE_MOOD_SYNC,
-    FEATURE_PERSONALITY_MODES,
-    FEATURE_CREATIVITY_ENGINE,
-    FEATURE_GAMIFIED_PRODUCTIVITY,
-    FEATURE_REAL_TIME_TRANSLATION,
-    FEATURE_WELLNESS_TRACKER,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
+from bots.buddy_bot.avatar_engine import (
+    AvatarAppearance,
+    AvatarEngine,
+    AvatarEngineError,
+    AvatarEnvironment,
+    AvatarFrame,
+    AvatarType,
+    BodyGesture,
+    MicroExpression,
 )
+from bots.buddy_bot.buddy_bot import BuddyBot, BuddyBotError, BuddyBotTierError
 
 # ---------------------------------------------------------------------------
 # Sub-engine imports
 # ---------------------------------------------------------------------------
 from bots.buddy_bot.conversation_engine import (
+    HUMOR_RESPONSES,
+    SUPPORTED_LANGUAGES,
+    CommunicationContext,
     ConversationEngine,
     ConversationTone,
-    CommunicationContext,
-    TranslationResult,
     ConversationTurn,
-    SUPPORTED_LANGUAGES,
-    HUMOR_RESPONSES,
+    TranslationResult,
+)
+from bots.buddy_bot.creativity_engine import (
+    Achievement,
+    ArtMedium,
+    ChallengeCategory,
+    CreativityEngine,
+    CreativityEngineError,
+    DailyChallenge,
+    Song,
+    SongMood,
+    StoryChapter,
+    StoryGenre,
 )
 from bots.buddy_bot.emotion_engine import (
     EmotionEngine,
     EmotionLabel,
-    EmotionSource,
     EmotionReading,
+    EmotionSource,
 )
 from bots.buddy_bot.memory_system import (
+    EpisodicMemory,
+    ImportantDate,
+    LifeMilestone,
     MemorySystem,
     MemorySystemError,
-    UserProfile,
-    LifeMilestone,
-    ImportantDate,
-    EpisodicMemory,
     MilestoneCategory,
     RelationshipDepth,
-)
-from bots.buddy_bot.avatar_engine import (
-    AvatarEngine,
-    AvatarType,
-    AvatarEnvironment,
-    MicroExpression,
-    BodyGesture,
-    AvatarAppearance,
-    AvatarFrame,
-    AvatarEngineError,
-)
-from bots.buddy_bot.voice_engine import (
-    VoiceEngine,
-    VoiceTone,
-    AccentStyle,
-    VoiceProfile,
-    SpeechOutput,
-    VoiceEngineError,
-)
-from bots.buddy_bot.creativity_engine import (
-    CreativityEngine,
-    StoryGenre,
-    SongMood,
-    ArtMedium,
-    ChallengeCategory,
-    Song,
-    StoryChapter,
-    Achievement,
-    DailyChallenge,
-    CreativityEngineError,
+    UserProfile,
 )
 from bots.buddy_bot.personality_engine import (
+    ETHICAL_GUARDRAILS,
+    PersonalityConfig,
     PersonalityEngine,
     PersonaMode,
     PersonaTone,
-    PersonalityConfig,
-    ETHICAL_GUARDRAILS,
 )
-from bots.buddy_bot.buddy_bot import BuddyBot, BuddyBotError, BuddyBotTierError
 
+# ---------------------------------------------------------------------------
+# Tier imports
+# ---------------------------------------------------------------------------
+from bots.buddy_bot.tiers import (
+    FEATURE_API_ACCESS,
+    FEATURE_AVATAR_2D,
+    FEATURE_AVATAR_3D,
+    FEATURE_BASIC_MEMORY,
+    FEATURE_CONFLICT_RESOLUTION,
+    FEATURE_CONVERSATIONAL_AI,
+    FEATURE_CREATIVITY_ENGINE,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_EMOTION_DETECTION,
+    FEATURE_EMPATHY_ENGINE,
+    FEATURE_GAMIFIED_PRODUCTIVITY,
+    FEATURE_GAN_IMAGE_MIMICRY,
+    FEATURE_HOLOGRAPHIC_PROJECTION,
+    FEATURE_HUMOR_ENGINE,
+    FEATURE_MILESTONE_TRACKER,
+    FEATURE_MOOD_SYNC,
+    FEATURE_MULTILINGUAL,
+    FEATURE_PERSONALITY_MODES,
+    FEATURE_REAL_TIME_TRANSLATION,
+    FEATURE_VOICE_CLONING,
+    FEATURE_VOICE_SYNTHESIS,
+    FEATURE_WELLNESS_TRACKER,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
+from bots.buddy_bot.voice_engine import (
+    AccentStyle,
+    SpeechOutput,
+    VoiceEngine,
+    VoiceEngineError,
+    VoiceProfile,
+    VoiceTone,
+)
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -168,9 +169,12 @@ class TestTiers:
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
         for feature in [
-            FEATURE_VOICE_CLONING, FEATURE_GAN_IMAGE_MIMICRY,
-            FEATURE_HOLOGRAPHIC_PROJECTION, FEATURE_WHITE_LABEL,
-            FEATURE_API_ACCESS, FEATURE_DEDICATED_SUPPORT,
+            FEATURE_VOICE_CLONING,
+            FEATURE_GAN_IMAGE_MIMICRY,
+            FEATURE_HOLOGRAPHIC_PROJECTION,
+            FEATURE_WHITE_LABEL,
+            FEATURE_API_ACCESS,
+            FEATURE_DEDICATED_SUPPORT,
         ]:
             assert cfg.has_feature(feature)
 
@@ -207,6 +211,7 @@ class TestTiers:
 # ===========================================================================
 # 2. ConversationEngine
 # ===========================================================================
+
 
 class TestConversationEngine:
     def test_basic_respond(self):
@@ -298,7 +303,11 @@ class TestConversationEngine:
 
     def test_humor_injection(self):
         eng = ConversationEngine(humor_probability=1.0)
-        turn = eng.respond("Tell me something funny.", tone=ConversationTone.HUMOROUS, inject_humor=True)
+        turn = eng.respond(
+            "Tell me something funny.",
+            tone=ConversationTone.HUMOROUS,
+            inject_humor=True,
+        )
         assert len(turn.response) > 0
 
     def test_filler_injection(self):
@@ -318,6 +327,7 @@ class TestConversationEngine:
 # ===========================================================================
 # 3. EmotionEngine
 # ===========================================================================
+
 
 class TestEmotionEngine:
     def test_detect_joy_from_text(self):
@@ -344,18 +354,24 @@ class TestEmotionEngine:
 
     def test_detect_from_voice(self):
         eng = EmotionEngine()
-        reading = eng.detect_from_voice({"pitch_hz": 260, "energy_db": 72, "tremor": False})
+        reading = eng.detect_from_voice(
+            {"pitch_hz": 260, "energy_db": 72, "tremor": False}
+        )
         assert isinstance(reading.label, EmotionLabel)
         assert reading.source == EmotionSource.VOICE
 
     def test_detect_fear_from_voice(self):
         eng = EmotionEngine()
-        reading = eng.detect_from_voice({"pitch_hz": 300, "energy_db": 50, "tremor": True})
+        reading = eng.detect_from_voice(
+            {"pitch_hz": 300, "energy_db": 50, "tremor": True}
+        )
         assert reading.label == EmotionLabel.FEAR
 
     def test_detect_sadness_from_voice(self):
         eng = EmotionEngine()
-        reading = eng.detect_from_voice({"pitch_hz": 140, "energy_db": 45, "tremor": False})
+        reading = eng.detect_from_voice(
+            {"pitch_hz": 140, "energy_db": 45, "tremor": False}
+        )
         assert reading.label == EmotionLabel.SADNESS
 
     def test_detect_from_camera_joy(self):
@@ -366,12 +382,16 @@ class TestEmotionEngine:
 
     def test_detect_from_camera_anger(self):
         eng = EmotionEngine()
-        reading = eng.detect_from_camera({"smile_score": 0.0, "brow_furrow": 0.8, "lip_compression": 0.7})
+        reading = eng.detect_from_camera(
+            {"smile_score": 0.0, "brow_furrow": 0.8, "lip_compression": 0.7}
+        )
         assert reading.label == EmotionLabel.ANGER
 
     def test_detect_from_camera_sadness(self):
         eng = EmotionEngine()
-        reading = eng.detect_from_camera({"smile_score": 0.0, "brow_furrow": 0.6, "eye_openness": 0.2})
+        reading = eng.detect_from_camera(
+            {"smile_score": 0.0, "brow_furrow": 0.6, "eye_openness": 0.2}
+        )
         assert reading.label == EmotionLabel.SADNESS
 
     def test_sync_mood(self):
@@ -425,6 +445,7 @@ class TestEmotionEngine:
 # ===========================================================================
 # 4. MemorySystem
 # ===========================================================================
+
 
 class TestMemorySystem:
     def test_create_profile(self):
@@ -511,8 +532,11 @@ class TestMemorySystem:
         mem = MemorySystem()
         mem.create_profile("u001", "Alice")
         ms = mem.add_milestone(
-            "u001", "First Marathon", "Ran 26.2 miles",
-            MilestoneCategory.HEALTH, "2024-05-12"
+            "u001",
+            "First Marathon",
+            "Ran 26.2 miles",
+            MilestoneCategory.HEALTH,
+            "2024-05-12",
         )
         assert ms.milestone_id.startswith("ms_")
         milestones = mem.get_milestones("u001")
@@ -522,8 +546,7 @@ class TestMemorySystem:
         mem = MemorySystem()
         mem.create_profile("u001", "Alice")
         ms = mem.add_milestone(
-            "u001", "Promotion!", "Got promoted",
-            MilestoneCategory.CAREER, "2024-01-01"
+            "u001", "Promotion!", "Got promoted", MilestoneCategory.CAREER, "2024-01-01"
         )
         msg = mem.celebrate_milestone("u001", ms.milestone_id)
         assert "Promotion!" in msg
@@ -586,8 +609,12 @@ class TestMemorySystem:
         mem = MemorySystem()
         mem.create_profile("u001", "Alice")
         ms = mem.add_milestone(
-            "u001", "Birthday", "Annual", MilestoneCategory.PERSONAL,
-            "2024-07-04", recurring_annually=True
+            "u001",
+            "Birthday",
+            "Annual",
+            MilestoneCategory.PERSONAL,
+            "2024-07-04",
+            recurring_annually=True,
         )
         assert ms.recurring_annually is True
 
@@ -595,6 +622,7 @@ class TestMemorySystem:
 # ===========================================================================
 # 5. AvatarEngine
 # ===========================================================================
+
 
 class TestAvatarEngine:
     def test_default_avatar_type_2d(self):
@@ -711,6 +739,7 @@ class TestAvatarEngine:
 # ===========================================================================
 # 6. VoiceEngine
 # ===========================================================================
+
 
 class TestVoiceEngine:
     def test_default_active_profile(self):
@@ -843,6 +872,7 @@ class TestVoiceEngine:
 # ===========================================================================
 # 7. CreativityEngine
 # ===========================================================================
+
 
 class TestCreativityEngine:
     def test_start_story(self):
@@ -988,6 +1018,7 @@ class TestCreativityEngine:
 # 8. PersonalityEngine
 # ===========================================================================
 
+
 class TestPersonalityEngine:
     def test_default_persona(self):
         eng = PersonalityEngine()
@@ -1000,7 +1031,9 @@ class TestPersonalityEngine:
 
     def test_set_persona_with_blend(self):
         eng = PersonalityEngine()
-        config = eng.set_persona(PersonaMode.COACH, blend_with=PersonaMode.CHEERLEADER, blend_ratio=0.7)
+        config = eng.set_persona(
+            PersonaMode.COACH, blend_with=PersonaMode.CHEERLEADER, blend_ratio=0.7
+        )
         assert config.active_persona == PersonaMode.COACH
         assert config.secondary_persona == PersonaMode.CHEERLEADER
         assert config.blend_ratio == 0.7
@@ -1085,6 +1118,7 @@ class TestPersonalityEngine:
 # 9. BuddyBot (integration)
 # ===========================================================================
 
+
 class TestBuddyBot:
     # --- Tier enforcement ---
 
@@ -1108,8 +1142,7 @@ class TestBuddyBot:
         buddy = BuddyBot(tier=Tier.FREE, user_name="Alex")
         with pytest.raises(BuddyBotTierError):
             buddy.add_life_milestone(
-                "Marathon", "Ran 26.2 miles",
-                MilestoneCategory.HEALTH, "2024-05-01"
+                "Marathon", "Ran 26.2 miles", MilestoneCategory.HEALTH, "2024-05-01"
             )
 
     def test_free_tier_blocks_holographic(self):
@@ -1193,7 +1226,9 @@ class TestBuddyBot:
 
     def test_pro_record_episode(self):
         buddy = BuddyBot(tier=Tier.PRO, user_name="Jordan")
-        episode = buddy.record_episode("New Chapter", "Started university", "excitement")
+        episode = buddy.record_episode(
+            "New Chapter", "Started university", "excitement"
+        )
         assert episode["title"] == "New Chapter"
 
     def test_pro_enter_ar_mode(self):
@@ -1408,6 +1443,7 @@ class TestBuddyBot:
 
     def test_register_with_buddy_orchestrator(self):
         from BuddyAI.buddy_bot import BuddyBot as BuddyOrchestrator
+
         orchestrator = BuddyOrchestrator()
         buddy = BuddyBot(tier=Tier.PRO, user_name="Alex")
         buddy.register_with_buddy(orchestrator)
@@ -1447,14 +1483,17 @@ class TestBuddyBot:
 # 10. Bot Library registration
 # ===========================================================================
 
+
 class TestBotLibraryRegistration:
     def test_buddy_bot_registered(self):
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS
+
         bot_ids = [e.bot_id for e in _DREAMCO_BOTS]
         assert "buddy_bot" in bot_ids
 
     def test_buddy_bot_entry_has_capabilities(self):
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS
+
         entry = next(e for e in _DREAMCO_BOTS if e.bot_id == "buddy_bot")
         assert "conversational_ai" in entry.capabilities
         assert "emotion_detection" in entry.capabilities
@@ -1463,11 +1502,13 @@ class TestBotLibraryRegistration:
 
     def test_buddy_bot_entry_category_ai(self):
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS, BotCategory
+
         entry = next(e for e in _DREAMCO_BOTS if e.bot_id == "buddy_bot")
         assert entry.category == BotCategory.AI
 
     def test_buddy_os_still_registered(self):
         from bots.global_bot_network.bot_library import _DREAMCO_BOTS
+
         bot_ids = [e.bot_id for e in _DREAMCO_BOTS]
         assert "buddy_os" in bot_ids
 
@@ -1477,14 +1518,14 @@ class TestBotLibraryRegistration:
 # ===========================================================================
 
 from bots.buddy_bot.lead_finder_engine import (
-    LeadFinderEngine,
     BusinessLead,
     BusinessVertical,
-    LeadStatus as LeadFinderStatus,
     LeadContactType,
+    LeadFinderEngine,
     LeadFinderError,
     LeadFinderTierError,
 )
+from bots.buddy_bot.lead_finder_engine import LeadStatus as LeadFinderStatus
 
 
 class TestLeadFinderEngine:
@@ -1497,7 +1538,9 @@ class TestLeadFinderEngine:
         assert all(isinstance(l, BusinessLead) for l in leads)
 
     def test_pro_scan_returns_up_to_100(self):
-        engine = LeadFinderEngine(max_leads_per_scan=100, can_filter_vertical=True, can_enrich=True)
+        engine = LeadFinderEngine(
+            max_leads_per_scan=100, can_filter_vertical=True, can_enrich=True
+        )
         leads = engine.scan()
         assert len(leads) <= 100
 
@@ -1523,7 +1566,9 @@ class TestLeadFinderEngine:
             assert 0.0 <= lead.digital_gap_score <= 100.0
 
     def test_enrichment_adds_location_and_contact(self):
-        engine = LeadFinderEngine(max_leads_per_scan=5, can_filter_vertical=True, can_enrich=True)
+        engine = LeadFinderEngine(
+            max_leads_per_scan=5, can_filter_vertical=True, can_enrich=True
+        )
         leads = engine.scan()
         assert any(l.location is not None for l in leads)
         assert any(l.contact_info is not None for l in leads)
@@ -1546,7 +1591,9 @@ class TestLeadFinderEngine:
         top = engine.get_top_leads(3)
         assert len(top) <= 3
         if len(top) >= 2:
-            assert top[0].estimated_monthly_value_usd >= top[1].estimated_monthly_value_usd
+            assert (
+                top[0].estimated_monthly_value_usd >= top[1].estimated_monthly_value_usd
+            )
 
     def test_mark_lead_status(self):
         engine = LeadFinderEngine(max_leads_per_scan=5)
@@ -1599,14 +1646,14 @@ class TestLeadFinderEngine:
 # ===========================================================================
 
 from bots.buddy_bot.offer_generator_engine import (
+    _ALL_SERVICE_TYPES,
+    _FREE_SERVICE_TYPES,
     OfferGeneratorEngine,
-    ServiceOffer,
-    ServiceType,
-    PricingModel,
     OfferGeneratorError,
     OfferGeneratorTierError,
-    _FREE_SERVICE_TYPES,
-    _ALL_SERVICE_TYPES,
+    PricingModel,
+    ServiceOffer,
+    ServiceType,
 )
 
 
@@ -1658,7 +1705,9 @@ class TestOfferGeneratorEngine:
             can_custom_bundle=False,
         )
         with pytest.raises(OfferGeneratorTierError):
-            engine.build_bundle("Co", [ServiceType.AD_CAMPAIGN, ServiceType.EMAIL_MARKETING])
+            engine.build_bundle(
+                "Co", [ServiceType.AD_CAMPAIGN, ServiceType.EMAIL_MARKETING]
+            )
 
     def test_bundle_enterprise(self):
         engine = OfferGeneratorEngine(
@@ -1729,12 +1778,12 @@ class TestOfferGeneratorEngine:
 
 from bots.buddy_bot.conversion_engine import (
     ConversionEngine,
-    Proposal,
-    ConversionRecord,
-    OutreachChannel,
-    ConversionStage,
     ConversionEngineError,
     ConversionEngineTierError,
+    ConversionRecord,
+    ConversionStage,
+    OutreachChannel,
+    Proposal,
 )
 
 
@@ -1764,8 +1813,12 @@ class TestConversionEngine:
     def test_generate_proposal(self):
         engine = self._make_engine_pro()
         proposal = engine.generate_proposal(
-            "Gym Co", "Get 50 leads/month", ["Ads", "Landing page"],
-            999.0, 500.0, "30 leads or free",
+            "Gym Co",
+            "Get 50 leads/month",
+            ["Ads", "Landing page"],
+            999.0,
+            500.0,
+            "30 leads or free",
         )
         assert isinstance(proposal, Proposal)
         assert proposal.business_name == "Gym Co"
@@ -1775,7 +1828,12 @@ class TestConversionEngine:
     def test_proposal_creates_conversion_record(self):
         engine = self._make_engine_pro()
         engine.generate_proposal(
-            "Roofing Co", "Get 30 leads", ["Ads"], 500.0, 250.0, "Guarantee",
+            "Roofing Co",
+            "Get 30 leads",
+            ["Ads"],
+            500.0,
+            250.0,
+            "Guarantee",
         )
         pipeline = engine.get_pipeline()
         assert any(r["business_name"] == "Roofing Co" for r in pipeline)
@@ -1783,9 +1841,15 @@ class TestConversionEngine:
     def test_send_outreach_requires_permission(self):
         engine = ConversionEngine(can_outreach=False)
         proposal = Proposal(
-            proposal_id="p001", business_name="Co", service_headline="Test",
-            body="body", deliverables=[], monthly_fee_usd=100.0,
-            setup_fee_usd=50.0, guarantee="g", call_to_action="cta",
+            proposal_id="p001",
+            business_name="Co",
+            service_headline="Test",
+            body="body",
+            deliverables=[],
+            monthly_fee_usd=100.0,
+            setup_fee_usd=50.0,
+            guarantee="g",
+            call_to_action="cta",
             channel=OutreachChannel.EMAIL,
         )
         with pytest.raises(ConversionEngineTierError):
@@ -1810,14 +1874,24 @@ class TestConversionEngine:
         engine = self._make_engine_pro()
         with pytest.raises(ConversionEngineTierError):
             engine.generate_proposal(
-                "SmsTest", "Test", ["item"], 100.0, 50.0, "g",
+                "SmsTest",
+                "Test",
+                ["item"],
+                100.0,
+                50.0,
+                "g",
                 channel=OutreachChannel.SMS,
             )
 
     def test_sms_works_on_enterprise(self):
         engine = self._make_engine_enterprise()
         proposal = engine.generate_proposal(
-            "SmsOK", "Test", ["item"], 100.0, 50.0, "g",
+            "SmsOK",
+            "Test",
+            ["item"],
+            100.0,
+            50.0,
+            "g",
             channel=OutreachChannel.SMS,
         )
         assert proposal.channel == OutreachChannel.SMS
@@ -1890,10 +1964,10 @@ class TestConversionEngine:
 # ===========================================================================
 
 from bots.buddy_bot.fulfillment_engine import (
-    FulfillmentEngine,
     Deliverable,
-    DeliverableType,
     DeliverableStatus,
+    DeliverableType,
+    FulfillmentEngine,
     FulfillmentEngineError,
     FulfillmentEngineTierError,
 )
@@ -2060,14 +2134,14 @@ class TestFulfillmentEngine:
 # ===========================================================================
 
 from bots.buddy_bot.retention_engine import (
-    RetentionEngine,
+    CheckIn,
     ClientHealthRecord,
     HealthStatus,
-    UpsellStage,
-    UpsellOffer,
-    CheckIn,
+    RetentionEngine,
     RetentionEngineError,
     RetentionEngineTierError,
+    UpsellOffer,
+    UpsellStage,
 )
 
 
@@ -2099,8 +2173,12 @@ class TestRetentionEngine:
     def test_score_health_champion(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "Champion Gym", "pro", 299.0,
-            months_active=4, satisfaction_score=9.0, results_delivered=5,
+            "Champion Gym",
+            "pro",
+            299.0,
+            months_active=4,
+            satisfaction_score=9.0,
+            results_delivered=5,
         )
         record = engine.score_health("Champion Gym")
         assert record.health_status == HealthStatus.CHAMPION
@@ -2108,8 +2186,11 @@ class TestRetentionEngine:
     def test_score_health_at_risk(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "AtRisk Co", "pro", 299.0,
-            months_active=2, satisfaction_score=5.5,
+            "AtRisk Co",
+            "pro",
+            299.0,
+            months_active=2,
+            satisfaction_score=5.5,
             last_contact_days_ago=20,
         )
         record = engine.score_health("AtRisk Co")
@@ -2118,8 +2199,11 @@ class TestRetentionEngine:
     def test_score_health_churning(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "Churning Co", "pro", 299.0,
-            months_active=2, satisfaction_score=2.0,
+            "Churning Co",
+            "pro",
+            299.0,
+            months_active=2,
+            satisfaction_score=2.0,
             last_contact_days_ago=35,
         )
         record = engine.score_health("Churning Co")
@@ -2132,8 +2216,22 @@ class TestRetentionEngine:
 
     def test_get_at_risk_clients(self):
         engine = self._make_pro_engine()
-        engine.add_client("Good Co", "pro", 299.0, months_active=3, satisfaction_score=8.0, results_delivered=5)
-        engine.add_client("Risk Co", "pro", 199.0, months_active=1, satisfaction_score=5.0, last_contact_days_ago=20)
+        engine.add_client(
+            "Good Co",
+            "pro",
+            299.0,
+            months_active=3,
+            satisfaction_score=8.0,
+            results_delivered=5,
+        )
+        engine.add_client(
+            "Risk Co",
+            "pro",
+            199.0,
+            months_active=1,
+            satisfaction_score=5.0,
+            last_contact_days_ago=20,
+        )
         at_risk = engine.get_at_risk_clients()
         names = [r.client_name for r in at_risk]
         assert "Risk Co" in names
@@ -2155,8 +2253,12 @@ class TestRetentionEngine:
     def test_detect_upsell_moment_ready(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "Ready Co", "pro", 299.0,
-            months_active=3, satisfaction_score=9.0, results_delivered=5,
+            "Ready Co",
+            "pro",
+            299.0,
+            months_active=3,
+            satisfaction_score=9.0,
+            results_delivered=5,
         )
         stage = engine.detect_upsell_moment("Ready Co")
         assert stage == UpsellStage.READY
@@ -2164,8 +2266,12 @@ class TestRetentionEngine:
     def test_detect_upsell_moment_not_ready(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "NotReady Co", "starter", 29.0,
-            months_active=0, satisfaction_score=6.0, results_delivered=0,
+            "NotReady Co",
+            "starter",
+            29.0,
+            months_active=0,
+            satisfaction_score=6.0,
+            results_delivered=0,
         )
         stage = engine.detect_upsell_moment("NotReady Co")
         assert stage == UpsellStage.NOT_READY
@@ -2179,8 +2285,12 @@ class TestRetentionEngine:
     def test_build_upsell_offer(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "Gym Co", "starter", 29.0,
-            months_active=3, satisfaction_score=8.5, results_delivered=5,
+            "Gym Co",
+            "starter",
+            29.0,
+            months_active=3,
+            satisfaction_score=8.5,
+            results_delivered=5,
         )
         offer = engine.build_upsell_offer("Gym Co")
         assert isinstance(offer, UpsellOffer)
@@ -2191,8 +2301,12 @@ class TestRetentionEngine:
     def test_referral_requires_enterprise(self):
         engine = self._make_pro_engine()
         engine.add_client(
-            "Champ Co", "pro", 299.0,
-            months_active=4, satisfaction_score=9.0, results_delivered=5,
+            "Champ Co",
+            "pro",
+            299.0,
+            months_active=4,
+            satisfaction_score=9.0,
+            results_delivered=5,
         )
         with pytest.raises(RetentionEngineTierError):
             engine.trigger_referral_ask("Champ Co")
@@ -2200,8 +2314,12 @@ class TestRetentionEngine:
     def test_referral_champion_enterprise(self):
         engine = self._make_enterprise_engine()
         engine.add_client(
-            "Champ Co", "pro", 299.0,
-            months_active=4, satisfaction_score=9.0, results_delivered=5,
+            "Champ Co",
+            "pro",
+            299.0,
+            months_active=4,
+            satisfaction_score=9.0,
+            results_delivered=5,
         )
         result = engine.trigger_referral_ask("Champ Co")
         assert result["eligible"] is True
@@ -2210,8 +2328,12 @@ class TestRetentionEngine:
     def test_referral_not_eligible_for_at_risk(self):
         engine = self._make_enterprise_engine()
         engine.add_client(
-            "Risk Co", "starter", 29.0,
-            months_active=1, satisfaction_score=4.0, last_contact_days_ago=20,
+            "Risk Co",
+            "starter",
+            29.0,
+            months_active=1,
+            satisfaction_score=4.0,
+            last_contact_days_ago=20,
         )
         result = engine.trigger_referral_ask("Risk Co")
         assert result["eligible"] is False
@@ -2252,7 +2374,14 @@ class TestRetentionEngine:
 
     def test_upsell_offer_to_dict(self):
         engine = self._make_pro_engine()
-        engine.add_client("Co", "starter", 29.0, months_active=3, satisfaction_score=8.5, results_delivered=5)
+        engine.add_client(
+            "Co",
+            "starter",
+            29.0,
+            months_active=3,
+            satisfaction_score=8.5,
+            results_delivered=5,
+        )
         offer = engine.build_upsell_offer("Co")
         d = offer.to_dict()
         assert "offer_id" in d
@@ -2280,6 +2409,7 @@ class TestRetentionEngine:
 # 10g. BuddyBot — Autonomous SaaS Integration Tests
 # ===========================================================================
 
+
 class TestBuddyBotAutonomousSaaS:
     """Integration tests for the new autonomous SaaS engines via BuddyBot."""
 
@@ -2303,8 +2433,12 @@ class TestBuddyBotAutonomousSaaS:
     def test_pro_tier_generate_proposal(self):
         buddy = BuddyBot(tier=Tier.PRO)
         proposal = buddy.generate_proposal(
-            "Test Gym", "50 leads/month", ["Ad campaigns", "Landing page"],
-            999.0, 500.0, "30 leads guaranteed",
+            "Test Gym",
+            "50 leads/month",
+            ["Ad campaigns", "Landing page"],
+            999.0,
+            500.0,
+            "30 leads guaranteed",
         )
         assert isinstance(proposal, Proposal)
         assert "Test Gym" in proposal.body
@@ -2345,8 +2479,12 @@ class TestBuddyBotAutonomousSaaS:
     def test_pro_tier_detect_upsell_moment(self):
         buddy = BuddyBot(tier=Tier.PRO)
         buddy.add_retained_client(
-            "Upsell Co", "starter", 29.0,
-            months_active=3, satisfaction_score=9.0, results_delivered=5,
+            "Upsell Co",
+            "starter",
+            29.0,
+            months_active=3,
+            satisfaction_score=9.0,
+            results_delivered=5,
         )
         stage = buddy.detect_upsell_moment("Upsell Co")
         assert stage in list(UpsellStage)
@@ -2354,8 +2492,12 @@ class TestBuddyBotAutonomousSaaS:
     def test_pro_tier_build_upsell_offer(self):
         buddy = BuddyBot(tier=Tier.PRO)
         buddy.add_retained_client(
-            "Upsell Co", "starter", 29.0,
-            months_active=3, satisfaction_score=8.5, results_delivered=5,
+            "Upsell Co",
+            "starter",
+            29.0,
+            months_active=3,
+            satisfaction_score=8.5,
+            results_delivered=5,
         )
         offer = buddy.build_upsell_offer("Upsell Co")
         assert isinstance(offer, UpsellOffer)
@@ -2387,13 +2529,18 @@ class TestBuddyBotAutonomousSaaS:
     def test_pro_features_include_saas_flags(self):
         buddy = BuddyBot(tier=Tier.PRO)
         from bots.buddy_bot.tiers import (
-            FEATURE_LEAD_FINDER, FEATURE_OFFER_GENERATOR,
-            FEATURE_CONVERSION_ENGINE, FEATURE_FULFILLMENT_ENGINE,
+            FEATURE_CONVERSION_ENGINE,
+            FEATURE_FULFILLMENT_ENGINE,
+            FEATURE_LEAD_FINDER,
+            FEATURE_OFFER_GENERATOR,
             FEATURE_RETENTION_ENGINE,
         )
+
         for feat in [
-            FEATURE_LEAD_FINDER, FEATURE_OFFER_GENERATOR,
-            FEATURE_CONVERSION_ENGINE, FEATURE_FULFILLMENT_ENGINE,
+            FEATURE_LEAD_FINDER,
+            FEATURE_OFFER_GENERATOR,
+            FEATURE_CONVERSION_ENGINE,
+            FEATURE_FULFILLMENT_ENGINE,
             FEATURE_RETENTION_ENGINE,
         ]:
             assert buddy.config.has_feature(feat), f"PRO should have {feat}"
@@ -2401,6 +2548,7 @@ class TestBuddyBotAutonomousSaaS:
     def test_free_does_not_have_saas_flags(self):
         buddy = BuddyBot(tier=Tier.FREE)
         from bots.buddy_bot.tiers import FEATURE_LEAD_FINDER
+
         assert not buddy.config.has_feature(FEATURE_LEAD_FINDER)
 
     def test_get_top_leads(self):
@@ -2413,6 +2561,7 @@ class TestBuddyBotAutonomousSaaS:
 # ===========================================================================
 # Adaptive Language / Communication Context
 # ===========================================================================
+
 
 class TestCommunicationContext:
     """Tests for CommunicationContext enum and ConversationEngine context awareness."""

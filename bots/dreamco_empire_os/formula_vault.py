@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -26,6 +27,7 @@ class FormulaCategory(Enum):
 @dataclass
 class Formula:
     """A stored reusable formula."""
+
     formula_id: str
     name: str
     category: FormulaCategory
@@ -35,7 +37,9 @@ class Formula:
     example_inputs: dict = field(default_factory=dict)
     tags: list = field(default_factory=list)
     use_count: int = 0
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # Built-in empire formulas
@@ -76,8 +80,18 @@ _BUILTIN_FORMULAS = [
         "category": FormulaCategory.AUTOMATION,
         "description": "Estimated daily profit from a bot given run count and success rate.",
         "expression": "runs_per_day * success_rate * revenue_per_success - daily_cost",
-        "variables": ["runs_per_day", "success_rate", "revenue_per_success", "daily_cost"],
-        "example_inputs": {"runs_per_day": 100, "success_rate": 0.8, "revenue_per_success": 5.0, "daily_cost": 10.0},
+        "variables": [
+            "runs_per_day",
+            "success_rate",
+            "revenue_per_success",
+            "daily_cost",
+        ],
+        "example_inputs": {
+            "runs_per_day": 100,
+            "success_rate": 0.8,
+            "revenue_per_success": 5.0,
+            "daily_cost": 10.0,
+        },
         "tags": ["bot", "profit", "automation"],
     },
     {
@@ -107,7 +121,11 @@ _BUILTIN_FORMULAS = [
         "description": "Units to sell before covering fixed costs.",
         "expression": "fixed_costs / (price_per_unit - variable_cost_per_unit)",
         "variables": ["fixed_costs", "price_per_unit", "variable_cost_per_unit"],
-        "example_inputs": {"fixed_costs": 5000.0, "price_per_unit": 100.0, "variable_cost_per_unit": 60.0},
+        "example_inputs": {
+            "fixed_costs": 5000.0,
+            "price_per_unit": 100.0,
+            "variable_cost_per_unit": 60.0,
+        },
         "tags": ["break_even", "costs"],
     },
 ]
@@ -194,24 +212,31 @@ class FormulaVault:
         safe_inputs: dict[str, Any] = {}
         for k, v in inputs.items():
             if not isinstance(v, (int, float)):
-                raise TypeError(f"Variable '{k}' must be numeric, got {type(v).__name__}.")
+                raise TypeError(
+                    f"Variable '{k}' must be numeric, got {type(v).__name__}."
+                )
             safe_inputs[k] = v
 
         # Guard expression against non-arithmetic content.
         # Allow: digits, variable names, arithmetic operators, whitespace, parens, dot, star-star.
         import re as _re
+
         if not _re.fullmatch(r"[A-Za-z0-9_\s\+\-\*\/\(\)\.\%]+", f.expression):
-            raise ValueError(f"Formula expression contains unsafe characters: {f.expression!r}")
+            raise ValueError(
+                f"Formula expression contains unsafe characters: {f.expression!r}"
+            )
 
         result = eval(f.expression, {"__builtins__": {}}, safe_inputs)  # noqa: S307
 
         f.use_count += 1
-        self._execution_log.append({
-            "formula_id": formula_id,
-            "inputs": inputs,
-            "result": result,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        self._execution_log.append(
+            {
+                "formula_id": formula_id,
+                "inputs": inputs,
+                "result": result,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
 
         return {
             "formula_id": formula_id,
@@ -254,7 +279,11 @@ class FormulaVault:
         return {
             "total_formulas": len(self._formulas),
             "total_executions": len(self._execution_log),
-            "most_used": max(self._formulas.values(), key=lambda f: f.use_count).formula_id if self._formulas else None,
+            "most_used": (
+                max(self._formulas.values(), key=lambda f: f.use_count).formula_id
+                if self._formulas
+                else None
+            ),
             "categories": list({f.category.value for f in self._formulas.values()}),
         }
 

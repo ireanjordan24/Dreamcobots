@@ -1,6 +1,5 @@
 """Marketplace pricing tiers for the DreamCobots platform."""
 
-
 STARTER = {
     "name": "Starter",
     "price_monthly": 49,

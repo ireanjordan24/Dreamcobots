@@ -5,14 +5,15 @@ Implements role-based access control (RBAC) and immutable audit logging
 for all system actions.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_GOVERNANCE
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .tiers import FEATURE_GOVERNANCE, Tier, TierConfig, get_tier_config
 
 
 class AccessRole(Enum):
@@ -71,8 +72,14 @@ class RBACError(Exception):
 
 ROLE_PERMISSIONS: dict = {
     AccessRole.ADMIN: [
-        "ingest", "classify", "sandbox", "analytics",
-        "hybrid", "deploy", "govern", "audit",
+        "ingest",
+        "classify",
+        "sandbox",
+        "analytics",
+        "hybrid",
+        "deploy",
+        "govern",
+        "audit",
     ],
     AccessRole.DATA_ENGINEER: ["ingest", "classify"],
     AccessRole.ML_ENGINEER: ["classify", "sandbox", "analytics", "hybrid"],

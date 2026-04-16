@@ -8,12 +8,12 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -21,7 +21,7 @@ class Meeting:
     meeting_id: str
     topic: str
     start_time: datetime
-    duration: int   # minutes
+    duration: int  # minutes
     status: str = "scheduled"
     reports: List[str] = field(default_factory=list)
 
@@ -41,7 +41,9 @@ class ZoomBot:
         self._api_secret = api_secret
         self._configured = bool(api_key and api_secret)
 
-    def schedule_meeting(self, topic: str, start_time: datetime, duration_minutes: int = 60) -> Meeting:
+    def schedule_meeting(
+        self, topic: str, start_time: datetime, duration_minutes: int = 60
+    ) -> Meeting:
         """Schedule a new Zoom meeting."""
         meeting = Meeting(
             meeting_id=str(uuid.uuid4()),
@@ -89,5 +91,7 @@ class ZoomBot:
         return {
             "configured": self._configured,
             "total_meetings": len(self._meetings),
-            "scheduled": sum(1 for m in self._meetings.values() if m.status == "scheduled"),
+            "scheduled": sum(
+                1 for m in self._meetings.values() if m.status == "scheduled"
+            ),
         }

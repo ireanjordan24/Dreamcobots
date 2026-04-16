@@ -26,19 +26,41 @@ class BrandKit:
 
 
 _INDUSTRY_COLORS: dict[str, ColorPalette] = {
-    "technology": ColorPalette(primary="#0057FF", secondary="#00C2FF", accent="#FF6B00", neutral="#F4F6F8"),
-    "healthcare": ColorPalette(primary="#00897B", secondary="#4DB6AC", accent="#FF7043", neutral="#FAFAFA"),
-    "finance": ColorPalette(primary="#1A237E", secondary="#283593", accent="#FFC107", neutral="#ECEFF1"),
-    "retail": ColorPalette(primary="#D32F2F", secondary="#F44336", accent="#FFC107", neutral="#F5F5F5"),
-    "education": ColorPalette(primary="#1565C0", secondary="#42A5F5", accent="#FF6F00", neutral="#E8F4FD"),
-    "food & beverage": ColorPalette(primary="#E65100", secondary="#FF8F00", accent="#2E7D32", neutral="#FFF8E1"),
-    "real estate": ColorPalette(primary="#37474F", secondary="#546E7A", accent="#C6A84B", neutral="#ECEFF1"),
-    "consulting": ColorPalette(primary="#004D40", secondary="#00796B", accent="#FF6D00", neutral="#F1F8E9"),
-    "e-commerce": ColorPalette(primary="#6A1B9A", secondary="#AB47BC", accent="#FFD600", neutral="#F3E5F5"),
-    "entertainment": ColorPalette(primary="#212121", secondary="#424242", accent="#E91E63", neutral="#F5F5F5"),
+    "technology": ColorPalette(
+        primary="#0057FF", secondary="#00C2FF", accent="#FF6B00", neutral="#F4F6F8"
+    ),
+    "healthcare": ColorPalette(
+        primary="#00897B", secondary="#4DB6AC", accent="#FF7043", neutral="#FAFAFA"
+    ),
+    "finance": ColorPalette(
+        primary="#1A237E", secondary="#283593", accent="#FFC107", neutral="#ECEFF1"
+    ),
+    "retail": ColorPalette(
+        primary="#D32F2F", secondary="#F44336", accent="#FFC107", neutral="#F5F5F5"
+    ),
+    "education": ColorPalette(
+        primary="#1565C0", secondary="#42A5F5", accent="#FF6F00", neutral="#E8F4FD"
+    ),
+    "food & beverage": ColorPalette(
+        primary="#E65100", secondary="#FF8F00", accent="#2E7D32", neutral="#FFF8E1"
+    ),
+    "real estate": ColorPalette(
+        primary="#37474F", secondary="#546E7A", accent="#C6A84B", neutral="#ECEFF1"
+    ),
+    "consulting": ColorPalette(
+        primary="#004D40", secondary="#00796B", accent="#FF6D00", neutral="#F1F8E9"
+    ),
+    "e-commerce": ColorPalette(
+        primary="#6A1B9A", secondary="#AB47BC", accent="#FFD600", neutral="#F3E5F5"
+    ),
+    "entertainment": ColorPalette(
+        primary="#212121", secondary="#424242", accent="#E91E63", neutral="#F5F5F5"
+    ),
 }
 
-_DEFAULT_COLORS = ColorPalette(primary="#2C3E50", secondary="#3498DB", accent="#E74C3C", neutral="#ECF0F1")
+_DEFAULT_COLORS = ColorPalette(
+    primary="#2C3E50", secondary="#3498DB", accent="#E74C3C", neutral="#ECF0F1"
+)
 
 _BRAND_VOICES: dict[str, str] = {
     "technology": "Innovative, clear, and forward-thinking — we speak with technical authority while remaining approachable.",

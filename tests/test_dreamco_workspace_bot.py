@@ -1,27 +1,29 @@
 """Tests for bots/dreamco_workspace_bot — DreamCo GitHub Codespaces competitor."""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.dreamco_workspace_bot.dreamco_workspace_bot import (
     DreamCoWorkspaceBot,
-    DreamCoWorkspaceBotTierError,
     DreamCoWorkspaceBotError,
+    DreamCoWorkspaceBotTierError,
     WorkspaceEnvironment,
 )
-from bots.dreamco_workspace_bot.tiers import get_bot_tier_info, BOT_FEATURES
-
+from bots.dreamco_workspace_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestDreamCoWorkspaceBotTiers:
     def test_three_tiers_have_features(self):
@@ -29,7 +31,9 @@ class TestDreamCoWorkspaceBotTiers:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
     def test_get_bot_tier_info_returns_dict(self):
         info = get_bot_tier_info(Tier.FREE)
@@ -45,6 +49,7 @@ class TestDreamCoWorkspaceBotTiers:
 # ===========================================================================
 # Instantiation tests
 # ===========================================================================
+
 
 class TestDreamCoWorkspaceBotInstantiation:
     def test_default_tier_is_free(self):
@@ -71,6 +76,7 @@ class TestDreamCoWorkspaceBotInstantiation:
 # ===========================================================================
 # Workspace creation tests
 # ===========================================================================
+
 
 class TestWorkspaceCreation:
     def test_create_workspace_returns_environment(self):
@@ -136,6 +142,7 @@ class TestWorkspaceCreation:
 # Workspace retrieval tests
 # ===========================================================================
 
+
 class TestWorkspaceRetrieval:
     def test_get_workspace_by_id(self):
         bot = DreamCoWorkspaceBot(tier=Tier.FREE)
@@ -170,6 +177,7 @@ class TestWorkspaceRetrieval:
 # Workspace lifecycle tests
 # ===========================================================================
 
+
 class TestWorkspaceLifecycle:
     def test_stop_workspace(self):
         bot = DreamCoWorkspaceBot(tier=Tier.FREE)
@@ -194,6 +202,7 @@ class TestWorkspaceLifecycle:
 # ===========================================================================
 # Port forwarding tests
 # ===========================================================================
+
 
 class TestPortForwarding:
     def test_free_cannot_forward_ports(self):
@@ -226,6 +235,7 @@ class TestPortForwarding:
 # Dotfiles tests
 # ===========================================================================
 
+
 class TestDotfiles:
     def test_free_cannot_set_dotfiles(self):
         bot = DreamCoWorkspaceBot(tier=Tier.FREE)
@@ -249,6 +259,7 @@ class TestDotfiles:
 # ===========================================================================
 # Custom images tests
 # ===========================================================================
+
 
 class TestCustomImages:
     def test_free_cannot_create_custom_image(self):
@@ -282,6 +293,7 @@ class TestCustomImages:
 # Workspace stats tests
 # ===========================================================================
 
+
 class TestWorkspaceStats:
     def test_initial_stats(self):
         bot = DreamCoWorkspaceBot(tier=Tier.FREE)
@@ -304,6 +316,7 @@ class TestWorkspaceStats:
 # ===========================================================================
 # Chat interface tests
 # ===========================================================================
+
 
 class TestChatInterface:
     def test_default_chat_response(self):

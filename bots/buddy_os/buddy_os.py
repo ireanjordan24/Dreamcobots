@@ -48,63 +48,62 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.buddy_os.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    FEATURE_DEVICE_MANAGER,
-    FEATURE_BLUETOOTH,
-    FEATURE_CAST_SCREEN,
-    FEATURE_MULTI_CAST,
-    FEATURE_APP_FRAMEWORK,
-    FEATURE_SMART_DEVICES,
-    FEATURE_BROWSER_TOOLS,
-    FEATURE_OS_KERNEL,
-    FEATURE_STARLINK,
-    FEATURE_NVIDIA_TOOLS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_ENTERPRISE_MDM,
-)
-from bots.buddy_os.device_manager import (
-    DeviceManager,
-    Device,
-    DeviceType,
-    DevicePlatform,
-    DeviceStatus,
+from bots.buddy_os.app_framework import (
+    AppCategory,
+    AppPlatform,
+    AppRegistry,
+    BrowserToolkit,
+    NvidiaToolsHub,
+    SmartDeviceHub,
+    SmartDeviceProtocol,
+    StarlinkManager,
 )
 from bots.buddy_os.bluetooth_engine import (
-    BluetoothEngine,
     BluetoothDevice,
+    BluetoothEngine,
     BluetoothProfileType,
     BluetoothState,
     FileTransfer,
 )
 from bots.buddy_os.cast_engine import (
     CastEngine,
+    CastProtocol,
     CastReceiver,
     CastSession,
-    CastProtocol,
     CastState,
     ContentType,
 )
-from bots.buddy_os.app_framework import (
-    AppRegistry,
-    BrowserToolkit,
-    SmartDeviceHub,
-    NvidiaToolsHub,
-    StarlinkManager,
-    AppCategory,
-    AppPlatform,
-    SmartDeviceProtocol,
+from bots.buddy_os.device_manager import (
+    Device,
+    DeviceManager,
+    DevicePlatform,
+    DeviceStatus,
+    DeviceType,
 )
+from bots.buddy_os.tiers import (
+    FEATURE_APP_FRAMEWORK,
+    FEATURE_BLUETOOTH,
+    FEATURE_BROWSER_TOOLS,
+    FEATURE_CAST_SCREEN,
+    FEATURE_DEVICE_MANAGER,
+    FEATURE_ENTERPRISE_MDM,
+    FEATURE_MULTI_CAST,
+    FEATURE_NVIDIA_TOOLS,
+    FEATURE_OS_KERNEL,
+    FEATURE_SMART_DEVICES,
+    FEATURE_STARLINK,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+)
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class BuddyOSError(Exception):
@@ -134,15 +133,9 @@ class BuddyOS:
         self.config: TierConfig = get_tier_config(tier)
 
         # Subsystems — instantiated regardless of tier but gated on use
-        self.device_manager = DeviceManager(
-            max_devices=self.config.max_paired_devices
-        )
-        self.bluetooth = BluetoothEngine(
-            max_paired=self.config.max_paired_devices
-        )
-        self.cast = CastEngine(
-            max_targets=self.config.max_cast_targets
-        )
+        self.device_manager = DeviceManager(max_devices=self.config.max_paired_devices)
+        self.bluetooth = BluetoothEngine(max_paired=self.config.max_paired_devices)
+        self.cast = CastEngine(max_targets=self.config.max_cast_targets)
         self.apps = AppRegistry()
         self.browser = BrowserToolkit()
         self.smart_devices = SmartDeviceHub()
@@ -161,15 +154,23 @@ class BuddyOS:
         """Initialise the Buddy OS kernel and load default apps."""
         self._boot_log.append("Buddy OS kernel initialised.")
         self._boot_log.append(f"Tier: {self.config.name}")
-        self._boot_log.append(f"Max paired devices: {self.config.max_paired_devices or 'unlimited'}")
-        self._boot_log.append(f"Max cast targets: {self.config.max_cast_targets or 'unlimited'}")
+        self._boot_log.append(
+            f"Max paired devices: {self.config.max_paired_devices or 'unlimited'}"
+        )
+        self._boot_log.append(
+            f"Max cast targets: {self.config.max_cast_targets or 'unlimited'}"
+        )
 
         # Pre-load built-in browser tools
         self.browser.add_tool(
-            "DreamCo Dashboard", "https://dreamcobots.com/dashboard", "Main control panel"
+            "DreamCo Dashboard",
+            "https://dreamcobots.com/dashboard",
+            "Main control panel",
         )
         self.browser.add_tool(
-            "Bot Marketplace", "https://dreamcobots.com/marketplace", "Browse and buy bots"
+            "Bot Marketplace",
+            "https://dreamcobots.com/marketplace",
+            "Browse and buy bots",
         )
 
         self._boot_log.append("Default browser tools loaded.")

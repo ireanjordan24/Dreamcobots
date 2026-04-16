@@ -1,14 +1,17 @@
 """Tests for bots/software_bot/tiers.py and bots/software_bot/software_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.software_bot.software_bot import SoftwareBot, SoftwareBotTierError
 
 
@@ -83,7 +86,9 @@ class TestGenerateAppIdea:
 class TestEstimateRevenue:
     def test_returns_dict(self):
         bot = SoftwareBot(tier=Tier.FREE)
-        result = bot.estimate_revenue({"name": "TestApp", "monetization": "Subscription"})
+        result = bot.estimate_revenue(
+            {"name": "TestApp", "monetization": "Subscription"}
+        )
         assert isinstance(result, dict)
 
     def test_has_projections(self):
@@ -98,13 +103,20 @@ class TestEstimateRevenue:
         ent_bot = SoftwareBot(tier=Tier.ENTERPRISE)
         free_rev = free_bot.estimate_revenue({"name": "App"})
         ent_rev = ent_bot.estimate_revenue({"name": "App"})
-        assert ent_rev["daily_revenue_usd"]["high"] >= free_rev["daily_revenue_usd"]["high"]
+        assert (
+            ent_rev["daily_revenue_usd"]["high"]
+            >= free_rev["daily_revenue_usd"]["high"]
+        )
 
 
 class TestCreateAppTemplate:
     def test_returns_dict(self):
         bot = SoftwareBot(tier=Tier.FREE)
-        idea = {"name": "TestApp", "category": "productivity", "monetization": "Subscription"}
+        idea = {
+            "name": "TestApp",
+            "category": "productivity",
+            "monetization": "Subscription",
+        }
         result = bot.create_app_template(idea)
         assert isinstance(result, dict)
 

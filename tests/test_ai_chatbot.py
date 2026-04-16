@@ -2,38 +2,46 @@
 Tests for bots/ai_chatbot/tiers.py and bots/ai_chatbot/chatbot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 # Clear cached 'tiers' module to prevent cross-test sys.modules pollution
-sys.modules.pop('tiers', None)
+sys.modules.pop("tiers", None)
 
 import pytest
-from tiers import Tier, NLP_GPT35, NLP_GPT4, NLP_BERT_BASE, NLP_BERT_LARGE
+from tiers import NLP_BERT_BASE, NLP_BERT_LARGE, NLP_GPT4, NLP_GPT35, Tier
+
+from bots.ai_chatbot.chatbot import Chatbot, ChatbotRequestLimitError, ChatbotTierError
 from bots.ai_chatbot.tiers import (
-    get_chatbot_tier_info,
     CHATBOT_EXTRA_FEATURES,
     CHATBOT_MODELS,
+    get_chatbot_tier_info,
 )
-from bots.ai_chatbot.chatbot import Chatbot, ChatbotTierError, ChatbotRequestLimitError
-
 
 # -----------------------------------------------------------------------
 # Chatbot tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestChatbotTierInfo:
     def test_free_tier_info_keys(self):
         info = get_chatbot_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "chatbot_features", "available_models",
-                    "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "chatbot_features",
+            "available_models",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -84,6 +92,7 @@ class TestChatbotTierInfo:
 # Chatbot class tests
 # -----------------------------------------------------------------------
 
+
 class TestChatbot:
     def test_free_chatbot_default_model(self):
         bot = Chatbot(tier=Tier.FREE)
@@ -97,8 +106,14 @@ class TestChatbot:
     def test_chat_result_keys(self):
         bot = Chatbot(tier=Tier.FREE)
         result = bot.chat("What is AI?")
-        for key in ("message", "model", "tier", "history_turns",
-                    "requests_used", "requests_remaining"):
+        for key in (
+            "message",
+            "model",
+            "tier",
+            "history_turns",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_chat_increments_request_count(self):

@@ -9,27 +9,29 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401
+
 
 @dataclass
 class WorkflowStage:
     stage_id: str
     name: str
-    avg_duration: float     # seconds
+    avg_duration: float  # seconds
     queue_depth: int
-    throughput: float       # tasks/sec
+    throughput: float  # tasks/sec
 
 
 @dataclass
@@ -37,7 +39,7 @@ class Bottleneck:
     bottleneck_id: str
     workflow_id: str
     stage_id: str
-    severity_score: float   # 0.0 - 10.0
+    severity_score: float  # 0.0 - 10.0
     remediation_suggestions: List[str]
     detected_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -51,11 +53,15 @@ class BottleneckDetector:
         self._workflow_stages: Dict[str, List[WorkflowStage]] = {}
         self._bottlenecks: Dict[str, Bottleneck] = {}
 
-    def analyze_workflow(self, workflow_id: str, stages: List[WorkflowStage]) -> List[Bottleneck]:
+    def analyze_workflow(
+        self, workflow_id: str, stages: List[WorkflowStage]
+    ) -> List[Bottleneck]:
         """Analyze workflow stages and identify bottlenecks."""
         self._workflow_stages[workflow_id] = stages
         detected = []
-        avg_throughput = (sum(s.throughput for s in stages) / len(stages)) if stages else 1.0
+        avg_throughput = (
+            (sum(s.throughput for s in stages) / len(stages)) if stages else 1.0
+        )
         for stage in stages:
             score = self._compute_severity(stage, avg_throughput)
             if score >= self.BOTTLENECK_THRESHOLD:
@@ -72,7 +78,9 @@ class BottleneckDetector:
 
     def _compute_severity(self, stage: WorkflowStage, avg_throughput: float) -> float:
         queue_score = min(stage.queue_depth / 10.0, 5.0)
-        throughput_score = max(0.0, 5.0 * (1.0 - stage.throughput / max(avg_throughput, 1e-9)))
+        throughput_score = max(
+            0.0, 5.0 * (1.0 - stage.throughput / max(avg_throughput, 1e-9))
+        )
         return queue_score + throughput_score
 
     def _suggest_remediation(self, stage: WorkflowStage) -> List[str]:
@@ -120,7 +128,9 @@ class BottleneckDetector:
 
     def get_workflow_summary(self, workflow_id: str) -> dict:
         """Return a summary of bottleneck analysis for a workflow."""
-        relevant = [b for b in self._bottlenecks.values() if b.workflow_id == workflow_id]
+        relevant = [
+            b for b in self._bottlenecks.values() if b.workflow_id == workflow_id
+        ]
         return {
             "workflow_id": workflow_id,
             "total_bottlenecks": len(relevant),

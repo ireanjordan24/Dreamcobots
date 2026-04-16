@@ -1,22 +1,26 @@
 """Tests for Occupational_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from Occupational_bots.feature_1 import JobSearchBot, EXAMPLES as OC1_EXAMPLES
-from Occupational_bots.feature_2 import ResumeBuildingBot, EXAMPLES as OC2_EXAMPLES
-from Occupational_bots.feature_3 import InterviewPrepBot, EXAMPLES as OC3_EXAMPLES
-
+from Occupational_bots.feature_1 import EXAMPLES as OC1_EXAMPLES
+from Occupational_bots.feature_1 import JobSearchBot
+from Occupational_bots.feature_2 import EXAMPLES as OC2_EXAMPLES
+from Occupational_bots.feature_2 import ResumeBuildingBot
+from Occupational_bots.feature_3 import EXAMPLES as OC3_EXAMPLES
+from Occupational_bots.feature_3 import InterviewPrepBot
 
 # ===========================================================================
 # Feature 1: JobSearchBot
 # ===========================================================================
+
 
 class TestJobSearchBotInstantiation:
     def test_default_tier_is_free(self):
@@ -150,6 +154,7 @@ class TestJobSearchBotMethods:
 # Feature 2: ResumeBuildingBot
 # ===========================================================================
 
+
 class TestResumeBuildingBotInstantiation:
     def test_default_tier_is_free(self):
         bot = ResumeBuildingBot()
@@ -268,6 +273,7 @@ class TestResumeBuildingBotMethods:
 # ===========================================================================
 # Feature 3: InterviewPrepBot
 # ===========================================================================
+
 
 class TestInterviewPrepBotInstantiation:
     def test_default_tier_is_free(self):

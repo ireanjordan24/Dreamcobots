@@ -23,51 +23,51 @@ Covers:
   19. Service-fee tracking
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.fiverr_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    FEATURE_GIG_LISTING,
-    FEATURE_ORDER_TRACKING,
-    FEATURE_INBOX_AUTOMATION,
-    FEATURE_REVIEW_COLLECTION,
-    FEATURE_ANALYTICS,
-    FEATURE_PRICING_OPTIMIZER,
-    FEATURE_CRM_EXPORT,
-    FEATURE_AI_PRICING,
-    FEATURE_WHITE_LABEL,
-    FEATURE_FREELANCER_MATCHING,
-    FEATURE_JOB_POSTINGS,
-    FEATURE_PROPOSALS,
-    FEATURE_STRIPE_PAYMENTS,
-    FEATURE_MILESTONES,
-    FEATURE_ADMIN_DASHBOARD,
-    FEATURE_FEATURED_GIGS,
-)
 from bots.fiverr_bot.fiverr_bot import (
     FiverrBot,
     FiverrBotError,
     FiverrBotTierError,
     GigCategory,
+    MilestoneStatus,
     OrderStatus,
     ProposalStatus,
-    MilestoneStatus,
 )
-
+from bots.fiverr_bot.tiers import (
+    FEATURE_ADMIN_DASHBOARD,
+    FEATURE_AI_PRICING,
+    FEATURE_ANALYTICS,
+    FEATURE_CRM_EXPORT,
+    FEATURE_FEATURED_GIGS,
+    FEATURE_FREELANCER_MATCHING,
+    FEATURE_GIG_LISTING,
+    FEATURE_INBOX_AUTOMATION,
+    FEATURE_JOB_POSTINGS,
+    FEATURE_MILESTONES,
+    FEATURE_ORDER_TRACKING,
+    FEATURE_PRICING_OPTIMIZER,
+    FEATURE_PROPOSALS,
+    FEATURE_REVIEW_COLLECTION,
+    FEATURE_STRIPE_PAYMENTS,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestFiverrBotTiers:
     def test_three_tiers(self):
@@ -104,12 +104,22 @@ class TestFiverrBotTiers:
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
         for feat in [
-            FEATURE_GIG_LISTING, FEATURE_ORDER_TRACKING, FEATURE_INBOX_AUTOMATION,
-            FEATURE_REVIEW_COLLECTION, FEATURE_ANALYTICS, FEATURE_PRICING_OPTIMIZER,
-            FEATURE_CRM_EXPORT, FEATURE_AI_PRICING, FEATURE_WHITE_LABEL,
-            FEATURE_FREELANCER_MATCHING, FEATURE_JOB_POSTINGS, FEATURE_PROPOSALS,
-            FEATURE_STRIPE_PAYMENTS, FEATURE_MILESTONES,
-            FEATURE_ADMIN_DASHBOARD, FEATURE_FEATURED_GIGS,
+            FEATURE_GIG_LISTING,
+            FEATURE_ORDER_TRACKING,
+            FEATURE_INBOX_AUTOMATION,
+            FEATURE_REVIEW_COLLECTION,
+            FEATURE_ANALYTICS,
+            FEATURE_PRICING_OPTIMIZER,
+            FEATURE_CRM_EXPORT,
+            FEATURE_AI_PRICING,
+            FEATURE_WHITE_LABEL,
+            FEATURE_FREELANCER_MATCHING,
+            FEATURE_JOB_POSTINGS,
+            FEATURE_PROPOSALS,
+            FEATURE_STRIPE_PAYMENTS,
+            FEATURE_MILESTONES,
+            FEATURE_ADMIN_DASHBOARD,
+            FEATURE_FEATURED_GIGS,
         ]:
             assert cfg.has_feature(feat), f"Missing feature: {feat}"
 
@@ -150,6 +160,7 @@ class TestFiverrBotTiers:
 # 2. Gig management
 # ===========================================================================
 
+
 class TestGigManagement:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -182,9 +193,13 @@ class TestGigManagement:
 
     def test_free_tier_gig_limit(self):
         bot = FiverrBot(tier=Tier.FREE)
-        for cat in [GigCategory.DATA_ENTRY, GigCategory.RESEARCH,
-                    GigCategory.CONTENT_WRITING, GigCategory.ANALYTICS,
-                    GigCategory.SEO]:
+        for cat in [
+            GigCategory.DATA_ENTRY,
+            GigCategory.RESEARCH,
+            GigCategory.CONTENT_WRITING,
+            GigCategory.ANALYTICS,
+            GigCategory.SEO,
+        ]:
             bot.create_gig(cat)
         with pytest.raises(FiverrBotTierError):
             bot.create_gig(GigCategory.SOCIAL_MEDIA)
@@ -227,6 +242,7 @@ class TestGigManagement:
 # ===========================================================================
 # 3. Order management
 # ===========================================================================
+
 
 class TestOrderManagement:
     def setup_method(self):
@@ -299,6 +315,7 @@ class TestOrderManagement:
 # 4. Inbox automation & bulk messaging
 # ===========================================================================
 
+
 class TestInboxAutomation:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -337,6 +354,7 @@ class TestInboxAutomation:
 # ===========================================================================
 # 5. Review collection
 # ===========================================================================
+
 
 class TestReviewCollection:
     def setup_method(self):
@@ -397,6 +415,7 @@ class TestReviewCollection:
 # 6. Pricing optimizer
 # ===========================================================================
 
+
 class TestPricingOptimizer:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -432,6 +451,7 @@ class TestPricingOptimizer:
 # 7. Analytics & revenue summary
 # ===========================================================================
 
+
 class TestAnalytics:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -447,8 +467,14 @@ class TestAnalytics:
 
     def test_analytics_has_required_keys(self):
         result = self.bot.get_analytics()
-        for key in ("total_gigs", "total_orders", "completed_orders",
-                    "total_revenue_usd", "avg_rating", "conversion_rate_pct"):
+        for key in (
+            "total_gigs",
+            "total_orders",
+            "completed_orders",
+            "total_revenue_usd",
+            "avg_rating",
+            "conversion_rate_pct",
+        ):
             assert key in result, f"Missing key: {key}"
 
     def test_analytics_counts_correct(self):
@@ -475,6 +501,7 @@ class TestAnalytics:
 # ===========================================================================
 # 8. CRM export
 # ===========================================================================
+
 
 class TestCRMExport:
     def setup_method(self):
@@ -510,6 +537,7 @@ class TestCRMExport:
 # 9. Chat & process interfaces
 # ===========================================================================
 
+
 class TestChatAndProcess:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -536,20 +564,24 @@ class TestChatAndProcess:
         assert "message" in result
 
     def test_process_create_gig(self):
-        result = self.bot.process({
-            "action": "create_gig",
-            "category": "data_entry",
-            "price_usd": 20.0,
-        })
+        result = self.bot.process(
+            {
+                "action": "create_gig",
+                "category": "data_entry",
+                "price_usd": 20.0,
+            }
+        )
         assert "gig_id" in result
 
     def test_process_receive_order(self):
         gig = self.bot.create_gig(GigCategory.DATA_ENTRY)
-        result = self.bot.process({
-            "action": "receive_order",
-            "gig_id": gig["gig_id"],
-            "buyer_username": "testbuyer",
-        })
+        result = self.bot.process(
+            {
+                "action": "receive_order",
+                "gig_id": gig["gig_id"],
+                "buyer_username": "testbuyer",
+            }
+        )
         assert "order_id" in result
 
     def test_process_get_analytics(self):
@@ -564,6 +596,7 @@ class TestChatAndProcess:
 # ===========================================================================
 # 10. run() helper
 # ===========================================================================
+
 
 class TestRunHelper:
     def test_run_returns_string(self):
@@ -593,6 +626,7 @@ class TestRunHelper:
 # 11. Freelancer & client registration
 # ===========================================================================
 
+
 class TestFreelancerClientRegistration:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -608,7 +642,9 @@ class TestFreelancerClientRegistration:
         assert "seo" in result["skills"]
 
     def test_register_freelancer_hourly_rate(self):
-        result = self.bot.register_freelancer("carol", ["writing"], hourly_rate_usd=50.0)
+        result = self.bot.register_freelancer(
+            "carol", ["writing"], hourly_rate_usd=50.0
+        )
         assert result["hourly_rate_usd"] == 50.0
 
     def test_register_duplicate_freelancer_raises(self):
@@ -649,6 +685,7 @@ class TestFreelancerClientRegistration:
 # ===========================================================================
 # 12. Job postings & filtering
 # ===========================================================================
+
 
 class TestJobPostings:
     def setup_method(self):
@@ -699,9 +736,7 @@ class TestJobPostings:
         assert len(jobs) == 1
 
     def test_get_jobs_filter_by_category(self):
-        self.bot.post_job(
-            "client1", "SEO job", "desc", GigCategory.SEO, 50.0, ["seo"]
-        )
+        self.bot.post_job("client1", "SEO job", "desc", GigCategory.SEO, 50.0, ["seo"])
         self.bot.post_job(
             "client1", "Writing job", "desc", GigCategory.CONTENT_WRITING, 50.0
         )
@@ -711,20 +746,26 @@ class TestJobPostings:
 
     def test_get_jobs_filter_by_skills(self):
         self.bot.post_job(
-            "client1", "Python job", "desc", GigCategory.WEB_DEVELOPMENT, 300.0,
+            "client1",
+            "Python job",
+            "desc",
+            GigCategory.WEB_DEVELOPMENT,
+            300.0,
             skills_required=["python", "django"],
         )
         self.bot.post_job(
-            "client1", "Design job", "desc", GigCategory.GRAPHIC_DESIGN, 100.0,
+            "client1",
+            "Design job",
+            "desc",
+            GigCategory.GRAPHIC_DESIGN,
+            100.0,
             skills_required=["illustrator"],
         )
         python_jobs = self.bot.get_jobs(skills=["python"])
         assert len(python_jobs) == 1
 
     def test_jobs_default_status_open(self):
-        self.bot.post_job(
-            "client1", "Open job", "desc", GigCategory.DATA_ENTRY, 30.0
-        )
+        self.bot.post_job("client1", "Open job", "desc", GigCategory.DATA_ENTRY, 30.0)
         jobs = self.bot.get_jobs(status="open")
         assert len(jobs) == 1
 
@@ -737,6 +778,7 @@ class TestJobPostings:
 # ===========================================================================
 # 13. Freelancer-client matching
 # ===========================================================================
+
 
 class TestFreelancerMatching:
     def setup_method(self):
@@ -793,6 +835,7 @@ class TestFreelancerMatching:
 # ===========================================================================
 # 14. Proposals
 # ===========================================================================
+
 
 class TestProposals:
     def setup_method(self):
@@ -876,6 +919,7 @@ class TestProposals:
 # 15. Stripe payment intents (mock mode)
 # ===========================================================================
 
+
 class TestStripePaymentIntents:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -922,6 +966,7 @@ class TestStripePaymentIntents:
 # ===========================================================================
 # 16. Milestones
 # ===========================================================================
+
 
 class TestMilestones:
     def setup_method(self):
@@ -1010,6 +1055,7 @@ class TestMilestones:
 # 17. Featured gigs
 # ===========================================================================
 
+
 class TestFeaturedGigs:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.ENTERPRISE)
@@ -1066,6 +1112,7 @@ class TestFeaturedGigs:
 # 18. Admin dashboard
 # ===========================================================================
 
+
 class TestAdminDashboard:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.ENTERPRISE)
@@ -1078,7 +1125,9 @@ class TestAdminDashboard:
         self.bot.deliver_order(order["order_id"], "SEO audit done")
         self.bot.complete_order(order["order_id"])
         # Post job & proposal
-        job = self.bot.post_job("corp1", "SEO project", "Need SEO", GigCategory.SEO, 500.0, ["seo"])
+        job = self.bot.post_job(
+            "corp1", "SEO project", "Need SEO", GigCategory.SEO, 500.0, ["seo"]
+        )
         self.bot.submit_proposal(job["job_id"], "fl1", "I can do this", 50.0, 7)
         # Milestone
         gig2 = self.bot.create_gig(GigCategory.ANALYTICS)
@@ -1093,8 +1142,16 @@ class TestAdminDashboard:
 
     def test_admin_dashboard_has_required_sections(self):
         result = self.bot.get_admin_dashboard()
-        for key in ("users", "gigs", "orders", "job_postings", "proposals",
-                    "milestones", "revenue", "reviews"):
+        for key in (
+            "users",
+            "gigs",
+            "orders",
+            "job_postings",
+            "proposals",
+            "milestones",
+            "revenue",
+            "reviews",
+        ):
             assert key in result, f"Missing section: {key}"
 
     def test_admin_dashboard_users_count(self):
@@ -1143,6 +1200,7 @@ class TestAdminDashboard:
 # ===========================================================================
 # 19. Service-fee tracking on order completion
 # ===========================================================================
+
 
 class TestServiceFeeTracking:
     def test_complete_order_records_service_fee(self):
@@ -1199,6 +1257,7 @@ class TestServiceFeeTracking:
 # 20. Process interface — new actions
 # ===========================================================================
 
+
 class TestProcessNewActions:
     def setup_method(self):
         self.bot = FiverrBot(tier=Tier.PRO)
@@ -1206,48 +1265,58 @@ class TestProcessNewActions:
         self.bot.register_freelancer("proc_fl", ["seo"])
 
     def test_process_post_job(self):
-        result = self.bot.process({
-            "action": "post_job",
-            "client_username": "proc_client",
-            "title": "SEO needed",
-            "category": "seo",
-            "budget_usd": 100.0,
-            "skills_required": ["seo"],
-        })
+        result = self.bot.process(
+            {
+                "action": "post_job",
+                "client_username": "proc_client",
+                "title": "SEO needed",
+                "category": "seo",
+                "budget_usd": 100.0,
+                "skills_required": ["seo"],
+            }
+        )
         assert "job_id" in result
 
     def test_process_submit_proposal(self):
-        job = self.bot.process({
-            "action": "post_job",
-            "client_username": "proc_client",
-            "title": "SEO needed",
-            "category": "seo",
-            "budget_usd": 100.0,
-            "skills_required": ["seo"],
-        })
-        result = self.bot.process({
-            "action": "submit_proposal",
-            "job_id": job["job_id"],
-            "freelancer_username": "proc_fl",
-            "cover_letter": "I can help!",
-            "rate_usd": 20.0,
-            "delivery_days": 5,
-        })
+        job = self.bot.process(
+            {
+                "action": "post_job",
+                "client_username": "proc_client",
+                "title": "SEO needed",
+                "category": "seo",
+                "budget_usd": 100.0,
+                "skills_required": ["seo"],
+            }
+        )
+        result = self.bot.process(
+            {
+                "action": "submit_proposal",
+                "job_id": job["job_id"],
+                "freelancer_username": "proc_fl",
+                "cover_letter": "I can help!",
+                "rate_usd": 20.0,
+                "delivery_days": 5,
+            }
+        )
         assert "proposal_id" in result
 
     def test_process_match_freelancers(self):
-        job = self.bot.process({
-            "action": "post_job",
-            "client_username": "proc_client",
-            "title": "SEO project",
-            "category": "seo",
-            "budget_usd": 150.0,
-            "skills_required": ["seo"],
-        })
-        result = self.bot.process({
-            "action": "match_freelancers",
-            "job_id": job["job_id"],
-        })
+        job = self.bot.process(
+            {
+                "action": "post_job",
+                "client_username": "proc_client",
+                "title": "SEO project",
+                "category": "seo",
+                "budget_usd": 150.0,
+                "skills_required": ["seo"],
+            }
+        )
+        result = self.bot.process(
+            {
+                "action": "match_freelancers",
+                "job_id": job["job_id"],
+            }
+        )
         assert "matches" in result
 
     def test_process_get_admin_dashboard_enterprise(self):

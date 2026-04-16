@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -23,42 +23,327 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": "ORD-001", "gig": "Logo Design",           "buyer": "techstartup_co",  "price": 50,  "status": "in_progress", "due_date": "2025-05-03", "revision_count": 1, "rating": None},
-    {"id": "ORD-002", "gig": "SEO Blog Post",          "buyer": "bloggerpro22",    "price": 30,  "status": "delivered",   "due_date": "2025-05-01", "revision_count": 0, "rating": 5},
-    {"id": "ORD-003", "gig": "WordPress Site",         "buyer": "small_biz_jane",  "price": 150, "status": "in_progress", "due_date": "2025-05-08", "revision_count": 0, "rating": None},
-    {"id": "ORD-004", "gig": "Social Media Pack",      "buyer": "coffee_brand",    "price": 60,  "status": "completed",   "due_date": "2025-04-30", "revision_count": 2, "rating": 4},
-    {"id": "ORD-005", "gig": "Explainer Video",        "buyer": "saas_founder",    "price": 100, "status": "in_progress", "due_date": "2025-05-05", "revision_count": 1, "rating": None},
-    {"id": "ORD-006", "gig": "Data Entry Task",        "buyer": "researcher_bob",  "price": 15,  "status": "completed",   "due_date": "2025-04-28", "revision_count": 0, "rating": 5},
-    {"id": "ORD-007", "gig": "Resume Writing",         "buyer": "job_seeker_2025", "price": 45,  "status": "delivered",   "due_date": "2025-05-02", "revision_count": 1, "rating": None},
-    {"id": "ORD-008", "gig": "Spanish Translation",    "buyer": "intl_docs_inc",   "price": 25,  "status": "completed",   "due_date": "2025-04-29", "revision_count": 0, "rating": 5},
-    {"id": "ORD-009", "gig": "Python Automation",      "buyer": "bizops_lead",     "price": 75,  "status": "in_progress", "due_date": "2025-05-06", "revision_count": 0, "rating": None},
-    {"id": "ORD-010", "gig": "Business Card Design",   "buyer": "realtor_mike",    "price": 20,  "status": "completed",   "due_date": "2025-04-27", "revision_count": 1, "rating": 4},
-    {"id": "ORD-011", "gig": "Product Descriptions",   "buyer": "ecom_store_amy",  "price": 40,  "status": "delivered",   "due_date": "2025-05-01", "revision_count": 0, "rating": None},
-    {"id": "ORD-012", "gig": "Google Ads Setup",       "buyer": "ad_agency_x",     "price": 90,  "status": "completed",   "due_date": "2025-04-26", "revision_count": 0, "rating": 5},
-    {"id": "ORD-013", "gig": "Shopify Store",          "buyer": "fashion_brand",   "price": 180, "status": "in_progress", "due_date": "2025-05-10", "revision_count": 0, "rating": None},
-    {"id": "ORD-014", "gig": "Voice Over",             "buyer": "podcast_host",    "price": 35,  "status": "delivered",   "due_date": "2025-05-01", "revision_count": 0, "rating": 5},
-    {"id": "ORD-015", "gig": "Manuscript Editing",     "buyer": "author_lisa",     "price": 50,  "status": "in_progress", "due_date": "2025-05-07", "revision_count": 0, "rating": None},
-    {"id": "ORD-016", "gig": "Instagram Content",      "buyer": "influencer_99",   "price": 70,  "status": "completed",   "due_date": "2025-04-25", "revision_count": 1, "rating": 4},
-    {"id": "ORD-017", "gig": "React Native App",       "buyer": "app_startup_x",   "price": 250, "status": "in_progress", "due_date": "2025-05-15", "revision_count": 0, "rating": None},
-    {"id": "ORD-018", "gig": "YouTube Intro",          "buyer": "gamer_youtuber",  "price": 55,  "status": "delivered",   "due_date": "2025-05-02", "revision_count": 1, "rating": None},
-    {"id": "ORD-019", "gig": "Mailchimp Setup",        "buyer": "retailer_mark",   "price": 65,  "status": "completed",   "due_date": "2025-04-30", "revision_count": 0, "rating": 5},
-    {"id": "ORD-020", "gig": "Keyword Research",       "buyer": "seo_agency_v",    "price": 40,  "status": "in_progress", "due_date": "2025-05-04", "revision_count": 0, "rating": None},
-    {"id": "ORD-021", "gig": "PowerPoint Deck",        "buyer": "finance_co",      "price": 55,  "status": "completed",   "due_date": "2025-04-24", "revision_count": 0, "rating": 5},
-    {"id": "ORD-022", "gig": "About Us Page",          "buyer": "new_brand_co",    "price": 25,  "status": "delivered",   "due_date": "2025-05-01", "revision_count": 0, "rating": None},
-    {"id": "ORD-023", "gig": "FastAPI Backend",        "buyer": "startup_cto",     "price": 140, "status": "in_progress", "due_date": "2025-05-12", "revision_count": 0, "rating": None},
-    {"id": "ORD-024", "gig": "Social Media Kit",       "buyer": "brand_kit_buyer", "price": 40,  "status": "completed",   "due_date": "2025-04-23", "revision_count": 1, "rating": 4},
-    {"id": "ORD-025", "gig": "Chatbot Dev",            "buyer": "ecom_cmo",        "price": 120, "status": "in_progress", "due_date": "2025-05-09", "revision_count": 0, "rating": None},
-    {"id": "ORD-026", "gig": "Guest Blog Posts",       "buyer": "seo_blogger",     "price": 80,  "status": "delivered",   "due_date": "2025-05-03", "revision_count": 0, "rating": None},
-    {"id": "ORD-027", "gig": "Ebook Creation",         "buyer": "coach_emma",      "price": 70,  "status": "completed",   "due_date": "2025-04-22", "revision_count": 0, "rating": 5},
-    {"id": "ORD-028", "gig": "Bug Fix Service",        "buyer": "dev_team_xyz",    "price": 35,  "status": "completed",   "due_date": "2025-04-21", "revision_count": 0, "rating": 5},
-    {"id": "ORD-029", "gig": "Pinterest Management",   "buyer": "home_decor_shop", "price": 45,  "status": "in_progress", "due_date": "2025-05-11", "revision_count": 0, "rating": None},
-    {"id": "ORD-030", "gig": "LinkedIn Profile",       "buyer": "exec_coach_tom",  "price": 60,  "status": "delivered",   "due_date": "2025-05-02", "revision_count": 1, "rating": None},
+    {
+        "id": "ORD-001",
+        "gig": "Logo Design",
+        "buyer": "techstartup_co",
+        "price": 50,
+        "status": "in_progress",
+        "due_date": "2025-05-03",
+        "revision_count": 1,
+        "rating": None,
+    },
+    {
+        "id": "ORD-002",
+        "gig": "SEO Blog Post",
+        "buyer": "bloggerpro22",
+        "price": 30,
+        "status": "delivered",
+        "due_date": "2025-05-01",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-003",
+        "gig": "WordPress Site",
+        "buyer": "small_biz_jane",
+        "price": 150,
+        "status": "in_progress",
+        "due_date": "2025-05-08",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-004",
+        "gig": "Social Media Pack",
+        "buyer": "coffee_brand",
+        "price": 60,
+        "status": "completed",
+        "due_date": "2025-04-30",
+        "revision_count": 2,
+        "rating": 4,
+    },
+    {
+        "id": "ORD-005",
+        "gig": "Explainer Video",
+        "buyer": "saas_founder",
+        "price": 100,
+        "status": "in_progress",
+        "due_date": "2025-05-05",
+        "revision_count": 1,
+        "rating": None,
+    },
+    {
+        "id": "ORD-006",
+        "gig": "Data Entry Task",
+        "buyer": "researcher_bob",
+        "price": 15,
+        "status": "completed",
+        "due_date": "2025-04-28",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-007",
+        "gig": "Resume Writing",
+        "buyer": "job_seeker_2025",
+        "price": 45,
+        "status": "delivered",
+        "due_date": "2025-05-02",
+        "revision_count": 1,
+        "rating": None,
+    },
+    {
+        "id": "ORD-008",
+        "gig": "Spanish Translation",
+        "buyer": "intl_docs_inc",
+        "price": 25,
+        "status": "completed",
+        "due_date": "2025-04-29",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-009",
+        "gig": "Python Automation",
+        "buyer": "bizops_lead",
+        "price": 75,
+        "status": "in_progress",
+        "due_date": "2025-05-06",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-010",
+        "gig": "Business Card Design",
+        "buyer": "realtor_mike",
+        "price": 20,
+        "status": "completed",
+        "due_date": "2025-04-27",
+        "revision_count": 1,
+        "rating": 4,
+    },
+    {
+        "id": "ORD-011",
+        "gig": "Product Descriptions",
+        "buyer": "ecom_store_amy",
+        "price": 40,
+        "status": "delivered",
+        "due_date": "2025-05-01",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-012",
+        "gig": "Google Ads Setup",
+        "buyer": "ad_agency_x",
+        "price": 90,
+        "status": "completed",
+        "due_date": "2025-04-26",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-013",
+        "gig": "Shopify Store",
+        "buyer": "fashion_brand",
+        "price": 180,
+        "status": "in_progress",
+        "due_date": "2025-05-10",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-014",
+        "gig": "Voice Over",
+        "buyer": "podcast_host",
+        "price": 35,
+        "status": "delivered",
+        "due_date": "2025-05-01",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-015",
+        "gig": "Manuscript Editing",
+        "buyer": "author_lisa",
+        "price": 50,
+        "status": "in_progress",
+        "due_date": "2025-05-07",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-016",
+        "gig": "Instagram Content",
+        "buyer": "influencer_99",
+        "price": 70,
+        "status": "completed",
+        "due_date": "2025-04-25",
+        "revision_count": 1,
+        "rating": 4,
+    },
+    {
+        "id": "ORD-017",
+        "gig": "React Native App",
+        "buyer": "app_startup_x",
+        "price": 250,
+        "status": "in_progress",
+        "due_date": "2025-05-15",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-018",
+        "gig": "YouTube Intro",
+        "buyer": "gamer_youtuber",
+        "price": 55,
+        "status": "delivered",
+        "due_date": "2025-05-02",
+        "revision_count": 1,
+        "rating": None,
+    },
+    {
+        "id": "ORD-019",
+        "gig": "Mailchimp Setup",
+        "buyer": "retailer_mark",
+        "price": 65,
+        "status": "completed",
+        "due_date": "2025-04-30",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-020",
+        "gig": "Keyword Research",
+        "buyer": "seo_agency_v",
+        "price": 40,
+        "status": "in_progress",
+        "due_date": "2025-05-04",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-021",
+        "gig": "PowerPoint Deck",
+        "buyer": "finance_co",
+        "price": 55,
+        "status": "completed",
+        "due_date": "2025-04-24",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-022",
+        "gig": "About Us Page",
+        "buyer": "new_brand_co",
+        "price": 25,
+        "status": "delivered",
+        "due_date": "2025-05-01",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-023",
+        "gig": "FastAPI Backend",
+        "buyer": "startup_cto",
+        "price": 140,
+        "status": "in_progress",
+        "due_date": "2025-05-12",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-024",
+        "gig": "Social Media Kit",
+        "buyer": "brand_kit_buyer",
+        "price": 40,
+        "status": "completed",
+        "due_date": "2025-04-23",
+        "revision_count": 1,
+        "rating": 4,
+    },
+    {
+        "id": "ORD-025",
+        "gig": "Chatbot Dev",
+        "buyer": "ecom_cmo",
+        "price": 120,
+        "status": "in_progress",
+        "due_date": "2025-05-09",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-026",
+        "gig": "Guest Blog Posts",
+        "buyer": "seo_blogger",
+        "price": 80,
+        "status": "delivered",
+        "due_date": "2025-05-03",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-027",
+        "gig": "Ebook Creation",
+        "buyer": "coach_emma",
+        "price": 70,
+        "status": "completed",
+        "due_date": "2025-04-22",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-028",
+        "gig": "Bug Fix Service",
+        "buyer": "dev_team_xyz",
+        "price": 35,
+        "status": "completed",
+        "due_date": "2025-04-21",
+        "revision_count": 0,
+        "rating": 5,
+    },
+    {
+        "id": "ORD-029",
+        "gig": "Pinterest Management",
+        "buyer": "home_decor_shop",
+        "price": 45,
+        "status": "in_progress",
+        "due_date": "2025-05-11",
+        "revision_count": 0,
+        "rating": None,
+    },
+    {
+        "id": "ORD-030",
+        "gig": "LinkedIn Profile",
+        "buyer": "exec_coach_tom",
+        "price": 60,
+        "status": "delivered",
+        "due_date": "2025-05-02",
+        "revision_count": 1,
+        "rating": None,
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_tracked": 10,   "auto_messages": False, "deadline_alerts": False},
-    "PRO":        {"price_usd": 29,  "max_tracked": 100,  "auto_messages": True,  "deadline_alerts": True},
-    "ENTERPRISE": {"price_usd": 99,  "max_tracked": None, "auto_messages": True,  "deadline_alerts": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_tracked": 10,
+        "auto_messages": False,
+        "deadline_alerts": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_tracked": 100,
+        "auto_messages": True,
+        "deadline_alerts": True,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_tracked": None,
+        "auto_messages": True,
+        "deadline_alerts": True,
+    },
 }
 
 
@@ -154,7 +439,11 @@ class FiverrOrderManagerBot:
 
     def get_unreviewed_orders(self) -> list[dict]:
         """Return completed orders that have not been reviewed yet."""
-        return [o for o in self._available_orders() if o["status"] == "completed" and o["rating"] is None]
+        return [
+            o
+            for o in self._available_orders()
+            if o["status"] == "completed" and o["rating"] is None
+        ]
 
     def get_average_rating(self) -> float:
         """Return the average rating across all rated orders."""
@@ -178,10 +467,16 @@ class FiverrOrderManagerBot:
     def run(self) -> dict:
         """Run the GLOBAL AI SOURCES FLOW pipeline."""
         result = self._flow.run_pipeline(
-            raw_data={"domain": "fiverr_order_management", "orders_count": len(EXAMPLES)},
+            raw_data={
+                "domain": "fiverr_order_management",
+                "orders_count": len(EXAMPLES),
+            },
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "revenue": self.get_revenue_summary()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "revenue": self.get_revenue_summary(),
+        }
 
 
 if __name__ == "__main__":
@@ -189,7 +484,9 @@ if __name__ == "__main__":
     active = bot.get_active_orders()
     print(f"Active orders: {len(active)}")
     revenue = bot.get_revenue_summary()
-    print(f"Total revenue: ${revenue['total_revenue_usd']} from {revenue['completed_orders']} orders")
+    print(
+        f"Total revenue: ${revenue['total_revenue_usd']} from {revenue['completed_orders']} orders"
+    )
     print(f"Average rating: {bot.get_average_rating()}")
     print(bot.describe_tier())
 
@@ -257,12 +554,21 @@ def _fiverrordermanager_bot_list_items(self, limit=None):
 
 def _fiverrordermanager_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {
+        "bot": "FiverrOrderManagerBot",
+        "tier": self.tier.value,
+        "count": len(EXAMPLES),
+    }
 
 
 def _fiverrordermanager_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "FiverrOrderManagerBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 FiverrOrderManagerBot.monthly_price = _fiverrordermanager_bot_monthly_price

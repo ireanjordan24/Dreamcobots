@@ -13,8 +13,8 @@ module so the suite can run in CI without extra dependencies.
 
 import os
 import sys
-import time
 import threading
+import time
 from typing import Any
 
 import pytest
@@ -22,14 +22,14 @@ import pytest
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-from framework import GlobalAISourcesFlow  # noqa: E402
-from bots.utils.logger import get_logger  # noqa: E402
 from bots.utils.error_handler import BotError, retry, safe_run  # noqa: E402
-
+from bots.utils.logger import get_logger  # noqa: E402
+from framework import GlobalAISourcesFlow  # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def _elapsed(fn, *args: Any, **kwargs: Any) -> float:
     """Return wall-clock seconds for a single call to *fn*."""
@@ -41,6 +41,7 @@ def _elapsed(fn, *args: Any, **kwargs: Any) -> float:
 # ─────────────────────────────────────────────────────────────────────────────
 # GlobalAISourcesFlow benchmarks
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestFrameworkBenchmarks:
     """Ensure the GLOBAL AI SOURCES FLOW pipeline meets latency budgets."""
@@ -60,8 +61,7 @@ class TestFrameworkBenchmarks:
         flow = GlobalAISourcesFlow("benchmark_bot")
         elapsed = _elapsed(flow.validate)
         assert elapsed < self._VALIDATE_BUDGET_S, (
-            f"validate() took {elapsed:.3f}s "
-            f"(budget: {self._VALIDATE_BUDGET_S}s)"
+            f"validate() took {elapsed:.3f}s " f"(budget: {self._VALIDATE_BUDGET_S}s)"
         )
 
     def test_pipeline_within_budget(self):
@@ -89,14 +89,15 @@ class TestFrameworkBenchmarks:
             f"Worst-case pipeline call: {worst:.3f}s "
             f"(budget: {self._PIPELINE_BUDGET_S}s)"
         )
-        assert avg < self._PIPELINE_BUDGET_S / 2, (
-            f"Average pipeline call: {avg:.3f}s — unexpectedly slow"
-        )
+        assert (
+            avg < self._PIPELINE_BUDGET_S / 2
+        ), f"Average pipeline call: {avg:.3f}s — unexpectedly slow"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Concurrency / stress tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestConcurrentAccess:
     """Verify that multiple bots can run their pipelines concurrently."""
@@ -115,8 +116,7 @@ class TestConcurrentAccess:
                 errors.append(exc)
 
         threads = [
-            threading.Thread(target=_run, args=(i,))
-            for i in range(self._N_THREADS)
+            threading.Thread(target=_run, args=(i,)) for i in range(self._N_THREADS)
         ]
         t0 = time.perf_counter()
         for t in threads:
@@ -135,6 +135,7 @@ class TestConcurrentAccess:
 # ─────────────────────────────────────────────────────────────────────────────
 # Logging benchmarks
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestLoggingBenchmarks:
     """Ensure structured logging overhead is negligible."""
@@ -158,10 +159,11 @@ class TestLoggingBenchmarks:
 # Error handling benchmarks
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestErrorHandlerBenchmarks:
     """Verify that retry / safe_run decorators add minimal overhead."""
 
-    _BUDGET_OVERHEAD_S = 0.01   # 10 ms max decorator overhead for a no-op
+    _BUDGET_OVERHEAD_S = 0.01  # 10 ms max decorator overhead for a no-op
 
     def test_retry_decorator_no_overhead_on_success(self):
         @retry(max_attempts=3)

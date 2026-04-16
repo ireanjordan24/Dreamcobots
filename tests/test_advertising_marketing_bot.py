@@ -9,53 +9,53 @@ Covers:
   5. GlobalAISourcesFlow integration
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.advertising_marketing_bot.advertising_marketing_bot import (
+    LEAD_VALIDATION_THRESHOLD,
+    MAX_VISITORS_PER_DOLLAR,
+    MIN_VISITORS_PER_DOLLAR,
+    AdvertisingMarketingBot,
+    AdvertisingMarketingError,
+    AdvertisingMarketingTierError,
+    AppointmentResult,
+    CRMRecord,
+    DealResult,
+    Lead,
+    OutreachResult,
+    PaymentResult,
+    TrafficResult,
+)
 from bots.advertising_marketing_bot.tiers import (
+    FEATURE_AI_AGENTS,
+    FEATURE_APPOINTMENT,
+    FEATURE_AUTOMATION,
+    FEATURE_CLOSE,
+    FEATURE_CRM_INTEGRATION,
+    FEATURE_FUNNEL,
+    FEATURE_LEAD_SCRAPER,
+    FEATURE_LEAD_VALIDATOR,
+    FEATURE_OUTREACH,
+    FEATURE_PAYMENT,
+    FEATURE_TRAFFIC_GENERATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_TRAFFIC_GENERATION,
-    FEATURE_LEAD_SCRAPER,
-    FEATURE_LEAD_VALIDATOR,
-    FEATURE_OUTREACH,
-    FEATURE_FUNNEL,
-    FEATURE_APPOINTMENT,
-    FEATURE_CLOSE,
-    FEATURE_PAYMENT,
-    FEATURE_CRM_INTEGRATION,
-    FEATURE_AUTOMATION,
-    FEATURE_AI_AGENTS,
-)
-from bots.advertising_marketing_bot.advertising_marketing_bot import (
-    AdvertisingMarketingBot,
-    AdvertisingMarketingError,
-    AdvertisingMarketingTierError,
-    Lead,
-    TrafficResult,
-    OutreachResult,
-    AppointmentResult,
-    DealResult,
-    PaymentResult,
-    CRMRecord,
-    LEAD_VALIDATION_THRESHOLD,
-    MIN_VISITORS_PER_DOLLAR,
-    MAX_VISITORS_PER_DOLLAR,
 )
 from framework import GlobalAISourcesFlow
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestAdvertisingMarketingTiers:
     def test_three_tiers(self):
@@ -154,6 +154,7 @@ class TestAdvertisingMarketingTiers:
 # 2. Bot instantiation and basics
 # ===========================================================================
 
+
 class TestAdvertisingMarketingBotInit:
     def test_default_tier_is_free(self):
         bot = AdvertisingMarketingBot()
@@ -222,6 +223,7 @@ class TestAdvertisingMarketingBotInit:
 # ===========================================================================
 # 3. Advertising and Marketing Team Button — full pipeline
 # ===========================================================================
+
 
 class TestAdvertisingMarketingTeamButton:
     def setup_method(self):
@@ -359,6 +361,7 @@ class TestAdvertisingMarketingTeamButton:
 # 4. Free tier pipeline — limited stages
 # ===========================================================================
 
+
 class TestFreeTeamPipeline:
     def setup_method(self):
         self.bot = AdvertisingMarketingBot(tier=Tier.FREE)
@@ -404,6 +407,7 @@ class TestFreeTeamPipeline:
 # 5. Data models
 # ===========================================================================
 
+
 class TestLeadDataModel:
     def test_lead_has_lead_id(self):
         lead = Lead()
@@ -443,7 +447,9 @@ class TestOutreachResultModel:
 
 class TestPaymentResultModel:
     def test_payment_result_has_link(self):
-        p = PaymentResult(lead_id="123", amount_usd=500.0, payment_link="https://pay.example.com/123")
+        p = PaymentResult(
+            lead_id="123", amount_usd=500.0, payment_link="https://pay.example.com/123"
+        )
         assert "https" in p.payment_link
 
     def test_payment_result_has_transaction_id(self):
@@ -465,6 +471,7 @@ class TestCRMRecordModel:
 # 6. Chat interface
 # ===========================================================================
 
+
 class TestAdvertisingMarketingBotChat:
     def setup_method(self):
         self.bot = AdvertisingMarketingBot(tier=Tier.PRO)
@@ -482,7 +489,10 @@ class TestAdvertisingMarketingBotChat:
 
     def test_chat_campaign_trigger(self):
         result = self.bot.chat("start campaign")
-        assert "pipeline" in result["message"].lower() or result["action"] == "suggest_pipeline"
+        assert (
+            "pipeline" in result["message"].lower()
+            or result["action"] == "suggest_pipeline"
+        )
 
     def test_chat_lead_query(self):
         result = self.bot.chat("how many leads do I have")
@@ -515,6 +525,7 @@ class TestAdvertisingMarketingBotChat:
 # 7. GlobalAISourcesFlow integration
 # ===========================================================================
 
+
 class TestAdvertisingMarketingFlowIntegration:
     def test_bot_has_flow(self):
         bot = AdvertisingMarketingBot()
@@ -546,6 +557,7 @@ class TestAdvertisingMarketingFlowIntegration:
 # ===========================================================================
 # 8. Pipeline simulation constants
 # ===========================================================================
+
 
 class TestPipelineConstants:
     def test_lead_validation_threshold_is_float(self):

@@ -20,8 +20,8 @@ Revenue hook (standard DreamCo format):
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -30,7 +30,6 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -88,7 +87,9 @@ class Campaign:
     sends: int = 0
     conversions: int = 0
     attributed_revenue: float = 0.0
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     launched_at: Optional[str] = None
 
     @property
@@ -259,7 +260,7 @@ class MultiChannelMarketing:
             "leads_generated": campaign.sends,
             "conversion_rate": campaign.conversion_rate,
             "action": f"Multi-channel campaign '{campaign.name}' via "
-                      f"{', '.join(c.value for c in campaign.channels)}",
+            f"{', '.join(c.value for c in campaign.channels)}",
         }
 
     # ------------------------------------------------------------------
@@ -273,9 +274,7 @@ class MultiChannelMarketing:
         return self._get_campaign(campaign_id).to_dict()
 
     def get_total_revenue(self) -> float:
-        return round(
-            sum(c.attributed_revenue for c in self._campaigns.values()), 2
-        )
+        return round(sum(c.attributed_revenue for c in self._campaigns.values()), 2)
 
     def get_segments(self, campaign_id: str) -> List[dict]:
         return [s.to_dict() for s in self._segments.get(campaign_id, [])]

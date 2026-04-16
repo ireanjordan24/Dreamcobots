@@ -65,8 +65,8 @@ class Strategy:
     description: str
     risk_level: RiskLevel
     expected_roi_pct: float
-    confidence_score: float          # 0.0 – 1.0
-    rules: list                      # list of rule dicts
+    confidence_score: float  # 0.0 – 1.0
+    rules: list  # list of rule dicts
     custom_params: dict = field(default_factory=dict)
     status: StrategyStatus = StrategyStatus.DRAFT
     client_id: Optional[str] = None

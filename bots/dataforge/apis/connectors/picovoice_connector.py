@@ -1,4 +1,5 @@
 """Picovoice wake word detection connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,10 +27,16 @@ class PicovoiceConnector:
         """
         try:
             import pvporcupine
-            porcupine = pvporcupine.create(access_key=self.access_key, keywords=["porcupine"])
+
+            porcupine = pvporcupine.create(
+                access_key=self.access_key, keywords=["porcupine"]
+            )
             keyword_index = porcupine.process(audio_frame)
             porcupine.delete()
-            logger.info("Picovoice wake word detection completed. keyword_index=%s", keyword_index)
+            logger.info(
+                "Picovoice wake word detection completed. keyword_index=%s",
+                keyword_index,
+            )
             return {"status": "success", "keyword_index": keyword_index}
         except ImportError:
             logger.error("pvporcupine library not installed.")
@@ -37,4 +44,3 @@ class PicovoiceConnector:
         except Exception as e:
             logger.error("Picovoice wake_word_detect error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -11,15 +11,15 @@ Provides four AI-powered tools for inventors:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
-import math
-
 
 # ===========================================================================
 # 1. Design Bot
 # ===========================================================================
+
 
 class DesignDomain(Enum):
     ROBOTICS = "robotics"
@@ -68,36 +68,77 @@ class DesignBot:
 
     COMPONENT_LIBRARY: dict = {
         DesignDomain.ROBOTICS: [
-            "servo motors", "encoders", "motor drivers", "microcontroller (ARM Cortex)",
-            "LiDAR sensor", "ultrasonic sensors", "battery management IC", "chassis frame",
+            "servo motors",
+            "encoders",
+            "motor drivers",
+            "microcontroller (ARM Cortex)",
+            "LiDAR sensor",
+            "ultrasonic sensors",
+            "battery management IC",
+            "chassis frame",
         ],
         DesignDomain.CONSUMER_ELECTRONICS: [
-            "SoC (ARM)", "NAND flash", "PMIC", "USB-C controller",
-            "display driver IC", "bluetooth module", "wifi module", "haptic motor",
+            "SoC (ARM)",
+            "NAND flash",
+            "PMIC",
+            "USB-C controller",
+            "display driver IC",
+            "bluetooth module",
+            "wifi module",
+            "haptic motor",
         ],
         DesignDomain.IOT: [
-            "ESP32 MCU", "LoRa module", "MQTT gateway", "temperature sensor",
-            "humidity sensor", "accelerometer", "LiPo battery", "antenna",
+            "ESP32 MCU",
+            "LoRa module",
+            "MQTT gateway",
+            "temperature sensor",
+            "humidity sensor",
+            "accelerometer",
+            "LiPo battery",
+            "antenna",
         ],
         DesignDomain.WEARABLES: [
-            "low-power MCU", "PPG sensor", "accelerometer/gyroscope IMU",
-            "BLE 5.0 module", "flexible PCB", "OLED display", "wireless charging IC",
+            "low-power MCU",
+            "PPG sensor",
+            "accelerometer/gyroscope IMU",
+            "BLE 5.0 module",
+            "flexible PCB",
+            "OLED display",
+            "wireless charging IC",
         ],
         DesignDomain.INDUSTRIAL: [
-            "PLC controller", "Modbus RTU module", "heavy-duty servo",
-            "industrial Ethernet switch", "HMI panel", "RFID reader", "vibration sensor",
+            "PLC controller",
+            "Modbus RTU module",
+            "heavy-duty servo",
+            "industrial Ethernet switch",
+            "HMI panel",
+            "RFID reader",
+            "vibration sensor",
         ],
         DesignDomain.MEDICAL_DEVICES: [
-            "medical-grade MCU", "ECG analog front-end", "SpO2 sensor",
-            "secure BLE module", "rechargeable battery", "biocompatible enclosure",
+            "medical-grade MCU",
+            "ECG analog front-end",
+            "SpO2 sensor",
+            "secure BLE module",
+            "rechargeable battery",
+            "biocompatible enclosure",
         ],
         DesignDomain.AUTOMOTIVE: [
-            "automotive MCU (ISO 26262)", "CAN bus transceiver", "radar sensor",
-            "camera module", "LiDAR unit", "12V power regulator", "OBD-II interface",
+            "automotive MCU (ISO 26262)",
+            "CAN bus transceiver",
+            "radar sensor",
+            "camera module",
+            "LiDAR unit",
+            "12V power regulator",
+            "OBD-II interface",
         ],
         DesignDomain.AEROSPACE: [
-            "radiation-hardened MCU", "GPS/IMU module", "RF transceiver",
-            "high-reliability connector", "thermal management module", "FPGA",
+            "radiation-hardened MCU",
+            "GPS/IMU module",
+            "RF transceiver",
+            "high-reliability connector",
+            "thermal management module",
+            "FPGA",
         ],
     }
 
@@ -153,7 +194,9 @@ class DesignBot:
         self._sessions[session_id] = session
         return session
 
-    def iterate(self, session_id: str, new_requirements: list) -> Optional[DesignSession]:
+    def iterate(
+        self, session_id: str, new_requirements: list
+    ) -> Optional[DesignSession]:
         """Add requirements and refresh suggestions for a session."""
         session = self._sessions.get(session_id)
         if not session:
@@ -172,6 +215,7 @@ class DesignBot:
 # ===========================================================================
 # 2. Financial Projection Bot
 # ===========================================================================
+
 
 @dataclass
 class HardwareCostBreakdown:
@@ -192,7 +236,9 @@ class HardwareCostBreakdown:
 
     @property
     def total_investment_usd(self) -> float:
-        return round(self.tooling_cost_usd + self.certification_cost_usd + self.total_cogs_usd, 2)
+        return round(
+            self.tooling_cost_usd + self.certification_cost_usd + self.total_cogs_usd, 2
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -292,6 +338,7 @@ class FinancialProjectionBot:
 # ===========================================================================
 # 3. Manufacturing Simulator
 # ===========================================================================
+
 
 class ManufacturingMethod(Enum):
     PCB_ASSEMBLY = "pcb_assembly"
@@ -396,7 +443,9 @@ class ManufacturingSimulator:
         volume_factor = max(0.5, 1.0 - (units / 100_000) * 0.3)
         labor_cost_per_unit = (unit_time / 60) * labor_rate_per_hour_usd * volume_factor
         cost_per_unit = round(
-            (base_cost + material_cost_per_unit_usd + labor_cost_per_unit) * volume_factor, 4
+            (base_cost + material_cost_per_unit_usd + labor_cost_per_unit)
+            * volume_factor,
+            4,
         )
         # Account for yield loss
         effective_cost = round(cost_per_unit / (yield_pct / 100), 4)
@@ -406,9 +455,13 @@ class ManufacturingSimulator:
         if units < 100:
             notes.append("Low volume — consider 3D printing for prototyping phase.")
         if units > 10_000:
-            notes.append("High volume — negotiate tooling amortisation with manufacturer.")
+            notes.append(
+                "High volume — negotiate tooling amortisation with manufacturer."
+            )
         if yield_pct < 97:
-            notes.append("Yield below 97% — invest in automated optical inspection (AOI).")
+            notes.append(
+                "Yield below 97% — invest in automated optical inspection (AOI)."
+            )
 
         return SimulationResult(
             method=method,
@@ -439,6 +492,7 @@ class ManufacturingSimulator:
 # ===========================================================================
 # 4. Patent Support AI
 # ===========================================================================
+
 
 class PatentType(Enum):
     UTILITY = "utility"
@@ -555,7 +609,8 @@ class PatentSupportAI:
             return []
         # Simulated prior-art references based on keywords
         references = [
-            f"US{10_000_000 + i}: Method and apparatus for {kw}" for i, kw in enumerate(keywords)
+            f"US{10_000_000 + i}: Method and apparatus for {kw}"
+            for i, kw in enumerate(keywords)
         ]
         dossier.prior_art_references = references
         dossier.status = PatentStatus.PRIOR_ART_SEARCH
@@ -566,9 +621,15 @@ class PatentSupportAI:
         dossier = self._dossiers.get(dossier_id)
         if not dossier:
             return []
-        claims = [f"Claim 1: A system comprising {invention_elements[0]}."] if invention_elements else []
+        claims = (
+            [f"Claim 1: A system comprising {invention_elements[0]}."]
+            if invention_elements
+            else []
+        )
         for i, element in enumerate(invention_elements[1:], start=2):
-            claims.append(f"Claim {i}: The system of claim 1, further comprising {element}.")
+            claims.append(
+                f"Claim {i}: The system of claim 1, further comprising {element}."
+            )
         dossier.claims = claims
         dossier.status = PatentStatus.CLAIMS_DRAFTED
         return claims
@@ -586,6 +647,7 @@ class PatentSupportAI:
 # ===========================================================================
 # Inventor Toolkit — aggregator
 # ===========================================================================
+
 
 class InventorToolkit:
     """

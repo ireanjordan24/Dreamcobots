@@ -2,9 +2,9 @@
 Tests for bots/sales_bot/ — SMSBot, FollowUpBot, ConversionTracker, and SalesBot.
 """
 
-import sys
-import os
 import json
+import os
+import sys
 import tempfile
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -12,35 +12,31 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.sales_bot.conversion_tracker import ConversionTracker, LeadStatus
+from bots.sales_bot.followup_bot import FollowUpBot
+from bots.sales_bot.sales_bot import SalesBot, SalesBotError, SalesBotTierError
+from bots.sales_bot.sms_bot import (
+    DEFAULT_SMS_TEMPLATE,
+    IRRESISTIBLE_OFFER_TEMPLATE,
+    SMSBot,
+)
 from bots.sales_bot.tiers import (
+    FEATURE_CONVERSION_TRACKING,
+    FEATURE_FOLLOWUP_BOT,
+    FEATURE_REVENUE_TRACKING,
+    FEATURE_SMS_OUTREACH,
+    FEATURE_VOICE_BOT,
     Tier,
     TierConfig,
     get_tier_config,
-    list_tiers,
     get_upgrade_path,
-    FEATURE_SMS_OUTREACH,
-    FEATURE_FOLLOWUP_BOT,
-    FEATURE_CONVERSION_TRACKING,
-    FEATURE_VOICE_BOT,
-    FEATURE_REVENUE_TRACKING,
+    list_tiers,
 )
-from bots.sales_bot.sms_bot import (
-    SMSBot,
-    DEFAULT_SMS_TEMPLATE,
-    IRRESISTIBLE_OFFER_TEMPLATE,
-)
-from bots.sales_bot.followup_bot import FollowUpBot
-from bots.sales_bot.conversion_tracker import ConversionTracker, LeadStatus
-from bots.sales_bot.sales_bot import (
-    SalesBot,
-    SalesBotError,
-    SalesBotTierError,
-)
-
 
 # ---------------------------------------------------------------------------
 # Framework compliance
 # ---------------------------------------------------------------------------
+
 
 class TestFrameworkCompliance:
     def test_sms_bot_has_framework_marker(self):
@@ -71,6 +67,7 @@ class TestFrameworkCompliance:
 # ---------------------------------------------------------------------------
 # Tiers
 # ---------------------------------------------------------------------------
+
 
 class TestSalesBotTiers:
     def test_three_tiers_exist(self):
@@ -121,6 +118,7 @@ class TestSalesBotTiers:
 # ---------------------------------------------------------------------------
 # SMS Bot
 # ---------------------------------------------------------------------------
+
 
 class TestSMSBot:
     def test_build_message_uses_name(self):
@@ -183,11 +181,10 @@ class TestSMSBot:
 # Follow-Up Bot
 # ---------------------------------------------------------------------------
 
+
 class TestFollowUpBot:
     def _make_leads_file(self, leads: list) -> str:
-        f = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        )
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
         json.dump(leads, f)
         f.close()
         return f.name
@@ -240,6 +237,7 @@ class TestFollowUpBot:
 # ---------------------------------------------------------------------------
 # Conversion Tracker
 # ---------------------------------------------------------------------------
+
 
 class TestConversionTracker:
     def test_add_lead(self):
@@ -330,6 +328,7 @@ class TestConversionTracker:
 # ---------------------------------------------------------------------------
 # Sales Bot
 # ---------------------------------------------------------------------------
+
 
 class TestSalesBot:
     def test_run_daily_cycle_free_tier(self):

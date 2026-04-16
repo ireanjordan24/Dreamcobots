@@ -2,24 +2,39 @@
 Tier configuration for the Dreamcobots Coding Assistant Bot.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import (
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # Bot-specific features per tier
 CODING_ASSISTANT_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: ["3 languages", "basic completion", "bug detection"],
-    Tier.PRO.value: ["20 languages", "advanced completion", "refactoring", "unit test generation", "code review"],
-    Tier.ENTERPRISE.value: ["all languages", "custom model training", "team analytics", "IDE plugins", "priority support"],
+    Tier.PRO.value: [
+        "20 languages",
+        "advanced completion",
+        "refactoring",
+        "unit test generation",
+        "code review",
+    ],
+    Tier.ENTERPRISE.value: [
+        "all languages",
+        "custom model training",
+        "team analytics",
+        "IDE plugins",
+        "priority support",
+    ],
 }
 
 

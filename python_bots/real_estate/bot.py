@@ -7,8 +7,8 @@ shared event bus so downstream bots (analyser, outreach, payment) can act.
 
 from __future__ import annotations
 
-from python_bots.base_bot import BaseBot
 from event_bus.base_bus import BaseEventBus
+from python_bots.base_bot import BaseBot
 
 
 class RealEstateBot(BaseBot):

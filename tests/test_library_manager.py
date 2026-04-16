@@ -1,7 +1,8 @@
 """Tests for LibraryManager."""
 
 import pytest
-from BuddyAI.library_manager import LibraryManager, LibraryInstallError
+
+from BuddyAI.library_manager import LibraryInstallError, LibraryManager
 
 
 @pytest.fixture
@@ -21,6 +22,7 @@ def test_is_available_nonexistent(manager):
 def test_load_library_stdlib(manager):
     mod = manager.load_library("os")
     import os
+
     assert mod is os
 
 
@@ -50,5 +52,6 @@ def test_validate_disallowed_characters(manager):
 
 def test_ensure_library_stdlib(manager):
     import json
+
     mod = manager.ensure_library("json")
     assert mod is json

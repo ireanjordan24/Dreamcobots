@@ -29,8 +29,8 @@ import os
 import re
 from typing import Any, Dict
 
-from core.dreamco_orchestrator import DreamCoOrchestrator
 from core.bot_validator import BotValidator
+from core.dreamco_orchestrator import DreamCoOrchestrator
 from core.sandbox_runner import SandboxRunner
 from saas.auth.auth import AuthService, UserRegistry
 from saas.auth.middleware import AuthMiddleware, RateLimiter
@@ -77,7 +77,7 @@ os.makedirs(_ABS_UPLOAD_FOLDER, exist_ok=True)
 _user_bots: Dict[str, list] = {}
 
 # Allowed user-id character set (hex after 'usr_' prefix)
-_USER_ID_RE = re.compile(r'^usr_[0-9a-f]{16}$')
+_USER_ID_RE = re.compile(r"^usr_[0-9a-f]{16}$")
 
 
 def authenticate(api_key: str) -> bool:
@@ -123,7 +123,11 @@ class DreamCoSaaSApp:
     def handle_run_single(self, api_key: str, bot_path: str, bot_name: str) -> tuple:
         if not authenticate(api_key):
             return {"error": "Unauthorized"}, 401
-        result = self._orch.run_bot(bot_path, bot_name) if hasattr(self._orch, "run_bot") else {}
+        result = (
+            self._orch.run_bot(bot_path, bot_name)
+            if hasattr(self._orch, "run_bot")
+            else {}
+        )
         return {"result": result}, 200
 
     def handle_summary(self, api_key: str) -> tuple:
@@ -166,7 +170,7 @@ def _safe_filename(raw_name: str) -> str | None:
     if not base.endswith(".py"):
         return None
     stem = base[:-3]
-    if not re.match(r'^[a-zA-Z0-9_\-]+$', stem):
+    if not re.match(r"^[a-zA-Z0-9_\-]+$", stem):
         return None
     return base
 
@@ -197,7 +201,7 @@ def _sanitise_bot_result(result: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 try:
-    from flask import Flask, request, jsonify  # type: ignore[import]
+    from flask import Flask, jsonify, request  # type: ignore[import]
 
     app = Flask(__name__)
 
@@ -223,7 +227,16 @@ try:
         )
         if not result.get("success"):
             return jsonify({"error": result.get("error", "signup failed")}), 400
-        return jsonify({"success": True, "user_id": result["user_id"], "token": result["token"]}), 201
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "user_id": result["user_id"],
+                    "token": result["token"],
+                }
+            ),
+            201,
+        )
 
     @app.route("/auth/login", methods=["POST"])
     def login() -> Any:
@@ -234,12 +247,14 @@ try:
         )
         if not result.get("success"):
             return jsonify({"error": "invalid credentials"}), 401
-        return jsonify({
-            "success": True,
-            "user_id": result["user_id"],
-            "token": result["token"],
-            "tier": result["tier"],
-        })
+        return jsonify(
+            {
+                "success": True,
+                "user_id": result["user_id"],
+                "token": result["token"],
+                "tier": result["tier"],
+            }
+        )
 
     # ------------------------------------------------------------------ #
     #  Bot execution                                                       #
@@ -308,7 +323,14 @@ try:
         file = request.files["file"]
         safe_name = _safe_filename(file.filename or "")
         if not safe_name:
-            return jsonify({"error": "invalid filename; only alphanumeric .py files are accepted"}), 400
+            return (
+                jsonify(
+                    {
+                        "error": "invalid filename; only alphanumeric .py files are accepted"
+                    }
+                ),
+                400,
+            )
 
         user_dir = _safe_user_dir(user.user_id)
         if not user_dir:
@@ -338,11 +360,13 @@ try:
             {"filename": safe_name, "status": "approved"}
         )
 
-        return jsonify({
-            "status": "approved",
-            "filename": safe_name,
-            "sandbox_success": run_result.get("success", False),
-        })
+        return jsonify(
+            {
+                "status": "approved",
+                "filename": safe_name,
+                "sandbox_success": run_result.get("success", False),
+            }
+        )
 
     @app.route("/bots/list", methods=["GET"])
     def list_bots() -> Any:
@@ -363,12 +387,14 @@ try:
             return jsonify({"error": "Unauthorized"}), 401
 
         quota = _auth_svc.check_quota(user.user_id)
-        return jsonify({
-            "user_id": user.user_id,
-            "tier": user.tier.value,
-            "quota": quota,
-            "bots_uploaded": len(_user_bots.get(user.user_id, [])),
-        })
+        return jsonify(
+            {
+                "user_id": user.user_id,
+                "tier": user.tier.value,
+                "quota": quota,
+                "bots_uploaded": len(_user_bots.get(user.user_id, [])),
+            }
+        )
 
     @app.route("/revenue", methods=["GET"])
     def revenue() -> Any:
@@ -396,7 +422,10 @@ try:
         data: Dict[str, Any] = request.get_json(silent=True) or {}
         tier = data.get("tier", "")
         if tier not in ("free", "pro", "enterprise"):
-            return jsonify({"error": "invalid tier; choose free, pro, or enterprise"}), 400
+            return (
+                jsonify({"error": "invalid tier; choose free, pro, or enterprise"}),
+                400,
+            )
 
         cust_result = _billing.create_customer(user.user_id, user.email)
         if not cust_result.get("success"):
@@ -413,11 +442,13 @@ try:
             return jsonify({"error": "subscription creation failed"}), 500
 
         _auth_svc.upgrade_tier(user.user_id, SubscriptionTier(tier))
-        return jsonify({
-            "success": True,
-            "tier": tier,
-            "subscription_id": sub_result.get("subscription_id"),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "tier": tier,
+                "subscription_id": sub_result.get("subscription_id"),
+            }
+        )
 
     @app.route("/billing/status", methods=["GET"])
     def billing_status() -> Any:
@@ -425,11 +456,13 @@ try:
         if err:
             return jsonify({"error": "Unauthorized"}), 401
 
-        return jsonify({
-            "user_id": user.user_id,
-            "tier": user.tier.value,
-            "revenue_summary": _billing.revenue_summary(),
-        })
+        return jsonify(
+            {
+                "user_id": user.user_id,
+                "tier": user.tier.value,
+                "revenue_summary": _billing.revenue_summary(),
+            }
+        )
 
     # Legacy endpoints (backwards compatible)
     @app.route("/run-bots", methods=["POST"])
@@ -439,7 +472,9 @@ try:
             return jsonify({"error": "Unauthorized"}), 401
         results = _orch.run_all_bots()
         summary = _orch.summary(results)
-        return jsonify({"results": [_sanitise_bot_result(r) for r in results], "summary": summary})
+        return jsonify(
+            {"results": [_sanitise_bot_result(r) for r in results], "summary": summary}
+        )
 
     @app.route("/run-single", methods=["POST"])
     def run_single_legacy() -> Any:

@@ -5,15 +5,24 @@ Central hub to manage, extend, and monetize AI capabilities with plugins,
 subscriptions, skill packs, and industry verticals.
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
-from framework import GlobalAISourcesFlow
-from bots.ai_marketplace.tiers import Tier, get_tier_config, FEATURE_PLUGIN_INSTALL, FEATURE_ALERTS, FEATURE_ANALYTICS, FEATURE_CUSTOM_PLUGINS
-from bots.ai_marketplace.plugins import PluginRegistry, PluginCategory
-from bots.ai_marketplace.subscriptions import SubscriptionManager, SubscriptionPlan
+
+from bots.ai_marketplace.plugins import PluginCategory, PluginRegistry
 from bots.ai_marketplace.skill_packs import SkillPackRegistry
+from bots.ai_marketplace.subscriptions import SubscriptionManager, SubscriptionPlan
+from bots.ai_marketplace.tiers import (
+    FEATURE_ALERTS,
+    FEATURE_ANALYTICS,
+    FEATURE_CUSTOM_PLUGINS,
+    FEATURE_PLUGIN_INSTALL,
+    Tier,
+    get_tier_config,
+)
+from framework import GlobalAISourcesFlow
 
 
 class AIMarketplaceError(Exception):
     """Base error for AI Marketplace."""
+
 
 class AIMarketplaceTierError(AIMarketplaceError):
     """Raised when a feature requires a higher tier."""
@@ -65,7 +74,10 @@ class AIMarketplace:
         self._installed.remove(plugin_id)
 
     def get_installed_plugins(self) -> list:
-        return [self._plugin_to_dict(self._registry.get_plugin(pid)) for pid in self._installed]
+        return [
+            self._plugin_to_dict(self._registry.get_plugin(pid))
+            for pid in self._installed
+        ]
 
     def search_plugins(self, query: str) -> list:
         results = self._registry.search_plugins(query)

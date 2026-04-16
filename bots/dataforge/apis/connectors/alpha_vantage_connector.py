@@ -1,4 +1,5 @@
 """Alpha Vantage financial data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,6 +28,7 @@ class AlphaVantageConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"function": "GLOBAL_QUOTE", "symbol": symbol, "apikey": self.api_key}
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
@@ -47,7 +49,12 @@ class AlphaVantageConnector:
             API response dict or error dict.
         """
         import requests
-        params = {"function": "TIME_SERIES_DAILY", "symbol": symbol, "apikey": self.api_key}
+
+        params = {
+            "function": "TIME_SERIES_DAILY",
+            "symbol": symbol,
+            "apikey": self.api_key,
+        }
         try:
             response = requests.get(self.BASE_URL, params=params, timeout=30)
             response.raise_for_status()
@@ -55,4 +62,3 @@ class AlphaVantageConnector:
         except requests.RequestException as e:
             logger.error("Alpha Vantage get_daily error: %s", e)
             return {"status": "error", "message": str(e)}
-

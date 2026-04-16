@@ -46,6 +46,7 @@ def _slugify(name: str) -> str:
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class OutreachChannel(Enum):
     EMAIL = "email"
     SMS = "sms"
@@ -69,6 +70,7 @@ class ConversionStage(Enum):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Proposal:
@@ -124,7 +126,9 @@ class ConversionRecord:
             "record_id": self.record_id,
             "business_name": self.business_name,
             "current_stage": self.current_stage.value,
-            "proposals": [p.to_dict() if hasattr(p, "to_dict") else p for p in self.proposals],
+            "proposals": [
+                p.to_dict() if hasattr(p, "to_dict") else p for p in self.proposals
+            ],
             "follow_up_count": self.follow_up_count,
             "objections": self.objections,
             "booking_slot": self.booking_slot,
@@ -135,6 +139,7 @@ class ConversionRecord:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class ConversionEngineError(Exception):
     """Base exception for ConversionEngine errors."""
@@ -185,6 +190,7 @@ _OBJECTION_RESPONSES: dict[str, str] = {
 # ---------------------------------------------------------------------------
 # ConversionEngine
 # ---------------------------------------------------------------------------
+
 
 class ConversionEngine:
     """AI-assisted pipeline for converting leads into clients.
@@ -264,9 +270,7 @@ class ConversionEngine:
             The generated proposal object.
         """
         if channel == OutreachChannel.SMS and not self.can_sms:
-            raise ConversionEngineTierError(
-                "SMS outreach requires ENTERPRISE tier."
-            )
+            raise ConversionEngineTierError("SMS outreach requires ENTERPRISE tier.")
 
         self._proposal_counter += 1
         deliverables_list = "\n".join(f"  ✓ {d}" for d in deliverables)
@@ -369,7 +373,11 @@ class ConversionEngine:
         if is_follow_up and proposal.business_name in self._records:
             rec = self._records[proposal.business_name]
             rec.follow_up_count += 1
-            stage = ConversionStage.FOLLOW_UP_1 if rec.follow_up_count == 1 else ConversionStage.FOLLOW_UP_2
+            stage = (
+                ConversionStage.FOLLOW_UP_1
+                if rec.follow_up_count == 1
+                else ConversionStage.FOLLOW_UP_2
+            )
             rec.current_stage = stage
 
         return {
@@ -405,7 +413,9 @@ class ConversionEngine:
                 break
 
         if business_name in self._records:
-            self._records[business_name].current_stage = ConversionStage.OBJECTION_HANDLED
+            self._records[business_name].current_stage = (
+                ConversionStage.OBJECTION_HANDLED
+            )
             self._records[business_name].objections.append(objection_text)
 
         return response
@@ -503,8 +513,7 @@ class ConversionEngine:
     def get_won_count(self) -> int:
         """Return number of won deals."""
         return sum(
-            1 for r in self._records.values()
-            if r.current_stage == ConversionStage.WON
+            1 for r in self._records.values() if r.current_stage == ConversionStage.WON
         )
 
     def reset_daily_sends(self) -> None:

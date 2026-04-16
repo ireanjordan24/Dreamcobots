@@ -1,11 +1,14 @@
 """Buddy Bot - Central AI assistant that orchestrates all DreamCobots bots."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from datetime import datetime
+
 from core.base_bot import BaseBot
 
 

@@ -22,11 +22,10 @@ Usage
 
 from __future__ import annotations
 
-import sqlite3
 import json
+import sqlite3
 from datetime import datetime, timezone
 from typing import Optional
-
 
 # ---------------------------------------------------------------------------
 # Schema
@@ -152,9 +151,7 @@ class BotPerformanceDB:
 
             # Efficiency: tasks completed vs errors, normalised 0–100
             run_efficiency = max(0.0, min(100.0, (tasks * 10) - (errors * 5)))
-            efficiency_score = round(
-                (old_efficiency * (n - 1) + run_efficiency) / n, 2
-            )
+            efficiency_score = round((old_efficiency * (n - 1) + run_efficiency) / n, 2)
 
             # ROI: revenue contribution, normalised 0–100 (cap at $500/run = 100)
             run_roi = min(100.0, (revenue / 500.0) * 100.0)
@@ -202,7 +199,9 @@ class BotPerformanceDB:
             resp_ms = kpis.get("response_time_ms", 0.0)
             failed = 1 if status == "error" else 0
 
-            efficiency_score = round(max(0.0, min(100.0, (tasks * 10) - (errors * 5))), 2)
+            efficiency_score = round(
+                max(0.0, min(100.0, (tasks * 10) - (errors * 5))), 2
+            )
             roi_score = round(min(100.0, (revenue / 500.0) * 100.0), 2)
             reliability_score = 0.0 if status == "error" else 100.0
             speed_score = max(0.0, min(100.0, 100.0 - (resp_ms / 50.0)))
@@ -280,8 +279,7 @@ class BotPerformanceDB:
         list of dict
         """
         rows = self._conn.execute(
-            "SELECT * FROM bot_runs WHERE bot_name = ? "
-            "ORDER BY id DESC LIMIT ?",
+            "SELECT * FROM bot_runs WHERE bot_name = ? " "ORDER BY id DESC LIMIT ?",
             (bot_name, limit),
         ).fetchall()
         result = []
@@ -332,15 +330,17 @@ class BotPerformanceDB:
 
     def get_stats(self) -> dict:
         """Return aggregate statistics across all tracked bots."""
-        total_bots = self._conn.execute(
-            "SELECT COUNT(*) FROM bot_scores"
-        ).fetchone()[0]
-        total_runs = self._conn.execute(
-            "SELECT SUM(total_runs) FROM bot_scores"
-        ).fetchone()[0] or 0
-        avg_composite = self._conn.execute(
-            "SELECT AVG(composite_score) FROM bot_scores"
-        ).fetchone()[0] or 0.0
+        total_bots = self._conn.execute("SELECT COUNT(*) FROM bot_scores").fetchone()[0]
+        total_runs = (
+            self._conn.execute("SELECT SUM(total_runs) FROM bot_scores").fetchone()[0]
+            or 0
+        )
+        avg_composite = (
+            self._conn.execute(
+                "SELECT AVG(composite_score) FROM bot_scores"
+            ).fetchone()[0]
+            or 0.0
+        )
         underperformers = self._conn.execute(
             "SELECT COUNT(*) FROM bot_scores WHERE composite_score < 30"
         ).fetchone()[0]

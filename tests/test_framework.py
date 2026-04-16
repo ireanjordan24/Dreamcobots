@@ -2,8 +2,9 @@
 Tests for the DreamCObots framework and bot implementations.
 """
 
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -13,9 +14,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 # Framework unit tests
 # ---------------------------------------------------------------------------
 
+
 class TestNLPEngine:
     def setup_method(self):
         from framework.nlp_engine import NLPEngine
+
         self.nlp = NLPEngine()
 
     def test_tokenize(self):
@@ -73,6 +76,7 @@ class TestNLPEngine:
 class TestAdaptiveLearning:
     def setup_method(self):
         from framework.adaptive_learning import AdaptiveLearning
+
         self.al = AdaptiveLearning("test-bot")
 
     def test_record_interaction(self):
@@ -81,7 +85,9 @@ class TestAdaptiveLearning:
 
     def test_top_intents(self):
         for _ in range(3):
-            self.al.record_interaction("u1", "job", "job_search", "neutral", 0.0, "Searching")
+            self.al.record_interaction(
+                "u1", "job", "job_search", "neutral", 0.0, "Searching"
+            )
         self.al.record_interaction("u1", "hi", "greeting", "positive", 0.5, "Hi")
         top = self.al.top_intents(n=1)
         assert top[0] == "job_search"
@@ -116,6 +122,7 @@ class TestAdaptiveLearning:
         filepath = str(tmp_path / "al_state.json")
         self.al.save(filepath)
         from framework.adaptive_learning import AdaptiveLearning
+
         loaded = AdaptiveLearning.load(filepath)
         assert loaded.bot_id == "test-bot"
         assert loaded._intent_freq["greeting"] == 1
@@ -124,6 +131,7 @@ class TestAdaptiveLearning:
 class TestDatasetManager:
     def setup_method(self):
         from framework.dataset_manager import DatasetManager
+
         self.mgr = DatasetManager(owner_bot_id="test-bot")
 
     def _add_dataset(self, name="Test Dataset", ethical=True):
@@ -178,23 +186,32 @@ class TestDatasetManager:
 
 class TestMonetizationManager:
     def setup_method(self):
-        from framework.monetization import MonetizationManager, PricingPlan, PricingModel
+        from framework.monetization import (
+            MonetizationManager,
+            PricingModel,
+            PricingPlan,
+        )
+
         self.mm = MonetizationManager(bot_id="test-bot")
-        self.mm.add_plan(PricingPlan(
-            plan_id="basic",
-            name="Basic",
-            model=PricingModel.SUBSCRIPTION,
-            price_usd=9.99,
-            description="Basic plan",
-        ))
-        self.mm.add_plan(PricingPlan(
-            plan_id="freemium",
-            name="Freemium",
-            model=PricingModel.FREEMIUM,
-            price_usd=9.99,
-            description="Freemium plan",
-            free_tier_limit=3,
-        ))
+        self.mm.add_plan(
+            PricingPlan(
+                plan_id="basic",
+                name="Basic",
+                model=PricingModel.SUBSCRIPTION,
+                price_usd=9.99,
+                description="Basic plan",
+            )
+        )
+        self.mm.add_plan(
+            PricingPlan(
+                plan_id="freemium",
+                name="Freemium",
+                model=PricingModel.FREEMIUM,
+                price_usd=9.99,
+                description="Freemium plan",
+                free_tier_limit=3,
+            )
+        )
 
     def test_charge_subscription(self):
         tx = self.mm.charge("user-1", "basic")
@@ -232,9 +249,11 @@ class TestMonetizationManager:
 # Bot integration tests
 # ---------------------------------------------------------------------------
 
+
 class TestJobSearchBot:
     def setup_method(self):
         from Occupational_bots.feature_1 import JobSearchBot
+
         self.bot = JobSearchBot()
 
     def test_chat_greeting(self):
@@ -267,6 +286,7 @@ class TestJobSearchBot:
 class TestInterviewPrepBot:
     def setup_method(self):
         from Occupational_bots.feature_3 import InterviewPrepBot
+
         self.bot = InterviewPrepBot()
 
     def test_interview_question_cycle(self):
@@ -284,6 +304,7 @@ class TestInterviewPrepBot:
 class TestInvoicingBot:
     def setup_method(self):
         from Business_bots.feature_3 import InvoicingBot
+
         self.bot = InvoicingBot()
 
     def test_invoice_number_increments(self):
@@ -296,6 +317,7 @@ class TestInvoicingBot:
 class TestCustomerFeedbackBot:
     def setup_method(self):
         from Marketing_bots.feature_3 import CustomerFeedbackBot
+
         self.bot = CustomerFeedbackBot()
 
     def test_positive_feedback_recorded(self):
@@ -312,9 +334,9 @@ class TestCustomerFeedbackBot:
 class TestBuddyAI:
     def setup_method(self):
         from BuddyAI.buddy_ai import BuddyAI
-        from Occupational_bots.feature_1 import JobSearchBot
         from Business_bots.feature_1 import MeetingSchedulerBot
         from Marketing_bots.feature_1 import SocialMediaBot
+        from Occupational_bots.feature_1 import JobSearchBot
         from Side_Hustle_bots.feature_1 import ContentCreatorBot
 
         self.buddy = BuddyAI()
@@ -353,6 +375,7 @@ class TestBuddyAI:
 
     def test_no_bots_registered(self):
         from BuddyAI.buddy_ai import BuddyAI
+
         empty = BuddyAI()
         response = empty.chat("Hello")
         assert "No bots" in response
@@ -372,6 +395,7 @@ class TestBuddyAI:
 class TestBaseBot:
     def setup_method(self):
         from Occupational_bots.feature_1 import JobSearchBot
+
         self.bot = JobSearchBot()
 
     def test_emotional_state_updates(self):

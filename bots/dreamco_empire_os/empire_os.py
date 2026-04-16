@@ -41,69 +41,69 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from datetime import datetime, timezone
+
+from bots.dreamco_empire_os.ai_leaders import AILeaders, LeaderRole, LeaderStatus
+from bots.dreamco_empire_os.bot_fleet import BotFleet, BotSpeed, BotStatus
+from bots.dreamco_empire_os.cost_tracking import CostCategory, CostTracking
+from bots.dreamco_empire_os.deal_analyzer import DealAnalyzer, DealType, RiskLevel
+from bots.dreamco_empire_os.empire_hq import EmpireHQ
+from bots.dreamco_empire_os.formula_vault import FormulaCategory, FormulaVault
+from bots.dreamco_empire_os.learning_matrix import LearningDomain, LearningMatrix
+from bots.dreamco_empire_os.marketplace import ListingCategory, Marketplace
+from bots.dreamco_empire_os.modules import (
+    AIEcosystem,
+    AIModelsHub,
+    AutonomyControl,
+    AutonomyMode,
+    BizLaunch,
+    CodeLab,
+    Connections,
+    CryptoTracker,
+    DebugIntel,
+    DebugLevel,
+    Divisions,
+    LoansDeals,
+    PaymentsHub,
+    PricingEngine,
+    TimeCapsule,
+)
+from bots.dreamco_empire_os.orchestration import Orchestration
+from bots.dreamco_empire_os.revenue_tracker import RevenueTracker
 from bots.dreamco_empire_os.tiers import (
+    FEATURE_AI_ECOSYSTEM,
+    FEATURE_AI_LEADERS,
+    FEATURE_AI_MODELS_HUB,
+    FEATURE_AUTONOMY,
+    FEATURE_BIZ_LAUNCH,
+    FEATURE_BOT_FLEET,
+    FEATURE_CODE_LAB,
+    FEATURE_CONNECTIONS,
+    FEATURE_COST_TRACKING,
+    FEATURE_CRYPTO,
+    FEATURE_DEAL_ANALYZER,
+    FEATURE_DEBUG_INTEL,
+    FEATURE_DIVISIONS,
+    FEATURE_EMPIRE_HQ,
+    FEATURE_FORMULA_VAULT,
+    FEATURE_LEARNING_MATRIX,
+    FEATURE_LOANS_DEALS,
+    FEATURE_MARKETPLACE,
+    FEATURE_ORCHESTRATION,
+    FEATURE_PAYMENTS,
+    FEATURE_PRICING,
+    FEATURE_REVENUE,
+    FEATURE_TIME_CAPSULE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_EMPIRE_HQ,
-    FEATURE_DIVISIONS,
-    FEATURE_BOT_FLEET,
-    FEATURE_DEAL_ANALYZER,
-    FEATURE_FORMULA_VAULT,
-    FEATURE_LEARNING_MATRIX,
-    FEATURE_AI_LEADERS,
-    FEATURE_AI_MODELS_HUB,
-    FEATURE_AI_ECOSYSTEM,
-    FEATURE_ORCHESTRATION,
-    FEATURE_MARKETPLACE,
-    FEATURE_CRYPTO,
-    FEATURE_PAYMENTS,
-    FEATURE_BIZ_LAUNCH,
-    FEATURE_CODE_LAB,
-    FEATURE_LOANS_DEALS,
-    FEATURE_DEBUG_INTEL,
-    FEATURE_REVENUE,
-    FEATURE_PRICING,
-    FEATURE_CONNECTIONS,
-    FEATURE_TIME_CAPSULE,
-    FEATURE_COST_TRACKING,
-    FEATURE_AUTONOMY,
 )
-from bots.dreamco_empire_os.empire_hq import EmpireHQ
-from bots.dreamco_empire_os.bot_fleet import BotFleet, BotSpeed, BotStatus
-from bots.dreamco_empire_os.deal_analyzer import DealAnalyzer, DealType, RiskLevel
-from bots.dreamco_empire_os.formula_vault import FormulaVault, FormulaCategory
-from bots.dreamco_empire_os.learning_matrix import LearningMatrix, LearningDomain
-from bots.dreamco_empire_os.ai_leaders import AILeaders, LeaderRole, LeaderStatus
-from bots.dreamco_empire_os.orchestration import Orchestration
-from bots.dreamco_empire_os.marketplace import Marketplace, ListingCategory
-from bots.dreamco_empire_os.revenue_tracker import RevenueTracker
-from bots.dreamco_empire_os.cost_tracking import CostTracking, CostCategory
-from bots.dreamco_empire_os.modules import (
-    Divisions,
-    AIModelsHub,
-    AIEcosystem,
-    CryptoTracker,
-    PaymentsHub,
-    BizLaunch,
-    CodeLab,
-    LoansDeals,
-    DebugIntel,
-    DebugLevel,
-    PricingEngine,
-    Connections,
-    TimeCapsule,
-    AutonomyControl,
-    AutonomyMode,
-)
-
-from datetime import datetime, timezone
 
 
 class DreamCoEmpireOSError(Exception):
@@ -122,7 +122,9 @@ class DreamCoEmpireOS:
     to the corresponding set of modules and capabilities.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE, operator_name: str = "Empire Operator") -> None:
+    def __init__(
+        self, tier: Tier = Tier.FREE, operator_name: str = "Empire Operator"
+    ) -> None:
         self.tier = tier
         self.operator_name = operator_name
         self._config: TierConfig = get_tier_config(tier)
@@ -162,7 +164,11 @@ class DreamCoEmpireOS:
     def _require(self, feature: str) -> None:
         if not self._config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            suggestion = f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)." if upgrade else ""
+            suggestion = (
+                f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
+                if upgrade
+                else ""
+            )
             raise DreamCoTierError(
                 f"Feature '{feature}' is not available on the {self._config.name} tier.{suggestion}"
             )
@@ -250,23 +256,40 @@ class DreamCoEmpireOS:
             return {"message": "Empire OS dashboard loaded.", "data": self.dashboard()}
 
         if "fleet" in msg or "bot" in msg:
-            return {"message": "Bot fleet stats retrieved.", "data": self.bot_fleet.get_fleet_stats()}
+            return {
+                "message": "Bot fleet stats retrieved.",
+                "data": self.bot_fleet.get_fleet_stats(),
+            }
 
         if "revenue" in msg or "money" in msg or "income" in msg:
-            return {"message": "Revenue summary retrieved.", "data": self.revenue_tracker.get_summary()}
+            return {
+                "message": "Revenue summary retrieved.",
+                "data": self.revenue_tracker.get_summary(),
+            }
 
         if "deal" in msg:
-            return {"message": "Deal analyzer ready. Add deals via empire.deal_analyzer.add_deal().",
-                    "data": self.deal_analyzer.get_summary()}
+            return {
+                "message": "Deal analyzer ready. Add deals via empire.deal_analyzer.add_deal().",
+                "data": self.deal_analyzer.get_summary(),
+            }
 
         if "formula" in msg:
-            return {"message": "Formula vault ready.", "data": self.formula_vault.get_stats()}
+            return {
+                "message": "Formula vault ready.",
+                "data": self.formula_vault.get_stats(),
+            }
 
         if "learn" in msg or "lesson" in msg or "matrix" in msg:
-            return {"message": "Learning matrix ready.", "data": self.learning_matrix.get_stats()}
+            return {
+                "message": "Learning matrix ready.",
+                "data": self.learning_matrix.get_stats(),
+            }
 
         if "cost" in msg or "spend" in msg or "expense" in msg:
-            return {"message": "Cost tracking summary retrieved.", "data": self.cost_tracking.get_summary()}
+            return {
+                "message": "Cost tracking summary retrieved.",
+                "data": self.cost_tracking.get_summary(),
+            }
 
         return {
             "message": (

@@ -43,7 +43,9 @@ class ComputerVisionModelsBot:
     def select_model(self, model_name):
         """Select the active computer vision model by name."""
         if model_name not in self.SUPPORTED_MODELS:
-            print(f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}")
+            print(
+                f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}"
+            )
             return
         self.active_model = model_name
         print(f"Active CV model set to: {model_name}")
@@ -175,19 +177,27 @@ class ComputerVisionModelsBot:
             Headers: Ocp-Apim-Subscription-Key: <AZURE_CV_KEY>
         """
         visual_features = visual_features or ["Description", "Tags"]
-        print(f"[Azure Computer Vision] Image: {image_url} | Features: {visual_features}")
+        print(
+            f"[Azure Computer Vision] Image: {image_url} | Features: {visual_features}"
+        )
         return f"[Azure Computer Vision Response] Features {visual_features} for '{image_url}'"
 
     def run(self):
         self.start()
-        self.run_openai_gpt4_vision("https://example.com/product.jpg",
-                                    "List all visible product labels.")
-        self.run_google_cloud_vision("https://example.com/scene.jpg",
-                                     features=["LABEL_DETECTION", "TEXT_DETECTION"])
-        self.run_aws_rekognition("s3://my-bucket/photo.jpg", analysis_type="detect-faces")
+        self.run_openai_gpt4_vision(
+            "https://example.com/product.jpg", "List all visible product labels."
+        )
+        self.run_google_cloud_vision(
+            "https://example.com/scene.jpg",
+            features=["LABEL_DETECTION", "TEXT_DETECTION"],
+        )
+        self.run_aws_rekognition(
+            "s3://my-bucket/photo.jpg", analysis_type="detect-faces"
+        )
         self.run_meta_dino_sam("https://example.com/street.jpg", task="segment")
-        self.run_azure_computer_vision("https://example.com/car.jpg",
-                                       visual_features=["Tags", "Objects"])
+        self.run_azure_computer_vision(
+            "https://example.com/car.jpg", visual_features=["Tags", "Objects"]
+        )
 
 
 # If this module is run directly, start the bot

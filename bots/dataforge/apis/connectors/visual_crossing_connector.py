@@ -1,4 +1,5 @@
 """Visual Crossing weather data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -9,7 +10,9 @@ logger = logging.getLogger(__name__)
 class VisualCrossingConnector:
     """VisualCrossingConnector for DataForge AI."""
 
-    BASE_URL = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services"
+    BASE_URL = (
+        "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services"
+    )
 
     def __init__(self):
         """Initialize connector, reading API key from environment."""
@@ -29,6 +32,7 @@ class VisualCrossingConnector:
             API response dict or error dict.
         """
         import requests
+
         url = f"{self.BASE_URL}/timeline/{location}/{date_from}/{date_to}"
         params = {"unitGroup": "metric", "key": self.api_key, "contentType": "json"}
         try:
@@ -39,4 +43,3 @@ class VisualCrossingConnector:
         except requests.RequestException as e:
             logger.error("Visual Crossing get_weather error: %s", e)
             return {"status": "error", "message": str(e)}
-

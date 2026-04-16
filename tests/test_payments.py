@@ -1,18 +1,24 @@
 """Tests for integrations/payments.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from integrations.payments import PaymentsClient, SUBSCRIPTION_PLANS, SubscriptionRecord, PaymentRecord
 
+from integrations.payments import (
+    SUBSCRIPTION_PLANS,
+    PaymentRecord,
+    PaymentsClient,
+    SubscriptionRecord,
+)
 
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestInstantiation:
     def test_mock_when_no_api_key(self):
@@ -27,6 +33,7 @@ class TestInstantiation:
 # ---------------------------------------------------------------------------
 # create_subscription
 # ---------------------------------------------------------------------------
+
 
 class TestCreateSubscription:
     def setup_method(self):
@@ -67,6 +74,7 @@ class TestCreateSubscription:
 # cancel_subscription
 # ---------------------------------------------------------------------------
 
+
 class TestCancelSubscription:
     def test_cancel_existing_subscription(self):
         client = PaymentsClient(mock=True)
@@ -83,6 +91,7 @@ class TestCancelSubscription:
 # ---------------------------------------------------------------------------
 # create_charge
 # ---------------------------------------------------------------------------
+
 
 class TestCreateCharge:
     def test_returns_payment_record(self):
@@ -111,17 +120,23 @@ class TestCreateCharge:
 # get_revenue_summary
 # ---------------------------------------------------------------------------
 
+
 class TestRevenueSummary:
     def test_summary_keys(self):
         client = PaymentsClient(mock=True)
         summary = client.get_revenue_summary()
-        for key in ("active_subscriptions", "mrr_usd", "one_time_revenue_usd", "total_revenue_usd"):
+        for key in (
+            "active_subscriptions",
+            "mrr_usd",
+            "one_time_revenue_usd",
+            "total_revenue_usd",
+        ):
             assert key in summary
 
     def test_mrr_calculated_correctly(self):
         client = PaymentsClient(mock=True)
-        client.create_subscription("a@example.com", "PRO")   # $29/mo
-        client.create_subscription("b@example.com", "SCALE") # $99/mo
+        client.create_subscription("a@example.com", "PRO")  # $29/mo
+        client.create_subscription("b@example.com", "SCALE")  # $99/mo
         summary = client.get_revenue_summary()
         assert summary["mrr_usd"] == pytest.approx(29.0 + 99.0)
 
@@ -134,6 +149,6 @@ class TestRevenueSummary:
     def test_total_revenue_sum(self):
         client = PaymentsClient(mock=True)
         client.create_subscription("a@example.com", "PRO")  # $29
-        client.create_charge("b@example.com", 1000)          # $10
+        client.create_charge("b@example.com", 1000)  # $10
         summary = client.get_revenue_summary()
         assert summary["total_revenue_usd"] == pytest.approx(39.0)

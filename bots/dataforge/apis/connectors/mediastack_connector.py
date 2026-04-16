@@ -1,4 +1,5 @@
 """MediaStack news API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,6 +29,7 @@ class MediaStackConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"access_key": self.api_key, "languages": languages}
         if keywords:
             params["keywords"] = keywords
@@ -47,12 +49,14 @@ class MediaStackConnector:
             API response dict with sources or error dict.
         """
         import requests
+
         params = {"access_key": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/sources", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/sources", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("MediaStack get_sources error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -12,16 +12,16 @@ Revenue is tracked per bot and can be queried at any time.
 
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
 
 class PricingModel(str, Enum):
-    SUBSCRIPTION  = "subscription"
-    PAY_PER_USE   = "pay_per_use"
-    ONE_TIME      = "one_time"
-    FREEMIUM      = "freemium"
+    SUBSCRIPTION = "subscription"
+    PAY_PER_USE = "pay_per_use"
+    ONE_TIME = "one_time"
+    FREEMIUM = "freemium"
 
 
 @dataclass
@@ -32,7 +32,7 @@ class PricingPlan:
     price_usd: float
     description: str
     features: List[str] = field(default_factory=list)
-    free_tier_limit: Optional[int] = None    # for freemium: number of free uses
+    free_tier_limit: Optional[int] = None  # for freemium: number of free uses
 
 
 @dataclass
@@ -68,7 +68,7 @@ class MonetizationManager:
         self.bot_id = bot_id
         self._plans: Dict[str, PricingPlan] = {}
         self._transactions: List[Transaction] = []
-        self._usage_counts: Dict[str, int] = {}   # user_id → free-tier usage
+        self._usage_counts: Dict[str, int] = {}  # user_id → free-tier usage
 
     # ------------------------------------------------------------------
     # Plan management

@@ -1,6 +1,7 @@
 """Tests for bots/space_ai_bot/ — mission planning, satellite monitoring, and main bot."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,19 +11,24 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.space_ai_bot.mission_planner import MissionPlanner, MissionPlannerError, MISSION_PROFILES
+
+from bots.space_ai_bot.mission_planner import (
+    MISSION_PROFILES,
+    MissionPlanner,
+    MissionPlannerError,
+)
 from bots.space_ai_bot.satellite_monitor import (
+    SATELLITE_DATABASE,
     SatelliteMonitor,
     SatelliteMonitorError,
-    SATELLITE_DATABASE,
 )
 from bots.space_ai_bot.space_ai_bot import SpaceAIBot, SpaceAIBotError
 from bots.space_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
-
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestSpaceAITiers:
     def test_bot_features_has_all_tiers(self):
@@ -68,6 +74,7 @@ class TestSpaceAITiers:
 # MissionPlanner
 # ===========================================================================
 
+
 class TestMissionPlannerFree:
     def test_default_tier_is_free(self):
         mp = MissionPlanner()
@@ -86,7 +93,13 @@ class TestMissionPlannerFree:
     def test_simulate_trajectory_has_required_keys(self):
         mp = MissionPlanner(Tier.FREE)
         result = mp.simulate_trajectory("Earth", "Moon", "2025-01-01")
-        for key in ("origin", "destination", "launch_date", "delta_v_km_s", "flight_duration_days"):
+        for key in (
+            "origin",
+            "destination",
+            "launch_date",
+            "delta_v_km_s",
+            "flight_duration_days",
+        ):
             assert key in result
 
     def test_simulate_trajectory_is_simulation_only_on_free(self):
@@ -114,7 +127,13 @@ class TestMissionPlannerPro:
     def test_pro_plan_mission_has_required_keys(self):
         mp = MissionPlanner(Tier.PRO)
         result = mp.plan_mission("iss_supply", "ISS")
-        for key in ("mission_id", "mission_type", "destination", "duration_days", "fuel_kg"):
+        for key in (
+            "mission_id",
+            "mission_type",
+            "destination",
+            "duration_days",
+            "fuel_kg",
+        ):
             assert key in result
 
     def test_pro_plan_mission_id_format(self):
@@ -154,7 +173,13 @@ class TestMissionPlannerPro:
     def test_pro_assess_risk_has_label(self):
         mp = MissionPlanner(Tier.PRO)
         result = mp.assess_mission_risk({"mission_type": "deep_space"})
-        assert result["risk_label"] in ("minimal", "low", "moderate", "high", "critical")
+        assert result["risk_label"] in (
+            "minimal",
+            "low",
+            "moderate",
+            "high",
+            "critical",
+        )
 
     def test_pro_get_mission_status(self):
         mp = MissionPlanner(Tier.PRO)
@@ -212,6 +237,7 @@ class TestMissionPlannerEnterprise:
 # ===========================================================================
 # SatelliteMonitor
 # ===========================================================================
+
 
 class TestSatelliteMonitorFree:
     def test_default_tier_is_free(self):
@@ -357,6 +383,7 @@ class TestSatelliteMonitorEnterprise:
 # SpaceAIBot
 # ===========================================================================
 
+
 class TestSpaceAIBotFree:
     def test_default_tier_is_free(self):
         bot = SpaceAIBot()
@@ -398,7 +425,13 @@ class TestSpaceAIBotFree:
     def test_free_dashboard_has_required_keys(self):
         bot = SpaceAIBot(Tier.FREE)
         result = bot.get_space_dashboard()
-        for key in ("bot", "tier", "features", "missions_planned", "satellites_tracked"):
+        for key in (
+            "bot",
+            "tier",
+            "features",
+            "missions_planned",
+            "satellites_tracked",
+        ):
             assert key in result
 
     def test_free_dashboard_bot_name(self):

@@ -1,7 +1,9 @@
 """Tests for Scheduler."""
 
 import time
+
 import pytest
+
 from BuddyAI.scheduler import Scheduler
 
 

@@ -1,4 +1,5 @@
 """Twitch Helix API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -29,12 +30,18 @@ class TwitchConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Client-ID": self.client_id, "Authorization": f"Bearer {self.access_token}"}
+
+        headers = {
+            "Client-ID": self.client_id,
+            "Authorization": f"Bearer {self.access_token}",
+        }
         params = {"first": first}
         if game_id:
             params["game_id"] = game_id
         try:
-            response = requests.get(f"{self.BASE_URL}/streams", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/streams", params=params, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("Twitch streams fetched.")
             return {"status": "success", "data": response.json()}
@@ -52,13 +59,18 @@ class TwitchConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Client-ID": self.client_id, "Authorization": f"Bearer {self.access_token}"}
+
+        headers = {
+            "Client-ID": self.client_id,
+            "Authorization": f"Bearer {self.access_token}",
+        }
         params = [("login", login) for login in logins]
         try:
-            response = requests.get(f"{self.BASE_URL}/users", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/users", params=params, headers=headers, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Twitch get_users error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -28,7 +28,6 @@ import os
 import sys
 from pathlib import Path
 
-
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -76,6 +75,7 @@ COMPLIANCE_MARKERS: tuple[str, ...] = (
 # ---------------------------------------------------------------------------
 # Scanner
 # ---------------------------------------------------------------------------
+
 
 def is_bot_file(path: Path) -> bool:
     """Return True if *path* should be checked for framework compliance."""
@@ -128,6 +128,7 @@ def scan_directory(root: Path) -> tuple[list[Path], list[Path]]:
 # Reporter
 # ---------------------------------------------------------------------------
 
+
 def report(
     compliant: list[Path],
     violations: list[Path],
@@ -169,6 +170,7 @@ def report(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(

@@ -1,41 +1,45 @@
 """Tests for all 30 Business bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from Business_bots.brand_monitor_bot import BrandMonitorBot
+from Business_bots.business_plan_bot import BusinessPlanBot
+from Business_bots.competitor_analyzer_bot import CompetitorAnalyzerBot
+from Business_bots.compliance_checker_bot import ComplianceCheckerBot
+from Business_bots.contract_generator_bot import ContractGeneratorBot
+from Business_bots.customer_support_bot import CustomerSupportBot
+from Business_bots.document_manager_bot import DocumentManagerBot
+from Business_bots.ecommerce_optimizer_bot import EcommerceOptimizerBot
+from Business_bots.employee_onboarding_bot import EmployeeOnboardingBot
+from Business_bots.expense_tracker_bot import ExpenseTrackerBot
 from Business_bots.feature_1 import BusinessLaunchBot
 from Business_bots.feature_2 import CRMBot
 from Business_bots.feature_3 import InvoicingBot
-from Business_bots.inventory_manager_bot import InventoryManagerBot
-from Business_bots.expense_tracker_bot import ExpenseTrackerBot
-from Business_bots.payroll_bot import PayrollBot
-from Business_bots.sales_pipeline_bot import SalesPipelineBot
-from Business_bots.customer_support_bot import CustomerSupportBot
-from Business_bots.contract_generator_bot import ContractGeneratorBot
 from Business_bots.financial_forecaster_bot import FinancialForecasterBot
-from Business_bots.competitor_analyzer_bot import CompetitorAnalyzerBot
-from Business_bots.brand_monitor_bot import BrandMonitorBot
-from Business_bots.employee_onboarding_bot import EmployeeOnboardingBot
-from Business_bots.meeting_scheduler_bot import MeetingSchedulerBot
-from Business_bots.document_manager_bot import DocumentManagerBot
-from Business_bots.tax_preparer_bot import TaxPreparerBot
-from Business_bots.grant_finder_bot import GrantFinderBot
-from Business_bots.business_plan_bot import BusinessPlanBot
-from Business_bots.pricing_strategy_bot import PricingStrategyBot
-from Business_bots.vendor_manager_bot import VendorManagerBot
-from Business_bots.kpi_tracker_bot import KPITrackerBot
-from Business_bots.market_research_bot import MarketResearchBot
-from Business_bots.partnership_finder_bot import PartnershipFinderBot
-from Business_bots.compliance_checker_bot import ComplianceCheckerBot
-from Business_bots.pitch_deck_bot import PitchDeckBot
-from Business_bots.llc_formation_bot import LLCFormationBot
-from Business_bots.insurance_advisor_bot import InsuranceAdvisorBot
-from Business_bots.supply_chain_bot import SupplyChainBot
-from Business_bots.ecommerce_optimizer_bot import EcommerceOptimizerBot
 from Business_bots.franchise_analyzer_bot import FranchiseAnalyzerBot
+from Business_bots.grant_finder_bot import GrantFinderBot
+from Business_bots.insurance_advisor_bot import InsuranceAdvisorBot
+from Business_bots.inventory_manager_bot import InventoryManagerBot
+from Business_bots.kpi_tracker_bot import KPITrackerBot
+from Business_bots.llc_formation_bot import LLCFormationBot
+from Business_bots.market_research_bot import MarketResearchBot
+from Business_bots.meeting_scheduler_bot import MeetingSchedulerBot
+from Business_bots.partnership_finder_bot import PartnershipFinderBot
+from Business_bots.payroll_bot import PayrollBot
+from Business_bots.pitch_deck_bot import PitchDeckBot
+from Business_bots.pricing_strategy_bot import PricingStrategyBot
+from Business_bots.sales_pipeline_bot import SalesPipelineBot
+from Business_bots.supply_chain_bot import SupplyChainBot
+from Business_bots.tax_preparer_bot import TaxPreparerBot
+from Business_bots.vendor_manager_bot import VendorManagerBot
 
 ALL_BOTS = [
     ("BusinessLaunchBot", BusinessLaunchBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

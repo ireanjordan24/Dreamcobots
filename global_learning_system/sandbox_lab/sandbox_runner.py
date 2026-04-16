@@ -125,4 +125,5 @@ class SandboxRunner:
     def _now_ns() -> int:
         """Return a monotonic-like nanosecond timestamp."""
         import time
+
         return time.perf_counter_ns()

@@ -11,21 +11,21 @@
  *   import { runAllUpgrades, upgradeSingleBot } from "./bot-manager.js";
  */
 
-import { execSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
-import { fileURLToPath } from "url";
-import path from "path";
-import { Octokit } from "@octokit/rest";
+import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { Octokit } from '@octokit/rest';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_CONFIG = path.join(__dirname, "..", "config", "bots.json");
+const BOTS_CONFIG = path.join(__dirname, '..', 'config', 'bots.json');
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function loadBots() {
-  return JSON.parse(readFileSync(BOTS_CONFIG, "utf8"));
+  return JSON.parse(readFileSync(BOTS_CONFIG, 'utf8'));
 }
 
 function saveBots(bots) {
@@ -41,15 +41,15 @@ function saveBots(bots) {
  */
 function pullLatest(repoPath) {
   try {
-    execSync(`git -C ${repoPath} pull --rebase origin main`, { stdio: "pipe" });
-    return { success: true, action: "rebase" };
+    execSync(`git -C ${repoPath} pull --rebase origin main`, { stdio: 'pipe' });
+    return { success: true, action: 'rebase' };
   } catch {
     console.warn(`⚠️  Conflict in ${repoPath} — auto-resolving with theirs strategy`);
     try {
-      execSync(`git -C ${repoPath} merge -X theirs origin/main`, { stdio: "pipe" });
-      return { success: true, action: "merge-theirs" };
+      execSync(`git -C ${repoPath} merge -X theirs origin/main`, { stdio: 'pipe' });
+      return { success: true, action: 'merge-theirs' };
     } catch (mergeErr) {
-      return { success: false, action: "failed", error: mergeErr.message };
+      return { success: false, action: 'failed', error: mergeErr.message };
     }
   }
 }
@@ -64,7 +64,7 @@ function runTests(repoPath) {
   try {
     const hasPackageJson = (() => {
       try {
-        readFileSync(path.join(repoPath, "package.json"));
+        readFileSync(path.join(repoPath, 'package.json'));
         return true;
       } catch {
         return false;
@@ -73,12 +73,12 @@ function runTests(repoPath) {
 
     if (hasPackageJson) {
       const output = execSync(`npm --prefix ${repoPath} test --if-present`, {
-        stdio: "pipe",
-        encoding: "utf8",
+        stdio: 'pipe',
+        encoding: 'utf8',
       });
       return { passed: true, output };
     }
-    return { passed: true, output: "no tests configured" };
+    return { passed: true, output: 'no tests configured' };
   } catch (err) {
     return { passed: false, output: err.message };
   }
@@ -92,7 +92,7 @@ function runTests(repoPath) {
  */
 async function createUpgradePR(botConfig, token) {
   if (!token) {
-    console.warn("GITHUB_TOKEN not set — skipping PR creation");
+    console.warn('GITHUB_TOKEN not set — skipping PR creation');
     return null;
   }
 
@@ -104,7 +104,7 @@ async function createUpgradePR(botConfig, token) {
     const hasChanges = (() => {
       try {
         const out = execSync(`git -C ${botConfig.repoPath} status --porcelain`, {
-          encoding: "utf8",
+          encoding: 'utf8',
         });
         return out.trim().length > 0;
       } catch {
@@ -113,12 +113,12 @@ async function createUpgradePR(botConfig, token) {
     })();
 
     if (!hasChanges) {
-      return { skipped: true, reason: "no changes to push" };
+      return { skipped: true, reason: 'no changes to push' };
     }
 
     execSync(
       `git -C ${botConfig.repoPath} checkout -b ${branch} && git -C ${botConfig.repoPath} push origin ${branch}`,
-      { stdio: "pipe" }
+      { stdio: 'pipe' }
     );
 
     const pr = await octokit.pulls.create({
@@ -126,16 +126,16 @@ async function createUpgradePR(botConfig, token) {
       repo: botConfig.repoName,
       title: `🤖 Auto-upgrade: ${botConfig.name} from Control Tower`,
       head: branch,
-      base: botConfig.branch || "main",
+      base: botConfig.branch || 'main',
       body: [
-        "## Auto-Upgrade from DreamCo Control Tower",
-        "",
+        '## Auto-Upgrade from DreamCo Control Tower',
+        '',
         `Bot: **${botConfig.name}**`,
         `Triggered at: ${new Date().toISOString()}`,
-        "",
-        "This PR was automatically created by the DreamCo Control Tower bot manager.",
-        "It includes the latest upstream changes pulled and merged automatically.",
-      ].join("\n"),
+        '',
+        'This PR was automatically created by the DreamCo Control Tower bot manager.',
+        'It includes the latest upstream changes pulled and merged automatically.',
+      ].join('\n'),
     });
 
     return { prNumber: pr.data.number, prUrl: pr.data.html_url };
@@ -209,14 +209,14 @@ export async function runAllUpgrades() {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runAllUpgrades()
     .then((results) => {
-      console.log("\n📋 Upgrade Summary:");
+      console.log('\n📋 Upgrade Summary:');
       results.forEach((r) => {
-        const status = r.pull.success ? "✅" : "❌";
+        const status = r.pull.success ? '✅' : '❌';
         console.log(`  ${status} ${r.bot}`);
       });
     })
     .catch((err) => {
-      console.error("Fatal error:", err);
+      console.error('Fatal error:', err);
       process.exit(1);
     });
 }

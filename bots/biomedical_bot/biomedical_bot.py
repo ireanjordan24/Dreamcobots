@@ -1,17 +1,25 @@
 """Biomedical Bot — tier-aware wearable health monitoring and precision medicine."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.biomedical_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from framework import GlobalAISourcesFlow  # noqa: F401
 
-from bots.biomedical_bot.health_monitor import WearableHealthMonitor, WearableHealthMonitorError
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.biomedical_bot.health_monitor import (
+    WearableHealthMonitor,
+    WearableHealthMonitorError,
+)
 from bots.biomedical_bot.precision_medicine import (
     NanotechDiseaseDetector,
     NanotechDiseaseDetectorError,
     PrecisionMedicineEngine,
     PrecisionMedicineError,
 )
+from bots.biomedical_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="BiomedicalBot")
 
@@ -48,25 +56,42 @@ class BiomedicalBot:
             if "heart_rate" in metrics_data:
                 readings = metrics_data["heart_rate"]
                 if isinstance(readings, list):
-                    results["heart_rate"] = self.monitor.monitor_heart_rate(patient_id, readings)
+                    results["heart_rate"] = self.monitor.monitor_heart_rate(
+                        patient_id, readings
+                    )
                 else:
-                    results["heart_rate"] = self.monitor.monitor_heart_rate(patient_id, [readings])
+                    results["heart_rate"] = self.monitor.monitor_heart_rate(
+                        patient_id, [readings]
+                    )
 
             if "glucose" in metrics_data:
                 readings = metrics_data["glucose"]
                 if isinstance(readings, list):
-                    results["glucose"] = self.monitor.monitor_glucose(patient_id, readings)
+                    results["glucose"] = self.monitor.monitor_glucose(
+                        patient_id, readings
+                    )
                 else:
-                    results["glucose"] = self.monitor.monitor_glucose(patient_id, [readings])
+                    results["glucose"] = self.monitor.monitor_glucose(
+                        patient_id, [readings]
+                    )
 
             # Track remaining metrics as vitals
-            vitals = {k: v for k, v in metrics_data.items()
-                      if k not in ("heart_rate", "glucose") and not isinstance(v, list)}
+            vitals = {
+                k: v
+                for k, v in metrics_data.items()
+                if k not in ("heart_rate", "glucose") and not isinstance(v, list)
+            }
             if vitals:
                 results["vitals"] = self.monitor.track_vitals(patient_id, vitals)
 
-            self._activity_log.append({"action": "monitor_patient", "patient_id": patient_id})
-            return {"patient_id": patient_id, "monitoring_results": results, "tier": self.tier.value}
+            self._activity_log.append(
+                {"action": "monitor_patient", "patient_id": patient_id}
+            )
+            return {
+                "patient_id": patient_id,
+                "monitoring_results": results,
+                "tier": self.tier.value,
+            }
         except WearableHealthMonitorError as exc:
             raise BiomedicalBotError(str(exc)) from exc
 
@@ -97,7 +122,9 @@ class BiomedicalBot:
         """Generate a personalised treatment plan (ENTERPRISE only)."""
         try:
             result = self.medicine.generate_treatment_plan(patient_id, condition)
-            self._activity_log.append({"action": "treatment_plan", "patient_id": patient_id})
+            self._activity_log.append(
+                {"action": "treatment_plan", "patient_id": patient_id}
+            )
             return result
         except PrecisionMedicineError as exc:
             raise BiomedicalBotError(str(exc)) from exc
@@ -110,7 +137,9 @@ class BiomedicalBot:
         """Generate a comprehensive health report for a patient."""
         try:
             report = self.monitor.generate_health_report(patient_id)
-            self._activity_log.append({"action": "generate_report", "patient_id": patient_id})
+            self._activity_log.append(
+                {"action": "generate_report", "patient_id": patient_id}
+            )
             return report
         except WearableHealthMonitorError as exc:
             raise BiomedicalBotError(str(exc)) from exc

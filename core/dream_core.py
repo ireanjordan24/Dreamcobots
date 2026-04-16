@@ -1,4 +1,5 @@
 """DreamCore: shared utility for outreach email generation."""
+
 import logging
 from typing import Dict, Optional
 
@@ -26,7 +27,9 @@ class DreamCore:
             "body": f"Hi {recipient_name},\n\n{body}\n\nBest regards,\n{self.signature}",
             "from": sender or "noreply@dreamco.io",
         }
-        self.logger.info("Email generated for recipient: %s | subject: %s", recipient_name, subject)
+        self.logger.info(
+            "Email generated for recipient: %s | subject: %s", recipient_name, subject
+        )
         return email
 
     def generate_lead_outreach(self, lead: Dict) -> Dict[str, str]:

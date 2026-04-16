@@ -3,9 +3,11 @@
 
 import random
 
-
 JOKES = [
-    {"setup": "Why don't scientists trust atoms?", "punchline": "Because they make up everything!"},
+    {
+        "setup": "Why don't scientists trust atoms?",
+        "punchline": "Because they make up everything!",
+    },
     {"setup": "Why did the robot go on a diet?", "punchline": "It had too many bytes!"},
     {
         "setup": "Why was the computer cold?",

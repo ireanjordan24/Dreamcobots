@@ -58,7 +58,10 @@ class HomeDashboardScreen:
             "screen": self.SCREEN_NAME,
             "route": self.ROUTE,
             "widgets": {
-                "header": {"title": "DreamCo Money OS", "subtitle": "Your Personal Profit Machine"},
+                "header": {
+                    "title": "DreamCo Money OS",
+                    "subtitle": "Your Personal Profit Machine",
+                },
                 "earnings_card": {
                     "total_earnings": f"${self.total_earnings:,.2f}",
                     "pending_cashback": f"${self.pending_cashback:,.2f}",
@@ -74,7 +77,10 @@ class HomeDashboardScreen:
                     "label": f"{self.active_bots} bot(s) running",
                 },
                 "top_opportunity": self.top_opportunity,
-                "alerts_badge": {"count": self.alerts_count, "color": "red" if self.alerts_count > 0 else "grey"},
+                "alerts_badge": {
+                    "count": self.alerts_count,
+                    "color": "red" if self.alerts_count > 0 else "grey",
+                },
                 "revenue_chart": {"data": self.revenue_trend, "type": "line"},
             },
             "last_updated": self.last_updated,
@@ -106,7 +112,11 @@ class HomeDashboardScreen:
             todays_revenue=128.50,
             weekly_revenue=847.30,
             monthly_revenue=3_247.85,
-            top_opportunity={"type": "deal", "title": "Electronics Deal #1 at amazon", "savings": 75.00},
+            top_opportunity={
+                "type": "deal",
+                "title": "Electronics Deal #1 at amazon",
+                "savings": 75.00,
+            },
             alerts_count=3,
             revenue_trend=[45, 82, 60, 128, 97, 115, 128],
         )

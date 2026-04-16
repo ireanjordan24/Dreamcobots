@@ -41,71 +41,70 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
+from typing import List, Optional
 
+from bots.buddy_omniscient_bot.ar_vr_engine import (
+    AROverlaySession,
+    AROverlayType,
+    ARVREngine,
+    HolographicMode,
+    HolographicSession,
+    ProjectionDevice,
+)
+from bots.buddy_omniscient_bot.knowledge_engine import (
+    CompetitorAI,
+    KnowledgeDomain,
+    KnowledgeEngine,
+)
+from bots.buddy_omniscient_bot.skill_database import (
+    CommunitySkill,
+    ExpertField,
+    ExpertProfile,
+    SkillCategory,
+    SkillDatabase,
+    SkillDifficulty,
+)
 from bots.buddy_omniscient_bot.tiers import (
+    FEATURE_AR_VR,
+    FEATURE_BUDDY_BADGES,
+    FEATURE_CHARITY_AMBASSADOR,
+    FEATURE_DREAM_BUSINESS,
+    FEATURE_DYNAMIC_LEARNING,
+    FEATURE_EXPERT_COLLABORATION,
+    FEATURE_HOLOGRAPHIC,
+    FEATURE_KNOWLEDGE_ENGINE,
+    FEATURE_OMNISCIENT_MODE,
+    FEATURE_REALITY_SHOW,
+    FEATURE_SKILL_DATABASE,
+    FEATURE_SKILL_UPLOAD,
+    FEATURE_SOCIAL_CREATORS,
+    FEATURE_VIRAL_CHALLENGES,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_AR_VR,
-    FEATURE_HOLOGRAPHIC,
-    FEATURE_VIRAL_CHALLENGES,
-    FEATURE_BUDDY_BADGES,
-    FEATURE_SKILL_DATABASE,
-    FEATURE_SKILL_UPLOAD,
-    FEATURE_KNOWLEDGE_ENGINE,
-    FEATURE_OMNISCIENT_MODE,
-    FEATURE_SOCIAL_CREATORS,
-    FEATURE_REALITY_SHOW,
-    FEATURE_CHARITY_AMBASSADOR,
-    FEATURE_DREAM_BUSINESS,
-    FEATURE_EXPERT_COLLABORATION,
-    FEATURE_DYNAMIC_LEARNING,
-)
-from bots.buddy_omniscient_bot.ar_vr_engine import (
-    ARVREngine,
-    AROverlaySession,
-    HolographicSession,
-    AROverlayType,
-    HolographicMode,
-    ProjectionDevice,
 )
 from bots.buddy_omniscient_bot.viral_challenges import (
-    ViralChallengesEngine,
-    RealityShowEngine,
-    CharityAmbassadorEngine,
-    DreamYourBusinessEngine,
     AISocialCreatorEngine,
-    DynamicLearningEngine,
-    ViralChallenge,
     BuddyBadge,
     ChallengeCategory,
-    SocialPlatform,
-    ContentType,
+    CharityAmbassadorEngine,
     CharityCause,
+    ContentType,
+    DreamYourBusinessEngine,
+    DynamicLearningEngine,
     LearningGameType,
+    RealityShowEngine,
+    SocialPlatform,
+    ViralChallenge,
+    ViralChallengesEngine,
 )
-from bots.buddy_omniscient_bot.skill_database import (
-    SkillDatabase,
-    CommunitySkill,
-    ExpertProfile,
-    SkillCategory,
-    SkillDifficulty,
-    ExpertField,
-)
-from bots.buddy_omniscient_bot.knowledge_engine import (
-    KnowledgeEngine,
-    KnowledgeDomain,
-    CompetitorAI,
-)
-
-from typing import List, Optional
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class BuddyOmniscientError(Exception):
@@ -237,9 +236,7 @@ class BuddyOmniscientBot:
             device=device, mode=mode, context=context
         )
 
-    def broadcast_ar_to_devices(
-        self, session_id: str, device_strs: List[str]
-    ) -> dict:
+    def broadcast_ar_to_devices(self, session_id: str, device_strs: List[str]) -> dict:
         """Broadcast an AR session to multiple devices simultaneously."""
         self._require_feature(FEATURE_AR_VR)
         devices = []
@@ -254,9 +251,7 @@ class BuddyOmniscientBot:
     # 2. Viral Challenges & Gamification
     # ------------------------------------------------------------------
 
-    def list_viral_challenges(
-        self, category_str: Optional[str] = None
-    ) -> List[dict]:
+    def list_viral_challenges(self, category_str: Optional[str] = None) -> List[dict]:
         """List available viral challenges."""
         self._require_feature(FEATURE_VIRAL_CHALLENGES)
         category = None
@@ -643,10 +638,26 @@ class BuddyOmniscientBot:
             return {
                 "response": "buddy_omniscient",
                 "message": f"You have {self.challenges.get_user_points()} points.",
-                "data": {"badges": self.get_earned_badges() if self.config.has_feature(FEATURE_BUDDY_BADGES) else []},
+                "data": {
+                    "badges": (
+                        self.get_earned_badges()
+                        if self.config.has_feature(FEATURE_BUDDY_BADGES)
+                        else []
+                    )
+                },
             }
 
-        if any(k in msg for k in ("augmented reality", "hologram", "ar overlay", "ar glasses", "vr headset", "virtual reality")):
+        if any(
+            k in msg
+            for k in (
+                "augmented reality",
+                "hologram",
+                "ar overlay",
+                "ar glasses",
+                "vr headset",
+                "virtual reality",
+            )
+        ):
             return {
                 "response": "buddy_omniscient",
                 "message": (
@@ -678,14 +689,19 @@ class BuddyOmniscientBot:
             }
 
         if any(k in msg for k in ("charity", "donate", "cause", "ambassador")):
-            initiatives = [i.to_dict() for i in self.charity.list_initiatives(active_only=True)]
+            initiatives = [
+                i.to_dict() for i in self.charity.list_initiatives(active_only=True)
+            ]
             return {
                 "response": "buddy_omniscient",
                 "message": "Buddy is your AI Charity Ambassador!",
                 "data": {"active_initiatives": initiatives},
             }
 
-        if any(k in msg for k in ("chatgpt", "gemini", "claude", "copilot", "compare", "better")):
+        if any(
+            k in msg
+            for k in ("chatgpt", "gemini", "claude", "copilot", "compare", "better")
+        ):
             if self.config.has_feature(FEATURE_OMNISCIENT_MODE):
                 return {
                     "response": "buddy_omniscient",
@@ -702,12 +718,16 @@ class BuddyOmniscientBot:
                 "data": {},
             }
 
-        if any(k in msg for k in ("expert", "nasa", "doctor", "scientist", "trained by")):
+        if any(
+            k in msg for k in ("expert", "nasa", "doctor", "scientist", "trained by")
+        ):
             if self.config.has_feature(FEATURE_EXPERT_COLLABORATION):
                 return {
                     "response": "buddy_omniscient",
                     "message": "Buddy is trained by the world's greatest minds!",
-                    "data": {"experts": [e.to_dict() for e in self.skills.list_experts()]},
+                    "data": {
+                        "experts": [e.to_dict() for e in self.skills.list_experts()]
+                    },
                 }
             return {
                 "response": "buddy_omniscient",

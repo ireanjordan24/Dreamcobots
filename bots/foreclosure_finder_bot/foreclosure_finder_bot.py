@@ -1,7 +1,13 @@
 """Foreclosure Finder Bot — tier-aware foreclosure search, risk assessment, and auction tracking."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.foreclosure_finder_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -26,7 +32,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 98000,
             "market_value": 148000,
-            "beds": 3, "baths": 1, "sqft": 1200,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1200,
             "year_built": 1955,
             "days_delinquent": 180,
             "tax_delinquent": True,
@@ -43,7 +51,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 165000,
             "market_value": 225000,
-            "beds": 3, "baths": 2, "sqft": 1450,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1450,
             "year_built": 1992,
             "days_delinquent": 365,
             "tax_delinquent": False,
@@ -60,7 +70,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 87000,
             "market_value": 142000,
-            "beds": 3, "baths": 2, "sqft": 1350,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1350,
             "year_built": 1978,
             "days_delinquent": 540,
             "tax_delinquent": True,
@@ -77,7 +89,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 42000,
             "market_value": 78000,
-            "beds": 3, "baths": 1, "sqft": 1100,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1100,
             "year_built": 1948,
             "days_delinquent": 120,
             "tax_delinquent": True,
@@ -94,7 +108,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 192000,
             "market_value": 275000,
-            "beds": 4, "baths": 2, "sqft": 1850,
+            "beds": 4,
+            "baths": 2,
+            "sqft": 1850,
             "year_built": 1995,
             "days_delinquent": 420,
             "tax_delinquent": False,
@@ -111,7 +127,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 128000,
             "market_value": 195000,
-            "beds": 3, "baths": 2, "sqft": 1500,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1500,
             "year_built": 1982,
             "days_delinquent": 600,
             "tax_delinquent": False,
@@ -128,7 +146,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 51000,
             "market_value": 92000,
-            "beds": 3, "baths": 1, "sqft": 1150,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1150,
             "year_built": 1960,
             "days_delinquent": 90,
             "tax_delinquent": True,
@@ -145,7 +165,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 148000,
             "market_value": 215000,
-            "beds": 3, "baths": 2, "sqft": 1600,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1600,
             "year_built": 2001,
             "days_delinquent": 330,
             "tax_delinquent": False,
@@ -162,7 +184,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 112000,
             "market_value": 178000,
-            "beds": 3, "baths": 2, "sqft": 1400,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1400,
             "year_built": 1975,
             "days_delinquent": 480,
             "tax_delinquent": True,
@@ -179,7 +203,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 185000,
             "market_value": 265000,
-            "beds": 3, "baths": 2, "sqft": 1700,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1700,
             "year_built": 1988,
             "days_delinquent": 150,
             "tax_delinquent": False,
@@ -196,7 +222,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 118000,
             "market_value": 182000,
-            "beds": 3, "baths": 2, "sqft": 1450,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1450,
             "year_built": 1980,
             "days_delinquent": 390,
             "tax_delinquent": True,
@@ -213,7 +241,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 58000,
             "market_value": 105000,
-            "beds": 3, "baths": 1, "sqft": 1100,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1100,
             "year_built": 1962,
             "days_delinquent": 720,
             "tax_delinquent": True,
@@ -230,7 +260,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 78000,
             "market_value": 135000,
-            "beds": 3, "baths": 1, "sqft": 1250,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1250,
             "year_built": 1968,
             "days_delinquent": 200,
             "tax_delinquent": True,
@@ -247,7 +279,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 72000,
             "market_value": 118000,
-            "beds": 3, "baths": 1, "sqft": 1200,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1200,
             "year_built": 1957,
             "days_delinquent": 300,
             "tax_delinquent": False,
@@ -264,7 +298,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 215000,
             "market_value": 345000,
-            "beds": 3, "baths": 2, "sqft": 1500,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1500,
             "year_built": 1978,
             "days_delinquent": 540,
             "tax_delinquent": False,
@@ -281,7 +317,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 245000,
             "market_value": 375000,
-            "beds": 3, "baths": 2, "sqft": 1650,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1650,
             "year_built": 1975,
             "days_delinquent": 95,
             "tax_delinquent": False,
@@ -298,7 +336,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 155000,
             "market_value": 238000,
-            "beds": 3, "baths": 2, "sqft": 1600,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1600,
             "year_built": 1990,
             "days_delinquent": 450,
             "tax_delinquent": True,
@@ -315,7 +355,9 @@ class ForeclosureFinderBot:
             "status": "reo",
             "listing_price": 62000,
             "market_value": 108000,
-            "beds": 3, "baths": 1, "sqft": 1150,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1150,
             "year_built": 1958,
             "days_delinquent": 680,
             "tax_delinquent": True,
@@ -332,7 +374,9 @@ class ForeclosureFinderBot:
             "status": "pre_foreclosure",
             "listing_price": 385000,
             "market_value": 525000,
-            "beds": 3, "baths": 2, "sqft": 1800,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1800,
             "year_built": 1985,
             "days_delinquent": 130,
             "tax_delinquent": False,
@@ -349,7 +393,9 @@ class ForeclosureFinderBot:
             "status": "auction",
             "listing_price": 68000,
             "market_value": 115000,
-            "beds": 3, "baths": 1, "sqft": 1250,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1250,
             "year_built": 1953,
             "days_delinquent": 360,
             "tax_delinquent": True,
@@ -427,7 +473,8 @@ class ForeclosureFinderBot:
         county_lower = county.lower().replace(" ", "_")
 
         results = [
-            prop for prop in self.FORECLOSURE_DATABASE
+            prop
+            for prop in self.FORECLOSURE_DATABASE
             if prop["county"].lower().replace(" ", "_") == county_lower
         ]
 
@@ -451,7 +498,9 @@ class ForeclosureFinderBot:
                 "status": prop["status"],
                 "listing_price_usd": prop["listing_price"],
                 "market_value_usd": prop["market_value"],
-                "discount_pct": self._compute_discount_pct(prop["listing_price"], prop["market_value"]),
+                "discount_pct": self._compute_discount_pct(
+                    prop["listing_price"], prop["market_value"]
+                ),
                 "beds": prop["beds"],
                 "baths": prop["baths"],
                 "sqft": prop["sqft"],
@@ -474,7 +523,9 @@ class ForeclosureFinderBot:
     def evaluate_foreclosure(self, property_id: str) -> dict:
         """Return risk assessment and discount analysis for a foreclosure property."""
         prop = self._get_property_by_id(property_id)
-        discount = self._compute_discount_pct(prop["listing_price"], prop["market_value"])
+        discount = self._compute_discount_pct(
+            prop["listing_price"], prop["market_value"]
+        )
         risk_level = self._assess_risk_level(prop)
         potential_profit = prop["market_value"] - prop["listing_price"]
 
@@ -497,11 +548,14 @@ class ForeclosureFinderBot:
                 "tax_delinquent": prop["tax_delinquent"],
                 "hoa_delinquent": prop["hoa_delinquent"],
                 "days_delinquent": prop["days_delinquent"],
-                "estimated_lien_payoff_usd": (prop["liens_count"] * self._COST_PER_LIEN_USD
-                                               + (self._TAX_DELINQUENCY_COST_USD if prop["tax_delinquent"] else 0)),
+                "estimated_lien_payoff_usd": (
+                    prop["liens_count"] * self._COST_PER_LIEN_USD
+                    + (self._TAX_DELINQUENCY_COST_USD if prop["tax_delinquent"] else 0)
+                ),
             }
             result["net_profit_after_liens_usd"] = round(
-                potential_profit - result["lien_summary"]["estimated_lien_payoff_usd"], 0
+                potential_profit - result["lien_summary"]["estimated_lien_payoff_usd"],
+                0,
             )
             if prop["auction_date"]:
                 result["auction_date"] = prop["auction_date"]
@@ -511,8 +565,12 @@ class ForeclosureFinderBot:
         if self.tier == Tier.ENTERPRISE:
             result["title_risks"] = self.check_title_risks(property_id)
             result["predictive_alert"] = {
-                "foreclosure_likelihood_next_90days": "HIGH" if prop["days_delinquent"] > 270 else "MEDIUM",
-                "recommended_action": "Submit offer immediately" if discount > 30 else "Monitor and wait",
+                "foreclosure_likelihood_next_90days": (
+                    "HIGH" if prop["days_delinquent"] > 270 else "MEDIUM"
+                ),
+                "recommended_action": (
+                    "Submit offer immediately" if discount > 30 else "Monitor and wait"
+                ),
             }
 
         return result
@@ -524,11 +582,17 @@ class ForeclosureFinderBot:
                 "Auction calendar requires PRO or ENTERPRISE tier."
             )
 
-        auctions = [p for p in self.FORECLOSURE_DATABASE if p["auction_date"] is not None]
+        auctions = [
+            p for p in self.FORECLOSURE_DATABASE if p["auction_date"] is not None
+        ]
 
         if county:
             county_lower = county.lower().replace(" ", "_")
-            auctions = [p for p in auctions if p["county"].lower().replace(" ", "_") == county_lower]
+            auctions = [
+                p
+                for p in auctions
+                if p["county"].lower().replace(" ", "_") == county_lower
+            ]
 
         result = []
         for prop in sorted(auctions, key=lambda x: x["auction_date"]):
@@ -540,7 +604,9 @@ class ForeclosureFinderBot:
                 "auction_date": prop["auction_date"],
                 "opening_bid_usd": prop["listing_price"],
                 "estimated_market_value_usd": prop["market_value"],
-                "discount_pct": self._compute_discount_pct(prop["listing_price"], prop["market_value"]),
+                "discount_pct": self._compute_discount_pct(
+                    prop["listing_price"], prop["market_value"]
+                ),
                 "beds": prop["beds"],
                 "baths": prop["baths"],
                 "sqft": prop["sqft"],
@@ -567,7 +633,9 @@ class ForeclosureFinderBot:
 
         risks = []
         if liens_count > 0:
-            risks.append(f"{liens_count} lien(s) recorded — title search required before purchase")
+            risks.append(
+                f"{liens_count} lien(s) recorded — title search required before purchase"
+            )
         if tax_del:
             risks.append("Tax delinquency flag — county may hold senior lien")
         if hoa_del:
@@ -590,7 +658,11 @@ class ForeclosureFinderBot:
             "liens_count": liens_count,
             "risk_factors": risks,
             "estimated_title_clearance_cost_usd": estimated_title_clearance_cost,
-            "recommendation": "Proceed with caution — hire title attorney" if overall_risk in ("HIGH", "VERY HIGH") else "Standard title search recommended",
+            "recommendation": (
+                "Proceed with caution — hire title attorney"
+                if overall_risk in ("HIGH", "VERY HIGH")
+                else "Standard title search recommended"
+            ),
         }
 
     def describe_tier(self) -> str:
@@ -610,8 +682,7 @@ class ForeclosureFinderBot:
     def run(self) -> dict:
         """Run the GlobalAISourcesFlow pipeline with sample foreclosure data."""
         sample_data = [
-            {k: v for k, v in prop.items()}
-            for prop in self.FORECLOSURE_DATABASE[:5]
+            {k: v for k, v in prop.items()} for prop in self.FORECLOSURE_DATABASE[:5]
         ]
         return self.flow.run_pipeline(
             raw_data={"foreclosure_listings": sample_data, "tier": self.tier.value},

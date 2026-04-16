@@ -5,6 +5,7 @@ Tests for bots/saas-selling-bot
 import json
 import os
 import sys
+
 import pytest
 
 # Make the bot module importable without depending on working directory
@@ -14,13 +15,14 @@ sys.path.insert(0, os.path.abspath(BOT_DIR))
 # Use an in-memory database for tests
 os.environ["SAAS_BOT_DB"] = ":memory:"
 
-import database as db  # noqa: E402
-from nlp import get_faq_response, _keyword_score  # noqa: E402
+from nlp import _keyword_score, get_faq_response  # noqa: E402
 
+import database as db  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def fresh_db(tmp_path, monkeypatch):
@@ -35,6 +37,7 @@ def fresh_db(tmp_path, monkeypatch):
 def client():
     """Flask test client with an isolated temp database."""
     import bot as b
+
     b.app.config["TESTING"] = True
     with b.app.test_client() as c:
         yield c
@@ -44,16 +47,24 @@ def client():
 # database.py tests
 # ---------------------------------------------------------------------------
 
+
 class TestDatabase:
     def test_init_creates_tables(self):
         conn = db.get_connection()
-        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        tables = {
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
         assert "leads" in tables
         assert "demo_events" in tables
         assert "chat_events" in tables
 
     def test_save_lead_returns_id(self):
-        lead_id = db.save_lead("Alice", "alice@example.com", "Acme", "custom-bot", "Hello")
+        lead_id = db.save_lead(
+            "Alice", "alice@example.com", "Acme", "custom-bot", "Hello"
+        )
         assert lead_id == 1
 
     def test_save_lead_stores_data(self):
@@ -100,6 +111,7 @@ class TestDatabase:
 # nlp.py tests
 # ---------------------------------------------------------------------------
 
+
 class TestNLP:
     def test_keyword_score_match(self):
         assert _keyword_score("what is the price?", ["price", "cost"]) == 1
@@ -120,7 +132,11 @@ class TestNLP:
 
     def test_get_faq_response_nlp(self):
         resp = get_faq_response("do you have an NLP chatbot?")
-        assert "nlp" in resp.lower() or "chatbot" in resp.lower() or "language" in resp.lower()
+        assert (
+            "nlp" in resp.lower()
+            or "chatbot" in resp.lower()
+            or "language" in resp.lower()
+        )
 
     def test_get_faq_response_income(self):
         resp = get_faq_response("how does income tracking work?")
@@ -142,6 +158,7 @@ class TestNLP:
 # ---------------------------------------------------------------------------
 # Flask route tests
 # ---------------------------------------------------------------------------
+
 
 class TestRoutes:
     def test_index(self, client):
@@ -166,13 +183,16 @@ class TestRoutes:
         assert b"Quote" in rv.data
 
     def test_lead_gen_post_success(self, client):
-        rv = client.post("/lead-gen", data={
-            "name": "Alice",
-            "email": "alice@example.com",
-            "company": "Acme",
-            "service": "custom-bot",
-            "message": "I need a bot",
-        })
+        rv = client.post(
+            "/lead-gen",
+            data={
+                "name": "Alice",
+                "email": "alice@example.com",
+                "company": "Acme",
+                "service": "custom-bot",
+                "message": "I need a bot",
+            },
+        )
         assert rv.status_code == 200
         assert b"Thank you" in rv.data
 
@@ -227,41 +247,49 @@ class TestRoutes:
 
     # JSON API endpoints
     def test_api_chat_valid(self, client):
-        rv = client.post("/api/chat",
-                         data=json.dumps({"message": "What is pricing?"}),
-                         content_type="application/json")
+        rv = client.post(
+            "/api/chat",
+            data=json.dumps({"message": "What is pricing?"}),
+            content_type="application/json",
+        )
         assert rv.status_code == 200
         data = json.loads(rv.data)
         assert "response" in data
         assert len(data["response"]) > 0
 
     def test_api_chat_missing_message(self, client):
-        rv = client.post("/api/chat",
-                         data=json.dumps({}),
-                         content_type="application/json")
+        rv = client.post(
+            "/api/chat", data=json.dumps({}), content_type="application/json"
+        )
         assert rv.status_code == 400
         data = json.loads(rv.data)
         assert "error" in data
 
     def test_api_chat_empty_message(self, client):
-        rv = client.post("/api/chat",
-                         data=json.dumps({"message": ""}),
-                         content_type="application/json")
+        rv = client.post(
+            "/api/chat",
+            data=json.dumps({"message": ""}),
+            content_type="application/json",
+        )
         assert rv.status_code == 400
 
     def test_api_submit_lead_valid(self, client):
-        rv = client.post("/api/submit-lead",
-                         data=json.dumps({"name": "Bob", "email": "b@b.com"}),
-                         content_type="application/json")
+        rv = client.post(
+            "/api/submit-lead",
+            data=json.dumps({"name": "Bob", "email": "b@b.com"}),
+            content_type="application/json",
+        )
         assert rv.status_code == 200
         data = json.loads(rv.data)
         assert data["success"] is True
         assert "lead_id" in data
 
     def test_api_submit_lead_missing_fields(self, client):
-        rv = client.post("/api/submit-lead",
-                         data=json.dumps({"name": "Bob"}),
-                         content_type="application/json")
+        rv = client.post(
+            "/api/submit-lead",
+            data=json.dumps({"name": "Bob"}),
+            content_type="application/json",
+        )
         assert rv.status_code == 400
 
     def test_api_analytics(self, client):
@@ -277,9 +305,11 @@ class TestRoutes:
 # bot.py demo helpers
 # ---------------------------------------------------------------------------
 
+
 class TestDemoHelpers:
     def test_run_custom_bot_demo(self):
         from bot import run_custom_bot_demo
+
         result = run_custom_bot_demo("Send weekly report")
         assert "steps" in result
         assert "result" in result
@@ -288,6 +318,7 @@ class TestDemoHelpers:
 
     def test_run_contract_search_keyword_match(self):
         from bot import run_contract_search
+
         results = run_contract_search("automation")
         assert len(results) > 0
         titles = [r["title"].lower() for r in results]
@@ -295,12 +326,14 @@ class TestDemoHelpers:
 
     def test_run_contract_search_no_match_returns_sample(self):
         from bot import run_contract_search
+
         results = run_contract_search("zzznomatch999")
         # Should return a random sample when no keyword match
         assert len(results) > 0
 
     def test_pricing_tiers_structure(self):
         from bot import PRICING_TIERS
+
         assert len(PRICING_TIERS) == 3
         for tier in PRICING_TIERS:
             assert "name" in tier
@@ -309,7 +342,15 @@ class TestDemoHelpers:
 
     def test_services_structure(self):
         from bot import SERVICES
+
         assert len(SERVICES) == 6
         slugs = {s["slug"] for s in SERVICES}
-        expected_slugs = {"custom-bot", "nlp-bot", "income-tracking", "contracts", "api-integration", "ui-ux"}
+        expected_slugs = {
+            "custom-bot",
+            "nlp-bot",
+            "income-tracking",
+            "contracts",
+            "api-integration",
+            "ui-ux",
+        }
         assert slugs == expected_slugs

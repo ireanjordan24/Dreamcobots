@@ -169,7 +169,7 @@ function optimizePrice(productId) {
   if (history.length > 0) {
     const avg = history.reduce((s, h) => s + h.price, 0) / history.length;
     // Nudge toward historical average with a slight premium
-    suggestedPrice = Number(((record.basePrice + avg) / 2 * 1.05).toFixed(2));
+    suggestedPrice = Number((((record.basePrice + avg) / 2) * 1.05).toFixed(2));
     reason = `Optimized based on ${history.length} historical data point(s).`;
   }
 

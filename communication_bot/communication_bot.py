@@ -16,7 +16,8 @@ from core.bot_base import AutonomyLevel, BotBase, ScalingLevel
 @dataclass
 class Message:
     """Represents a communication message across any channel."""
-    channel: str           # 'call', 'text', 'email', 'video', 'social', 'chat'
+
+    channel: str  # 'call', 'text', 'email', 'video', 'social', 'chat'
     sender: str
     recipient: str
     content: str
@@ -27,6 +28,7 @@ class Message:
 @dataclass
 class BluetoothTransfer:
     """Represents a Bluetooth file-exchange session."""
+
     device_id: str
     filename: str
     file_size_bytes: int
@@ -37,6 +39,7 @@ class BluetoothTransfer:
 @dataclass
 class VerificationNotification:
     """Notification generated for an unresolved verification action."""
+
     item: str
     live_link: str
     notification_id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -98,21 +101,37 @@ class CommunicationBot(BotBase):
             ValueError: If the channel is not supported.
         """
         if channel not in self.SUPPORTED_CHANNELS:
-            raise ValueError(f"Unsupported channel '{channel}'. Supported: {self.SUPPORTED_CHANNELS}")
+            raise ValueError(
+                f"Unsupported channel '{channel}'. Supported: {self.SUPPORTED_CHANNELS}"
+            )
 
-        msg = Message(channel=channel, sender=sender, recipient=recipient, content=content)
+        msg = Message(
+            channel=channel, sender=sender, recipient=recipient, content=content
+        )
         msg.status = "sent"
         self._outbox.append(msg)
-        self.logger.info("Message sent via %s to %s (id=%s)", channel, recipient, msg.message_id)
+        self.logger.info(
+            "Message sent via %s to %s (id=%s)", channel, recipient, msg.message_id
+        )
         return msg
 
-    def receive_message(self, channel: str, sender: str, recipient: str, content: str) -> Message:
+    def receive_message(
+        self, channel: str, sender: str, recipient: str, content: str
+    ) -> Message:
         """Record an incoming message."""
         if channel not in self.SUPPORTED_CHANNELS:
             raise ValueError(f"Unsupported channel '{channel}'.")
-        msg = Message(channel=channel, sender=sender, recipient=recipient, content=content, status="delivered")
+        msg = Message(
+            channel=channel,
+            sender=sender,
+            recipient=recipient,
+            content=content,
+            status="delivered",
+        )
         self._inbox.append(msg)
-        self.logger.info("Message received via %s from %s (id=%s)", channel, sender, msg.message_id)
+        self.logger.info(
+            "Message received via %s from %s (id=%s)", channel, sender, msg.message_id
+        )
         return msg
 
     def get_inbox(self, channel: Optional[str] = None) -> List[Message]:
@@ -193,7 +212,9 @@ class CommunicationBot(BotBase):
             status="in_progress",
         )
         self._bt_transfers.append(transfer)
-        self.logger.info("Bluetooth transfer started: %s → device %s", filename, device_id)
+        self.logger.info(
+            "Bluetooth transfer started: %s → device %s", filename, device_id
+        )
         return transfer
 
     def complete_bluetooth_transfer(self, transfer_id: str) -> bool:
@@ -213,7 +234,9 @@ class CommunicationBot(BotBase):
     # Verification notifications
     # ------------------------------------------------------------------
 
-    def create_verification_notification(self, item: str, live_link: str) -> VerificationNotification:
+    def create_verification_notification(
+        self, item: str, live_link: str
+    ) -> VerificationNotification:
         """
         Generate a notification for an unresolved verification item.
 
@@ -226,7 +249,9 @@ class CommunicationBot(BotBase):
         """
         notif = VerificationNotification(item=item, live_link=live_link)
         self._notifications.append(notif)
-        self.logger.info("Verification notification created for '%s' → %s", item, live_link)
+        self.logger.info(
+            "Verification notification created for '%s' → %s", item, live_link
+        )
         return notif
 
     def resolve_notification(self, notification_id: str) -> bool:

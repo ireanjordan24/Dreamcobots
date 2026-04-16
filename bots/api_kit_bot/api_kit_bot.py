@@ -31,28 +31,27 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.api_kit_bot.api_kit_catalog import APIKitCatalog
+from bots.api_kit_bot.one_click_deploy import OneClickDeploy
+from bots.api_kit_bot.sandbox_manager import SandboxManager
 from bots.api_kit_bot.tiers import (
+    FEATURE_ADVANCED_SANDBOX,
+    FEATURE_ANALYTICS,
+    FEATURE_API_KIT_BASIC,
+    FEATURE_AUTO_KEY_EXPIRATION,
+    FEATURE_ONE_CLICK_DEPLOY,
+    FEATURE_SANDBOX_BASIC,
+    FEATURE_SECRET_KEY_MANAGEMENT,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_API_KIT_BASIC,
-    FEATURE_SANDBOX_BASIC,
-    FEATURE_SECRET_KEY_MANAGEMENT,
-    FEATURE_ONE_CLICK_DEPLOY,
-    FEATURE_ANALYTICS,
-    FEATURE_ADVANCED_SANDBOX,
-    FEATURE_AUTO_KEY_EXPIRATION,
 )
-from bots.api_kit_bot.api_kit_catalog import APIKitCatalog
-from bots.api_kit_bot.sandbox_manager import SandboxManager
-from bots.api_kit_bot.one_click_deploy import OneClickDeploy
-
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -193,7 +192,9 @@ class APIKitBot:
             "upgrade_to": upgrade.tier.value,
             "upgrade_name": upgrade.name,
             "upgrade_price_usd_monthly": upgrade.price_usd_monthly,
-            "new_features": [f for f in upgrade.features if f not in self.config.features],
+            "new_features": [
+                f for f in upgrade.features if f not in self.config.features
+            ],
         }
 
     # ------------------------------------------------------------------

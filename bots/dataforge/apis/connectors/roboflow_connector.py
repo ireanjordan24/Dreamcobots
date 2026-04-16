@@ -1,4 +1,5 @@
 """Roboflow computer vision inference connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,6 +29,7 @@ class RoboflowConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             headers = {"api-key": self.api_key}
             with open(image_path, "rb") as f:
@@ -35,7 +37,7 @@ class RoboflowConnector:
                     f"{self.BASE_URL}/{model_id}",
                     files={"file": f},
                     headers=headers,
-                    timeout=30
+                    timeout=30,
                 )
             response.raise_for_status()
             logger.info("Roboflow inference completed for model %s.", model_id)
@@ -43,4 +45,3 @@ class RoboflowConnector:
         except Exception as e:
             logger.error("Roboflow infer error: %s", e)
             return {"status": "error", "message": str(e)}
-

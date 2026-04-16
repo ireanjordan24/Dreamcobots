@@ -52,6 +52,7 @@ class Optimization:
 # Performance Tracker
 # ---------------------------------------------------------------------------
 
+
 class PerformanceTracker:
     """Records and queries performance metrics."""
 
@@ -99,6 +100,7 @@ class PerformanceTracker:
 # ---------------------------------------------------------------------------
 # Revenue Tracker
 # ---------------------------------------------------------------------------
+
 
 class RevenueTracker:
     """Tracks revenue events per bot and overall."""
@@ -205,6 +207,7 @@ class AutoOptimizer:
 # FeedbackLoop (facade)
 # ---------------------------------------------------------------------------
 
+
 class FeedbackLoop:
     """Composes PerformanceTracker, RevenueTracker, and AutoOptimizer."""
 
@@ -226,8 +229,7 @@ class FeedbackLoop:
             "suggestions": suggestions,
             "optimizations_applied": len(applied),
             "metrics_summary": {
-                mt.value: self.tracker.get_average(bot_id, mt)
-                for mt in MetricType
+                mt.value: self.tracker.get_average(bot_id, mt) for mt in MetricType
             },
             "revenue": self.revenue.get_revenue(bot_id),
         }

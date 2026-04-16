@@ -49,13 +49,17 @@ def _sha256(path: Path) -> str:
 
 def _list_tracked_files(cwd: Path = ROOT) -> list[Path]:
     """Return all files currently tracked by git."""
-    rc, out = _run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=cwd)
+    rc, out = _run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=cwd
+    )
     if rc != 0:
         return []
     return [cwd / p.strip() for p in out.splitlines() if p.strip()]
 
 
-def _changed_files_in_pr(base: str, head: str, cwd: Path = ROOT) -> dict[str, list[str]]:
+def _changed_files_in_pr(
+    base: str, head: str, cwd: Path = ROOT
+) -> dict[str, list[str]]:
     """
     Return files categorised by status (added, modified, deleted, renamed).
     Falls back to comparing HEAD with HEAD~1 when base/head are not available.
@@ -114,6 +118,7 @@ def check_duplicate_files(files: list[Path]) -> list[dict[str, Any]]:
 # Check 2 — Duplicate symbols (Python functions / classes, JS exports)
 # ---------------------------------------------------------------------------
 
+
 def _python_symbols(path: Path) -> list[str]:
     try:
         tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
@@ -128,10 +133,10 @@ def _python_symbols(path: Path) -> list[str]:
 
 _JS_SYM_RE = re.compile(
     r"""(?:^|\s)(?:"""
-    r"""function\s+(\w+)"""                           # function foo()
-    r"""|class\s+(\w+)"""                             # class Foo
+    r"""function\s+(\w+)"""  # function foo()
+    r"""|class\s+(\w+)"""  # class Foo
     r"""|(?:const|let|var)\s+(\w+)\s*=\s*(?:function|\(|async\s*\()"""  # const foo = function / () =>
-    r"""|(?:const|let|var)\s+(\w+)\s*=\s*async\s+function"""            # const foo = async function
+    r"""|(?:const|let|var)\s+(\w+)\s*=\s*async\s+function"""  # const foo = async function
     r""")""",
     re.MULTILINE,
 )
@@ -178,7 +183,7 @@ def check_duplicate_symbols(files: list[Path]) -> list[dict[str, Any]]:
 # Check 3 — Data loss (deleted critical files)
 # ---------------------------------------------------------------------------
 
-_MAX_SYMBOLS_DISPLAY = 20   # max duplicate-symbol entries shown in PR comment
+_MAX_SYMBOLS_DISPLAY = 20  # max duplicate-symbol entries shown in PR comment
 _MAX_CHANGELOG_DISPLAY = 50  # max change-log entries shown in PR comment
 
 _CRITICAL_PATTERNS = [
@@ -186,7 +191,7 @@ _CRITICAL_PATTERNS = [
     re.compile(r"^package\.json$"),
     re.compile(r"^README(\.md)?$", re.IGNORECASE),
     re.compile(r"^framework/"),
-    re.compile(r"^bots/[^/]+/[^/]+\.py$"),       # any Python module inside a bot folder
+    re.compile(r"^bots/[^/]+/[^/]+\.py$"),  # any Python module inside a bot folder
     re.compile(r"^tests/test_.*\.py$"),
     re.compile(r"^tools/"),
     re.compile(r"^\.github/workflows/"),
@@ -199,7 +204,9 @@ def check_data_loss(deleted: list[str]) -> list[dict[str, str]]:
     for path in deleted:
         for pat in _CRITICAL_PATTERNS:
             if pat.search(path):
-                flagged.append({"file": path, "reason": f"Matches critical pattern: {pat.pattern}"})
+                flagged.append(
+                    {"file": path, "reason": f"Matches critical pattern: {pat.pattern}"}
+                )
                 break
     return flagged
 
@@ -211,12 +218,25 @@ def check_data_loss(deleted: list[str]) -> list[dict[str, str]]:
 _CONFLICT_RE = re.compile(r"^(<{7}|={7}|>{7})\s", re.MULTILINE)
 
 _TEXT_EXTENSIONS = {
-    ".py", ".js", ".ts", ".mjs", ".cjs", ".json", ".md",
-    ".txt", ".yml", ".yaml", ".html", ".css", ".sh",
+    ".py",
+    ".js",
+    ".ts",
+    ".mjs",
+    ".cjs",
+    ".json",
+    ".md",
+    ".txt",
+    ".yml",
+    ".yaml",
+    ".html",
+    ".css",
+    ".sh",
 }
 
 
-def check_conflict_markers(changed_files: list[str], cwd: Path = ROOT) -> list[dict[str, Any]]:
+def check_conflict_markers(
+    changed_files: list[str], cwd: Path = ROOT
+) -> list[dict[str, Any]]:
     """Return files that still contain git merge-conflict markers."""
     conflicts = []
     for rel in changed_files:
@@ -242,7 +262,10 @@ def check_conflict_markers(changed_files: list[str], cwd: Path = ROOT) -> list[d
 # Change audit log
 # ---------------------------------------------------------------------------
 
-def build_change_log(categories: dict[str, list[str]], cwd: Path = ROOT) -> list[dict[str, Any]]:
+
+def build_change_log(
+    categories: dict[str, list[str]], cwd: Path = ROOT
+) -> list[dict[str, Any]]:
     log = []
     for status, files in categories.items():
         for f in files:
@@ -257,6 +280,7 @@ def build_change_log(categories: dict[str, list[str]], cwd: Path = ROOT) -> list
 # ---------------------------------------------------------------------------
 # Report assembly
 # ---------------------------------------------------------------------------
+
 
 def build_report(
     dup_files: list[dict],
@@ -310,9 +334,19 @@ def format_markdown(report: dict[str, Any]) -> str:
         return f"| {label} | {count} | {marker} |"
 
     lines += [
-        row("Duplicate files introduced by this change", summary["duplicate_files_new"], True),
-        row("Pre-existing duplicate files (repo-wide)", summary["duplicate_files_preexisting"], False),
-        row("Duplicate code symbols (this change)", summary["duplicate_symbols"], False),
+        row(
+            "Duplicate files introduced by this change",
+            summary["duplicate_files_new"],
+            True,
+        ),
+        row(
+            "Pre-existing duplicate files (repo-wide)",
+            summary["duplicate_files_preexisting"],
+            False,
+        ),
+        row(
+            "Duplicate code symbols (this change)", summary["duplicate_symbols"], False
+        ),
         row("Data loss risk (deleted critical files)", summary["data_loss_risk"], True),
         row("Merge conflict markers", summary["conflict_markers"], True),
         f"| Files changed in this update | {summary['total_changed_files']} | ℹ️ |",
@@ -327,7 +361,9 @@ def format_markdown(report: dict[str, Any]) -> str:
             "",
         ]
         for entry in report["duplicate_files"]:
-            lines.append(f"- **SHA:** `{entry['sha256']}` — files: `{'`, `'.join(entry['files'])}`")
+            lines.append(
+                f"- **SHA:** `{entry['sha256']}` — files: `{'`, `'.join(entry['files'])}`"
+            )
         lines += [
             "",
             "**Recommended action:** Keep one canonical copy and update all imports/references.",
@@ -342,7 +378,9 @@ def format_markdown(report: dict[str, Any]) -> str:
             "",
         ]
         for entry in report["duplicate_files_preexisting"]:
-            lines.append(f"- **SHA:** `{entry['sha256']}` — files: `{'`, `'.join(entry['files'])}`")
+            lines.append(
+                f"- **SHA:** `{entry['sha256']}` — files: `{'`, `'.join(entry['files'])}`"
+            )
         lines.append("")
 
     if report["data_loss_risk"]:
@@ -359,7 +397,9 @@ def format_markdown(report: dict[str, Any]) -> str:
         lines += ["### 🚫 Unresolved Merge Conflict Markers", ""]
         for entry in report["conflict_markers"]:
             linenos = ", ".join(str(n) for n in entry["conflict_lines"][:10])
-            lines.append(f"- `{entry['file']}` — conflict markers at line(s): {linenos}")
+            lines.append(
+                f"- `{entry['file']}` — conflict markers at line(s): {linenos}"
+            )
         lines += [
             "",
             "**Recommended action:** Resolve all conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) before merging.",
@@ -373,21 +413,31 @@ def format_markdown(report: dict[str, Any]) -> str:
             "This is a warning — it may be intentional (e.g., base classes) but should be reviewed.",
             "",
         ]
-        for entry in report["duplicate_symbols"][:_MAX_SYMBOLS_DISPLAY]:  # cap to keep comment readable
+        for entry in report["duplicate_symbols"][
+            :_MAX_SYMBOLS_DISPLAY
+        ]:  # cap to keep comment readable
             files = ", ".join(f"`{p}`" for p in entry["defined_in"])
             lines.append(f"- `{entry['symbol']}` — defined in: {files}")
         if len(report["duplicate_symbols"]) > _MAX_SYMBOLS_DISPLAY:
-            lines.append(f"- … and {len(report['duplicate_symbols']) - _MAX_SYMBOLS_DISPLAY} more (see JSON report artifact)")
+            lines.append(
+                f"- … and {len(report['duplicate_symbols']) - _MAX_SYMBOLS_DISPLAY} more (see JSON report artifact)"
+            )
         lines.append("")
 
     if report["change_log"]:
         lines += ["### 📋 Change Audit Log", ""]
         lines += ["| File | Status | Size |", "|------|--------|------|"]
         for entry in report["change_log"][:_MAX_CHANGELOG_DISPLAY]:
-            size = f"{entry.get('size_bytes', '—')} bytes" if "size_bytes" in entry else "deleted"
+            size = (
+                f"{entry.get('size_bytes', '—')} bytes"
+                if "size_bytes" in entry
+                else "deleted"
+            )
             lines.append(f"| `{entry['file']}` | {entry['status']} | {size} |")
         if len(report["change_log"]) > _MAX_CHANGELOG_DISPLAY:
-            lines.append(f"| … | +{len(report['change_log']) - _MAX_CHANGELOG_DISPLAY} more | |")
+            lines.append(
+                f"| … | +{len(report['change_log']) - _MAX_CHANGELOG_DISPLAY} more | |"
+            )
         lines.append("")
 
     if report["blocking"]:
@@ -414,12 +464,25 @@ def format_markdown(report: dict[str, Any]) -> str:
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="DreamCobots data-integrity checker")
-    parser.add_argument("--base", default="origin/main", help="Base ref for diff (default: origin/main)")
-    parser.add_argument("--head", default="HEAD", help="Head ref for diff (default: HEAD)")
-    parser.add_argument("--output-json", default="/tmp/integrity-report.json", help="Path to write JSON report")
-    parser.add_argument("--output-md", default="/tmp/integrity-report.md", help="Path to write Markdown report")
+    parser.add_argument(
+        "--base", default="origin/main", help="Base ref for diff (default: origin/main)"
+    )
+    parser.add_argument(
+        "--head", default="HEAD", help="Head ref for diff (default: HEAD)"
+    )
+    parser.add_argument(
+        "--output-json",
+        default="/tmp/integrity-report.json",
+        help="Path to write JSON report",
+    )
+    parser.add_argument(
+        "--output-md",
+        default="/tmp/integrity-report.md",
+        help="Path to write Markdown report",
+    )
     parser.add_argument(
         "--skip-symbol-scan",
         action="store_true",
@@ -464,8 +527,14 @@ def main() -> int:
     change_log = build_change_log(categories)
 
     # 4. Build report (pass pre-existing duplicates separately for informational display)
-    report = build_report(dup_files_new, dup_symbols, data_loss, conflicts, change_log,
-                          preexisting_dup_files=dup_files_existing)
+    report = build_report(
+        dup_files_new,
+        dup_symbols,
+        data_loss,
+        conflicts,
+        change_log,
+        preexisting_dup_files=dup_files_existing,
+    )
     md = format_markdown(report)
 
     # 5. Write outputs

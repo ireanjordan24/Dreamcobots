@@ -2,12 +2,13 @@
 # Functionality: Helps gig workers maximise earnings and manage multiple income streams.
 # Use Cases: Uber drivers, TaskRabbit workers, multi-platform freelancers.
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from framework import BaseBot
-from framework.monetization import PricingPlan, PricingModel
+from framework.monetization import PricingModel, PricingPlan
 
 
 class GigEconomyBot(BaseBot):
@@ -20,11 +21,11 @@ class GigEconomyBot(BaseBot):
     """
 
     _PLATFORMS = {
-        "rideshare":   ["Uber", "Lyft", "Via"],
-        "delivery":    ["DoorDash", "Instacart", "Amazon Flex", "Postmates"],
-        "freelance":   ["Upwork", "Fiverr", "Toptal", "99designs"],
-        "tasks":       ["TaskRabbit", "Handy", "Thumbtack"],
-        "tutoring":    ["Wyzant", "Chegg Tutors", "VIPKid"],
+        "rideshare": ["Uber", "Lyft", "Via"],
+        "delivery": ["DoorDash", "Instacart", "Amazon Flex", "Postmates"],
+        "freelance": ["Upwork", "Fiverr", "Toptal", "99designs"],
+        "tasks": ["TaskRabbit", "Handy", "Thumbtack"],
+        "tutoring": ["Wyzant", "Chegg Tutors", "VIPKid"],
     }
 
     def __init__(self):
@@ -48,14 +49,21 @@ class GigEconomyBot(BaseBot):
 
     def _setup_plans(self):
         super()._setup_plans()
-        self.monetization.add_plan(PricingPlan(
-            plan_id="gig_optimizer",
-            name="Gig Optimizer",
-            model=PricingModel.SUBSCRIPTION,
-            price_usd=9.99,
-            description="Monthly earnings optimisation with peak-hour alerts and tax estimates.",
-            features=["Peak-hour alerts", "Platform earnings comparison", "Tax estimates", "Tips"],
-        ))
+        self.monetization.add_plan(
+            PricingPlan(
+                plan_id="gig_optimizer",
+                name="Gig Optimizer",
+                model=PricingModel.SUBSCRIPTION,
+                price_usd=9.99,
+                description="Monthly earnings optimisation with peak-hour alerts and tax estimates.",
+                features=[
+                    "Peak-hour alerts",
+                    "Platform earnings comparison",
+                    "Tax estimates",
+                    "Tips",
+                ],
+            )
+        )
 
     def _build_response(self, nlp_result, user_id):
         intent = nlp_result["intent"]

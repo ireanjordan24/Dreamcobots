@@ -4,15 +4,21 @@ Athlete Module for CreatorEmpire.
 Handles highlight reel editing, recruitment profile management, and NIL
 (Name, Image, Likeness) monetization guides for the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -25,25 +31,39 @@ class AthleteModuleError(Exception):
 # ---------------------------------------------------------------------------
 
 SPORTS = [
-    "basketball", "football", "soccer", "baseball", "track_and_field",
-    "swimming", "tennis", "volleyball", "wrestling", "esports",
+    "basketball",
+    "football",
+    "soccer",
+    "baseball",
+    "track_and_field",
+    "swimming",
+    "tennis",
+    "volleyball",
+    "wrestling",
+    "esports",
 ]
 
 NIL_DEAL_CATEGORIES = [
-    "social_media_sponsorship", "autograph_signing", "appearance_fee",
-    "merchandise_deal", "brand_ambassador", "content_creation",
-    "camp_instruction", "endorsement",
+    "social_media_sponsorship",
+    "autograph_signing",
+    "appearance_fee",
+    "merchandise_deal",
+    "brand_ambassador",
+    "content_creation",
+    "camp_instruction",
+    "endorsement",
 ]
 
 
 @dataclass
 class HighlightClip:
     """Represents a single highlight clip."""
+
     clip_id: str
     timestamp_start: float  # seconds
-    timestamp_end: float    # seconds
+    timestamp_end: float  # seconds
     description: str = ""
-    score: float = 0.0      # AI-assigned quality score (0–1)
+    score: float = 0.0  # AI-assigned quality score (0–1)
 
     def duration(self) -> float:
         return max(0.0, self.timestamp_end - self.timestamp_start)
@@ -62,6 +82,7 @@ class HighlightClip:
 @dataclass
 class HighlightReel:
     """A compiled highlight reel for an athlete."""
+
     reel_id: str
     talent_id: str
     title: str
@@ -87,6 +108,7 @@ class HighlightReel:
 @dataclass
 class RecruitmentProfile:
     """Athletic recruitment profile sent to colleges/teams."""
+
     talent_id: str
     sport: str
     position: str
@@ -114,6 +136,7 @@ class RecruitmentProfile:
 @dataclass
 class NILDeal:
     """Represents an NIL monetization opportunity."""
+
     deal_id: str
     talent_id: str
     category: str
@@ -187,7 +210,9 @@ class AthleteModule:
     # Highlight reel management
     # ------------------------------------------------------------------
 
-    def create_highlight_reel(self, reel_id: str, talent_id: str, title: str) -> HighlightReel:
+    def create_highlight_reel(
+        self, reel_id: str, talent_id: str, title: str
+    ) -> HighlightReel:
         """Create a new empty highlight reel."""
         if reel_id in self._reels:
             raise AthleteModuleError(f"Reel ID '{reel_id}' already exists.")
@@ -206,7 +231,9 @@ class AthleteModule:
         """Add a clip to a highlight reel."""
         reel = self._get_reel(reel_id)
         if timestamp_end <= timestamp_start:
-            raise AthleteModuleError("timestamp_end must be greater than timestamp_start.")
+            raise AthleteModuleError(
+                "timestamp_end must be greater than timestamp_start."
+            )
         clip = HighlightClip(
             clip_id=clip_id,
             timestamp_start=timestamp_start,
@@ -274,18 +301,26 @@ class AthleteModule:
         self._recruitment_profiles[talent_id] = profile
         return profile
 
-    def attach_reel_to_recruitment(self, talent_id: str, reel_id: str) -> RecruitmentProfile:
+    def attach_reel_to_recruitment(
+        self, talent_id: str, reel_id: str
+    ) -> RecruitmentProfile:
         """Link a highlight reel URL to a recruitment profile."""
         if talent_id not in self._recruitment_profiles:
-            raise AthleteModuleError(f"No recruitment profile for talent '{talent_id}'.")
+            raise AthleteModuleError(
+                f"No recruitment profile for talent '{talent_id}'."
+            )
         reel = self._get_reel(reel_id)
         profile = self._recruitment_profiles[talent_id]
-        profile.highlight_reel_url = reel.export_url or f"https://creatorempire.io/reels/{reel_id}"
+        profile.highlight_reel_url = (
+            reel.export_url or f"https://creatorempire.io/reels/{reel_id}"
+        )
         return profile
 
     def get_recruitment_profile(self, talent_id: str) -> dict:
         if talent_id not in self._recruitment_profiles:
-            raise AthleteModuleError(f"No recruitment profile for talent '{talent_id}'.")
+            raise AthleteModuleError(
+                f"No recruitment profile for talent '{talent_id}'."
+            )
         return self._recruitment_profiles[talent_id].to_dict()
 
     # ------------------------------------------------------------------
@@ -333,7 +368,9 @@ class AthleteModule:
             raise AthleteModuleError(f"Deal '{deal_id}' not found.")
         valid = {"prospect", "negotiating", "signed", "completed"}
         if status not in valid:
-            raise AthleteModuleError(f"Invalid status '{status}'. Choose from: {valid}.")
+            raise AthleteModuleError(
+                f"Invalid status '{status}'. Choose from: {valid}."
+            )
         self._nil_deals[deal_id].status = status
         return self._nil_deals[deal_id]
 

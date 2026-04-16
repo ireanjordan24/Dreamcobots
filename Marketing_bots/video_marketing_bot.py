@@ -5,12 +5,14 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations
-import sys, os
-import random
-from enum import Enum
-from typing import Optional, List, Dict, Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import random
+import sys
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -33,7 +35,208 @@ class VideoMarketingBot:
     # String-keyed to avoid cross-module enum identity issues
     RESULT_LIMITS: Dict[str, int] = {"free": 5, "pro": 25, "enterprise": 100}
 
-    MOCK_DATA: List[Dict[str, Any]] = [{'id': 'MKT001', 'campaign': 'Campaign 1', 'channel': 'Social', 'reach': 900, 'clicks': 85, 'conversions': 8, 'score': 47.7, 'budget_usd': 175}, {'id': 'MKT002', 'campaign': 'Campaign 2', 'channel': 'SEO', 'reach': 1300, 'clicks': 120, 'conversions': 11, 'score': 50.4, 'budget_usd': 250}, {'id': 'MKT003', 'campaign': 'Campaign 3', 'channel': 'PPC', 'reach': 1700, 'clicks': 155, 'conversions': 14, 'score': 53.1, 'budget_usd': 325}, {'id': 'MKT004', 'campaign': 'Campaign 4', 'channel': 'Content', 'reach': 2100, 'clicks': 190, 'conversions': 17, 'score': 55.8, 'budget_usd': 400}, {'id': 'MKT005', 'campaign': 'Campaign 5', 'channel': 'Email', 'reach': 2500, 'clicks': 225, 'conversions': 20, 'score': 58.5, 'budget_usd': 475}, {'id': 'MKT006', 'campaign': 'Campaign 6', 'channel': 'Social', 'reach': 2900, 'clicks': 260, 'conversions': 23, 'score': 61.2, 'budget_usd': 550}, {'id': 'MKT007', 'campaign': 'Campaign 7', 'channel': 'SEO', 'reach': 3300, 'clicks': 295, 'conversions': 26, 'score': 63.9, 'budget_usd': 625}, {'id': 'MKT008', 'campaign': 'Campaign 8', 'channel': 'PPC', 'reach': 3700, 'clicks': 330, 'conversions': 29, 'score': 66.6, 'budget_usd': 700}, {'id': 'MKT009', 'campaign': 'Campaign 9', 'channel': 'Content', 'reach': 4100, 'clicks': 365, 'conversions': 32, 'score': 69.3, 'budget_usd': 775}, {'id': 'MKT010', 'campaign': 'Campaign 10', 'channel': 'Email', 'reach': 4500, 'clicks': 400, 'conversions': 35, 'score': 72.0, 'budget_usd': 850}, {'id': 'MKT011', 'campaign': 'Campaign 11', 'channel': 'Social', 'reach': 4900, 'clicks': 435, 'conversions': 38, 'score': 74.7, 'budget_usd': 925}, {'id': 'MKT012', 'campaign': 'Campaign 12', 'channel': 'SEO', 'reach': 5300, 'clicks': 470, 'conversions': 41, 'score': 77.4, 'budget_usd': 1000}, {'id': 'MKT013', 'campaign': 'Campaign 13', 'channel': 'PPC', 'reach': 5700, 'clicks': 505, 'conversions': 44, 'score': 80.1, 'budget_usd': 1075}, {'id': 'MKT014', 'campaign': 'Campaign 14', 'channel': 'Content', 'reach': 6100, 'clicks': 540, 'conversions': 47, 'score': 82.8, 'budget_usd': 1150}, {'id': 'MKT015', 'campaign': 'Campaign 15', 'channel': 'Email', 'reach': 6500, 'clicks': 575, 'conversions': 50, 'score': 85.5, 'budget_usd': 1225}, {'id': 'MKT016', 'campaign': 'Campaign 16', 'channel': 'Social', 'reach': 6900, 'clicks': 610, 'conversions': 53, 'score': 88.2, 'budget_usd': 1300}, {'id': 'MKT017', 'campaign': 'Campaign 17', 'channel': 'SEO', 'reach': 7300, 'clicks': 645, 'conversions': 56, 'score': 90.9, 'budget_usd': 1375}, {'id': 'MKT018', 'campaign': 'Campaign 18', 'channel': 'PPC', 'reach': 7700, 'clicks': 680, 'conversions': 59, 'score': 93.6, 'budget_usd': 1450}, {'id': 'MKT019', 'campaign': 'Campaign 19', 'channel': 'Content', 'reach': 8100, 'clicks': 715, 'conversions': 62, 'score': 96.3, 'budget_usd': 1525}, {'id': 'MKT020', 'campaign': 'Campaign 20', 'channel': 'Email', 'reach': 8500, 'clicks': 750, 'conversions': 65, 'score': 99.0, 'budget_usd': 1600}]
+    MOCK_DATA: List[Dict[str, Any]] = [
+        {
+            "id": "MKT001",
+            "campaign": "Campaign 1",
+            "channel": "Social",
+            "reach": 900,
+            "clicks": 85,
+            "conversions": 8,
+            "score": 47.7,
+            "budget_usd": 175,
+        },
+        {
+            "id": "MKT002",
+            "campaign": "Campaign 2",
+            "channel": "SEO",
+            "reach": 1300,
+            "clicks": 120,
+            "conversions": 11,
+            "score": 50.4,
+            "budget_usd": 250,
+        },
+        {
+            "id": "MKT003",
+            "campaign": "Campaign 3",
+            "channel": "PPC",
+            "reach": 1700,
+            "clicks": 155,
+            "conversions": 14,
+            "score": 53.1,
+            "budget_usd": 325,
+        },
+        {
+            "id": "MKT004",
+            "campaign": "Campaign 4",
+            "channel": "Content",
+            "reach": 2100,
+            "clicks": 190,
+            "conversions": 17,
+            "score": 55.8,
+            "budget_usd": 400,
+        },
+        {
+            "id": "MKT005",
+            "campaign": "Campaign 5",
+            "channel": "Email",
+            "reach": 2500,
+            "clicks": 225,
+            "conversions": 20,
+            "score": 58.5,
+            "budget_usd": 475,
+        },
+        {
+            "id": "MKT006",
+            "campaign": "Campaign 6",
+            "channel": "Social",
+            "reach": 2900,
+            "clicks": 260,
+            "conversions": 23,
+            "score": 61.2,
+            "budget_usd": 550,
+        },
+        {
+            "id": "MKT007",
+            "campaign": "Campaign 7",
+            "channel": "SEO",
+            "reach": 3300,
+            "clicks": 295,
+            "conversions": 26,
+            "score": 63.9,
+            "budget_usd": 625,
+        },
+        {
+            "id": "MKT008",
+            "campaign": "Campaign 8",
+            "channel": "PPC",
+            "reach": 3700,
+            "clicks": 330,
+            "conversions": 29,
+            "score": 66.6,
+            "budget_usd": 700,
+        },
+        {
+            "id": "MKT009",
+            "campaign": "Campaign 9",
+            "channel": "Content",
+            "reach": 4100,
+            "clicks": 365,
+            "conversions": 32,
+            "score": 69.3,
+            "budget_usd": 775,
+        },
+        {
+            "id": "MKT010",
+            "campaign": "Campaign 10",
+            "channel": "Email",
+            "reach": 4500,
+            "clicks": 400,
+            "conversions": 35,
+            "score": 72.0,
+            "budget_usd": 850,
+        },
+        {
+            "id": "MKT011",
+            "campaign": "Campaign 11",
+            "channel": "Social",
+            "reach": 4900,
+            "clicks": 435,
+            "conversions": 38,
+            "score": 74.7,
+            "budget_usd": 925,
+        },
+        {
+            "id": "MKT012",
+            "campaign": "Campaign 12",
+            "channel": "SEO",
+            "reach": 5300,
+            "clicks": 470,
+            "conversions": 41,
+            "score": 77.4,
+            "budget_usd": 1000,
+        },
+        {
+            "id": "MKT013",
+            "campaign": "Campaign 13",
+            "channel": "PPC",
+            "reach": 5700,
+            "clicks": 505,
+            "conversions": 44,
+            "score": 80.1,
+            "budget_usd": 1075,
+        },
+        {
+            "id": "MKT014",
+            "campaign": "Campaign 14",
+            "channel": "Content",
+            "reach": 6100,
+            "clicks": 540,
+            "conversions": 47,
+            "score": 82.8,
+            "budget_usd": 1150,
+        },
+        {
+            "id": "MKT015",
+            "campaign": "Campaign 15",
+            "channel": "Email",
+            "reach": 6500,
+            "clicks": 575,
+            "conversions": 50,
+            "score": 85.5,
+            "budget_usd": 1225,
+        },
+        {
+            "id": "MKT016",
+            "campaign": "Campaign 16",
+            "channel": "Social",
+            "reach": 6900,
+            "clicks": 610,
+            "conversions": 53,
+            "score": 88.2,
+            "budget_usd": 1300,
+        },
+        {
+            "id": "MKT017",
+            "campaign": "Campaign 17",
+            "channel": "SEO",
+            "reach": 7300,
+            "clicks": 645,
+            "conversions": 56,
+            "score": 90.9,
+            "budget_usd": 1375,
+        },
+        {
+            "id": "MKT018",
+            "campaign": "Campaign 18",
+            "channel": "PPC",
+            "reach": 7700,
+            "clicks": 680,
+            "conversions": 59,
+            "score": 93.6,
+            "budget_usd": 1450,
+        },
+        {
+            "id": "MKT019",
+            "campaign": "Campaign 19",
+            "channel": "Content",
+            "reach": 8100,
+            "clicks": 715,
+            "conversions": 62,
+            "score": 96.3,
+            "budget_usd": 1525,
+        },
+        {
+            "id": "MKT020",
+            "campaign": "Campaign 20",
+            "channel": "Email",
+            "reach": 8500,
+            "clicks": 750,
+            "conversions": 65,
+            "score": 99.0,
+            "budget_usd": 1600,
+        },
+    ]
 
     def __init__(self, tier: Tier = Tier.FREE):
         # Normalize cross-module Tier enum instances by value string
@@ -109,4 +312,3 @@ class VideoMarketingBot:
             "items": self.MOCK_DATA,
             "generated_by": "GLOBAL AI SOURCES FLOW",
         }
-

@@ -1,16 +1,18 @@
 """Tests for shared core modules."""
+
 import pytest
 
-from core.bot_base import AbstractBotBase as BotBase, BotStatus
-from core.revenue_engine import RevenueEngine
+from core.bot_base import AbstractBotBase as BotBase
+from core.bot_base import BotStatus
 from core.crash_guard import crash_guard, safe_run
-from core.monetization_hooks import MonetizationHooks
 from core.dream_core import DreamCore
-
+from core.monetization_hooks import MonetizationHooks
+from core.revenue_engine import RevenueEngine
 
 # ---------------------------------------------------------------------------
 # BotBase tests
 # ---------------------------------------------------------------------------
+
 
 class ConcreteBot(BotBase):
     """Minimal concrete bot for testing BotBase lifecycle."""
@@ -35,8 +37,12 @@ class ErrorBot(BotBase):
     def __init__(self):
         super().__init__(name="ErrorBot")
 
-    def on_start(self): pass
-    def on_stop(self): pass
+    def on_start(self):
+        pass
+
+    def on_stop(self):
+        pass
+
     def execute(self):
         raise ValueError("boom")
 
@@ -78,6 +84,7 @@ class TestBotBase:
 # RevenueEngine tests
 # ---------------------------------------------------------------------------
 
+
 class TestRevenueEngine:
     def test_record_and_total(self):
         engine = RevenueEngine()
@@ -116,6 +123,7 @@ class TestRevenueEngine:
 # CrashGuard tests
 # ---------------------------------------------------------------------------
 
+
 class TestCrashGuard:
     def test_crash_guard_decorator_swallows_exception(self):
         @crash_guard
@@ -148,6 +156,7 @@ class TestCrashGuard:
 # ---------------------------------------------------------------------------
 # MonetizationHooks tests
 # ---------------------------------------------------------------------------
+
 
 class TestMonetizationHooks:
     def test_track_records_stage(self):
@@ -187,6 +196,7 @@ class TestMonetizationHooks:
 # ---------------------------------------------------------------------------
 # DreamCore tests
 # ---------------------------------------------------------------------------
+
 
 class TestDreamCore:
     def test_generate_email_structure(self):

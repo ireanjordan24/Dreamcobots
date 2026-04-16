@@ -31,7 +31,6 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # Email sequence length limits
 MIN_EMAIL_SEQUENCE_LENGTH: int = 3
 MAX_EMAIL_SEQUENCE_LENGTH: int = 10
@@ -40,6 +39,7 @@ MAX_EMAIL_SEQUENCE_LENGTH: int = 10
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class DeliverableType(Enum):
     AD_COPY = "ad_copy"
@@ -63,6 +63,7 @@ class DeliverableStatus(Enum):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Deliverable:
@@ -95,6 +96,7 @@ class Deliverable:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class FulfillmentEngineError(Exception):
     """Base exception for FulfillmentEngine errors."""
@@ -138,6 +140,7 @@ _PLATFORMS = ["Facebook", "Instagram", "Google", "TikTok", "LinkedIn", "X (Twitt
 # ---------------------------------------------------------------------------
 # FulfillmentEngine
 # ---------------------------------------------------------------------------
+
 
 class FulfillmentEngine:
     """Delivers services automatically after a deal is closed.
@@ -207,19 +210,21 @@ class FulfillmentEngine:
 
         ads = []
         for platform in chosen_platforms:
-            ads.append({
-                "platform": platform,
-                "headline": rng.choice(_AD_HOOKS).replace("{client}", client_name),
-                "body": (
-                    f"Attention {industry} owners — "
-                    f"DreamCo Buddy AI has helped businesses just like {client_name} "
-                    f"grow their customer base by 3x in 60 days using automated "
-                    f"marketing systems. No guesswork. No wasted budget. "
-                    f"Just results."
-                ),
-                "cta": rng.choice(_CTA_PHRASES),
-                "estimated_reach": rng.randint(5000, 80000),
-            })
+            ads.append(
+                {
+                    "platform": platform,
+                    "headline": rng.choice(_AD_HOOKS).replace("{client}", client_name),
+                    "body": (
+                        f"Attention {industry} owners — "
+                        f"DreamCo Buddy AI has helped businesses just like {client_name} "
+                        f"grow their customer base by 3x in 60 days using automated "
+                        f"marketing systems. No guesswork. No wasted budget. "
+                        f"Just results."
+                    ),
+                    "cta": rng.choice(_CTA_PHRASES),
+                    "estimated_reach": rng.randint(5000, 80000),
+                }
+            )
 
         return self._create_deliverable(
             client_name=client_name,
@@ -322,7 +327,14 @@ class FulfillmentEngine:
                 "form_fields": ["First name", "Email address", "Phone number"],
                 "cta_button": rng.choice(_CTA_PHRASES),
                 "trust_badges": ["SSL Secured", "No Spam", "Cancel Anytime"],
-                "sections": ["Hero", "Pain Points", "Solution", "Social Proof", "CTA", "FAQ"],
+                "sections": [
+                    "Hero",
+                    "Pain Points",
+                    "Solution",
+                    "Social Proof",
+                    "CTA",
+                    "FAQ",
+                ],
             },
         )
 
@@ -351,34 +363,40 @@ class FulfillmentEngine:
             raise FulfillmentEngineTierError(
                 "Email sequence generation requires PRO tier or above."
             )
-        sequence_length = max(MIN_EMAIL_SEQUENCE_LENGTH, min(sequence_length, MAX_EMAIL_SEQUENCE_LENGTH))
+        sequence_length = max(
+            MIN_EMAIL_SEQUENCE_LENGTH, min(sequence_length, MAX_EMAIL_SEQUENCE_LENGTH)
+        )
         rng = random.Random(self._counter + hash(client_name) % 555)
 
         emails = []
         for i in range(sequence_length):
             day = [0, 2, 4, 7, 10, 14, 21, 28, 35, 42][i]
-            emails.append({
-                "email_number": i + 1,
-                "send_day": day,
-                "subject": _EMAIL_SUBJECTS[i % len(_EMAIL_SUBJECTS)].format(client=client_name),
-                "preview_text": f"Quick update for {client_name} — Day {day}",
-                "body_summary": (
-                    f"Email {i + 1} ({goal}): "
-                    + [
-                        f"Welcome to DreamCo! Here's what happens next for {client_name}.",
-                        f"Your first quick win — here's the easiest thing to improve.",
-                        f"Case study: how a business like {client_name} grew 40% in 30 days.",
-                        f"Frequently asked questions — answered.",
-                        f"Your progress report — what we've done so far.",
-                        f"Introducing our most powerful feature for {client_name}.",
-                        f"Special offer — upgrade and save 30% this month only.",
-                        f"Success story: {client_name} spotlight.",
-                        f"What's coming next for your account.",
-                        f"Thank you — and here's your bonus resource.",
-                    ][i % 10]
-                ),
-                "cta": rng.choice(_CTA_PHRASES),
-            })
+            emails.append(
+                {
+                    "email_number": i + 1,
+                    "send_day": day,
+                    "subject": _EMAIL_SUBJECTS[i % len(_EMAIL_SUBJECTS)].format(
+                        client=client_name
+                    ),
+                    "preview_text": f"Quick update for {client_name} — Day {day}",
+                    "body_summary": (
+                        f"Email {i + 1} ({goal}): "
+                        + [
+                            f"Welcome to DreamCo! Here's what happens next for {client_name}.",
+                            f"Your first quick win — here's the easiest thing to improve.",
+                            f"Case study: how a business like {client_name} grew 40% in 30 days.",
+                            f"Frequently asked questions — answered.",
+                            f"Your progress report — what we've done so far.",
+                            f"Introducing our most powerful feature for {client_name}.",
+                            f"Special offer — upgrade and save 30% this month only.",
+                            f"Success story: {client_name} spotlight.",
+                            f"What's coming next for your account.",
+                            f"Thank you — and here's your bonus resource.",
+                        ][i % 10]
+                    ),
+                    "cta": rng.choice(_CTA_PHRASES),
+                }
+            )
 
         return self._create_deliverable(
             client_name=client_name,
@@ -479,34 +497,56 @@ class FulfillmentEngine:
                     {
                         "name": "Appointment Booking",
                         "tool": "Calendly / Cal.com",
-                        "setup_steps": ["Embed booking widget on website", "Configure availability", "Enable reminders"],
+                        "setup_steps": [
+                            "Embed booking widget on website",
+                            "Configure availability",
+                            "Enable reminders",
+                        ],
                     },
                     {
                         "name": "Invoice & Payments",
                         "tool": "Stripe",
-                        "setup_steps": ["Create product catalog", "Set up recurring billing", "Configure automatic receipts"],
+                        "setup_steps": [
+                            "Create product catalog",
+                            "Set up recurring billing",
+                            "Configure automatic receipts",
+                        ],
                     },
                     {
                         "name": "Customer Support Bot",
                         "tool": "DreamCo Buddy AI Chat",
-                        "setup_steps": ["Configure FAQ responses", "Set escalation rules", "Enable 24/7 auto-reply"],
+                        "setup_steps": [
+                            "Configure FAQ responses",
+                            "Set escalation rules",
+                            "Enable 24/7 auto-reply",
+                        ],
                     },
                     {
                         "name": "CRM & Lead Tracking",
                         "tool": "HubSpot / Pipedrive",
-                        "setup_steps": ["Import existing contacts", "Set up pipeline stages", "Configure auto-follow-ups"],
+                        "setup_steps": [
+                            "Import existing contacts",
+                            "Set up pipeline stages",
+                            "Configure auto-follow-ups",
+                        ],
                     },
                     {
                         "name": "Review Generation",
                         "tool": "Automated email after service delivery",
-                        "setup_steps": ["Set trigger: 48 hours post-service", "Draft review request email", "Track response rate"],
+                        "setup_steps": [
+                            "Set trigger: 48 hours post-service",
+                            "Draft review request email",
+                            "Track response rate",
+                        ],
                     },
                 ],
                 "estimated_time_savings_hrs_per_week": 15,
             },
         )
 
-    def generate_brand_kit(self, client_name: str, industry: str = "general") -> Deliverable:
+    def generate_brand_kit(
+        self, client_name: str, industry: str = "general"
+    ) -> Deliverable:
         """Generate a brand identity kit brief.
 
         Parameters
@@ -539,20 +579,33 @@ class FulfillmentEngine:
             content={
                 "brand_name": client_name,
                 "industry": industry,
-                "brand_voice": rng.choice([
-                    "Bold, confident, results-driven",
-                    "Warm, approachable, community-focused",
-                    "Professional, trustworthy, expert",
-                    "Energetic, innovative, forward-thinking",
-                    "Premium, exclusive, sophisticated",
-                ]),
+                "brand_voice": rng.choice(
+                    [
+                        "Bold, confident, results-driven",
+                        "Warm, approachable, community-focused",
+                        "Professional, trustworthy, expert",
+                        "Energetic, innovative, forward-thinking",
+                        "Premium, exclusive, sophisticated",
+                    ]
+                ),
                 "colour_palette": rng.choice(palettes),
                 "typography": {
-                    "heading": rng.choice(["Montserrat Bold", "Playfair Display", "Raleway ExtraBold", "Bebas Neue"]),
-                    "body": rng.choice(["Open Sans", "Lato", "Source Sans Pro", "Nunito"]),
+                    "heading": rng.choice(
+                        [
+                            "Montserrat Bold",
+                            "Playfair Display",
+                            "Raleway ExtraBold",
+                            "Bebas Neue",
+                        ]
+                    ),
+                    "body": rng.choice(
+                        ["Open Sans", "Lato", "Source Sans Pro", "Nunito"]
+                    ),
                 },
                 "logo_brief": {
-                    "style": rng.choice(["Wordmark", "Icon + Wordmark", "Monogram", "Abstract Icon"]),
+                    "style": rng.choice(
+                        ["Wordmark", "Icon + Wordmark", "Monogram", "Abstract Icon"]
+                    ),
                     "feeling": "Trustworthy, modern, memorable",
                     "avoid": "Clip art, overly complex designs, dated fonts",
                 },
@@ -561,7 +614,12 @@ class FulfillmentEngine:
                     f"Your {industry} partner, elevated.",
                     f"Results. Every time.",
                 ],
-                "social_media_templates": ["Profile picture", "Cover photo", "Post template", "Story template"],
+                "social_media_templates": [
+                    "Profile picture",
+                    "Cover photo",
+                    "Post template",
+                    "Story template",
+                ],
             },
         )
 
@@ -597,19 +655,27 @@ class FulfillmentEngine:
             elif dtype == DeliverableType.AD_CAMPAIGN:
                 results.append(self.generate_ad_campaign(client_name))
             elif dtype == DeliverableType.LANDING_PAGE:
-                results.append(self.build_landing_page(
-                    client_name,
-                    headline=kwargs.get("headline", f"Grow {client_name} with AI Marketing"),
-                    offer_summary=kwargs.get("offer_summary", "Full AI marketing system"),
-                ))
+                results.append(
+                    self.build_landing_page(
+                        client_name,
+                        headline=kwargs.get(
+                            "headline", f"Grow {client_name} with AI Marketing"
+                        ),
+                        offer_summary=kwargs.get(
+                            "offer_summary", "Full AI marketing system"
+                        ),
+                    )
+                )
             elif dtype == DeliverableType.EMAIL_SEQUENCE:
                 results.append(self.generate_email_sequence(client_name))
             elif dtype == DeliverableType.SALES_FUNNEL:
-                results.append(self.assemble_funnel(
-                    client_name,
-                    lead_magnet=kwargs.get("lead_magnet", "Free marketing audit"),
-                    offer=kwargs.get("offer", "Full AI marketing package"),
-                ))
+                results.append(
+                    self.assemble_funnel(
+                        client_name,
+                        lead_magnet=kwargs.get("lead_magnet", "Free marketing audit"),
+                        offer=kwargs.get("offer", "Full AI marketing package"),
+                    )
+                )
             elif dtype == DeliverableType.AUTOMATION_SETUP:
                 results.append(self.setup_automation(client_name))
             elif dtype == DeliverableType.BRAND_KIT:

@@ -1,4 +1,5 @@
 """Direct API seller for DataForge AI datasets."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import hashlib
 import logging
@@ -9,9 +10,21 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 PRICING_TIERS = {
-    "standard": {"price": 499.00, "billing": "monthly", "description": "Standard API access"},
-    "research": {"price": 999.00, "billing": "annual", "description": "Research license"},
-    "enterprise": {"price": None, "billing": "custom", "description": "Enterprise custom pricing"},
+    "standard": {
+        "price": 499.00,
+        "billing": "monthly",
+        "description": "Standard API access",
+    },
+    "research": {
+        "price": 999.00,
+        "billing": "annual",
+        "description": "Research license",
+    },
+    "enterprise": {
+        "price": None,
+        "billing": "custom",
+        "description": "Enterprise custom pricing",
+    },
 }
 
 
@@ -37,7 +50,9 @@ class DirectAPISeller:
             ValueError: If tier is not valid.
         """
         if tier not in PRICING_TIERS:
-            raise ValueError(f"Unknown tier: {tier}. Valid tiers: {list(PRICING_TIERS.keys())}")
+            raise ValueError(
+                f"Unknown tier: {tier}. Valid tiers: {list(PRICING_TIERS.keys())}"
+            )
         api_key = self.generate_api_key(user_id)
         subscription = {
             "subscription_id": str(uuid.uuid4()),

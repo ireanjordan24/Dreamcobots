@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -35,6 +36,7 @@ class RiskLevel(Enum):
 @dataclass
 class Deal:
     """Represents a business deal or opportunity."""
+
     deal_id: str
     name: str
     deal_type: DealType
@@ -43,14 +45,18 @@ class Deal:
     risk_level: RiskLevel
     description: str = ""
     tags: list = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     score: Optional[float] = None
 
     @property
     def monthly_roi_pct(self) -> float:
         if self.upfront_cost_usd <= 0:
             return 0.0
-        return round(self.projected_monthly_revenue_usd / self.upfront_cost_usd * 100, 1)
+        return round(
+            self.projected_monthly_revenue_usd / self.upfront_cost_usd * 100, 1
+        )
 
     @property
     def payback_months(self) -> Optional[float]:
@@ -139,14 +145,16 @@ class DealAnalyzer:
         for deal in self._deals.values():
             if deal.score is None:
                 self.analyze_deal(deal.deal_id)
-            results.append({
-                "deal_id": deal.deal_id,
-                "name": deal.name,
-                "score": deal.score,
-                "monthly_roi_pct": deal.monthly_roi_pct,
-                "risk_level": deal.risk_level.value,
-                "verdict": self._verdict(deal.score),
-            })
+            results.append(
+                {
+                    "deal_id": deal.deal_id,
+                    "name": deal.name,
+                    "score": deal.score,
+                    "monthly_roi_pct": deal.monthly_roi_pct,
+                    "risk_level": deal.risk_level.value,
+                    "verdict": self._verdict(deal.score),
+                }
+            )
         results.sort(key=lambda d: d["score"], reverse=True)
         return results
 
@@ -160,9 +168,11 @@ class DealAnalyzer:
             "analyzed": self._analyzed_count,
             "total_upfront_investment_usd": round(total_upfront, 2),
             "total_projected_monthly_revenue_usd": round(total_monthly_rev, 2),
-            "avg_monthly_roi_pct": round(
-                sum(d.monthly_roi_pct for d in deals) / len(deals), 1
-            ) if deals else 0.0,
+            "avg_monthly_roi_pct": (
+                round(sum(d.monthly_roi_pct for d in deals) / len(deals), 1)
+                if deals
+                else 0.0
+            ),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 

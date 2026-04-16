@@ -34,10 +34,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class BusinessVertical(Enum):
     LOCAL_SERVICE = "local_service"
@@ -72,6 +72,7 @@ class LeadStatus(Enum):
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BusinessLead:
     """A single business lead candidate."""
@@ -84,8 +85,8 @@ class BusinessLead:
     estimated_monthly_value_usd: float
     contact_type: LeadContactType
     contact_info: Optional[str]
-    digital_gap_score: float          # 0–100: 100 = severe gap
-    close_probability: float          # 0.0–1.0
+    digital_gap_score: float  # 0–100: 100 = severe gap
+    close_probability: float  # 0.0–1.0
     status: LeadStatus = LeadStatus.RAW
     tags: list = field(default_factory=list)
     discovered_at: str = field(
@@ -113,6 +114,7 @@ class BusinessLead:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class LeadFinderError(Exception):
     """Base exception for LeadFinderEngine errors."""
@@ -214,57 +216,100 @@ _VERTICAL_VALUE_RANGES: dict[BusinessVertical, tuple[float, float]] = {
 
 _SAMPLE_BUSINESS_NAMES: dict[BusinessVertical, list[str]] = {
     BusinessVertical.LOCAL_SERVICE: [
-        "City Plumbing Co.", "FastFix HVAC", "Sunrise Electric", "Peak Pest Control",
+        "City Plumbing Co.",
+        "FastFix HVAC",
+        "Sunrise Electric",
+        "Peak Pest Control",
         "BlueLine Locksmith",
     ],
     BusinessVertical.ECOMMERCE: [
-        "TrendVault Store", "UrbanEdge Apparel", "NaturalGlow Skincare",
-        "PetSupply Plus", "TechGadget Deals",
+        "TrendVault Store",
+        "UrbanEdge Apparel",
+        "NaturalGlow Skincare",
+        "PetSupply Plus",
+        "TechGadget Deals",
     ],
     BusinessVertical.REAL_ESTATE: [
-        "HomePath Realty", "PrimeKey Properties", "Nextdoor Homes",
-        "SkyHigh Investments", "GreenAcre Realty",
+        "HomePath Realty",
+        "PrimeKey Properties",
+        "Nextdoor Homes",
+        "SkyHigh Investments",
+        "GreenAcre Realty",
     ],
     BusinessVertical.HEALTH_FITNESS: [
-        "Iron Core Gym", "Zen Flow Yoga", "StrideFit Crossfit",
-        "PureBalance Nutrition", "FitLife Studio",
+        "Iron Core Gym",
+        "Zen Flow Yoga",
+        "StrideFit Crossfit",
+        "PureBalance Nutrition",
+        "FitLife Studio",
     ],
     BusinessVertical.RESTAURANT: [
-        "Mama Rosa's Kitchen", "Urban Bites Cafe", "Dragon Palace",
-        "The Steak Loft", "Sunrise Breakfast Bar",
+        "Mama Rosa's Kitchen",
+        "Urban Bites Cafe",
+        "Dragon Palace",
+        "The Steak Loft",
+        "Sunrise Breakfast Bar",
     ],
     BusinessVertical.CONTRACTOR: [
-        "Summit Roofing", "ProBuild Contractors", "SteelFrame Construction",
-        "TopCoat Painting", "Premier Foundation Works",
+        "Summit Roofing",
+        "ProBuild Contractors",
+        "SteelFrame Construction",
+        "TopCoat Painting",
+        "Premier Foundation Works",
     ],
     BusinessVertical.COACH_CONSULTANT: [
-        "Apex Life Coaching", "Revenue Mastery Consulting", "Bold Mindset Academy",
-        "CareerEdge Coaching", "Wealth Blueprint Advisors",
+        "Apex Life Coaching",
+        "Revenue Mastery Consulting",
+        "Bold Mindset Academy",
+        "CareerEdge Coaching",
+        "Wealth Blueprint Advisors",
     ],
     BusinessVertical.AUTOMOTIVE: [
-        "FastLane Auto Repair", "Premier Detailing Co.", "Speedway Tire & Lube",
-        "Prestige Auto Body", "AllStar Car Care",
+        "FastLane Auto Repair",
+        "Premier Detailing Co.",
+        "Speedway Tire & Lube",
+        "Prestige Auto Body",
+        "AllStar Car Care",
     ],
     BusinessVertical.HOME_SERVICES: [
-        "SparkleFresh Cleaning", "GreenCut Lawn Care", "SnowKing Removal",
-        "ClearView Window Cleaning", "QuickMove Movers",
+        "SparkleFresh Cleaning",
+        "GreenCut Lawn Care",
+        "SnowKing Removal",
+        "ClearView Window Cleaning",
+        "QuickMove Movers",
     ],
     BusinessVertical.RETAIL: [
-        "Boutique 27", "The Hardware Spot", "KidsWorld Toys",
-        "StyleHouse Clothing", "Bookmarks & More",
+        "Boutique 27",
+        "The Hardware Spot",
+        "KidsWorld Toys",
+        "StyleHouse Clothing",
+        "Bookmarks & More",
     ],
 }
 
 _LOCATIONS: list[str] = [
-    "Atlanta, GA", "Houston, TX", "Chicago, IL", "Phoenix, AZ", "Miami, FL",
-    "Dallas, TX", "Los Angeles, CA", "New York, NY", "Denver, CO", "Seattle, WA",
-    "Nashville, TN", "Charlotte, NC", "Detroit, MI", "Portland, OR", "Austin, TX",
+    "Atlanta, GA",
+    "Houston, TX",
+    "Chicago, IL",
+    "Phoenix, AZ",
+    "Miami, FL",
+    "Dallas, TX",
+    "Los Angeles, CA",
+    "New York, NY",
+    "Denver, CO",
+    "Seattle, WA",
+    "Nashville, TN",
+    "Charlotte, NC",
+    "Detroit, MI",
+    "Portland, OR",
+    "Austin, TX",
 ]
 
 
 # ---------------------------------------------------------------------------
 # LeadFinderEngine
 # ---------------------------------------------------------------------------
+
 
 class LeadFinderEngine:
     """Autonomous engine that discovers businesses needing marketing services.
@@ -322,14 +367,10 @@ class LeadFinderEngine:
             Newly discovered leads (also stored internally).
         """
         if vertical is not None and not self.can_filter_vertical:
-            raise LeadFinderTierError(
-                "Vertical filtering requires PRO tier or above."
-            )
+            raise LeadFinderTierError("Vertical filtering requires PRO tier or above.")
 
         self._scan_count += 1
-        verticals = (
-            [vertical] if vertical else list(BusinessVertical)
-        )
+        verticals = [vertical] if vertical else list(BusinessVertical)
 
         results: list[BusinessLead] = []
         rng = random.Random(int(time.time()) + self._scan_count)
@@ -351,15 +392,21 @@ class LeadFinderEngine:
                     business_name=name,
                     vertical=v,
                     problem=rng.choice(problems),
-                    location=location or (rng.choice(_LOCATIONS) if self.can_enrich else None),
+                    location=location
+                    or (rng.choice(_LOCATIONS) if self.can_enrich else None),
                     estimated_monthly_value_usd=value,
                     contact_type=rng.choice(list(LeadContactType)),
                     contact_info=(
                         f"contact@{name.lower().replace(' ', '').replace('.', '')}.com"
-                        if self.can_enrich else None
+                        if self.can_enrich
+                        else None
                     ),
                     digital_gap_score=gap_score,
-                    close_probability=close_prob if self.can_ai_score else round(rng.uniform(0.3, 0.7), 2),
+                    close_probability=(
+                        close_prob
+                        if self.can_ai_score
+                        else round(rng.uniform(0.3, 0.7), 2)
+                    ),
                     tags=[v.value, "needs_marketing"],
                 )
                 results.append(lead)

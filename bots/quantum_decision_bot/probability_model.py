@@ -87,7 +87,9 @@ class ProbabilityModel:
     # Learning / adaptation
     # ------------------------------------------------------------------
 
-    def learn(self, scenario_name: str, predicted_score: float, actual_profit: float) -> dict:
+    def learn(
+        self, scenario_name: str, predicted_score: float, actual_profit: float
+    ) -> dict:
         """
         Record an actual outcome to improve future scoring.
 

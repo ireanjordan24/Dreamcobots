@@ -1,4 +1,5 @@
 """Imagga image tagging connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,8 +29,13 @@ class ImaggaConnector:
             API response dict with tags or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/tags?image_url={image_url}", auth=(self.api_key, self.api_secret), timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/tags?image_url={image_url}",
+                auth=(self.api_key, self.api_secret),
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Imagga tagging completed.")
             return {"status": "success", "data": response.json()}
@@ -47,12 +53,16 @@ class ImaggaConnector:
             API response dict with categories or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/categories/personal_photos?image_url={image_url}", auth=(self.api_key, self.api_secret), timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/categories/personal_photos?image_url={image_url}",
+                auth=(self.api_key, self.api_secret),
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Imagga categorization completed.")
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Imagga categorize error: %s", e)
             return {"status": "error", "message": str(e)}
-

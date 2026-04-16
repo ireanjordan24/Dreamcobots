@@ -6,8 +6,8 @@ Covers all modules under global_learning_system/:
   deployment, profit_layer, governance, database, api, dashboards
 """
 
-import sys
 import os
+import sys
 
 # Ensure repo root is on the path
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -15,74 +15,119 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-# ---------------------------------------------------------------------------
-# ingestion
-# ---------------------------------------------------------------------------
-from global_learning_system.ingestion.paper_scraper import PaperScraper, Paper
-from global_learning_system.ingestion.github_scraper import GitHubScraper, GitHubRepo
-from global_learning_system.ingestion.kaggle_scraper import KaggleScraper, KaggleDataset
-from global_learning_system.ingestion.dataset_normalizer import DatasetNormalizer, NormalizedRecord
+from global_learning_system.analytics.learning_matrix import LearningMatrix, MatrixEntry
+
+# analytics
+from global_learning_system.analytics.performance_engine import (
+    PerformanceEngine,
+    PerformanceReport,
+)
+from global_learning_system.api.bot_control_api import BotControlAPI
+
+# api
+from global_learning_system.api.learning_api import APIResponse, LearningAPI
+from global_learning_system.classifier.ai_method_tags import AIMethodTagger, MethodTag
 
 # classifier
 from global_learning_system.classifier.method_classifier import (
-    MethodClassifier,
-    ClassificationResult,
-    CATEGORY_SUPERVISED,
-    CATEGORY_REINFORCEMENT,
-    CATEGORY_OTHER,
     ALL_CATEGORIES,
+    CATEGORY_OTHER,
+    CATEGORY_REINFORCEMENT,
+    CATEGORY_SUPERVISED,
+    ClassificationResult,
+    MethodClassifier,
 )
-from global_learning_system.classifier.ai_method_tags import AIMethodTagger, MethodTag
-
-# sandbox_lab
-from global_learning_system.sandbox_lab.sandbox_runner import SandboxRunner, SandboxResult
-from global_learning_system.sandbox_lab.experiment_manager import ExperimentManager, Experiment
-from global_learning_system.sandbox_lab.metrics_collector import MetricsCollector, MetricEntry
-
-# analytics
-from global_learning_system.analytics.performance_engine import PerformanceEngine, PerformanceReport
-from global_learning_system.analytics.learning_matrix import LearningMatrix, MatrixEntry
-
-# evolution
-from global_learning_system.evolution.hybrid_generator import HybridGenerator, HybridPipeline
-from global_learning_system.evolution.genetic_optimizer import GeneticOptimizer, Individual
-from global_learning_system.evolution.reinforcement_tuner import ReinforcementTuner, TuningStep
-
-# deployment
-from global_learning_system.deployment.strategy_deployer import StrategyDeployer, DeploymentRecord
-from global_learning_system.deployment.bot_updater import BotUpdater, BotVersion
-
-# profit_layer
-from global_learning_system.profit_layer.roi_tracker import ROITracker, ROIRecord
-from global_learning_system.profit_layer.market_adaptation import MarketAdaptation, MarketSignal
-
-# governance
-from global_learning_system.governance.security_layer import SecurityLayer, EncryptedPayload
-from global_learning_system.governance.compliance_engine import (
-    ComplianceEngine,
-    AuditEntry,
-    POLICY_GDPR,
-    POLICY_HIPAA,
-    ALL_POLICIES,
-)
-
-# database
-from global_learning_system.database.models import Base, ResearchPaper, ExperimentResult, BotDeployment
-from global_learning_system.database.postgres_connector import PostgresConnector, ConnectionConfig
-
-# api
-from global_learning_system.api.learning_api import LearningAPI, APIResponse
-from global_learning_system.api.bot_control_api import BotControlAPI
 
 # dashboards
-from global_learning_system.dashboards.learning_dashboard import LearningDashboard, DashboardPanel
-from global_learning_system.dashboards.sandbox_dashboard import SandboxDashboard
+from global_learning_system.dashboards.learning_dashboard import (
+    DashboardPanel,
+    LearningDashboard,
+)
 from global_learning_system.dashboards.profit_dashboard import ProfitDashboard
+from global_learning_system.dashboards.sandbox_dashboard import SandboxDashboard
 
+# database
+from global_learning_system.database.models import (
+    Base,
+    BotDeployment,
+    ExperimentResult,
+    ResearchPaper,
+)
+from global_learning_system.database.postgres_connector import (
+    ConnectionConfig,
+    PostgresConnector,
+)
+from global_learning_system.deployment.bot_updater import BotUpdater, BotVersion
+
+# deployment
+from global_learning_system.deployment.strategy_deployer import (
+    DeploymentRecord,
+    StrategyDeployer,
+)
+from global_learning_system.evolution.genetic_optimizer import (
+    GeneticOptimizer,
+    Individual,
+)
+
+# evolution
+from global_learning_system.evolution.hybrid_generator import (
+    HybridGenerator,
+    HybridPipeline,
+)
+from global_learning_system.evolution.reinforcement_tuner import (
+    ReinforcementTuner,
+    TuningStep,
+)
+from global_learning_system.governance.compliance_engine import (
+    ALL_POLICIES,
+    POLICY_GDPR,
+    POLICY_HIPAA,
+    AuditEntry,
+    ComplianceEngine,
+)
+
+# governance
+from global_learning_system.governance.security_layer import (
+    EncryptedPayload,
+    SecurityLayer,
+)
+from global_learning_system.ingestion.dataset_normalizer import (
+    DatasetNormalizer,
+    NormalizedRecord,
+)
+from global_learning_system.ingestion.github_scraper import GitHubRepo, GitHubScraper
+from global_learning_system.ingestion.kaggle_scraper import KaggleDataset, KaggleScraper
+
+# ---------------------------------------------------------------------------
+# ingestion
+# ---------------------------------------------------------------------------
+from global_learning_system.ingestion.paper_scraper import Paper, PaperScraper
+from global_learning_system.profit_layer.market_adaptation import (
+    MarketAdaptation,
+    MarketSignal,
+)
+
+# profit_layer
+from global_learning_system.profit_layer.roi_tracker import ROIRecord, ROITracker
+from global_learning_system.sandbox_lab.experiment_manager import (
+    Experiment,
+    ExperimentManager,
+)
+from global_learning_system.sandbox_lab.metrics_collector import (
+    MetricEntry,
+    MetricsCollector,
+)
+
+# sandbox_lab
+from global_learning_system.sandbox_lab.sandbox_runner import (
+    SandboxResult,
+    SandboxRunner,
+)
 
 # ===========================================================================
 # ingestion / PaperScraper
 # ===========================================================================
+
 
 class TestPaperScraper:
     def test_default_sources(self):
@@ -138,6 +183,7 @@ class TestPaperScraper:
 # ingestion / GitHubScraper
 # ===========================================================================
 
+
 class TestGitHubScraper:
     def test_search_returns_repos(self):
         scraper = GitHubScraper()
@@ -172,6 +218,7 @@ class TestGitHubScraper:
 # ingestion / KaggleScraper
 # ===========================================================================
 
+
 class TestKaggleScraper:
     def test_search_datasets(self):
         scraper = KaggleScraper()
@@ -199,6 +246,7 @@ class TestKaggleScraper:
 # ===========================================================================
 # ingestion / DatasetNormalizer
 # ===========================================================================
+
 
 class TestDatasetNormalizer:
     def test_normalize_basic(self):
@@ -251,6 +299,7 @@ class TestDatasetNormalizer:
 # classifier / MethodClassifier
 # ===========================================================================
 
+
 class TestMethodClassifier:
     def test_classify_supervised(self):
         clf = MethodClassifier()
@@ -279,7 +328,11 @@ class TestMethodClassifier:
 
     def test_classify_batch(self):
         clf = MethodClassifier()
-        texts = ["supervised classification", "clustering unsupervised", "reinforcement reward"]
+        texts = [
+            "supervised classification",
+            "clustering unsupervised",
+            "reinforcement reward",
+        ]
         results = clf.classify_batch(texts)
         assert len(results) == 3
 
@@ -294,7 +347,9 @@ class TestMethodClassifier:
 
     def test_secondary_categories_present(self):
         clf = MethodClassifier()
-        result = clf.classify("supervised classification with transfer learning fine-tuning")
+        result = clf.classify(
+            "supervised classification with transfer learning fine-tuning"
+        )
         # May have secondary categories
         assert isinstance(result.secondary_categories, list)
 
@@ -302,6 +357,7 @@ class TestMethodClassifier:
 # ===========================================================================
 # classifier / AIMethodTagger
 # ===========================================================================
+
 
 class TestAIMethodTagger:
     def test_tag_returns_list(self):
@@ -351,6 +407,7 @@ class TestAIMethodTagger:
 # ===========================================================================
 # sandbox_lab / SandboxRunner
 # ===========================================================================
+
 
 class TestSandboxRunner:
     def test_run_success(self):
@@ -405,9 +462,12 @@ class TestSandboxRunner:
 # sandbox_lab / ExperimentManager
 # ===========================================================================
 
+
 class TestExperimentManager:
     def _make_exp(self, name="exp1", etype="benchmark"):
-        return Experiment(name=name, description="desc", experiment_type=etype, fn=lambda: None)
+        return Experiment(
+            name=name, description="desc", experiment_type=etype, fn=lambda: None
+        )
 
     def test_register_and_get(self):
         mgr = ExperimentManager()
@@ -455,6 +515,7 @@ class TestExperimentManager:
 # ===========================================================================
 # sandbox_lab / MetricsCollector
 # ===========================================================================
+
 
 class TestMetricsCollector:
     def test_log_entry_returned(self):
@@ -505,6 +566,7 @@ class TestMetricsCollector:
 # analytics / PerformanceEngine
 # ===========================================================================
 
+
 class TestPerformanceEngine:
     def _results(self):
         return [
@@ -554,6 +616,7 @@ class TestPerformanceEngine:
 # ===========================================================================
 # analytics / LearningMatrix
 # ===========================================================================
+
 
 class TestLearningMatrix:
     def _entry(self, mid="m1", name="Method1", cat="supervised_learning", score=0.8):
@@ -620,6 +683,7 @@ class TestLearningMatrix:
 # evolution / HybridGenerator
 # ===========================================================================
 
+
 class TestHybridGenerator:
     def test_generate_returns_pipeline(self):
         gen = HybridGenerator()
@@ -665,6 +729,7 @@ class TestHybridGenerator:
 # evolution / GeneticOptimizer
 # ===========================================================================
 
+
 class TestGeneticOptimizer:
     def _genome_factory(self):
         return {"lr": 0.01, "dropout": 0.5, "layers": 3}
@@ -708,6 +773,7 @@ class TestGeneticOptimizer:
 # evolution / ReinforcementTuner
 # ===========================================================================
 
+
 class TestReinforcementTuner:
     def test_tune_returns_dict(self):
         tuner = ReinforcementTuner(max_steps=5)
@@ -747,6 +813,7 @@ class TestReinforcementTuner:
 # ===========================================================================
 # deployment / StrategyDeployer
 # ===========================================================================
+
 
 class TestStrategyDeployer:
     def test_deploy_creates_record(self):
@@ -798,6 +865,7 @@ class TestStrategyDeployer:
 # deployment / BotUpdater
 # ===========================================================================
 
+
 class TestBotUpdater:
     def test_register_version(self):
         updater = BotUpdater()
@@ -847,6 +915,7 @@ class TestBotUpdater:
 # profit_layer / ROITracker
 # ===========================================================================
 
+
 class TestROITracker:
     def test_record_creates_entry(self):
         tracker = ROITracker()
@@ -888,6 +957,7 @@ class TestROITracker:
 # ===========================================================================
 # profit_layer / MarketAdaptation
 # ===========================================================================
+
 
 class TestMarketAdaptation:
     def test_observe_no_alert_within_threshold(self):
@@ -931,6 +1001,7 @@ class TestMarketAdaptation:
 # governance / SecurityLayer
 # ===========================================================================
 
+
 class TestSecurityLayer:
     def test_encrypt_decrypt_roundtrip(self):
         sl = SecurityLayer()
@@ -962,6 +1033,7 @@ class TestSecurityLayer:
 
     def test_rotate_key(self):
         import os
+
         sl = SecurityLayer()
         new_key = os.urandom(32)
         sl.rotate_key(new_key, "v2")
@@ -976,6 +1048,7 @@ class TestSecurityLayer:
 # ===========================================================================
 # governance / ComplianceEngine
 # ===========================================================================
+
 
 class TestComplianceEngine:
     def test_check_permitted(self):
@@ -1027,9 +1100,12 @@ class TestComplianceEngine:
 # database / models
 # ===========================================================================
 
+
 class TestDatabaseModels:
     def test_research_paper_fields(self):
-        paper = ResearchPaper(title="Test Paper", source="arxiv", url="https://example.com")
+        paper = ResearchPaper(
+            title="Test Paper", source="arxiv", url="https://example.com"
+        )
         assert paper.title == "Test Paper"
         assert paper.source == "arxiv"
 
@@ -1057,6 +1133,7 @@ class TestDatabaseModels:
 # ===========================================================================
 # database / PostgresConnector
 # ===========================================================================
+
 
 class TestPostgresConnector:
     def test_initial_not_connected(self):
@@ -1092,7 +1169,9 @@ class TestPostgresConnector:
         assert "host" in health
 
     def test_dsn_format(self):
-        config = ConnectionConfig(host="db_host", port=5432, database="mydb", user="user", password="pass")
+        config = ConnectionConfig(
+            host="db_host", port=5432, database="mydb", user="user", password="pass"
+        )
         assert "db_host" in config.dsn
         assert "5432" in config.dsn
 
@@ -1100,6 +1179,7 @@ class TestPostgresConnector:
 # ===========================================================================
 # api / LearningAPI
 # ===========================================================================
+
 
 class TestLearningAPI:
     def test_health_route(self):
@@ -1115,7 +1195,9 @@ class TestLearningAPI:
 
     def test_classify_post(self):
         api = LearningAPI()
-        resp = api.dispatch("/api/v1/learning/classify", "POST", payload={"text": "deep RL"})
+        resp = api.dispatch(
+            "/api/v1/learning/classify", "POST", payload={"text": "deep RL"}
+        )
         assert resp.status == "ok"
 
     def test_ingest_post(self):
@@ -1130,7 +1212,9 @@ class TestLearningAPI:
 
     def test_register_custom_route(self):
         api = LearningAPI()
-        api.register_route("/custom", "GET", lambda: APIResponse(status="ok", data="custom"))
+        api.register_route(
+            "/custom", "GET", lambda: APIResponse(status="ok", data="custom")
+        )
         resp = api.dispatch("/api/v1/learning/custom", "GET")
         assert resp.status == "ok"
 
@@ -1143,6 +1227,7 @@ class TestLearningAPI:
 # ===========================================================================
 # api / BotControlAPI
 # ===========================================================================
+
 
 class TestBotControlAPI:
     def test_health_route(self):
@@ -1157,17 +1242,25 @@ class TestBotControlAPI:
 
     def test_deploy_post(self):
         api = BotControlAPI()
-        resp = api.dispatch("/api/v1/bots/deploy", "POST", payload={"deployment_id": "d1", "strategy_id": "s1"})
+        resp = api.dispatch(
+            "/api/v1/bots/deploy",
+            "POST",
+            payload={"deployment_id": "d1", "strategy_id": "s1"},
+        )
         assert resp.status == "ok"
 
     def test_rollback_post(self):
         api = BotControlAPI()
-        resp = api.dispatch("/api/v1/bots/rollback", "POST", payload={"deployment_id": "d1"})
+        resp = api.dispatch(
+            "/api/v1/bots/rollback", "POST", payload={"deployment_id": "d1"}
+        )
         assert resp.status == "ok"
 
     def test_retrain_post(self):
         api = BotControlAPI()
-        resp = api.dispatch("/api/v1/bots/retrain", "POST", payload={"bot_name": "bot1"})
+        resp = api.dispatch(
+            "/api/v1/bots/retrain", "POST", payload={"bot_name": "bot1"}
+        )
         assert resp.status == "ok"
 
     def test_unknown_route_error(self):
@@ -1183,6 +1276,7 @@ class TestBotControlAPI:
 # ===========================================================================
 # dashboards / LearningDashboard
 # ===========================================================================
+
 
 class TestLearningDashboard:
     def test_render_returns_string(self):
@@ -1219,17 +1313,39 @@ class TestLearningDashboard:
 # dashboards / SandboxDashboard
 # ===========================================================================
 
+
 class TestSandboxDashboard:
     def test_record_and_render(self):
         dash = SandboxDashboard()
-        dash.record_run({"experiment_name": "exp1", "status": "success", "duration_ms": 150.0, "metrics": {}})
+        dash.record_run(
+            {
+                "experiment_name": "exp1",
+                "status": "success",
+                "duration_ms": 150.0,
+                "metrics": {},
+            }
+        )
         output = dash.render()
         assert "exp1" in output
 
     def test_summary_counts(self):
         dash = SandboxDashboard()
-        dash.record_run({"experiment_name": "e1", "status": "success", "duration_ms": 100.0, "metrics": {}})
-        dash.record_run({"experiment_name": "e2", "status": "failed", "duration_ms": 50.0, "metrics": {}})
+        dash.record_run(
+            {
+                "experiment_name": "e1",
+                "status": "success",
+                "duration_ms": 100.0,
+                "metrics": {},
+            }
+        )
+        dash.record_run(
+            {
+                "experiment_name": "e2",
+                "status": "failed",
+                "duration_ms": 50.0,
+                "metrics": {},
+            }
+        )
         summary = dash.summary()
         assert summary["total"] == 2
         assert summary["success"] == 1
@@ -1237,7 +1353,14 @@ class TestSandboxDashboard:
 
     def test_clear(self):
         dash = SandboxDashboard()
-        dash.record_run({"experiment_name": "e1", "status": "success", "duration_ms": 10.0, "metrics": {}})
+        dash.record_run(
+            {
+                "experiment_name": "e1",
+                "status": "success",
+                "duration_ms": 10.0,
+                "metrics": {},
+            }
+        )
         dash.clear()
         assert dash.summary()["total"] == 0
 
@@ -1245,6 +1368,7 @@ class TestSandboxDashboard:
 # ===========================================================================
 # dashboards / ProfitDashboard
 # ===========================================================================
+
 
 class TestProfitDashboard:
     def test_record_roi_and_render(self):

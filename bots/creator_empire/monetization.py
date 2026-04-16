@@ -5,6 +5,7 @@ Supports multiple revenue models: subscriptions (basic/premium), tips,
 pay-per-view, merchandise, direct service fees, brand deals, and more.
 Includes a lightweight revenue ledger for tracking earnings.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -13,11 +14,11 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .tiers import (
-    Tier,
     CREATOR_FEATURES_BY_TIER,
-    MONETIZATION_MODELS_BY_TIER,
-    FEATURE_MONETIZATION_BASIC,
     FEATURE_MONETIZATION_ADVANCED,
+    FEATURE_MONETIZATION_BASIC,
+    MONETIZATION_MODELS_BY_TIER,
+    Tier,
 )
 
 
@@ -143,7 +144,7 @@ class MonetizationEngine:
 
     def __init__(self, tier: Tier = Tier.FREE):
         self.tier = tier
-        self._active_models: dict[str, list[str]] = {}   # creator → [model_ids]
+        self._active_models: dict[str, list[str]] = {}  # creator → [model_ids]
         self._ledger: list[RevenueEntry] = []
         self._entry_counter: int = 0
 
@@ -247,16 +248,16 @@ class MonetizationEngine:
 
     def get_total_revenue(self, creator_name: str) -> float:
         """Return the total gross revenue for a creator."""
-        return sum(
-            e.amount_usd for e in self._ledger if e.creator_name == creator_name
-        )
+        return sum(e.amount_usd for e in self._ledger if e.creator_name == creator_name)
 
     def get_revenue_by_model(self, creator_name: str) -> dict[str, float]:
         """Return a breakdown of gross revenue by model for a creator."""
         breakdown: dict[str, float] = {}
         for entry in self._ledger:
             if entry.creator_name == creator_name:
-                breakdown[entry.model] = breakdown.get(entry.model, 0.0) + entry.amount_usd
+                breakdown[entry.model] = (
+                    breakdown.get(entry.model, 0.0) + entry.amount_usd
+                )
         return breakdown
 
     def get_ledger(self, creator_name: Optional[str] = None) -> list[dict]:
@@ -307,12 +308,15 @@ class MonetizationEngine:
             ],
         }
         role = role.lower().strip()
-        return strategies.get(role, [
-            "Set up a tip jar for one-time fan support",
-            "Launch a basic subscription tier with exclusive content",
-            "Explore brand deals once your audience reaches 1k",
-            "Sell digital products related to your niche",
-        ])
+        return strategies.get(
+            role,
+            [
+                "Set up a tip jar for one-time fan support",
+                "Launch a basic subscription tier with exclusive content",
+                "Explore brand deals once your audience reaches 1k",
+                "Sell digital products related to your niche",
+            ],
+        )
 
     # ------------------------------------------------------------------
     # Internal helpers

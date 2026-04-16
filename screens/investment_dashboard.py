@@ -21,14 +21,15 @@ from typing import Optional
 @dataclass
 class AssetHolding:
     """A single asset position in the portfolio."""
+
     asset_id: str
     name: str
-    asset_class: str          # e.g. "Gold", "Stock", "Crypto"
-    allocation_tier: str      # "wealth_protection" | "growth" | "high_growth"
+    asset_class: str  # e.g. "Gold", "Stock", "Crypto"
+    allocation_tier: str  # "wealth_protection" | "growth" | "high_growth"
     invested_usd: float = 0.0
     current_value_usd: float = 0.0
     quantity: float = 0.0
-    unit_label: str = "units"   # e.g. "oz", "shares", "BTC"
+    unit_label: str = "units"  # e.g. "oz", "shares", "BTC"
 
     def gain_loss_usd(self) -> float:
         return self.current_value_usd - self.invested_usd
@@ -129,7 +130,9 @@ class InvestmentDashboardScreen:
         if best:
             lines.append(f"  Best Performer:     {best.name} ({best.roi_pct():+.1f}%)")
         if worst:
-            lines.append(f"  Worst Performer:    {worst.name} ({worst.roi_pct():+.1f}%)")
+            lines.append(
+                f"  Worst Performer:    {worst.name} ({worst.roi_pct():+.1f}%)"
+            )
 
         tier_labels = [
             ("wealth_protection", "🧱 WEALTH PROTECTION (40%)"),
@@ -172,8 +175,12 @@ class InvestmentDashboardScreen:
             "total_current_value_usd": round(self.total_current_value(), 2),
             "total_gain_loss_usd": round(self.total_gain_loss(), 2),
             "portfolio_roi_pct": self.portfolio_roi_pct(),
-            "best_performer": self.best_performer().name if self.best_performer() else None,
-            "worst_performer": self.worst_performer().name if self.worst_performer() else None,
+            "best_performer": (
+                self.best_performer().name if self.best_performer() else None
+            ),
+            "worst_performer": (
+                self.worst_performer().name if self.worst_performer() else None
+            ),
             "holdings": [
                 {
                     "asset_id": h.asset_id,
@@ -200,41 +207,90 @@ class InvestmentDashboardScreen:
             total_invested_usd=8_500.00,
         )
         # Wealth Protection (40% = $3,400)
-        screen.add_holding(AssetHolding(
-            "gold", "Gold", "Commodity", "wealth_protection",
-            invested_usd=2_000.0, current_value_usd=2_180.0,
-            quantity=0.985, unit_label="oz",
-        ))
-        screen.add_holding(AssetHolding(
-            "silver", "Silver", "Commodity", "wealth_protection",
-            invested_usd=800.0, current_value_usd=854.0,
-            quantity=32.5, unit_label="oz",
-        ))
-        screen.add_holding(AssetHolding(
-            "tbills", "US T-Bills", "Fixed Income", "wealth_protection",
-            invested_usd=600.0, current_value_usd=618.0,
-            quantity=600.0, unit_label="USD",
-        ))
+        screen.add_holding(
+            AssetHolding(
+                "gold",
+                "Gold",
+                "Commodity",
+                "wealth_protection",
+                invested_usd=2_000.0,
+                current_value_usd=2_180.0,
+                quantity=0.985,
+                unit_label="oz",
+            )
+        )
+        screen.add_holding(
+            AssetHolding(
+                "silver",
+                "Silver",
+                "Commodity",
+                "wealth_protection",
+                invested_usd=800.0,
+                current_value_usd=854.0,
+                quantity=32.5,
+                unit_label="oz",
+            )
+        )
+        screen.add_holding(
+            AssetHolding(
+                "tbills",
+                "US T-Bills",
+                "Fixed Income",
+                "wealth_protection",
+                invested_usd=600.0,
+                current_value_usd=618.0,
+                quantity=600.0,
+                unit_label="USD",
+            )
+        )
         # Growth (40% = $3,400)
-        screen.add_holding(AssetHolding(
-            "spy", "S&P 500 ETF (SPY)", "ETF", "growth",
-            invested_usd=2_000.0, current_value_usd=2_340.0,
-            quantity=3.9, unit_label="shares",
-        ))
-        screen.add_holding(AssetHolding(
-            "reits", "Real Estate (REITs)", "Real Estate", "growth",
-            invested_usd=1_400.0, current_value_usd=1_350.0,
-            quantity=12.5, unit_label="shares",
-        ))
+        screen.add_holding(
+            AssetHolding(
+                "spy",
+                "S&P 500 ETF (SPY)",
+                "ETF",
+                "growth",
+                invested_usd=2_000.0,
+                current_value_usd=2_340.0,
+                quantity=3.9,
+                unit_label="shares",
+            )
+        )
+        screen.add_holding(
+            AssetHolding(
+                "reits",
+                "Real Estate (REITs)",
+                "Real Estate",
+                "growth",
+                invested_usd=1_400.0,
+                current_value_usd=1_350.0,
+                quantity=12.5,
+                unit_label="shares",
+            )
+        )
         # High-Growth (20% = $1,700)
-        screen.add_holding(AssetHolding(
-            "btc", "Bitcoin (BTC)", "Crypto", "high_growth",
-            invested_usd=1_200.0, current_value_usd=1_540.0,
-            quantity=0.0154, unit_label="BTC",
-        ))
-        screen.add_holding(AssetHolding(
-            "eth", "Ethereum (ETH)", "Crypto", "high_growth",
-            invested_usd=500.0, current_value_usd=448.0,
-            quantity=0.135, unit_label="ETH",
-        ))
+        screen.add_holding(
+            AssetHolding(
+                "btc",
+                "Bitcoin (BTC)",
+                "Crypto",
+                "high_growth",
+                invested_usd=1_200.0,
+                current_value_usd=1_540.0,
+                quantity=0.0154,
+                unit_label="BTC",
+            )
+        )
+        screen.add_holding(
+            AssetHolding(
+                "eth",
+                "Ethereum (ETH)",
+                "Crypto",
+                "high_growth",
+                invested_usd=500.0,
+                current_value_usd=448.0,
+                quantity=0.135,
+                unit_label="ETH",
+            )
+        )
         return screen

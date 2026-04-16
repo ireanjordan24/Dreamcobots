@@ -15,86 +15,87 @@ Covers all modules:
  11. BuddyOmniscientBot main class (integration + chat)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-# ---------------------------------------------------------------------------
-# Imports
-# ---------------------------------------------------------------------------
-from bots.buddy_omniscient_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_AR_VR,
-    FEATURE_HOLOGRAPHIC,
-    FEATURE_VIRAL_CHALLENGES,
-    FEATURE_BUDDY_BADGES,
-    FEATURE_SKILL_DATABASE,
-    FEATURE_SKILL_UPLOAD,
-    FEATURE_KNOWLEDGE_ENGINE,
-    FEATURE_OMNISCIENT_MODE,
-    FEATURE_SOCIAL_CREATORS,
-    FEATURE_REALITY_SHOW,
-    FEATURE_CHARITY_AMBASSADOR,
-    FEATURE_DREAM_BUSINESS,
-    FEATURE_EXPERT_COLLABORATION,
-    FEATURE_DYNAMIC_LEARNING,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_ADVANCED_ANALYTICS,
-    FEATURE_DEDICATED_SUPPORT,
-)
 from bots.buddy_omniscient_bot.ar_vr_engine import (
-    ARVREngine,
     AROverlaySession,
-    HolographicSession,
     AROverlayType,
+    ARVREngine,
     HolographicMode,
+    HolographicSession,
     ProjectionDevice,
-)
-from bots.buddy_omniscient_bot.viral_challenges import (
-    ViralChallengesEngine,
-    RealityShowEngine,
-    CharityAmbassadorEngine,
-    DreamYourBusinessEngine,
-    AISocialCreatorEngine,
-    DynamicLearningEngine,
-    ChallengeCategory,
-    BadgeTier,
-    SocialPlatform,
-    ContentType,
-    CharityCause,
-    LearningGameType,
-)
-from bots.buddy_omniscient_bot.skill_database import (
-    SkillDatabase,
-    SkillCategory,
-    SkillDifficulty,
-    ExpertField,
-)
-from bots.buddy_omniscient_bot.knowledge_engine import (
-    KnowledgeEngine,
-    KnowledgeDomain,
-    CompetitorAI,
 )
 from bots.buddy_omniscient_bot.buddy_omniscient_bot import (
     BuddyOmniscientBot,
     BuddyOmniscientError,
     BuddyOmniscientTierError,
 )
+from bots.buddy_omniscient_bot.knowledge_engine import (
+    CompetitorAI,
+    KnowledgeDomain,
+    KnowledgeEngine,
+)
+from bots.buddy_omniscient_bot.skill_database import (
+    ExpertField,
+    SkillCategory,
+    SkillDatabase,
+    SkillDifficulty,
+)
 
+# ---------------------------------------------------------------------------
+# Imports
+# ---------------------------------------------------------------------------
+from bots.buddy_omniscient_bot.tiers import (
+    FEATURE_ADVANCED_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_AR_VR,
+    FEATURE_BUDDY_BADGES,
+    FEATURE_CHARITY_AMBASSADOR,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_DREAM_BUSINESS,
+    FEATURE_DYNAMIC_LEARNING,
+    FEATURE_EXPERT_COLLABORATION,
+    FEATURE_HOLOGRAPHIC,
+    FEATURE_KNOWLEDGE_ENGINE,
+    FEATURE_OMNISCIENT_MODE,
+    FEATURE_REALITY_SHOW,
+    FEATURE_SKILL_DATABASE,
+    FEATURE_SKILL_UPLOAD,
+    FEATURE_SOCIAL_CREATORS,
+    FEATURE_VIRAL_CHALLENGES,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
+from bots.buddy_omniscient_bot.viral_challenges import (
+    AISocialCreatorEngine,
+    BadgeTier,
+    ChallengeCategory,
+    CharityAmbassadorEngine,
+    CharityCause,
+    ContentType,
+    DreamYourBusinessEngine,
+    DynamicLearningEngine,
+    LearningGameType,
+    RealityShowEngine,
+    SocialPlatform,
+    ViralChallengesEngine,
+)
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -145,11 +146,20 @@ class TestTiers:
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
         for feature in [
-            FEATURE_AR_VR, FEATURE_HOLOGRAPHIC, FEATURE_VIRAL_CHALLENGES,
-            FEATURE_BUDDY_BADGES, FEATURE_OMNISCIENT_MODE, FEATURE_SOCIAL_CREATORS,
-            FEATURE_REALITY_SHOW, FEATURE_CHARITY_AMBASSADOR, FEATURE_DREAM_BUSINESS,
-            FEATURE_EXPERT_COLLABORATION, FEATURE_WHITE_LABEL, FEATURE_API_ACCESS,
-            FEATURE_ADVANCED_ANALYTICS, FEATURE_DEDICATED_SUPPORT,
+            FEATURE_AR_VR,
+            FEATURE_HOLOGRAPHIC,
+            FEATURE_VIRAL_CHALLENGES,
+            FEATURE_BUDDY_BADGES,
+            FEATURE_OMNISCIENT_MODE,
+            FEATURE_SOCIAL_CREATORS,
+            FEATURE_REALITY_SHOW,
+            FEATURE_CHARITY_AMBASSADOR,
+            FEATURE_DREAM_BUSINESS,
+            FEATURE_EXPERT_COLLABORATION,
+            FEATURE_WHITE_LABEL,
+            FEATURE_API_ACCESS,
+            FEATURE_ADVANCED_ANALYTICS,
+            FEATURE_DEDICATED_SUPPORT,
         ]:
             assert cfg.has_feature(feature), f"Missing feature: {feature}"
 
@@ -176,6 +186,7 @@ class TestTiers:
 # 2. AR/VR Engine
 # ===========================================================================
 
+
 class TestARVREngine:
     def setup_method(self):
         self.engine = ARVREngine(max_sessions=10)
@@ -196,15 +207,15 @@ class TestARVREngine:
 
     def test_ar_session_voice_guidance(self):
         session = self.engine.start_ar_overlay(
-            AROverlayType.REPAIR_GUIDE, ProjectionDevice.SMARTPHONE,
-            voice_guidance=True
+            AROverlayType.REPAIR_GUIDE, ProjectionDevice.SMARTPHONE, voice_guidance=True
         )
         assert session.voice_guidance is True
 
     def test_ar_session_hands_free_mode(self):
         session = self.engine.start_ar_overlay(
-            AROverlayType.REPAIR_GUIDE, ProjectionDevice.AR_GLASSES,
-            hands_free_mode=True
+            AROverlayType.REPAIR_GUIDE,
+            ProjectionDevice.AR_GLASSES,
+            hands_free_mode=True,
         )
         assert session.hands_free_mode is True
 
@@ -259,7 +270,11 @@ class TestARVREngine:
         )
         result = self.engine.broadcast_to_devices(
             session.session_id,
-            [ProjectionDevice.SMART_TV, ProjectionDevice.TABLET, ProjectionDevice.COMPUTER],
+            [
+                ProjectionDevice.SMART_TV,
+                ProjectionDevice.TABLET,
+                ProjectionDevice.COMPUTER,
+            ],
         )
         assert result["status"] == "broadcasting"
         assert len(result["broadcast_to"]) == 3
@@ -269,7 +284,9 @@ class TestARVREngine:
             AROverlayType.EDUCATION, ProjectionDevice.SMARTPHONE
         )
         self.engine.stop_ar_overlay(session.session_id)
-        result = self.engine.broadcast_to_devices(session.session_id, [ProjectionDevice.TABLET])
+        result = self.engine.broadcast_to_devices(
+            session.session_id, [ProjectionDevice.TABLET]
+        )
         assert "error" in result
 
     def test_broadcast_nonexistent_session_returns_error(self):
@@ -286,8 +303,9 @@ class TestARVREngine:
 
     def test_ar_session_to_dict(self):
         session = self.engine.start_ar_overlay(
-            AROverlayType.FURNITURE_PLACEMENT, ProjectionDevice.SMART_TV,
-            context="Living room redesign"
+            AROverlayType.FURNITURE_PLACEMENT,
+            ProjectionDevice.SMART_TV,
+            context="Living room redesign",
         )
         d = session.to_dict()
         assert d["overlay_type"] == "furniture_placement"
@@ -306,8 +324,12 @@ class TestARVREngine:
         assert d["buddy_persona"] == "Buddy Pro"
 
     def test_count_active_ar_sessions(self):
-        self.engine.start_ar_overlay(AROverlayType.EDUCATION, ProjectionDevice.SMARTPHONE)
-        self.engine.start_ar_overlay(AROverlayType.COOKING_GUIDE, ProjectionDevice.TABLET)
+        self.engine.start_ar_overlay(
+            AROverlayType.EDUCATION, ProjectionDevice.SMARTPHONE
+        )
+        self.engine.start_ar_overlay(
+            AROverlayType.COOKING_GUIDE, ProjectionDevice.TABLET
+        )
         assert self.engine.count_active_ar_sessions() == 2
 
     def test_count_active_holographic_sessions(self):
@@ -316,13 +338,16 @@ class TestARVREngine:
 
     def test_all_overlay_types_get_instructions(self):
         for overlay_type in AROverlayType:
-            session = self.engine.start_ar_overlay(overlay_type, ProjectionDevice.SMARTPHONE)
+            session = self.engine.start_ar_overlay(
+                overlay_type, ProjectionDevice.SMARTPHONE
+            )
             assert len(session.instructions) > 0
 
 
 # ===========================================================================
 # 3. Viral Challenges Engine
 # ===========================================================================
+
 
 class TestViralChallengesEngine:
     def setup_method(self):
@@ -426,6 +451,7 @@ class TestViralChallengesEngine:
 # 4. Reality Show Engine
 # ===========================================================================
 
+
 class TestRealityShowEngine:
     def setup_method(self):
         self.engine = RealityShowEngine()
@@ -443,7 +469,8 @@ class TestRealityShowEngine:
 
     def test_go_live(self):
         episode = self.engine.create_episode(
-            title="Buddy Cooks!", description="Live cooking challenge",
+            title="Buddy Cooks!",
+            description="Live cooking challenge",
             challenge_category=ChallengeCategory.COOKING,
             participants=["Chef_A"],
         )
@@ -457,7 +484,8 @@ class TestRealityShowEngine:
 
     def test_voting(self):
         episode = self.engine.create_episode(
-            title="Buddy Art Show", description="AR art challenge",
+            title="Buddy Art Show",
+            description="AR art challenge",
             challenge_category=ChallengeCategory.CREATIVE_ART,
             participants=["Artist_X"],
         )
@@ -467,7 +495,8 @@ class TestRealityShowEngine:
 
     def test_voting_accumulates(self):
         episode = self.engine.create_episode(
-            title="Buddy Music", description="Live jam session",
+            title="Buddy Music",
+            description="Live jam session",
             challenge_category=ChallengeCategory.MUSIC,
             participants=["JRock"],
         )
@@ -481,23 +510,31 @@ class TestRealityShowEngine:
 
     def test_list_episodes(self):
         self.engine.create_episode(
-            title="E1", description="Ep1",
-            challenge_category=ChallengeCategory.GAMING, participants=["P1"]
+            title="E1",
+            description="Ep1",
+            challenge_category=ChallengeCategory.GAMING,
+            participants=["P1"],
         )
         self.engine.create_episode(
-            title="E2", description="Ep2",
-            challenge_category=ChallengeCategory.COOKING, participants=["P2"]
+            title="E2",
+            description="Ep2",
+            challenge_category=ChallengeCategory.COOKING,
+            participants=["P2"],
         )
         assert len(self.engine.list_episodes()) == 2
 
     def test_list_live_episodes_only(self):
         ep1 = self.engine.create_episode(
-            title="Live1", description="L1",
-            challenge_category=ChallengeCategory.BUSINESS, participants=["P1"]
+            title="Live1",
+            description="L1",
+            challenge_category=ChallengeCategory.BUSINESS,
+            participants=["P1"],
         )
         self.engine.create_episode(
-            title="Offline1", description="O1",
-            challenge_category=ChallengeCategory.COOKING, participants=["P2"]
+            title="Offline1",
+            description="O1",
+            challenge_category=ChallengeCategory.COOKING,
+            participants=["P2"],
         )
         self.engine.go_live(ep1.episode_id)
         live = self.engine.list_episodes(live_only=True)
@@ -505,8 +542,10 @@ class TestRealityShowEngine:
 
     def test_episode_to_dict(self):
         episode = self.engine.create_episode(
-            title="Test", description="Test episode",
-            challenge_category=ChallengeCategory.EDUCATION, participants=["P1"]
+            title="Test",
+            description="Test episode",
+            challenge_category=ChallengeCategory.EDUCATION,
+            participants=["P1"],
         )
         d = episode.to_dict()
         assert "episode_id" in d
@@ -515,8 +554,10 @@ class TestRealityShowEngine:
 
     def test_episode_default_platforms(self):
         episode = self.engine.create_episode(
-            title="Test", description="T",
-            challenge_category=ChallengeCategory.GAMING, participants=["P"]
+            title="Test",
+            description="T",
+            challenge_category=ChallengeCategory.GAMING,
+            participants=["P"],
         )
         assert len(episode.platforms) > 0
 
@@ -524,6 +565,7 @@ class TestRealityShowEngine:
 # ===========================================================================
 # 5. Charity Ambassador Engine
 # ===========================================================================
+
 
 class TestCharityAmbassadorEngine:
     def setup_method(self):
@@ -594,19 +636,31 @@ class TestCharityAmbassadorEngine:
 
     def test_list_initiatives(self):
         self.engine.create_initiative(
-            cause=CharityCause.EDUCATION, title="I1", description="D1", goal_amount=1000.0
+            cause=CharityCause.EDUCATION,
+            title="I1",
+            description="D1",
+            goal_amount=1000.0,
         )
         self.engine.create_initiative(
-            cause=CharityCause.MENTAL_HEALTH, title="I2", description="D2", goal_amount=2000.0
+            cause=CharityCause.MENTAL_HEALTH,
+            title="I2",
+            description="D2",
+            goal_amount=2000.0,
         )
         assert len(self.engine.list_initiatives()) == 2
 
     def test_list_active_initiatives_only(self):
         i1 = self.engine.create_initiative(
-            cause=CharityCause.HUNGER_RELIEF, title="Active", description="A", goal_amount=500.0
+            cause=CharityCause.HUNGER_RELIEF,
+            title="Active",
+            description="A",
+            goal_amount=500.0,
         )
         i2 = self.engine.create_initiative(
-            cause=CharityCause.VETERANS, title="Inactive", description="I", goal_amount=500.0
+            cause=CharityCause.VETERANS,
+            title="Inactive",
+            description="I",
+            goal_amount=500.0,
         )
         i2.active = False
         active = self.engine.list_initiatives(active_only=True)
@@ -615,7 +669,10 @@ class TestCharityAmbassadorEngine:
 
     def test_initiative_to_dict(self):
         initiative = self.engine.create_initiative(
-            cause=CharityCause.DISASTER_RELIEF, title="T", description="D", goal_amount=5000.0
+            cause=CharityCause.DISASTER_RELIEF,
+            title="T",
+            description="D",
+            goal_amount=5000.0,
         )
         d = initiative.to_dict()
         assert "initiative_id" in d
@@ -633,6 +690,7 @@ class TestCharityAmbassadorEngine:
 # ===========================================================================
 # 6. Dream Your Business Engine
 # ===========================================================================
+
 
 class TestDreamYourBusinessEngine:
     def setup_method(self):
@@ -687,44 +745,61 @@ class TestDreamYourBusinessEngine:
 # 7. AI Social Creator Engine
 # ===========================================================================
 
+
 class TestAISocialCreatorEngine:
     def setup_method(self):
         self.engine = AISocialCreatorEngine()
 
     def test_generate_video_idea(self):
-        content = self.engine.generate_content(ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK)
+        content = self.engine.generate_content(
+            ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK
+        )
         assert content is not None
         assert content.content_type == ContentType.VIDEO_IDEA
         assert content.platform == SocialPlatform.TIKTOK
 
     def test_generate_script(self):
-        content = self.engine.generate_content(ContentType.SCRIPT, SocialPlatform.YOUTUBE, topic="guitar")
+        content = self.engine.generate_content(
+            ContentType.SCRIPT, SocialPlatform.YOUTUBE, topic="guitar"
+        )
         assert content is not None
         assert "guitar" in content.title.lower() or len(content.body) > 0
 
     def test_generate_meme(self):
-        content = self.engine.generate_content(ContentType.MEME, SocialPlatform.INSTAGRAM)
+        content = self.engine.generate_content(
+            ContentType.MEME, SocialPlatform.INSTAGRAM
+        )
         assert "Buddy" in content.body or len(content.body) > 0
 
     def test_generate_tweet(self):
-        content = self.engine.generate_content(ContentType.TWEET, SocialPlatform.TWITTER, topic="AI")
+        content = self.engine.generate_content(
+            ContentType.TWEET, SocialPlatform.TWITTER, topic="AI"
+        )
         assert content.content_type == ContentType.TWEET
 
     def test_generate_reel_idea(self):
-        content = self.engine.generate_content(ContentType.REEL_IDEA, SocialPlatform.INSTAGRAM)
+        content = self.engine.generate_content(
+            ContentType.REEL_IDEA, SocialPlatform.INSTAGRAM
+        )
         assert content.content_type == ContentType.REEL_IDEA
 
     def test_generate_trend_analysis(self):
-        content = self.engine.generate_content(ContentType.TREND_ANALYSIS, SocialPlatform.TIKTOK)
+        content = self.engine.generate_content(
+            ContentType.TREND_ANALYSIS, SocialPlatform.TIKTOK
+        )
         assert content.content_type == ContentType.TREND_ANALYSIS
 
     def test_content_has_hashtags(self):
-        content = self.engine.generate_content(ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK)
+        content = self.engine.generate_content(
+            ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK
+        )
         assert len(content.hashtags) >= 3
         assert "#DreamCoAI" in content.hashtags
 
     def test_content_has_trend_score(self):
-        content = self.engine.generate_content(ContentType.SCRIPT, SocialPlatform.YOUTUBE)
+        content = self.engine.generate_content(
+            ContentType.SCRIPT, SocialPlatform.YOUTUBE
+        )
         assert 7.0 <= content.trend_score <= 10.0
 
     def test_count_generated(self):
@@ -738,7 +813,9 @@ class TestAISocialCreatorEngine:
         assert len(content_list) == 1
 
     def test_content_to_dict(self):
-        content = self.engine.generate_content(ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK)
+        content = self.engine.generate_content(
+            ContentType.VIDEO_IDEA, SocialPlatform.TIKTOK
+        )
         d = content.to_dict()
         assert "content_id" in d
         assert "body" in d
@@ -749,6 +826,7 @@ class TestAISocialCreatorEngine:
 # ===========================================================================
 # 8. Dynamic Learning Engine
 # ===========================================================================
+
 
 class TestDynamicLearningEngine:
     def setup_method(self):
@@ -813,6 +891,7 @@ class TestDynamicLearningEngine:
 # 9. Skill Database
 # ===========================================================================
 
+
 class TestSkillDatabase:
     def setup_method(self):
         self.db = SkillDatabase(max_uploads=None)
@@ -863,23 +942,32 @@ class TestSkillDatabase:
         db = SkillDatabase(max_uploads=0)
         with pytest.raises(PermissionError):
             db.upload_skill(
-                title="Test", category=SkillCategory.TECHNOLOGY,
-                difficulty=SkillDifficulty.BEGINNER, uploaded_by="User",
-                description="Test", steps=["step"]
+                title="Test",
+                category=SkillCategory.TECHNOLOGY,
+                difficulty=SkillDifficulty.BEGINNER,
+                uploaded_by="User",
+                description="Test",
+                steps=["step"],
             )
 
     def test_upload_denied_when_limit_reached(self):
         db = SkillDatabase(max_uploads=1)
         db.upload_skill(
-            title="S1", category=SkillCategory.ARTS,
-            difficulty=SkillDifficulty.BEGINNER, uploaded_by="U",
-            description="D", steps=["s"]
+            title="S1",
+            category=SkillCategory.ARTS,
+            difficulty=SkillDifficulty.BEGINNER,
+            uploaded_by="U",
+            description="D",
+            steps=["s"],
         )
         with pytest.raises(PermissionError):
             db.upload_skill(
-                title="S2", category=SkillCategory.ARTS,
-                difficulty=SkillDifficulty.BEGINNER, uploaded_by="U",
-                description="D", steps=["s"]
+                title="S2",
+                category=SkillCategory.ARTS,
+                difficulty=SkillDifficulty.BEGINNER,
+                uploaded_by="U",
+                description="D",
+                steps=["s"],
             )
 
     def test_rate_skill(self):
@@ -942,6 +1030,7 @@ class TestSkillDatabase:
 # 10. Knowledge Engine
 # ===========================================================================
 
+
 class TestKnowledgeEngine:
     def setup_method(self):
         self.engine = KnowledgeEngine(max_domains=None)
@@ -999,9 +1088,13 @@ class TestKnowledgeEngine:
         assert dims["Holographic projection support"]["advantage"] == "Buddy"
 
     def test_compare_with_unknown_competitor(self):
-        result = self.engine.compare_with_competitor.__func__(
-            self.engine, "Unknown AI"  # type: ignore
-        ) if False else self.engine._comparisons.get("Unknown AI")
+        result = (
+            self.engine.compare_with_competitor.__func__(
+                self.engine, "Unknown AI"  # type: ignore
+            )
+            if False
+            else self.engine._comparisons.get("Unknown AI")
+        )
         # Just verify the comparisons dict has known competitors
         assert "ChatGPT (OpenAI)" in self.engine._comparisons
 
@@ -1034,6 +1127,7 @@ class TestKnowledgeEngine:
 # ===========================================================================
 # 11. BuddyOmniscientBot — Main Integration
 # ===========================================================================
+
 
 class TestBuddyOmniscientBotFree:
     def setup_method(self):
@@ -1140,7 +1234,10 @@ class TestBuddyOmniscientBotFree:
     def test_chat_compare_ai_no_omniscient_mode(self):
         resp = self.bot.chat("is buddy better than chatgpt")
         assert resp["response"] == "buddy_omniscient"
-        assert "surpasses" in resp["message"].lower() or "upgrade" in resp["message"].lower()
+        assert (
+            "surpasses" in resp["message"].lower()
+            or "upgrade" in resp["message"].lower()
+        )
 
 
 class TestBuddyOmniscientBotPro:
@@ -1222,7 +1319,9 @@ class TestBuddyOmniscientBotPro:
         assert result["amount_donated"] == 250.0
 
     def test_generate_social_content(self):
-        result = self.bot.generate_social_content("video_idea", "tiktok", "car repair AR")
+        result = self.bot.generate_social_content(
+            "video_idea", "tiktok", "car repair AR"
+        )
         assert result["content_type"] == "video_idea"
         assert "#DreamCoAI" in result["hashtags"]
 
@@ -1284,10 +1383,17 @@ class TestBuddyOmniscientBotPro:
     def test_dashboard_shows_all_fields(self):
         d = self.bot.dashboard()
         expected_fields = [
-            "ar_sessions_active", "holographic_sessions_active", "total_points",
-            "badges_earned", "community_skills", "expert_trainers",
-            "business_plans", "charity_initiatives", "social_content_generated",
-            "knowledge_entries", "knowledge_queries",
+            "ar_sessions_active",
+            "holographic_sessions_active",
+            "total_points",
+            "badges_earned",
+            "community_skills",
+            "expert_trainers",
+            "business_plans",
+            "charity_initiatives",
+            "social_content_generated",
+            "knowledge_entries",
+            "knowledge_queries",
         ]
         for field in expected_fields:
             assert field in d, f"Missing field: {field}"
@@ -1296,6 +1402,7 @@ class TestBuddyOmniscientBotPro:
         class MockBuddy:
             def __init__(self):
                 self.registered = {}
+
             def register_bot(self, name, instance):
                 self.registered[name] = instance
 
@@ -1363,32 +1470,44 @@ class TestBuddyOmniscientBotEnterprise:
 # Edge Cases and Framework Compliance
 # ===========================================================================
 
+
 class TestEdgeCases:
     def test_bot_import(self):
         from bots.buddy_omniscient_bot import BuddyOmniscientBot, Tier
+
         bot = BuddyOmniscientBot(tier=Tier.FREE)
         assert bot is not None
 
     def test_framework_compliance(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "buddy_omniscient_bot",
-            os.path.join(REPO_ROOT, "bots", "buddy_omniscient_bot", "buddy_omniscient_bot.py")
+            os.path.join(
+                REPO_ROOT, "bots", "buddy_omniscient_bot", "buddy_omniscient_bot.py"
+            ),
         )
         source = open(
-            os.path.join(REPO_ROOT, "bots", "buddy_omniscient_bot", "buddy_omniscient_bot.py")
+            os.path.join(
+                REPO_ROOT, "bots", "buddy_omniscient_bot", "buddy_omniscient_bot.py"
+            )
         ).read()
         assert "GlobalAISourcesFlow" in source
 
     def test_all_modules_have_framework_reference(self):
         modules = [
-            "ar_vr_engine.py", "viral_challenges.py", "skill_database.py",
-            "knowledge_engine.py", "buddy_omniscient_bot.py",
+            "ar_vr_engine.py",
+            "viral_challenges.py",
+            "skill_database.py",
+            "knowledge_engine.py",
+            "buddy_omniscient_bot.py",
         ]
         for module in modules:
             path = os.path.join(REPO_ROOT, "bots", "buddy_omniscient_bot", module)
             content = open(path).read()
-            assert "GlobalAISourcesFlow" in content, f"Missing framework ref in {module}"
+            assert (
+                "GlobalAISourcesFlow" in content
+            ), f"Missing framework ref in {module}"
 
     def test_tier_error_inheritance(self):
         assert issubclass(BuddyOmniscientTierError, BuddyOmniscientError)
@@ -1435,6 +1554,6 @@ class TestEdgeCases:
         result = engine.compare_with_all_competitors()
         # Buddy should win in all comparisons
         for comparison in result["comparisons"]:
-            assert comparison["buddy_win_pct"] > 80, (
-                f"Buddy should dominate {comparison['competitor']}"
-            )
+            assert (
+                comparison["buddy_win_pct"] > 80
+            ), f"Buddy should dominate {comparison['competitor']}"

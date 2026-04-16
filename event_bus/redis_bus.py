@@ -25,6 +25,7 @@ from event_bus.base_bus import BaseEventBus
 
 try:
     import redis as _redis  # type: ignore[import]
+
     _REDIS_AVAILABLE = True
 except ImportError:
     _redis = None  # type: ignore[assignment]

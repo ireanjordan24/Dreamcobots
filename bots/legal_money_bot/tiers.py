@@ -15,11 +15,19 @@ Tiers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+from tiers import (
+    Tier,
+    TierConfig,
+    get_tier_config,  # noqa: F401
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ---------------------------------------------------------------------------
 # Feature flags

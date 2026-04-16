@@ -1,9 +1,10 @@
 """Tests for DataForgeBot."""
-import sys
+
 import os
+import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
 
 class TestDataForgeBot(unittest.TestCase):
@@ -12,6 +13,7 @@ class TestDataForgeBot(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.dataforge_bot import DataForgeBot
+
         self.bot = DataForgeBot()
 
     def test_init(self):

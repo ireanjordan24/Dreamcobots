@@ -1,4 +1,5 @@
 """DeepFace facial analysis connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,6 +27,7 @@ class DeepFaceConnector:
         """
         try:
             from deepface import DeepFace
+
             acts = actions or self.default_actions
             result = DeepFace.analyze(img_path=image_path, actions=acts)
             logger.info("DeepFace analysis completed for %s.", image_path)
@@ -36,4 +38,3 @@ class DeepFaceConnector:
         except Exception as e:
             logger.error("DeepFace analyze error: %s", e)
             return {"status": "error", "message": str(e)}
-

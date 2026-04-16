@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Mental Health Screening Bot - evidence-based mental health screening tool."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -65,7 +70,11 @@ class MentalHealthScreeningBot:
             "instrument": "PHQ-2",
             "score": score,
             "positive_screen": score >= 3,
-            "recommendation": "Follow up with PHQ-9" if score >= 3 else "Low risk; monitor if symptoms persist.",
+            "recommendation": (
+                "Follow up with PHQ-9"
+                if score >= 3
+                else "Low risk; monitor if symptoms persist."
+            ),
             "disclaimer": "Not a clinical diagnosis. Consult a healthcare professional.",
         }
 
@@ -96,7 +105,9 @@ class MentalHealthScreeningBot:
             "score": score,
             "severity": severity,
             "action": action,
-            "crisis_resources": CRISIS_RESOURCES if score >= 20 or responses[8] > 0 else [],
+            "crisis_resources": (
+                CRISIS_RESOURCES if score >= 20 or responses[8] > 0 else []
+            ),
             "disclaimer": "Not a clinical diagnosis. Consult a licensed healthcare professional.",
         }
         return result

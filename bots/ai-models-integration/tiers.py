@@ -7,8 +7,8 @@ Tiers:
   - ENTERPRISE: Unlimited access, all models, priority support.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional
 
 
@@ -39,10 +39,11 @@ class TierConfig:
     support_level : str
         Description of the support offering (e.g. "Community", "Email (48 h SLA)").
     """
+
     name: str
     tier: Tier
     price_usd_monthly: float
-    requests_per_month: Optional[int]   # None = unlimited
+    requests_per_month: Optional[int]  # None = unlimited
     models_allowed: list
     features: list
     support_level: str

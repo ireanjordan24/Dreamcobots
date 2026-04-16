@@ -21,6 +21,7 @@ from typing import Optional
 # Load .env file if python-dotenv is available (optional dependency)
 try:
     from dotenv import load_dotenv  # type: ignore[import-not-found]
+
     load_dotenv()
 except ImportError:
     pass  # python-dotenv not installed — use environment variables directly
@@ -60,9 +61,7 @@ class Settings:
         default_factory=lambda: os.getenv("SIMULATION_MODE", "true").lower()
         in ("true", "1", "yes")
     )
-    log_level: str = field(
-        default_factory=lambda: os.getenv("LOG_LEVEL", "INFO")
-    )
+    log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
     money_loop_cycles: int = field(
         default_factory=lambda: int(os.getenv("MONEY_LOOP_CYCLES", "1"))
     )

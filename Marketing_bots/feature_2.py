@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,42 +22,330 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "name": "Welcome Series - Day 1",           "subject": "Welcome to DreamCo! Here's what to expect 🎉",                    "type": "welcome",       "open_rate": 52.3, "click_rate": 18.4, "subscribers": 5000,  "status": "active"},
-    {"id": 2,  "name": "Welcome Series - Day 3",           "subject": "3 ways to get started with DreamCo today",                          "type": "welcome",       "open_rate": 44.1, "click_rate": 14.2, "subscribers": 5000,  "status": "active"},
-    {"id": 3,  "name": "Welcome Series - Day 7",           "subject": "How are you getting on? Let us help 🤝",                             "type": "welcome",       "open_rate": 35.8, "click_rate": 10.6, "subscribers": 5000,  "status": "active"},
-    {"id": 4,  "name": "Product Launch Blast",             "subject": "🚀 Introducing [Feature] — available NOW",                           "type": "announcement",  "open_rate": 41.2, "click_rate": 15.8, "subscribers": 25000, "status": "active"},
-    {"id": 5,  "name": "Monthly Newsletter - May",         "subject": "May digest: Top stories, tips & updates 📰",                         "type": "newsletter",    "open_rate": 28.5, "click_rate": 8.2,  "subscribers": 20000, "status": "active"},
-    {"id": 6,  "name": "Flash Sale Announcement",          "subject": "⚡ 48-HOUR SALE: 40% off everything. Code: DREAM40",                 "type": "promotional",   "open_rate": 38.7, "click_rate": 22.1, "subscribers": 30000, "status": "sent"},
-    {"id": 7,  "name": "Abandoned Cart Recovery",          "subject": "You left something behind! 🛒 Complete your order",                  "type": "transactional", "open_rate": 45.6, "click_rate": 19.3, "subscribers": 1500,  "status": "active"},
-    {"id": 8,  "name": "Re-engagement Campaign",           "subject": "We miss you! Here's 20% off to come back 💙",                        "type": "re_engagement", "open_rate": 22.4, "click_rate": 8.9,  "subscribers": 8000,  "status": "active"},
-    {"id": 9,  "name": "Customer Win-Back",                "subject": "Is this goodbye? One last thing before you go…",                     "type": "win_back",      "open_rate": 18.3, "click_rate": 6.4,  "subscribers": 3000,  "status": "sent"},
-    {"id": 10, "name": "Birthday Email",                   "subject": "🎂 Happy Birthday! A special gift inside",                           "type": "lifecycle",     "open_rate": 58.2, "click_rate": 24.6, "subscribers": 500,   "status": "active"},
-    {"id": 11, "name": "Weekly Tips - Automation",         "subject": "This week: 3 automation hacks for 2025 ⚙️",                          "type": "educational",   "open_rate": 33.1, "click_rate": 11.4, "subscribers": 15000, "status": "active"},
-    {"id": 12, "name": "Case Study Spotlight",             "subject": "How [Customer] 10x'd their revenue in 90 days 📈",                   "type": "social_proof",  "open_rate": 36.4, "click_rate": 13.7, "subscribers": 20000, "status": "sent"},
-    {"id": 13, "name": "Free Webinar Invite",              "subject": "Free webinar: Master AI marketing in 60 min 🎓 [Register]",           "type": "event",         "open_rate": 30.2, "click_rate": 14.8, "subscribers": 25000, "status": "active"},
-    {"id": 14, "name": "Review Request",                   "subject": "Got a minute? Share your experience 🙏",                             "type": "feedback",      "open_rate": 26.8, "click_rate": 9.2,  "subscribers": 5000,  "status": "active"},
-    {"id": 15, "name": "Upsell Campaign - PRO",            "subject": "Upgrade to PRO and unlock 10x more power ⚡",                        "type": "upsell",        "open_rate": 24.5, "click_rate": 7.8,  "subscribers": 10000, "status": "active"},
-    {"id": 16, "name": "Year in Review",                   "subject": "Your 2024 DreamCo recap — you did amazing! 🌟",                      "type": "lifecycle",     "open_rate": 47.3, "click_rate": 16.2, "subscribers": 20000, "status": "sent"},
-    {"id": 17, "name": "Cold Outreach - SaaS Founders",   "subject": "How top founders automate 80% of their marketing",                   "type": "cold_outreach", "open_rate": 19.8, "click_rate": 5.6,  "subscribers": 1000,  "status": "active"},
-    {"id": 18, "name": "Free Trial Expiry Reminder",       "subject": "Your free trial expires in 3 days ⏰ Upgrade now",                  "type": "transactional", "open_rate": 55.4, "click_rate": 28.3, "subscribers": 2000,  "status": "active"},
-    {"id": 19, "name": "New Blog Post Notification",       "subject": "New post: 7 ways AI is transforming marketing in 2025 📖",           "type": "content",       "open_rate": 27.6, "click_rate": 10.1, "subscribers": 18000, "status": "active"},
-    {"id": 20, "name": "Referral Program Launch",          "subject": "Earn $50 for every friend you refer 💸",                             "type": "referral",      "open_rate": 34.2, "click_rate": 16.9, "subscribers": 15000, "status": "active"},
-    {"id": 21, "name": "Feature Announcement - API",       "subject": "NEW: Connect DreamCo to any tool with our API 🔌",                   "type": "announcement",  "open_rate": 32.8, "click_rate": 12.4, "subscribers": 10000, "status": "sent"},
-    {"id": 22, "name": "End of Year Sale",                 "subject": "🎄 Our biggest sale of the year — 60% off for 24 hours only!",        "type": "promotional",   "open_rate": 46.7, "click_rate": 25.3, "subscribers": 40000, "status": "sent"},
-    {"id": 23, "name": "VIP Customer Thank You",           "subject": "You're one of our top customers — here's a surprise 🎁",             "type": "loyalty",       "open_rate": 61.5, "click_rate": 30.1, "subscribers": 500,   "status": "active"},
-    {"id": 24, "name": "Survey Campaign",                  "subject": "Quick question: What's your biggest marketing challenge? (30 sec)",  "type": "feedback",      "open_rate": 29.4, "click_rate": 12.8, "subscribers": 12000, "status": "active"},
-    {"id": 25, "name": "Seasonal Campaign - Summer",       "subject": "☀️ Supercharge your summer marketing with DreamCo",                  "type": "seasonal",      "open_rate": 28.1, "click_rate": 9.5,  "subscribers": 20000, "status": "active"},
-    {"id": 26, "name": "Competitor Comparison",            "subject": "DreamCo vs [Competitor]: See why 10K+ chose us 🏆",                   "type": "comparison",    "open_rate": 31.6, "click_rate": 13.2, "subscribers": 15000, "status": "sent"},
-    {"id": 27, "name": "Milestone Celebration",            "subject": "🎉 We just hit 100,000 users — celebrate with us!",                   "type": "announcement",  "open_rate": 43.8, "click_rate": 17.6, "subscribers": 30000, "status": "sent"},
-    {"id": 28, "name": "Drip Campaign - Lead Nurture 1",   "subject": "Before you buy, here's what you should know about DreamCo",          "type": "nurture",       "open_rate": 35.2, "click_rate": 11.8, "subscribers": 8000,  "status": "active"},
-    {"id": 29, "name": "Drip Campaign - Lead Nurture 2",   "subject": "Still thinking? Here's a real ROI example from a customer like you", "type": "nurture",       "open_rate": 29.8, "click_rate": 10.4, "subscribers": 6500,  "status": "active"},
-    {"id": 30, "name": "Drip Campaign - Lead Nurture 3",   "subject": "Last chance: Try DreamCo free for 14 days — no credit card needed", "type": "nurture",       "open_rate": 38.4, "click_rate": 19.7, "subscribers": 5200,  "status": "active"},
+    {
+        "id": 1,
+        "name": "Welcome Series - Day 1",
+        "subject": "Welcome to DreamCo! Here's what to expect 🎉",
+        "type": "welcome",
+        "open_rate": 52.3,
+        "click_rate": 18.4,
+        "subscribers": 5000,
+        "status": "active",
+    },
+    {
+        "id": 2,
+        "name": "Welcome Series - Day 3",
+        "subject": "3 ways to get started with DreamCo today",
+        "type": "welcome",
+        "open_rate": 44.1,
+        "click_rate": 14.2,
+        "subscribers": 5000,
+        "status": "active",
+    },
+    {
+        "id": 3,
+        "name": "Welcome Series - Day 7",
+        "subject": "How are you getting on? Let us help 🤝",
+        "type": "welcome",
+        "open_rate": 35.8,
+        "click_rate": 10.6,
+        "subscribers": 5000,
+        "status": "active",
+    },
+    {
+        "id": 4,
+        "name": "Product Launch Blast",
+        "subject": "🚀 Introducing [Feature] — available NOW",
+        "type": "announcement",
+        "open_rate": 41.2,
+        "click_rate": 15.8,
+        "subscribers": 25000,
+        "status": "active",
+    },
+    {
+        "id": 5,
+        "name": "Monthly Newsletter - May",
+        "subject": "May digest: Top stories, tips & updates 📰",
+        "type": "newsletter",
+        "open_rate": 28.5,
+        "click_rate": 8.2,
+        "subscribers": 20000,
+        "status": "active",
+    },
+    {
+        "id": 6,
+        "name": "Flash Sale Announcement",
+        "subject": "⚡ 48-HOUR SALE: 40% off everything. Code: DREAM40",
+        "type": "promotional",
+        "open_rate": 38.7,
+        "click_rate": 22.1,
+        "subscribers": 30000,
+        "status": "sent",
+    },
+    {
+        "id": 7,
+        "name": "Abandoned Cart Recovery",
+        "subject": "You left something behind! 🛒 Complete your order",
+        "type": "transactional",
+        "open_rate": 45.6,
+        "click_rate": 19.3,
+        "subscribers": 1500,
+        "status": "active",
+    },
+    {
+        "id": 8,
+        "name": "Re-engagement Campaign",
+        "subject": "We miss you! Here's 20% off to come back 💙",
+        "type": "re_engagement",
+        "open_rate": 22.4,
+        "click_rate": 8.9,
+        "subscribers": 8000,
+        "status": "active",
+    },
+    {
+        "id": 9,
+        "name": "Customer Win-Back",
+        "subject": "Is this goodbye? One last thing before you go…",
+        "type": "win_back",
+        "open_rate": 18.3,
+        "click_rate": 6.4,
+        "subscribers": 3000,
+        "status": "sent",
+    },
+    {
+        "id": 10,
+        "name": "Birthday Email",
+        "subject": "🎂 Happy Birthday! A special gift inside",
+        "type": "lifecycle",
+        "open_rate": 58.2,
+        "click_rate": 24.6,
+        "subscribers": 500,
+        "status": "active",
+    },
+    {
+        "id": 11,
+        "name": "Weekly Tips - Automation",
+        "subject": "This week: 3 automation hacks for 2025 ⚙️",
+        "type": "educational",
+        "open_rate": 33.1,
+        "click_rate": 11.4,
+        "subscribers": 15000,
+        "status": "active",
+    },
+    {
+        "id": 12,
+        "name": "Case Study Spotlight",
+        "subject": "How [Customer] 10x'd their revenue in 90 days 📈",
+        "type": "social_proof",
+        "open_rate": 36.4,
+        "click_rate": 13.7,
+        "subscribers": 20000,
+        "status": "sent",
+    },
+    {
+        "id": 13,
+        "name": "Free Webinar Invite",
+        "subject": "Free webinar: Master AI marketing in 60 min 🎓 [Register]",
+        "type": "event",
+        "open_rate": 30.2,
+        "click_rate": 14.8,
+        "subscribers": 25000,
+        "status": "active",
+    },
+    {
+        "id": 14,
+        "name": "Review Request",
+        "subject": "Got a minute? Share your experience 🙏",
+        "type": "feedback",
+        "open_rate": 26.8,
+        "click_rate": 9.2,
+        "subscribers": 5000,
+        "status": "active",
+    },
+    {
+        "id": 15,
+        "name": "Upsell Campaign - PRO",
+        "subject": "Upgrade to PRO and unlock 10x more power ⚡",
+        "type": "upsell",
+        "open_rate": 24.5,
+        "click_rate": 7.8,
+        "subscribers": 10000,
+        "status": "active",
+    },
+    {
+        "id": 16,
+        "name": "Year in Review",
+        "subject": "Your 2024 DreamCo recap — you did amazing! 🌟",
+        "type": "lifecycle",
+        "open_rate": 47.3,
+        "click_rate": 16.2,
+        "subscribers": 20000,
+        "status": "sent",
+    },
+    {
+        "id": 17,
+        "name": "Cold Outreach - SaaS Founders",
+        "subject": "How top founders automate 80% of their marketing",
+        "type": "cold_outreach",
+        "open_rate": 19.8,
+        "click_rate": 5.6,
+        "subscribers": 1000,
+        "status": "active",
+    },
+    {
+        "id": 18,
+        "name": "Free Trial Expiry Reminder",
+        "subject": "Your free trial expires in 3 days ⏰ Upgrade now",
+        "type": "transactional",
+        "open_rate": 55.4,
+        "click_rate": 28.3,
+        "subscribers": 2000,
+        "status": "active",
+    },
+    {
+        "id": 19,
+        "name": "New Blog Post Notification",
+        "subject": "New post: 7 ways AI is transforming marketing in 2025 📖",
+        "type": "content",
+        "open_rate": 27.6,
+        "click_rate": 10.1,
+        "subscribers": 18000,
+        "status": "active",
+    },
+    {
+        "id": 20,
+        "name": "Referral Program Launch",
+        "subject": "Earn $50 for every friend you refer 💸",
+        "type": "referral",
+        "open_rate": 34.2,
+        "click_rate": 16.9,
+        "subscribers": 15000,
+        "status": "active",
+    },
+    {
+        "id": 21,
+        "name": "Feature Announcement - API",
+        "subject": "NEW: Connect DreamCo to any tool with our API 🔌",
+        "type": "announcement",
+        "open_rate": 32.8,
+        "click_rate": 12.4,
+        "subscribers": 10000,
+        "status": "sent",
+    },
+    {
+        "id": 22,
+        "name": "End of Year Sale",
+        "subject": "🎄 Our biggest sale of the year — 60% off for 24 hours only!",
+        "type": "promotional",
+        "open_rate": 46.7,
+        "click_rate": 25.3,
+        "subscribers": 40000,
+        "status": "sent",
+    },
+    {
+        "id": 23,
+        "name": "VIP Customer Thank You",
+        "subject": "You're one of our top customers — here's a surprise 🎁",
+        "type": "loyalty",
+        "open_rate": 61.5,
+        "click_rate": 30.1,
+        "subscribers": 500,
+        "status": "active",
+    },
+    {
+        "id": 24,
+        "name": "Survey Campaign",
+        "subject": "Quick question: What's your biggest marketing challenge? (30 sec)",
+        "type": "feedback",
+        "open_rate": 29.4,
+        "click_rate": 12.8,
+        "subscribers": 12000,
+        "status": "active",
+    },
+    {
+        "id": 25,
+        "name": "Seasonal Campaign - Summer",
+        "subject": "☀️ Supercharge your summer marketing with DreamCo",
+        "type": "seasonal",
+        "open_rate": 28.1,
+        "click_rate": 9.5,
+        "subscribers": 20000,
+        "status": "active",
+    },
+    {
+        "id": 26,
+        "name": "Competitor Comparison",
+        "subject": "DreamCo vs [Competitor]: See why 10K+ chose us 🏆",
+        "type": "comparison",
+        "open_rate": 31.6,
+        "click_rate": 13.2,
+        "subscribers": 15000,
+        "status": "sent",
+    },
+    {
+        "id": 27,
+        "name": "Milestone Celebration",
+        "subject": "🎉 We just hit 100,000 users — celebrate with us!",
+        "type": "announcement",
+        "open_rate": 43.8,
+        "click_rate": 17.6,
+        "subscribers": 30000,
+        "status": "sent",
+    },
+    {
+        "id": 28,
+        "name": "Drip Campaign - Lead Nurture 1",
+        "subject": "Before you buy, here's what you should know about DreamCo",
+        "type": "nurture",
+        "open_rate": 35.2,
+        "click_rate": 11.8,
+        "subscribers": 8000,
+        "status": "active",
+    },
+    {
+        "id": 29,
+        "name": "Drip Campaign - Lead Nurture 2",
+        "subject": "Still thinking? Here's a real ROI example from a customer like you",
+        "type": "nurture",
+        "open_rate": 29.8,
+        "click_rate": 10.4,
+        "subscribers": 6500,
+        "status": "active",
+    },
+    {
+        "id": 30,
+        "name": "Drip Campaign - Lead Nurture 3",
+        "subject": "Last chance: Try DreamCo free for 14 days — no credit card needed",
+        "type": "nurture",
+        "open_rate": 38.4,
+        "click_rate": 19.7,
+        "subscribers": 5200,
+        "status": "active",
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_campaigns": 3,    "subscribers": 500,    "ab_testing": False, "analytics": False},
-    "PRO":        {"price_usd": 49,  "max_campaigns": 50,   "subscribers": 25000,  "ab_testing": True,  "analytics": True},
-    "ENTERPRISE": {"price_usd": 199, "max_campaigns": None, "subscribers": None,   "ab_testing": True,  "analytics": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_campaigns": 3,
+        "subscribers": 500,
+        "ab_testing": False,
+        "analytics": False,
+    },
+    "PRO": {
+        "price_usd": 49,
+        "max_campaigns": 50,
+        "subscribers": 25000,
+        "ab_testing": True,
+        "analytics": True,
+    },
+    "ENTERPRISE": {
+        "price_usd": 199,
+        "max_campaigns": None,
+        "subscribers": None,
+        "ab_testing": True,
+        "analytics": True,
+    },
 }
 
 
@@ -105,7 +393,9 @@ class EmailCampaignBot:
         self._active_campaigns.append(result)
         return result
 
-    def get_top_performing_campaigns(self, metric: str = "open_rate", count: int = 5) -> list[dict]:
+    def get_top_performing_campaigns(
+        self, metric: str = "open_rate", count: int = 5
+    ) -> list[dict]:
         """Return top campaigns by open rate or click rate."""
         if metric not in {"open_rate", "click_rate"}:
             raise ValueError("metric must be 'open_rate' or 'click_rate'")
@@ -125,7 +415,8 @@ class EmailCampaignBot:
             "original_subject": campaign["subject"],
             "variant_a": campaign["subject"],
             "variant_b": f"RE: {campaign['subject']}",
-            "variant_c": campaign["subject"].replace("🎉", "").strip() + " [Limited Time]",
+            "variant_c": campaign["subject"].replace("🎉", "").strip()
+            + " [Limited Time]",
             "recommendation": "Test variant B for 20% higher open rates in B2B segments.",
         }
 
@@ -147,7 +438,9 @@ class EmailCampaignBot:
             "total_campaigns": len(EXAMPLES),
             "avg_open_rate_pct": avg_open,
             "avg_click_rate_pct": avg_click,
-            "top_campaigns": [{"name": c["name"], "open_rate": c["open_rate"]} for c in top],
+            "top_campaigns": [
+                {"name": c["name"], "open_rate": c["open_rate"]} for c in top
+            ],
             "open_rate_by_type": type_avg,
             "tier": self.tier,
         }
@@ -176,7 +469,10 @@ class EmailCampaignBot:
             raw_data={"domain": "email_campaigns", "templates_count": len(EXAMPLES)},
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "templates": len(EXAMPLES)}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "templates": len(EXAMPLES),
+        }
 
 
 if __name__ == "__main__":
@@ -258,7 +554,12 @@ def _emailcampaign_bot_analyze(self):
 
 def _emailcampaign_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "EmailCampaignBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "EmailCampaignBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 EmailCampaignBot.monthly_price = _emailcampaign_bot_monthly_price

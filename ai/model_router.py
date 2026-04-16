@@ -19,24 +19,23 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Routing table
 # ---------------------------------------------------------------------------
 
 DEFAULT_ROUTES: dict[str, str] = {
-    "coding":    "anthropic",
-    "general":   "openai",
-    "vision":    "google",
-    "cheap":     "mistral",
-    "search":    "cohere",
+    "coding": "anthropic",
+    "general": "openai",
+    "vision": "google",
+    "cheap": "mistral",
+    "search": "cohere",
     "real_time": "xai",
 }
 
@@ -77,6 +76,7 @@ PROVIDER_INFO: dict[str, dict] = {
 # ModelRouter
 # ---------------------------------------------------------------------------
 
+
 class ModelRouter:
     """Routes tasks to the best AI model/provider.
 
@@ -93,7 +93,9 @@ class ModelRouter:
         routes: dict[str, str] | None = None,
         default_provider: str = "openai",
     ) -> None:
-        self.routes: dict[str, str] = routes if routes is not None else dict(DEFAULT_ROUTES)
+        self.routes: dict[str, str] = (
+            routes if routes is not None else dict(DEFAULT_ROUTES)
+        )
         self.default_provider: str = default_provider
 
     # ------------------------------------------------------------------

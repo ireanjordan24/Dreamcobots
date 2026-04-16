@@ -1,8 +1,10 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-TOOL_DIR = os.path.join(REPO_ROOT, 'education-tools', 'recipe_scaling_tool')
+TOOL_DIR = os.path.join(REPO_ROOT, "education-tools", "recipe_scaling_tool")
 sys.path.insert(0, TOOL_DIR)
 
 import pytest

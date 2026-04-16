@@ -22,11 +22,12 @@ from typing import Any, Optional
 @dataclass
 class DataSample:
     """A single training data sample."""
+
     sample_id: str
-    category: str          # e.g. 'coin', 'antique', 'face', 'job_task'
+    category: str  # e.g. 'coin', 'antique', 'face', 'job_task'
     data: dict[str, Any]
     label: str = ""
-    split: str = "train"   # 'train' | 'val' | 'test'
+    split: str = "train"  # 'train' | 'val' | 'test'
     source: str = "manual"
 
 
@@ -66,7 +67,9 @@ class TrainingDataStore:
         self._samples.append(sample)
         return sample
 
-    def get_samples(self, category: str, split: Optional[str] = None) -> list[DataSample]:
+    def get_samples(
+        self, category: str, split: Optional[str] = None
+    ) -> list[DataSample]:
         """Return samples for *category*, optionally filtered by *split*."""
         results = [s for s in self._samples if s.category == category]
         if split:

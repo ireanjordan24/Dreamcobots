@@ -2,15 +2,15 @@
 
 import pytest
 
+from BuddyAI.dashboard.dashboard import ClientDashboard
 from BuddyAI.dashboard.metrics import MetricsCollector
 from BuddyAI.dashboard.stress_test import StressTestRunner
-from BuddyAI.dashboard.dashboard import ClientDashboard
 from BuddyAI.financial.models import Account
-
 
 # ---------------------------------------------------------------------------
 # MetricsCollector tests
 # ---------------------------------------------------------------------------
+
 
 class TestMetricsCollector:
     def setup_method(self):
@@ -41,7 +41,9 @@ class TestMetricsCollector:
         assert completed[0].task_id == "t1"
 
     def test_record_compute_snapshot(self):
-        snap = self.metrics.record_compute_snapshot(cpu_percent=55.0, memory_percent=70.0)
+        snap = self.metrics.record_compute_snapshot(
+            cpu_percent=55.0, memory_percent=70.0
+        )
         assert snap.cpu_percent == 55.0
         assert snap.memory_percent == 70.0
 
@@ -66,6 +68,7 @@ class TestMetricsCollector:
 
     def test_earnings_timeline_sorted(self):
         from datetime import datetime
+
         dt_jan1 = datetime(2024, 1, 1)
         dt_jan2 = datetime(2024, 1, 2)
         dt_jan3 = datetime(2024, 1, 3)
@@ -89,6 +92,7 @@ class TestMetricsCollector:
 # StressTestRunner tests
 # ---------------------------------------------------------------------------
 
+
 class TestStressTestRunner:
     def setup_method(self):
         self.runner = StressTestRunner()
@@ -103,7 +107,9 @@ class TestStressTestRunner:
         def always_fail():
             raise RuntimeError("simulated failure")
 
-        result = self.runner.run(target=always_fail, test_name="fail_test", iterations=10)
+        result = self.runner.run(
+            target=always_fail, test_name="fail_test", iterations=10
+        )
         assert result.failed_ops == 10
         assert result.successful_ops == 0
 
@@ -135,11 +141,18 @@ class TestStressTestRunner:
         assert results[0].test_id == r2.test_id
 
     def test_result_to_dict_has_required_fields(self):
-        result = self.runner.run(target=lambda: None, test_name="dict_test", iterations=1)
+        result = self.runner.run(
+            target=lambda: None, test_name="dict_test", iterations=1
+        )
         d = result.to_dict()
         for key in (
-            "test_id", "test_name", "iterations", "successful_ops",
-            "failed_ops", "success_rate", "ops_per_second",
+            "test_id",
+            "test_name",
+            "iterations",
+            "successful_ops",
+            "failed_ops",
+            "success_rate",
+            "ops_per_second",
         ):
             assert key in d
 
@@ -147,6 +160,7 @@ class TestStressTestRunner:
 # ---------------------------------------------------------------------------
 # ClientDashboard tests
 # ---------------------------------------------------------------------------
+
 
 class TestClientDashboard:
     def setup_method(self):
@@ -159,7 +173,15 @@ class TestClientDashboard:
 
     def test_render_contains_top_level_keys(self):
         data = self.dashboard.render()
-        for key in ("client_id", "client_name", "profitability", "compute_usage", "tasks", "stress_tests", "visualizations"):
+        for key in (
+            "client_id",
+            "client_name",
+            "profitability",
+            "compute_usage",
+            "tasks",
+            "stress_tests",
+            "visualizations",
+        ):
             assert key in data
 
     def test_render_account_balance(self):
@@ -183,12 +205,16 @@ class TestClientDashboard:
         assert data["profitability"]["total_earnings"] == pytest.approx(200.0)
 
     def test_dashboard_compute_snapshots_in_render(self):
-        self.dashboard.metrics.record_compute_snapshot(cpu_percent=30.0, memory_percent=50.0)
+        self.dashboard.metrics.record_compute_snapshot(
+            cpu_percent=30.0, memory_percent=50.0
+        )
         data = self.dashboard.render()
         assert len(data["compute_usage"]["snapshots"]) == 1
 
     def test_visualizations_populated_after_snapshots_and_earnings(self):
-        self.dashboard.metrics.record_compute_snapshot(cpu_percent=50.0, memory_percent=60.0)
+        self.dashboard.metrics.record_compute_snapshot(
+            cpu_percent=50.0, memory_percent=60.0
+        )
         self.dashboard.metrics.record_earning(100.0)
         data = self.dashboard.render()
         viz = data["visualizations"]

@@ -1,8 +1,10 @@
 """Entrepreneur Bot - Business planning, market research, and startup guidance."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -33,7 +35,12 @@ class EntrepreneurBot(BaseBot):
                 "business_name": f"{industry.title()} Ventures",
                 "mission": f"To revolutionize the {industry} industry through {business_idea}.",
                 "vision": "Become the market leader within 5 years.",
-                "core_values": ["Innovation", "Integrity", "Customer Focus", "Excellence"],
+                "core_values": [
+                    "Innovation",
+                    "Integrity",
+                    "Customer Focus",
+                    "Excellence",
+                ],
             },
             "business_description": {
                 "idea": business_idea,
@@ -79,8 +86,12 @@ class EntrepreneurBot(BaseBot):
         """Perform market analysis for a given industry and target market."""
         self.log(f"Researching market: {industry} / {target_market}")
         market_sizes = {
-            "technology": "$5.2T", "healthcare": "$4.1T", "real estate": "$3.7T",
-            "education": "$7.3T", "finance": "$22.5T", "retail": "$26.7T",
+            "technology": "$5.2T",
+            "healthcare": "$4.1T",
+            "real estate": "$3.7T",
+            "education": "$7.3T",
+            "finance": "$22.5T",
+            "retail": "$26.7T",
         }
         tam = market_sizes.get(industry.lower(), "$1.2T")
         return {
@@ -97,9 +108,17 @@ class EntrepreneurBot(BaseBot):
                 "Consolidation creating acquisition opportunities",
             ],
             "competitors": [
-                {"name": "CompetitorA", "market_share": "18%", "weakness": "High pricing"},
+                {
+                    "name": "CompetitorA",
+                    "market_share": "18%",
+                    "weakness": "High pricing",
+                },
                 {"name": "CompetitorB", "market_share": "12%", "weakness": "Poor UX"},
-                {"name": "CompetitorC", "market_share": "8%", "weakness": "Limited features"},
+                {
+                    "name": "CompetitorC",
+                    "market_share": "8%",
+                    "weakness": "Limited features",
+                },
             ],
             "customer_segments": [
                 f"Small {industry} businesses (1-50 employees): 65% of target",
@@ -113,22 +132,48 @@ class EntrepreneurBot(BaseBot):
         self.log(f"Finding funding: stage={business_stage}, amount=${amount_needed}")
         sources = {
             "grants": [
-                {"source": "SBIR Phase I", "amount": "$275,000", "match": "High", "type": "non-dilutive"},
-                {"source": "SBA Microloan", "amount": "Up to $50,000", "match": "High", "type": "debt"},
+                {
+                    "source": "SBIR Phase I",
+                    "amount": "$275,000",
+                    "match": "High",
+                    "type": "non-dilutive",
+                },
+                {
+                    "source": "SBA Microloan",
+                    "amount": "Up to $50,000",
+                    "match": "High",
+                    "type": "debt",
+                },
             ],
             "investors": [
-                {"type": "Angel Investors", "typical_check": "$25K-$250K", "equity": "5-15%"},
+                {
+                    "type": "Angel Investors",
+                    "typical_check": "$25K-$250K",
+                    "equity": "5-15%",
+                },
                 {"type": "Seed VC", "typical_check": "$500K-$2M", "equity": "15-25%"},
             ],
             "crowdfunding": [
-                {"platform": "Republic", "type": "equity crowdfunding", "max_raise": "$5M"},
-                {"platform": "Kickstarter", "type": "rewards-based", "best_for": "consumer products"},
+                {
+                    "platform": "Republic",
+                    "type": "equity crowdfunding",
+                    "max_raise": "$5M",
+                },
+                {
+                    "platform": "Kickstarter",
+                    "type": "rewards-based",
+                    "best_for": "consumer products",
+                },
             ],
             "bootstrapping": {
                 "strategy": "Reinvest early revenue; aim for profitability before raising",
                 "advantage": "Retain 100% equity",
             },
-            "recommended": "SBIR Grant + Angel round" if amount_needed < 500000 else "Seed VC round",
+            "recommended": (
+                "SBIR Grant + Angel round"
+                if amount_needed < 500000
+                else "Seed VC round"
+            ),
             "amount_needed": f"${amount_needed:,.0f}",
         }
         return sources
@@ -138,29 +183,50 @@ class EntrepreneurBot(BaseBot):
         structures = {
             "LLC": {
                 "best_for": "Most small businesses, solopreneurs, service businesses",
-                "pros": ["Pass-through taxation", "Limited liability", "Flexible management", "Low cost"],
+                "pros": [
+                    "Pass-through taxation",
+                    "Limited liability",
+                    "Flexible management",
+                    "Low cost",
+                ],
                 "cons": ["Cannot issue stock", "Some investors prefer C-Corp"],
                 "setup_cost": "$50-$500 (filing fees vary by state)",
                 "formation_time": "1-2 weeks",
             },
             "C-Corporation": {
                 "best_for": "Venture-backed startups, businesses planning IPO",
-                "pros": ["Issue stock", "VC-friendly", "Unlimited shareholders", "QSBS tax benefits"],
-                "cons": ["Double taxation", "More complex compliance", "Higher setup cost"],
+                "pros": [
+                    "Issue stock",
+                    "VC-friendly",
+                    "Unlimited shareholders",
+                    "QSBS tax benefits",
+                ],
+                "cons": [
+                    "Double taxation",
+                    "More complex compliance",
+                    "Higher setup cost",
+                ],
                 "setup_cost": "$500-$2,000",
                 "formation_time": "1-3 weeks",
             },
             "S-Corporation": {
                 "best_for": "Small profitable businesses wanting pass-through taxation with corporate benefits",
                 "pros": ["Pass-through taxation", "Limited liability", "Credibility"],
-                "cons": ["100 shareholder limit", "Only US citizens/residents", "Single class of stock"],
+                "cons": [
+                    "100 shareholder limit",
+                    "Only US citizens/residents",
+                    "Single class of stock",
+                ],
                 "setup_cost": "$500-$1,500",
                 "formation_time": "2-4 weeks",
             },
         }
         if "tech" in business_type.lower() or "startup" in business_type.lower():
             recommended = "C-Corporation"
-        elif "freelance" in business_type.lower() or "consulting" in business_type.lower():
+        elif (
+            "freelance" in business_type.lower()
+            or "consulting" in business_type.lower()
+        ):
             recommended = "LLC"
         else:
             recommended = "LLC"
@@ -211,18 +277,66 @@ class EntrepreneurBot(BaseBot):
         return {
             "slide_count": 12,
             "slides": [
-                {"slide": 1, "title": "Cover Slide", "content": "Company name, tagline, presenter info"},
-                {"slide": 2, "title": "Problem", "content": f"The {business_idea} problem costs businesses $X billion annually"},
-                {"slide": 3, "title": "Solution", "content": f"How {business_idea} solves this uniquely"},
-                {"slide": 4, "title": "Market Opportunity", "content": "$TAM / $SAM / $SOM breakdown"},
-                {"slide": 5, "title": "Product Demo", "content": "Screenshots / mockups / demo video link"},
-                {"slide": 6, "title": "Business Model", "content": "How you make money - revenue streams"},
-                {"slide": 7, "title": "Traction", "content": "Users, revenue, growth metrics, logos"},
-                {"slide": 8, "title": "Go-to-Market", "content": "Customer acquisition strategy"},
-                {"slide": 9, "title": "Competition", "content": "Competitive landscape and your advantages"},
-                {"slide": 10, "title": "Team", "content": "Founders and key team with relevant experience"},
-                {"slide": 11, "title": "Financials", "content": "3-year projections, unit economics"},
-                {"slide": 12, "title": "The Ask", "content": "Funding amount, use of funds, milestones"},
+                {
+                    "slide": 1,
+                    "title": "Cover Slide",
+                    "content": "Company name, tagline, presenter info",
+                },
+                {
+                    "slide": 2,
+                    "title": "Problem",
+                    "content": f"The {business_idea} problem costs businesses $X billion annually",
+                },
+                {
+                    "slide": 3,
+                    "title": "Solution",
+                    "content": f"How {business_idea} solves this uniquely",
+                },
+                {
+                    "slide": 4,
+                    "title": "Market Opportunity",
+                    "content": "$TAM / $SAM / $SOM breakdown",
+                },
+                {
+                    "slide": 5,
+                    "title": "Product Demo",
+                    "content": "Screenshots / mockups / demo video link",
+                },
+                {
+                    "slide": 6,
+                    "title": "Business Model",
+                    "content": "How you make money - revenue streams",
+                },
+                {
+                    "slide": 7,
+                    "title": "Traction",
+                    "content": "Users, revenue, growth metrics, logos",
+                },
+                {
+                    "slide": 8,
+                    "title": "Go-to-Market",
+                    "content": "Customer acquisition strategy",
+                },
+                {
+                    "slide": 9,
+                    "title": "Competition",
+                    "content": "Competitive landscape and your advantages",
+                },
+                {
+                    "slide": 10,
+                    "title": "Team",
+                    "content": "Founders and key team with relevant experience",
+                },
+                {
+                    "slide": 11,
+                    "title": "Financials",
+                    "content": "3-year projections, unit economics",
+                },
+                {
+                    "slide": 12,
+                    "title": "The Ask",
+                    "content": "Funding amount, use of funds, milestones",
+                },
             ],
             "tip": "Keep each slide to ONE key message. Less is more.",
         }

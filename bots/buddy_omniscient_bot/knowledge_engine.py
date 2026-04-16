@@ -17,14 +17,15 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Dict
-import uuid
+from typing import Dict, List, Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -357,6 +358,7 @@ _KNOWLEDGE_ENTRIES: List[KnowledgeEntry] = [
 # Knowledge Engine class
 # ===========================================================================
 
+
 class KnowledgeEngine:
     """
     Omniscient Knowledge Engine for Buddy Omniscient Bot.
@@ -387,7 +389,8 @@ class KnowledgeEngine:
 
         # Search entries
         matches = [
-            e for e in self._entries.values()
+            e
+            for e in self._entries.values()
             if topic_lower in e.topic.lower()
             or topic_lower in e.summary.lower()
             or any(topic_lower in d.lower() for d in e.details)
@@ -451,7 +454,8 @@ class KnowledgeEngine:
         if not comparison:
             return {"error": f"Comparison data for '{competitor.value}' not found."}
         winning_dimensions = [
-            dim for dim, data in comparison.dimensions.items()
+            dim
+            for dim, data in comparison.dimensions.items()
             if data.get("advantage") == "Buddy"
         ]
         return {
@@ -472,17 +476,20 @@ class KnowledgeEngine:
         summaries = []
         for comp_value, comparison in self._comparisons.items():
             buddy_wins = sum(
-                1 for data in comparison.dimensions.values()
+                1
+                for data in comparison.dimensions.values()
                 if data.get("advantage") == "Buddy"
             )
-            summaries.append({
-                "competitor": comp_value,
-                "buddy_wins": buddy_wins,
-                "total_dimensions": len(comparison.dimensions),
-                "buddy_win_pct": round(
-                    buddy_wins / len(comparison.dimensions) * 100, 1
-                ),
-            })
+            summaries.append(
+                {
+                    "competitor": comp_value,
+                    "buddy_wins": buddy_wins,
+                    "total_dimensions": len(comparison.dimensions),
+                    "buddy_win_pct": round(
+                        buddy_wins / len(comparison.dimensions) * 100, 1
+                    ),
+                }
+            )
         return {
             "total_competitors_analyzed": len(summaries),
             "buddy_advantage_dimensions": _COMPETITOR_DIMENSIONS,

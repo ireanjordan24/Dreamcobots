@@ -122,7 +122,7 @@ class TaskEngine:
             return {
                 "success": False,
                 "message": (
-                    f"Sorry, I didn't understand: \"{text}\". "
+                    f'Sorry, I didn\'t understand: "{text}". '
                     "Type 'help' to see what I can do."
                 ),
             }

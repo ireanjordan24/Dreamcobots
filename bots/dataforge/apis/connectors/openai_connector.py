@@ -1,4 +1,5 @@
 """OpenAI GPT API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,16 +29,24 @@ class OpenAIConnector:
             API response dict or error dict.
         """
         import requests
+
         if not self.api_key:
             return {"status": "error", "message": "No OpenAI API key provided."}
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
         try:
-            response = requests.post(f"{self.BASE_URL}/chat/completions", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/chat/completions",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("OpenAI text generated for model %s.", model)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("OpenAI error: %s", e)
             return {"status": "error", "message": str(e)}
-

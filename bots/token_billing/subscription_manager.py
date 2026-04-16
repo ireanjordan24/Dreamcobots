@@ -54,7 +54,9 @@ class SubscriptionManager:
     # Account creation
     # ------------------------------------------------------------------
 
-    def initialize_account(self, user_id: str, tier: Tier = Tier.FREE) -> SubscriptionRecord:
+    def initialize_account(
+        self, user_id: str, tier: Tier = Tier.FREE
+    ) -> SubscriptionRecord:
         """Set up a new subscription account for *user_id*.
 
         Parameters

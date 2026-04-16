@@ -65,7 +65,7 @@ class BroadcastTarget:
     target_id: str
     name: str
     category: DeviceCategory
-    platform: str = ""          # e.g. "Android TV", "PlayStation 5"
+    platform: str = ""  # e.g. "Android TV", "PlayStation 5"
     ip_address: str = ""
     state: BroadcastState = BroadcastState.IDLE
     volume: float = 0.8

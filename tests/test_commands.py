@@ -1,7 +1,7 @@
 # Unit tests for Dreamcobots commands, communication, content, and rendering.
 
-import sys
 import os
+import sys
 import unittest
 
 # Add project root to path so all modules can be imported
@@ -15,10 +15,10 @@ from content.movie_info import MovieInfo
 from content.random_facts import RandomFacts
 from cross_platform.renderer import CrossPlatformRenderer
 
-
 # =============================================================================
 # CommandHandler tests
 # =============================================================================
+
 
 class TestCommandHandler(unittest.TestCase):
 
@@ -80,7 +80,9 @@ class TestCommandHandler(unittest.TestCase):
         self.assertGreaterEqual(result["commands_executed"], 1)
 
     def test_device_register(self):
-        result = self.handler.device_register("device-001", "smart_tv", {"brand": "Samsung"})
+        result = self.handler.device_register(
+            "device-001", "smart_tv", {"brand": "Samsung"}
+        )
         self.assertEqual(result["status"], "registered")
         self.assertEqual(result["device_id"], "device-001")
         self.assertIn("device-001", self.handler.devices)
@@ -111,6 +113,7 @@ class TestCommandHandler(unittest.TestCase):
 # =============================================================================
 # BluetoothHandler tests
 # =============================================================================
+
 
 class TestBluetoothHandler(unittest.TestCase):
 
@@ -207,6 +210,7 @@ class TestBluetoothHandler(unittest.TestCase):
 # WebSocketCommunicationHandler tests
 # =============================================================================
 
+
 class TestWebSocketHandler(unittest.TestCase):
 
     def setUp(self):
@@ -256,6 +260,7 @@ class TestWebSocketHandler(unittest.TestCase):
 # MovieInfo tests
 # =============================================================================
 
+
 class TestMovieInfo(unittest.TestCase):
 
     def setUp(self):
@@ -297,6 +302,7 @@ class TestMovieInfo(unittest.TestCase):
 # ChatContent tests
 # =============================================================================
 
+
 class TestChatContent(unittest.TestCase):
 
     def setUp(self):
@@ -334,6 +340,7 @@ class TestChatContent(unittest.TestCase):
 # RandomFacts tests
 # =============================================================================
 
+
 class TestRandomFacts(unittest.TestCase):
 
     def setUp(self):
@@ -370,6 +377,7 @@ class TestRandomFacts(unittest.TestCase):
 # =============================================================================
 # CrossPlatformRenderer tests
 # =============================================================================
+
 
 class TestCrossplatformRenderer(unittest.TestCase):
 
@@ -422,6 +430,7 @@ class TestCrossplatformRenderer(unittest.TestCase):
 
     def test_unknown_platform_uses_other(self):
         from cross_platform.renderer import PLATFORM_PROFILES
+
         renderer = CrossPlatformRenderer("unknown_device")
         self.assertEqual(renderer.profile, PLATFORM_PROFILES["other"])
         output = renderer.render("Test")

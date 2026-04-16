@@ -7,8 +7,8 @@ Covers: tiers, API kit catalog, sandbox manager, one-click deploy,
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -16,52 +16,52 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from bots.api_kit_bot.api_kit_bot import APIKitBot, APIKitBotError, APIKitTierError
+from bots.api_kit_bot.api_kit_catalog import (
+    E_COMMERCE,
+    EDUCATION,
+    ENTERTAINMENT,
+    FINANCE,
+    HEALTHCARE_DIAGNOSTICS,
+    HR,
+    LEGAL,
+    LOGISTICS,
+    MARKETING,
+    PRODUCTIVITY,
+    APIKit,
+    APIKitCatalog,
+)
+from bots.api_kit_bot.one_click_deploy import (
+    AWS_LAMBDA,
+    DEPLOY_TARGETS,
+    DOCKER,
+    RAILWAY,
+    VERCEL,
+    OneClickDeploy,
+)
+from bots.api_kit_bot.sandbox_manager import SandboxManager, _generate_secret_key
 from bots.api_kit_bot.tiers import (
+    FEATURE_ADVANCED_SANDBOX,
+    FEATURE_ANALYTICS,
+    FEATURE_API_KIT_BASIC,
+    FEATURE_AUTO_KEY_EXPIRATION,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_FORTUNE500_INTEGRATIONS,
+    FEATURE_ONE_CLICK_DEPLOY,
+    FEATURE_SANDBOX_BASIC,
+    FEATURE_SECRET_KEY_MANAGEMENT,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_API_KIT_BASIC,
-    FEATURE_SANDBOX_BASIC,
-    FEATURE_SECRET_KEY_MANAGEMENT,
-    FEATURE_ONE_CLICK_DEPLOY,
-    FEATURE_ANALYTICS,
-    FEATURE_ADVANCED_SANDBOX,
-    FEATURE_AUTO_KEY_EXPIRATION,
-    FEATURE_WHITE_LABEL,
-    FEATURE_FORTUNE500_INTEGRATIONS,
-    FEATURE_DEDICATED_SUPPORT,
 )
-from bots.api_kit_bot.api_kit_catalog import (
-    APIKitCatalog,
-    APIKit,
-    HEALTHCARE_DIAGNOSTICS,
-    PRODUCTIVITY,
-    FINANCE,
-    E_COMMERCE,
-    HR,
-    EDUCATION,
-    MARKETING,
-    LEGAL,
-    LOGISTICS,
-    ENTERTAINMENT,
-)
-from bots.api_kit_bot.sandbox_manager import SandboxManager, _generate_secret_key
-from bots.api_kit_bot.one_click_deploy import (
-    OneClickDeploy,
-    DEPLOY_TARGETS,
-    AWS_LAMBDA,
-    VERCEL,
-    DOCKER,
-    RAILWAY,
-)
-from bots.api_kit_bot.api_kit_bot import APIKitBot, APIKitBotError, APIKitTierError
-
 
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -145,6 +145,7 @@ class TestTiers:
 # API Kit Catalog
 # ===========================================================================
 
+
 class TestAPIKitCatalog:
     def setup_method(self):
         self.catalog = APIKitCatalog()
@@ -169,7 +170,10 @@ class TestAPIKitCatalog:
 
     def test_search_kits_returns_matches(self):
         results = self.catalog.search_kits("fraud")
-        assert any("fraud" in k.name.lower() or "fraud" in k.description.lower() for k in results)
+        assert any(
+            "fraud" in k.name.lower() or "fraud" in k.description.lower()
+            for k in results
+        )
 
     def test_search_kits_no_match(self):
         results = self.catalog.search_kits("xyznonexistent123")
@@ -193,16 +197,33 @@ class TestAPIKitCatalog:
     def test_kit_to_dict_structure(self):
         kit = self.catalog.get_kit("kit_001")
         d = kit.to_dict()
-        for key in ["kit_id", "name", "category", "description", "endpoints",
-                    "sample_code", "monthly_price_usd", "setup_fee_usd",
-                    "ai_model_type", "response_time_ms"]:
+        for key in [
+            "kit_id",
+            "name",
+            "category",
+            "description",
+            "endpoints",
+            "sample_code",
+            "monthly_price_usd",
+            "setup_fee_usd",
+            "ai_model_type",
+            "response_time_ms",
+        ]:
             assert key in d
 
     def test_all_categories_present(self):
         all_categories = {k.category for k in self.catalog.list_kits()}
         expected = {
-            HEALTHCARE_DIAGNOSTICS, PRODUCTIVITY, ENTERTAINMENT, FINANCE,
-            E_COMMERCE, HR, EDUCATION, MARKETING, LEGAL, LOGISTICS,
+            HEALTHCARE_DIAGNOSTICS,
+            PRODUCTIVITY,
+            ENTERTAINMENT,
+            FINANCE,
+            E_COMMERCE,
+            HR,
+            EDUCATION,
+            MARKETING,
+            LEGAL,
+            LOGISTICS,
         }
         assert expected.issubset(all_categories)
 
@@ -210,6 +231,7 @@ class TestAPIKitCatalog:
 # ===========================================================================
 # Sandbox Manager
 # ===========================================================================
+
 
 class TestSandboxManager:
     def setup_method(self):
@@ -336,6 +358,7 @@ class TestSandboxManager:
 # One-Click Deploy
 # ===========================================================================
 
+
 class TestOneClickDeploy:
     def setup_method(self):
         self.deployer = OneClickDeploy()
@@ -388,6 +411,7 @@ class TestOneClickDeploy:
 # ===========================================================================
 # APIKitBot (orchestrator + tier enforcement)
 # ===========================================================================
+
 
 class TestAPIKitBot:
     def test_free_bot_browse_kits(self):

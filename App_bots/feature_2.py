@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,42 +22,297 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "question": "How do I reset my password?",                      "category": "account",     "answer": "Go to Settings → Security → Reset Password. You'll receive an email with a reset link within 2 minutes.", "helpful_votes": 342, "difficulty": "easy",   "escalate": False},
-    {"id": 2,  "question": "How do I upgrade my plan?",                        "category": "billing",     "answer": "Navigate to Settings → Billing → Upgrade Plan. Select your desired tier and complete checkout.", "helpful_votes": 287, "difficulty": "easy",   "escalate": False},
-    {"id": 3,  "question": "Why is my bot not running?",                       "category": "technical",   "answer": "Check 1) Token balance in Billing, 2) Bot status in Dashboard, 3) API key validity in Settings → Developer.", "helpful_votes": 412, "difficulty": "medium", "escalate": False},
-    {"id": 4,  "question": "How do I connect my CRM?",                         "category": "integrations","answer": "Go to Settings → Integrations and select your CRM (Salesforce, HubSpot, Pipedrive). Follow the OAuth flow.", "helpful_votes": 198, "difficulty": "medium", "escalate": False},
-    {"id": 5,  "question": "How do I generate an API key?",                    "category": "developer",   "answer": "Go to Settings → Developer → API Keys → Generate New Key. Copy and store it securely — it's only shown once.", "helpful_votes": 356, "difficulty": "easy",   "escalate": False},
-    {"id": 6,  "question": "Why am I being charged twice?",                    "category": "billing",     "answer": "This may be due to a failed charge retry. Please contact billing@dreamcobots.com with your invoice numbers.", "helpful_votes": 145, "difficulty": "hard",   "escalate": True},
-    {"id": 7,  "question": "How do I cancel my subscription?",                 "category": "billing",     "answer": "Go to Settings → Billing → Cancel Plan. Your access continues until the end of the billing period.", "helpful_votes": 223, "difficulty": "easy",   "escalate": False},
-    {"id": 8,  "question": "Can I export my data?",                            "category": "data",        "answer": "Yes! Go to Settings → Data → Export. Choose CSV or JSON format. Enterprise users get automated daily exports.", "helpful_votes": 189, "difficulty": "easy",   "escalate": False},
-    {"id": 9,  "question": "How do I invite team members?",                    "category": "collaboration","answer": "Go to Settings → Team → Invite Members. Enter their email. They'll receive an invite valid for 48 hours.", "helpful_votes": 267, "difficulty": "easy",   "escalate": False},
-    {"id": 10, "question": "What are tokens and how are they used?",           "category": "billing",     "answer": "Tokens are the currency used to run bots. Each bot action costs a fixed number of tokens. View usage in Dashboard.", "helpful_votes": 445, "difficulty": "easy",   "escalate": False},
-    {"id": 11, "question": "How do I set up a Stripe integration?",            "category": "integrations","answer": "Go to Settings → Payments → Connect Stripe. You'll be redirected to Stripe's OAuth page to connect your account.", "helpful_votes": 312, "difficulty": "medium", "escalate": False},
-    {"id": 12, "question": "My bot returned wrong data — what do I do?",       "category": "technical",   "answer": "Check your bot configuration filters and API connections. If the issue persists, submit a bug report from the Dashboard.", "helpful_votes": 178, "difficulty": "medium", "escalate": False},
-    {"id": 13, "question": "How do I create a custom bot template?",           "category": "product",     "answer": "Go to Bot Factory → Create New → Start from Scratch. Define inputs, outputs, and automation logic using our visual builder.", "helpful_votes": 234, "difficulty": "hard",   "escalate": False},
-    {"id": 14, "question": "Does DreamCo support GDPR compliance?",            "category": "compliance",  "answer": "Yes. DreamCo is GDPR compliant. Go to Settings → Privacy to configure data retention, consent banners, and DPA agreements.", "helpful_votes": 289, "difficulty": "medium", "escalate": False},
-    {"id": 15, "question": "How do I view bot performance analytics?",         "category": "analytics",   "answer": "Go to Dashboard → Analytics → Bot Performance. Filter by date range, bot type, or revenue generated.", "helpful_votes": 321, "difficulty": "easy",   "escalate": False},
-    {"id": 16, "question": "Why is my account suspended?",                     "category": "account",     "answer": "Suspensions occur for TOS violations or unpaid invoices. Contact support@dreamcobots.com immediately to resolve.", "helpful_votes": 89,  "difficulty": "hard",   "escalate": True},
-    {"id": 17, "question": "How do I configure webhook notifications?",        "category": "developer",   "answer": "Go to Settings → Developer → Webhooks → Add Endpoint. Enter your URL and select the events to subscribe to.", "helpful_votes": 267, "difficulty": "medium", "escalate": False},
-    {"id": 18, "question": "Can I use DreamCo on mobile?",                    "category": "product",     "answer": "Yes! The DreamCo mobile app is available on iOS and Android. Download from the App Store or Google Play.", "helpful_votes": 198, "difficulty": "easy",   "escalate": False},
-    {"id": 19, "question": "How do I set up a referral link?",                 "category": "growth",      "answer": "Go to Dashboard → Referrals → Copy Your Link. Share it and earn $50 for every customer who upgrades.", "helpful_votes": 345, "difficulty": "easy",   "escalate": False},
-    {"id": 20, "question": "How do I report a security vulnerability?",       "category": "security",    "answer": "Email security@dreamcobots.com with details. We follow responsible disclosure and reward valid reports.", "helpful_votes": 156, "difficulty": "medium", "escalate": True},
-    {"id": 21, "question": "How do I bulk import leads?",                     "category": "product",     "answer": "Go to Lead Manager → Import → Upload CSV. Map the fields and confirm. Supports up to 50,000 records.", "helpful_votes": 278, "difficulty": "medium", "escalate": False},
-    {"id": 22, "question": "Why is the dashboard loading slowly?",            "category": "technical",   "answer": "Try clearing cache, using a different browser, or checking status.dreamcobots.com for incidents.", "helpful_votes": 213, "difficulty": "easy",   "escalate": False},
-    {"id": 23, "question": "How do I enable white-label mode?",               "category": "enterprise",  "answer": "White-label is available on ENTERPRISE plans. Go to Settings → White Label → Configure Brand to upload your logo and colors.", "helpful_votes": 189, "difficulty": "medium", "escalate": False},
-    {"id": 24, "question": "Can I run multiple bots simultaneously?",         "category": "product",     "answer": "Yes! PRO and ENTERPRISE users can run multiple bots at the same time. Free tier runs one bot at a time.", "helpful_votes": 312, "difficulty": "easy",   "escalate": False},
-    {"id": 25, "question": "How do I get a refund?",                          "category": "billing",     "answer": "We offer a 14-day money-back guarantee. Email billing@dreamcobots.com with your account email and reason.", "helpful_votes": 267, "difficulty": "medium", "escalate": True},
-    {"id": 26, "question": "How do I connect Google Sheets?",                 "category": "integrations","answer": "Go to Settings → Integrations → Google Sheets. Click Connect and authorize access. Then map sheets to your bots.", "helpful_votes": 345, "difficulty": "easy",   "escalate": False},
-    {"id": 27, "question": "How do I create a drip email sequence?",          "category": "marketing",   "answer": "Go to Marketing → Email → New Sequence. Add steps, set delays, and configure triggers. Preview before activating.", "helpful_votes": 231, "difficulty": "medium", "escalate": False},
-    {"id": 28, "question": "What's the uptime SLA for ENTERPRISE?",          "category": "enterprise",  "answer": "Enterprise plans include a 99.9% uptime SLA with dedicated infrastructure and priority support.", "helpful_votes": 178, "difficulty": "easy",   "escalate": False},
-    {"id": 29, "question": "How do I set rate limits on bots?",               "category": "developer",   "answer": "Go to Bot Settings → Advanced → Rate Limiting. Set max requests per minute/hour/day to prevent overuse.", "helpful_votes": 145, "difficulty": "hard",   "escalate": False},
-    {"id": 30, "question": "How do I access the API documentation?",          "category": "developer",   "answer": "Visit docs.dreamcobots.com for full REST API documentation, SDK guides, and code examples.", "helpful_votes": 423, "difficulty": "easy",   "escalate": False},
+    {
+        "id": 1,
+        "question": "How do I reset my password?",
+        "category": "account",
+        "answer": "Go to Settings → Security → Reset Password. You'll receive an email with a reset link within 2 minutes.",
+        "helpful_votes": 342,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 2,
+        "question": "How do I upgrade my plan?",
+        "category": "billing",
+        "answer": "Navigate to Settings → Billing → Upgrade Plan. Select your desired tier and complete checkout.",
+        "helpful_votes": 287,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 3,
+        "question": "Why is my bot not running?",
+        "category": "technical",
+        "answer": "Check 1) Token balance in Billing, 2) Bot status in Dashboard, 3) API key validity in Settings → Developer.",
+        "helpful_votes": 412,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 4,
+        "question": "How do I connect my CRM?",
+        "category": "integrations",
+        "answer": "Go to Settings → Integrations and select your CRM (Salesforce, HubSpot, Pipedrive). Follow the OAuth flow.",
+        "helpful_votes": 198,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 5,
+        "question": "How do I generate an API key?",
+        "category": "developer",
+        "answer": "Go to Settings → Developer → API Keys → Generate New Key. Copy and store it securely — it's only shown once.",
+        "helpful_votes": 356,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 6,
+        "question": "Why am I being charged twice?",
+        "category": "billing",
+        "answer": "This may be due to a failed charge retry. Please contact billing@dreamcobots.com with your invoice numbers.",
+        "helpful_votes": 145,
+        "difficulty": "hard",
+        "escalate": True,
+    },
+    {
+        "id": 7,
+        "question": "How do I cancel my subscription?",
+        "category": "billing",
+        "answer": "Go to Settings → Billing → Cancel Plan. Your access continues until the end of the billing period.",
+        "helpful_votes": 223,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 8,
+        "question": "Can I export my data?",
+        "category": "data",
+        "answer": "Yes! Go to Settings → Data → Export. Choose CSV or JSON format. Enterprise users get automated daily exports.",
+        "helpful_votes": 189,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 9,
+        "question": "How do I invite team members?",
+        "category": "collaboration",
+        "answer": "Go to Settings → Team → Invite Members. Enter their email. They'll receive an invite valid for 48 hours.",
+        "helpful_votes": 267,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 10,
+        "question": "What are tokens and how are they used?",
+        "category": "billing",
+        "answer": "Tokens are the currency used to run bots. Each bot action costs a fixed number of tokens. View usage in Dashboard.",
+        "helpful_votes": 445,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 11,
+        "question": "How do I set up a Stripe integration?",
+        "category": "integrations",
+        "answer": "Go to Settings → Payments → Connect Stripe. You'll be redirected to Stripe's OAuth page to connect your account.",
+        "helpful_votes": 312,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 12,
+        "question": "My bot returned wrong data — what do I do?",
+        "category": "technical",
+        "answer": "Check your bot configuration filters and API connections. If the issue persists, submit a bug report from the Dashboard.",
+        "helpful_votes": 178,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 13,
+        "question": "How do I create a custom bot template?",
+        "category": "product",
+        "answer": "Go to Bot Factory → Create New → Start from Scratch. Define inputs, outputs, and automation logic using our visual builder.",
+        "helpful_votes": 234,
+        "difficulty": "hard",
+        "escalate": False,
+    },
+    {
+        "id": 14,
+        "question": "Does DreamCo support GDPR compliance?",
+        "category": "compliance",
+        "answer": "Yes. DreamCo is GDPR compliant. Go to Settings → Privacy to configure data retention, consent banners, and DPA agreements.",
+        "helpful_votes": 289,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 15,
+        "question": "How do I view bot performance analytics?",
+        "category": "analytics",
+        "answer": "Go to Dashboard → Analytics → Bot Performance. Filter by date range, bot type, or revenue generated.",
+        "helpful_votes": 321,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 16,
+        "question": "Why is my account suspended?",
+        "category": "account",
+        "answer": "Suspensions occur for TOS violations or unpaid invoices. Contact support@dreamcobots.com immediately to resolve.",
+        "helpful_votes": 89,
+        "difficulty": "hard",
+        "escalate": True,
+    },
+    {
+        "id": 17,
+        "question": "How do I configure webhook notifications?",
+        "category": "developer",
+        "answer": "Go to Settings → Developer → Webhooks → Add Endpoint. Enter your URL and select the events to subscribe to.",
+        "helpful_votes": 267,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 18,
+        "question": "Can I use DreamCo on mobile?",
+        "category": "product",
+        "answer": "Yes! The DreamCo mobile app is available on iOS and Android. Download from the App Store or Google Play.",
+        "helpful_votes": 198,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 19,
+        "question": "How do I set up a referral link?",
+        "category": "growth",
+        "answer": "Go to Dashboard → Referrals → Copy Your Link. Share it and earn $50 for every customer who upgrades.",
+        "helpful_votes": 345,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 20,
+        "question": "How do I report a security vulnerability?",
+        "category": "security",
+        "answer": "Email security@dreamcobots.com with details. We follow responsible disclosure and reward valid reports.",
+        "helpful_votes": 156,
+        "difficulty": "medium",
+        "escalate": True,
+    },
+    {
+        "id": 21,
+        "question": "How do I bulk import leads?",
+        "category": "product",
+        "answer": "Go to Lead Manager → Import → Upload CSV. Map the fields and confirm. Supports up to 50,000 records.",
+        "helpful_votes": 278,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 22,
+        "question": "Why is the dashboard loading slowly?",
+        "category": "technical",
+        "answer": "Try clearing cache, using a different browser, or checking status.dreamcobots.com for incidents.",
+        "helpful_votes": 213,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 23,
+        "question": "How do I enable white-label mode?",
+        "category": "enterprise",
+        "answer": "White-label is available on ENTERPRISE plans. Go to Settings → White Label → Configure Brand to upload your logo and colors.",
+        "helpful_votes": 189,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 24,
+        "question": "Can I run multiple bots simultaneously?",
+        "category": "product",
+        "answer": "Yes! PRO and ENTERPRISE users can run multiple bots at the same time. Free tier runs one bot at a time.",
+        "helpful_votes": 312,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 25,
+        "question": "How do I get a refund?",
+        "category": "billing",
+        "answer": "We offer a 14-day money-back guarantee. Email billing@dreamcobots.com with your account email and reason.",
+        "helpful_votes": 267,
+        "difficulty": "medium",
+        "escalate": True,
+    },
+    {
+        "id": 26,
+        "question": "How do I connect Google Sheets?",
+        "category": "integrations",
+        "answer": "Go to Settings → Integrations → Google Sheets. Click Connect and authorize access. Then map sheets to your bots.",
+        "helpful_votes": 345,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 27,
+        "question": "How do I create a drip email sequence?",
+        "category": "marketing",
+        "answer": "Go to Marketing → Email → New Sequence. Add steps, set delays, and configure triggers. Preview before activating.",
+        "helpful_votes": 231,
+        "difficulty": "medium",
+        "escalate": False,
+    },
+    {
+        "id": 28,
+        "question": "What's the uptime SLA for ENTERPRISE?",
+        "category": "enterprise",
+        "answer": "Enterprise plans include a 99.9% uptime SLA with dedicated infrastructure and priority support.",
+        "helpful_votes": 178,
+        "difficulty": "easy",
+        "escalate": False,
+    },
+    {
+        "id": 29,
+        "question": "How do I set rate limits on bots?",
+        "category": "developer",
+        "answer": "Go to Bot Settings → Advanced → Rate Limiting. Set max requests per minute/hour/day to prevent overuse.",
+        "helpful_votes": 145,
+        "difficulty": "hard",
+        "escalate": False,
+    },
+    {
+        "id": 30,
+        "question": "How do I access the API documentation?",
+        "category": "developer",
+        "answer": "Visit docs.dreamcobots.com for full REST API documentation, SDK guides, and code examples.",
+        "helpful_votes": 423,
+        "difficulty": "easy",
+        "escalate": False,
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_queries": 10,   "ai_answers": False, "ticket_creation": False},
-    "PRO":        {"price_usd": 29,  "max_queries": 500,  "ai_answers": True,  "ticket_creation": True},
-    "ENTERPRISE": {"price_usd": 99,  "max_queries": None, "ai_answers": True,  "ticket_creation": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_queries": 10,
+        "ai_answers": False,
+        "ticket_creation": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_queries": 500,
+        "ai_answers": True,
+        "ticket_creation": True,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_queries": None,
+        "ai_answers": True,
+        "ticket_creation": True,
+    },
 }
 
 
@@ -92,7 +347,8 @@ class UserSupportBot:
         self._query_count += 1
         query_lower = query.lower()
         results = [
-            e for e in EXAMPLES
+            e
+            for e in EXAMPLES
             if any(word in e["question"].lower() for word in query_lower.split())
         ]
         return results[:5] if results else EXAMPLES[:3]
@@ -111,11 +367,14 @@ class UserSupportBot:
             "helpful_votes": entry["helpful_votes"],
         }
         if entry["escalate"]:
-            result["note"] = "⚠️ This issue may require human support. A ticket can be created."
+            result["note"] = (
+                "⚠️ This issue may require human support. A ticket can be created."
+            )
         return result
 
-    def create_ticket(self, user_email: str, subject: str, description: str,
-                      priority: str = "normal") -> dict:
+    def create_ticket(
+        self, user_email: str, subject: str, description: str, priority: str = "normal"
+    ) -> dict:
         """Create a support ticket (PRO/ENTERPRISE)."""
         if not self._config["ticket_creation"]:
             raise PermissionError(
@@ -180,7 +439,9 @@ class UserSupportBot:
             "total_faq_entries": len(EXAMPLES),
             "by_category": categories,
             "escalation_required": len(self.get_escalation_required_questions()),
-            "avg_helpful_votes": round(sum(e["helpful_votes"] for e in EXAMPLES) / len(EXAMPLES), 1),
+            "avg_helpful_votes": round(
+                sum(e["helpful_votes"] for e in EXAMPLES) / len(EXAMPLES), 1
+            ),
             "open_tickets": len([t for t in self._tickets if t["status"] == "open"]),
             "tier": self.tier,
         }
@@ -203,7 +464,10 @@ class UserSupportBot:
             raw_data={"domain": "user_support", "faq_entries": len(EXAMPLES)},
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "stats": self.get_support_stats()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "stats": self.get_support_stats(),
+        }
 
 
 if __name__ == "__main__":
@@ -245,7 +509,11 @@ _orig_usersupport_bot_init = UserSupportBot.__init__
 
 def _usersupport_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+        tier = (
+            Tier(str(tier).lower())
+            if str(tier).lower() in ("free", "pro", "enterprise")
+            else Tier.FREE
+        )
     _orig_usersupport_bot_init(self, tier.value.upper())
     self.tier = tier
 
@@ -286,7 +554,12 @@ def _usersupport_bot_analyze(self):
 
 def _usersupport_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "UserSupportBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "UserSupportBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 UserSupportBot.monthly_price = _usersupport_bot_monthly_price

@@ -20,7 +20,6 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
@@ -83,6 +82,7 @@ class ValidationResult:
 # PRValidationBot
 # ---------------------------------------------------------------------------
 
+
 class PRValidationBot:
     """Validates PRs, auto-restores deleted critical files, and checks revenue readiness."""
 
@@ -131,7 +131,8 @@ class PRValidationBot:
         """Return list of FileStatus objects for files changed relative to base branch."""
         try:
             result = self._run(
-                ["git", "diff", "--name-status", f"{self.base_branch}...HEAD"], check=False
+                ["git", "diff", "--name-status", f"{self.base_branch}...HEAD"],
+                check=False,
             )
             statuses: List[FileStatus] = []
             for line in result.stdout.splitlines():

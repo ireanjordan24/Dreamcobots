@@ -1,18 +1,19 @@
 """Tests for bots/home_buyer_bot/contract_generator.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.home_buyer_bot.contract_generator import ContractGenerator, Contract
 
+from bots.home_buyer_bot.contract_generator import Contract, ContractGenerator
 
 # ---------------------------------------------------------------------------
 # generate_contract
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateContract:
     def setup_method(self):
@@ -62,6 +63,7 @@ class TestGenerateContract:
 # get_contract
 # ---------------------------------------------------------------------------
 
+
 class TestGetContract:
     def test_get_existing_contract(self):
         gen = ContractGenerator()
@@ -78,6 +80,7 @@ class TestGetContract:
 # ---------------------------------------------------------------------------
 # mark_signed
 # ---------------------------------------------------------------------------
+
 
 class TestMarkSigned:
     def test_mark_signed_returns_true(self):
@@ -96,6 +99,7 @@ class TestMarkSigned:
 # list_contracts
 # ---------------------------------------------------------------------------
 
+
 class TestListContracts:
     def test_empty_list(self):
         gen = ContractGenerator()
@@ -106,5 +110,12 @@ class TestListContracts:
         gen.generate_contract("B", "S", "Addr", 10_000)
         contracts = gen.list_contracts()
         d = contracts[0]
-        for key in ("contract_id", "buyer", "seller", "property_address", "price", "signed"):
+        for key in (
+            "contract_id",
+            "buyer",
+            "seller",
+            "property_address",
+            "price",
+            "signed",
+        ):
             assert key in d

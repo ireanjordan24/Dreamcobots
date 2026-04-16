@@ -1,4 +1,5 @@
 """API Registry for DataForge AI - maps all 100 APIs to metadata."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
 API_REGISTRY = {

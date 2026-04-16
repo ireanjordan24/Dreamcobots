@@ -87,7 +87,8 @@ async function migrateUp() {
   if (!fs.existsSync(migrationsDir)) {
     return { applied: 0, migrations: [] };
   }
-  const files = fs.readdirSync(migrationsDir)
+  const files = fs
+    .readdirSync(migrationsDir)
     .filter((f) => f.endsWith('.sql'))
     .sort();
 

@@ -7,11 +7,18 @@ Engines:
   3. Revenue Matching Engine     — match_property_to_program(), calculate_housing_revenue()
   4. Outreach Engine             — send_outreach()
 """
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
-from .tiers import BOT_FEATURES, get_bot_tier_info
+
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .tiers import BOT_FEATURES, get_bot_tier_info
 
 
 class RealEstateBotTierError(Exception):
@@ -25,76 +32,396 @@ class RealEstateBot:
 
     PROPERTY_DATABASE = {
         "austin": [
-            {"address": "1204 Oak Blvd, Austin TX", "price": 320000, "beds": 3, "baths": 2, "sqft": 1450, "type": "single_family", "monthly_rent": 2400, "year_built": 1998},
-            {"address": "5601 Riverside Dr #203, Austin TX", "price": 185000, "beds": 2, "baths": 1, "sqft": 875, "type": "condo", "monthly_rent": 1600, "year_built": 2005},
-            {"address": "820 S Congress Ave, Austin TX", "price": 450000, "beds": 4, "baths": 3, "sqft": 2100, "type": "single_family", "monthly_rent": 3200, "year_built": 2001},
-            {"address": "311 W 7th St #402, Austin TX", "price": 275000, "beds": 1, "baths": 1, "sqft": 720, "type": "condo", "monthly_rent": 2000, "year_built": 2010},
-            {"address": "4422 Burnet Rd, Austin TX", "price": 380000, "beds": 3, "baths": 2, "sqft": 1600, "type": "townhouse", "monthly_rent": 2800, "year_built": 2003},
+            {
+                "address": "1204 Oak Blvd, Austin TX",
+                "price": 320000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1450,
+                "type": "single_family",
+                "monthly_rent": 2400,
+                "year_built": 1998,
+            },
+            {
+                "address": "5601 Riverside Dr #203, Austin TX",
+                "price": 185000,
+                "beds": 2,
+                "baths": 1,
+                "sqft": 875,
+                "type": "condo",
+                "monthly_rent": 1600,
+                "year_built": 2005,
+            },
+            {
+                "address": "820 S Congress Ave, Austin TX",
+                "price": 450000,
+                "beds": 4,
+                "baths": 3,
+                "sqft": 2100,
+                "type": "single_family",
+                "monthly_rent": 3200,
+                "year_built": 2001,
+            },
+            {
+                "address": "311 W 7th St #402, Austin TX",
+                "price": 275000,
+                "beds": 1,
+                "baths": 1,
+                "sqft": 720,
+                "type": "condo",
+                "monthly_rent": 2000,
+                "year_built": 2010,
+            },
+            {
+                "address": "4422 Burnet Rd, Austin TX",
+                "price": 380000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1600,
+                "type": "townhouse",
+                "monthly_rent": 2800,
+                "year_built": 2003,
+            },
         ],
         "phoenix": [
-            {"address": "3901 E Indian School Rd, Phoenix AZ", "price": 285000, "beds": 3, "baths": 2, "sqft": 1550, "type": "single_family", "monthly_rent": 2100, "year_built": 1995},
-            {"address": "1820 N 44th St #110, Phoenix AZ", "price": 165000, "beds": 2, "baths": 2, "sqft": 1000, "type": "condo", "monthly_rent": 1450, "year_built": 2002},
-            {"address": "6120 N 7th Ave, Phoenix AZ", "price": 220000, "beds": 3, "baths": 2, "sqft": 1350, "type": "single_family", "monthly_rent": 1800, "year_built": 1988},
-            {"address": "2401 W Camelback Rd, Phoenix AZ", "price": 340000, "beds": 4, "baths": 2, "sqft": 1900, "type": "single_family", "monthly_rent": 2500, "year_built": 2000},
-            {"address": "910 E Osborn Rd #301, Phoenix AZ", "price": 195000, "beds": 2, "baths": 1, "sqft": 880, "type": "condo", "monthly_rent": 1600, "year_built": 2008},
+            {
+                "address": "3901 E Indian School Rd, Phoenix AZ",
+                "price": 285000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1550,
+                "type": "single_family",
+                "monthly_rent": 2100,
+                "year_built": 1995,
+            },
+            {
+                "address": "1820 N 44th St #110, Phoenix AZ",
+                "price": 165000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 1000,
+                "type": "condo",
+                "monthly_rent": 1450,
+                "year_built": 2002,
+            },
+            {
+                "address": "6120 N 7th Ave, Phoenix AZ",
+                "price": 220000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1350,
+                "type": "single_family",
+                "monthly_rent": 1800,
+                "year_built": 1988,
+            },
+            {
+                "address": "2401 W Camelback Rd, Phoenix AZ",
+                "price": 340000,
+                "beds": 4,
+                "baths": 2,
+                "sqft": 1900,
+                "type": "single_family",
+                "monthly_rent": 2500,
+                "year_built": 2000,
+            },
+            {
+                "address": "910 E Osborn Rd #301, Phoenix AZ",
+                "price": 195000,
+                "beds": 2,
+                "baths": 1,
+                "sqft": 880,
+                "type": "condo",
+                "monthly_rent": 1600,
+                "year_built": 2008,
+            },
         ],
         "nashville": [
-            {"address": "2204 Belmont Blvd, Nashville TN", "price": 415000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "monthly_rent": 2900, "year_built": 1997},
-            {"address": "500 Church St #1205, Nashville TN", "price": 310000, "beds": 2, "baths": 2, "sqft": 1100, "type": "condo", "monthly_rent": 2400, "year_built": 2012},
-            {"address": "1122 Gallatin Ave, Nashville TN", "price": 295000, "beds": 3, "baths": 1, "sqft": 1400, "type": "single_family", "monthly_rent": 2200, "year_built": 1962},
-            {"address": "4401 Murphy Rd, Nashville TN", "price": 375000, "beds": 4, "baths": 3, "sqft": 2000, "type": "townhouse", "monthly_rent": 2700, "year_built": 2004},
+            {
+                "address": "2204 Belmont Blvd, Nashville TN",
+                "price": 415000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1700,
+                "type": "single_family",
+                "monthly_rent": 2900,
+                "year_built": 1997,
+            },
+            {
+                "address": "500 Church St #1205, Nashville TN",
+                "price": 310000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 1100,
+                "type": "condo",
+                "monthly_rent": 2400,
+                "year_built": 2012,
+            },
+            {
+                "address": "1122 Gallatin Ave, Nashville TN",
+                "price": 295000,
+                "beds": 3,
+                "baths": 1,
+                "sqft": 1400,
+                "type": "single_family",
+                "monthly_rent": 2200,
+                "year_built": 1962,
+            },
+            {
+                "address": "4401 Murphy Rd, Nashville TN",
+                "price": 375000,
+                "beds": 4,
+                "baths": 3,
+                "sqft": 2000,
+                "type": "townhouse",
+                "monthly_rent": 2700,
+                "year_built": 2004,
+            },
         ],
         "denver": [
-            {"address": "1502 Larimer St #4C, Denver CO", "price": 265000, "beds": 1, "baths": 1, "sqft": 750, "type": "condo", "monthly_rent": 2000, "year_built": 2007},
-            {"address": "3822 W 38th Ave, Denver CO", "price": 445000, "beds": 3, "baths": 2, "sqft": 1650, "type": "single_family", "monthly_rent": 3100, "year_built": 1955},
-            {"address": "7001 E Colfax Ave, Denver CO", "price": 325000, "beds": 3, "baths": 2, "sqft": 1500, "type": "single_family", "monthly_rent": 2500, "year_built": 1974},
+            {
+                "address": "1502 Larimer St #4C, Denver CO",
+                "price": 265000,
+                "beds": 1,
+                "baths": 1,
+                "sqft": 750,
+                "type": "condo",
+                "monthly_rent": 2000,
+                "year_built": 2007,
+            },
+            {
+                "address": "3822 W 38th Ave, Denver CO",
+                "price": 445000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1650,
+                "type": "single_family",
+                "monthly_rent": 3100,
+                "year_built": 1955,
+            },
+            {
+                "address": "7001 E Colfax Ave, Denver CO",
+                "price": 325000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1500,
+                "type": "single_family",
+                "monthly_rent": 2500,
+                "year_built": 1974,
+            },
         ],
         "tampa": [
-            {"address": "4810 W Kennedy Blvd, Tampa FL", "price": 310000, "beds": 3, "baths": 2, "sqft": 1550, "type": "single_family", "monthly_rent": 2300, "year_built": 1993},
-            {"address": "111 N 12th St #2205, Tampa FL", "price": 220000, "beds": 2, "baths": 2, "sqft": 1050, "type": "condo", "monthly_rent": 1900, "year_built": 2006},
-            {"address": "2901 W Cypress St, Tampa FL", "price": 275000, "beds": 3, "baths": 2, "sqft": 1350, "type": "single_family", "monthly_rent": 2100, "year_built": 1985},
+            {
+                "address": "4810 W Kennedy Blvd, Tampa FL",
+                "price": 310000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1550,
+                "type": "single_family",
+                "monthly_rent": 2300,
+                "year_built": 1993,
+            },
+            {
+                "address": "111 N 12th St #2205, Tampa FL",
+                "price": 220000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 1050,
+                "type": "condo",
+                "monthly_rent": 1900,
+                "year_built": 2006,
+            },
+            {
+                "address": "2901 W Cypress St, Tampa FL",
+                "price": 275000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1350,
+                "type": "single_family",
+                "monthly_rent": 2100,
+                "year_built": 1985,
+            },
         ],
         "charlotte": [
-            {"address": "2215 Park Rd, Charlotte NC", "price": 295000, "beds": 3, "baths": 2, "sqft": 1480, "type": "single_family", "monthly_rent": 2100, "year_built": 1996},
-            {"address": "500 W 5th St #1804, Charlotte NC", "price": 245000, "beds": 1, "baths": 1, "sqft": 820, "type": "condo", "monthly_rent": 1800, "year_built": 2014},
+            {
+                "address": "2215 Park Rd, Charlotte NC",
+                "price": 295000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1480,
+                "type": "single_family",
+                "monthly_rent": 2100,
+                "year_built": 1996,
+            },
+            {
+                "address": "500 W 5th St #1804, Charlotte NC",
+                "price": 245000,
+                "beds": 1,
+                "baths": 1,
+                "sqft": 820,
+                "type": "condo",
+                "monthly_rent": 1800,
+                "year_built": 2014,
+            },
         ],
         "atlanta": [
-            {"address": "1350 Spring St NW, Atlanta GA", "price": 380000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "monthly_rent": 2600, "year_built": 2001},
-            {"address": "805 Peachtree St NE #14, Atlanta GA", "price": 290000, "beds": 2, "baths": 2, "sqft": 1200, "type": "condo", "monthly_rent": 2200, "year_built": 2009},
+            {
+                "address": "1350 Spring St NW, Atlanta GA",
+                "price": 380000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1700,
+                "type": "single_family",
+                "monthly_rent": 2600,
+                "year_built": 2001,
+            },
+            {
+                "address": "805 Peachtree St NE #14, Atlanta GA",
+                "price": 290000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 1200,
+                "type": "condo",
+                "monthly_rent": 2200,
+                "year_built": 2009,
+            },
         ],
         "dallas": [
-            {"address": "4421 Lemmon Ave, Dallas TX", "price": 350000, "beds": 3, "baths": 2, "sqft": 1600, "type": "single_family", "monthly_rent": 2500, "year_built": 1999},
-            {"address": "2922 Elm St #301, Dallas TX", "price": 210000, "beds": 1, "baths": 1, "sqft": 780, "type": "condo", "monthly_rent": 1700, "year_built": 2011},
+            {
+                "address": "4421 Lemmon Ave, Dallas TX",
+                "price": 350000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1600,
+                "type": "single_family",
+                "monthly_rent": 2500,
+                "year_built": 1999,
+            },
+            {
+                "address": "2922 Elm St #301, Dallas TX",
+                "price": 210000,
+                "beds": 1,
+                "baths": 1,
+                "sqft": 780,
+                "type": "condo",
+                "monthly_rent": 1700,
+                "year_built": 2011,
+            },
         ],
         "houston": [
-            {"address": "3901 Richmond Ave, Houston TX", "price": 290000, "beds": 3, "baths": 2, "sqft": 1500, "type": "single_family", "monthly_rent": 2000, "year_built": 1994},
-            {"address": "2400 Mid Ln #401, Houston TX", "price": 175000, "beds": 2, "baths": 2, "sqft": 950, "type": "condo", "monthly_rent": 1500, "year_built": 2003},
+            {
+                "address": "3901 Richmond Ave, Houston TX",
+                "price": 290000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1500,
+                "type": "single_family",
+                "monthly_rent": 2000,
+                "year_built": 1994,
+            },
+            {
+                "address": "2400 Mid Ln #401, Houston TX",
+                "price": 175000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 950,
+                "type": "condo",
+                "monthly_rent": 1500,
+                "year_built": 2003,
+            },
         ],
         "las_vegas": [
-            {"address": "8901 W Charleston Blvd, Las Vegas NV", "price": 320000, "beds": 3, "baths": 2, "sqft": 1700, "type": "single_family", "monthly_rent": 2200, "year_built": 2002},
-            {"address": "4455 Paradise Rd #506, Las Vegas NV", "price": 185000, "beds": 2, "baths": 2, "sqft": 1000, "type": "condo", "monthly_rent": 1550, "year_built": 2007},
+            {
+                "address": "8901 W Charleston Blvd, Las Vegas NV",
+                "price": 320000,
+                "beds": 3,
+                "baths": 2,
+                "sqft": 1700,
+                "type": "single_family",
+                "monthly_rent": 2200,
+                "year_built": 2002,
+            },
+            {
+                "address": "4455 Paradise Rd #506, Las Vegas NV",
+                "price": 185000,
+                "beds": 2,
+                "baths": 2,
+                "sqft": 1000,
+                "type": "condo",
+                "monthly_rent": 1550,
+                "year_built": 2007,
+            },
         ],
     }
 
     MARKET_TRENDS = {
-        "austin": {"avg_price_change_pct": 6.2, "inventory_months": 2.1, "days_on_market": 18, "price_per_sqft": 285},
-        "phoenix": {"avg_price_change_pct": 4.8, "inventory_months": 2.8, "days_on_market": 22, "price_per_sqft": 210},
-        "nashville": {"avg_price_change_pct": 5.5, "inventory_months": 1.9, "days_on_market": 15, "price_per_sqft": 260},
-        "denver": {"avg_price_change_pct": 3.2, "inventory_months": 3.1, "days_on_market": 28, "price_per_sqft": 295},
-        "tampa": {"avg_price_change_pct": 7.1, "inventory_months": 2.5, "days_on_market": 20, "price_per_sqft": 230},
-        "charlotte": {"avg_price_change_pct": 5.9, "inventory_months": 2.2, "days_on_market": 17, "price_per_sqft": 218},
-        "atlanta": {"avg_price_change_pct": 4.4, "inventory_months": 2.7, "days_on_market": 24, "price_per_sqft": 225},
-        "dallas": {"avg_price_change_pct": 3.8, "inventory_months": 3.0, "days_on_market": 26, "price_per_sqft": 215},
-        "houston": {"avg_price_change_pct": 3.1, "inventory_months": 3.4, "days_on_market": 30, "price_per_sqft": 190},
-        "las_vegas": {"avg_price_change_pct": 4.9, "inventory_months": 2.6, "days_on_market": 21, "price_per_sqft": 220},
+        "austin": {
+            "avg_price_change_pct": 6.2,
+            "inventory_months": 2.1,
+            "days_on_market": 18,
+            "price_per_sqft": 285,
+        },
+        "phoenix": {
+            "avg_price_change_pct": 4.8,
+            "inventory_months": 2.8,
+            "days_on_market": 22,
+            "price_per_sqft": 210,
+        },
+        "nashville": {
+            "avg_price_change_pct": 5.5,
+            "inventory_months": 1.9,
+            "days_on_market": 15,
+            "price_per_sqft": 260,
+        },
+        "denver": {
+            "avg_price_change_pct": 3.2,
+            "inventory_months": 3.1,
+            "days_on_market": 28,
+            "price_per_sqft": 295,
+        },
+        "tampa": {
+            "avg_price_change_pct": 7.1,
+            "inventory_months": 2.5,
+            "days_on_market": 20,
+            "price_per_sqft": 230,
+        },
+        "charlotte": {
+            "avg_price_change_pct": 5.9,
+            "inventory_months": 2.2,
+            "days_on_market": 17,
+            "price_per_sqft": 218,
+        },
+        "atlanta": {
+            "avg_price_change_pct": 4.4,
+            "inventory_months": 2.7,
+            "days_on_market": 24,
+            "price_per_sqft": 225,
+        },
+        "dallas": {
+            "avg_price_change_pct": 3.8,
+            "inventory_months": 3.0,
+            "days_on_market": 26,
+            "price_per_sqft": 215,
+        },
+        "houston": {
+            "avg_price_change_pct": 3.1,
+            "inventory_months": 3.4,
+            "days_on_market": 30,
+            "price_per_sqft": 190,
+        },
+        "las_vegas": {
+            "avg_price_change_pct": 4.9,
+            "inventory_months": 2.6,
+            "days_on_market": 21,
+            "price_per_sqft": 220,
+        },
     }
 
     # ------------------------------------------------------------------ #
     # Housing + Gov Contract Bot data                                      #
     # ------------------------------------------------------------------ #
 
-    DEFAULT_PAYMENT_PER_PERSON_MONTHLY = 750   # conservative fallback rate (USD)
-    OPERATING_COST_RATE = 0.20                 # 20% of gross rent reserved for operations
+    DEFAULT_PAYMENT_PER_PERSON_MONTHLY = 750  # conservative fallback rate (USD)
+    OPERATING_COST_RATE = 0.20  # 20% of gross rent reserved for operations
 
     DISTRESSED_PROPERTIES = [
         {
@@ -104,7 +431,9 @@ class RealEstateBot:
             "city": "milwaukee",
             "price": 18500,
             "market_value": 65000,
-            "beds": 3, "baths": 1, "sqft": 1150,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1150,
             "type": "foreclosure",
             "source": "county_tax_sale",
             "tax_delinquent": True,
@@ -118,7 +447,9 @@ class RealEstateBot:
             "city": "detroit",
             "price": 9500,
             "market_value": 42000,
-            "beds": 3, "baths": 1, "sqft": 1050,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1050,
             "type": "tax_sale",
             "source": "county_tax_sale",
             "tax_delinquent": True,
@@ -132,7 +463,9 @@ class RealEstateBot:
             "city": "cleveland",
             "price": 22000,
             "market_value": 78000,
-            "beds": 4, "baths": 2, "sqft": 1600,
+            "beds": 4,
+            "baths": 2,
+            "sqft": 1600,
             "type": "abandoned",
             "source": "facebook_marketplace",
             "tax_delinquent": False,
@@ -146,7 +479,9 @@ class RealEstateBot:
             "city": "kansas_city",
             "price": 29000,
             "market_value": 95000,
-            "beds": 5, "baths": 2, "sqft": 2000,
+            "beds": 5,
+            "baths": 2,
+            "sqft": 2000,
             "type": "foreclosure",
             "source": "auction_site",
             "tax_delinquent": True,
@@ -160,7 +495,9 @@ class RealEstateBot:
             "city": "newark",
             "price": 55000,
             "market_value": 180000,
-            "beds": 6, "baths": 3, "sqft": 2800,
+            "beds": 6,
+            "baths": 3,
+            "sqft": 2800,
             "type": "multifamily",
             "source": "zillow",
             "tax_delinquent": False,
@@ -174,7 +511,9 @@ class RealEstateBot:
             "city": "grand_rapids",
             "price": 16000,
             "market_value": 58000,
-            "beds": 3, "baths": 1, "sqft": 1050,
+            "beds": 3,
+            "baths": 1,
+            "sqft": 1050,
             "type": "tax_sale",
             "source": "county_tax_sale",
             "tax_delinquent": True,
@@ -188,7 +527,9 @@ class RealEstateBot:
             "city": "gary",
             "price": 7500,
             "market_value": 35000,
-            "beds": 4, "baths": 1, "sqft": 1300,
+            "beds": 4,
+            "baths": 1,
+            "sqft": 1300,
             "type": "abandoned",
             "source": "county_tax_sale",
             "tax_delinquent": True,
@@ -202,7 +543,9 @@ class RealEstateBot:
             "city": "philadelphia",
             "price": 28000,
             "market_value": 110000,
-            "beds": 4, "baths": 2, "sqft": 1550,
+            "beds": 4,
+            "baths": 2,
+            "sqft": 1550,
             "type": "foreclosure",
             "source": "auction_site",
             "tax_delinquent": False,
@@ -346,7 +689,11 @@ class RealEstateBot:
     def _check_location_limit(self, location: str) -> None:
         limit = self.LOCATION_LIMITS[self.tier]
         loc_lower = location.lower().replace(" ", "_")
-        if limit is not None and len(self._searched_locations) >= limit and loc_lower not in self._searched_locations:
+        if (
+            limit is not None
+            and len(self._searched_locations) >= limit
+            and loc_lower not in self._searched_locations
+        ):
             raise RealEstateBotTierError(
                 f"Location limit of {limit} reached on {self.config.name} tier. Upgrade to search more locations."
             )
@@ -357,7 +704,9 @@ class RealEstateBot:
         """Return properties under budget in location."""
         self._check_location_limit(location)
         loc_key = location.lower().replace(" ", "_")
-        properties = self.PROPERTY_DATABASE.get(loc_key, self.PROPERTY_DATABASE["austin"])
+        properties = self.PROPERTY_DATABASE.get(
+            loc_key, self.PROPERTY_DATABASE["austin"]
+        )
         results = [p for p in properties if p["price"] <= budget]
         for p in results:
             p["roi_estimate"] = round(self.estimate_roi(p), 2)
@@ -398,7 +747,9 @@ class RealEstateBot:
             "tier": self.tier.value,
         }
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
-            result["rental_comps"] = [{"address": "Comparable nearby", "rent": prop["monthly_rent"] + 100}]
+            result["rental_comps"] = [
+                {"address": "Comparable nearby", "rent": prop["monthly_rent"] + 100}
+            ]
             result["cash_flow_analysis"] = {
                 "gross_rent": annual_rent,
                 "vacancy_loss": round(annual_rent * 0.05, 2),
@@ -420,7 +771,9 @@ class RealEstateBot:
     def get_market_trends(self, location: str) -> dict:
         """Return price trends, inventory, and days-on-market."""
         if self.tier == Tier.FREE:
-            raise RealEstateBotTierError("Market trends require PRO or ENTERPRISE tier.")
+            raise RealEstateBotTierError(
+                "Market trends require PRO or ENTERPRISE tier."
+            )
         loc_key = location.lower().replace(" ", "_")
         trends = self.MARKET_TRENDS.get(loc_key, self.MARKET_TRENDS["austin"])
         result = {
@@ -494,15 +847,18 @@ class RealEstateBot:
         results = list(self.GOV_HOUSING_PROGRAMS)
         if state:
             results = [
-                p for p in results
-                if "all" in p["states"] or state.upper() in [s.upper() for s in p["states"]]
+                p
+                for p in results
+                if "all" in p["states"]
+                or state.upper() in [s.upper() for s in p["states"]]
             ]
         if category:
             results = [p for p in results if p["category"] == category]
         if portal:
             portal_lower = portal.lower()
             results = [
-                p for p in results
+                p
+                for p in results
                 if (
                     p["portal"].lower() == portal_lower
                     or p["portal"].lower().startswith(portal_lower + "/")
@@ -557,13 +913,18 @@ class RealEstateBot:
             raise RealEstateBotTierError(
                 "Property-to-program matching requires PRO or ENTERPRISE tier."
             )
-        prop = next((p for p in self.DISTRESSED_PROPERTIES if p["id"] == property_id), None)
+        prop = next(
+            (p for p in self.DISTRESSED_PROPERTIES if p["id"] == property_id), None
+        )
         if not prop:
-            raise ValueError(f"Property '{property_id}' not found in distressed properties database.")
+            raise ValueError(
+                f"Property '{property_id}' not found in distressed properties database."
+            )
 
         state = prop["state"]
         candidates = [
-            p for p in self.GOV_HOUSING_PROGRAMS
+            p
+            for p in self.GOV_HOUSING_PROGRAMS
             if "all" in p["states"] or state.upper() in [s.upper() for s in p["states"]]
         ]
         if not candidates:
@@ -585,7 +946,8 @@ class RealEstateBot:
             "annual_net_usd": revenue["annual_net_usd"],
             "payback_months": (
                 round(prop["price"] / revenue["monthly_net_usd"], 1)
-                if revenue["monthly_net_usd"] > 0 else None
+                if revenue["monthly_net_usd"] > 0
+                else None
             ),
             "tier": self.tier.value,
         }
@@ -615,7 +977,9 @@ class RealEstateBot:
         the message only. Requires PRO or ENTERPRISE tier.
         """
         if self.tier == Tier.FREE:
-            raise RealEstateBotTierError("Outreach engine requires PRO or ENTERPRISE tier.")
+            raise RealEstateBotTierError(
+                "Outreach engine requires PRO or ENTERPRISE tier."
+            )
         if contact_type not in self.OUTREACH_TEMPLATES:
             raise ValueError(
                 f"Unknown contact_type '{contact_type}'. "
@@ -666,8 +1030,8 @@ def run() -> dict:
 from bots.stripe_integration.stripe_client import StripeClient as _StripeClientREB
 
 _REB_PRICES = {
-    Tier.PRO: 4900,         # $49/month
-    Tier.ENTERPRISE: 29900, # $299/month
+    Tier.PRO: 4900,  # $49/month
+    Tier.ENTERPRISE: 29900,  # $299/month
 }
 
 _orig_reb_init = RealEstateBot.__init__
@@ -678,11 +1042,15 @@ def _reb_new_init(self, tier: Tier = Tier.FREE) -> None:
     self._stripe = _StripeClientREB()
 
 
-def _reb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
+def _reb_create_checkout_session(
+    self, upgrade_tier: Tier, customer_email: str = None
+) -> dict:
     if upgrade_tier == Tier.FREE:
         raise RealEstateBotTierError("Cannot create checkout for FREE tier.")
     price_cents = _REB_PRICES.get(upgrade_tier, 4900)
-    result = self._stripe.create_checkout_session(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+    result = self._stripe.create_checkout_session(
+        plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents
+    )
     if customer_email:
         result["customer_email"] = customer_email
     result["mode"] = "subscription"
@@ -693,7 +1061,9 @@ def _reb_create_payment_link(self, upgrade_tier: Tier) -> dict:
     if upgrade_tier == Tier.FREE:
         raise RealEstateBotTierError("Cannot create payment link for FREE tier.")
     price_cents = _REB_PRICES.get(upgrade_tier, 4900)
-    return self._stripe.create_payment_link(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+    return self._stripe.create_payment_link(
+        plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents
+    )
 
 
 RealEstateBot.__init__ = _reb_new_init

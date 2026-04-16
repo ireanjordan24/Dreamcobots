@@ -26,10 +26,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Avatar types
 # ---------------------------------------------------------------------------
+
 
 class AvatarType(Enum):
     AVATAR_2D = "2d"
@@ -47,6 +47,7 @@ class AvatarEnvironment(Enum):
 # ---------------------------------------------------------------------------
 # Expression catalogue
 # ---------------------------------------------------------------------------
+
 
 class MicroExpression(Enum):
     NEUTRAL = "neutral"
@@ -96,6 +97,7 @@ EMOTION_TO_EXPRESSION: dict[str, MicroExpression] = {
 @dataclass
 class AvatarAppearance:
     """Customisable visual appearance of Buddy's avatar."""
+
     face_preset: str = "default"
     skin_tone: str = "medium"
     hair_style: str = "natural_waves"
@@ -119,6 +121,7 @@ class AvatarAppearance:
 @dataclass
 class AvatarFrame:
     """A single rendered frame descriptor for Buddy's avatar."""
+
     expression: MicroExpression
     gesture: BodyGesture
     environment: AvatarEnvironment
@@ -142,6 +145,7 @@ class AvatarFrame:
 @dataclass
 class ConsentRecord:
     """Tracks explicit user consent for identity/image replication features."""
+
     user_id: str
     feature: str
     granted: bool
@@ -218,7 +222,10 @@ class AvatarEngine:
         gesture = self._emotion_to_gesture(emotion)
         blink = force_blink if force_blink is not None else (random.random() < 0.08)
         tilt = 0.0
-        if expression in (MicroExpression.CURIOUS_HEAD_TILT, MicroExpression.EMPATHETIC_NOD):
+        if expression in (
+            MicroExpression.CURIOUS_HEAD_TILT,
+            MicroExpression.EMPATHETIC_NOD,
+        ):
             tilt = random.uniform(5.0, 12.0)
 
         frame = AvatarFrame(
@@ -258,7 +265,11 @@ class AvatarEngine:
         return {
             "mode": "ar",
             "status": "Buddy is now projected into your real-world space via AR.",
-            "capabilities": ["spatial_awareness", "room_scale_presence", "gesture_response"],
+            "capabilities": [
+                "spatial_awareness",
+                "room_scale_presence",
+                "gesture_response",
+            ],
         }
 
     def enter_vr_mode(self) -> dict:
@@ -268,8 +279,11 @@ class AvatarEngine:
             "mode": "vr",
             "status": "Buddy is now your fully immersive VR companion.",
             "capabilities": [
-                "full_body_presence", "spatial_audio", "interactive_environment",
-                "hand_tracking", "gaze_tracking",
+                "full_body_presence",
+                "spatial_audio",
+                "interactive_environment",
+                "hand_tracking",
+                "gaze_tracking",
             ],
         }
 
@@ -286,12 +300,16 @@ class AvatarEngine:
                 "Connect to compatible holographic display hardware."
             ),
             "capabilities": [
-                "room_scale_hologram", "360_degree_visibility",
-                "physical_gesture_mirroring", "ambient_lighting_integration",
+                "room_scale_hologram",
+                "360_degree_visibility",
+                "physical_gesture_mirroring",
+                "ambient_lighting_integration",
             ],
             "hardware_requirements": [
-                "Microsoft HoloLens 2+", "Magic Leap 2",
-                "Looking Glass Portrait", "custom_dreamco_holo_unit",
+                "Microsoft HoloLens 2+",
+                "Magic Leap 2",
+                "Looking Glass Portrait",
+                "custom_dreamco_holo_unit",
             ],
         }
 
@@ -308,12 +326,19 @@ class AvatarEngine:
         ``accessories``.
         """
         allowed = {
-            "face_preset", "skin_tone", "hair_style", "hair_color",
-            "eye_color", "clothing_style", "accessories",
+            "face_preset",
+            "skin_tone",
+            "hair_style",
+            "hair_color",
+            "eye_color",
+            "clothing_style",
+            "accessories",
         }
         for key, value in kwargs.items():
             if key not in allowed:
-                raise AvatarEngineError(f"Appearance field '{key}' is not customisable.")
+                raise AvatarEngineError(
+                    f"Appearance field '{key}' is not customisable."
+                )
             setattr(self.appearance, key, value)
         return self.appearance
 
@@ -337,7 +362,9 @@ class AvatarEngine:
             f"To confirm, pass this exact text to grant_consent()."
         )
 
-    def grant_consent(self, user_id: str, feature: str, consent_text: str) -> ConsentRecord:
+    def grant_consent(
+        self, user_id: str, feature: str, consent_text: str
+    ) -> ConsentRecord:
         """
         Record explicit user consent for a sensitive feature.
 
@@ -355,6 +382,7 @@ class AvatarEngine:
         ConsentRecord
         """
         import time as _time
+
         record = ConsentRecord(
             user_id=user_id,
             feature=feature,
@@ -363,7 +391,8 @@ class AvatarEngine:
             consent_text=consent_text,
         )
         self._consent_records = [
-            r for r in self._consent_records
+            r
+            for r in self._consent_records
             if not (r.user_id == user_id and r.feature == feature)
         ]
         self._consent_records.append(record)
@@ -372,7 +401,8 @@ class AvatarEngine:
     def revoke_consent(self, user_id: str, feature: str) -> None:
         """Revoke previously granted consent for a feature."""
         self._consent_records = [
-            r for r in self._consent_records
+            r
+            for r in self._consent_records
             if not (r.user_id == user_id and r.feature == feature)
         ]
 

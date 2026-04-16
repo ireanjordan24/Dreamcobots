@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class BotRecord:
     bot_id: str
@@ -12,6 +13,7 @@ class BotRecord:
     revenue_generated: float = 0.0
     uptime_pct: float = 100.0
 
+
 class BotInsights:
     def __init__(self):
         self._bots: dict = {}
@@ -21,7 +23,9 @@ class BotInsights:
         self._bots[bot_id] = rec
         return rec
 
-    def update_metrics(self, bot_id, tasks_completed, success_rate, revenue_generated, uptime_pct):
+    def update_metrics(
+        self, bot_id, tasks_completed, success_rate, revenue_generated, uptime_pct
+    ):
         if bot_id not in self._bots:
             raise KeyError(f"Bot '{bot_id}' not found")
         rec = self._bots[bot_id]
@@ -45,7 +49,12 @@ class BotInsights:
     def get_performance_report(self) -> dict:
         bots = list(self._bots.values())
         if not bots:
-            return {"total_bots": 0, "avg_success_rate": 0.0, "total_revenue": 0.0, "avg_uptime": 0.0}
+            return {
+                "total_bots": 0,
+                "avg_success_rate": 0.0,
+                "total_revenue": 0.0,
+                "avg_uptime": 0.0,
+            }
         return {
             "total_bots": len(bots),
             "avg_success_rate": sum(b.success_rate for b in bots) / len(bots),

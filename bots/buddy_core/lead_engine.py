@@ -24,6 +24,7 @@ class LeadEngineError(Exception):
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class LeadSource(Enum):
     LINKEDIN = "linkedin"
     GOOGLE_BUSINESS = "google_business"
@@ -57,6 +58,7 @@ class MonetizationStrategy(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Lead:
     lead_id: str
@@ -88,19 +90,60 @@ class Revenue:
 # ---------------------------------------------------------------------------
 
 _FIRST_NAMES = [
-    "Alice", "Bob", "Carol", "David", "Eve", "Frank", "Grace", "Henry",
-    "Iris", "Jack", "Karen", "Leo", "Maria", "Nick", "Olivia", "Paul",
-    "Quinn", "Rachel", "Steve", "Tina",
+    "Alice",
+    "Bob",
+    "Carol",
+    "David",
+    "Eve",
+    "Frank",
+    "Grace",
+    "Henry",
+    "Iris",
+    "Jack",
+    "Karen",
+    "Leo",
+    "Maria",
+    "Nick",
+    "Olivia",
+    "Paul",
+    "Quinn",
+    "Rachel",
+    "Steve",
+    "Tina",
 ]
 _LAST_NAMES = [
-    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller",
-    "Davis", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
-    "White", "Harris", "Martin", "Thompson", "Walker", "Young",
+    "Smith",
+    "Johnson",
+    "Williams",
+    "Brown",
+    "Jones",
+    "Garcia",
+    "Miller",
+    "Davis",
+    "Wilson",
+    "Moore",
+    "Taylor",
+    "Anderson",
+    "Thomas",
+    "Jackson",
+    "White",
+    "Harris",
+    "Martin",
+    "Thompson",
+    "Walker",
+    "Young",
 ]
 _COMPANIES = [
-    "Apex Realty", "BlueWave Finance", "CloudNine Marketing",
-    "Delta Logistics", "Echo Health", "FreeFlow Freelance",
-    "GreenPath Consulting", "HorizonTech", "InnoVentures", "JetSet Travel",
+    "Apex Realty",
+    "BlueWave Finance",
+    "CloudNine Marketing",
+    "Delta Logistics",
+    "Echo Health",
+    "FreeFlow Freelance",
+    "GreenPath Consulting",
+    "HorizonTech",
+    "InnoVentures",
+    "JetSet Travel",
 ]
 _DOMAINS = ["gmail.com", "yahoo.com", "outlook.com", "company.io", "biz.net"]
 
@@ -125,6 +168,7 @@ def _fake_company() -> str:
 # ---------------------------------------------------------------------------
 # Lead Scraper
 # ---------------------------------------------------------------------------
+
 
 class LeadScraper:
     """Generates synthetic leads (no real network calls)."""
@@ -176,6 +220,7 @@ class LeadScraper:
 # Lead Scorer
 # ---------------------------------------------------------------------------
 
+
 class LeadScorer:
     """Scores and tiers leads based on data completeness and signals."""
 
@@ -213,6 +258,7 @@ class LeadScorer:
 # Monetization Engine
 # ---------------------------------------------------------------------------
 
+
 class MonetizationEngine:
     """Sells leads, manages subscriptions, and tracks affiliate revenue."""
 
@@ -233,9 +279,7 @@ class MonetizationEngine:
         self._revenues.append(rev)
         return rev
 
-    def create_subscription(
-        self, user_id: str, plan: str, amount_usd: float
-    ) -> dict:
+    def create_subscription(self, user_id: str, plan: str, amount_usd: float) -> dict:
         sub = {
             "subscription_id": str(uuid.uuid4()),
             "user_id": user_id,
@@ -283,6 +327,7 @@ class MonetizationEngine:
 # LeadEngine (facade)
 # ---------------------------------------------------------------------------
 
+
 class LeadEngine:
     """Composes LeadScraper, LeadScorer, and MonetizationEngine."""
 
@@ -314,9 +359,11 @@ class LeadEngine:
             "hot_leads": len(hot),
             "warm_leads": sum(1 for l in ranked if l.tier == LeadTier.WARM),
             "cold_leads": sum(1 for l in ranked if l.tier == LeadTier.COLD),
-            "avg_quality_score": round(
-                sum(l.quality_score for l in ranked) / len(ranked), 4
-            ) if ranked else 0.0,
+            "avg_quality_score": (
+                round(sum(l.quality_score for l in ranked) / len(ranked), 4)
+                if ranked
+                else 0.0
+            ),
             "leads": [
                 {
                     "lead_id": l.lead_id,

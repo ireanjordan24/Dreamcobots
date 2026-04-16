@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -32,6 +33,7 @@ class ListingStatus(Enum):
 @dataclass
 class MarketplaceListing:
     """A single item in the DreamCo marketplace."""
+
     listing_id: str
     name: str
     category: ListingCategory
@@ -43,7 +45,9 @@ class MarketplaceListing:
     reviews: int = 0
     purchases: int = 0
     tags: list = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class Marketplace:
@@ -107,17 +111,28 @@ class Marketplace:
         total = listing.rating * listing.reviews + rating
         listing.reviews += 1
         listing.rating = round(total / listing.reviews, 2)
-        return {"listing_id": listing_id, "new_rating": listing.rating, "total_reviews": listing.reviews}
+        return {
+            "listing_id": listing_id,
+            "new_rating": listing.rating,
+            "total_reviews": listing.reviews,
+        }
 
-    def search(self, query: str = "", category: Optional[ListingCategory] = None) -> list:
+    def search(
+        self, query: str = "", category: Optional[ListingCategory] = None
+    ) -> list:
         """Search listings by keyword and/or category."""
         results = list(self._listings.values())
         if category:
             results = [l for l in results if l.category == category]
         if query:
             q = query.lower()
-            results = [l for l in results if q in l.name.lower() or q in l.description.lower()
-                       or any(q in t.lower() for t in l.tags)]
+            results = [
+                l
+                for l in results
+                if q in l.name.lower()
+                or q in l.description.lower()
+                or any(q in t.lower() for t in l.tags)
+            ]
         results.sort(key=lambda l: l.rating, reverse=True)
         return [_listing_to_dict(l) for l in results]
 
@@ -125,10 +140,16 @@ class Marketplace:
         listings = list(self._listings.values())
         return {
             "total_listings": len(listings),
-            "available": sum(1 for l in listings if l.status == ListingStatus.AVAILABLE),
+            "available": sum(
+                1 for l in listings if l.status == ListingStatus.AVAILABLE
+            ),
             "total_purchases": sum(l.purchases for l in listings),
             "total_revenue_usd": round(self._total_revenue_usd, 2),
-            "avg_rating": round(sum(l.rating for l in listings) / len(listings), 2) if listings else 0.0,
+            "avg_rating": (
+                round(sum(l.rating for l in listings) / len(listings), 2)
+                if listings
+                else 0.0
+            ),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 

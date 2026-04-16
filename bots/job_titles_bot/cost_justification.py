@@ -15,17 +15,18 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class CostItem:
     """A single line-item cost."""
+
     name: str
     amount_usd: float
-    frequency: str      # 'one-time' | 'monthly' | 'annual' | 'per-request'
+    frequency: str  # 'one-time' | 'monthly' | 'annual' | 'per-request'
     description: str
     is_optional: bool = False
 
@@ -33,11 +34,12 @@ class CostItem:
 @dataclass
 class PaymentOption:
     """One of the available ways to pay for a DreamCo feature."""
+
     option_id: str
     label: str
     amount_usd: float
     currency: str = "USD"
-    method: str = "card"   # 'card' | 'paypal' | 'tokens' | 'crypto'
+    method: str = "card"  # 'card' | 'paypal' | 'tokens' | 'crypto'
     savings_vs_monthly: float = 0.0
     description: str = ""
 
@@ -66,6 +68,7 @@ class CostJustification:
     autonomous_decision: str
         The bot's autonomous recommendation (e.g. 'proceed', 'defer', 'escalate').
     """
+
     total_monthly_usd: float
     total_annual_usd: float
     roi_explanation: str
@@ -74,13 +77,14 @@ class CostJustification:
     recommended_option: str
     line_items: list[CostItem]
     autonomous_decision: str
-    token_cost: Optional[int] = None      # tokens required (if token billing)
-    token_balance: Optional[int] = None   # current token balance
+    token_cost: Optional[int] = None  # tokens required (if token billing)
+    token_balance: Optional[int] = None  # current token balance
 
 
 # ---------------------------------------------------------------------------
 # Engine
 # ---------------------------------------------------------------------------
+
 
 class CostJustificationEngine:
     """
@@ -96,10 +100,10 @@ class CostJustificationEngine:
     """
 
     # Annual discount applied to yearly subscriptions
-    ANNUAL_DISCOUNT: float = 0.20    # 20% off
+    ANNUAL_DISCOUNT: float = 0.20  # 20% off
 
     # Token markup (clients bear the cost via token consumption)
-    TOKEN_MARKUP: float = 1.15       # 15% markup on token purchases
+    TOKEN_MARKUP: float = 1.15  # 15% markup on token purchases
 
     def __init__(
         self,

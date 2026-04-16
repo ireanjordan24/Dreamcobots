@@ -299,29 +299,50 @@ class ItemDetector:
             if match:
                 raw_min, raw_max = match
                 factors = self._extract_factors(desc_lower, category)
-                explanation = self._build_explanation(description, category, raw_min, raw_max)
+                explanation = self._build_explanation(
+                    description, category, raw_min, raw_max
+                )
                 return category, raw_min, raw_max, 0.85, explanation, factors
 
         # Jewelry detection
-        if any(w in desc_lower for w in ["gold", "silver", "diamond", "ring", "necklace", "bracelet"]):
+        if any(
+            w in desc_lower
+            for w in ["gold", "silver", "diamond", "ring", "necklace", "bracelet"]
+        ):
             match = _lookup_value(description, _ANTIQUE_DB) or (100.0, 10000.0)
             raw_min, raw_max = match if isinstance(match, tuple) else match
-            factors = ["precious metal/stone content", "craftsmanship", "brand/hallmark"]
-            explanation = f"Detected as jewelry. Value based on material and craftsmanship."
+            factors = [
+                "precious metal/stone content",
+                "craftsmanship",
+                "brand/hallmark",
+            ]
+            explanation = (
+                f"Detected as jewelry. Value based on material and craftsmanship."
+            )
             return ItemCategory.JEWELRY, raw_min, raw_max, 0.70, explanation, factors
 
         # Artwork detection
-        if any(w in desc_lower for w in ["painting", "drawing", "sketch", "artwork", "print", "lithograph"]):
+        if any(
+            w in desc_lower
+            for w in ["painting", "drawing", "sketch", "artwork", "print", "lithograph"]
+        ):
             raw_min, raw_max = 50.0, 500000.0
             factors = ["artist reputation", "provenance", "medium", "size", "condition"]
-            explanation = "Detected as artwork. Value varies enormously by artist and provenance."
+            explanation = (
+                "Detected as artwork. Value varies enormously by artist and provenance."
+            )
             return ItemCategory.ARTWORK, raw_min, raw_max, 0.65, explanation, factors
 
-        return ItemCategory.UNKNOWN, 0.0, 0.0, 0.30, "Item not recognised in the database.", []
+        return (
+            ItemCategory.UNKNOWN,
+            0.0,
+            0.0,
+            0.30,
+            "Item not recognised in the database.",
+            [],
+        )
 
-    def _extract_factors(
-        self, desc_lower: str, category: ItemCategory
-    ) -> list[str]:
+    def _extract_factors(self, desc_lower: str, category: ItemCategory) -> list[str]:
         factors = ["item condition", "market demand"]
         if category == ItemCategory.COIN:
             if "error" in desc_lower:

@@ -9,10 +9,12 @@ GLOBAL AI SOURCES FLOW: participates via crypto_bot.py pipeline.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from bots.crypto_bot.crypto_database import get_coin
 from bots.crypto_bot.portfolio import Portfolio, PortfolioError
@@ -82,9 +84,7 @@ class TradingEngine:
         amount = net_usd / price
 
         try:
-            result = self.portfolio.buy(
-                symbol, amount, price, fee_pct=self.fee_pct
-            )
+            result = self.portfolio.buy(symbol, amount, price, fee_pct=self.fee_pct)
         except PortfolioError as exc:
             raise TradingError(str(exc)) from exc
 
@@ -108,9 +108,7 @@ class TradingEngine:
         price = self.current_price(symbol)
 
         try:
-            result = self.portfolio.sell(
-                symbol, amount, price, fee_pct=self.fee_pct
-            )
+            result = self.portfolio.sell(symbol, amount, price, fee_pct=self.fee_pct)
         except PortfolioError as exc:
             raise TradingError(str(exc)) from exc
 
@@ -202,18 +200,20 @@ class TradingEngine:
             sym = h["symbol"]
             price = get_price(sym, use_live=self.use_live) or 0.0
             change = get_price_change_24h(sym)
-            rows.append({
-                "symbol": sym,
-                "amount": h["total_amount"],
-                "avg_cost_usd": h["avg_cost_usd"],
-                "current_price_usd": price,
-                "market_value_usd": h.get("market_value_usd", 0.0),
-                "cost_basis_usd": h["cost_basis_usd"],
-                "unrealised_pnl_usd": h.get("unrealised_pnl_usd", 0.0),
-                "realised_pnl_usd": h["realised_pnl_usd"],
-                "total_pnl_usd": h.get("total_pnl_usd", 0.0),
-                "change_24h_pct": change,
-            })
+            rows.append(
+                {
+                    "symbol": sym,
+                    "amount": h["total_amount"],
+                    "avg_cost_usd": h["avg_cost_usd"],
+                    "current_price_usd": price,
+                    "market_value_usd": h.get("market_value_usd", 0.0),
+                    "cost_basis_usd": h["cost_basis_usd"],
+                    "unrealised_pnl_usd": h.get("unrealised_pnl_usd", 0.0),
+                    "realised_pnl_usd": h["realised_pnl_usd"],
+                    "total_pnl_usd": h.get("total_pnl_usd", 0.0),
+                    "change_24h_pct": change,
+                }
+            )
 
         return {
             "holdings": rows,

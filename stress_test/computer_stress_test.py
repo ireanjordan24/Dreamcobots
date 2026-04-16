@@ -1,8 +1,9 @@
 """Hardware stress tests for DreamCobots platform."""
-import sys
+
 import os
-import time
+import sys
 import threading
+import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -20,6 +21,7 @@ class HardwareStressTest:
         """Verify system can handle stress testing before running."""
         try:
             import psutil
+
             cpu = psutil.cpu_percent(interval=1)
             ram = psutil.virtual_memory()
             disk = psutil.disk_usage("/")
@@ -29,14 +31,25 @@ class HardwareStressTest:
                 "current_cpu_percent": cpu,
                 "current_ram_percent": ram.percent,
                 "current_disk_percent": disk.percent,
-                "available_ram_gb": round(ram.available / (1024 ** 3), 2),
-                "warnings": [] if safe else [
-                    f"CPU at {cpu:.1f}% - may be too high" if cpu >= 70 else None,
-                    f"RAM at {ram.percent:.1f}% - may be too high" if ram.percent >= 80 else None,
-                ],
+                "available_ram_gb": round(ram.available / (1024**3), 2),
+                "warnings": (
+                    []
+                    if safe
+                    else [
+                        f"CPU at {cpu:.1f}% - may be too high" if cpu >= 70 else None,
+                        (
+                            f"RAM at {ram.percent:.1f}% - may be too high"
+                            if ram.percent >= 80
+                            else None
+                        ),
+                    ]
+                ),
             }
         except ImportError:
-            return {"safe_to_proceed": True, "note": "psutil not available; proceeding with caution"}
+            return {
+                "safe_to_proceed": True,
+                "note": "psutil not available; proceeding with caution",
+            }
 
     def test_cpu(self, intensity: int = 50, duration: int = 5) -> dict:
         """Run a safe, throttled CPU stress test."""
@@ -53,7 +66,9 @@ class HardwareStressTest:
             "intensity_percent": intensity,
             "duration_seconds": round(elapsed, 2),
             "iterations_completed": iterations,
-            "iterations_per_second": round(iterations / elapsed, 1) if elapsed > 0 else 0,
+            "iterations_per_second": (
+                round(iterations / elapsed, 1) if elapsed > 0 else 0
+            ),
             "status": "COMPLETED",
         }
 
@@ -99,8 +114,12 @@ class HardwareStressTest:
             return {
                 "test_type": "disk_io",
                 "mb_written": mb_to_write,
-                "write_speed_mbps": round(mb_to_write / write_time, 1) if write_time > 0 else 0,
-                "read_speed_mbps": round(mb_to_write / read_time, 1) if read_time > 0 else 0,
+                "write_speed_mbps": (
+                    round(mb_to_write / write_time, 1) if write_time > 0 else 0
+                ),
+                "read_speed_mbps": (
+                    round(mb_to_write / read_time, 1) if read_time > 0 else 0
+                ),
                 "total_seconds": round(time.time() - start, 2),
                 "status": "PASSED",
             }
@@ -118,7 +137,10 @@ class HardwareStressTest:
         print("[HardwareTest] Running safety check...")
         safety = self.safety_check()
         if not safety.get("safe_to_proceed", True):
-            return {"error": "Safety check failed - system resources too high", "details": safety}
+            return {
+                "error": "Safety check failed - system resources too high",
+                "details": safety,
+            }
 
         print("[HardwareTest] Testing CPU...")
         cpu_result = self.test_cpu(intensity=40, duration=3)
@@ -138,12 +160,24 @@ class HardwareStressTest:
 
         return {
             "overall_score": total_score,
-            "rating": "Excellent" if total_score >= 80 else "Good" if total_score >= 60 else "Fair" if total_score >= 40 else "Low",
+            "rating": (
+                "Excellent"
+                if total_score >= 80
+                else (
+                    "Good"
+                    if total_score >= 60
+                    else "Fair" if total_score >= 40 else "Low"
+                )
+            ),
             "cpu_test": cpu_result,
             "ram_test": ram_result,
             "disk_test": disk_result,
             "recommendations": [
-                "Add more RAM to improve bot concurrency" if total_score < 60 else "System is well-equipped for DreamCobots",
+                (
+                    "Add more RAM to improve bot concurrency"
+                    if total_score < 60
+                    else "System is well-equipped for DreamCobots"
+                ),
                 f"Can safely run {max(1, total_score // 10)} bots concurrently based on resources",
             ],
         }

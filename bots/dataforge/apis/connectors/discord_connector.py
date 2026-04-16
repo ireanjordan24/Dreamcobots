@@ -1,4 +1,5 @@
 """Discord API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,9 +28,14 @@ class DiscordConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bot {self.token}"}
         try:
-            response = requests.get(f"{self.BASE_URL}/guilds/{guild_id}/channels", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/guilds/{guild_id}/channels",
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Discord guild channels fetched for guild %s.", guild_id)
             return {"status": "success", "data": response.json()}
@@ -48,14 +54,21 @@ class DiscordConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bot {self.token}",
+            "Content-Type": "application/json",
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/channels/{channel_id}/messages",
-                json={"content": content}, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/channels/{channel_id}/messages",
+                json={"content": content},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Discord message sent to channel %s.", channel_id)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Discord send_message error: %s", e)
             return {"status": "error", "message": str(e)}
-

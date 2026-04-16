@@ -17,13 +17,13 @@ Screens
 - ReferralSystemScreen  — invite links, earnings tracker, team growth tree
 """
 
-from .home_dashboard import HomeDashboardScreen
-from .wealth_hub_screen import WealthHubScreen
 from .bot_control_center import BotControlCenterScreen
-from .wallet_screen import WalletScreen
 from .governance_panel import GovernancePanelScreen
+from .home_dashboard import HomeDashboardScreen
 from .investment_dashboard import InvestmentDashboardScreen
 from .referral_system import ReferralSystemScreen
+from .wallet_screen import WalletScreen
+from .wealth_hub_screen import WealthHubScreen
 
 __all__ = [
     "HomeDashboardScreen",

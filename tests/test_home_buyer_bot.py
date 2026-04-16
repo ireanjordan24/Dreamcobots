@@ -1,7 +1,7 @@
 """Tests for bots/home_buyer_bot/home_buyer_bot.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,16 +10,16 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.home_buyer_bot.home_buyer_bot import (
-    HomeBuyerBot,
+    CHICAGO_LISTINGS,
+    SERVICE_FEES,
     DealType,
+    HomeBuyerBot,
+    HomeBuyerBotError,
     LeadStatus,
     PaymentProvider,
-    HomeBuyerBotError,
-    SERVICE_FEES,
-    CHICAGO_LISTINGS,
 )
-
 
 # ---------------------------------------------------------------------------
 # Instantiation
@@ -63,44 +63,38 @@ class TestLeadSubmission:
 
     def test_submit_lead_returns_dict(self):
         result = self.bot.submit_lead(
-            "Alice", "alice@example.com", "312-555-0001",
-            DealType.BUY, 400000
+            "Alice", "alice@example.com", "312-555-0001", DealType.BUY, 400000
         )
         assert isinstance(result, dict)
 
     def test_submit_lead_has_lead_id(self):
         result = self.bot.submit_lead(
-            "Bob", "bob@example.com", "312-555-0002",
-            DealType.RENT, 2000
+            "Bob", "bob@example.com", "312-555-0002", DealType.RENT, 2000
         )
         assert "lead_id" in result
         assert result["lead_id"].startswith("lead-")
 
     def test_submit_lead_stores_name(self):
         result = self.bot.submit_lead(
-            "Carol", "carol@example.com", "312-555-0003",
-            DealType.BUY, 300000
+            "Carol", "carol@example.com", "312-555-0003", DealType.BUY, 300000
         )
         assert result["name"] == "Carol"
 
     def test_submit_lead_stores_deal_type(self):
         result = self.bot.submit_lead(
-            "Dave", "dave@example.com", "312-555-0004",
-            DealType.OFF_MARKET, 150000
+            "Dave", "dave@example.com", "312-555-0004", DealType.OFF_MARKET, 150000
         )
         assert result["deal_type"] == "off_market"
 
     def test_submit_lead_default_status_is_new(self):
         result = self.bot.submit_lead(
-            "Eve", "eve@example.com", "312-555-0005",
-            DealType.BUY, 500000
+            "Eve", "eve@example.com", "312-555-0005", DealType.BUY, 500000
         )
         assert result["status"] == "new"
 
     def test_get_lead_returns_correct_data(self):
         submitted = self.bot.submit_lead(
-            "Frank", "frank@example.com", "312-555-0006",
-            DealType.BUY, 250000
+            "Frank", "frank@example.com", "312-555-0006", DealType.BUY, 250000
         )
         fetched = self.bot.get_lead(submitted["lead_id"])
         assert fetched["lead_id"] == submitted["lead_id"]
@@ -112,15 +106,13 @@ class TestLeadSubmission:
     def test_list_leads_returns_all(self):
         for i in range(3):
             self.bot.submit_lead(
-                f"User{i}", f"u{i}@example.com", "312-555-0000",
-                DealType.RENT, 1500
+                f"User{i}", f"u{i}@example.com", "312-555-0000", DealType.RENT, 1500
             )
         assert len(self.bot.list_leads()) == 3
 
     def test_update_lead_status(self):
         lead = self.bot.submit_lead(
-            "Grace", "grace@example.com", "312-555-0007",
-            DealType.BUY, 350000
+            "Grace", "grace@example.com", "312-555-0007", DealType.BUY, 350000
         )
         updated = self.bot.update_lead_status(
             lead["lead_id"], LeadStatus.QUALIFIED, notes="Ready to close"
@@ -134,8 +126,7 @@ class TestLeadSubmission:
 
     def test_list_leads_filter_by_status(self):
         lead = self.bot.submit_lead(
-            "Hank", "hank@example.com", "312-555-0008",
-            DealType.BUY, 300000
+            "Hank", "hank@example.com", "312-555-0008", DealType.BUY, 300000
         )
         self.bot.update_lead_status(lead["lead_id"], LeadStatus.QUALIFIED)
         qualified = self.bot.list_leads(status=LeadStatus.QUALIFIED)
@@ -202,8 +193,7 @@ class TestPaymentProcessing:
     def setup_method(self):
         self.bot = HomeBuyerBot(tier=Tier.FREE)
         lead = self.bot.submit_lead(
-            "Ivan", "ivan@example.com", "312-555-0009",
-            DealType.BUY, 400000
+            "Ivan", "ivan@example.com", "312-555-0009", DealType.BUY, 400000
         )
         self.lead_id = lead["lead_id"]
 
@@ -225,9 +215,7 @@ class TestPaymentProcessing:
         assert result["amount"] == SERVICE_FEES[Tier.FREE.value]
 
     def test_payment_via_paypal(self):
-        result = self.bot.process_payment(
-            self.lead_id, provider=PaymentProvider.PAYPAL
-        )
+        result = self.bot.process_payment(self.lead_id, provider=PaymentProvider.PAYPAL)
         assert result["provider"] == "paypal"
 
     def test_payment_unknown_lead_raises(self):
@@ -278,8 +266,7 @@ class TestRevenueSummary:
     def test_revenue_accumulates(self):
         for i in range(3):
             lead = self.bot.submit_lead(
-                f"User{i}", f"u{i}@ex.com", "312-000-0000",
-                DealType.BUY, 200000
+                f"User{i}", f"u{i}@ex.com", "312-000-0000", DealType.BUY, 200000
             )
             self.bot.process_payment(lead["lead_id"])
         summary = self.bot.revenue_summary()
@@ -289,8 +276,7 @@ class TestRevenueSummary:
 
     def test_refunded_payment_not_in_revenue(self):
         lead = self.bot.submit_lead(
-            "Refund User", "r@ex.com", "312-111-1111",
-            DealType.BUY, 200000
+            "Refund User", "r@ex.com", "312-111-1111", DealType.BUY, 200000
         )
         pay = self.bot.process_payment(lead["lead_id"])
         self.bot.refund_payment(pay["payment_id"])

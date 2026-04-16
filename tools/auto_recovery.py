@@ -35,7 +35,6 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -47,6 +46,7 @@ RECOVERY_LOG_DEFAULT = "ci_recovery.log"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _utcnow() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
@@ -60,6 +60,7 @@ def _run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
 # ---------------------------------------------------------------------------
 # Checks
 # ---------------------------------------------------------------------------
+
 
 def check_python_version() -> dict:
     """Verify the running Python meets the minimum version requirement."""
@@ -77,8 +78,10 @@ def check_python_version() -> dict:
             )
         ),
         "fix_applied": False,
-        "manual_action": None if ok else (
-            f"Upgrade to Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or later."
+        "manual_action": (
+            None
+            if ok
+            else (f"Upgrade to Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or later.")
         ),
     }
 
@@ -115,8 +118,16 @@ def check_dependencies(requirements_file: Path) -> dict:
 
     # Attempt automatic fix
     fix_result = _run(
-        [sys.executable, "-m", "pip", "install", "-r", str(requirements_file),
-         "--quiet", "--disable-pip-version-check"],
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            str(requirements_file),
+            "--quiet",
+            "--disable-pip-version-check",
+        ],
     )
     if fix_result.returncode == 0:
         return {
@@ -165,7 +176,9 @@ def check_framework_compliance(repo_root: Path) -> dict:
         "detail": result.stdout.strip() or result.stderr.strip(),
         "fix_applied": False,
         "manual_action": (
-            None if ok else (
+            None
+            if ok
+            else (
                 "Add 'GLOBAL AI SOURCES FLOW' compliance marker to each listed file. "
                 "See CONTRIBUTING.md for details."
             )
@@ -198,6 +211,7 @@ def check_uncommitted_changes(repo_root: Path) -> dict:
 # Logging
 # ---------------------------------------------------------------------------
 
+
 def write_log(results: list[dict], log_file: Path) -> None:
     """Append a JSON-formatted recovery report to *log_file*."""
     entry = {
@@ -214,6 +228,7 @@ def write_log(results: list[dict], log_file: Path) -> None:
 # ---------------------------------------------------------------------------
 # Notifications
 # ---------------------------------------------------------------------------
+
 
 def send_webhook(webhook_url: str, results: list[dict]) -> None:
     """POST a JSON summary of recovery results to *webhook_url*."""
@@ -250,6 +265,7 @@ def send_webhook(webhook_url: str, results: list[dict]) -> None:
 # Reporter
 # ---------------------------------------------------------------------------
 
+
 def print_report(results: list[dict]) -> None:
     """Print a human-readable summary to stdout."""
     icons = {"ok": "✅", "fail": "❌", "warn": "⚠️ ", "skip": "⏭️ "}
@@ -282,6 +298,7 @@ def print_report(results: list[dict]) -> None:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Diagnose and auto-recover common CI failures in Dreamcobots.",
@@ -313,9 +330,21 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
 
-    repo_root = Path(args.repo_root).resolve() if args.repo_root else Path(__file__).resolve().parent.parent
-    requirements_file = Path(args.requirements).resolve() if args.requirements else repo_root / "requirements.txt"
-    log_file = Path(args.log_file).resolve() if args.log_file else repo_root / RECOVERY_LOG_DEFAULT
+    repo_root = (
+        Path(args.repo_root).resolve()
+        if args.repo_root
+        else Path(__file__).resolve().parent.parent
+    )
+    requirements_file = (
+        Path(args.requirements).resolve()
+        if args.requirements
+        else repo_root / "requirements.txt"
+    )
+    log_file = (
+        Path(args.log_file).resolve()
+        if args.log_file
+        else repo_root / RECOVERY_LOG_DEFAULT
+    )
 
     print(f"[auto_recovery] Running diagnostics in: {repo_root}")
 

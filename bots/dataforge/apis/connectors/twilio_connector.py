@@ -1,4 +1,5 @@
 """Twilio SMS and voice connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -30,10 +31,13 @@ class TwilioConnector:
             API response dict or error dict.
         """
         import requests
+
         url = f"{self.BASE_URL}/Accounts/{self.account_sid}/Messages.json"
         payload = {"To": to, "From": self.from_number, "Body": body}
         try:
-            response = requests.post(url, data=payload, auth=(self.account_sid, self.auth_token), timeout=30)
+            response = requests.post(
+                url, data=payload, auth=(self.account_sid, self.auth_token), timeout=30
+            )
             response.raise_for_status()
             logger.info("Twilio SMS sent to %s.", to)
             return {"status": "success", "data": response.json()}
@@ -52,14 +56,16 @@ class TwilioConnector:
             API response dict or error dict.
         """
         import requests
+
         url = f"{self.BASE_URL}/Accounts/{self.account_sid}/Calls.json"
         payload = {"To": to, "From": self.from_number, "Url": twiml_url}
         try:
-            response = requests.post(url, data=payload, auth=(self.account_sid, self.auth_token), timeout=30)
+            response = requests.post(
+                url, data=payload, auth=(self.account_sid, self.auth_token), timeout=30
+            )
             response.raise_for_status()
             logger.info("Twilio call initiated to %s.", to)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Twilio make_call error: %s", e)
             return {"status": "error", "message": str(e)}
-

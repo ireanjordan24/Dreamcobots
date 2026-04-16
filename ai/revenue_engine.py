@@ -9,8 +9,8 @@ Monitors revenue metrics across all running bots and applies scaling rules:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -31,10 +31,16 @@ def evaluate(metrics: dict) -> dict:
     revenue = metrics.get("revenue", 0)
 
     if revenue > 1000:
-        return {"status": "scale", "message": f"Scale aggressively — revenue ${revenue:.2f}"}
+        return {
+            "status": "scale",
+            "message": f"Scale aggressively — revenue ${revenue:.2f}",
+        }
     if revenue >= 100:
         return {"status": "maintain", "message": f"Maintain — revenue ${revenue:.2f}"}
-    return {"status": "change_strategy", "message": f"Change strategy — revenue ${revenue:.2f}"}
+    return {
+        "status": "change_strategy",
+        "message": f"Change strategy — revenue ${revenue:.2f}",
+    }
 
 
 def run() -> dict:

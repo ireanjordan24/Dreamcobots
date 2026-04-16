@@ -1,6 +1,7 @@
 """Tests for TaskEngine."""
 
 import pytest
+
 from BuddyAI.task_engine import TaskEngine, UnknownIntentError
 
 
@@ -69,7 +70,9 @@ def test_process_text_with_registered_intent():
 
 
 def test_handler_exception_returns_error(engine):
-    engine.register_capability("explode", lambda p: (_ for _ in ()).throw(RuntimeError("boom")))
+    engine.register_capability(
+        "explode", lambda p: (_ for _ in ()).throw(RuntimeError("boom"))
+    )
     result = engine.execute("explode", {})
     assert result["success"] is False
     assert "boom" in result["error"]

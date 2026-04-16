@@ -1,7 +1,13 @@
 """Space Mission Planner — tier-aware mission planning and trajectory simulation."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="MissionPlanner")
@@ -154,7 +160,11 @@ class MissionPlanner:
     ) -> dict:
         """Simulate a trajectory between two bodies (all tiers)."""
         profile = next(
-            (p for p in MISSION_PROFILES.values() if destination.lower() in p["description"].lower()),
+            (
+                p
+                for p in MISSION_PROFILES.values()
+                if destination.lower() in p["description"].lower()
+            ),
             MISSION_PROFILES["lunar"],
         )
 
@@ -229,7 +239,11 @@ class MissionPlanner:
     def get_mission_status(self, mission_id: str) -> dict:
         """Return the current status of a planned mission."""
         if mission_id not in self._missions:
-            return {"mission_id": mission_id, "status": "not_found", "error": "Mission ID not found."}
+            return {
+                "mission_id": mission_id,
+                "status": "not_found",
+                "error": "Mission ID not found.",
+            }
         mission = self._missions[mission_id]
         return {
             "mission_id": mission_id,

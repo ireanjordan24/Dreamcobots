@@ -2,24 +2,39 @@
 Tier configuration for the Dreamcobots Social Media Bot.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import (
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # Bot-specific features per tier
 SOCIAL_MEDIA_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: ["1 account", "10 posts/month", "basic analytics"],
-    Tier.PRO.value: ["5 accounts", "200 posts/month", "scheduling", "hashtag optimization", "engagement tracking"],
-    Tier.ENTERPRISE.value: ["unlimited accounts", "unlimited posts", "AI content generation", "influencer analytics", "API access"],
+    Tier.PRO.value: [
+        "5 accounts",
+        "200 posts/month",
+        "scheduling",
+        "hashtag optimization",
+        "engagement tracking",
+    ],
+    Tier.ENTERPRISE.value: [
+        "unlimited accounts",
+        "unlimited posts",
+        "AI content generation",
+        "influencer analytics",
+        "API access",
+    ],
 }
 
 

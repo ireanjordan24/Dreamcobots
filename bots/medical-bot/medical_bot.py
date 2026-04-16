@@ -1,8 +1,10 @@
 """Medical Bot - Health information with HIPAA compliance and medical disclaimers."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -38,9 +40,18 @@ class MedicalBot(BaseBot):
         symptom_map = {
             "headache": ["Tension headache", "Migraine", "Dehydration", "Hypertension"],
             "fever": ["Common cold", "Influenza", "COVID-19", "Bacterial infection"],
-            "chest pain": ["Muscle strain", "Acid reflux", "Angina - SEEK IMMEDIATE CARE"],
+            "chest pain": [
+                "Muscle strain",
+                "Acid reflux",
+                "Angina - SEEK IMMEDIATE CARE",
+            ],
             "fatigue": ["Anemia", "Thyroid disorder", "Sleep apnea", "Diabetes"],
-            "cough": ["Upper respiratory infection", "Allergies", "Asthma", "Bronchitis"],
+            "cough": [
+                "Upper respiratory infection",
+                "Allergies",
+                "Asthma",
+                "Bronchitis",
+            ],
             "shortness of breath": ["Asthma", "Anxiety", "Pneumonia - SEEK CARE"],
         }
         possible_conditions = []
@@ -48,14 +59,20 @@ class MedicalBot(BaseBot):
             for key, conditions in symptom_map.items():
                 if key in symptom.lower():
                     possible_conditions.extend(conditions)
-        possible_conditions = list(set(possible_conditions)) if possible_conditions else [
-            "No matching conditions found in knowledge base"
-        ]
+        possible_conditions = (
+            list(set(possible_conditions))
+            if possible_conditions
+            else ["No matching conditions found in knowledge base"]
+        )
         return {
             "disclaimer": MEDICAL_DISCLAIMER,
             "symptoms_analyzed": symptoms_list,
             "possible_conditions": possible_conditions[:5],
-            "urgency_indicator": "SEEK IMMEDIATE CARE" if any("SEEK" in c for c in possible_conditions) else "Monitor symptoms; consult doctor if persisting",
+            "urgency_indicator": (
+                "SEEK IMMEDIATE CARE"
+                if any("SEEK" in c for c in possible_conditions)
+                else "Monitor symptoms; consult doctor if persisting"
+            ),
             "recommended_action": "Schedule appointment with primary care physician",
             "emergency_number": "911 (US) | 999 (UK) | 112 (EU)",
         }
@@ -117,7 +134,10 @@ class MedicalBot(BaseBot):
         self.log(f"Checking drug interactions: {drug1} + {drug2}")
         known_interactions = {
             ("warfarin", "aspirin"): "MAJOR: Increased bleeding risk. Monitor closely.",
-            ("ssri", "maoi"): "CONTRAINDICATED: Serotonin syndrome risk. Do NOT combine.",
+            (
+                "ssri",
+                "maoi",
+            ): "CONTRAINDICATED: Serotonin syndrome risk. Do NOT combine.",
             ("statin", "grapefruit"): "MODERATE: Grapefruit increases statin levels.",
         }
         for (d1, d2), interaction in known_interactions.items():
@@ -179,7 +199,10 @@ class MedicalBot(BaseBot):
                 {"item": "Security Officer designated", "required": True},
                 {"item": "Workforce training completed (annual)", "required": True},
                 {"item": "Risk assessment conducted (annual)", "required": True},
-                {"item": "Business Associate Agreements (BAAs) in place", "required": True},
+                {
+                    "item": "Business Associate Agreements (BAAs) in place",
+                    "required": True,
+                },
                 {"item": "Sanction policy for violations", "required": True},
             ],
             "physical_safeguards": [
@@ -197,7 +220,10 @@ class MedicalBot(BaseBot):
             "breach_notification": [
                 {"item": "60-day notification to HHS", "required": True},
                 {"item": "Individual notification within 60 days", "required": True},
-                {"item": "Media notification if 500+ individuals in state", "required": True},
+                {
+                    "item": "Media notification if 500+ individuals in state",
+                    "required": True,
+                },
             ],
             "resources": [
                 "https://www.hhs.gov/hipaa",
@@ -208,32 +234,72 @@ class MedicalBot(BaseBot):
     def medical_equipment_suggestions(self, department: str) -> list:
         """Return medical equipment recommendations for a given department."""
         equipment_map = {
-            "emergency": ["Crash cart / AED", "Ventilators", "Portable monitors", "IV pumps", "Oxygen delivery systems"],
-            "radiology": ["MRI scanner", "CT scanner", "Digital X-ray", "Ultrasound machines", "PACS software"],
-            "icu": ["Hemodynamic monitors", "Ventilators", "Infusion pumps", "Warming blankets", "Dialysis machines"],
-            "surgery": ["Surgical robot (da Vinci)", "Anesthesia machines", "Electrosurgical units", "Laparoscopic equipment"],
-            "general": ["Electronic health record (EHR) system", "Patient kiosks", "Telemedicine platform", "Blood pressure monitors"],
+            "emergency": [
+                "Crash cart / AED",
+                "Ventilators",
+                "Portable monitors",
+                "IV pumps",
+                "Oxygen delivery systems",
+            ],
+            "radiology": [
+                "MRI scanner",
+                "CT scanner",
+                "Digital X-ray",
+                "Ultrasound machines",
+                "PACS software",
+            ],
+            "icu": [
+                "Hemodynamic monitors",
+                "Ventilators",
+                "Infusion pumps",
+                "Warming blankets",
+                "Dialysis machines",
+            ],
+            "surgery": [
+                "Surgical robot (da Vinci)",
+                "Anesthesia machines",
+                "Electrosurgical units",
+                "Laparoscopic equipment",
+            ],
+            "general": [
+                "Electronic health record (EHR) system",
+                "Patient kiosks",
+                "Telemedicine platform",
+                "Blood pressure monitors",
+            ],
         }
         dept_lower = department.lower()
         for key, equipment in equipment_map.items():
             if key in dept_lower:
-                return [{"equipment": e, "estimated_cost": "Contact vendor for pricing"} for e in equipment]
-        return [{"equipment": e, "estimated_cost": "Contact vendor for pricing"}
-                for e in equipment_map["general"]]
+                return [
+                    {"equipment": e, "estimated_cost": "Contact vendor for pricing"}
+                    for e in equipment
+                ]
+        return [
+            {"equipment": e, "estimated_cost": "Contact vendor for pricing"}
+            for e in equipment_map["general"]
+        ]
 
     def generate_patient_report_template(self) -> dict:
         """Generate a standardized patient report template."""
         return {
             "disclaimer": MEDICAL_DISCLAIMER,
             "template": {
-                "patient_info": {"name": "[PATIENT NAME]", "dob": "[DATE OF BIRTH]", "mrn": "[MEDICAL RECORD NUMBER]"},
+                "patient_info": {
+                    "name": "[PATIENT NAME]",
+                    "dob": "[DATE OF BIRTH]",
+                    "mrn": "[MEDICAL RECORD NUMBER]",
+                },
                 "visit_date": "[VISIT DATE]",
                 "chief_complaint": "[PRIMARY REASON FOR VISIT]",
                 "history_of_present_illness": "[DETAILED SYMPTOM HISTORY]",
                 "past_medical_history": "[PREVIOUS CONDITIONS]",
                 "medications": ["[MEDICATION 1 - DOSE - FREQUENCY]"],
                 "allergies": ["[ALLERGY 1]"],
-                "physical_exam": {"vitals": "BP: ___ HR: ___ Temp: ___ RR: ___ SpO2: ___", "findings": "[EXAM FINDINGS]"},
+                "physical_exam": {
+                    "vitals": "BP: ___ HR: ___ Temp: ___ RR: ___ SpO2: ___",
+                    "findings": "[EXAM FINDINGS]",
+                },
                 "assessment": "[DIAGNOSIS / ASSESSMENT]",
                 "plan": ["[TREATMENT 1]", "[FOLLOW-UP INSTRUCTIONS]"],
                 "provider_signature": "[PROVIDER NAME, CREDENTIALS, DATE]",

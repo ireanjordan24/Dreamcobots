@@ -9,25 +9,27 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401
+
 
 @dataclass
 class CostData:
     dept_id: str
     monthly_spend: float
-    categories: Dict[str, float]   # category -> spend amount
+    categories: Dict[str, float]  # category -> spend amount
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -36,7 +38,7 @@ class WasteItem:
     item_id: str
     description: str
     estimated_waste_usd: float
-    automation_score: float   # 0.0 - 10.0
+    automation_score: float  # 0.0 - 10.0
 
 
 class CostReductionEngine:
@@ -79,16 +81,20 @@ class CostReductionEngine:
             ratio = spend / max(cost_data.monthly_spend, 1.0)
             if ratio > 0.20:
                 waste_estimate = spend * 0.15  # 15% estimated reducible
-                items.append(WasteItem(
-                    item_id=str(uuid.uuid4()),
-                    description=f"High spend in '{category}' ({ratio*100:.1f}% of budget)",
-                    estimated_waste_usd=round(waste_estimate, 2),
-                    automation_score=round(min(ratio * 20, 10.0), 2),
-                ))
+                items.append(
+                    WasteItem(
+                        item_id=str(uuid.uuid4()),
+                        description=f"High spend in '{category}' ({ratio*100:.1f}% of budget)",
+                        estimated_waste_usd=round(waste_estimate, 2),
+                        automation_score=round(min(ratio * 20, 10.0), 2),
+                    )
+                )
         self._waste_items[dept_id] = items
         return items
 
-    def score_automation_opportunity(self, process_id: str, process_config: Optional[dict] = None) -> dict:
+    def score_automation_opportunity(
+        self, process_id: str, process_config: Optional[dict] = None
+    ) -> dict:
         """Score the automation potential of a process."""
         config = process_config or {}
         repetitiveness = config.get("repetitiveness", 0.7)
@@ -101,7 +107,11 @@ class CostReductionEngine:
         return {
             "process_id": process_id,
             "automation_score": round(score, 2),
-            "recommendation": "automate" if score >= 7.0 else ("consider" if score >= 4.0 else "manual"),
+            "recommendation": (
+                "automate"
+                if score >= 7.0
+                else ("consider" if score >= 4.0 else "manual")
+            ),
             "estimated_hours_saved_monthly": round(volume * 0.1 * score / 10.0, 1),
         }
 
@@ -115,7 +125,9 @@ class CostReductionEngine:
                 "estimated_saving_usd": w.estimated_waste_usd,
                 "automation_score": w.automation_score,
             }
-            for w in sorted(waste_items, key=lambda x: x.estimated_waste_usd, reverse=True)
+            for w in sorted(
+                waste_items, key=lambda x: x.estimated_waste_usd, reverse=True
+            )
         ]
         plan = {
             "dept_id": dept_id,

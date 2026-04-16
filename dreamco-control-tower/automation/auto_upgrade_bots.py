@@ -31,9 +31,9 @@ import sys
 _BACKEND = os.path.join(os.path.dirname(__file__), "..", "backend")
 sys.path.insert(0, _BACKEND)
 
-from bot_manager import BotManager
-from repo_manager import RepoManager, GitHubClient
 from auto_upgrader import AutoUpgrader
+from bot_manager import BotManager
+from repo_manager import GitHubClient, RepoManager
 
 
 def main() -> None:
@@ -43,7 +43,9 @@ def main() -> None:
     bots_config = os.path.join(config_dir, "bots.json")
     repos_config = os.path.join(config_dir, "repos.json")
 
-    repo_root = os.environ.get("REPO_ROOT", os.path.join(os.path.dirname(__file__), "..", ".."))
+    repo_root = os.environ.get(
+        "REPO_ROOT", os.path.join(os.path.dirname(__file__), "..", "..")
+    )
     run_tests = os.environ.get("RUN_TESTS", "1") != "0"
     dry_run = os.environ.get("DRY_RUN", "0") == "1"
 

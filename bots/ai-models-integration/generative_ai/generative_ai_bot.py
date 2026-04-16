@@ -40,7 +40,9 @@ class GenerativeAIModelsBot:
     def select_model(self, model_name):
         """Select the active generative AI model by name."""
         if model_name not in self.SUPPORTED_MODELS:
-            print(f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}")
+            print(
+                f"Model '{model_name}' is not supported. Choose from: {self.SUPPORTED_MODELS}"
+            )
             return
         self.active_model = model_name
         print(f"Active generative model set to: {model_name}")
@@ -75,8 +77,14 @@ class GenerativeAIModelsBot:
     # ------------------------------------------------------------------
     # Stability AI Stable Diffusion
     # ------------------------------------------------------------------
-    def run_stable_diffusion(self, prompt, negative_prompt="", steps=30, cfg_scale=7.0,
-                              engine="stable-diffusion-xl-1024-v1-0"):
+    def run_stable_diffusion(
+        self,
+        prompt,
+        negative_prompt="",
+        steps=30,
+        cfg_scale=7.0,
+        engine="stable-diffusion-xl-1024-v1-0",
+    ):
         """
         Generate an image using Stability AI's Stable Diffusion.
 
@@ -107,8 +115,9 @@ class GenerativeAIModelsBot:
     # ------------------------------------------------------------------
     # Google Gemini
     # ------------------------------------------------------------------
-    def run_google_gemini(self, prompt, modality="text", image_url=None,
-                           model="gemini-1.5-pro"):
+    def run_google_gemini(
+        self, prompt, modality="text", image_url=None, model="gemini-1.5-pro"
+    ):
         """
         Generate content using Google Gemini (multimodal).
 
@@ -132,8 +141,12 @@ class GenerativeAIModelsBot:
             POST https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent
             Headers: x-goog-api-key: <GOOGLE_API_KEY>
         """
-        print(f"[Google Gemini] Model: {model} | Modality: {modality} | Prompt: {prompt}")
-        return f"[Google Gemini Response] '{model}' generated content for prompt: {prompt}"
+        print(
+            f"[Google Gemini] Model: {model} | Modality: {modality} | Prompt: {prompt}"
+        )
+        return (
+            f"[Google Gemini Response] '{model}' generated content for prompt: {prompt}"
+        )
 
     # ------------------------------------------------------------------
     # Midjourney
@@ -161,7 +174,9 @@ class GenerativeAIModelsBot:
             Headers: Authorization: Bearer <MIDJOURNEY_API_KEY>
             Body: {"prompt": "<prompt>", "aspect_ratio": "<ar>", "version": "<version>"}
         """
-        print(f"[Midjourney] Version: {version} | Aspect: {aspect_ratio} | Prompt: {prompt}")
+        print(
+            f"[Midjourney] Version: {version} | Aspect: {aspect_ratio} | Prompt: {prompt}"
+        )
         return f"[Midjourney Response] Image URL: https://cdn.midjourney.com/<uuid>.png"
 
     # ------------------------------------------------------------------
@@ -190,31 +205,35 @@ class GenerativeAIModelsBot:
             Headers: Authorization: Bearer <RUNWAYML_API_KEY>
             Body: {"prompt": "<prompt>", "mode": "<mode>", "duration": <duration_seconds>}
         """
-        print(f"[Runway ML] Mode: {mode} | Duration: {duration_seconds}s | Prompt: {prompt}")
+        print(
+            f"[Runway ML] Mode: {mode} | Duration: {duration_seconds}s | Prompt: {prompt}"
+        )
         return f"[Runway ML Response] Video URL: https://runway.ml/generated/<uuid>.mp4"
 
     def run(self):
         self.start()
         self.run_openai_dalle3(
             "A futuristic robot working alongside humans in a modern factory.",
-            size="1792x1024", quality="hd"
+            size="1792x1024",
+            quality="hd",
         )
         self.run_stable_diffusion(
             "Photorealistic cityscape at sunset",
             negative_prompt="blurry, low quality",
-            steps=50
+            steps=50,
         )
         self.run_google_gemini(
-            "Write a marketing tagline for the Dreamcobots platform.",
-            modality="text"
+            "Write a marketing tagline for the Dreamcobots platform.", modality="text"
         )
         self.run_midjourney(
             "Dreamcobot in a neon cyberpunk city --style raw",
-            aspect_ratio="16:9", version="v6"
+            aspect_ratio="16:9",
+            version="v6",
         )
         self.run_runwayml(
             "A Dreamcobot assembling electronics on a futuristic production line.",
-            mode="text-to-video", duration_seconds=8
+            mode="text-to-video",
+            duration_seconds=8,
         )
 
 

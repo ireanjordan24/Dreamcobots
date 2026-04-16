@@ -2,31 +2,33 @@
 Tests for bots/health_wellness_bot/tiers.py and bots/health_wellness_bot/health_wellness_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'health_wellness_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "health_wellness_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.health_wellness_bot.health_wellness_bot import (
     HealthWellnessBot,
-    HealthWellnessBotTierError,
     HealthWellnessBotRequestLimitError,
+    HealthWellnessBotTierError,
 )
-
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestHealthWellnessBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_health_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -37,8 +39,14 @@ class TestHealthWellnessBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_health_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "health_features", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "health_features",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -58,6 +66,7 @@ class TestHealthWellnessBotTierInfo:
 # -----------------------------------------------------------------------
 # HealthWellnessBot tests
 # -----------------------------------------------------------------------
+
 
 class TestHealthWellnessBot:
     def test_default_tier_free(self):
@@ -115,11 +124,15 @@ class TestHealthWellnessBot:
     def test_log_nutrition_macros_pro_only(self):
         bot = HealthWellnessBot(tier=Tier.FREE)
         with pytest.raises(HealthWellnessBotTierError):
-            bot.log_nutrition("Lunch", 600, macros={"protein": 30, "carbs": 60, "fat": 20})
+            bot.log_nutrition(
+                "Lunch", 600, macros={"protein": 30, "carbs": 60, "fat": 20}
+            )
 
     def test_log_nutrition_macros_pro_ok(self):
         bot = HealthWellnessBot(tier=Tier.PRO)
-        result = bot.log_nutrition("Lunch", 600, macros={"protein": 30, "carbs": 60, "fat": 20})
+        result = bot.log_nutrition(
+            "Lunch", 600, macros={"protein": 30, "carbs": 60, "fat": 20}
+        )
         assert isinstance(result, dict)
         entry = result.get("nutrition_entry") or result.get("nutrition")
         assert entry is not None

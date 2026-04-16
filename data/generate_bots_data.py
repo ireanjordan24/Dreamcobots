@@ -808,9 +808,9 @@ HEADERS = [
 # High = green, Medium = yellow, Low = red
 # ---------------------------------------------------------------------------
 ROI_COLORS = {
-    "High": "C6EFCE",    # light green
+    "High": "C6EFCE",  # light green
     "Medium": "FFEB9C",  # light yellow
-    "Low": "FFC7CE",     # light red/pink
+    "Low": "FFC7CE",  # light red/pink
 }
 
 
@@ -827,13 +827,7 @@ def _write_xlsx(output_path: Path) -> None:
     """Write bot data to an interactive Excel workbook."""
     try:
         from openpyxl import Workbook
-        from openpyxl.styles import (
-            Alignment,
-            Border,
-            Font,
-            PatternFill,
-            Side,
-        )
+        from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
         from openpyxl.utils import get_column_letter
     except ImportError as exc:
         raise SystemExit(
@@ -846,7 +840,9 @@ def _write_xlsx(output_path: Path) -> None:
     ws.title = "DreamCo Bots"
 
     # ── Header row ──────────────────────────────────────────────────────
-    header_fill = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="1F4E79", end_color="1F4E79", fill_type="solid"
+    )
     header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
     thin_side = Side(style="thin", color="BFBFBF")
     thin_border = Border(
@@ -857,7 +853,9 @@ def _write_xlsx(output_path: Path) -> None:
         cell = ws.cell(row=1, column=col_idx, value=header)
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True
+        )
         cell.border = thin_border
 
     ws.row_dimensions[1].height = 30

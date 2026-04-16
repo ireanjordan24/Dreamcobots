@@ -10,6 +10,24 @@ class TierConfig:
 
 TIERS = {
     "free": TierConfig("Free", 0.0, ["PHQ-2 screening", "basic risk indicator"]),
-    "pro": TierConfig("Pro", 39.0, ["PHQ-9 screening", "GAD-7 screening", "detailed risk report", "resource referrals"]),
-    "enterprise": TierConfig("Enterprise", 149.0, ["all features", "custom questionnaires", "EHR integration", "analytics dashboard"]),
+    "pro": TierConfig(
+        "Pro",
+        39.0,
+        [
+            "PHQ-9 screening",
+            "GAD-7 screening",
+            "detailed risk report",
+            "resource referrals",
+        ],
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        149.0,
+        [
+            "all features",
+            "custom questionnaires",
+            "EHR integration",
+            "analytics dashboard",
+        ],
+    ),
 }

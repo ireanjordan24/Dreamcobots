@@ -23,12 +23,13 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
-from framework import GlobalAISourcesFlow  # noqa: F401
 
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Progress bar
 # ---------------------------------------------------------------------------
+
 
 def progress_bar(value: int, total: int = 100, width: int = 20) -> str:
     """Return an ASCII progress bar string.
@@ -45,6 +46,7 @@ def progress_bar(value: int, total: int = 100, width: int = 20) -> str:
 # ---------------------------------------------------------------------------
 # Achievements
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Achievement:
@@ -78,18 +80,22 @@ _DEFAULT_ACHIEVEMENTS = [
 # Bot Idea
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BotIdea:
     name: str
     profit_per_day_usd: float
     usage_pct: float
     category: str = "general"
-    generated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    generated_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # ---------------------------------------------------------------------------
 # Bot Speed
 # ---------------------------------------------------------------------------
+
 
 class BotSpeed(Enum):
     SLOW = "slow"
@@ -108,6 +114,7 @@ class BotSpeed(Enum):
 # ---------------------------------------------------------------------------
 # Interactive Dashboard
 # ---------------------------------------------------------------------------
+
 
 class InteractiveDashboard:
     """
@@ -291,12 +298,17 @@ class InteractiveDashboard:
             "hint": "Big Bro picked a single digit. Trust your instincts.",
             "_secret": secret,
         }
-        self._gladiator_history.append({"challenge_id": challenge_id, "secret": secret, "submitted": False})
+        self._gladiator_history.append(
+            {"challenge_id": challenge_id, "secret": secret, "submitted": False}
+        )
         return {k: v for k, v in challenge.items() if not k.startswith("_")}
 
     def submit_gladiator_answer(self, challenge_id: str, guess: int) -> dict:
         """Submit an answer to a Code Gladiator challenge."""
-        record = next((r for r in self._gladiator_history if r["challenge_id"] == challenge_id), None)
+        record = next(
+            (r for r in self._gladiator_history if r["challenge_id"] == challenge_id),
+            None,
+        )
         if not record:
             return {"status": "not_found", "challenge_id": challenge_id}
         if record["submitted"]:
@@ -340,7 +352,9 @@ class InteractiveDashboard:
         name, base_profit, category = random.choice(self.IDEA_POOL)
         profit = round(base_profit * random.uniform(0.8, 1.5), 2)
         usage = round(random.uniform(20.0, 95.0), 1)
-        idea = BotIdea(name=name, profit_per_day_usd=profit, usage_pct=usage, category=category)
+        idea = BotIdea(
+            name=name, profit_per_day_usd=profit, usage_pct=usage, category=category
+        )
         self.bot_ideas.append(idea)
 
         xp_result = self.add_xp(20)
@@ -443,7 +457,9 @@ class InteractiveDashboard:
             "🤖 Top Bot Ideas",
         ]
         for bot in snap["top_bots"]:
-            lines.append(f"  {bot['name']} | ${bot['profit_per_day_usd']}/day | {bot['usage_pct']}% usage")
+            lines.append(
+                f"  {bot['name']} | ${bot['profit_per_day_usd']}/day | {bot['usage_pct']}% usage"
+            )
         lines += [
             "",
             "⚙️  Bot Speed: " + snap["bot_speed"].upper(),

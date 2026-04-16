@@ -4,6 +4,7 @@ Event Planning module for the CreatorEmpire bot.
 Supports creator-led events such as live shows, meet-and-greets, pop-up
 experiences, virtual concerts, and community tournaments.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -11,11 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .tiers import (
-    Tier,
-    CREATOR_FEATURES_BY_TIER,
-    FEATURE_EVENT_PLANNER,
-)
+from .tiers import CREATOR_FEATURES_BY_TIER, FEATURE_EVENT_PLANNER, Tier
 
 
 class EventError(Exception):

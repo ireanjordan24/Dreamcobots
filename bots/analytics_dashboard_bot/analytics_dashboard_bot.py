@@ -1,13 +1,18 @@
 """Analytics Dashboard Bot — tier-aware metric tracking and reporting."""
-import sys, os
+
+import os
 import random
+import sys
 from datetime import datetime
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.analytics_dashboard_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 METRIC_LIMITS = {Tier.FREE: 3, Tier.PRO: 20, Tier.ENTERPRISE: None}
 
@@ -21,12 +26,25 @@ class AnalyticsDashboardBot:
         self.flow = GlobalAISourcesFlow(bot_name="AnalyticsDashboardBot")
         self._metrics = []
 
-    def track_metric(self, name: str, value: float, channel: str = "website", date=None) -> dict:
+    def track_metric(
+        self, name: str, value: float, channel: str = "website", date=None
+    ) -> dict:
         limit = METRIC_LIMITS[self.tier]
         distinct_names = set(m["name"] for m in self._metrics)
-        if limit is not None and name not in distinct_names and len(distinct_names) >= limit:
-            raise PermissionError(f"Metric type limit ({limit}) reached for {self.tier.value} tier")
-        entry = {"name": name, "value": value, "channel": channel, "date": date or datetime.now().isoformat()}
+        if (
+            limit is not None
+            and name not in distinct_names
+            and len(distinct_names) >= limit
+        ):
+            raise PermissionError(
+                f"Metric type limit ({limit}) reached for {self.tier.value} tier"
+            )
+        entry = {
+            "name": name,
+            "value": value,
+            "channel": channel,
+            "date": date or datetime.now().isoformat(),
+        }
         self._metrics.append(entry)
         return entry
 
@@ -100,6 +118,10 @@ class AnalyticsDashboardBot:
 
     def run(self) -> dict:
         return self.flow.run_pipeline(
-            raw_data={"bot": "AnalyticsDashboardBot", "tier": self.tier.value, "metrics_count": len(self._metrics)},
+            raw_data={
+                "bot": "AnalyticsDashboardBot",
+                "tier": self.tier.value,
+                "metrics_count": len(self._metrics),
+            },
             learning_method="supervised",
         )

@@ -11,45 +11,48 @@ from typing import Any, Dict, List, Optional
 
 from core.bot_base import AutonomyLevel, BotBase, ScalingLevel
 
-
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Property:
     """Represents a real estate property listing."""
+
     property_id: str
     address: str
     city: str
     state: str
     zip_code: str
-    listing_type: str          # 'sale', 'rent'
+    listing_type: str  # 'sale', 'rent'
     price: float
     bedrooms: int
     bathrooms: float
     sqft: float
     description: str = ""
-    status: str = "active"     # 'active', 'pending', 'sold', 'rented'
+    status: str = "active"  # 'active', 'pending', 'sold', 'rented'
     tags: List[str] = field(default_factory=list)
 
 
 @dataclass
 class Lead:
     """Represents a prospective buyer or renter lead."""
+
     lead_id: str
     name: str
     email: str
     phone: str
-    interest: str              # 'buy', 'rent', 'invest'
+    interest: str  # 'buy', 'rent', 'invest'
     budget: float
     preferred_cities: List[str] = field(default_factory=list)
-    status: str = "new"        # 'new', 'contacted', 'qualified', 'closed'
+    status: str = "new"  # 'new', 'contacted', 'qualified', 'closed'
 
 
 # ---------------------------------------------------------------------------
 # RealEstateAI bot
 # ---------------------------------------------------------------------------
+
 
 class RealEstateAI(BotBase):
     """
@@ -132,14 +135,18 @@ class RealEstateAI(BotBase):
     # Market analysis
     # ------------------------------------------------------------------
 
-    def record_market_data(self, city: str, avg_price: float, volume: int, month: str) -> None:
+    def record_market_data(
+        self, city: str, avg_price: float, volume: int, month: str
+    ) -> None:
         """Record a monthly market data point for trend analysis."""
-        self._market_data.append({
-            "city": city,
-            "avg_price": avg_price,
-            "volume": volume,
-            "month": month,
-        })
+        self._market_data.append(
+            {
+                "city": city,
+                "avg_price": avg_price,
+                "volume": volume,
+                "month": month,
+            }
+        )
 
     def analyze_market_trends(self, city: str) -> Dict[str, Any]:
         """
@@ -154,7 +161,11 @@ class RealEstateAI(BotBase):
 
         prices = [d["avg_price"] for d in city_data]
         volumes = [d["volume"] for d in city_data]
-        trend = "rising" if len(prices) >= 2 and prices[-1] > prices[0] else "stable_or_declining"
+        trend = (
+            "rising"
+            if len(prices) >= 2 and prices[-1] > prices[0]
+            else "stable_or_declining"
+        )
 
         return {
             "city": city,
@@ -182,7 +193,9 @@ class RealEstateAI(BotBase):
         """
         city_data = [d for d in self._market_data if d["city"].lower() == city.lower()]
         if city_data:
-            avg_price_per_sqft = sum(d["avg_price"] for d in city_data) / len(city_data) / 1500
+            avg_price_per_sqft = (
+                sum(d["avg_price"] for d in city_data) / len(city_data) / 1500
+            )
         else:
             avg_price_per_sqft = 200.0  # national fallback $/sqft
 
@@ -237,7 +250,9 @@ class RealEstateAI(BotBase):
             "active_listings": len(active),
             "sold_or_rented": len(sold),
             "total_leads": len(self._leads),
-            "qualified_leads": sum(1 for l in self._leads.values() if l.status == "qualified"),
+            "qualified_leads": sum(
+                1 for l in self._leads.values() if l.status == "qualified"
+            ),
             "cities_covered": cities,
         }
 

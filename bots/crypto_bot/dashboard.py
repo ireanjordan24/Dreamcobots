@@ -11,10 +11,9 @@ from __future__ import annotations
 
 from typing import Optional
 
+from bots.crypto_bot.crypto_database import CRYPTO_DATABASE
 from bots.crypto_bot.portfolio import Portfolio
 from bots.crypto_bot.price_feed import get_market_summary, get_price_change_24h
-from bots.crypto_bot.crypto_database import CRYPTO_DATABASE
-
 
 _SEPARATOR = "─" * 72
 _DOUBLE_SEP = "═" * 72
@@ -74,16 +73,27 @@ def render_portfolio(portfolio: Portfolio, use_live: bool = False) -> str:
     return "\n".join(lines)
 
 
-def render_market_overview(symbols: Optional[list[str]] = None, use_live: bool = False) -> str:
+def render_market_overview(
+    symbols: Optional[list[str]] = None, use_live: bool = False
+) -> str:
     """
     Render a live market overview table for the given symbols.
     Default symbols cover the 12 coins shown in the UI mockup.
     """
     if symbols is None:
         symbols = [
-            "BTC", "ETH", "SOL", "ADA", "DOT",
-            "AVAX", "LINK", "MATIC", "LTC", "XRP",
-            "DOGE", "TON",
+            "BTC",
+            "ETH",
+            "SOL",
+            "ADA",
+            "DOT",
+            "AVAX",
+            "LINK",
+            "MATIC",
+            "LTC",
+            "XRP",
+            "DOGE",
+            "TON",
         ]
 
     data = get_market_summary(symbols, use_live=use_live)

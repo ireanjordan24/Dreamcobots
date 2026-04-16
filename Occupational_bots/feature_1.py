@@ -11,8 +11,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -23,42 +23,450 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "title": "Software Engineer",              "company": "TechCorp",       "location": "Austin, TX",       "salary_min": 90000,  "salary_max": 130000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Python","JavaScript","React"],        "platform": "LinkedIn",    "posted_days_ago": 2},
-    {"id": 2,  "title": "Data Analyst",                   "company": "Analytics Inc",  "location": "Remote",           "salary_min": 65000,  "salary_max": 90000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["SQL","Tableau","Excel"],              "platform": "Indeed",      "posted_days_ago": 1},
-    {"id": 3,  "title": "Product Manager",                "company": "StartupXYZ",     "location": "San Francisco, CA","salary_min": 130000, "salary_max": 180000, "type": "full_time", "remote": False, "experience": "senior", "skills": ["Product Strategy","Agile","Jira"],    "platform": "LinkedIn",    "posted_days_ago": 3},
-    {"id": 4,  "title": "Marketing Manager",              "company": "BrandCo",        "location": "New York, NY",     "salary_min": 80000,  "salary_max": 110000, "type": "full_time", "remote": False, "experience": "mid",    "skills": ["SEO","Content Marketing","Analytics"], "platform": "Glassdoor",   "posted_days_ago": 4},
-    {"id": 5,  "title": "UX Designer",                    "company": "DesignHub",      "location": "Remote",           "salary_min": 75000,  "salary_max": 105000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Figma","UX Research","Prototyping"],  "platform": "ZipRecruiter","posted_days_ago": 1},
-    {"id": 6,  "title": "DevOps Engineer",                "company": "CloudFirst",     "location": "Seattle, WA",      "salary_min": 110000, "salary_max": 150000, "type": "full_time", "remote": True,  "experience": "senior", "skills": ["AWS","Docker","Kubernetes","CI/CD"],   "platform": "Indeed",      "posted_days_ago": 2},
-    {"id": 7,  "title": "Sales Representative",           "company": "RevGrowth",      "location": "Dallas, TX",       "salary_min": 50000,  "salary_max": 80000,  "type": "full_time", "remote": False, "experience": "entry",  "skills": ["CRM","Cold Calling","Negotiation"],   "platform": "LinkedIn",    "posted_days_ago": 1},
-    {"id": 8,  "title": "Machine Learning Engineer",      "company": "AI Ventures",    "location": "Remote",           "salary_min": 140000, "salary_max": 200000, "type": "full_time", "remote": True,  "experience": "senior", "skills": ["PyTorch","TensorFlow","Python","ML"],  "platform": "LinkedIn",    "posted_days_ago": 5},
-    {"id": 9,  "title": "Customer Success Manager",       "company": "SaaS Pro",       "location": "Remote",           "salary_min": 70000,  "salary_max": 95000,  "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["CRM","Communication","SaaS"],          "platform": "Indeed",      "posted_days_ago": 2},
-    {"id": 10, "title": "Financial Analyst",              "company": "Finance Co",     "location": "Chicago, IL",      "salary_min": 70000,  "salary_max": 95000,  "type": "full_time", "remote": False, "experience": "entry",  "skills": ["Excel","Financial Modeling","CFA"],     "platform": "Glassdoor",   "posted_days_ago": 3},
-    {"id": 11, "title": "Content Writer",                 "company": "ContentPlus",    "location": "Remote",           "salary_min": 45000,  "salary_max": 65000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["Writing","SEO","WordPress","Editing"], "platform": "ZipRecruiter","posted_days_ago": 1},
-    {"id": 12, "title": "Cybersecurity Analyst",          "company": "SecureNet",      "location": "Washington, DC",   "salary_min": 85000,  "salary_max": 120000, "type": "full_time", "remote": False, "experience": "mid",    "skills": ["SIEM","Penetration Testing","CISSP"],  "platform": "LinkedIn",    "posted_days_ago": 4},
-    {"id": 13, "title": "Project Manager",                "company": "PM Solutions",   "location": "Denver, CO",       "salary_min": 75000,  "salary_max": 100000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["PMP","Agile","Scrum","Jira"],          "platform": "Indeed",      "posted_days_ago": 2},
-    {"id": 14, "title": "React Developer",                "company": "WebTech",        "location": "Remote",           "salary_min": 85000,  "salary_max": 120000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["React","TypeScript","CSS","REST API"], "platform": "LinkedIn",    "posted_days_ago": 1},
-    {"id": 15, "title": "HR Business Partner",            "company": "PeopleFirst",    "location": "Atlanta, GA",      "salary_min": 70000,  "salary_max": 95000,  "type": "full_time", "remote": False, "experience": "mid",    "skills": ["HRIS","Employee Relations","Recruiting"],"platform": "Glassdoor",  "posted_days_ago": 3},
-    {"id": 16, "title": "Operations Manager",             "company": "LogiCo",         "location": "Houston, TX",      "salary_min": 80000,  "salary_max": 110000, "type": "full_time", "remote": False, "experience": "senior", "skills": ["Operations","Supply Chain","ERP"],     "platform": "LinkedIn",    "posted_days_ago": 5},
-    {"id": 17, "title": "Social Media Manager",           "company": "DigitalAgency",  "location": "Remote",           "salary_min": 50000,  "salary_max": 70000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["Social Media","Content","Analytics"],  "platform": "Indeed",      "posted_days_ago": 1},
-    {"id": 18, "title": "Backend Developer (Node.js)",    "company": "AppFactory",     "location": "Remote",           "salary_min": 90000,  "salary_max": 125000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Node.js","Express","MongoDB","AWS"],   "platform": "ZipRecruiter","posted_days_ago": 2},
-    {"id": 19, "title": "Business Analyst",               "company": "ConsultCo",      "location": "New York, NY",     "salary_min": 75000,  "salary_max": 100000, "type": "full_time", "remote": False, "experience": "mid",    "skills": ["Business Analysis","SQL","Tableau"],   "platform": "LinkedIn",    "posted_days_ago": 4},
-    {"id": 20, "title": "Graphic Designer",               "company": "Creative Studio","location": "Remote",           "salary_min": 50000,  "salary_max": 75000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["Photoshop","Illustrator","Figma"],     "platform": "Indeed",      "posted_days_ago": 2},
-    {"id": 21, "title": "QA Engineer",                    "company": "QualityTech",    "location": "Remote",           "salary_min": 75000,  "salary_max": 100000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Selenium","Test Automation","Python"],  "platform": "LinkedIn",    "posted_days_ago": 3},
-    {"id": 22, "title": "Account Executive",              "company": "SalesForce Co",  "location": "San Francisco, CA","salary_min": 70000,  "salary_max": 120000, "type": "full_time", "remote": False, "experience": "mid",    "skills": ["B2B Sales","Negotiation","CRM"],       "platform": "Glassdoor",   "posted_days_ago": 1},
-    {"id": 23, "title": "Data Scientist",                 "company": "DataDriven",     "location": "Remote",           "salary_min": 110000, "salary_max": 160000, "type": "full_time", "remote": True,  "experience": "senior", "skills": ["Python","R","Statistics","ML"],         "platform": "LinkedIn",    "posted_days_ago": 2},
-    {"id": 24, "title": "Technical Support Specialist",   "company": "TechHelp",       "location": "Remote",           "salary_min": 45000,  "salary_max": 65000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["Technical Support","Communication"],  "platform": "Indeed",      "posted_days_ago": 1},
-    {"id": 25, "title": "iOS Developer (Swift)",          "company": "AppMakers",      "location": "Austin, TX",       "salary_min": 100000, "salary_max": 140000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Swift","iOS","Xcode","UIKit"],         "platform": "LinkedIn",    "posted_days_ago": 3},
-    {"id": 26, "title": "Legal Counsel",                  "company": "LawFirm LLC",    "location": "New York, NY",     "salary_min": 120000, "salary_max": 200000, "type": "full_time", "remote": False, "experience": "senior", "skills": ["Contract Law","Corporate Law","JD"],   "platform": "Glassdoor",   "posted_days_ago": 5},
-    {"id": 27, "title": "Email Marketing Specialist",     "company": "GrowthAgency",   "location": "Remote",           "salary_min": 55000,  "salary_max": 75000,  "type": "full_time", "remote": True,  "experience": "entry",  "skills": ["Mailchimp","Klaviyo","Email Design"],  "platform": "ZipRecruiter","posted_days_ago": 2},
-    {"id": 28, "title": "Scrum Master",                   "company": "AgileTeam",      "location": "Chicago, IL",      "salary_min": 85000,  "salary_max": 115000, "type": "full_time", "remote": True,  "experience": "mid",    "skills": ["Scrum","Agile","Jira","Facilitation"], "platform": "LinkedIn",    "posted_days_ago": 4},
-    {"id": 29, "title": "Supply Chain Manager",           "company": "GlobalOps",      "location": "Dallas, TX",       "salary_min": 90000,  "salary_max": 125000, "type": "full_time", "remote": False, "experience": "senior", "skills": ["Supply Chain","SAP","Logistics"],      "platform": "Indeed",      "posted_days_ago": 3},
-    {"id": 30, "title": "AI/ML Researcher",               "company": "DeepAI Labs",    "location": "Remote",           "salary_min": 160000, "salary_max": 250000, "type": "full_time", "remote": True,  "experience": "senior", "skills": ["Deep Learning","NLP","Research","PhD"],"platform": "LinkedIn",    "posted_days_ago": 1},
+    {
+        "id": 1,
+        "title": "Software Engineer",
+        "company": "TechCorp",
+        "location": "Austin, TX",
+        "salary_min": 90000,
+        "salary_max": 130000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Python", "JavaScript", "React"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 2,
+        "title": "Data Analyst",
+        "company": "Analytics Inc",
+        "location": "Remote",
+        "salary_min": 65000,
+        "salary_max": 90000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["SQL", "Tableau", "Excel"],
+        "platform": "Indeed",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 3,
+        "title": "Product Manager",
+        "company": "StartupXYZ",
+        "location": "San Francisco, CA",
+        "salary_min": 130000,
+        "salary_max": 180000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "senior",
+        "skills": ["Product Strategy", "Agile", "Jira"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 4,
+        "title": "Marketing Manager",
+        "company": "BrandCo",
+        "location": "New York, NY",
+        "salary_min": 80000,
+        "salary_max": 110000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "mid",
+        "skills": ["SEO", "Content Marketing", "Analytics"],
+        "platform": "Glassdoor",
+        "posted_days_ago": 4,
+    },
+    {
+        "id": 5,
+        "title": "UX Designer",
+        "company": "DesignHub",
+        "location": "Remote",
+        "salary_min": 75000,
+        "salary_max": 105000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Figma", "UX Research", "Prototyping"],
+        "platform": "ZipRecruiter",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 6,
+        "title": "DevOps Engineer",
+        "company": "CloudFirst",
+        "location": "Seattle, WA",
+        "salary_min": 110000,
+        "salary_max": 150000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "senior",
+        "skills": ["AWS", "Docker", "Kubernetes", "CI/CD"],
+        "platform": "Indeed",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 7,
+        "title": "Sales Representative",
+        "company": "RevGrowth",
+        "location": "Dallas, TX",
+        "salary_min": 50000,
+        "salary_max": 80000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "entry",
+        "skills": ["CRM", "Cold Calling", "Negotiation"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 8,
+        "title": "Machine Learning Engineer",
+        "company": "AI Ventures",
+        "location": "Remote",
+        "salary_min": 140000,
+        "salary_max": 200000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "senior",
+        "skills": ["PyTorch", "TensorFlow", "Python", "ML"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 5,
+    },
+    {
+        "id": 9,
+        "title": "Customer Success Manager",
+        "company": "SaaS Pro",
+        "location": "Remote",
+        "salary_min": 70000,
+        "salary_max": 95000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["CRM", "Communication", "SaaS"],
+        "platform": "Indeed",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 10,
+        "title": "Financial Analyst",
+        "company": "Finance Co",
+        "location": "Chicago, IL",
+        "salary_min": 70000,
+        "salary_max": 95000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "entry",
+        "skills": ["Excel", "Financial Modeling", "CFA"],
+        "platform": "Glassdoor",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 11,
+        "title": "Content Writer",
+        "company": "ContentPlus",
+        "location": "Remote",
+        "salary_min": 45000,
+        "salary_max": 65000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["Writing", "SEO", "WordPress", "Editing"],
+        "platform": "ZipRecruiter",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 12,
+        "title": "Cybersecurity Analyst",
+        "company": "SecureNet",
+        "location": "Washington, DC",
+        "salary_min": 85000,
+        "salary_max": 120000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "mid",
+        "skills": ["SIEM", "Penetration Testing", "CISSP"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 4,
+    },
+    {
+        "id": 13,
+        "title": "Project Manager",
+        "company": "PM Solutions",
+        "location": "Denver, CO",
+        "salary_min": 75000,
+        "salary_max": 100000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["PMP", "Agile", "Scrum", "Jira"],
+        "platform": "Indeed",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 14,
+        "title": "React Developer",
+        "company": "WebTech",
+        "location": "Remote",
+        "salary_min": 85000,
+        "salary_max": 120000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["React", "TypeScript", "CSS", "REST API"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 15,
+        "title": "HR Business Partner",
+        "company": "PeopleFirst",
+        "location": "Atlanta, GA",
+        "salary_min": 70000,
+        "salary_max": 95000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "mid",
+        "skills": ["HRIS", "Employee Relations", "Recruiting"],
+        "platform": "Glassdoor",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 16,
+        "title": "Operations Manager",
+        "company": "LogiCo",
+        "location": "Houston, TX",
+        "salary_min": 80000,
+        "salary_max": 110000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "senior",
+        "skills": ["Operations", "Supply Chain", "ERP"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 5,
+    },
+    {
+        "id": 17,
+        "title": "Social Media Manager",
+        "company": "DigitalAgency",
+        "location": "Remote",
+        "salary_min": 50000,
+        "salary_max": 70000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["Social Media", "Content", "Analytics"],
+        "platform": "Indeed",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 18,
+        "title": "Backend Developer (Node.js)",
+        "company": "AppFactory",
+        "location": "Remote",
+        "salary_min": 90000,
+        "salary_max": 125000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Node.js", "Express", "MongoDB", "AWS"],
+        "platform": "ZipRecruiter",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 19,
+        "title": "Business Analyst",
+        "company": "ConsultCo",
+        "location": "New York, NY",
+        "salary_min": 75000,
+        "salary_max": 100000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "mid",
+        "skills": ["Business Analysis", "SQL", "Tableau"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 4,
+    },
+    {
+        "id": 20,
+        "title": "Graphic Designer",
+        "company": "Creative Studio",
+        "location": "Remote",
+        "salary_min": 50000,
+        "salary_max": 75000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["Photoshop", "Illustrator", "Figma"],
+        "platform": "Indeed",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 21,
+        "title": "QA Engineer",
+        "company": "QualityTech",
+        "location": "Remote",
+        "salary_min": 75000,
+        "salary_max": 100000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Selenium", "Test Automation", "Python"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 22,
+        "title": "Account Executive",
+        "company": "SalesForce Co",
+        "location": "San Francisco, CA",
+        "salary_min": 70000,
+        "salary_max": 120000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "mid",
+        "skills": ["B2B Sales", "Negotiation", "CRM"],
+        "platform": "Glassdoor",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 23,
+        "title": "Data Scientist",
+        "company": "DataDriven",
+        "location": "Remote",
+        "salary_min": 110000,
+        "salary_max": 160000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "senior",
+        "skills": ["Python", "R", "Statistics", "ML"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 24,
+        "title": "Technical Support Specialist",
+        "company": "TechHelp",
+        "location": "Remote",
+        "salary_min": 45000,
+        "salary_max": 65000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["Technical Support", "Communication"],
+        "platform": "Indeed",
+        "posted_days_ago": 1,
+    },
+    {
+        "id": 25,
+        "title": "iOS Developer (Swift)",
+        "company": "AppMakers",
+        "location": "Austin, TX",
+        "salary_min": 100000,
+        "salary_max": 140000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Swift", "iOS", "Xcode", "UIKit"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 26,
+        "title": "Legal Counsel",
+        "company": "LawFirm LLC",
+        "location": "New York, NY",
+        "salary_min": 120000,
+        "salary_max": 200000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "senior",
+        "skills": ["Contract Law", "Corporate Law", "JD"],
+        "platform": "Glassdoor",
+        "posted_days_ago": 5,
+    },
+    {
+        "id": 27,
+        "title": "Email Marketing Specialist",
+        "company": "GrowthAgency",
+        "location": "Remote",
+        "salary_min": 55000,
+        "salary_max": 75000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "entry",
+        "skills": ["Mailchimp", "Klaviyo", "Email Design"],
+        "platform": "ZipRecruiter",
+        "posted_days_ago": 2,
+    },
+    {
+        "id": 28,
+        "title": "Scrum Master",
+        "company": "AgileTeam",
+        "location": "Chicago, IL",
+        "salary_min": 85000,
+        "salary_max": 115000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "mid",
+        "skills": ["Scrum", "Agile", "Jira", "Facilitation"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 4,
+    },
+    {
+        "id": 29,
+        "title": "Supply Chain Manager",
+        "company": "GlobalOps",
+        "location": "Dallas, TX",
+        "salary_min": 90000,
+        "salary_max": 125000,
+        "type": "full_time",
+        "remote": False,
+        "experience": "senior",
+        "skills": ["Supply Chain", "SAP", "Logistics"],
+        "platform": "Indeed",
+        "posted_days_ago": 3,
+    },
+    {
+        "id": 30,
+        "title": "AI/ML Researcher",
+        "company": "DeepAI Labs",
+        "location": "Remote",
+        "salary_min": 160000,
+        "salary_max": 250000,
+        "type": "full_time",
+        "remote": True,
+        "experience": "senior",
+        "skills": ["Deep Learning", "NLP", "Research", "PhD"],
+        "platform": "LinkedIn",
+        "posted_days_ago": 1,
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_results": 5,    "job_alerts": False, "ai_matching": False, "application_tracking": False},
-    "PRO":        {"price_usd": 19,  "max_results": 50,   "job_alerts": True,  "ai_matching": True,  "application_tracking": True},
-    "ENTERPRISE": {"price_usd": 49,  "max_results": None, "job_alerts": True,  "ai_matching": True,  "application_tracking": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_results": 5,
+        "job_alerts": False,
+        "ai_matching": False,
+        "application_tracking": False,
+    },
+    "PRO": {
+        "price_usd": 19,
+        "max_results": 50,
+        "job_alerts": True,
+        "ai_matching": True,
+        "application_tracking": True,
+    },
+    "ENTERPRISE": {
+        "price_usd": 49,
+        "max_results": None,
+        "job_alerts": True,
+        "ai_matching": True,
+        "application_tracking": True,
+    },
 }
 
 
@@ -83,15 +491,25 @@ class JobSearchBot:
         limit = self._config["max_results"]
         return results[:limit] if limit else results
 
-    def search_jobs(self, *, title: str | None = None, location: str | None = None,
-                    remote_only: bool = False, min_salary: float | None = None,
-                    experience: str | None = None) -> list[dict]:
+    def search_jobs(
+        self,
+        *,
+        title: str | None = None,
+        location: str | None = None,
+        remote_only: bool = False,
+        min_salary: float | None = None,
+        experience: str | None = None,
+    ) -> list[dict]:
         """Search job listings with filters."""
         results = list(EXAMPLES)
         if title:
             results = [j for j in results if title.lower() in j["title"].lower()]
         if location:
-            results = [j for j in results if location.lower() in j["location"].lower() or j["remote"]]
+            results = [
+                j
+                for j in results
+                if location.lower() in j["location"].lower() or j["remote"]
+            ]
         if remote_only:
             results = [j for j in results if j["remote"]]
         if min_salary is not None:
@@ -113,7 +531,9 @@ class JobSearchBot:
 
     def get_jobs_by_platform(self, platform: str) -> list[dict]:
         """Return jobs from a specific platform."""
-        return self._limit_results([j for j in EXAMPLES if j["platform"].lower() == platform.lower()])
+        return self._limit_results(
+            [j for j in EXAMPLES if j["platform"].lower() == platform.lower()]
+        )
 
     def get_top_paying_jobs(self, count: int = 5) -> list[dict]:
         """Return the top N highest-paying jobs."""
@@ -130,9 +550,13 @@ class JobSearchBot:
         scored = []
         for job in EXAMPLES:
             job_skills_lower = [s.lower() for s in job["skills"]]
-            matches = sum(1 for s in skills_lower if any(s in js for js in job_skills_lower))
+            matches = sum(
+                1 for s in skills_lower if any(s in js for js in job_skills_lower)
+            )
             if matches > 0:
-                scored.append({**job, "match_score": round(matches / len(job["skills"]) * 100, 1)})
+                scored.append(
+                    {**job, "match_score": round(matches / len(job["skills"]) * 100, 1)}
+                )
         scored.sort(key=lambda j: j["match_score"], reverse=True)
         return self._limit_results(scored)
 
@@ -204,7 +628,10 @@ class JobSearchBot:
             raw_data={"domain": "job_search", "listings_count": len(EXAMPLES)},
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "stats": self.get_search_stats()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "stats": self.get_search_stats(),
+        }
 
 
 if __name__ == "__main__":
@@ -284,7 +711,12 @@ def _jobsearch_bot_analyze(self):
 
 def _jobsearch_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "JobSearchBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "JobSearchBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 JobSearchBot.monthly_price = _jobsearch_bot_monthly_price
@@ -333,6 +765,7 @@ JobSearchBot.end_session = _jobsearchbot_end_session
 # JobSearchBot extended interface: datasets, status, sell_dataset, chat
 # ---------------------------------------------------------------------------
 
+
 class _MockDataset:
     def __init__(self, dataset_id, name):
         self.dataset_id = dataset_id
@@ -371,6 +804,7 @@ def _jobsearch_status(self) -> dict:
 
 def _jobsearch_sell_dataset(self, dataset_id: str, buyer_id: str) -> str:
     import uuid as _u
+
     sale_id = str(_u.uuid4())[:8]
     return f"Sale ID: {sale_id} — Dataset {dataset_id} sold to {buyer_id}."
 
@@ -381,6 +815,7 @@ def _jobsearch_full_init(self, tier=Tier.FREE):
     # self.tier stays as string from _orig_init
     if not hasattr(self, "bot_id"):
         import uuid as _u2
+
         self.bot_id = str(_u2.uuid4())
     self.name = "JobSearch Bot"
     self.category = "occupational"
@@ -419,7 +854,15 @@ class _MockEmotion:
         self.label = "neutral"
 
     def update(self, text):
-        positive = {"wonderful", "great", "love", "amazing", "excellent", "happy", "good"}
+        positive = {
+            "wonderful",
+            "great",
+            "love",
+            "amazing",
+            "excellent",
+            "happy",
+            "good",
+        }
         negative = {"terrible", "awful", "bad", "broken", "horrible", "hate"}
         words = set(text.lower().split())
         if words & positive:
@@ -438,6 +881,7 @@ def _jobsearch_extended_init(self, tier=Tier.FREE):
     _orig_jobsearch_bot_init(self, tier_val.upper())
     # self.tier stays as string from _orig_init
     import uuid as _u3
+
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_u3.uuid4())
     self.name = "JobSearch Bot"
@@ -473,7 +917,10 @@ def _jobsearch_status_full(self) -> dict:
         "category": self.category,
         "domain": self.domain,
         "revenue": {"total_revenue_usd": 0.0},
-        "datasets": {"datasets_available": len(self.datasets.list_datasets()), "total_sales": 0},
+        "datasets": {
+            "datasets_available": len(self.datasets.list_datasets()),
+            "total_sales": 0,
+        },
         "top_intents": ["job_search", "career"],
     }
 

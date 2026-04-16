@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Workplace Audit Tool - 5S methodology audit system."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -29,10 +34,16 @@ class WorkplaceAuditTool:
         scores = {}
         for pillar in self.PILLARS:
             pillar_items = [i for i in items if i.get("pillar") == pillar]
-            avg = sum(i.get("score", 0) for i in pillar_items) / len(pillar_items) if pillar_items else 0.0
+            avg = (
+                sum(i.get("score", 0) for i in pillar_items) / len(pillar_items)
+                if pillar_items
+                else 0.0
+            )
             scores[pillar] = round(avg, 2)
 
-        total_score = round(sum(scores.values()) / len(self.PILLARS), 2) if scores else 0.0
+        total_score = (
+            round(sum(scores.values()) / len(self.PILLARS), 2) if scores else 0.0
+        )
         return {
             "category": category,
             "scores": scores,

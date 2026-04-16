@@ -1,8 +1,12 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-TOOL_DIR = os.path.join(REPO_ROOT, 'analytics-elites', 'loyalty_program_impact_simulator')
+TOOL_DIR = os.path.join(
+    REPO_ROOT, "analytics-elites", "loyalty_program_impact_simulator"
+)
 sys.path.insert(0, TOOL_DIR)
 
 import pytest
@@ -70,22 +74,26 @@ class TestModelCLV:
 
     def test_clv_with_loyalty_higher(self):
         sim = LoyaltyProgramImpactSimulator(tier="pro")
-        result = sim.model_clv({
-            "avg_annual_spend": 500,
-            "retention_rate": 0.70,
-            "discount_rate": 0.10,
-            "loyalty_retention_lift": 0.05,
-        })
+        result = sim.model_clv(
+            {
+                "avg_annual_spend": 500,
+                "retention_rate": 0.70,
+                "discount_rate": 0.10,
+                "loyalty_retention_lift": 0.05,
+            }
+        )
         assert result["clv_with_loyalty"] > result["clv_without_loyalty"]
 
     def test_clv_lift_positive(self):
         sim = LoyaltyProgramImpactSimulator(tier="pro")
-        result = sim.model_clv({
-            "avg_annual_spend": 500,
-            "retention_rate": 0.70,
-            "discount_rate": 0.10,
-            "loyalty_retention_lift": 0.05,
-        })
+        result = sim.model_clv(
+            {
+                "avg_annual_spend": 500,
+                "retention_rate": 0.70,
+                "discount_rate": 0.10,
+                "loyalty_retention_lift": 0.05,
+            }
+        )
         assert result["clv_lift"] > 0
 
 
@@ -97,20 +105,24 @@ class TestEstimateChurnReduction:
 
     def test_customers_retained_positive(self):
         sim = LoyaltyProgramImpactSimulator(tier="pro")
-        result = sim.estimate_churn_reduction({
-            "base_churn_rate": 0.25,
-            "loyalty_churn_reduction": 0.05,
-            "customer_count": 1000,
-            "avg_annual_spend": 500.0,
-        })
+        result = sim.estimate_churn_reduction(
+            {
+                "base_churn_rate": 0.25,
+                "loyalty_churn_reduction": 0.05,
+                "customer_count": 1000,
+                "avg_annual_spend": 500.0,
+            }
+        )
         assert result["customers_retained"] == 50
 
     def test_new_churn_lower(self):
         sim = LoyaltyProgramImpactSimulator(tier="pro")
-        result = sim.estimate_churn_reduction({
-            "base_churn_rate": 0.25,
-            "loyalty_churn_reduction": 0.05,
-            "customer_count": 1000,
-            "avg_annual_spend": 500.0,
-        })
+        result = sim.estimate_churn_reduction(
+            {
+                "base_churn_rate": 0.25,
+                "loyalty_churn_reduction": 0.05,
+                "customer_count": 1000,
+                "avg_annual_spend": 500.0,
+            }
+        )
         assert result["new_churn_rate"] < result["base_churn_rate"]

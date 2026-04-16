@@ -1,11 +1,14 @@
 """Referral Bot - Manages referral programs, tracking, and commission calculations."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from datetime import datetime
+
 from core.base_bot import BaseBot
 
 
@@ -69,7 +72,9 @@ class ReferralBot(BaseBot):
         """Calculate total commission earnings for a referrer."""
         if referrer_id not in self._referrers:
             return {"error": f"Referrer {referrer_id} not found"}
-        referrer_referrals = [r for r in self._referrals if r["referrer_id"] == referrer_id]
+        referrer_referrals = [
+            r for r in self._referrals if r["referrer_id"] == referrer_id
+        ]
         completed = [r for r in referrer_referrals if r["status"] == "completed"]
         pending_count = len(referrer_referrals) - len(completed)
         total_earnings = self._referrers[referrer_id]["total_earnings"]
@@ -90,24 +95,42 @@ class ReferralBot(BaseBot):
     def get_leaderboard(self) -> list:
         """Return the top referrers leaderboard."""
         sorted_referrers = sorted(
-            self._referrers.values(),
-            key=lambda x: x["referral_count"],
-            reverse=True
+            self._referrers.values(), key=lambda x: x["referral_count"], reverse=True
         )
         leaderboard = []
         for rank, r in enumerate(sorted_referrers[:10], 1):
-            leaderboard.append({
-                "rank": rank,
-                "name": r["name"],
-                "referral_count": r["referral_count"],
-                "earnings": r["total_earnings"],
-                "tier": r["tier"],
-            })
+            leaderboard.append(
+                {
+                    "rank": rank,
+                    "name": r["name"],
+                    "referral_count": r["referral_count"],
+                    "earnings": r["total_earnings"],
+                    "tier": r["tier"],
+                }
+            )
         if not leaderboard:
             leaderboard = [
-                {"rank": 1, "name": "JohnDoe", "referral_count": 47, "earnings": 2350.0, "tier": "Platinum"},
-                {"rank": 2, "name": "JaneSmith", "referral_count": 32, "earnings": 1600.0, "tier": "Gold"},
-                {"rank": 3, "name": "BobJohnson", "referral_count": 21, "earnings": 1050.0, "tier": "Silver"},
+                {
+                    "rank": 1,
+                    "name": "JohnDoe",
+                    "referral_count": 47,
+                    "earnings": 2350.0,
+                    "tier": "Platinum",
+                },
+                {
+                    "rank": 2,
+                    "name": "JaneSmith",
+                    "referral_count": 32,
+                    "earnings": 1600.0,
+                    "tier": "Gold",
+                },
+                {
+                    "rank": 3,
+                    "name": "BobJohnson",
+                    "referral_count": 21,
+                    "earnings": 1050.0,
+                    "tier": "Silver",
+                },
             ]
         return leaderboard
 
@@ -127,15 +150,23 @@ class ReferralBot(BaseBot):
     def get_referral_stats(self) -> dict:
         """Return overall referral program statistics."""
         total_referrals = len(self._referrals)
-        completed_referrals = sum(1 for r in self._referrals if r["status"] == "completed")
-        total_earnings_paid = sum(r.get("commission_earned", 0) for r in self._referrals)
+        completed_referrals = sum(
+            1 for r in self._referrals if r["status"] == "completed"
+        )
+        total_earnings_paid = sum(
+            r.get("commission_earned", 0) for r in self._referrals
+        )
         return {
             "program_name": "DreamCobots 50/50 Referral Program",
             "commission_rate": "50%",
             "total_referrers": len(self._referrers),
             "total_referrals": total_referrals,
             "completed_conversions": completed_referrals,
-            "conversion_rate": f"{(completed_referrals / total_referrals * 100):.1f}%" if total_referrals else "0%",
+            "conversion_rate": (
+                f"{(completed_referrals / total_referrals * 100):.1f}%"
+                if total_referrals
+                else "0%"
+            ),
             "total_commissions_paid": round(total_earnings_paid, 2),
             "notifications_sent": len(self._notifications),
         }

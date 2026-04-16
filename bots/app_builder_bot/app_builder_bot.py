@@ -1,9 +1,15 @@
 """App Builder Bot — tier-aware application project creation and scaffolding."""
-import sys, os
+
+import os
+import sys
 import uuid
 from datetime import datetime, timezone
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.app_builder_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -20,29 +26,100 @@ class AppBuilderBot:
 
     SCAFFOLDS = {
         "web": {
-            "directories": ["src/", "src/components/", "src/pages/", "src/styles/", "public/", "tests/"],
-            "files": ["src/App.tsx", "src/index.tsx", "public/index.html", "package.json", "tsconfig.json", "README.md"],
+            "directories": [
+                "src/",
+                "src/components/",
+                "src/pages/",
+                "src/styles/",
+                "public/",
+                "tests/",
+            ],
+            "files": [
+                "src/App.tsx",
+                "src/index.tsx",
+                "public/index.html",
+                "package.json",
+                "tsconfig.json",
+                "README.md",
+            ],
             "commands": ["npm install", "npm run dev"],
         },
         "mobile": {
-            "directories": ["src/", "src/screens/", "src/components/", "src/navigation/", "src/services/", "assets/"],
-            "files": ["src/App.tsx", "app.json", "package.json", "babel.config.js", "README.md"],
+            "directories": [
+                "src/",
+                "src/screens/",
+                "src/components/",
+                "src/navigation/",
+                "src/services/",
+                "assets/",
+            ],
+            "files": [
+                "src/App.tsx",
+                "app.json",
+                "package.json",
+                "babel.config.js",
+                "README.md",
+            ],
             "commands": ["npm install", "npx expo start"],
         },
         "desktop": {
-            "directories": ["src/", "src/main/", "src/renderer/", "src/preload/", "assets/"],
-            "files": ["src/main/index.ts", "src/renderer/App.tsx", "package.json", "electron-builder.yml", "README.md"],
+            "directories": [
+                "src/",
+                "src/main/",
+                "src/renderer/",
+                "src/preload/",
+                "assets/",
+            ],
+            "files": [
+                "src/main/index.ts",
+                "src/renderer/App.tsx",
+                "package.json",
+                "electron-builder.yml",
+                "README.md",
+            ],
             "commands": ["npm install", "npm run dev"],
         },
         "api": {
-            "directories": ["app/", "app/routers/", "app/models/", "app/schemas/", "app/services/", "tests/"],
-            "files": ["app/main.py", "app/routers/health.py", "requirements.txt", "Dockerfile", "README.md"],
-            "commands": ["pip install -r requirements.txt", "uvicorn app.main:app --reload"],
+            "directories": [
+                "app/",
+                "app/routers/",
+                "app/models/",
+                "app/schemas/",
+                "app/services/",
+                "tests/",
+            ],
+            "files": [
+                "app/main.py",
+                "app/routers/health.py",
+                "requirements.txt",
+                "Dockerfile",
+                "README.md",
+            ],
+            "commands": [
+                "pip install -r requirements.txt",
+                "uvicorn app.main:app --reload",
+            ],
         },
         "fullstack": {
-            "directories": ["frontend/", "frontend/src/", "backend/", "backend/app/", "shared/", "docker/"],
-            "files": ["frontend/src/App.tsx", "backend/app/main.py", "docker-compose.yml", "README.md"],
-            "commands": ["docker-compose up", "npm run dev (frontend)", "uvicorn main:app (backend)"],
+            "directories": [
+                "frontend/",
+                "frontend/src/",
+                "backend/",
+                "backend/app/",
+                "shared/",
+                "docker/",
+            ],
+            "files": [
+                "frontend/src/App.tsx",
+                "backend/app/main.py",
+                "docker-compose.yml",
+                "README.md",
+            ],
+            "commands": [
+                "docker-compose up",
+                "npm run dev (frontend)",
+                "uvicorn main:app (backend)",
+            ],
         },
     }
 
@@ -65,7 +142,9 @@ class AppBuilderBot:
                 "Archive existing projects or upgrade."
             )
         if app_type not in self.APP_TYPES:
-            raise ValueError(f"Invalid app_type '{app_type}'. Must be one of: {self.APP_TYPES}")
+            raise ValueError(
+                f"Invalid app_type '{app_type}'. Must be one of: {self.APP_TYPES}"
+            )
 
         project_id = str(uuid.uuid4())[:8]
         project = {
@@ -107,7 +186,11 @@ class AppBuilderBot:
         }
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             result["code_generation_enabled"] = True
-            result["premium_templates"] = [f"{app_type}-auth", f"{app_type}-dashboard", f"{app_type}-payments"]
+            result["premium_templates"] = [
+                f"{app_type}-auth",
+                f"{app_type}-dashboard",
+                f"{app_type}-payments",
+            ]
         if self.tier == Tier.ENTERPRISE:
             result["ai_generated"] = True
             result["ci_cd_config"] = {
@@ -123,10 +206,22 @@ class AppBuilderBot:
             raise KeyError(f"Project '{project_id}' not found.")
         project = self._projects[project_id]
         app_type = project["app_type"]
-        base_hours = {"web": 80, "mobile": 120, "desktop": 100, "api": 60, "fullstack": 200}.get(app_type, 80)
-        feature_hours = len(project["features"]) * self.HOURS_PER_FEATURE.get(app_type, 4)
+        base_hours = {
+            "web": 80,
+            "mobile": 120,
+            "desktop": 100,
+            "api": 60,
+            "fullstack": 200,
+        }.get(app_type, 80)
+        feature_hours = len(project["features"]) * self.HOURS_PER_FEATURE.get(
+            app_type, 4
+        )
         total_hours = base_hours + feature_hours
-        multiplier = 1.0 if self.tier == Tier.ENTERPRISE else (0.9 if self.tier == Tier.PRO else 1.0)
+        multiplier = (
+            1.0
+            if self.tier == Tier.ENTERPRISE
+            else (0.9 if self.tier == Tier.PRO else 1.0)
+        )
         total_hours = int(total_hours * multiplier)
 
         return {
@@ -138,7 +233,9 @@ class AppBuilderBot:
             "total_hours": total_hours,
             "estimated_days": round(total_hours / 8, 1),
             "estimated_weeks": round(total_hours / 40, 1),
-            "team_size_recommended": 1 if total_hours < 200 else (2 if total_hours < 500 else 3),
+            "team_size_recommended": (
+                1 if total_hours < 200 else (2 if total_hours < 500 else 3)
+            ),
             "tier": self.tier.value,
         }
 

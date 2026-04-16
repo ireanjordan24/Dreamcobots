@@ -2,29 +2,39 @@
 Tests for bots/social_media_bot/tiers.py and bots/social_media_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.social_media_bot.tiers import SOCIAL_MEDIA_FEATURES, get_social_media_tier_info
+
 from bots.social_media_bot.bot import (
     SocialMediaBot,
-    SocialMediaBotTierError,
     SocialMediaBotRequestLimitError,
+    SocialMediaBotTierError,
+)
+from bots.social_media_bot.tiers import (
+    SOCIAL_MEDIA_FEATURES,
+    get_social_media_tier_info,
 )
 
 
 class TestSocialMediaTierInfo:
     def test_free_tier_info_keys(self):
         info = get_social_media_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -59,11 +69,14 @@ class TestSocialMediaBot:
 
     def test_schedule_post_status(self):
         bot = SocialMediaBot(tier=Tier.PRO)
-        result = bot.schedule_post({"content": "Scheduled content", "platform": "linkedin"})
+        result = bot.schedule_post(
+            {"content": "Scheduled content", "platform": "linkedin"}
+        )
         assert result["status"] in ("scheduled", "queued", "published")
 
     def test_post_limit_free_tier(self):
         from bots.social_media_bot.bot import SocialMediaBotRequestLimitError
+
         bot = SocialMediaBot(tier=Tier.FREE)
         bot._posts_this_month = 10
         with pytest.raises((SocialMediaBotTierError, SocialMediaBotRequestLimitError)):
@@ -103,7 +116,9 @@ class TestSocialMediaBot:
     def test_enterprise_no_request_limit(self):
         bot = SocialMediaBot(tier=Tier.ENTERPRISE)
         bot._request_count = 9999
-        result = bot.schedule_post({"content": "Enterprise post", "platform": "twitter"})
+        result = bot.schedule_post(
+            {"content": "Enterprise post", "platform": "twitter"}
+        )
         assert "post_id" in result
 
     def test_get_stats_buddy_integration(self):

@@ -46,23 +46,26 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
+import os
 import random
 import sys
-import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.cinecore_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class CineCoreBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -91,9 +94,11 @@ BULK_LIMIT_PRO = 20
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class CommercialScript:
     """A generated commercial script with all components."""
+
     business_name: str
     product: str
     target_audience: str
@@ -125,6 +130,7 @@ class CommercialScript:
 @dataclass
 class VideoAsset:
     """A generated video asset."""
+
     script_id: str
     video_url: str
     provider: str
@@ -150,6 +156,7 @@ class VideoAsset:
 @dataclass
 class LeadRecord:
     """A business lead found via the lead engine."""
+
     name: str
     business_type: str
     location: str
@@ -173,6 +180,7 @@ class LeadRecord:
 @dataclass
 class AnalyticsRecord:
     """Performance metrics for a video asset."""
+
     video_id: str
     views: int = 0
     clicks: int = 0
@@ -198,6 +206,7 @@ class AnalyticsRecord:
 # ---------------------------------------------------------------------------
 # Sub-engines
 # ---------------------------------------------------------------------------
+
 
 class ScriptEngine:
     """
@@ -480,10 +489,10 @@ class PlatformOptimizer:
     """
 
     PLATFORM_SPECS = {
-        "tiktok":    {"max_duration": 60,  "aspect_ratio": "9:16", "format": "mp4"},
-        "youtube":   {"max_duration": 60,  "aspect_ratio": "16:9", "format": "mp4"},
-        "instagram": {"max_duration": 60,  "aspect_ratio": "1:1",  "format": "mp4"},
-        "facebook":  {"max_duration": 240, "aspect_ratio": "16:9", "format": "mp4"},
+        "tiktok": {"max_duration": 60, "aspect_ratio": "9:16", "format": "mp4"},
+        "youtube": {"max_duration": 60, "aspect_ratio": "16:9", "format": "mp4"},
+        "instagram": {"max_duration": 60, "aspect_ratio": "1:1", "format": "mp4"},
+        "facebook": {"max_duration": 240, "aspect_ratio": "16:9", "format": "mp4"},
     }
 
     def __init__(self, tier: Tier) -> None:
@@ -539,17 +548,63 @@ class LeadEngine:
 
     # Simulated public business data (replaces live API in tests)
     _SAMPLE_BUSINESSES = [
-        {"name": "Joe's Diner",      "type": "restaurant",   "rating": 3.1, "location": "downtown"},
-        {"name": "AutoFix Pro",      "type": "auto_service", "rating": 2.8, "location": "westside"},
-        {"name": "Sunset Realty",    "type": "real_estate",  "rating": 3.5, "location": "suburbs"},
-        {"name": "CurlsNMore Salon", "type": "beauty",       "rating": 3.8, "location": "midtown"},
-        {"name": "QuickPlumb Co",    "type": "plumbing",     "rating": 2.5, "location": "eastside"},
-        {"name": "TechStart LLC",    "type": "tech",         "rating": 4.5, "location": "downtown"},
-        {"name": "Green Lawn Care",  "type": "landscaping",  "rating": 3.2, "location": "suburbs"},
-        {"name": "FitLife Gym",      "type": "fitness",      "rating": 3.7, "location": "northside"},
+        {
+            "name": "Joe's Diner",
+            "type": "restaurant",
+            "rating": 3.1,
+            "location": "downtown",
+        },
+        {
+            "name": "AutoFix Pro",
+            "type": "auto_service",
+            "rating": 2.8,
+            "location": "westside",
+        },
+        {
+            "name": "Sunset Realty",
+            "type": "real_estate",
+            "rating": 3.5,
+            "location": "suburbs",
+        },
+        {
+            "name": "CurlsNMore Salon",
+            "type": "beauty",
+            "rating": 3.8,
+            "location": "midtown",
+        },
+        {
+            "name": "QuickPlumb Co",
+            "type": "plumbing",
+            "rating": 2.5,
+            "location": "eastside",
+        },
+        {
+            "name": "TechStart LLC",
+            "type": "tech",
+            "rating": 4.5,
+            "location": "downtown",
+        },
+        {
+            "name": "Green Lawn Care",
+            "type": "landscaping",
+            "rating": 3.2,
+            "location": "suburbs",
+        },
+        {
+            "name": "FitLife Gym",
+            "type": "fitness",
+            "rating": 3.7,
+            "location": "northside",
+        },
     ]
 
-    HIGH_VALUE_TYPES = {"restaurant", "real_estate", "auto_service", "plumbing", "roofing"}
+    HIGH_VALUE_TYPES = {
+        "restaurant",
+        "real_estate",
+        "auto_service",
+        "plumbing",
+        "roofing",
+    }
 
     def __init__(self, tier: Tier) -> None:
         self.tier = tier
@@ -747,7 +802,9 @@ class ClosingAgent:
     def generate_upsell(self, current_spend: float) -> str:
         """Generate an upsell offer for an existing client (PRO+ only)."""
         if self.tier == Tier.FREE:
-            raise CineCoreBotTierError("Upsell generation requires PRO or ENTERPRISE tier.")
+            raise CineCoreBotTierError(
+                "Upsell generation requires PRO or ENTERPRISE tier."
+            )
 
         if current_spend < 300:
             return "Upgrade to our Pro package ($500/month) for 5x more ad reach and analytics."
@@ -766,9 +823,13 @@ class BillingEngine:
     """
 
     PLANS = {
-        "basic":      {"name": "Basic Ad",         "price_usd": 150.0,   "interval": "one-time"},
-        "pro":        {"name": "Pro Commercial",   "price_usd": 500.0,   "interval": "monthly"},
-        "enterprise": {"name": "Monthly Ads Pack", "price_usd": 2000.0,  "interval": "monthly"},
+        "basic": {"name": "Basic Ad", "price_usd": 150.0, "interval": "one-time"},
+        "pro": {"name": "Pro Commercial", "price_usd": 500.0, "interval": "monthly"},
+        "enterprise": {
+            "name": "Monthly Ads Pack",
+            "price_usd": 2000.0,
+            "interval": "monthly",
+        },
     }
 
     def __init__(self, tier: Tier) -> None:
@@ -781,7 +842,9 @@ class BillingEngine:
     def create_customer(self, email: str) -> dict:
         """Create a Stripe customer record (simulated)."""
         if self.tier == Tier.FREE:
-            raise CineCoreBotTierError("Billing management requires PRO or ENTERPRISE tier.")
+            raise CineCoreBotTierError(
+                "Billing management requires PRO or ENTERPRISE tier."
+            )
         return {
             "customer_id": f"cus_{uuid.uuid4().hex[:14]}",
             "email": email,
@@ -793,7 +856,9 @@ class BillingEngine:
         if self.tier == Tier.FREE:
             raise CineCoreBotTierError("Subscriptions require PRO or ENTERPRISE tier.")
         if plan not in self.PLANS:
-            raise CineCoreBotError(f"Plan '{plan}' not found. Available: {list(self.PLANS.keys())}")
+            raise CineCoreBotError(
+                f"Plan '{plan}' not found. Available: {list(self.PLANS.keys())}"
+            )
 
         customer = self.create_customer(email)
         plan_info = self.PLANS[plan]
@@ -813,7 +878,9 @@ class BillingEngine:
     def cancel_subscription(self, subscription_id: str) -> dict:
         """Cancel an active subscription (ENTERPRISE only)."""
         if self.tier != Tier.ENTERPRISE:
-            raise CineCoreBotTierError("Subscription cancellation requires ENTERPRISE tier.")
+            raise CineCoreBotTierError(
+                "Subscription cancellation requires ENTERPRISE tier."
+            )
         return {
             "subscription_id": subscription_id,
             "status": "cancelled",
@@ -841,7 +908,11 @@ class AnalyticsEngine:
         views = random.randint(100, 50_000)
         clicks = random.randint(5, views // 10) if self.tier != Tier.FREE else 0
         conversions = random.randint(0, clicks // 5) if self.tier != Tier.FREE else 0
-        revenue = round(conversions * random.uniform(50, 500), 2) if self.tier != Tier.FREE else 0.0
+        revenue = (
+            round(conversions * random.uniform(50, 500), 2)
+            if self.tier != Tier.FREE
+            else 0.0
+        )
 
         record = AnalyticsRecord(
             video_id=video_id,
@@ -883,7 +954,9 @@ class BulkGenerator:
     ENTERPRISE: unlimited bulk generation.
     """
 
-    def __init__(self, tier: Tier, script_engine: ScriptEngine, video_engine: VideoEngine) -> None:
+    def __init__(
+        self, tier: Tier, script_engine: ScriptEngine, video_engine: VideoEngine
+    ) -> None:
         self.tier = tier
         self._script_engine = script_engine
         self._video_engine = video_engine
@@ -929,7 +1002,9 @@ class BulkGenerator:
                     video = self._video_engine.generate(script.script)
                     entry["video"] = video.to_dict()
                 except CineCoreBotTierError:
-                    entry["video"] = {"error": "video generation not available on this tier"}
+                    entry["video"] = {
+                        "error": "video generation not available on this tier"
+                    }
 
             results.append(entry)
 
@@ -990,6 +1065,7 @@ class SelfHeal:
 # CRM
 # ---------------------------------------------------------------------------
 
+
 class CRM:
     """
     Client Relationship Management system.
@@ -997,7 +1073,13 @@ class CRM:
     Tracks leads, active clients, pipeline stages, and revenue per client.
     """
 
-    PIPELINE_STAGES = ["new_lead", "demo_sent", "negotiating", "closed_won", "closed_lost"]
+    PIPELINE_STAGES = [
+        "new_lead",
+        "demo_sent",
+        "negotiating",
+        "closed_won",
+        "closed_lost",
+    ]
 
     def __init__(self) -> None:
         self._leads: List[dict] = []
@@ -1005,7 +1087,11 @@ class CRM:
 
     def add_lead(self, lead: LeadRecord) -> dict:
         """Add a new lead to the pipeline."""
-        entry = {**lead.to_dict(), "stage": "new_lead", "added_at": datetime.now(timezone.utc).isoformat()}
+        entry = {
+            **lead.to_dict(),
+            "stage": "new_lead",
+            "added_at": datetime.now(timezone.utc).isoformat(),
+        }
         self._leads.append(entry)
         return entry
 
@@ -1019,7 +1105,9 @@ class CRM:
             if lead["lead_id"] == lead_id:
                 lead["stage"] = stage
                 if stage == "closed_won":
-                    self._clients.append({**lead, "client_since": datetime.now(timezone.utc).isoformat()})
+                    self._clients.append(
+                        {**lead, "client_since": datetime.now(timezone.utc).isoformat()}
+                    )
                 return lead
         raise CineCoreBotError(f"Lead '{lead_id}' not found.")
 
@@ -1057,6 +1145,7 @@ class CRM:
 # Main CineCoreBot
 # ---------------------------------------------------------------------------
 
+
 class CineCoreBot:
     """
     DreamCo CineCore™ — AI-Powered Commercial & Video Creation System.
@@ -1078,7 +1167,9 @@ class CineCoreBot:
         self._closing_agent = ClosingAgent(tier)
         self._billing_engine = BillingEngine(tier)
         self._analytics_engine = AnalyticsEngine(tier)
-        self._bulk_generator = BulkGenerator(tier, self._script_engine, self._video_engine)
+        self._bulk_generator = BulkGenerator(
+            tier, self._script_engine, self._video_engine
+        )
         self._self_heal = SelfHeal()
         self._crm = CRM()
 
@@ -1094,7 +1185,9 @@ class CineCoreBot:
         genre: str = "ad",
     ) -> dict:
         """Generate a commercial script and return as a dict."""
-        result = self._script_engine.generate(business_name, product, target_audience, genre)
+        result = self._script_engine.generate(
+            business_name, product, target_audience, genre
+        )
         return result.to_dict()
 
     # ------------------------------------------------------------------
@@ -1281,7 +1374,9 @@ class CineCoreBot:
     # Tier & orchestration
     # ------------------------------------------------------------------
 
-    def run_full_campaign(self, business_name: str, product: str, target_audience: str) -> dict:
+    def run_full_campaign(
+        self, business_name: str, product: str, target_audience: str
+    ) -> dict:
         """
         Run the complete CineCore commercial campaign pipeline:
         Script → Video (PRO+) → Voiceover → Platform optimization → Analytics.
@@ -1336,7 +1431,9 @@ class CineCoreBot:
             lines.append(f"  \u2713 {f}")
         upgrade = get_upgrade_path(self.tier)
         if upgrade:
-            lines.append(f"\nUpgrade to {upgrade.name} for ${upgrade.price_usd_monthly:.2f}/month")
+            lines.append(
+                f"\nUpgrade to {upgrade.name} for ${upgrade.price_usd_monthly:.2f}/month"
+            )
         output = "\n".join(lines)
         print(output)
         return output

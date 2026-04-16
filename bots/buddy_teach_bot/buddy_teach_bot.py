@@ -37,59 +37,58 @@ from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  — GLOBAL AI SOURCES FLOW
-
+from bots.buddy_teach_bot.broadcast_engine import (
+    BroadcastEngine,
+    BroadcastEngineError,
+    BroadcastSession,
+    BroadcastState,
+    BroadcastTarget,
+    ContentFormat,
+    DeviceCategory,
+)
+from bots.buddy_teach_bot.item_detector import (
+    ConditionGrade,
+    DetectionResult,
+    ItemCategory,
+    ItemDetector,
+    ItemDetectorError,
+    TrainingExample,
+)
+from bots.buddy_teach_bot.personality_engine import (
+    Milestone,
+    PersonalityEngine,
+    PersonalityEngineError,
+    PersonalityTrait,
+    ToneStyle,
+)
+from bots.buddy_teach_bot.skill_trainer import (
+    DifficultyLevel,
+    Lesson,
+    LessonProgress,
+    LessonStatus,
+    SkillDomain,
+    SkillTrainer,
+    SkillTrainerError,
+)
 from bots.buddy_teach_bot.tiers import (
+    FEATURE_AI_TRAINING,
+    FEATURE_API_ACCESS,
+    FEATURE_AR_VR_OVERLAY,
+    FEATURE_BROADCAST,
+    FEATURE_CURRICULUM_BUILDER,
+    FEATURE_ITEM_DETECTION,
+    FEATURE_LIVE_FEEDBACK,
+    FEATURE_MULTI_BROADCAST,
+    FEATURE_PERSONALITY,
+    FEATURE_SKILL_TRAINING,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_SKILL_TRAINING,
-    FEATURE_ITEM_DETECTION,
-    FEATURE_BROADCAST,
-    FEATURE_MULTI_BROADCAST,
-    FEATURE_PERSONALITY,
-    FEATURE_AI_TRAINING,
-    FEATURE_CURRICULUM_BUILDER,
-    FEATURE_AR_VR_OVERLAY,
-    FEATURE_LIVE_FEEDBACK,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
 )
-from bots.buddy_teach_bot.broadcast_engine import (
-    BroadcastEngine,
-    BroadcastTarget,
-    BroadcastSession,
-    BroadcastState,
-    DeviceCategory,
-    ContentFormat,
-    BroadcastEngineError,
-)
-from bots.buddy_teach_bot.skill_trainer import (
-    SkillTrainer,
-    Lesson,
-    LessonProgress,
-    LessonStatus,
-    SkillDomain,
-    DifficultyLevel,
-    SkillTrainerError,
-)
-from bots.buddy_teach_bot.item_detector import (
-    ItemDetector,
-    DetectionResult,
-    ItemCategory,
-    ConditionGrade,
-    TrainingExample,
-    ItemDetectorError,
-)
-from bots.buddy_teach_bot.personality_engine import (
-    PersonalityEngine,
-    ToneStyle,
-    PersonalityTrait,
-    Milestone,
-    PersonalityEngineError,
-)
+from framework import GlobalAISourcesFlow  # noqa: F401  — GLOBAL AI SOURCES FLOW
 
 
 class BuddyTeachBotError(Exception):
@@ -126,12 +125,8 @@ class BuddyTeachBot:
         self.bot_name = bot_name
 
         # Subsystems
-        self.broadcast = BroadcastEngine(
-            max_targets=self.config.max_broadcast_targets
-        )
-        self.trainer = SkillTrainer(
-            max_skill_tracks=self.config.max_skill_tracks
-        )
+        self.broadcast = BroadcastEngine(max_targets=self.config.max_broadcast_targets)
+        self.trainer = SkillTrainer(max_skill_tracks=self.config.max_skill_tracks)
         self.detector = ItemDetector()
         self.personality = PersonalityEngine(
             bot_name=bot_name,
@@ -147,14 +142,15 @@ class BuddyTeachBot:
 
     def _boot(self) -> None:
         self._boot_log.append(f"{self.bot_name} Teach Bot initialised.")
-        self._boot_log.append(f"Tier: {self.config.name} (${self.config.price_usd_monthly}/mo)")
+        self._boot_log.append(
+            f"Tier: {self.config.name} (${self.config.price_usd_monthly}/mo)"
+        )
         self._boot_log.append(
             f"Max broadcast targets: "
             f"{self.config.max_broadcast_targets or 'unlimited'}"
         )
         self._boot_log.append(
-            f"Max skill tracks: "
-            f"{self.config.max_skill_tracks or 'unlimited'}"
+            f"Max skill tracks: " f"{self.config.max_skill_tracks or 'unlimited'}"
         )
         self._boot_log.append(
             f"Max AI training sessions: "
@@ -276,9 +272,7 @@ class BuddyTeachBot:
         self._require_feature(FEATURE_SKILL_TRAINING)
         return self.trainer.advance_step(progress_id)
 
-    def complete_lesson(
-        self, progress_id: str, quiz_score: float
-    ) -> LessonProgress:
+    def complete_lesson(self, progress_id: str, quiz_score: float) -> LessonProgress:
         """
         Submit a quiz score and complete the lesson.
 
@@ -385,9 +379,7 @@ class BuddyTeachBot:
             "broadcast_targets": len(self.broadcast.list_targets()),
             "active_broadcasts": len(self.broadcast.active_sessions()),
             "total_lessons": len(self.trainer.list_lessons()),
-            "ai_training_examples": self.detector.training_stats()[
-                "total_examples"
-            ],
+            "ai_training_examples": self.detector.training_stats()["total_examples"],
             "personality_profile": self.personality.get_personality_profile(),
         }
 

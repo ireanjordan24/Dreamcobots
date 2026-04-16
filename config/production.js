@@ -41,7 +41,7 @@ module.exports = {
     enabled: true,
   },
   features: {
-    autoFix: false,    // Disable automated fixes in production
+    autoFix: false, // Disable automated fixes in production
     autoDeploy: false, // Require manual deploy approvals
     monitoring: true,
   },

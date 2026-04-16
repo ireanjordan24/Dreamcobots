@@ -1,22 +1,26 @@
 """Tests for Marketing_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from Marketing_bots.feature_1 import SocialMediaPostingBot, EXAMPLES as MK1_EXAMPLES
-from Marketing_bots.feature_2 import EmailCampaignBot, EXAMPLES as MK2_EXAMPLES
-from Marketing_bots.feature_3 import CustomerFeedbackBot, EXAMPLES as MK3_EXAMPLES
-
+from Marketing_bots.feature_1 import EXAMPLES as MK1_EXAMPLES
+from Marketing_bots.feature_1 import SocialMediaPostingBot
+from Marketing_bots.feature_2 import EXAMPLES as MK2_EXAMPLES
+from Marketing_bots.feature_2 import EmailCampaignBot
+from Marketing_bots.feature_3 import EXAMPLES as MK3_EXAMPLES
+from Marketing_bots.feature_3 import CustomerFeedbackBot
 
 # ===========================================================================
 # Feature 1: SocialMediaPostingBot
 # ===========================================================================
+
 
 class TestSocialMediaPostingBotInstantiation:
     def test_default_tier_is_free(self):
@@ -54,7 +58,9 @@ class TestSocialMediaPostingBotMethods:
 
     def test_free_tier_only_twitter(self):
         bot = SocialMediaPostingBot(tier="FREE")
-        non_twitter = next((p for p in MK1_EXAMPLES if p["platform"] != "twitter"), None)
+        non_twitter = next(
+            (p for p in MK1_EXAMPLES if p["platform"] != "twitter"), None
+        )
         if non_twitter:
             with pytest.raises(PermissionError):
                 bot.schedule_post(non_twitter["id"])
@@ -82,7 +88,9 @@ class TestSocialMediaPostingBotMethods:
 
     def test_get_pending_posts_returns_list(self):
         bot = SocialMediaPostingBot(tier="PRO")
-        bot.schedule_post(next(p for p in MK1_EXAMPLES if p["platform"] == "twitter")["id"])
+        bot.schedule_post(
+            next(p for p in MK1_EXAMPLES if p["platform"] == "twitter")["id"]
+        )
         pending = bot.get_pending_posts()
         assert isinstance(pending, list)
 
@@ -105,7 +113,9 @@ class TestSocialMediaPostingBotMethods:
     def test_pro_has_more_platforms(self):
         free_bot = SocialMediaPostingBot(tier="FREE")
         pro_bot = SocialMediaPostingBot(tier="PRO")
-        assert len(pro_bot.get_available_platforms()) > len(free_bot.get_available_platforms())
+        assert len(pro_bot.get_available_platforms()) > len(
+            free_bot.get_available_platforms()
+        )
 
     def test_describe_tier_returns_string(self):
         bot = SocialMediaPostingBot(tier="FREE")
@@ -122,6 +132,7 @@ class TestSocialMediaPostingBotMethods:
 # ===========================================================================
 # Feature 2: EmailCampaignBot
 # ===========================================================================
+
 
 class TestEmailCampaignBotInstantiation:
     def test_default_tier_is_free(self):
@@ -221,6 +232,7 @@ class TestEmailCampaignBotMethods:
 # ===========================================================================
 # Feature 3: CustomerFeedbackBot
 # ===========================================================================
+
 
 class TestCustomerFeedbackBotInstantiation:
     def test_default_tier_is_free(self):

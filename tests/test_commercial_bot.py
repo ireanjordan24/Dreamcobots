@@ -1,42 +1,44 @@
 """Tests for bots/commercial_bot/tiers.py and bots/commercial_bot/commercial_bot.py"""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.commercial_bot.commercial_bot import (
-    CommercialBot,
-    CommercialBotTierError,
-    CommercialScript,
-    Lead,
-    Deal,
-    AdPerformance,
-    ScriptEngine,
-    VideoEngine,
-    VoiceEngine,
-    PlatformOptimizer,
-    ClientFinder,
-    ClosingAgent,
-    BillingEngine,
-    AnalyticsEngine,
-    BulkGenerator,
-    SelfHeal,
+    BULK_LIMITS,
     PLATFORMS,
     PRICING_TIERS,
     SCRIPT_DURATIONS,
-    BULK_LIMITS,
+    AdPerformance,
+    AnalyticsEngine,
+    BillingEngine,
+    BulkGenerator,
+    ClientFinder,
+    ClosingAgent,
+    CommercialBot,
+    CommercialBotTierError,
+    CommercialScript,
+    Deal,
+    Lead,
+    PlatformOptimizer,
+    ScriptEngine,
+    SelfHeal,
+    VideoEngine,
+    VoiceEngine,
 )
 from bots.commercial_bot.tiers import BOT_FEATURES, get_bot_tier_info
-
 
 # ---------------------------------------------------------------------------
 # Tier definitions
 # ---------------------------------------------------------------------------
+
 
 class TestTierDefinitions:
     def test_all_tiers_have_features(self):
@@ -44,7 +46,9 @@ class TestTierDefinitions:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_pro(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.PRO.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.PRO.value]
+        )
 
     def test_pro_has_more_features_than_free(self):
         assert len(BOT_FEATURES[Tier.PRO.value]) > len(BOT_FEATURES[Tier.FREE.value])
@@ -66,7 +70,9 @@ class TestTierDefinitions:
     def test_get_bot_tier_info_enterprise(self):
         info = get_bot_tier_info(Tier.ENTERPRISE)
         assert info["tier"] == "enterprise"
-        assert info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        assert (
+            info["price_usd_monthly"] > get_bot_tier_info(Tier.PRO)["price_usd_monthly"]
+        )
 
     def test_free_tier_has_script_generator(self):
         features = BOT_FEATURES[Tier.FREE.value]
@@ -80,6 +86,7 @@ class TestTierDefinitions:
 # ---------------------------------------------------------------------------
 # ScriptEngine
 # ---------------------------------------------------------------------------
+
 
 class TestScriptEngine:
     def setup_method(self):
@@ -114,15 +121,11 @@ class TestScriptEngine:
         assert result.duration_seconds in allowed
 
     def test_free_tier_single_platform(self):
-        result = self.engine.generate(
-            "Biz", "product", "audience", tier=Tier.FREE
-        )
+        result = self.engine.generate("Biz", "product", "audience", tier=Tier.FREE)
         assert result.platforms == ["TikTok"]
 
     def test_pro_tier_multi_platform(self):
-        result = self.engine.generate(
-            "Biz", "product", "audience", tier=Tier.PRO
-        )
+        result = self.engine.generate("Biz", "product", "audience", tier=Tier.PRO)
         assert len(result.platforms) > 1
 
     def test_created_at_set(self):
@@ -138,6 +141,7 @@ class TestScriptEngine:
 # ---------------------------------------------------------------------------
 # VideoEngine
 # ---------------------------------------------------------------------------
+
 
 class TestVideoEngine:
     def setup_method(self):
@@ -182,12 +186,15 @@ class TestVideoEngine:
 # VoiceEngine
 # ---------------------------------------------------------------------------
 
+
 class TestVoiceEngine:
     def setup_method(self):
         self.engine = VoiceEngine()
 
     def test_generate_voiceover_returns_dict(self):
-        result = self.engine.generate_voiceover("Buy now!", tone="excited", platform="TikTok")
+        result = self.engine.generate_voiceover(
+            "Buy now!", tone="excited", platform="TikTok"
+        )
         assert isinstance(result, dict)
 
     def test_voiceover_contains_script(self):
@@ -216,6 +223,7 @@ class TestVoiceEngine:
 # ---------------------------------------------------------------------------
 # PlatformOptimizer
 # ---------------------------------------------------------------------------
+
 
 class TestPlatformOptimizer:
     def setup_method(self):
@@ -252,6 +260,7 @@ class TestPlatformOptimizer:
 # ClientFinder
 # ---------------------------------------------------------------------------
 
+
 class TestClientFinder:
     def setup_method(self):
         self.finder = ClientFinder()
@@ -282,12 +291,18 @@ class TestClientFinder:
     def test_high_value_niches_get_bonus_score(self):
         finder = ClientFinder()
         real_estate_lead = Lead(
-            name="Top Realty", niche="real_estate", contact="x@y.com",
-            source="google_maps", score=70
+            name="Top Realty",
+            niche="real_estate",
+            contact="x@y.com",
+            source="google_maps",
+            score=70,
         )
         restaurant_lead = Lead(
-            name="Joe's Diner", niche="restaurant", contact="a@b.com",
-            source="google_maps", score=70
+            name="Joe's Diner",
+            niche="restaurant",
+            contact="a@b.com",
+            source="google_maps",
+            score=70,
         )
         assert finder.score_lead(real_estate_lead) > finder.score_lead(restaurant_lead)
 
@@ -299,6 +314,7 @@ class TestClientFinder:
 # ---------------------------------------------------------------------------
 # ClosingAgent
 # ---------------------------------------------------------------------------
+
 
 class TestClosingAgent:
     def setup_method(self):
@@ -352,6 +368,7 @@ class TestClosingAgent:
 # BillingEngine
 # ---------------------------------------------------------------------------
 
+
 class TestBillingEngine:
     def setup_method(self):
         self.billing = BillingEngine()
@@ -402,12 +419,15 @@ class TestBillingEngine:
 # AnalyticsEngine
 # ---------------------------------------------------------------------------
 
+
 class TestAnalyticsEngine:
     def setup_method(self):
         self.analytics = AnalyticsEngine()
 
     def test_record_creates_entry(self):
-        perf = self.analytics.record("vid_001", views=1000, clicks=50, conversions=5, revenue=250.0)
+        perf = self.analytics.record(
+            "vid_001", views=1000, clicks=50, conversions=5, revenue=250.0
+        )
         assert isinstance(perf, AdPerformance)
         assert perf.video_id == "vid_001"
 
@@ -456,6 +476,7 @@ class TestAnalyticsEngine:
 # BulkGenerator
 # ---------------------------------------------------------------------------
 
+
 class TestBulkGenerator:
     def setup_method(self):
         self.script_engine = ScriptEngine()
@@ -494,6 +515,7 @@ class TestBulkGenerator:
 # SelfHeal
 # ---------------------------------------------------------------------------
 
+
 class TestSelfHeal:
     def setup_method(self):
         self.heal = SelfHeal()
@@ -531,6 +553,7 @@ class TestSelfHeal:
 # ---------------------------------------------------------------------------
 # CommercialBot FREE tier
 # ---------------------------------------------------------------------------
+
 
 class TestCommercialBotFree:
     def setup_method(self):
@@ -587,6 +610,7 @@ class TestCommercialBotFree:
 # ---------------------------------------------------------------------------
 # CommercialBot PRO tier
 # ---------------------------------------------------------------------------
+
 
 class TestCommercialBotPro:
     def setup_method(self):
@@ -685,6 +709,7 @@ class TestCommercialBotPro:
 # CommercialBot ENTERPRISE tier
 # ---------------------------------------------------------------------------
 
+
 class TestCommercialBotEnterprise:
     def setup_method(self):
         self.bot = CommercialBot(tier=Tier.ENTERPRISE)
@@ -728,6 +753,7 @@ class TestCommercialBotEnterprise:
 # Constants / Pricing
 # ---------------------------------------------------------------------------
 
+
 class TestConstants:
     def test_platforms_list(self):
         assert "TikTok" in PLATFORMS
@@ -760,6 +786,7 @@ class TestConstants:
 # Integration: Full workflow
 # ---------------------------------------------------------------------------
 
+
 class TestFullWorkflow:
     def test_full_commercial_creation_workflow(self):
         bot = CommercialBot(tier=Tier.PRO)
@@ -791,7 +818,9 @@ class TestFullWorkflow:
         assert sub["status"] == "active"
 
         # Step 7: Track analytics
-        bot.analytics.record("vid_wf_001", views=1000, clicks=100, conversions=10, revenue=500.0)
+        bot.analytics.record(
+            "vid_wf_001", views=1000, clicks=100, conversions=10, revenue=500.0
+        )
         stats = bot.analytics.track("vid_wf_001")
         assert stats["ctr_pct"] == 10.0
 

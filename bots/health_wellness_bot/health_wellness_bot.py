@@ -10,17 +10,24 @@ Usage
     result = bot.calculate_bmi(70.0, 1.75)
     print(result)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_health_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_health_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _health_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_health_tiers)
 HEALTH_FEATURES = _health_tiers.HEALTH_FEATURES
@@ -73,7 +80,7 @@ class HealthWellnessBot:
         """
         self._check_request_limit()
         self._request_count += 1
-        bmi = round(weight_kg / (height_m ** 2), 2)
+        bmi = round(weight_kg / (height_m**2), 2)
         if bmi < 18.5:
             category = "Underweight"
         elif bmi < 25.0:
@@ -92,8 +99,12 @@ class HealthWellnessBot:
             "requests_remaining": self._requests_remaining(),
         }
 
-    def log_workout(self, workout_type: str, duration_minutes: int,
-                    calories_burned: int | None = None) -> dict:
+    def log_workout(
+        self,
+        workout_type: str,
+        duration_minutes: int,
+        calories_burned: int | None = None,
+    ) -> dict:
         """
         Log a workout session.
 
@@ -127,7 +138,9 @@ class HealthWellnessBot:
             "requests_remaining": self._requests_remaining(),
         }
 
-    def log_nutrition(self, meal: str, calories: int, macros: dict | None = None) -> dict:
+    def log_nutrition(
+        self, meal: str, calories: int, macros: dict | None = None
+    ) -> dict:
         """
         Log a meal and nutrition data.
 
@@ -222,7 +235,9 @@ class HealthWellnessBot:
             print(msg)
             return msg
         current_feats = set(HEALTH_FEATURES[self.tier.value])
-        new_feats = [f for f in HEALTH_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f for f in HEALTH_FEATURES[next_cfg.tier.value] if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

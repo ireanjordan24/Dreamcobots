@@ -9,7 +9,7 @@ grow more human-like over time.
 import json
 import math
 import time
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional
 
 
@@ -27,8 +27,8 @@ class AdaptiveLearning:
     * Serialises / deserialises state to JSON for persistence.
     """
 
-    MAX_HISTORY = 500          # maximum stored interactions
-    DECAY_FACTOR = 0.95        # weight decay applied per session boundary
+    MAX_HISTORY = 500  # maximum stored interactions
+    DECAY_FACTOR = 0.95  # weight decay applied per session boundary
 
     def __init__(self, bot_id: str):
         self.bot_id = bot_id
@@ -36,7 +36,11 @@ class AdaptiveLearning:
         self._intent_freq: Counter = Counter()
         self._sentiment_history: List[str] = []
         self._user_profiles: Dict[str, Dict[str, Any]] = defaultdict(
-            lambda: {"interactions": 0, "preferred_intents": Counter(), "sentiment_sum": 0.0}
+            lambda: {
+                "interactions": 0,
+                "preferred_intents": Counter(),
+                "sentiment_sum": 0.0,
+            }
         )
         self._response_weights: Dict[str, float] = {}
         self._session_count: int = 0
@@ -134,7 +138,7 @@ class AdaptiveLearning:
     def end_session(self) -> None:
         """Signal the end of a user session; triggers learning updates."""
         self._session_count += 1
-        self.fine_tune_hook(self._history[-50:])    # last 50 turns
+        self.fine_tune_hook(self._history[-50:])  # last 50 turns
 
     # ------------------------------------------------------------------
     # Serialisation

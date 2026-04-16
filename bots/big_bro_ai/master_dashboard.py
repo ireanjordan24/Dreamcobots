@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-
 # ---------------------------------------------------------------------------
 # Dashboard panel types
 # ---------------------------------------------------------------------------
@@ -37,6 +36,7 @@ PANEL_NAMES: tuple[str, ...] = (
 # Alert levels
 # ---------------------------------------------------------------------------
 
+
 class AlertLevel:
     INFO = "info"
     WARNING = "warning"
@@ -48,9 +48,11 @@ class AlertLevel:
 # Dashboard alert
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class DashboardAlert:
     """A system-generated alert surfaced in the dashboard."""
+
     level: str
     source: str
     message: str
@@ -70,6 +72,7 @@ class DashboardAlert:
 # ---------------------------------------------------------------------------
 # Master Dashboard
 # ---------------------------------------------------------------------------
+
 
 class MasterDashboard:
     """
@@ -123,9 +126,7 @@ class MasterDashboard:
     # Alert management
     # ------------------------------------------------------------------
 
-    def add_alert(
-        self, level: str, source: str, message: str
-    ) -> DashboardAlert:
+    def add_alert(self, level: str, source: str, message: str) -> DashboardAlert:
         """Add a system alert to the dashboard."""
         alert = DashboardAlert(level=level, source=source, message=message)
         self._alerts.append(alert)
@@ -163,9 +164,7 @@ class MasterDashboard:
             "tier": self.tier,
             "initialized_at": self._initialized_at,
             "snapshot_at": datetime.now(timezone.utc).isoformat(),
-            "panels": {
-                name: self._panels.get(name, {}) for name in PANEL_NAMES
-            },
+            "panels": {name: self._panels.get(name, {}) for name in PANEL_NAMES},
             "recent_alerts": [a.to_dict() for a in recent_alerts],
             "alert_count": len(self._alerts),
         }

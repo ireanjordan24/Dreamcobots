@@ -1,4 +1,5 @@
 """MonetizationHooks: funnel tracking and conversion management."""
+
 import logging
 from typing import Callable, Dict, List, Optional
 

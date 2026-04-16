@@ -15,10 +15,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
-
 # ---------------------------------------------------------------------------
 # Life situation categories
 # ---------------------------------------------------------------------------
+
 
 class LifeSituation(Enum):
     STRESS = "stress"
@@ -63,9 +63,11 @@ MEMORY_TAGS: frozenset[str] = frozenset(
 # User profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class MemoryEntry:
     """A single timestamped memory entry."""
+
     timestamp: str
     situation: str
     note: str
@@ -252,6 +254,7 @@ class UserProfile:
 # ---------------------------------------------------------------------------
 # Memory System (in-memory store)
 # ---------------------------------------------------------------------------
+
 
 class MemorySystemError(Exception):
     """Raised when a memory operation cannot be completed."""

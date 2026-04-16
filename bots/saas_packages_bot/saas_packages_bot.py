@@ -30,30 +30,29 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.saas_packages_bot.enterprise_scaler import EnterpriseScaler
+from bots.saas_packages_bot.modular_builder import ModularSaaSBuilder
+from bots.saas_packages_bot.package_catalog import Industry, PackageCatalog
 from bots.saas_packages_bot.tiers import (
+    FEATURE_ADVANCED_TEMPLATES,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_PACKAGES,
+    FEATURE_CRM_MODULE,
+    FEATURE_CUSTOM_BUILDER,
+    FEATURE_ECOMMERCE_MODULE,
+    FEATURE_FORTUNE500_INTEGRATIONS,
+    FEATURE_HR_MODULE,
+    FEATURE_USAGE_ANALYTICS,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BASIC_PACKAGES,
-    FEATURE_ADVANCED_TEMPLATES,
-    FEATURE_USAGE_ANALYTICS,
-    FEATURE_ECOMMERCE_MODULE,
-    FEATURE_CRM_MODULE,
-    FEATURE_HR_MODULE,
-    FEATURE_CUSTOM_BUILDER,
-    FEATURE_FORTUNE500_INTEGRATIONS,
-    FEATURE_API_ACCESS,
 )
-from bots.saas_packages_bot.package_catalog import PackageCatalog, Industry
-from bots.saas_packages_bot.modular_builder import ModularSaaSBuilder
-from bots.saas_packages_bot.enterprise_scaler import EnterpriseScaler
-
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -96,7 +95,9 @@ class SaaSPackagesBot:
 
     def run(self) -> str:
         """Return a status message confirming the bot is online."""
-        return f"{self.bot_name} v{self.version} Online [{self.tier.value.upper()} tier]"
+        return (
+            f"{self.bot_name} v{self.version} Online [{self.tier.value.upper()} tier]"
+        )
 
     # ------------------------------------------------------------------
     # Package Catalog delegation
@@ -197,7 +198,9 @@ class SaaSPackagesBot:
     ) -> dict:
         """Generate an infrastructure scaling plan."""
         self._require_feature(FEATURE_BASIC_PACKAGES)
-        return self.scaler.generate_scaling_plan(plan_id, current_users, projected_users)
+        return self.scaler.generate_scaling_plan(
+            plan_id, current_users, projected_users
+        )
 
     def estimate_infrastructure_cost(
         self,
@@ -215,7 +218,9 @@ class SaaSPackagesBot:
     ) -> dict:
         """Generate a Fortune 500 integration specification."""
         self._require_feature(FEATURE_FORTUNE500_INTEGRATIONS)
-        return self.scaler.generate_fortune500_integration(company_name, integration_type)
+        return self.scaler.generate_fortune500_integration(
+            company_name, integration_type
+        )
 
     # ------------------------------------------------------------------
     # Chat
@@ -238,7 +243,9 @@ class SaaSPackagesBot:
                 f"Features: {', '.join(cfg.features)}."
             )
             if upgrade:
-                resp += f" Upgrade to {upgrade.name} for ${upgrade.price_usd_monthly}/mo."
+                resp += (
+                    f" Upgrade to {upgrade.name} for ${upgrade.price_usd_monthly}/mo."
+                )
             return resp
         if "module" in msg or "build" in msg or "custom" in msg:
             return (

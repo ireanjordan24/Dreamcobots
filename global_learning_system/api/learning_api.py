@@ -71,7 +71,9 @@ class LearningAPI:
             self._routes[full_path] = {}
         self._routes[full_path][method.upper()] = handler
 
-    def dispatch(self, path: str, method: str = "GET", payload: Optional[Dict] = None) -> APIResponse:
+    def dispatch(
+        self, path: str, method: str = "GET", payload: Optional[Dict] = None
+    ) -> APIResponse:
         """
         Dispatch a request to the matching handler.
 
@@ -89,10 +91,16 @@ class LearningAPI:
         handlers = self._routes.get(path, {})
         handler = handlers.get(method.upper())
         if handler is None:
-            return APIResponse(status="error", error=f"Route {method} {path} not found.")
+            return APIResponse(
+                status="error", error=f"Route {method} {path} not found."
+            )
         try:
             result = handler(payload) if payload is not None else handler()
-            return result if isinstance(result, APIResponse) else APIResponse(status="ok", data=result)
+            return (
+                result
+                if isinstance(result, APIResponse)
+                else APIResponse(status="ok", data=result)
+            )
         except Exception as exc:  # noqa: BLE001
             return APIResponse(status="error", error=str(exc))
 
@@ -119,15 +127,33 @@ class LearningAPI:
     # ------------------------------------------------------------------
 
     def _health_handler(self) -> APIResponse:
-        return APIResponse(status="ok", data={"service": "learning_api", "healthy": True})
+        return APIResponse(
+            status="ok", data={"service": "learning_api", "healthy": True}
+        )
 
     def _matrix_rank_handler(self) -> APIResponse:
-        return APIResponse(status="ok", data={"rankings": [], "message": "Connect to LearningMatrix for real data."})
+        return APIResponse(
+            status="ok",
+            data={
+                "rankings": [],
+                "message": "Connect to LearningMatrix for real data.",
+            },
+        )
 
     def _classify_handler(self, payload: Optional[Dict]) -> APIResponse:
         text = (payload or {}).get("text", "")
-        return APIResponse(status="ok", data={"text": text, "category": "unknown", "message": "Connect to MethodClassifier."})
+        return APIResponse(
+            status="ok",
+            data={
+                "text": text,
+                "category": "unknown",
+                "message": "Connect to MethodClassifier.",
+            },
+        )
 
     def _ingest_handler(self, payload: Optional[Dict]) -> APIResponse:
         query = (payload or {}).get("query", "")
-        return APIResponse(status="ok", data={"query": query, "ingested": 0, "message": "Connect to PaperScraper."})
+        return APIResponse(
+            status="ok",
+            data={"query": query, "ingested": 0, "message": "Connect to PaperScraper."},
+        )

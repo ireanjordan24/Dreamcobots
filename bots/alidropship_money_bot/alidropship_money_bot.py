@@ -14,13 +14,17 @@ Tiers:
   PRO ($49)  — full store builder, 50 products/day, ads bot, 5 niches
   ENTERPRISE ($199) — multi-store, unlimited discovery, AI automation, white-label
 """
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.alidropship_money_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -200,39 +204,70 @@ class AliDropshipMoneyBot:
         },
     ]
 
-    NICHES = ["health", "beauty", "fitness", "pets", "home_gadgets", "fashion", "tech_accessories", "baby", "outdoor", "kitchen"]
+    NICHES = [
+        "health",
+        "beauty",
+        "fitness",
+        "pets",
+        "home_gadgets",
+        "fashion",
+        "tech_accessories",
+        "baby",
+        "outdoor",
+        "kitchen",
+    ]
 
     STORE_PAGES = ["Home", "Shop", "Track Order", "Contact", "FAQ", "About Us"]
 
     MOCK_ORDERS = [
-        {"order_id": "ORD-001", "product_id": "p001", "customer": "Alice Johnson", "amount_usd": 29.99, "status": "pending"},
-        {"order_id": "ORD-002", "product_id": "p004", "customer": "Bob Smith",   "amount_usd": 19.99, "status": "pending"},
-        {"order_id": "ORD-003", "product_id": "p005", "customer": "Carol Davis", "amount_usd": 34.99, "status": "pending"},
+        {
+            "order_id": "ORD-001",
+            "product_id": "p001",
+            "customer": "Alice Johnson",
+            "amount_usd": 29.99,
+            "status": "pending",
+        },
+        {
+            "order_id": "ORD-002",
+            "product_id": "p004",
+            "customer": "Bob Smith",
+            "amount_usd": 19.99,
+            "status": "pending",
+        },
+        {
+            "order_id": "ORD-003",
+            "product_id": "p005",
+            "customer": "Carol Davis",
+            "amount_usd": 34.99,
+            "status": "pending",
+        },
     ]
 
     DAILY_PRODUCT_LIMIT = {Tier.FREE: 5, Tier.PRO: 50, Tier.ENTERPRISE: None}
-    NICHE_LIMIT         = {Tier.FREE: 1, Tier.PRO: 5,  Tier.ENTERPRISE: None}
-    STORE_LIMIT         = {Tier.FREE: 0, Tier.PRO: 1,  Tier.ENTERPRISE: 10}
-    AD_LIMIT_PER_DAY    = {Tier.FREE: 0, Tier.PRO: 5,  Tier.ENTERPRISE: None}
-    VIDEO_LIMIT_PER_DAY = {Tier.FREE: 0, Tier.PRO: 3,  Tier.ENTERPRISE: 10}
+    NICHE_LIMIT = {Tier.FREE: 1, Tier.PRO: 5, Tier.ENTERPRISE: None}
+    STORE_LIMIT = {Tier.FREE: 0, Tier.PRO: 1, Tier.ENTERPRISE: 10}
+    AD_LIMIT_PER_DAY = {Tier.FREE: 0, Tier.PRO: 5, Tier.ENTERPRISE: None}
+    VIDEO_LIMIT_PER_DAY = {Tier.FREE: 0, Tier.PRO: 3, Tier.ENTERPRISE: 10}
 
     # ------------------------------------------------------------------ #
     # Lifecycle                                                            #
     # ------------------------------------------------------------------ #
 
     def __init__(self, tier: Tier = Tier.FREE):
-        self.tier   = tier
+        self.tier = tier
         self.config = get_tier_config(tier)
-        self._built_stores:    list[dict] = []
+        self._built_stores: list[dict] = []
         self._active_products: list[dict] = []
         self._fulfilled_orders: list[dict] = []
-        self._launched_ads:    list[dict] = []
+        self._launched_ads: list[dict] = []
 
     # ================================================================== #
     # 1. Product Hunter Engine                                             #
     # ================================================================== #
 
-    def find_winning_products(self, niche: str | None = None, limit: int | None = None) -> list[dict]:
+    def find_winning_products(
+        self, niche: str | None = None, limit: int | None = None
+    ) -> list[dict]:
         """
         Discover viral, high-profit AliExpress products.
 
@@ -244,8 +279,7 @@ class AliDropshipMoneyBot:
         daily_cap = self.DAILY_PRODUCT_LIMIT[self.tier]
 
         products = [
-            p for p in self.WINNING_PRODUCTS
-            if p["orders"] > 500 and p["rating"] > 4.5
+            p for p in self.WINNING_PRODUCTS if p["orders"] > 500 and p["rating"] > 4.5
         ]
 
         if niche:
@@ -265,12 +299,12 @@ class AliDropshipMoneyBot:
 
     def _annotate_product(self, product: dict) -> dict:
         sell_price = self.calculate_sell_price(product["aliexpress_cost_usd"])
-        profit     = round(sell_price - product["aliexpress_cost_usd"], 2)
+        profit = round(sell_price - product["aliexpress_cost_usd"], 2)
         return {
             **product,
             "suggested_sell_price_usd": sell_price,
-            "estimated_profit_usd":     profit,
-            "profit_margin_pct":        round(profit / sell_price * 100, 1),
+            "estimated_profit_usd": profit,
+            "profit_margin_pct": round(profit / sell_price * 100, 1),
             "tier": self.tier.value,
         }
 
@@ -301,27 +335,27 @@ class AliDropshipMoneyBot:
         if products is None:
             products = self.find_winning_products(niche=niche)
 
-        domain   = self._generate_domain(niche)
-        brand    = self.create_brand(niche)
+        domain = self._generate_domain(niche)
+        brand = self.create_brand(niche)
         store_id = f"store_{len(self._built_stores) + 1:03d}"
 
         store = {
-            "store_id":    store_id,
-            "domain":      domain,
-            "niche":       niche,
-            "brand":       brand,
-            "platform":    "WordPress + AliDropship",
-            "pages":       self.STORE_PAGES,
-            "products":    products,
+            "store_id": store_id,
+            "domain": domain,
+            "niche": niche,
+            "brand": brand,
+            "platform": "WordPress + AliDropship",
+            "pages": self.STORE_PAGES,
+            "products": products,
             "features": {
-                "reviews":       True,
+                "reviews": True,
                 "scarcity_alert": True,
-                "upsells":       self.tier in (Tier.PRO, Tier.ENTERPRISE),
+                "upsells": self.tier in (Tier.PRO, Tier.ENTERPRISE),
                 "ai_descriptions": self.tier == Tier.ENTERPRISE,
-                "live_chat":     self.tier == Tier.ENTERPRISE,
+                "live_chat": self.tier == Tier.ENTERPRISE,
             },
             "status": "live",
-            "tier":   self.tier.value,
+            "tier": self.tier.value,
         }
         self._built_stores.append(store)
         return store
@@ -329,28 +363,30 @@ class AliDropshipMoneyBot:
     def create_brand(self, niche: str) -> dict:
         """Generate a brand identity (name, logo placeholder, slogan) for a niche."""
         brand_map = {
-            "health":          ("VitalCore Shop",   "Your health, delivered."),
-            "beauty":          ("GlowHaven",        "Reveal your glow."),
-            "fitness":         ("IronEdge Gear",    "Train harder. Live stronger."),
-            "pets":            ("PawPerfect Store", "Because they deserve the best."),
-            "home_gadgets":    ("SmartNest Hub",    "Smart home, smart life."),
-            "fashion":         ("TrendVault",       "Style without limits."),
-            "tech_accessories": ("TechFlow Store",  "Power your world."),
-            "baby":            ("TinyWonders",      "Gentle care, big smiles."),
-            "outdoor":         ("TrailBlaze Gear",  "Gear up, go further."),
-            "kitchen":         ("ChefMate Store",   "Cook smarter, eat better."),
+            "health": ("VitalCore Shop", "Your health, delivered."),
+            "beauty": ("GlowHaven", "Reveal your glow."),
+            "fitness": ("IronEdge Gear", "Train harder. Live stronger."),
+            "pets": ("PawPerfect Store", "Because they deserve the best."),
+            "home_gadgets": ("SmartNest Hub", "Smart home, smart life."),
+            "fashion": ("TrendVault", "Style without limits."),
+            "tech_accessories": ("TechFlow Store", "Power your world."),
+            "baby": ("TinyWonders", "Gentle care, big smiles."),
+            "outdoor": ("TrailBlaze Gear", "Gear up, go further."),
+            "kitchen": ("ChefMate Store", "Cook smarter, eat better."),
         }
-        name, slogan = brand_map.get(niche, (f"{niche.title()} Store", "Quality you can trust."))
+        name, slogan = brand_map.get(
+            niche, (f"{niche.title()} Store", "Quality you can trust.")
+        )
         return {
-            "name":   name,
-            "logo":   f"https://assets.dreamco.ai/logos/{niche}_logo.png",
+            "name": name,
+            "logo": f"https://assets.dreamco.ai/logos/{niche}_logo.png",
             "slogan": slogan,
-            "niche":  niche,
+            "niche": niche,
         }
 
     def _generate_domain(self, niche: str) -> str:
         brand = self.create_brand(niche)
-        slug  = brand["name"].lower().replace(" ", "")
+        slug = brand["name"].lower().replace(" ", "")
         return f"https://www.{slug}.com"
 
     # ================================================================== #
@@ -363,27 +399,33 @@ class AliDropshipMoneyBot:
 
         Example: $10 cost → $29.99
         """
-        raw   = cost_usd * multiplier
+        raw = cost_usd * multiplier
         floor = int(raw)
         return float(floor) + 0.99 if floor < raw else float(floor) - 0.01
 
     def generate_pricing_report(self, products: list[dict] | None = None) -> list[dict]:
         """Return a pricing report for the supplied (or active) products."""
         if products is None:
-            products = self._active_products if self._active_products else self.find_winning_products()
+            products = (
+                self._active_products
+                if self._active_products
+                else self.find_winning_products()
+            )
         report = []
         for p in products:
             sell_price = self.calculate_sell_price(p["aliexpress_cost_usd"])
-            profit     = round(sell_price - p["aliexpress_cost_usd"], 2)
-            report.append({
-                "id":             p["id"],
-                "title":          p["title"],
-                "cost_usd":       p["aliexpress_cost_usd"],
-                "sell_price_usd": sell_price,
-                "profit_usd":     profit,
-                "roi_multiplier": 3.0,
-                "tier":           self.tier.value,
-            })
+            profit = round(sell_price - p["aliexpress_cost_usd"], 2)
+            report.append(
+                {
+                    "id": p["id"],
+                    "title": p["title"],
+                    "cost_usd": p["aliexpress_cost_usd"],
+                    "sell_price_usd": sell_price,
+                    "profit_usd": profit,
+                    "roi_multiplier": 3.0,
+                    "tier": self.tier.value,
+                }
+            )
         return report
 
     # ================================================================== #
@@ -404,7 +446,7 @@ class AliDropshipMoneyBot:
         tracking = f"AE{abs(hash(order['order_id'])) % 10 ** 12:012d}"
         fulfilled = {
             **order,
-            "status":        "fulfilled",
+            "status": "fulfilled",
             "aliexpress_order_placed": True,
             "tracking_number": tracking,
             "customer_notified": True,
@@ -419,7 +461,11 @@ class AliDropshipMoneyBot:
             raise AliDropshipBotTierError(
                 "Bulk fulfillment requires PRO or ENTERPRISE tier."
             )
-        pending = orders if orders is not None else [o for o in self.MOCK_ORDERS if o["status"] == "pending"]
+        pending = (
+            orders
+            if orders is not None
+            else [o for o in self.MOCK_ORDERS if o["status"] == "pending"]
+        )
         return [self.fulfill_order(o) for o in pending]
 
     # ================================================================== #
@@ -448,19 +494,23 @@ class AliDropshipMoneyBot:
         ]
         videos = []
         for i, hook in enumerate(hooks[:cap]):
-            videos.append({
-                "video_id":  f"vid_{product['id']}_{i + 1:02d}",
-                "product":   product["title"],
-                "hook":      hook,
-                "format":    "demo + hook + CTA",
-                "duration_s": 15 + i * 5,
-                "posted":    True,
-                "platform":  "TikTok",
-                "tier":      self.tier.value,
-            })
+            videos.append(
+                {
+                    "video_id": f"vid_{product['id']}_{i + 1:02d}",
+                    "product": product["title"],
+                    "hook": hook,
+                    "format": "demo + hook + CTA",
+                    "duration_s": 15 + i * 5,
+                    "posted": True,
+                    "platform": "TikTok",
+                    "tier": self.tier.value,
+                }
+            )
         return videos
 
-    def run_facebook_ads(self, product: dict, daily_budget_usd: float = 10.0) -> list[dict]:
+    def run_facebook_ads(
+        self, product: dict, daily_budget_usd: float = 10.0
+    ) -> list[dict]:
         """
         Launch and monitor Facebook ad campaigns for a product.
 
@@ -485,16 +535,18 @@ class AliDropshipMoneyBot:
         limit = cap if cap is not None else len(ad_copy_templates)
         for i, copy in enumerate(ad_copy_templates[:limit]):
             roas = round(1.5 + i * 0.4, 1)
-            ads.append({
-                "ad_id":         f"ad_{product['id']}_{i + 1:02d}",
-                "product":       product["title"],
-                "copy":          copy,
-                "daily_budget":  daily_budget_usd,
-                "status":        "active" if roas >= 2.0 else "paused",
-                "roas":          roas,
-                "platform":      "Facebook",
-                "tier":          self.tier.value,
-            })
+            ads.append(
+                {
+                    "ad_id": f"ad_{product['id']}_{i + 1:02d}",
+                    "product": product["title"],
+                    "copy": copy,
+                    "daily_budget": daily_budget_usd,
+                    "status": "active" if roas >= 2.0 else "paused",
+                    "roas": roas,
+                    "platform": "Facebook",
+                    "tier": self.tier.value,
+                }
+            )
         return ads
 
     def run_influencer_outreach(self, niche: str) -> list[dict]:
@@ -508,21 +560,27 @@ class AliDropshipMoneyBot:
                 "Influencer outreach requires ENTERPRISE tier."
             )
         influencers = [
-            {"handle": f"@{niche}fan_{i}", "followers": 15000 + i * 5000, "niche": niche}
+            {
+                "handle": f"@{niche}fan_{i}",
+                "followers": 15000 + i * 5000,
+                "niche": niche,
+            }
             for i in range(1, 6)
         ]
         outreach = []
         for inf in influencers:
-            outreach.append({
-                **inf,
-                "dm_script": (
-                    f"Hey {inf['handle']}! Love your {niche} content. "
-                    "We'd love to partner — free product + commission per sale. "
-                    "Interested? Reply here!"
-                ),
-                "sent":  True,
-                "tier":  self.tier.value,
-            })
+            outreach.append(
+                {
+                    **inf,
+                    "dm_script": (
+                        f"Hey {inf['handle']}! Love your {niche} content. "
+                        "We'd love to partner — free product + commission per sale. "
+                        "Interested? Reply here!"
+                    ),
+                    "sent": True,
+                    "tier": self.tier.value,
+                }
+            )
         return outreach
 
     # ================================================================== #
@@ -543,27 +601,29 @@ class AliDropshipMoneyBot:
         if roi >= 2.0:
             action = "scale"
             result = {
-                "action":           "scale",
-                "budget_increase":  "2x current spend",
-                "duplicate_ads":    True,
-                "new_creatives":    self.tier == Tier.ENTERPRISE,
-                "build_brand":      self.tier == Tier.ENTERPRISE,
+                "action": "scale",
+                "budget_increase": "2x current spend",
+                "duplicate_ads": True,
+                "new_creatives": self.tier == Tier.ENTERPRISE,
+                "build_brand": self.tier == Tier.ENTERPRISE,
             }
         else:
             action = "kill"
             result = {
-                "action":  "kill",
-                "reason":  f"ROI {roi:.2f} below 2.0 threshold",
+                "action": "kill",
+                "reason": f"ROI {roi:.2f} below 2.0 threshold",
             }
         return {
             "product_id": product.get("id", "unknown"),
-            "product":    product.get("title", ""),
-            "roi":        roi,
+            "product": product.get("title", ""),
+            "roi": roi,
             **result,
-            "tier":       self.tier.value,
+            "tier": self.tier.value,
         }
 
-    def get_scaling_report(self, product_roi_map: dict[str, float] | None = None) -> list[dict]:
+    def get_scaling_report(
+        self, product_roi_map: dict[str, float] | None = None
+    ) -> list[dict]:
         """
         Generate scaling decisions for all active products.
 
@@ -577,12 +637,13 @@ class AliDropshipMoneyBot:
                 "Scaling report requires PRO or ENTERPRISE tier."
             )
         mock_rois = {"p001": 2.5, "p004": 3.1, "p005": 1.8, "p007": 2.2, "p010": 0.9}
-        rois      = product_roi_map if product_roi_map is not None else mock_rois
-        products  = self._active_products if self._active_products else self.find_winning_products()
-        return [
-            self.scale_or_kill_product(p, rois.get(p["id"], 1.5))
-            for p in products
-        ]
+        rois = product_roi_map if product_roi_map is not None else mock_rois
+        products = (
+            self._active_products
+            if self._active_products
+            else self.find_winning_products()
+        )
+        return [self.scale_or_kill_product(p, rois.get(p["id"], 1.5)) for p in products]
 
     # ================================================================== #
     # Master Orchestrator                                                  #
@@ -643,33 +704,33 @@ class AliDropshipMoneyBot:
             )
         slug = niche.replace("_", "")
         return {
-            "niche":        niche,
+            "niche": niche,
             "store_domain": store_domain,
             "sites": [
                 {
-                    "type":    "authority_blog",
-                    "domain":  f"https://www.{slug}review.com",
+                    "type": "authority_blog",
+                    "domain": f"https://www.{slug}review.com",
                     "content": f"Top 10 trending {niche} products",
                     "traffic": "SEO",
                     "links_to": store_domain,
                 },
                 {
-                    "type":    "deal_site",
-                    "domain":  f"https://www.{slug}deals.com",
+                    "type": "deal_site",
+                    "domain": f"https://www.{slug}deals.com",
                     "content": "Discount alerts for all stores",
                     "traffic": "email + push",
                     "links_to": store_domain,
                 },
                 {
-                    "type":    "review_site",
-                    "domain":  f"https://www.best{slug}stores.com",
+                    "type": "review_site",
+                    "domain": f"https://www.best{slug}stores.com",
                     "content": f"Top rated {niche} stores",
                     "traffic": "organic",
                     "links_to": store_domain,
                 },
                 {
-                    "type":    "viral_hub",
-                    "domain":  f"https://www.{slug}viral.com",
+                    "type": "viral_hub",
+                    "domain": f"https://www.{slug}viral.com",
                     "content": "Embedded TikTok videos",
                     "traffic": "TikTok embed",
                     "links_to": store_domain,
@@ -686,24 +747,24 @@ class AliDropshipMoneyBot:
         """Return realistic revenue projections based on tier."""
         projections = {
             Tier.FREE: {
-                "day_1":     "$0 – $100",
-                "week_1":    "$0 – $200",
-                "month_1":   "$0 – $500",
-                "note":      "Manual setup required. Upgrade to PRO to automate.",
+                "day_1": "$0 – $100",
+                "week_1": "$0 – $200",
+                "month_1": "$0 – $500",
+                "note": "Manual setup required. Upgrade to PRO to automate.",
             },
             Tier.PRO: {
-                "day_1":     "$0 – $100",
-                "week_1":    "$200 – $1,000",
-                "month_1":   "$1K – $5K",
+                "day_1": "$0 – $100",
+                "week_1": "$200 – $1,000",
+                "month_1": "$1K – $5K",
                 "months_3_6": "$5K – $20K+",
-                "note":      "Depends on niche selection and ad execution.",
+                "note": "Depends on niche selection and ad execution.",
             },
             Tier.ENTERPRISE: {
-                "day_1":     "$0 – $100",
-                "week_1":    "$200 – $1,000",
-                "month_1":   "$1K – $10K",
+                "day_1": "$0 – $100",
+                "week_1": "$200 – $1,000",
+                "month_1": "$1K – $10K",
                 "months_3_6": "$10K – $50K+",
-                "note":      "Multi-store + AI automation + influencer network.",
+                "note": "Multi-store + AI automation + influencer network.",
             },
         }
         return {"tier": self.tier.value, **projections[self.tier]}
@@ -713,7 +774,7 @@ class AliDropshipMoneyBot:
     # ================================================================== #
 
     def describe_tier(self) -> str:
-        info  = get_bot_tier_info(self.tier)
+        info = get_bot_tier_info(self.tier)
         lines = [
             f"=== {info['name']} AliDropship Money Bot Tier ===",
             f"Price: ${info['price_usd_monthly']:.2f}/month",

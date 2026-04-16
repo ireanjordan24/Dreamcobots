@@ -4,38 +4,40 @@ Validates GLOBAL AI SOURCES FLOW framework compliance and all bot generation
 pipeline stages: parser, tool injector, template engine, deployer, and the
 main BotGeneratorBot orchestrator.
 """
-import sys
+
 import os
+import sys
 import tempfile
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.bot_generator_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    list_tiers,
-    get_upgrade_path,
-    FEATURE_BASIC_GENERATION,
-    FEATURE_TOOL_INJECTION,
-    FEATURE_AUTO_DEPLOY,
-    FEATURE_CUSTOM_DNA,
-)
-from bots.bot_generator_bot.parser import BotParser, BotIntent, _slugify
-from bots.bot_generator_bot.tool_injector import ToolInjector
-from bots.bot_generator_bot.template_engine import TemplateEngine
-from bots.bot_generator_bot.deployer import BotDeployer
+
 from bots.bot_generator_bot.bot_generator_bot import (
     BotGeneratorBot,
     BotGeneratorTierError,
 )
-
+from bots.bot_generator_bot.deployer import BotDeployer
+from bots.bot_generator_bot.parser import BotIntent, BotParser, _slugify
+from bots.bot_generator_bot.template_engine import TemplateEngine
+from bots.bot_generator_bot.tiers import (
+    FEATURE_AUTO_DEPLOY,
+    FEATURE_BASIC_GENERATION,
+    FEATURE_CUSTOM_DNA,
+    FEATURE_TOOL_INJECTION,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
+from bots.bot_generator_bot.tool_injector import ToolInjector
 
 # ---------------------------------------------------------------------------
 # Framework compliance
 # ---------------------------------------------------------------------------
+
 
 class TestFrameworkCompliance:
     def test_bot_generator_bot_imports_globalaisourcesflow(self):
@@ -47,13 +49,15 @@ class TestFrameworkCompliance:
         assert "GlobalAISourcesFlow" in text
 
     def test_parser_has_framework_marker(self):
-        parser_file = os.path.join(
-            REPO_ROOT, "bots", "bot_generator_bot", "parser.py"
-        )
+        parser_file = os.path.join(REPO_ROOT, "bots", "bot_generator_bot", "parser.py")
         text = open(parser_file).read()
         assert any(
             marker in text
-            for marker in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW", "global_ai_sources_flow")
+            for marker in (
+                "GlobalAISourcesFlow",
+                "GLOBAL AI SOURCES FLOW",
+                "global_ai_sources_flow",
+            )
         )
 
     def test_tool_injector_has_framework_marker(self):
@@ -63,7 +67,11 @@ class TestFrameworkCompliance:
         text = open(injector_file).read()
         assert any(
             marker in text
-            for marker in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW", "global_ai_sources_flow")
+            for marker in (
+                "GlobalAISourcesFlow",
+                "GLOBAL AI SOURCES FLOW",
+                "global_ai_sources_flow",
+            )
         )
 
     def test_template_engine_has_framework_marker(self):
@@ -73,7 +81,11 @@ class TestFrameworkCompliance:
         text = open(engine_file).read()
         assert any(
             marker in text
-            for marker in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW", "global_ai_sources_flow")
+            for marker in (
+                "GlobalAISourcesFlow",
+                "GLOBAL AI SOURCES FLOW",
+                "global_ai_sources_flow",
+            )
         )
 
     def test_deployer_has_framework_marker(self):
@@ -83,13 +95,18 @@ class TestFrameworkCompliance:
         text = open(deployer_file).read()
         assert any(
             marker in text
-            for marker in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW", "global_ai_sources_flow")
+            for marker in (
+                "GlobalAISourcesFlow",
+                "GLOBAL AI SOURCES FLOW",
+                "global_ai_sources_flow",
+            )
         )
 
 
 # ---------------------------------------------------------------------------
 # Tiers
 # ---------------------------------------------------------------------------
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -159,6 +176,7 @@ class TestTiers:
 # ---------------------------------------------------------------------------
 # Parser
 # ---------------------------------------------------------------------------
+
 
 class TestBotParser:
     def setup_method(self):
@@ -247,6 +265,7 @@ class TestSlugify:
 # Tool Injector
 # ---------------------------------------------------------------------------
 
+
 class TestToolInjector:
     def setup_method(self):
         self.injector = ToolInjector()
@@ -317,6 +336,7 @@ class TestToolInjector:
 # ---------------------------------------------------------------------------
 # Template Engine
 # ---------------------------------------------------------------------------
+
 
 class TestTemplateEngine:
     def setup_method(self):
@@ -393,6 +413,7 @@ class TestTemplateEngine:
 # ---------------------------------------------------------------------------
 # Deployer
 # ---------------------------------------------------------------------------
+
 
 class TestBotDeployer:
     def setup_method(self):
@@ -477,6 +498,7 @@ class TestBotDeployer:
 # ---------------------------------------------------------------------------
 # BotGeneratorBot (full pipeline)
 # ---------------------------------------------------------------------------
+
 
 class TestBotGeneratorBotInstantiation:
     def test_default_tier_is_free(self):
@@ -578,7 +600,12 @@ class TestBotGeneratorBotGenerate:
 
     def test_free_cannot_use_custom_dna(self):
         bot = BotGeneratorBot(tier=Tier.FREE)
-        custom = {"industry": "legal", "goal": "generate_leads", "bot_name": "x", "tools": []}
+        custom = {
+            "industry": "legal",
+            "goal": "generate_leads",
+            "bot_name": "x",
+            "tools": [],
+        }
         with pytest.raises(BotGeneratorTierError):
             bot.generate("", custom_dna=custom)
 

@@ -85,7 +85,7 @@ from .{module_name} import {class_name}
 __all__ = ["{class_name}"]
 '''
 
-_README_TEMPLATE = '''\
+_README_TEMPLATE = """\
 # {bot_name}
 
 Auto-generated DreamCo bot.
@@ -98,12 +98,13 @@ from bots.{module_name}.{module_name} import {class_name}
 bot = {class_name}()
 print(bot.run())
 ```
-'''
+"""
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _to_snake_case(name: str) -> str:
     """Convert a human-readable name to snake_case module name."""
@@ -123,6 +124,7 @@ def _to_class_name(name: str) -> str:
 # ---------------------------------------------------------------------------
 # Generator
 # ---------------------------------------------------------------------------
+
 
 class Generator:
     """
@@ -235,7 +237,9 @@ class Generator:
             logger.info("Created bot '%s' at %s", bot_name, bot_dir)
 
             if register and self._controller is not None:
-                registered = self._register_with_controller(module_name, class_name, bot_dir)
+                registered = self._register_with_controller(
+                    module_name, class_name, bot_dir
+                )
                 result["registered"] = registered
 
         self._generation_log.append(result)
@@ -255,7 +259,11 @@ class Generator:
             "bots_root": self.bots_root,
             "total_bots_generated": len(self._generation_log),
             "bots": [
-                {"bot_name": r["bot_name"], "module_name": r["module_name"], "registered": r["registered"]}
+                {
+                    "bot_name": r["bot_name"],
+                    "module_name": r["module_name"],
+                    "registered": r["registered"],
+                }
                 for r in self._generation_log
             ],
         }
@@ -268,7 +276,9 @@ class Generator:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _register_with_controller(self, module_name: str, class_name: str, bot_dir: str) -> bool:
+    def _register_with_controller(
+        self, module_name: str, class_name: str, bot_dir: str
+    ) -> bool:
         """Attempt to import the newly-created bot and register it."""
         repo_root = os.path.abspath(os.path.join(self.bots_root, ".."))
         if repo_root not in sys.path:

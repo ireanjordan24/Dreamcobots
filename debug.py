@@ -7,10 +7,10 @@ It can be run directly to test bot connectivity, configuration, and runtime
 behavior, or imported by individual bot scripts for logging support.
 """
 
-import os
-import sys
 import json
 import logging
+import os
+import sys
 import traceback
 from datetime import datetime, timezone
 
@@ -26,6 +26,7 @@ logger = logging.getLogger("DreamCobots.Debug")
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def load_config(config_path: str = None) -> dict:
     """Load and return the bot configuration from config.json."""
@@ -92,7 +93,9 @@ def stress_test_bot(bot_instance, iterations: int = 10) -> dict:
             bot_instance.run()
             results["successes"] += 1
             logger.debug("Iteration %d/%d: OK", i + 1, iterations)
-        except Exception as exc:  # noqa: BLE001 — intentional: capture any bot failure without crashing the test runner
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 — intentional: capture any bot failure without crashing the test runner
             results["failures"] += 1
             error_msg = f"Iteration {i + 1}: {exc}"
             results["errors"].append(error_msg)
@@ -110,6 +113,7 @@ def stress_test_bot(bot_instance, iterations: int = 10) -> dict:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main():
     """Run full diagnostics for all known bots."""
@@ -135,9 +139,9 @@ def main():
     sys.path.insert(0, gov_bot_dir)
 
     try:
-        from government_contract_grant_bot import (  # noqa: E402
+        from government_contract_grant_bot import (
             GovernmentContractGrantBot,
-        )
+        )  # noqa: E402
 
         bot = GovernmentContractGrantBot()
         logger.info("Running diagnostics for GovernmentContractGrantBot…")

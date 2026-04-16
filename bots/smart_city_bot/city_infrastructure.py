@@ -1,7 +1,13 @@
 """Smart City Infrastructure Management — traffic, energy, and public safety."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="SmartCityInfrastructure")
@@ -15,22 +21,73 @@ class SmartCityInfrastructureError(Exception):
 # Traffic Management
 # ---------------------------------------------------------------------------
 
+
 class TrafficManagementSystem:
     """Tier-aware traffic monitoring and optimization system."""
 
     ZONE_LIMITS = {Tier.FREE: 1, Tier.PRO: 10, Tier.ENTERPRISE: None}
 
     TRAFFIC_DATA = {
-        "downtown":     {"congestion": 0.78, "avg_speed_kmh": 22, "incidents": 3, "flow_rate": 1200},
-        "north":        {"congestion": 0.42, "avg_speed_kmh": 58, "incidents": 0, "flow_rate": 850},
-        "south":        {"congestion": 0.55, "avg_speed_kmh": 41, "incidents": 1, "flow_rate": 960},
-        "east":         {"congestion": 0.31, "avg_speed_kmh": 72, "incidents": 0, "flow_rate": 700},
-        "west":         {"congestion": 0.63, "avg_speed_kmh": 34, "incidents": 2, "flow_rate": 1050},
-        "industrial":   {"congestion": 0.47, "avg_speed_kmh": 50, "incidents": 1, "flow_rate": 800},
-        "residential":  {"congestion": 0.28, "avg_speed_kmh": 45, "incidents": 0, "flow_rate": 620},
-        "port":         {"congestion": 0.69, "avg_speed_kmh": 28, "incidents": 2, "flow_rate": 980},
-        "airport":      {"congestion": 0.72, "avg_speed_kmh": 30, "incidents": 1, "flow_rate": 1100},
-        "suburbs":      {"congestion": 0.22, "avg_speed_kmh": 80, "incidents": 0, "flow_rate": 450},
+        "downtown": {
+            "congestion": 0.78,
+            "avg_speed_kmh": 22,
+            "incidents": 3,
+            "flow_rate": 1200,
+        },
+        "north": {
+            "congestion": 0.42,
+            "avg_speed_kmh": 58,
+            "incidents": 0,
+            "flow_rate": 850,
+        },
+        "south": {
+            "congestion": 0.55,
+            "avg_speed_kmh": 41,
+            "incidents": 1,
+            "flow_rate": 960,
+        },
+        "east": {
+            "congestion": 0.31,
+            "avg_speed_kmh": 72,
+            "incidents": 0,
+            "flow_rate": 700,
+        },
+        "west": {
+            "congestion": 0.63,
+            "avg_speed_kmh": 34,
+            "incidents": 2,
+            "flow_rate": 1050,
+        },
+        "industrial": {
+            "congestion": 0.47,
+            "avg_speed_kmh": 50,
+            "incidents": 1,
+            "flow_rate": 800,
+        },
+        "residential": {
+            "congestion": 0.28,
+            "avg_speed_kmh": 45,
+            "incidents": 0,
+            "flow_rate": 620,
+        },
+        "port": {
+            "congestion": 0.69,
+            "avg_speed_kmh": 28,
+            "incidents": 2,
+            "flow_rate": 980,
+        },
+        "airport": {
+            "congestion": 0.72,
+            "avg_speed_kmh": 30,
+            "incidents": 1,
+            "flow_rate": 1100,
+        },
+        "suburbs": {
+            "congestion": 0.22,
+            "avg_speed_kmh": 80,
+            "incidents": 0,
+            "flow_rate": 450,
+        },
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -121,7 +178,11 @@ class TrafficManagementSystem:
             )
         self._check_zone_limit(zone)
         base = self.TRAFFIC_DATA.get(zone, self.TRAFFIC_DATA["downtown"])
-        peak_factor = 1.4 if hour in (7, 8, 9, 17, 18, 19) else 0.8 if hour < 6 or hour > 22 else 1.0
+        peak_factor = (
+            1.4
+            if hour in (7, 8, 9, 17, 18, 19)
+            else 0.8 if hour < 6 or hour > 22 else 1.0
+        )
         predicted_flow = round(base["flow_rate"] * peak_factor)
         predicted_congestion = min(round(base["congestion"] * peak_factor, 2), 1.0)
 
@@ -144,22 +205,73 @@ class TrafficManagementSystem:
 # Energy Management
 # ---------------------------------------------------------------------------
 
+
 class EnergyManagementSystem:
     """Tier-aware smart grid energy monitoring and optimization."""
 
     DISTRICT_LIMITS = {Tier.FREE: 1, Tier.PRO: 10, Tier.ENTERPRISE: None}
 
     GRID_DATA = {
-        "residential_north": {"load_mw": 45.2, "capacity_mw": 80.0, "renewable_pct": 32, "outages": 0},
-        "residential_south": {"load_mw": 38.7, "capacity_mw": 75.0, "renewable_pct": 28, "outages": 0},
-        "commercial_center": {"load_mw": 120.5, "capacity_mw": 150.0, "renewable_pct": 18, "outages": 1},
-        "industrial_east":   {"load_mw": 210.0, "capacity_mw": 250.0, "renewable_pct": 12, "outages": 0},
-        "industrial_west":   {"load_mw": 185.3, "capacity_mw": 220.0, "renewable_pct": 15, "outages": 2},
-        "hospital_district": {"load_mw": 55.0,  "capacity_mw": 70.0,  "renewable_pct": 40, "outages": 0},
-        "university":        {"load_mw": 28.4,  "capacity_mw": 45.0,  "renewable_pct": 55, "outages": 0},
-        "port_logistics":    {"load_mw": 95.0,  "capacity_mw": 120.0, "renewable_pct": 10, "outages": 1},
-        "suburbs_east":      {"load_mw": 22.1,  "capacity_mw": 40.0,  "renewable_pct": 45, "outages": 0},
-        "suburbs_west":      {"load_mw": 19.8,  "capacity_mw": 38.0,  "renewable_pct": 50, "outages": 0},
+        "residential_north": {
+            "load_mw": 45.2,
+            "capacity_mw": 80.0,
+            "renewable_pct": 32,
+            "outages": 0,
+        },
+        "residential_south": {
+            "load_mw": 38.7,
+            "capacity_mw": 75.0,
+            "renewable_pct": 28,
+            "outages": 0,
+        },
+        "commercial_center": {
+            "load_mw": 120.5,
+            "capacity_mw": 150.0,
+            "renewable_pct": 18,
+            "outages": 1,
+        },
+        "industrial_east": {
+            "load_mw": 210.0,
+            "capacity_mw": 250.0,
+            "renewable_pct": 12,
+            "outages": 0,
+        },
+        "industrial_west": {
+            "load_mw": 185.3,
+            "capacity_mw": 220.0,
+            "renewable_pct": 15,
+            "outages": 2,
+        },
+        "hospital_district": {
+            "load_mw": 55.0,
+            "capacity_mw": 70.0,
+            "renewable_pct": 40,
+            "outages": 0,
+        },
+        "university": {
+            "load_mw": 28.4,
+            "capacity_mw": 45.0,
+            "renewable_pct": 55,
+            "outages": 0,
+        },
+        "port_logistics": {
+            "load_mw": 95.0,
+            "capacity_mw": 120.0,
+            "renewable_pct": 10,
+            "outages": 1,
+        },
+        "suburbs_east": {
+            "load_mw": 22.1,
+            "capacity_mw": 40.0,
+            "renewable_pct": 45,
+            "outages": 0,
+        },
+        "suburbs_west": {
+            "load_mw": 19.8,
+            "capacity_mw": 38.0,
+            "renewable_pct": 50,
+            "outages": 0,
+        },
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -202,7 +314,9 @@ class EnergyManagementSystem:
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             result["renewable_pct"] = data["renewable_pct"]
-            result["carbon_intensity_gco2_kwh"] = round(400 * (1 - data["renewable_pct"] / 100), 1)
+            result["carbon_intensity_gco2_kwh"] = round(
+                400 * (1 - data["renewable_pct"] / 100), 1
+            )
 
         if self.tier == Tier.ENTERPRISE:
             result["smart_meter_count"] = 1200
@@ -235,7 +349,9 @@ class EnergyManagementSystem:
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             result["load_shift_windows"] = ["02:00-06:00", "13:00-15:00"]
-            result["battery_storage_recommendation_mwh"] = round(data["load_mw"] * 0.1, 1)
+            result["battery_storage_recommendation_mwh"] = round(
+                data["load_mw"] * 0.1, 1
+            )
 
         if self.tier == Tier.ENTERPRISE:
             result["ai_optimized"] = True
@@ -251,7 +367,9 @@ class EnergyManagementSystem:
             )
         self._check_district_limit(district)
         data = self.GRID_DATA.get(district, self.GRID_DATA["commercial_center"])
-        peak_factor = 1.3 if hour in (8, 9, 10, 18, 19, 20) else 0.7 if hour < 5 else 1.0
+        peak_factor = (
+            1.3 if hour in (8, 9, 10, 18, 19, 20) else 0.7 if hour < 5 else 1.0
+        )
         predicted_load = round(data["load_mw"] * peak_factor, 2)
 
         result = {
@@ -274,30 +392,81 @@ class EnergyManagementSystem:
 # Public Safety
 # ---------------------------------------------------------------------------
 
+
 class PublicSafetyMonitor:
     """Tier-aware public safety monitoring and incident management."""
 
     ZONE_LIMITS = {Tier.FREE: 1, Tier.PRO: 10, Tier.ENTERPRISE: None}
 
     SAFETY_DATA = {
-        "downtown":    {"crime_index": 0.62, "incidents_24h": 8, "cameras": 42, "patrol_units": 6},
-        "north":       {"crime_index": 0.31, "incidents_24h": 2, "cameras": 18, "patrol_units": 3},
-        "south":       {"crime_index": 0.45, "incidents_24h": 4, "cameras": 24, "patrol_units": 4},
-        "east":        {"crime_index": 0.28, "incidents_24h": 1, "cameras": 15, "patrol_units": 2},
-        "west":        {"crime_index": 0.55, "incidents_24h": 6, "cameras": 30, "patrol_units": 5},
-        "industrial":  {"crime_index": 0.48, "incidents_24h": 3, "cameras": 20, "patrol_units": 3},
-        "residential": {"crime_index": 0.22, "incidents_24h": 1, "cameras": 10, "patrol_units": 2},
-        "port":        {"crime_index": 0.71, "incidents_24h": 9, "cameras": 38, "patrol_units": 7},
-        "airport":     {"crime_index": 0.35, "incidents_24h": 2, "cameras": 85, "patrol_units": 8},
-        "suburbs":     {"crime_index": 0.18, "incidents_24h": 0, "cameras": 8,  "patrol_units": 1},
+        "downtown": {
+            "crime_index": 0.62,
+            "incidents_24h": 8,
+            "cameras": 42,
+            "patrol_units": 6,
+        },
+        "north": {
+            "crime_index": 0.31,
+            "incidents_24h": 2,
+            "cameras": 18,
+            "patrol_units": 3,
+        },
+        "south": {
+            "crime_index": 0.45,
+            "incidents_24h": 4,
+            "cameras": 24,
+            "patrol_units": 4,
+        },
+        "east": {
+            "crime_index": 0.28,
+            "incidents_24h": 1,
+            "cameras": 15,
+            "patrol_units": 2,
+        },
+        "west": {
+            "crime_index": 0.55,
+            "incidents_24h": 6,
+            "cameras": 30,
+            "patrol_units": 5,
+        },
+        "industrial": {
+            "crime_index": 0.48,
+            "incidents_24h": 3,
+            "cameras": 20,
+            "patrol_units": 3,
+        },
+        "residential": {
+            "crime_index": 0.22,
+            "incidents_24h": 1,
+            "cameras": 10,
+            "patrol_units": 2,
+        },
+        "port": {
+            "crime_index": 0.71,
+            "incidents_24h": 9,
+            "cameras": 38,
+            "patrol_units": 7,
+        },
+        "airport": {
+            "crime_index": 0.35,
+            "incidents_24h": 2,
+            "cameras": 85,
+            "patrol_units": 8,
+        },
+        "suburbs": {
+            "crime_index": 0.18,
+            "incidents_24h": 0,
+            "cameras": 8,
+            "patrol_units": 1,
+        },
     }
 
     INCIDENT_RESOURCES = {
-        "theft":    {"police": 2, "detective": 1},
-        "fire":     {"fire_truck": 2, "ambulance": 1, "police": 1},
+        "theft": {"police": 2, "detective": 1},
+        "fire": {"fire_truck": 2, "ambulance": 1, "police": 1},
         "accident": {"ambulance": 2, "police": 2, "tow_truck": 1},
-        "protest":  {"police": 8, "supervisor": 1},
-        "medical":  {"ambulance": 2, "fire_truck": 1},
+        "protest": {"police": 8, "supervisor": 1},
+        "medical": {"ambulance": 2, "fire_truck": 1},
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -352,11 +521,15 @@ class PublicSafetyMonitor:
         data = self.SAFETY_DATA.get(zone, self.SAFETY_DATA["downtown"])
         incidents = []
         for i in range(data["incidents_24h"]):
-            incidents.append({
-                "incident_id": f"INC-{zone[:3].upper()}-{i + 1:03d}",
-                "type": ["theft", "accident", "medical", "fire", "protest"][i % 5],
-                "severity": "high" if i % 3 == 0 else "medium" if i % 2 == 0 else "low",
-            })
+            incidents.append(
+                {
+                    "incident_id": f"INC-{zone[:3].upper()}-{i + 1:03d}",
+                    "type": ["theft", "accident", "medical", "fire", "protest"][i % 5],
+                    "severity": (
+                        "high" if i % 3 == 0 else "medium" if i % 2 == 0 else "low"
+                    ),
+                }
+            )
 
         result = {
             "zone": zone,

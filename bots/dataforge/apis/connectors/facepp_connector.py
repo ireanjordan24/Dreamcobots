@@ -1,4 +1,5 @@
 """Face++ facial recognition connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,16 @@ class FacePPConnector:
             API response dict or error dict.
         """
         import requests
-        payload = {"api_key": self.api_key, "api_secret": self.api_secret, "image_url": image_url}
+
+        payload = {
+            "api_key": self.api_key,
+            "api_secret": self.api_secret,
+            "image_url": image_url,
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/detect", data=payload, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/detect", data=payload, timeout=30
+            )
             response.raise_for_status()
             logger.info("Face++ detection completed.")
             return {"status": "success", "data": response.json()}
@@ -49,13 +57,20 @@ class FacePPConnector:
             API response dict with confidence score or error dict.
         """
         import requests
-        payload = {"api_key": self.api_key, "api_secret": self.api_secret, "image_url1": image_url1, "image_url2": image_url2}
+
+        payload = {
+            "api_key": self.api_key,
+            "api_secret": self.api_secret,
+            "image_url1": image_url1,
+            "image_url2": image_url2,
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/compare", data=payload, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/compare", data=payload, timeout=30
+            )
             response.raise_for_status()
             logger.info("Face++ comparison completed.")
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Face++ compare error: %s", e)
             return {"status": "error", "message": str(e)}
-

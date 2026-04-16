@@ -1,4 +1,5 @@
 """Vosk offline speech recognition connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,9 +26,11 @@ class VoskConnector:
             Dict with transcript or error message.
         """
         try:
-            import vosk
-            import wave
             import json
+            import wave
+
+            import vosk
+
             model = vosk.Model(model_path)
             with wave.open(audio_path, "rb") as wf:
                 rec = vosk.KaldiRecognizer(model, wf.getframerate())
@@ -47,4 +50,3 @@ class VoskConnector:
         except Exception as e:
             logger.error("Vosk transcription error: %s", e)
             return {"status": "error", "message": str(e)}
-

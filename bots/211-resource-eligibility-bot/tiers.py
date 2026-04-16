@@ -9,8 +9,8 @@ Tiers:
                 support, custom integrations.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional
 
 
@@ -123,6 +123,7 @@ ENTERPRISE_MAX_RESULTS = None  # unlimited
 # ---------------------------------------------------------------------------
 # Tier config dataclass
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TierConfig:

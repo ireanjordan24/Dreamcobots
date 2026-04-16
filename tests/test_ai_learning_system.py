@@ -2,88 +2,88 @@
 Tests for bots/ai_learning_system/ — DreamCo Global AI Learning System
 """
 
-import sys
-import os
 import datetime
+import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.ai_learning_system.tiers import (
-    Tier,
-    TierConfig,
-    FEATURE_SCRAPER,
-    FEATURE_CLASSIFIER,
-    FEATURE_SANDBOX,
-    FEATURE_ANALYTICS,
-    FEATURE_HYBRID_ENGINE,
-    FEATURE_DEPLOYMENT,
-    FEATURE_GOVERNANCE,
-    FEATURE_SCHEDULER,
-    FEATURE_KUBERNETES,
-    FEATURE_GENETIC_ALGO,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-)
-from bots.ai_learning_system.ingestion import (
-    DataIngestionLayer,
-    DataSourceType,
-    ContentType,
-    IngestedRecord,
-    IngestionLimitError,
-)
-from bots.ai_learning_system.classifier import (
-    LearningMethodClassifier,
-    LearningMethodType,
-    ClassifiedMethod,
-    ClassifierTierError,
-)
-from bots.ai_learning_system.sandbox import (
-    SandboxTestingLayer,
-    SandboxStatus,
-    SandboxTestResult,
-    SandboxTierError,
-)
-from bots.ai_learning_system.analytics import (
-    PerformanceAnalyticsLayer,
-    MethodRanking,
-    AnalyticsTierError,
-)
-from bots.ai_learning_system.hybrid_engine import (
-    HybridEvolutionEngine,
-    HybridStrategy,
-    HybridEngineTierError,
-)
-from bots.ai_learning_system.deployment import (
-    DeploymentOrchestrator,
-    BotApplication,
-    Deployment,
-    DeploymentStatus,
-    DeploymentTierError,
-    DeploymentNotFoundError,
-)
-from bots.ai_learning_system.governance import (
-    GovernanceLayer,
-    AccessRole,
-    AuditLogEntry,
-    GovernanceTierError,
-    RBACError,
-    ROLE_PERMISSIONS,
-)
-from bots.ai_learning_system.scheduler import (
-    AutomationScheduler,
-    ScheduleFrequency,
-    JobStatus,
-    ScheduledJob,
-    SchedulerTierError,
-    JobNotFoundError,
-)
 from bots.ai_learning_system.ai_learning_system import (
     AILearningSystem,
     AILearningSystemTierError,
+)
+from bots.ai_learning_system.analytics import (
+    AnalyticsTierError,
+    MethodRanking,
+    PerformanceAnalyticsLayer,
+)
+from bots.ai_learning_system.classifier import (
+    ClassifiedMethod,
+    ClassifierTierError,
+    LearningMethodClassifier,
+    LearningMethodType,
+)
+from bots.ai_learning_system.deployment import (
+    BotApplication,
+    Deployment,
+    DeploymentNotFoundError,
+    DeploymentOrchestrator,
+    DeploymentStatus,
+    DeploymentTierError,
+)
+from bots.ai_learning_system.governance import (
+    ROLE_PERMISSIONS,
+    AccessRole,
+    AuditLogEntry,
+    GovernanceLayer,
+    GovernanceTierError,
+    RBACError,
+)
+from bots.ai_learning_system.hybrid_engine import (
+    HybridEngineTierError,
+    HybridEvolutionEngine,
+    HybridStrategy,
+)
+from bots.ai_learning_system.ingestion import (
+    ContentType,
+    DataIngestionLayer,
+    DataSourceType,
+    IngestedRecord,
+    IngestionLimitError,
+)
+from bots.ai_learning_system.sandbox import (
+    SandboxStatus,
+    SandboxTestingLayer,
+    SandboxTestResult,
+    SandboxTierError,
+)
+from bots.ai_learning_system.scheduler import (
+    AutomationScheduler,
+    JobNotFoundError,
+    JobStatus,
+    ScheduledJob,
+    ScheduleFrequency,
+    SchedulerTierError,
+)
+from bots.ai_learning_system.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_CLASSIFIER,
+    FEATURE_DEPLOYMENT,
+    FEATURE_GENETIC_ALGO,
+    FEATURE_GOVERNANCE,
+    FEATURE_HYBRID_ENGINE,
+    FEATURE_KUBERNETES,
+    FEATURE_SANDBOX,
+    FEATURE_SCHEDULER,
+    FEATURE_SCRAPER,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
 )
 
 
@@ -95,6 +95,7 @@ def _utc_now_naive() -> datetime.datetime:
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_free_tier_price(self):
@@ -237,6 +238,7 @@ class TestTiers:
 # Ingestion tests
 # ===========================================================================
 
+
 class TestIngestion:
     def _layer(self, tier=Tier.FREE):
         return DataIngestionLayer(tier)
@@ -338,6 +340,7 @@ class TestIngestion:
 # ===========================================================================
 # Classifier tests
 # ===========================================================================
+
 
 def _make_record(tags, title="Test Record", source=DataSourceType.ARXIV):
     return IngestedRecord(
@@ -450,6 +453,7 @@ class TestClassifier:
 # Sandbox tests
 # ===========================================================================
 
+
 def _make_method(method_type=LearningMethodType.SUPERVISED, novelty=0.8):
     return ClassifiedMethod(
         id="method-id",
@@ -548,6 +552,7 @@ class TestSandbox:
 # ===========================================================================
 # Analytics tests
 # ===========================================================================
+
 
 def _make_test_results_and_methods(n=5):
     methods = []
@@ -662,6 +667,7 @@ class TestAnalytics:
 # Hybrid engine tests
 # ===========================================================================
 
+
 def _make_rankings(n=5):
     return [
         MethodRanking(
@@ -744,7 +750,9 @@ class TestHybridEngine:
         engine.evolve(generations=2)
         best = engine.get_best_strategy()
         assert best is not None
-        assert best.fitness_score == max(s.fitness_score for s in engine.get_strategies())
+        assert best.fitness_score == max(
+            s.fitness_score for s in engine.get_strategies()
+        )
 
     def test_get_best_strategy_none_when_empty(self):
         engine = self._engine()
@@ -766,6 +774,7 @@ class TestHybridEngine:
 # ===========================================================================
 # Deployment tests
 # ===========================================================================
+
 
 def _make_strategy(generation=0):
     return HybridStrategy(
@@ -858,6 +867,7 @@ class TestDeployment:
 # ===========================================================================
 # Governance tests
 # ===========================================================================
+
 
 class TestGovernance:
     def _gov(self, tier=Tier.PRO):
@@ -964,6 +974,7 @@ class TestGovernance:
 # Scheduler tests
 # ===========================================================================
 
+
 class TestScheduler:
     def _scheduler(self, tier=Tier.FREE):
         return AutomationScheduler(tier)
@@ -1049,6 +1060,7 @@ class TestScheduler:
 # ===========================================================================
 # Full pipeline / AILearningSystem tests
 # ===========================================================================
+
 
 class TestAILearningSystem:
     def test_instantiate_free(self):
@@ -1142,8 +1154,16 @@ class TestAILearningSystem:
     def test_get_system_status_has_all_subsystems(self):
         system = AILearningSystem(Tier.PRO)
         status = system.get_system_status()
-        for key in ("ingestion", "classification", "sandbox", "analytics",
-                    "hybrid_engine", "deployment", "governance", "scheduler"):
+        for key in (
+            "ingestion",
+            "classification",
+            "sandbox",
+            "analytics",
+            "hybrid_engine",
+            "deployment",
+            "governance",
+            "scheduler",
+        ):
             assert key in status
 
     def test_run_full_pipeline_enterprise_genetic_algo(self):

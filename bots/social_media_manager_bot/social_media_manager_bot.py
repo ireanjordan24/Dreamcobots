@@ -1,12 +1,17 @@
 """Social Media Manager Bot — tier-aware social media post creation and scheduling."""
-import sys, os
+
+import os
 import random
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.social_media_manager_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 ALL_PLATFORMS = ["instagram", "twitter", "linkedin", "facebook", "tiktok", "youtube"]
 PLATFORM_LIMITS = {
@@ -24,11 +29,23 @@ class SocialMediaManagerBot:
         self.config = get_tier_config(tier)
         self.flow = GlobalAISourcesFlow(bot_name="SocialMediaManagerBot")
 
-    def create_post(self, platform: str, topic: str, tone: str = "professional", include_hashtags: bool = True) -> dict:
+    def create_post(
+        self,
+        platform: str,
+        topic: str,
+        tone: str = "professional",
+        include_hashtags: bool = True,
+    ) -> dict:
         if platform not in PLATFORM_LIMITS[self.tier]:
-            raise PermissionError(f"Platform '{platform}' not available on {self.tier.value} tier")
+            raise PermissionError(
+                f"Platform '{platform}' not available on {self.tier.value} tier"
+            )
         caption = f"Exciting update about {topic}! {random.choice(['Stay tuned', 'Learn more', 'Check it out', 'Join us'])}"
-        hashtags = [f"#{topic.replace(' ', '')}", "#business", "#growth"] if include_hashtags else []
+        hashtags = (
+            [f"#{topic.replace(' ', '')}", "#business", "#growth"]
+            if include_hashtags
+            else []
+        )
         return {
             "platform": platform,
             "topic": topic,
@@ -36,20 +53,41 @@ class SocialMediaManagerBot:
             "caption": caption,
             "hashtags": hashtags,
             "estimated_reach": random.randint(100, 10000),
-            "best_time_to_post": random.choice(["9:00 AM", "12:00 PM", "6:00 PM", "8:00 PM"]),
-            "media_suggestion": random.choice(["high-quality photo", "infographic", "short video", "carousel"]),
+            "best_time_to_post": random.choice(
+                ["9:00 AM", "12:00 PM", "6:00 PM", "8:00 PM"]
+            ),
+            "media_suggestion": random.choice(
+                ["high-quality photo", "infographic", "short video", "carousel"]
+            ),
             "tier_used": self.tier.value,
         }
 
     def schedule_content(self, platform: str, posts_per_week: int = 3) -> dict:
         if platform not in PLATFORM_LIMITS[self.tier]:
-            raise PermissionError(f"Platform '{platform}' not available on {self.tier.value} tier")
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            raise PermissionError(
+                f"Platform '{platform}' not available on {self.tier.value} tier"
+            )
+        days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
         calendar = [
             {
                 "day": days[i % 7],
                 "time": random.choice(["9:00 AM", "12:00 PM", "6:00 PM"]),
-                "topic_suggestion": random.choice(["Product highlight", "Customer story", "Industry tip", "Behind the scenes"]),
+                "topic_suggestion": random.choice(
+                    [
+                        "Product highlight",
+                        "Customer story",
+                        "Industry tip",
+                        "Behind the scenes",
+                    ]
+                ),
                 "content_type": random.choice(["image", "video", "carousel", "story"]),
             }
             for i in range(posts_per_week)
@@ -66,8 +104,16 @@ class SocialMediaManagerBot:
             raise PermissionError("Hashtag suggestions require PRO or ENTERPRISE tier")
         base = topic.replace(" ", "")
         return [
-            f"#{base}", "#trending", "#viral", "#business", "#growth",
-            "#marketing", "#digital", "#brand", f"#{base}tips", "#community",
+            f"#{base}",
+            "#trending",
+            "#viral",
+            "#business",
+            "#growth",
+            "#marketing",
+            "#digital",
+            "#brand",
+            f"#{base}tips",
+            "#community",
         ]
 
     def analyze_engagement(self, platform: str, post_id: str) -> dict:

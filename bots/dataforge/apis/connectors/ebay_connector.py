@@ -1,4 +1,5 @@
 """eBay Browse API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,10 +29,19 @@ class EbayConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.oauth_token}", "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"}
+
+        headers = {
+            "Authorization": f"Bearer {self.oauth_token}",
+            "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
+        }
         params = {"q": query, "limit": limit}
         try:
-            response = requests.get(f"{self.BASE_URL}/item_summary/search", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/item_summary/search",
+                params=params,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("eBay search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -49,12 +59,14 @@ class EbayConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.oauth_token}"}
         try:
-            response = requests.get(f"{self.BASE_URL}/item/{item_id}", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/item/{item_id}", headers=headers, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("eBay get_item error: %s", e)
             return {"status": "error", "message": str(e)}
-

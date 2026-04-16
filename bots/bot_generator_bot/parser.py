@@ -19,7 +19,15 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 
 INDUSTRY_KEYWORDS: dict[str, list[str]] = {
-    "real_estate": ["real estate", "realtor", "property", "zillow", "mls", "housing", "mortgage"],
+    "real_estate": [
+        "real estate",
+        "realtor",
+        "property",
+        "zillow",
+        "mls",
+        "housing",
+        "mortgage",
+    ],
     "dental": ["dentist", "dental", "orthodontist", "teeth", "clinic"],
     "legal": ["law", "lawyer", "attorney", "legal", "paralegal", "court"],
     "ecommerce": ["ecommerce", "e-commerce", "shop", "store", "product", "retail"],
@@ -42,10 +50,24 @@ INDUSTRY_KEYWORDS: dict[str, list[str]] = {
 }
 
 GOAL_KEYWORDS: dict[str, list[str]] = {
-    "generate_leads": ["lead", "leads", "find clients", "find customers", "prospect", "outreach"],
+    "generate_leads": [
+        "lead",
+        "leads",
+        "find clients",
+        "find customers",
+        "prospect",
+        "outreach",
+    ],
     "scrape_data": ["scrape", "collect data", "data collection", "harvest", "extract"],
     "automate_outreach": ["outreach", "email", "message", "contact", "follow up"],
-    "track_analytics": ["analytics", "track", "report", "dashboard", "metrics", "performance"],
+    "track_analytics": [
+        "analytics",
+        "track",
+        "report",
+        "dashboard",
+        "metrics",
+        "performance",
+    ],
     "manage_payments": ["payment", "stripe", "invoice", "billing", "subscription"],
     "generate_content": ["content", "post", "write", "create", "generate text"],
     "monitor_market": ["monitor", "price watch", "competitor", "market intelligence"],
@@ -63,9 +85,11 @@ MONETIZATION_KEYWORDS: dict[str, list[str]] = {
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BotIntent:
     """Structured representation of a user's bot-generation request."""
+
     raw_input: str
     industry: str
     goal: str
@@ -88,6 +112,7 @@ class BotIntent:
 # ---------------------------------------------------------------------------
 # Parser
 # ---------------------------------------------------------------------------
+
 
 class BotParser:
     """
@@ -157,7 +182,11 @@ class BotParser:
 
     def _extract_bot_name(self, text: str) -> Optional[str]:
         # Pattern: "Make a <Name> Bot" / "Build a <Name>"
-        match = re.search(r"(?:make|build|create|generate)\s+(?:a|an|me\s+a|me\s+an)?\s+(.+?)(?:\s+bot)?$", text, re.IGNORECASE)
+        match = re.search(
+            r"(?:make|build|create|generate)\s+(?:a|an|me\s+a|me\s+an)?\s+(.+?)(?:\s+bot)?$",
+            text,
+            re.IGNORECASE,
+        )
         if match:
             raw = match.group(1).strip()
             return _slugify(raw) + "_bot"
@@ -177,6 +206,7 @@ class BotParser:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _slugify(text: str) -> str:
     """Convert a human-readable string to a safe Python identifier."""

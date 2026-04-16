@@ -1,28 +1,30 @@
 """Tests for bots/dreamco_code_bot — DreamCo Replit competitor."""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.dreamco_code_bot.dreamco_code_bot import (
-    DreamCoCodeBot,
-    DreamCoCodeBotTierError,
-    DreamCoCodeBotError,
     CodeSession,
+    DreamCoCodeBot,
+    DreamCoCodeBotError,
+    DreamCoCodeBotTierError,
     ExecutionResult,
 )
-from bots.dreamco_code_bot.tiers import get_bot_tier_info, BOT_FEATURES
-
+from bots.dreamco_code_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestDreamCoCodeBotTiers:
     def test_three_tiers_have_features(self):
@@ -34,7 +36,9 @@ class TestDreamCoCodeBotTiers:
         assert any("100" in f or "2 languages" in f for f in free)
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
     def test_get_bot_tier_info_returns_dict(self):
         info = get_bot_tier_info(Tier.FREE)
@@ -50,6 +54,7 @@ class TestDreamCoCodeBotTiers:
 # ===========================================================================
 # Instantiation tests
 # ===========================================================================
+
 
 class TestDreamCoCodeBotInstantiation:
     def test_default_tier_is_free(self):
@@ -76,6 +81,7 @@ class TestDreamCoCodeBotInstantiation:
 # ===========================================================================
 # Language support tests
 # ===========================================================================
+
 
 class TestLanguageSupport:
     def test_free_lists_2_languages(self):
@@ -115,6 +121,7 @@ class TestLanguageSupport:
 # ===========================================================================
 # Code execution tests
 # ===========================================================================
+
 
 class TestCodeExecution:
     def test_execute_python_free(self):
@@ -173,6 +180,7 @@ class TestCodeExecution:
 # Package management tests
 # ===========================================================================
 
+
 class TestPackageManagement:
     def test_free_cannot_install_packages(self):
         bot = DreamCoCodeBot(tier=Tier.FREE)
@@ -201,6 +209,7 @@ class TestPackageManagement:
 # ===========================================================================
 # Session management tests
 # ===========================================================================
+
 
 class TestSessionManagement:
     def test_free_cannot_create_sessions(self):
@@ -255,6 +264,7 @@ class TestSessionManagement:
 # Snippet sharing tests
 # ===========================================================================
 
+
 class TestSnippetSharing:
     def test_free_cannot_share_snippets(self):
         bot = DreamCoCodeBot(tier=Tier.FREE)
@@ -276,6 +286,7 @@ class TestSnippetSharing:
 # ===========================================================================
 # AI suggestion tests
 # ===========================================================================
+
 
 class TestAISuggestions:
     def test_free_cannot_get_suggestions(self):
@@ -301,6 +312,7 @@ class TestAISuggestions:
 # CI/CD Pipeline tests (ENTERPRISE)
 # ===========================================================================
 
+
 class TestCICDPipelines:
     def test_free_cannot_create_pipeline(self):
         bot = DreamCoCodeBot(tier=Tier.FREE)
@@ -314,7 +326,9 @@ class TestCICDPipelines:
 
     def test_enterprise_can_create_pipeline(self):
         bot = DreamCoCodeBot(tier=Tier.ENTERPRISE)
-        pipeline = bot.create_pipeline("CI Pipeline", ["npm install", "npm test", "npm run build"])
+        pipeline = bot.create_pipeline(
+            "CI Pipeline", ["npm install", "npm test", "npm run build"]
+        )
         assert "pipeline_id" in pipeline
         assert pipeline["name"] == "CI Pipeline"
         assert pipeline["status"] == "created"
@@ -329,6 +343,7 @@ class TestCICDPipelines:
 # ===========================================================================
 # Stats tests
 # ===========================================================================
+
 
 class TestExecutionStats:
     def test_initial_stats(self):
@@ -353,6 +368,7 @@ class TestExecutionStats:
 # ===========================================================================
 # Chat interface tests
 # ===========================================================================
+
 
 class TestChatInterface:
     def test_default_chat_response(self):

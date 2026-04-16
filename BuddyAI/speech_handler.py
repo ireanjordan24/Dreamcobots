@@ -72,9 +72,7 @@ class SpeechHandler:
             logger.warning("No speech detected within %d seconds.", self.timeout)
             return ""
         except OSError as exc:
-            raise SpeechRecognitionError(
-                f"Microphone access failed: {exc}"
-            ) from exc
+            raise SpeechRecognitionError(f"Microphone access failed: {exc}") from exc
 
     def transcribe_audio_file(self, path: str) -> str:
         """Transcribe an audio file at *path* and return the text.
@@ -86,9 +84,7 @@ class SpeechHandler:
             Transcribed text string.
         """
         if self._sr is None or self._recognizer is None:
-            raise SpeechRecognitionError(
-                "SpeechRecognition package is not available."
-            )
+            raise SpeechRecognitionError("SpeechRecognition package is not available.")
 
         with self._sr.AudioFile(path) as source:
             audio = self._recognizer.record(source)
@@ -127,9 +123,7 @@ class SpeechHandler:
             logger.warning("Google could not understand the audio.")
             return ""
         except self._sr.RequestError as exc:  # type: ignore[union-attr]
-            logger.warning(
-                "Google Speech API request failed: %s. Trying offline…", exc
-            )
+            logger.warning("Google Speech API request failed: %s. Trying offline…", exc)
             return self._transcribe_offline(audio)
 
     def _transcribe_offline(self, audio: object) -> str:

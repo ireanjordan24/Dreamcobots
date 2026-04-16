@@ -32,59 +32,59 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.big_bro_ai.bot_factory import BotCategory, BotFactory, BotFactoryError
+from bots.big_bro_ai.catalog_franchise import (
+    CatalogCategory,
+    CatalogFranchiseEngine,
+    CatalogFranchiseError,
+    FranchiseStatus,
+)
+from bots.big_bro_ai.continuous_study import (
+    ContinuousStudyEngine,
+    ContinuousStudyError,
+    KnowledgeDomain,
+)
+from bots.big_bro_ai.courses_system import (
+    CourseCategory,
+    CoursesSystem,
+    CoursesSystemError,
+)
+from bots.big_bro_ai.master_dashboard import AlertLevel, MasterDashboard
+from bots.big_bro_ai.memory_system import MemorySystem, MemorySystemError
+from bots.big_bro_ai.mentor_engine import MentorDomain, MentorEngine
+from bots.big_bro_ai.personality import (
+    BIG_BRO_CORE_RULES,
+    BIG_BRO_SIGNATURES,
+    DREAMCO_PHILOSOPHY,
+    PersonalityEngine,
+    RelationshipTier,
+    RoastMode,
+)
+from bots.big_bro_ai.prospectus import ProspectusStatus, ProspectusSystem, ROIBridge
+from bots.big_bro_ai.route_gps import ResourceCategory, RouteGPSIntelligence, RouteType
+from bots.big_bro_ai.sales_monetization import IncomeStreamType, SalesMonetizationEngine
 from bots.big_bro_ai.tiers import (
+    FEATURE_BOT_FACTORY,
+    FEATURE_CATALOG,
+    FEATURE_CONTINUOUS_STUDY,
+    FEATURE_COURSES_SYSTEM,
+    FEATURE_FRANCHISE_ENGINE,
+    FEATURE_MASTER_DASHBOARD,
+    FEATURE_MEMORY_SYSTEM,
+    FEATURE_PROSPECTUS,
+    FEATURE_RELATIONSHIP_MENTOR,
+    FEATURE_ROUTE_GPS,
+    FEATURE_SALES_MONETIZATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_MEMORY_SYSTEM,
-    FEATURE_BOT_FACTORY,
-    FEATURE_CONTINUOUS_STUDY,
-    FEATURE_PROSPECTUS,
-    FEATURE_COURSES_SYSTEM,
-    FEATURE_ROUTE_GPS,
-    FEATURE_SALES_MONETIZATION,
-    FEATURE_CATALOG,
-    FEATURE_FRANCHISE_ENGINE,
-    FEATURE_MASTER_DASHBOARD,
-    FEATURE_RELATIONSHIP_MENTOR,
 )
-from bots.big_bro_ai.personality import (
-    PersonalityEngine,
-    RelationshipTier,
-    RoastMode,
-    BIG_BRO_CORE_RULES,
-    DREAMCO_PHILOSOPHY,
-    BIG_BRO_SIGNATURES,
-)
-from bots.big_bro_ai.memory_system import MemorySystem, MemorySystemError
-from bots.big_bro_ai.mentor_engine import MentorEngine, MentorDomain
-from bots.big_bro_ai.bot_factory import BotFactory, BotCategory, BotFactoryError
-from bots.big_bro_ai.continuous_study import (
-    ContinuousStudyEngine,
-    KnowledgeDomain,
-    ContinuousStudyError,
-)
-from bots.big_bro_ai.prospectus import ProspectusSystem, ROIBridge, ProspectusStatus
-from bots.big_bro_ai.courses_system import CoursesSystem, CourseCategory, CoursesSystemError
-from bots.big_bro_ai.route_gps import RouteGPSIntelligence, ResourceCategory, RouteType
-from bots.big_bro_ai.sales_monetization import (
-    SalesMonetizationEngine,
-    IncomeStreamType,
-)
-from bots.big_bro_ai.catalog_franchise import (
-    CatalogFranchiseEngine,
-    CatalogCategory,
-    FranchiseStatus,
-    CatalogFranchiseError,
-)
-from bots.big_bro_ai.master_dashboard import MasterDashboard, AlertLevel
-
 from framework import GlobalAISourcesFlow
 
 
@@ -140,9 +140,7 @@ class BigBroAI:
         self.personality = PersonalityEngine(custom_name=name)
 
         # 2. Memory System
-        self.memory = MemorySystem(
-            max_profiles=self.config.max_memory_profiles
-        )
+        self.memory = MemorySystem(max_profiles=self.config.max_memory_profiles)
 
         # 3. Mentor Engine
         self.mentor = MentorEngine()
@@ -162,9 +160,7 @@ class BigBroAI:
         self.courses = CoursesSystem()
 
         # 8. Route & GPS Intelligence
-        self.route_gps = RouteGPSIntelligence(
-            default_city=city, default_state=state
-        )
+        self.route_gps = RouteGPSIntelligence(default_city=city, default_state=state)
 
         # 9. Sales & Monetization Engine
         self.sales = SalesMonetizationEngine()
@@ -199,20 +195,18 @@ class BigBroAI:
             "memory_system", {"profile_count": self.memory.profile_count()}
         )
         self.dashboard.update_panel("bot_factory", self.bot_factory.factory_report())
-        self.dashboard.update_panel("continuous_study", self.study_engine.study_report())
+        self.dashboard.update_panel(
+            "continuous_study", self.study_engine.study_report()
+        )
         self.dashboard.update_panel(
             "prospectus_system", self.prospectus_system.system_report()
         )
-        self.dashboard.update_panel(
-            "courses_system", self.courses.revenue_summary()
-        )
+        self.dashboard.update_panel("courses_system", self.courses.revenue_summary())
         self.dashboard.update_panel("route_gps", self.route_gps.gps_report())
         self.dashboard.update_panel(
             "sales_monetization", self.sales.revenue_dashboard()
         )
-        self.dashboard.update_panel(
-            "catalog_franchise", self.catalog.catalog_report()
-        )
+        self.dashboard.update_panel("catalog_franchise", self.catalog.catalog_report())
 
     # ------------------------------------------------------------------
     # BuddyAI-compatible chat interface
@@ -237,7 +231,9 @@ class BigBroAI:
         msg_lower = message.lower()
 
         # Greeting / introduction
-        if any(kw in msg_lower for kw in ("hello", "hi", "hey", "who are you", "introduce")):
+        if any(
+            kw in msg_lower for kw in ("hello", "hi", "hey", "who are you", "introduce")
+        ):
             profile = self.memory.get_profile(user_id)
             if profile:
                 reply = self.personality.greet(profile.name)
@@ -246,12 +242,17 @@ class BigBroAI:
             return self._response(self.personality.introduce())
 
         # Money / income questions
-        if any(kw in msg_lower for kw in ("money", "income", "earn", "make", "revenue", "dollar")):
+        if any(
+            kw in msg_lower
+            for kw in ("money", "income", "earn", "make", "revenue", "dollar")
+        ):
             result = self.mentor.teach(user_id, MentorDomain.MONEY)
             return self._response(result["lesson"])
 
         # Tech questions
-        if any(kw in msg_lower for kw in ("tech", "code", "api", "ai", "automate", "build")):
+        if any(
+            kw in msg_lower for kw in ("tech", "code", "api", "ai", "automate", "build")
+        ):
             result = self.mentor.teach(user_id, MentorDomain.TECH)
             return self._response(result["lesson"])
 
@@ -269,7 +270,9 @@ class BigBroAI:
             return self._response(f"Today's task: {task}")
 
         # DreamCo philosophy
-        if any(kw in msg_lower for kw in ("dreamco", "system", "philosophy", "passive")):
+        if any(
+            kw in msg_lower for kw in ("dreamco", "system", "philosophy", "passive")
+        ):
             return self._response(self.personality.teach_philosophy("core"))
 
         # Dashboard / status
@@ -297,7 +300,9 @@ class BigBroAI:
             return self._response("You're already on the top tier. Let's build.")
 
         # Default — signature wisdom
-        return self._response(self.personality.get_signature(len(message) % len(BIG_BRO_SIGNATURES)))
+        return self._response(
+            self.personality.get_signature(len(message) % len(BIG_BRO_SIGNATURES))
+        )
 
     def process(self, message: str, **kwargs) -> dict:
         """Alias for chat() — BuddyAI process() compatibility."""
@@ -370,7 +375,9 @@ class BigBroAI:
     # Mentor helpers (delegated)
     # ------------------------------------------------------------------
 
-    def teach(self, user_id: str, domain: MentorDomain, topic: str | None = None) -> dict:
+    def teach(
+        self, user_id: str, domain: MentorDomain, topic: str | None = None
+    ) -> dict:
         """Deliver a lesson to *user_id* in *domain*."""
         return self.mentor.teach(user_id, domain, topic)
 

@@ -4,6 +4,7 @@ Tests for divisions/revenue_simulator.py
 Run with:
     python -m pytest tests/test_revenue_simulator.py -v
 """
+
 # GLOBAL AI SOURCES FLOW
 
 import os
@@ -14,8 +15,7 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from divisions.revenue_simulator import RevenueSimulator, BUNDLE_TIERS
-
+from divisions.revenue_simulator import BUNDLE_TIERS, RevenueSimulator
 
 # ---------------------------------------------------------------------------
 # RevenueSimulator.simulate()
@@ -288,9 +288,7 @@ class TestRevenueSimulatorEnterpriseRevenue:
         assert result["license_info"]["price_per_license_usd"] == 499.0
 
     def test_projections_length(self):
-        result = self.sim.model_enterprise_revenue(
-            "DreamRealEstate", 5, months=3
-        )
+        result = self.sim.model_enterprise_revenue("DreamRealEstate", 5, months=3)
         assert len(result["projections"]) == 3
 
     def test_tier_label_is_enterprise(self):
@@ -322,7 +320,11 @@ class TestBundleTiersConstant:
             assert info["description"], f"{name} missing description"
 
     def test_starter_cheaper_than_growth(self):
-        assert BUNDLE_TIERS["Starter+"]["price_usd"] < BUNDLE_TIERS["Growth+"]["price_usd"]
+        assert (
+            BUNDLE_TIERS["Starter+"]["price_usd"] < BUNDLE_TIERS["Growth+"]["price_usd"]
+        )
 
     def test_growth_cheaper_than_empire(self):
-        assert BUNDLE_TIERS["Growth+"]["price_usd"] < BUNDLE_TIERS["Empire"]["price_usd"]
+        assert (
+            BUNDLE_TIERS["Growth+"]["price_usd"] < BUNDLE_TIERS["Empire"]["price_usd"]
+        )

@@ -1,16 +1,25 @@
 """
 Dreamcobots StockTradingBot — tier-aware stock analysis and trading signals.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.stock_trading_bot.tiers import STOCK_TRADING_FEATURES, get_stock_trading_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.stock_trading_bot.tiers import (
+    STOCK_TRADING_FEATURES,
+    get_stock_trading_tier_info,
+)
 
 
 class StockTradingBotTierError(Exception):
@@ -135,19 +144,55 @@ class StockTradingBot:
         signal = self._deterministic_signal(ticker)
 
         if self.tier == Tier.FREE:
-            signals = [{"type": "daily", "signal": signal, "timestamp": datetime.now().isoformat()}]
+            signals = [
+                {
+                    "type": "daily",
+                    "signal": signal,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            ]
         elif self.tier == Tier.PRO:
             signals = [
-                {"type": "real_time", "signal": signal, "timestamp": datetime.now().isoformat()},
-                {"type": "momentum", "signal": "BUY" if signal != "SELL" else "SELL", "timestamp": datetime.now().isoformat()},
-                {"type": "trend", "signal": "HOLD", "timestamp": datetime.now().isoformat()},
+                {
+                    "type": "real_time",
+                    "signal": signal,
+                    "timestamp": datetime.now().isoformat(),
+                },
+                {
+                    "type": "momentum",
+                    "signal": "BUY" if signal != "SELL" else "SELL",
+                    "timestamp": datetime.now().isoformat(),
+                },
+                {
+                    "type": "trend",
+                    "signal": "HOLD",
+                    "timestamp": datetime.now().isoformat(),
+                },
             ]
         else:  # ENTERPRISE
             signals = [
-                {"type": "real_time", "signal": signal, "timestamp": datetime.now().isoformat()},
-                {"type": "algorithmic", "signal": signal, "strategy": "mean_reversion", "timestamp": datetime.now().isoformat()},
-                {"type": "options_flow", "signal": "BUY", "contract": "call", "timestamp": datetime.now().isoformat()},
-                {"type": "institutional", "signal": "accumulation", "timestamp": datetime.now().isoformat()},
+                {
+                    "type": "real_time",
+                    "signal": signal,
+                    "timestamp": datetime.now().isoformat(),
+                },
+                {
+                    "type": "algorithmic",
+                    "signal": signal,
+                    "strategy": "mean_reversion",
+                    "timestamp": datetime.now().isoformat(),
+                },
+                {
+                    "type": "options_flow",
+                    "signal": "BUY",
+                    "contract": "call",
+                    "timestamp": datetime.now().isoformat(),
+                },
+                {
+                    "type": "institutional",
+                    "signal": "accumulation",
+                    "timestamp": datetime.now().isoformat(),
+                },
             ]
 
         return {

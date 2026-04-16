@@ -15,8 +15,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from core.ai_brain import decide_bot_type, find_opportunity
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-from core.ai_brain import find_opportunity, decide_bot_type
 
 # ---------------------------------------------------------------------------
 # Bot scaffold template

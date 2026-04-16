@@ -5,15 +5,16 @@ Normalizes sandbox test metrics and computes global and regional rankings
 for all tested AI/ML methods.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_ANALYTICS
-from .sandbox import SandboxTestResult, SandboxStatus
-from .classifier import ClassifiedMethod
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .classifier import ClassifiedMethod
+from .sandbox import SandboxStatus, SandboxTestResult
+from .tiers import FEATURE_ANALYTICS, Tier, TierConfig, get_tier_config
 
 
 @dataclass
@@ -149,18 +150,28 @@ class PerformanceAnalyticsLayer:
 
         method_ids = list(aggregated.keys())
         avg_accuracy = [
-            sum(aggregated[mid]["accuracies"]) / len(aggregated[mid]["accuracies"])
-            if aggregated[mid]["accuracies"] else 0.0
+            (
+                sum(aggregated[mid]["accuracies"]) / len(aggregated[mid]["accuracies"])
+                if aggregated[mid]["accuracies"]
+                else 0.0
+            )
             for mid in method_ids
         ]
         avg_convergence = [
-            sum(aggregated[mid]["convergences"]) / len(aggregated[mid]["convergences"])
-            if aggregated[mid]["convergences"] else 0.0
+            (
+                sum(aggregated[mid]["convergences"])
+                / len(aggregated[mid]["convergences"])
+                if aggregated[mid]["convergences"]
+                else 0.0
+            )
             for mid in method_ids
         ]
         avg_resource = [
-            sum(aggregated[mid]["resources"]) / len(aggregated[mid]["resources"])
-            if aggregated[mid]["resources"] else 50.0
+            (
+                sum(aggregated[mid]["resources"]) / len(aggregated[mid]["resources"])
+                if aggregated[mid]["resources"]
+                else 50.0
+            )
             for mid in method_ids
         ]
         # Efficiency = 1 - normalised_resource (less CPU is better)
@@ -181,16 +192,18 @@ class PerformanceAnalyticsLayer:
             m = method_map.get(mid)
             title = m.title if m else mid
             region = m.country_of_origin if m else "Unknown"
-            entries.append({
-                "method_id": mid,
-                "title": title,
-                "region": region,
-                "composite": composite[i],
-                "accuracy": norm_acc[i],
-                "convergence": norm_conv[i],
-                "efficiency": norm_eff[i],
-                "count": aggregated[mid]["count"],
-            })
+            entries.append(
+                {
+                    "method_id": mid,
+                    "title": title,
+                    "region": region,
+                    "composite": composite[i],
+                    "accuracy": norm_acc[i],
+                    "convergence": norm_conv[i],
+                    "efficiency": norm_eff[i],
+                    "count": aggregated[mid]["count"],
+                }
+            )
 
         # Sort by composite score descending for global rank
         entries.sort(key=lambda x: x["composite"], reverse=True)

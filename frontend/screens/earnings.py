@@ -38,5 +38,10 @@ class EarningsScreen:
             daily=127.50,
             weekly=892.75,
             monthly=3210.00,
-            breakdown={"deals": 580.0, "flips": 215.0, "cashback": 45.0, "coupons": 62.0},
+            breakdown={
+                "deals": 580.0,
+                "flips": 215.0,
+                "cashback": 45.0,
+                "coupons": 62.0,
+            },
         )

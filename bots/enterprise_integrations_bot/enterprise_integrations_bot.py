@@ -26,24 +26,27 @@ GLOBAL AI SOURCES FLOW: framework imported below.
 
 from __future__ import annotations
 
-import sys
 import os
-import uuid
+import sys
 import time
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.enterprise_integrations_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class EnterpriseIntegrationsBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -65,6 +68,7 @@ class SubscriptionError(EnterpriseIntegrationsBotError):
 # Provider categories
 # ---------------------------------------------------------------------------
 
+
 class ProviderCategory(str, Enum):
     BIG_TECH_AI = "big_tech_ai"
     CLOUD_COMPUTE = "cloud_compute"
@@ -76,6 +80,7 @@ class ProviderCategory(str, Enum):
 # ---------------------------------------------------------------------------
 # Provider registry
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Provider:
@@ -103,6 +108,7 @@ class Provider:
 # ---------------------------------------------------------------------------
 # Mock adapters — replace with live HTTP clients in production
 # ---------------------------------------------------------------------------
+
 
 def _google_adapter(action: str, payload: dict) -> dict:
     return {
@@ -298,8 +304,16 @@ _PROVIDERS: List[Provider] = [
         name="Google Cloud AI",
         category=ProviderCategory.BIG_TECH_AI,
         description="Google's AI platform — Vertex AI, Gemini, Speech, Vision, NLP.",
-        services=["vertex_ai", "gemini", "speech_to_text", "text_to_speech",
-                  "vision", "natural_language", "translation", "automl"],
+        services=[
+            "vertex_ai",
+            "gemini",
+            "speech_to_text",
+            "text_to_speech",
+            "vision",
+            "natural_language",
+            "translation",
+            "automl",
+        ],
         min_tier=Tier.FREE,
         adapter=_google_adapter,
     ),
@@ -308,8 +322,14 @@ _PROVIDERS: List[Provider] = [
         name="IBM Watson / watsonx.ai",
         category=ProviderCategory.BIG_TECH_AI,
         description="IBM's enterprise AI platform — Watson Assistant, Discovery, NLU, watsonx.",
-        services=["watson_assistant", "watson_discovery", "nlu",
-                  "watson_speech", "watsonx_ai", "granite_models"],
+        services=[
+            "watson_assistant",
+            "watson_discovery",
+            "nlu",
+            "watson_speech",
+            "watsonx_ai",
+            "granite_models",
+        ],
         min_tier=Tier.FREE,
         adapter=_ibm_adapter,
     ),
@@ -318,9 +338,16 @@ _PROVIDERS: List[Provider] = [
         name="Microsoft Azure AI",
         category=ProviderCategory.BIG_TECH_AI,
         description="Azure AI services — Cognitive Services, Azure OpenAI, Copilot.",
-        services=["azure_openai", "cognitive_services", "form_recognizer",
-                  "speech_service", "computer_vision", "language_service",
-                  "azure_ml", "copilot_studio"],
+        services=[
+            "azure_openai",
+            "cognitive_services",
+            "form_recognizer",
+            "speech_service",
+            "computer_vision",
+            "language_service",
+            "azure_ml",
+            "copilot_studio",
+        ],
         min_tier=Tier.PRO,
         adapter=_microsoft_azure_adapter,
     ),
@@ -329,8 +356,14 @@ _PROVIDERS: List[Provider] = [
         name="Nvidia AI",
         category=ProviderCategory.BIG_TECH_AI,
         description="Nvidia AI inference — NIM microservices, DGX Cloud, CUDA AI.",
-        services=["nim_microservices", "dgx_cloud", "cuda_toolkit",
-                  "triton_inference", "nemo", "rapids"],
+        services=[
+            "nim_microservices",
+            "dgx_cloud",
+            "cuda_toolkit",
+            "triton_inference",
+            "nemo",
+            "rapids",
+        ],
         min_tier=Tier.PRO,
         adapter=_nvidia_adapter,
     ),
@@ -339,8 +372,16 @@ _PROVIDERS: List[Provider] = [
         name="Amazon AWS AI",
         category=ProviderCategory.BIG_TECH_AI,
         description="AWS AI services — Bedrock, SageMaker, Rekognition, Polly, Lex.",
-        services=["bedrock", "sagemaker", "rekognition", "polly",
-                  "lex", "comprehend", "textract", "transcribe"],
+        services=[
+            "bedrock",
+            "sagemaker",
+            "rekognition",
+            "polly",
+            "lex",
+            "comprehend",
+            "textract",
+            "transcribe",
+        ],
         min_tier=Tier.PRO,
         adapter=_aws_adapter,
     ),
@@ -361,8 +402,13 @@ _PROVIDERS: List[Provider] = [
         name="IBM Cloud",
         category=ProviderCategory.CLOUD_COMPUTE,
         description="IBM's hybrid cloud platform with AI-optimised workloads.",
-        services=["virtual_servers", "code_engine", "cloud_databases",
-                  "cloud_object_storage", "openshift"],
+        services=[
+            "virtual_servers",
+            "code_engine",
+            "cloud_databases",
+            "cloud_object_storage",
+            "openshift",
+        ],
         min_tier=Tier.PRO,
         adapter=_ibm_adapter,
     ),
@@ -371,8 +417,15 @@ _PROVIDERS: List[Provider] = [
         name="Google Cloud Platform",
         category=ProviderCategory.CLOUD_COMPUTE,
         description="Google's cloud compute, storage, and data services.",
-        services=["compute_engine", "gke", "cloud_run", "bigquery",
-                  "cloud_storage", "cloud_sql", "cloud_spanner"],
+        services=[
+            "compute_engine",
+            "gke",
+            "cloud_run",
+            "bigquery",
+            "cloud_storage",
+            "cloud_sql",
+            "cloud_spanner",
+        ],
         min_tier=Tier.PRO,
         adapter=_google_adapter,
     ),
@@ -381,12 +434,19 @@ _PROVIDERS: List[Provider] = [
         name="Oracle Cloud Infrastructure",
         category=ProviderCategory.CLOUD_COMPUTE,
         description="Oracle Cloud — compute, autonomous DB, AI infrastructure.",
-        services=["oci_compute", "autonomous_database", "ai_services",
-                  "object_storage", "container_engine"],
+        services=[
+            "oci_compute",
+            "autonomous_database",
+            "ai_services",
+            "object_storage",
+            "container_engine",
+        ],
         min_tier=Tier.ENTERPRISE,
         adapter=lambda a, p: {
-            "provider": "oracle_cloud", "action": a, "status": "ok",
-            "result": f"[Oracle Cloud mock] {a} completed"
+            "provider": "oracle_cloud",
+            "action": a,
+            "status": "ok",
+            "result": f"[Oracle Cloud mock] {a} completed",
         },
     ),
     # -----------------------------------------------------------------------
@@ -397,8 +457,15 @@ _PROVIDERS: List[Provider] = [
         name="Databricks",
         category=ProviderCategory.BIG_DATA_ANALYTICS,
         description="Databricks Lakehouse — unified data engineering, ML, and analytics.",
-        services=["delta_lake", "mlflow", "spark_sql", "databricks_sql",
-                  "automl", "feature_store", "unity_catalog"],
+        services=[
+            "delta_lake",
+            "mlflow",
+            "spark_sql",
+            "databricks_sql",
+            "automl",
+            "feature_store",
+            "unity_catalog",
+        ],
         min_tier=Tier.PRO,
         adapter=_databricks_adapter,
     ),
@@ -407,8 +474,14 @@ _PROVIDERS: List[Provider] = [
         name="Palantir Foundry",
         category=ProviderCategory.BIG_DATA_ANALYTICS,
         description="Palantir — ontology-driven AI for enterprise data operations.",
-        services=["foundry", "gotham", "apollo", "aip",
-                  "ontology_builder", "pipeline_builder"],
+        services=[
+            "foundry",
+            "gotham",
+            "apollo",
+            "aip",
+            "ontology_builder",
+            "pipeline_builder",
+        ],
         min_tier=Tier.ENTERPRISE,
         adapter=_palantir_adapter,
     ),
@@ -417,8 +490,14 @@ _PROVIDERS: List[Provider] = [
         name="Snowflake",
         category=ProviderCategory.BIG_DATA_ANALYTICS,
         description="Snowflake Data Cloud — elastic SQL, data sharing, and Cortex AI.",
-        services=["snowpark", "cortex_ai", "dynamic_tables",
-                  "streamlit", "data_sharing", "marketplace"],
+        services=[
+            "snowpark",
+            "cortex_ai",
+            "dynamic_tables",
+            "streamlit",
+            "data_sharing",
+            "marketplace",
+        ],
         min_tier=Tier.PRO,
         adapter=_snowflake_adapter,
     ),
@@ -427,8 +506,14 @@ _PROVIDERS: List[Provider] = [
         name="Tableau",
         category=ProviderCategory.BIG_DATA_ANALYTICS,
         description="Tableau Analytics — interactive dashboards and embedded analytics.",
-        services=["tableau_desktop", "tableau_server", "tableau_cloud",
-                  "embedded_analytics", "tableau_prep", "ask_data"],
+        services=[
+            "tableau_desktop",
+            "tableau_server",
+            "tableau_cloud",
+            "embedded_analytics",
+            "tableau_prep",
+            "ask_data",
+        ],
         min_tier=Tier.PRO,
         adapter=_tableau_adapter,
     ),
@@ -440,8 +525,15 @@ _PROVIDERS: List[Provider] = [
         name="Slack",
         category=ProviderCategory.COMMUNICATION,
         description="Slack — messaging, workflows, and app integrations.",
-        services=["messages", "channels", "workflows", "bots",
-                  "webhooks", "block_kit", "canvas"],
+        services=[
+            "messages",
+            "channels",
+            "workflows",
+            "bots",
+            "webhooks",
+            "block_kit",
+            "canvas",
+        ],
         min_tier=Tier.FREE,
         adapter=_slack_adapter,
     ),
@@ -450,8 +542,15 @@ _PROVIDERS: List[Provider] = [
         name="Microsoft Teams",
         category=ProviderCategory.COMMUNICATION,
         description="Microsoft Teams — enterprise chat, meetings, and Power Platform bots.",
-        services=["channels", "meetings", "bots", "tabs",
-                  "messaging_extensions", "power_automate", "graph_api"],
+        services=[
+            "channels",
+            "meetings",
+            "bots",
+            "tabs",
+            "messaging_extensions",
+            "power_automate",
+            "graph_api",
+        ],
         min_tier=Tier.PRO,
         adapter=_teams_adapter,
     ),
@@ -460,8 +559,15 @@ _PROVIDERS: List[Provider] = [
         name="Zoom",
         category=ProviderCategory.COMMUNICATION,
         description="Zoom — video meetings, webinars, phone, and Zoom Apps.",
-        services=["meetings", "webinars", "phone", "zoom_apps",
-                  "contact_center", "rooms", "video_sdk"],
+        services=[
+            "meetings",
+            "webinars",
+            "phone",
+            "zoom_apps",
+            "contact_center",
+            "rooms",
+            "video_sdk",
+        ],
         min_tier=Tier.PRO,
         adapter=_zoom_adapter,
     ),
@@ -473,9 +579,15 @@ _PROVIDERS: List[Provider] = [
         name="DreamLLM",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo's proprietary foundation language model — "
-                    "competing with GPT-4 / Gemini / Claude.",
-        services=["chat", "completion", "summarisation",
-                  "translation", "code_generation", "embeddings"],
+        "competing with GPT-4 / Gemini / Claude.",
+        services=[
+            "chat",
+            "completion",
+            "summarisation",
+            "translation",
+            "code_generation",
+            "embeddings",
+        ],
         min_tier=Tier.FREE,
         adapter=_dream_llm_adapter,
     ),
@@ -484,13 +596,21 @@ _PROVIDERS: List[Provider] = [
         name="DreamVision",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo multimodal vision model — competing with GPT-4o / Gemini Vision.",
-        services=["image_analysis", "ocr", "object_detection",
-                  "image_generation", "visual_qa"],
+        services=[
+            "image_analysis",
+            "ocr",
+            "object_detection",
+            "image_generation",
+            "visual_qa",
+        ],
         min_tier=Tier.PRO,
         adapter=lambda a, p: {
-            "provider": "dream_vision", "action": a, "status": "ok",
+            "provider": "dream_vision",
+            "action": a,
+            "status": "ok",
             "result": f"[DreamVision mock] {a} completed",
-            "model": "dreamvision-1.0", "proprietary": True
+            "model": "dreamvision-1.0",
+            "proprietary": True,
         },
     ),
     Provider(
@@ -498,13 +618,20 @@ _PROVIDERS: List[Provider] = [
         name="DreamVoice",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo speech synthesis & recognition — competing with AWS Polly / Azure Speech.",
-        services=["text_to_speech", "speech_to_text",
-                  "voice_cloning", "real_time_translation"],
+        services=[
+            "text_to_speech",
+            "speech_to_text",
+            "voice_cloning",
+            "real_time_translation",
+        ],
         min_tier=Tier.PRO,
         adapter=lambda a, p: {
-            "provider": "dream_voice", "action": a, "status": "ok",
+            "provider": "dream_voice",
+            "action": a,
+            "status": "ok",
             "result": f"[DreamVoice mock] {a} completed",
-            "model": "dreamvoice-2.0", "proprietary": True
+            "model": "dreamvoice-2.0",
+            "proprietary": True,
         },
     ),
     Provider(
@@ -512,13 +639,21 @@ _PROVIDERS: List[Provider] = [
         name="DreamCode",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo code generation model — competing with GitHub Copilot / Claude Code.",
-        services=["code_completion", "code_review",
-                  "test_generation", "refactoring", "documentation"],
+        services=[
+            "code_completion",
+            "code_review",
+            "test_generation",
+            "refactoring",
+            "documentation",
+        ],
         min_tier=Tier.PRO,
         adapter=lambda a, p: {
-            "provider": "dream_code", "action": a, "status": "ok",
+            "provider": "dream_code",
+            "action": a,
+            "status": "ok",
             "result": f"[DreamCode mock] {a} completed",
-            "model": "dreamcode-1.2", "proprietary": True
+            "model": "dreamcode-1.2",
+            "proprietary": True,
         },
     ),
     Provider(
@@ -526,8 +661,14 @@ _PROVIDERS: List[Provider] = [
         name="DreamAnalytics",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo analytics engine — competing with Tableau / Databricks.",
-        services=["dashboard", "sql_query", "ml_pipeline",
-                  "forecasting", "anomaly_detection", "report_generation"],
+        services=[
+            "dashboard",
+            "sql_query",
+            "ml_pipeline",
+            "forecasting",
+            "anomaly_detection",
+            "report_generation",
+        ],
         min_tier=Tier.PRO,
         adapter=_dream_analytics_adapter,
     ),
@@ -536,8 +677,14 @@ _PROVIDERS: List[Provider] = [
         name="DreamCollab",
         category=ProviderCategory.DREAM_PROPRIETARY,
         description="DreamCo collaboration workspace — competing with Slack / Teams / Zoom.",
-        services=["messaging", "video_calls", "file_sharing",
-                  "task_boards", "docs", "ai_assistant"],
+        services=[
+            "messaging",
+            "video_calls",
+            "file_sharing",
+            "task_boards",
+            "docs",
+            "ai_assistant",
+        ],
         min_tier=Tier.PRO,
         adapter=_dream_collab_adapter,
     ),
@@ -550,6 +697,7 @@ _PROVIDER_INDEX: Dict[str, Provider] = {p.provider_id: p for p in _PROVIDERS}
 # ---------------------------------------------------------------------------
 # Subscription record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Subscription:
@@ -568,7 +716,9 @@ class Subscription:
 
     @property
     def total_price_usd(self) -> float:
-        return round(self.seats * self.price_per_seat_usd * (1 + self.resale_markup_pct / 100), 2)
+        return round(
+            self.seats * self.price_per_seat_usd * (1 + self.resale_markup_pct / 100), 2
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -589,6 +739,7 @@ class Subscription:
 # ---------------------------------------------------------------------------
 # API call record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class APICallRecord:
@@ -617,6 +768,7 @@ class APICallRecord:
 # ---------------------------------------------------------------------------
 # Main bot
 # ---------------------------------------------------------------------------
+
 
 class EnterpriseIntegrationsBot:
     """
@@ -735,9 +887,7 @@ class EnterpriseIntegrationsBot:
             if category is not None and p.category != category:
                 continue
             d = p.to_dict()
-            d["available_on_current_tier"] = (
-                p.provider_id in self._enabled_providers
-            )
+            d["available_on_current_tier"] = p.provider_id in self._enabled_providers
             result.append(d)
         return result
 
@@ -747,9 +897,7 @@ class EnterpriseIntegrationsBot:
             raise ProviderNotFoundError(f"Unknown provider: '{provider_id}'")
         p = _PROVIDER_INDEX[provider_id]
         d = p.to_dict()
-        d["available_on_current_tier"] = (
-            p.provider_id in self._enabled_providers
-        )
+        d["available_on_current_tier"] = p.provider_id in self._enabled_providers
         return d
 
     # ------------------------------------------------------------------
@@ -865,15 +1013,11 @@ class EnterpriseIntegrationsBot:
         """Call DreamCode — DreamCo's code generation model (PRO+)."""
         return self.call_provider("dream_code", action, payload)
 
-    def dream_analytics(
-        self, action: str, payload: Optional[dict] = None
-    ) -> dict:
+    def dream_analytics(self, action: str, payload: Optional[dict] = None) -> dict:
         """Call DreamAnalytics — DreamCo's analytics engine (PRO+)."""
         return self.call_provider("dream_analytics", action, payload)
 
-    def dream_collab(
-        self, action: str, payload: Optional[dict] = None
-    ) -> dict:
+    def dream_collab(self, action: str, payload: Optional[dict] = None) -> dict:
         """Call DreamCollab — DreamCo's collaboration workspace (PRO+)."""
         return self.call_provider("dream_collab", action, payload)
 
@@ -896,7 +1040,8 @@ class EnterpriseIntegrationsBot:
         """
         payload = payload or {}
         candidates = [
-            p for p in _PROVIDERS
+            p
+            for p in _PROVIDERS
             if p.category == category and p.provider_id in self._enabled_providers
         ]
         if not candidates:
@@ -956,7 +1101,9 @@ class EnterpriseIntegrationsBot:
                 f"{self.tier.value.upper()} tier. Upgrade to ENTERPRISE for unlimited seats."
             )
 
-        effective_markup = markup_pct if markup_pct is not None else self.DEFAULT_MARKUP[self.tier]
+        effective_markup = (
+            markup_pct if markup_pct is not None else self.DEFAULT_MARKUP[self.tier]
+        )
         sub = Subscription(
             subscription_id=str(uuid.uuid4()),
             provider_id=provider_id,
@@ -989,13 +1136,9 @@ class EnterpriseIntegrationsBot:
     def get_resale_revenue(self) -> dict:
         """Return total resale revenue metrics (PRO+)."""
         self._require_tier(Tier.PRO, "resale revenue analytics")
-        active = [
-            s for s in self._subscriptions.values() if s.status == "active"
-        ]
+        active = [s for s in self._subscriptions.values() if s.status == "active"]
         total_revenue = sum(s.total_price_usd for s in active)
-        total_cost = sum(
-            s.seats * s.price_per_seat_usd for s in active
-        )
+        total_cost = sum(s.seats * s.price_per_seat_usd for s in active)
         return {
             "active_subscriptions": len(active),
             "total_seats_managed": sum(s.seats for s in active),
@@ -1044,7 +1187,9 @@ class EnterpriseIntegrationsBot:
         """Unified natural-language interface for the Enterprise Integrations Bot."""
         msg = message.lower()
 
-        if any(kw in msg for kw in ("providers", "list providers", "available services")):
+        if any(
+            kw in msg for kw in ("providers", "list providers", "available services")
+        ):
             providers = self.list_providers()
             return {
                 "message": f"{len(providers)} provider(s) available on your tier.",
@@ -1105,7 +1250,9 @@ class EnterpriseIntegrationsBot:
             return {"message": result["result"], "data": result}
 
         if any(kw in msg for kw in ("slack", "send message")):
-            result = self.slack("post_message", {"channel": "#general", "text": message})
+            result = self.slack(
+                "post_message", {"channel": "#general", "text": message}
+            )
             return {"message": result["result"], "data": result}
 
         if any(kw in msg for kw in ("teams", "microsoft teams")):

@@ -1,41 +1,45 @@
 """Tests for all 30 App bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from App_bots.ab_testing_bot import ABTestingBot
+from App_bots.accessibility_bot import AccessibilityBot
+from App_bots.analytics_bot import AnalyticsBot
+from App_bots.api_rate_limiter_bot import APIRateLimiterBot
+from App_bots.app_store_optimizer_bot import AppStoreOptimizerBot
+from App_bots.beta_tester_bot import BetaTesterBot
+from App_bots.churn_predictor_bot import ChurnPredictorBot
+from App_bots.crash_reporter_bot import CrashReporterBot
+from App_bots.deep_link_bot import DeepLinkBot
 from App_bots.feature_1 import OnboardingBot
 from App_bots.feature_2 import SupportBot
 from App_bots.feature_3 import NotificationBot
-from App_bots.analytics_bot import AnalyticsBot
-from App_bots.user_retention_bot import UserRetentionBot
-from App_bots.monetization_bot import MonetizationBot
-from App_bots.push_notification_bot import PushNotificationBot
-from App_bots.ab_testing_bot import ABTestingBot
-from App_bots.crash_reporter_bot import CrashReporterBot
-from App_bots.user_segmentation_bot import UserSegmentationBot
-from App_bots.in_app_purchase_bot import InAppPurchaseBot
-from App_bots.subscription_manager_bot import SubscriptionManagerBot
-from App_bots.review_collector_bot import ReviewCollectorBot
-from App_bots.referral_program_bot import ReferralProgramBot
-from App_bots.gamification_bot import GamificationBot
-from App_bots.personalization_bot import PersonalizationBot
-from App_bots.churn_predictor_bot import ChurnPredictorBot
-from App_bots.onboarding_funnel_bot import OnboardingFunnelBot
-from App_bots.app_store_optimizer_bot import AppStoreOptimizerBot
-from App_bots.session_tracker_bot import SessionTrackerBot
 from App_bots.feature_flag_bot import FeatureFlagBot
-from App_bots.user_feedback_bot import UserFeedbackBot
-from App_bots.deep_link_bot import DeepLinkBot
-from App_bots.social_sharing_bot import SocialSharingBot
-from App_bots.payment_gateway_bot import PaymentGatewayBot
+from App_bots.gamification_bot import GamificationBot
+from App_bots.in_app_purchase_bot import InAppPurchaseBot
 from App_bots.localization_bot import LocalizationBot
-from App_bots.accessibility_bot import AccessibilityBot
+from App_bots.monetization_bot import MonetizationBot
+from App_bots.onboarding_funnel_bot import OnboardingFunnelBot
+from App_bots.payment_gateway_bot import PaymentGatewayBot
 from App_bots.performance_monitor_bot import PerformanceMonitorBot
-from App_bots.beta_tester_bot import BetaTesterBot
-from App_bots.api_rate_limiter_bot import APIRateLimiterBot
+from App_bots.personalization_bot import PersonalizationBot
+from App_bots.push_notification_bot import PushNotificationBot
+from App_bots.referral_program_bot import ReferralProgramBot
+from App_bots.review_collector_bot import ReviewCollectorBot
+from App_bots.session_tracker_bot import SessionTrackerBot
+from App_bots.social_sharing_bot import SocialSharingBot
+from App_bots.subscription_manager_bot import SubscriptionManagerBot
+from App_bots.user_feedback_bot import UserFeedbackBot
+from App_bots.user_retention_bot import UserRetentionBot
+from App_bots.user_segmentation_bot import UserSegmentationBot
 
 ALL_BOTS = [
     ("OnboardingBot", OnboardingBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

@@ -24,10 +24,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
+
 
 class SkillLevel(Enum):
     BEGINNER = "beginner"
@@ -59,11 +59,13 @@ class LearningGoal(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class LabeledSample:
     """A single labelled data sample in a dataset."""
+
     sample_id: str
-    raw_data: str          # text description or file reference
+    raw_data: str  # text description or file reference
     label: str
     confidence: float = 1.0
     labeled_by: str = "human"
@@ -82,6 +84,7 @@ class LabeledSample:
 @dataclass
 class ManagedDataset:
     """A dataset created and managed through the human trainer workflows."""
+
     dataset_id: str
     name: str
     description: str
@@ -106,6 +109,7 @@ class ManagedDataset:
 @dataclass
 class LearnerProfile:
     """Tracks a human learner's progress through the training platform."""
+
     learner_id: str
     name: str
     skill_level: SkillLevel
@@ -130,6 +134,7 @@ class LearnerProfile:
 @dataclass
 class WorkflowStep:
     """A single step within a guided training workflow."""
+
     step_id: str
     title: str
     description: str
@@ -243,7 +248,9 @@ _WORKFLOWS: dict[WorkflowType, list[WorkflowStep]] = {
                 "Tell Buddy your goal (e.g. 'classify images', 'answer questions').",
                 "Buddy will recommend an architecture and starting hyperparameters.",
             ],
-            tips=["Start simple — a small model trained well beats a large model trained poorly."],
+            tips=[
+                "Start simple — a small model trained well beats a large model trained poorly."
+            ],
             xp_reward=15,
         ),
         WorkflowStep(
@@ -254,7 +261,9 @@ _WORKFLOWS: dict[WorkflowType, list[WorkflowStep]] = {
                 "Use Buddy's start_training() with your dataset ID.",
                 "Start with epochs=20, learning_rate=0.001.",
             ],
-            tips=["Monitor validation loss — stop if it starts increasing (overfitting)."],
+            tips=[
+                "Monitor validation loss — stop if it starts increasing (overfitting)."
+            ],
             xp_reward=20,
         ),
         WorkflowStep(
@@ -265,7 +274,9 @@ _WORKFLOWS: dict[WorkflowType, list[WorkflowStep]] = {
                 "Read the feedback field in your training session result.",
                 "Adjust parameters and re-train as Buddy suggests.",
             ],
-            tips=["Three iterations of tuning are usually enough to reach a good baseline."],
+            tips=[
+                "Three iterations of tuning are usually enough to reach a good baseline."
+            ],
             xp_reward=25,
         ),
         WorkflowStep(
@@ -290,6 +301,7 @@ def get_workflow(workflow_type: WorkflowType) -> list[WorkflowStep]:
 # ---------------------------------------------------------------------------
 # Core class
 # ---------------------------------------------------------------------------
+
 
 class HumanTrainer:
     """
@@ -386,11 +398,13 @@ class HumanTrainer:
         path: list[dict] = []
         for wt in workflow_types:
             steps = get_workflow(wt)
-            path.append({
-                "workflow": wt.value,
-                "steps": [s.to_dict() for s in steps],
-                "total_xp": sum(s.xp_reward for s in steps),
-            })
+            path.append(
+                {
+                    "workflow": wt.value,
+                    "steps": [s.to_dict() for s in steps],
+                    "total_xp": sum(s.xp_reward for s in steps),
+                }
+            )
         return path
 
     def complete_step(self, learner_id: str, step_id: str) -> dict:

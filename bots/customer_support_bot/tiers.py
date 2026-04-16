@@ -2,24 +2,38 @@
 Tier configuration for the Dreamcobots Customer Support Bot.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import (
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # Bot-specific features per tier
 CUSTOMER_SUPPORT_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: ["3 support categories", "basic FAQ responses", "email handoff"],
-    Tier.PRO.value: ["15 support categories", "sentiment analysis", "priority routing", "CRM integration"],
-    Tier.ENTERPRISE.value: ["unlimited categories", "custom AI training", "white-label", "SLA guarantees", "API webhooks"],
+    Tier.PRO.value: [
+        "15 support categories",
+        "sentiment analysis",
+        "priority routing",
+        "CRM integration",
+    ],
+    Tier.ENTERPRISE.value: [
+        "unlimited categories",
+        "custom AI training",
+        "white-label",
+        "SLA guarantees",
+        "API webhooks",
+    ],
 }
 
 

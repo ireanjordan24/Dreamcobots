@@ -23,17 +23,18 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FaceRecord:
     """A registered face in the recognition system."""
+
     face_id: str
-    label: str              # e.g. person's name or role
-    encoding_hash: str      # SHA-256 of the raw encoding bytes (simulated)
+    label: str  # e.g. person's name or role
+    encoding_hash: str  # SHA-256 of the raw encoding bytes (simulated)
     registered_at: float = field(default_factory=time.time)
     extra_metadata: dict = field(default_factory=dict)
 
@@ -41,8 +42,9 @@ class FaceRecord:
 @dataclass
 class ObjectRecord:
     """A registered object category in the recognition system."""
+
     object_id: str
-    category: str           # e.g. 'coin', 'antique', 'currency'
+    category: str  # e.g. 'coin', 'antique', 'currency'
     description: str
     visual_keywords: list[str]
     estimated_value_usd: float = 0.0
@@ -52,6 +54,7 @@ class ObjectRecord:
 @dataclass
 class ValuationResult:
     """Result of an item valuation query."""
+
     item_description: str
     category: str
     estimated_min_usd: float
@@ -65,11 +68,12 @@ class ValuationResult:
 @dataclass
 class TrainingSession:
     """Records a completed training session."""
+
     session_id: str
-    trainee: str            # 'human' | 'ai' | 'bot_name'
+    trainee: str  # 'human' | 'ai' | 'bot_name'
     skill: str
     duration_seconds: int
-    score: float            # 0.0 – 1.0
+    score: float  # 0.0 – 1.0
     passed: bool
     feedback: str
 
@@ -124,6 +128,7 @@ _CURRENCY_MULTIPLIERS: dict[str, float] = {
 # ---------------------------------------------------------------------------
 # Core class
 # ---------------------------------------------------------------------------
+
 
 class AutonomousTrainer:
     """
@@ -242,7 +247,8 @@ class AutonomousTrainer:
         """
         desc_lower = description.lower()
         matches = [
-            obj for obj in self._objects.values()
+            obj
+            for obj in self._objects.values()
             if any(kw.lower() in desc_lower for kw in obj.visual_keywords)
         ]
         return sorted(matches, key=lambda o: o.confidence, reverse=True)
@@ -273,8 +279,12 @@ class AutonomousTrainer:
         """
         desc = item_description.lower()
         condition_mult = {
-            "poor": 0.3, "fair": 0.6, "good": 1.0,
-            "very good": 1.3, "excellent": 1.6, "mint": 2.0,
+            "poor": 0.3,
+            "fair": 0.6,
+            "good": 1.0,
+            "very good": 1.3,
+            "excellent": 1.6,
+            "mint": 2.0,
         }.get(condition.lower(), 1.0)
 
         # Try coins first
@@ -376,12 +386,11 @@ class AutonomousTrainer:
         """
         # Deterministic score based on skill string hash so tests are stable
         hash_val = int(hashlib.md5(skill.encode()).hexdigest(), 16)
-        score = round(0.5 + (hash_val % 500) / 1000.0, 2)   # 0.50–0.99
+        score = round(0.5 + (hash_val % 500) / 1000.0, 2)  # 0.50–0.99
         passed = score >= 0.6
         session_id = f"session_{hashlib.md5(f'{trainee}{skill}{time.time()}'.encode()).hexdigest()[:12]}"
-        feedback = (
-            f"Training complete for '{skill}'. Score: {score:.0%}. "
-            + ("Passed ✓" if passed else "Needs improvement — please retry.")
+        feedback = f"Training complete for '{skill}'. Score: {score:.0%}. " + (
+            "Passed ✓" if passed else "Needs improvement — please retry."
         )
         session = TrainingSession(
             session_id=session_id,

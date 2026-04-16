@@ -28,8 +28,9 @@ logger = logging.getLogger(__name__)
 # ── Try to import sklearn – fall back gracefully ───────────────────────────
 
 try:
-    from sklearn.linear_model import LinearRegression  # type: ignore
     import numpy as np  # type: ignore
+    from sklearn.linear_model import LinearRegression  # type: ignore
+
     _SKLEARN_AVAILABLE = True
 except ImportError:
     _SKLEARN_AVAILABLE = False
@@ -41,8 +42,8 @@ except ImportError:
 class Prediction:
     source: str
     predicted_revenue: float
-    confidence: float          # 0 – 1
-    growth_factor: float       # multiplier vs current
+    confidence: float  # 0 – 1
+    growth_factor: float  # multiplier vs current
     recommendation: str
 
     def to_dict(self) -> dict:
@@ -62,7 +63,7 @@ class OptimizationResult:
     best_score: float
     best_config: dict
     improvement_pct: float
-    status: str                # "scaled" | "rejected" | "testing"
+    status: str  # "scaled" | "rejected" | "testing"
     history: list[float] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -79,9 +80,7 @@ class OptimizationResult:
 # ── Pure-Python linear regression ─────────────────────────────────────────
 
 
-def _simple_linear_regression(
-    x: list[float], y: list[float]
-) -> tuple[float, float]:
+def _simple_linear_regression(x: list[float], y: list[float]) -> tuple[float, float]:
     """Return (slope, intercept) for the simple linear regression of x → y."""
     n = len(x)
     if n < 2:
@@ -142,7 +141,10 @@ class IncomePredictor:
             self._r2[source] = r2
             logger.debug(
                 "Trained model for %s: slope=%.4f, intercept=%.4f, R²=%.4f",
-                source, slope, intercept, r2,
+                source,
+                slope,
+                intercept,
+                r2,
             )
 
     def predict(self, source: str, steps_ahead: int = 30) -> Prediction:
@@ -166,7 +168,9 @@ class IncomePredictor:
         growth_factor = predicted / current if current > 0 else 1.0
         confidence = min(max(self._r2.get(source, 0.5), 0.0), 1.0)
         if growth_factor >= 1.2:
-            recommendation = "High growth trajectory — increase investment in this stream."
+            recommendation = (
+                "High growth trajectory — increase investment in this stream."
+            )
         elif growth_factor >= 1.0:
             recommendation = "Stable growth — maintain current strategy."
         else:
@@ -179,7 +183,9 @@ class IncomePredictor:
             recommendation=recommendation,
         )
 
-    def predict_all(self, sources: list[str], steps_ahead: int = 30) -> list[Prediction]:
+    def predict_all(
+        self, sources: list[str], steps_ahead: int = 30
+    ) -> list[Prediction]:
         """Return predictions for every source in *sources*."""
         return [self.predict(s, steps_ahead) for s in sources]
 
@@ -206,7 +212,9 @@ class OptimizationEngine:
         self.bus = bus
         self.iterations = int(cfg.get("optimization_iterations", 100))
 
-    def optimize(self, idea: str, baseline_score: float | None = None) -> OptimizationResult:
+    def optimize(
+        self, idea: str, baseline_score: float | None = None
+    ) -> OptimizationResult:
         """
         Run an optimization loop for the given *idea*.
 
@@ -232,9 +240,7 @@ class OptimizationEngine:
 
         for i in range(self.iterations):
             # Sample a random configuration
-            candidate_config = {
-                k: random.choice(v) for k, v in config_options.items()
-            }
+            candidate_config = {k: random.choice(v) for k, v in config_options.items()}
             # Simulate a score (in production: A/B test or live metric)
             candidate_score = self._simulate_score(candidate_config, i)
 
@@ -249,9 +255,14 @@ class OptimizationEngine:
 
         improvement_pct = (
             (best_score - baseline_score) / baseline_score * 100
-            if baseline_score > 0 else 0.0
+            if baseline_score > 0
+            else 0.0
         )
-        status = "scaled" if best_score >= 0.7 else "testing" if best_score >= 0.5 else "rejected"
+        status = (
+            "scaled"
+            if best_score >= 0.7
+            else "testing" if best_score >= 0.5 else "rejected"
+        )
         result = OptimizationResult(
             idea=idea,
             iterations_run=self.iterations,
@@ -263,7 +274,10 @@ class OptimizationEngine:
         )
         logger.info(
             "Optimization complete for '%s': score=%.4f (%+.1f%%) → %s",
-            idea, best_score, improvement_pct, status,
+            idea,
+            best_score,
+            improvement_pct,
+            status,
         )
         self.bus.publish("optimizer.result", result.to_dict())
         return result

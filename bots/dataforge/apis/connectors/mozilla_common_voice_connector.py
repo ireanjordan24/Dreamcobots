@@ -1,4 +1,5 @@
 """Mozilla Common Voice API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,9 +28,12 @@ class MozillaCommonVoiceConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.api_key}"}
         try:
-            response = requests.get(f"{self.BASE_URL}/{language}/clips", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/{language}/clips", headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("Mozilla Common Voice clips fetched for language %s.", language)
             return {"status": "success", "data": response.json()}
@@ -49,6 +53,7 @@ class MozillaCommonVoiceConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.api_key}"}
         try:
             with open(audio_path, "rb") as f:
@@ -57,7 +62,7 @@ class MozillaCommonVoiceConnector:
                     files={"audio": f},
                     data={"sentence": sentence},
                     headers=headers,
-                    timeout=30
+                    timeout=30,
                 )
             response.raise_for_status()
             logger.info("Mozilla Common Voice clip submitted.")
@@ -65,4 +70,3 @@ class MozillaCommonVoiceConnector:
         except Exception as e:
             logger.error("Mozilla Common Voice submit_clip error: %s", e)
             return {"status": "error", "message": str(e)}
-

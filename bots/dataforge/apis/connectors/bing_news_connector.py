@@ -1,4 +1,5 @@
 """Microsoft Bing News Search connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -29,14 +30,16 @@ class BingNewsConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Ocp-Apim-Subscription-Key": self.api_key}
         params = {"q": query, "mkt": market, "count": count}
         try:
-            response = requests.get(f"{self.BASE_URL}/search", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search", params=params, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("Bing News search completed for: %s", query)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Bing News search error: %s", e)
             return {"status": "error", "message": str(e)}
-

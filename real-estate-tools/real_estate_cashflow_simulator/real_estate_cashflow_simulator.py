@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Real Estate Cashflow Simulator - property investment cashflow and ROI analysis."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -66,7 +71,11 @@ class RealEstateCashflowSimulator:
         annual_rent = round(effective_rent * 12, 2)
         noi = round((effective_rent - expenses - mgmt_fee) * 12, 2)
         cap_rate = round((noi / price) * 100, 2) if price else 0.0
-        cash_on_cash = round((annual_cashflow / (price * down_pct)) * 100, 2) if (price * down_pct) else 0.0
+        cash_on_cash = (
+            round((annual_cashflow / (price * down_pct)) * 100, 2)
+            if (price * down_pct)
+            else 0.0
+        )
 
         return {
             "purchase_price": price,
@@ -98,7 +107,8 @@ class RealEstateCashflowSimulator:
             loan
             * (monthly_rate * (1 + monthly_rate) ** n_payments)
             / ((1 + monthly_rate) ** n_payments - 1)
-            if monthly_rate else loan / n_payments
+            if monthly_rate
+            else loan / n_payments
         )
 
         schedule = []
@@ -112,13 +122,15 @@ class RealEstateCashflowSimulator:
                 balance -= principal
                 year_interest += interest
                 year_principal += principal
-            schedule.append({
-                "year": year,
-                "annual_payment": round(payment * 12, 2),
-                "principal_paid": round(year_principal, 2),
-                "interest_paid": round(year_interest, 2),
-                "remaining_balance": round(max(0, balance), 2),
-            })
+            schedule.append(
+                {
+                    "year": year,
+                    "annual_payment": round(payment * 12, 2),
+                    "principal_paid": round(year_principal, 2),
+                    "interest_paid": round(year_interest, 2),
+                    "remaining_balance": round(max(0, balance), 2),
+                }
+            )
         return schedule
 
     def portfolio_summary(self, properties: list) -> dict:
@@ -128,14 +140,21 @@ class RealEstateCashflowSimulator:
         results = [self.simulate_cashflow(p) for p in properties]
         total_cashflow = sum(r["annual_cashflow"] for r in results)
         total_invested = sum(
-            p.get("purchase_price", 0) * p.get("down_payment_pct", 0.20) for p in properties
+            p.get("purchase_price", 0) * p.get("down_payment_pct", 0.20)
+            for p in properties
         )
-        avg_cap_rate = sum(r["cap_rate_pct"] for r in results) / len(results) if results else 0.0
+        avg_cap_rate = (
+            sum(r["cap_rate_pct"] for r in results) / len(results) if results else 0.0
+        )
         return {
             "property_count": len(properties),
             "total_annual_cashflow": round(total_cashflow, 2),
             "total_capital_invested": round(total_invested, 2),
-            "portfolio_coc_return_pct": round((total_cashflow / total_invested) * 100, 2) if total_invested else 0.0,
+            "portfolio_coc_return_pct": (
+                round((total_cashflow / total_invested) * 100, 2)
+                if total_invested
+                else 0.0
+            ),
             "avg_cap_rate_pct": round(avg_cap_rate, 2),
             "properties": results,
         }

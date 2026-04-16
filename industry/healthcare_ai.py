@@ -12,14 +12,15 @@ from typing import Any, Dict, List, Optional
 
 from core.bot_base import AutonomyLevel, BotBase, ScalingLevel
 
-
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Patient:
     """Simplified patient record."""
+
     patient_id: str
     name: str
     date_of_birth: date
@@ -31,29 +32,40 @@ class Patient:
 @dataclass
 class TriageResult:
     """Result of an automated symptom triage assessment."""
+
     patient_id: str
     symptoms: List[str]
-    urgency: str          # 'low', 'moderate', 'high', 'emergency'
+    urgency: str  # 'low', 'moderate', 'high', 'emergency'
     recommendation: str
-    confidence: float     # 0.0 – 1.0
+    confidence: float  # 0.0 – 1.0
     triage_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
 # High-priority symptoms that warrant immediate escalation
 _EMERGENCY_SYMPTOMS = {
-    "chest pain", "difficulty breathing", "stroke", "unconscious",
-    "severe bleeding", "anaphylaxis", "cardiac arrest",
+    "chest pain",
+    "difficulty breathing",
+    "stroke",
+    "unconscious",
+    "severe bleeding",
+    "anaphylaxis",
+    "cardiac arrest",
 }
 
 _HIGH_SYMPTOMS = {
-    "high fever", "severe headache", "confusion", "abdominal pain",
-    "vomiting blood", "severe allergic reaction",
+    "high fever",
+    "severe headache",
+    "confusion",
+    "abdominal pain",
+    "vomiting blood",
+    "severe allergic reaction",
 }
 
 
 # ---------------------------------------------------------------------------
 # HealthcareAI bot
 # ---------------------------------------------------------------------------
+
 
 class HealthcareAI(BotBase):
     """
@@ -138,7 +150,9 @@ class HealthcareAI(BotBase):
             confidence = 0.70
         else:
             urgency = "low"
-            recommendation = "Monitor symptoms; book a routine appointment if persistent."
+            recommendation = (
+                "Monitor symptoms; book a routine appointment if persistent."
+            )
             confidence = 0.60
 
         result = TriageResult(
@@ -178,7 +192,9 @@ class HealthcareAI(BotBase):
         self._appointments.append(appt)
         return appt
 
-    def get_appointments(self, patient_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_appointments(
+        self, patient_id: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """Return all (or patient-filtered) appointments."""
         if patient_id:
             return [a for a in self._appointments if a["patient_id"] == patient_id]
@@ -195,7 +211,12 @@ class HealthcareAI(BotBase):
         Returns:
             Dict with patient count, triage breakdown, and appointment stats.
         """
-        urgency_counts: Dict[str, int] = {"emergency": 0, "high": 0, "moderate": 0, "low": 0}
+        urgency_counts: Dict[str, int] = {
+            "emergency": 0,
+            "high": 0,
+            "moderate": 0,
+            "low": 0,
+        }
         for t in self._triage_log:
             urgency_counts[t.urgency] = urgency_counts.get(t.urgency, 0) + 1
 
@@ -214,7 +235,11 @@ class HealthcareAI(BotBase):
         task_type = task.get("type", "")
         if task_type == "triage":
             result = self.triage(task.get("patient_id", ""), task.get("symptoms", []))
-            return {"status": "ok", "triage_id": result.triage_id, "urgency": result.urgency}
+            return {
+                "status": "ok",
+                "triage_id": result.triage_id,
+                "urgency": result.urgency,
+            }
         if task_type == "schedule_appointment":
             appt = self.schedule_appointment(
                 task.get("patient_id", ""),

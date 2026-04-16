@@ -8,19 +8,19 @@ real money or external APIs are involved.
 Supported currencies: USD, EUR, GBP, CAD, AUD, JPY, MXN
 """
 
-import uuid
 import datetime
+import uuid
 from typing import Optional
 
 from bots.dreamco_payments.tiers import (
+    FEATURE_BASIC_SUBSCRIPTIONS,
+    FEATURE_CURRENCY_CONVERSION,
+    FEATURE_PAYMENT_PROCESSING,
+    FEATURE_RECURRING_BILLING,
+    FEATURE_REFUNDS,
     Tier,
     TierConfig,
     get_tier_config,
-    FEATURE_PAYMENT_PROCESSING,
-    FEATURE_BASIC_SUBSCRIPTIONS,
-    FEATURE_CURRENCY_CONVERSION,
-    FEATURE_RECURRING_BILLING,
-    FEATURE_REFUNDS,
 )
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -77,7 +77,9 @@ class PaymentProcessor:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     def _validate_currency(self, currency: str) -> None:
         if currency.upper() not in SUPPORTED_CURRENCIES:
@@ -309,7 +311,9 @@ class PaymentProcessor:
     # Refunds  (all tiers)
     # ------------------------------------------------------------------
 
-    def refund_payment(self, transaction_id: str, amount: Optional[float] = None) -> dict:
+    def refund_payment(
+        self, transaction_id: str, amount: Optional[float] = None
+    ) -> dict:
         """
         Refund a previously processed payment (full or partial).
 
@@ -367,7 +371,8 @@ class PaymentProcessor:
             List of transaction records (most recent first).
         """
         results = [
-            t for t in self._transactions.values()
+            t
+            for t in self._transactions.values()
             if t.get("customer_id") == customer_id
         ]
         return sorted(results, key=lambda t: t["created_at"], reverse=True)

@@ -58,12 +58,55 @@ _DEFAULT_TRAITS: dict[str, float] = {
 
 # Keywords that nudge trait scores
 _TRAIT_SIGNALS: dict[str, list[str]] = {
-    PersonalityTrait.HUMOUR.value: ["joke", "funny", "lol", "haha", "laugh", "😂", "😄"],
-    PersonalityTrait.EMPATHY.value: ["feel", "sad", "frustrated", "stressed", "overwhelmed", "worried"],
-    PersonalityTrait.ENTHUSIASM.value: ["amazing", "awesome", "love", "excited", "great", "fantastic", "🔥"],
-    PersonalityTrait.CURIOSITY.value: ["why", "how", "what", "curious", "interesting", "tell me more"],
-    PersonalityTrait.DIRECTNESS.value: ["quick", "just", "tldr", "short", "brief", "straight"],
-    PersonalityTrait.PATIENCE.value: ["slow", "again", "repeat", "don't understand", "confused"],
+    PersonalityTrait.HUMOUR.value: [
+        "joke",
+        "funny",
+        "lol",
+        "haha",
+        "laugh",
+        "😂",
+        "😄",
+    ],
+    PersonalityTrait.EMPATHY.value: [
+        "feel",
+        "sad",
+        "frustrated",
+        "stressed",
+        "overwhelmed",
+        "worried",
+    ],
+    PersonalityTrait.ENTHUSIASM.value: [
+        "amazing",
+        "awesome",
+        "love",
+        "excited",
+        "great",
+        "fantastic",
+        "🔥",
+    ],
+    PersonalityTrait.CURIOSITY.value: [
+        "why",
+        "how",
+        "what",
+        "curious",
+        "interesting",
+        "tell me more",
+    ],
+    PersonalityTrait.DIRECTNESS.value: [
+        "quick",
+        "just",
+        "tldr",
+        "short",
+        "brief",
+        "straight",
+    ],
+    PersonalityTrait.PATIENCE.value: [
+        "slow",
+        "again",
+        "repeat",
+        "don't understand",
+        "confused",
+    ],
 }
 
 
@@ -77,7 +120,7 @@ class UserInteraction:
     tone_used: ToneStyle
     topics: list[str]
     timestamp: float = field(default_factory=time.time)
-    sentiment_score: float = 0.5   # 0.0 = very negative, 1.0 = very positive
+    sentiment_score: float = 0.5  # 0.0 = very negative, 1.0 = very positive
 
     def to_dict(self) -> dict:
         return {
@@ -98,7 +141,7 @@ class Milestone:
     milestone_id: str
     title: str
     description: str
-    category: str   # e.g. "lesson_completed", "item_detected", "streak"
+    category: str  # e.g. "lesson_completed", "item_detected", "streak"
     achieved_at: float = field(default_factory=time.time)
 
     def to_dict(self) -> dict:
@@ -222,9 +265,7 @@ class PersonalityEngine:
                 f"{milestone.description}"
             )
         else:
-            return (
-                f"Milestone reached: {milestone.title}. {milestone.description}"
-            )
+            return f"Milestone reached: {milestone.title}. {milestone.description}"
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -242,7 +283,9 @@ class PersonalityEngine:
     def _select_tone(self, message: str) -> ToneStyle:
         """Choose the best response tone based on message content and traits."""
         msg_lower = message.lower()
-        if any(w in msg_lower for w in ["sad", "frustrated", "stressed", "worried", "fail"]):
+        if any(
+            w in msg_lower for w in ["sad", "frustrated", "stressed", "worried", "fail"]
+        ):
             return ToneStyle.EMPATHETIC
         if any(w in msg_lower for w in ["joke", "funny", "lol", "haha"]):
             return ToneStyle.HUMOROUS
@@ -302,8 +345,26 @@ class PersonalityEngine:
         return [t for t, _ in sorted_topics[:n]]
 
     def _estimate_sentiment(self, message: str) -> float:
-        positive = ["good", "great", "love", "amazing", "awesome", "yes", "perfect", "thanks"]
-        negative = ["bad", "hate", "terrible", "no", "wrong", "fail", "frustrated", "confused"]
+        positive = [
+            "good",
+            "great",
+            "love",
+            "amazing",
+            "awesome",
+            "yes",
+            "perfect",
+            "thanks",
+        ]
+        negative = [
+            "bad",
+            "hate",
+            "terrible",
+            "no",
+            "wrong",
+            "fail",
+            "frustrated",
+            "confused",
+        ]
         msg_lower = message.lower()
         pos = sum(1 for w in positive if w in msg_lower)
         neg = sum(1 for w in negative if w in msg_lower)

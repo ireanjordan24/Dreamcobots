@@ -7,38 +7,38 @@ Covers:
   3. Chat & process interfaces
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.multi_source_lead_scraper.lead_scraper import (
+    LeadScraperTierError,
+    LeadSource,
+    LeadStatus,
+    MultiSourceLeadScraper,
+)
 from bots.multi_source_lead_scraper.tiers import (
+    FEATURE_AI_SCORING,
+    FEATURE_BASIC_SCRAPING,
+    FEATURE_CRM_EXPORT,
+    FEATURE_LEAD_ENRICHMENT,
+    FEATURE_MULTI_SOURCE,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_BASIC_SCRAPING,
-    FEATURE_MULTI_SOURCE,
-    FEATURE_LEAD_ENRICHMENT,
-    FEATURE_AI_SCORING,
-    FEATURE_CRM_EXPORT,
-    FEATURE_WHITE_LABEL,
 )
-from bots.multi_source_lead_scraper.lead_scraper import (
-    MultiSourceLeadScraper,
-    LeadScraperTierError,
-    LeadSource,
-    LeadStatus,
-)
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestLeadScraperTiers:
     def test_three_tiers(self):
@@ -85,6 +85,7 @@ class TestLeadScraperTiers:
 # ===========================================================================
 # 2. Scraping
 # ===========================================================================
+
 
 class TestLeadScraperBasic:
     def setup_method(self):
@@ -166,7 +167,9 @@ class TestLeadScraperPro:
         assert "leads_exported" in result
 
     def test_industry_filter(self):
-        result = self.scraper.scrape(LeadSource.GOOGLE, count=20, industry_filter="SaaS")
+        result = self.scraper.scrape(
+            LeadSource.GOOGLE, count=20, industry_filter="SaaS"
+        )
         # All returned leads should be filtered (may be 0 or more due to randomness)
         assert isinstance(result, dict)
 
@@ -214,6 +217,7 @@ class TestLeadScraperEnterprise:
 # ===========================================================================
 # 3. Chat & Process
 # ===========================================================================
+
 
 class TestLeadScraperChat:
     def setup_method(self):

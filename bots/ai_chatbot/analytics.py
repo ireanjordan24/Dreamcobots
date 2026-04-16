@@ -12,6 +12,7 @@ Key capabilities
 
 All features except ``usage_summary`` require the Premium tier.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -22,10 +23,10 @@ from typing import Dict, List, Optional
 
 from .tiers import Tier, require_feature
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CompanyProfile:
@@ -51,9 +52,9 @@ class PartnerRecruitmentResult:
     run_id: str
     generated_at: str
     requester_company: str
-    candidates: List[Dict]          # ranked list of CompanyProfile dicts
-    recommended_outreach: List[str] # action-item strings
-    estimated_reach: int            # total developer community size
+    candidates: List[Dict]  # ranked list of CompanyProfile dicts
+    recommended_outreach: List[str]  # action-item strings
+    estimated_reach: int  # total developer community size
 
 
 @dataclass
@@ -99,7 +100,11 @@ _AI_ECOSYSTEM_SEED: List[CompanyProfile] = [
         company_id="org_003",
         name="Moonshot AI (KimiK)",
         industry="AI Products",
-        focus_areas=["long-context LLMs", "Chinese-English bilingual AI", "enterprise chatbots"],
+        focus_areas=[
+            "long-context LLMs",
+            "Chinese-English bilingual AI",
+            "enterprise chatbots",
+        ],
         headquarters="Beijing, China",
         website="https://moonshot.cn",
         description="Developer of Kimi, a long-context AI assistant with 128k-token context.",
@@ -167,6 +172,7 @@ _AI_ECOSYSTEM_SEED: List[CompanyProfile] = [
 # Analytics engine
 # ---------------------------------------------------------------------------
 
+
 class AnalyticsEngine:
     """
     Provides company analytics, partner-recruitment, and ecosystem-directory
@@ -213,15 +219,16 @@ class AnalyticsEngine:
         if query:
             q = query.lower()
             results = [
-                c for c in results
-                if q in c.name.lower() or q in c.description.lower()
+                c for c in results if q in c.name.lower() or q in c.description.lower()
             ]
         if tags:
             tag_set = set(tags)
             results = [c for c in results if tag_set.intersection(c.tags)]
         results = [c for c in results if c.partnership_potential_score >= min_score]
 
-        return sorted(results, key=lambda c: c.partnership_potential_score, reverse=True)
+        return sorted(
+            results, key=lambda c: c.partnership_potential_score, reverse=True
+        )
 
     def add_company(self, profile: CompanyProfile) -> None:
         """Add or update a company in the ecosystem directory (Premium only)."""
@@ -259,15 +266,17 @@ class AnalyticsEngine:
 
         candidate_dicts = []
         for company in ranked:
-            candidate_dicts.append({
-                "company_id": company.company_id,
-                "name": company.name,
-                "score": _score(company),
-                "focus_areas": company.focus_areas,
-                "website": company.website,
-                "contact_email": company.contact_email,
-                "developer_portal_url": company.developer_portal_url,
-            })
+            candidate_dicts.append(
+                {
+                    "company_id": company.company_id,
+                    "name": company.name,
+                    "score": _score(company),
+                    "focus_areas": company.focus_areas,
+                    "website": company.website,
+                    "contact_email": company.contact_email,
+                    "developer_portal_url": company.developer_portal_url,
+                }
+            )
 
         outreach_actions = [
             f"Send personalised introduction to {c['name']} via {c['contact_email']}"
@@ -296,9 +305,7 @@ class AnalyticsEngine:
     # OnSite Signup Flow (Premium)
     # ------------------------------------------------------------------
 
-    def generate_onsite_signup_flow(
-        self, user_type: str = "developer"
-    ) -> Dict:
+    def generate_onsite_signup_flow(self, user_type: str = "developer") -> Dict:
         """
         Generate a personalised OnSite signup/developer flow config.
 
@@ -327,7 +334,11 @@ class AnalyticsEngine:
                     "Go-live review and load-test",
                 ],
                 "cta": "Schedule your Enterprise Demo",
-                "resources": ["Enterprise Brochure", "Security Whitepaper", "Case Studies"],
+                "resources": [
+                    "Enterprise Brochure",
+                    "Security Whitepaper",
+                    "Case Studies",
+                ],
             },
             "partner": {
                 "steps": [
@@ -338,7 +349,11 @@ class AnalyticsEngine:
                     "Attend partner enablement webinar",
                 ],
                 "cta": "Apply to the Dreamcobots Partner Programme",
-                "resources": ["Partner Guide", "Co-Marketing Toolkit", "Technical Integration Docs"],
+                "resources": [
+                    "Partner Guide",
+                    "Co-Marketing Toolkit",
+                    "Technical Integration Docs",
+                ],
             },
         }
 
@@ -371,7 +386,9 @@ class AnalyticsEngine:
             return {"message": "No usage data recorded yet."}
 
         total_msgs = sum(s.total_messages for s in self._usage_history)
-        avg_users = sum(s.active_users for s in self._usage_history) / len(self._usage_history)
+        avg_users = sum(s.active_users for s in self._usage_history) / len(
+            self._usage_history
+        )
         return {
             "days_recorded": len(self._usage_history),
             "total_messages": total_msgs,

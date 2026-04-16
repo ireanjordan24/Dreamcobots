@@ -22,6 +22,7 @@ from typing import Optional
 @dataclass
 class BotCard:
     """Status card for a single AI bot."""
+
     bot_type: str
     display_name: str
     description: str
@@ -58,13 +59,48 @@ class BotControlCenterScreen:
 
     # Full bot catalogue with descriptions
     BOT_CATALOGUE = [
-        ("money_finder", "💰 Money Finder Bot", "Scrapes grants, unclaimed funds & opportunities", "FREE"),
-        ("referral", "📢 Referral Bot", "Auto-promotes apps and affiliate programs", "PRO"),
-        ("real_estate", "🏠 Real Estate Bot", "Finds foreclosures, deals & rental properties", "PRO"),
-        ("trading", "📊 Trading Bot", "Executes AI-driven stock & crypto trades", "PRO"),
-        ("arbitrage", "🛒 Arbitrage Bot", "Flips products across platforms automatically", "ENTERPRISE"),
-        ("grant_finder", "🔍 Grant Finder Bot", "Discovers government & private grants", "FREE"),
-        ("lead_gen", "🎯 Lead Gen Bot", "Generates high-quality leads for member businesses", "PRO"),
+        (
+            "money_finder",
+            "💰 Money Finder Bot",
+            "Scrapes grants, unclaimed funds & opportunities",
+            "FREE",
+        ),
+        (
+            "referral",
+            "📢 Referral Bot",
+            "Auto-promotes apps and affiliate programs",
+            "PRO",
+        ),
+        (
+            "real_estate",
+            "🏠 Real Estate Bot",
+            "Finds foreclosures, deals & rental properties",
+            "PRO",
+        ),
+        (
+            "trading",
+            "📊 Trading Bot",
+            "Executes AI-driven stock & crypto trades",
+            "PRO",
+        ),
+        (
+            "arbitrage",
+            "🛒 Arbitrage Bot",
+            "Flips products across platforms automatically",
+            "ENTERPRISE",
+        ),
+        (
+            "grant_finder",
+            "🔍 Grant Finder Bot",
+            "Discovers government & private grants",
+            "FREE",
+        ),
+        (
+            "lead_gen",
+            "🎯 Lead Gen Bot",
+            "Generates high-quality leads for member businesses",
+            "PRO",
+        ),
     ]
 
     def __init__(self, hub_id: str, hub_name: str) -> None:
@@ -152,35 +188,65 @@ class BotControlCenterScreen:
         """Return a pre-populated demo instance."""
         screen = cls(hub_id="hub-001", hub_name="Family Wealth Circle")
         now = datetime.now(timezone.utc)
-        screen.add_bot(BotCard(
-            "money_finder", "💰 Money Finder Bot",
-            "Scrapes grants, unclaimed funds & opportunities",
-            is_active=True, total_earnings_usd=1_240.50,
-            last_run=now, run_count=47, tier_required="FREE",
-        ))
-        screen.add_bot(BotCard(
-            "referral", "📢 Referral Bot",
-            "Auto-promotes apps and affiliate programs",
-            is_active=True, total_earnings_usd=3_820.75,
-            last_run=now, run_count=120, tier_required="PRO",
-        ))
-        screen.add_bot(BotCard(
-            "real_estate", "🏠 Real Estate Bot",
-            "Finds foreclosures, deals & rental properties",
-            is_active=True, total_earnings_usd=0.0,
-            last_run=None, run_count=12, tier_required="PRO",
-        ))
-        screen.add_bot(BotCard(
-            "trading", "📊 Trading Bot",
-            "Executes AI-driven stock & crypto trades",
-            is_active=False, total_earnings_usd=520.00,
-            last_run=now, run_count=8, tier_required="PRO",
-        ))
-        screen.add_bot(BotCard(
-            "arbitrage", "🛒 Arbitrage Bot",
-            "Flips products across platforms automatically",
-            is_active=False, total_earnings_usd=0.0,
-            last_run=None, run_count=0,
-            tier_required="ENTERPRISE", is_available=False,
-        ))
+        screen.add_bot(
+            BotCard(
+                "money_finder",
+                "💰 Money Finder Bot",
+                "Scrapes grants, unclaimed funds & opportunities",
+                is_active=True,
+                total_earnings_usd=1_240.50,
+                last_run=now,
+                run_count=47,
+                tier_required="FREE",
+            )
+        )
+        screen.add_bot(
+            BotCard(
+                "referral",
+                "📢 Referral Bot",
+                "Auto-promotes apps and affiliate programs",
+                is_active=True,
+                total_earnings_usd=3_820.75,
+                last_run=now,
+                run_count=120,
+                tier_required="PRO",
+            )
+        )
+        screen.add_bot(
+            BotCard(
+                "real_estate",
+                "🏠 Real Estate Bot",
+                "Finds foreclosures, deals & rental properties",
+                is_active=True,
+                total_earnings_usd=0.0,
+                last_run=None,
+                run_count=12,
+                tier_required="PRO",
+            )
+        )
+        screen.add_bot(
+            BotCard(
+                "trading",
+                "📊 Trading Bot",
+                "Executes AI-driven stock & crypto trades",
+                is_active=False,
+                total_earnings_usd=520.00,
+                last_run=now,
+                run_count=8,
+                tier_required="PRO",
+            )
+        )
+        screen.add_bot(
+            BotCard(
+                "arbitrage",
+                "🛒 Arbitrage Bot",
+                "Flips products across platforms automatically",
+                is_active=False,
+                total_earnings_usd=0.0,
+                last_run=None,
+                run_count=0,
+                tier_required="ENTERPRISE",
+                is_available=False,
+            )
+        )
         return screen

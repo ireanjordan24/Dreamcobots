@@ -1,4 +1,5 @@
 """OpenCage geocoding API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,6 +28,7 @@ class OpenCageConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": query, "key": self.api_key, "no_annotations": 1}
         try:
             response = requests.get(f"{self.BASE_URL}/json", params=params, timeout=30)
@@ -48,6 +50,7 @@ class OpenCageConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": f"{lat}+{lng}", "key": self.api_key}
         try:
             response = requests.get(f"{self.BASE_URL}/json", params=params, timeout=30)
@@ -56,4 +59,3 @@ class OpenCageConnector:
         except requests.RequestException as e:
             logger.error("OpenCage reverse_geocode error: %s", e)
             return {"status": "error", "message": str(e)}
-

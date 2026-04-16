@@ -1,4 +1,5 @@
 """Facial expression dataset generator for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import random
@@ -7,8 +8,18 @@ import uuid
 logger = logging.getLogger(__name__)
 
 BASE_EXPRESSIONS = [
-    "joy", "sadness", "anger", "fear", "disgust", "surprise", "contempt",
-    "neutral", "confusion", "concentration", "boredom", "excitement",
+    "joy",
+    "sadness",
+    "anger",
+    "fear",
+    "disgust",
+    "surprise",
+    "contempt",
+    "neutral",
+    "confusion",
+    "concentration",
+    "boredom",
+    "excitement",
 ]
 LIGHTING = ["natural", "studio", "low_light", "backlit", "mixed"]
 AGE_GROUPS = ["child", "teen", "young_adult", "adult", "senior"]
@@ -26,10 +37,23 @@ def _generate_micro_expressions():
         for intensity in intensities:
             combinations.append(f"{intensity}_{base}")
     extras = [
-        "raised_inner_brow", "raised_outer_brow", "nose_wrinkle", "lip_corner_pull",
-        "cheek_raise", "lid_tighten", "chin_raise", "dimpler", "brow_lowerer",
-        "upper_lip_raise", "lip_stretch", "lip_tighten", "lip_pressor",
-        "mouth_open", "jaw_drop", "blink_rapid", "gaze_avert",
+        "raised_inner_brow",
+        "raised_outer_brow",
+        "nose_wrinkle",
+        "lip_corner_pull",
+        "cheek_raise",
+        "lid_tighten",
+        "chin_raise",
+        "dimpler",
+        "brow_lowerer",
+        "upper_lip_raise",
+        "lip_stretch",
+        "lip_tighten",
+        "lip_pressor",
+        "mouth_open",
+        "jaw_drop",
+        "blink_rapid",
+        "gaze_avert",
     ]
     return combinations + extras
 

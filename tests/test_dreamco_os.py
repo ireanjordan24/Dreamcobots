@@ -178,7 +178,7 @@ class TestFeature1Bot:
 # core.bot_registry
 # ---------------------------------------------------------------------------
 
-from core.bot_registry import register_bot, get_registered_bots, clear_registry
+from core.bot_registry import clear_registry, get_registered_bots, register_bot
 
 
 class TestBotRegistry:
@@ -405,6 +405,7 @@ class TestOrchestrator:
 # ---------------------------------------------------------------------------
 
 import io
+
 from api.upload_api import app as flask_app
 
 
@@ -446,7 +447,9 @@ class TestUploadApi:
         assert resp.status_code == 400
 
     def test_upload_no_file_returns_400(self):
-        resp = self.client.post("/upload_bot", data={}, content_type="multipart/form-data")
+        resp = self.client.post(
+            "/upload_bot", data={}, content_type="multipart/form-data"
+        )
         assert resp.status_code == 400
 
     def test_list_bots_endpoint(self):

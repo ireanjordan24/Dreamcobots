@@ -24,10 +24,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Persona modes
 # ---------------------------------------------------------------------------
+
 
 class PersonaMode(Enum):
     MENTOR = "mentor"
@@ -154,17 +154,20 @@ SELF_DOUBT_FILLERS: list[str] = [
 @dataclass
 class PersonalityConfig:
     """Runtime personality configuration for a Buddy session."""
+
     active_persona: PersonaMode = PersonaMode.CASUAL_FRIEND
     secondary_persona: Optional[PersonaMode] = None
-    blend_ratio: float = 1.0        # 1.0 = pure primary, 0.0 = pure secondary
+    blend_ratio: float = 1.0  # 1.0 = pure primary, 0.0 = pure secondary
     tone: PersonaTone = PersonaTone.CASUAL
-    flaw_injection_rate: float = 0.07   # probability of inserting a self-doubt filler
-    catchphrase_rate: float = 0.2       # probability of using a catchphrase
+    flaw_injection_rate: float = 0.07  # probability of inserting a self-doubt filler
+    catchphrase_rate: float = 0.2  # probability of using a catchphrase
 
     def to_dict(self) -> dict:
         return {
             "active_persona": self.active_persona.value,
-            "secondary_persona": self.secondary_persona.value if self.secondary_persona else None,
+            "secondary_persona": (
+                self.secondary_persona.value if self.secondary_persona else None
+            ),
             "blend_ratio": self.blend_ratio,
             "tone": self.tone.value,
             "flaw_injection_rate": self.flaw_injection_rate,
@@ -368,8 +371,16 @@ class PersonalityEngine:
             (is_ethical, reasoning)
         """
         harmful_patterns = [
-            "harm", "hurt", "attack", "manipulate", "deceive", "stalk",
-            "illegal", "weapon", "threaten", "abuse",
+            "harm",
+            "hurt",
+            "attack",
+            "manipulate",
+            "deceive",
+            "stalk",
+            "illegal",
+            "weapon",
+            "threaten",
+            "abuse",
         ]
         lower = request.lower()
         for pattern in harmful_patterns:

@@ -1,19 +1,39 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 import pytest
-from bots.division_performance_dashboard.tiers import (
-    Tier, TierConfig, TIER_CATALOGUE, get_tier_config, list_tiers, get_upgrade_path,
-    FEATURE_REVENUE_TRACKING, FEATURE_GROWTH_ANALYSIS, FEATURE_API_METRICS,
-    FEATURE_BOT_INSIGHTS, FEATURE_PREDICTIVE, FEATURE_WHITE_LABEL, FEATURE_API_ACCESS,
-    FREE_FEATURES, PRO_FEATURES, ENTERPRISE_FEATURES,
-)
-from bots.division_performance_dashboard.revenue_tracker import RevenueTracker, DivisionRevenue
-from bots.division_performance_dashboard.growth_analysis import GrowthAnalysis
-from bots.division_performance_dashboard.api_metrics import APIMetrics, APICall
+
+from bots.division_performance_dashboard.api_metrics import APICall, APIMetrics
 from bots.division_performance_dashboard.bot_insights import BotInsights, BotRecord
 from bots.division_performance_dashboard.division_performance_dashboard import (
-    DivisionPerformanceDashboard, DivisionDashboardError, DivisionDashboardTierError
+    DivisionDashboardError,
+    DivisionDashboardTierError,
+    DivisionPerformanceDashboard,
+)
+from bots.division_performance_dashboard.growth_analysis import GrowthAnalysis
+from bots.division_performance_dashboard.revenue_tracker import (
+    DivisionRevenue,
+    RevenueTracker,
+)
+from bots.division_performance_dashboard.tiers import (
+    ENTERPRISE_FEATURES,
+    FEATURE_API_ACCESS,
+    FEATURE_API_METRICS,
+    FEATURE_BOT_INSIGHTS,
+    FEATURE_GROWTH_ANALYSIS,
+    FEATURE_PREDICTIVE,
+    FEATURE_REVENUE_TRACKING,
+    FEATURE_WHITE_LABEL,
+    FREE_FEATURES,
+    PRO_FEATURES,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
 )
 
 
@@ -120,22 +140,30 @@ class TestDivisionPerformanceDashboard:
 
     def test_add_revenue_free_tier(self):
         d = DivisionPerformanceDashboard(Tier.FREE)
-        r = d.add_division_revenue("div1", "Division 1", 10000.0, 4000.0, "January", 2024)
+        r = d.add_division_revenue(
+            "div1", "Division 1", 10000.0, 4000.0, "January", 2024
+        )
         assert r["division_id"] == "div1"
 
     def test_add_revenue_pro_tier(self):
         d = DivisionPerformanceDashboard(Tier.PRO)
-        r = d.add_division_revenue("div1", "Division 1", 10000.0, 4000.0, "January", 2024)
+        r = d.add_division_revenue(
+            "div1", "Division 1", 10000.0, 4000.0, "January", 2024
+        )
         assert r["revenue_usd"] == 10000.0
 
     def test_add_revenue_enterprise_tier(self):
         d = DivisionPerformanceDashboard(Tier.ENTERPRISE)
-        r = d.add_division_revenue("div1", "Division 1", 10000.0, 4000.0, "January", 2024)
+        r = d.add_division_revenue(
+            "div1", "Division 1", 10000.0, 4000.0, "January", 2024
+        )
         assert r["expenses_usd"] == 4000.0
 
     def test_add_revenue_returns_profit(self):
         d = DivisionPerformanceDashboard(Tier.FREE)
-        r = d.add_division_revenue("div1", "Division 1", 10000.0, 4000.0, "January", 2024)
+        r = d.add_division_revenue(
+            "div1", "Division 1", 10000.0, 4000.0, "January", 2024
+        )
         assert r["profit"] == 6000.0
 
     def test_get_revenue_summary_free(self):
@@ -290,7 +318,16 @@ class TestRevenueTracker:
     def test_get_summary_keys(self):
         self.tracker.record_revenue("div1", "D1", 5000.0, 2000.0, "Jan", 2024)
         s = self.tracker.get_summary()
-        assert all(k in s for k in ["total_revenue", "total_profit", "divisions", "records", "top_divisions"])
+        assert all(
+            k in s
+            for k in [
+                "total_revenue",
+                "total_profit",
+                "divisions",
+                "records",
+                "top_divisions",
+            ]
+        )
 
     def test_empty_total_revenue(self):
         assert self.tracker.get_total_revenue() == 0.0
@@ -368,6 +405,7 @@ class TestGrowthAnalysis:
         class Rev:
             def __init__(self, v):
                 self.revenue_usd = v
+
         data = [Rev(1000), Rev(1100), Rev(1200)]
         r = self.ga.analyze_division("div1", data)
         assert r["division_id"] == "div1"
@@ -425,7 +463,16 @@ class TestAPIMetrics:
 
     def test_utilization_report_keys(self):
         r = self.metrics.get_utilization_report()
-        assert all(k in r for k in ["total_calls", "avg_response_time_ms", "error_rate", "top_endpoints", "sla_compliance"])
+        assert all(
+            k in r
+            for k in [
+                "total_calls",
+                "avg_response_time_ms",
+                "error_rate",
+                "top_endpoints",
+                "sla_compliance",
+            ]
+        )
 
     def test_sla_compliance_all_within(self):
         self.metrics.record_call("/api/test", "div1", 100.0, 200)

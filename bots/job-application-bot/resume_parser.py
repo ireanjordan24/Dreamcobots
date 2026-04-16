@@ -4,6 +4,7 @@ resume_parser.py
 Extracts text from PDF and DOCX resumes, then identifies skills and
 qualifications via keyword matching.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import re
@@ -14,6 +15,7 @@ def _extract_text_pdf(file_path: str) -> str:
     """Return the full text of a PDF resume using pdfminer.six."""
     try:
         from pdfminer.high_level import extract_text  # type: ignore
+
         return extract_text(file_path)
     except ImportError:
         raise ImportError(
@@ -26,6 +28,7 @@ def _extract_text_docx(file_path: str) -> str:
     """Return the full text of a DOCX resume using python-docx."""
     try:
         from docx import Document  # type: ignore
+
         doc = Document(file_path)
         return "\n".join(para.text for para in doc.paragraphs)
     except ImportError:

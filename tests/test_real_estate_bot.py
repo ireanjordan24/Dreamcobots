@@ -1,14 +1,17 @@
 """Tests for bots/real_estate_bot/tiers.py and bots/real_estate_bot/real_estate_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.real_estate_bot.real_estate_bot import RealEstateBot, RealEstateBotTierError
 
 
@@ -51,16 +54,36 @@ class TestSearchDeals:
 
     def test_pro_allows_10_locations(self):
         bot = RealEstateBot(tier=Tier.PRO)
-        locations = ["austin", "phoenix", "nashville", "denver", "tampa",
-                     "charlotte", "atlanta", "dallas", "houston", "las_vegas"]
+        locations = [
+            "austin",
+            "phoenix",
+            "nashville",
+            "denver",
+            "tampa",
+            "charlotte",
+            "atlanta",
+            "dallas",
+            "houston",
+            "las_vegas",
+        ]
         for loc in locations:
             result = bot.search_deals(loc, 500000)
             assert isinstance(result, list)
 
     def test_enterprise_unlimited_locations(self):
         bot = RealEstateBot(tier=Tier.ENTERPRISE)
-        locations = ["austin", "phoenix", "nashville", "denver", "tampa",
-                     "charlotte", "atlanta", "dallas", "houston", "las_vegas"]
+        locations = [
+            "austin",
+            "phoenix",
+            "nashville",
+            "denver",
+            "tampa",
+            "charlotte",
+            "atlanta",
+            "dallas",
+            "houston",
+            "las_vegas",
+        ]
         for loc in locations:
             result = bot.search_deals(loc, 500000)
             assert isinstance(result, list)
@@ -75,7 +98,12 @@ class TestEvaluateProperty:
     def test_has_required_keys(self):
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.evaluate_property("1204 Oak Blvd, Austin TX")
-        for key in ("price", "cap_rate_pct", "monthly_cashflow_usd", "roi_estimate_pct"):
+        for key in (
+            "price",
+            "cap_rate_pct",
+            "monthly_cashflow_usd",
+            "roi_estimate_pct",
+        ):
             assert key in result
 
     def test_enterprise_has_ai_valuation(self):
@@ -107,7 +135,11 @@ class TestGetMarketTrends:
     def test_has_required_keys(self):
         bot = RealEstateBot(tier=Tier.PRO)
         result = bot.get_market_trends("austin")
-        for key in ("avg_price_change_pct_yoy", "inventory_months_supply", "avg_days_on_market"):
+        for key in (
+            "avg_price_change_pct_yoy",
+            "inventory_months_supply",
+            "avg_days_on_market",
+        ):
             assert key in result
 
     def test_free_tier_raises(self):
@@ -124,6 +156,7 @@ class TestGetMarketTrends:
 # ------------------------------------------------------------------ #
 # Housing + Gov Contract Bot Tests                                     #
 # ------------------------------------------------------------------ #
+
 
 class TestFindDistressedProperties:
     def test_free_returns_list(self):
@@ -164,7 +197,9 @@ class TestFindDistressedProperties:
     def test_enterprise_returns_more_than_free(self):
         free_bot = RealEstateBot(tier=Tier.FREE)
         ent_bot = RealEstateBot(tier=Tier.ENTERPRISE)
-        assert len(ent_bot.find_distressed_properties()) > len(free_bot.find_distressed_properties())
+        assert len(ent_bot.find_distressed_properties()) > len(
+            free_bot.find_distressed_properties()
+        )
 
 
 class TestFindGovHousingPrograms:
@@ -217,6 +252,7 @@ class TestFindGovHousingPrograms:
 
 class TestCalculateHousingRevenue:
     FLOATING_POINT_TOLERANCE = 0.01
+
     def test_free_tier_returns_dict(self):
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.calculate_housing_revenue(beds=3)
@@ -225,7 +261,12 @@ class TestCalculateHousingRevenue:
     def test_has_required_keys(self):
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.calculate_housing_revenue(beds=3)
-        for key in ("monthly_gross_usd", "monthly_net_usd", "annual_net_usd", "tenants"):
+        for key in (
+            "monthly_gross_usd",
+            "monthly_net_usd",
+            "annual_net_usd",
+            "tenants",
+        ):
             assert key in result
 
     def test_five_bed_revenue(self):
@@ -247,7 +288,10 @@ class TestCalculateHousingRevenue:
     def test_annual_is_twelve_times_monthly(self):
         bot = RealEstateBot(tier=Tier.FREE)
         result = bot.calculate_housing_revenue(beds=2)
-        assert abs(result["annual_net_usd"] - result["monthly_net_usd"] * 12) < self.FLOATING_POINT_TOLERANCE
+        assert (
+            abs(result["annual_net_usd"] - result["monthly_net_usd"] * 12)
+            < self.FLOATING_POINT_TOLERANCE
+        )
 
 
 class TestMatchPropertyToProgram:

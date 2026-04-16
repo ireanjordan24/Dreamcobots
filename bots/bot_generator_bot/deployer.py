@@ -10,8 +10,8 @@ GLOBAL AI SOURCES FLOW: participates via bot_generator_bot.py pipeline.
 
 from __future__ import annotations
 
-import os
 import json
+import os
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -29,9 +29,7 @@ class BotDeployer:
 
     def __init__(self, bots_root: Optional[str] = None) -> None:
         if bots_root is None:
-            bots_root = os.path.join(
-                os.path.dirname(__file__), "..", ".."
-            ) + "/bots"
+            bots_root = os.path.join(os.path.dirname(__file__), "..", "..") + "/bots"
         self.bots_root = os.path.abspath(bots_root)
         self._deploy_log: list = []
 
@@ -73,7 +71,9 @@ class BotDeployer:
             "goal": dna.get("goal", "generate_leads"),
             "tools": dna.get("tools", []),
             "monetization": dna.get("monetization", []),
-            "generated_at": build_result.get("generated_at", datetime.now(timezone.utc).isoformat()),
+            "generated_at": build_result.get(
+                "generated_at", datetime.now(timezone.utc).isoformat()
+            ),
             "deployed_at": datetime.now(timezone.utc).isoformat(),
             "dry_run": dry_run,
         }
@@ -117,7 +117,8 @@ class BotDeployer:
         if not os.path.isdir(self.bots_root):
             return []
         return [
-            d for d in os.listdir(self.bots_root)
+            d
+            for d in os.listdir(self.bots_root)
             if os.path.isdir(os.path.join(self.bots_root, d))
         ]
 

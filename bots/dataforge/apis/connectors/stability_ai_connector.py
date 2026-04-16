@@ -1,4 +1,5 @@
 """Stability AI image generation connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -17,7 +18,9 @@ class StabilityAIConnector:
         if not self.api_key:
             logger.warning("STABILITY_API_KEY not set.")
 
-    def generate_image(self, prompt: str, engine: str = "stable-diffusion-xl-1024-v1-0") -> dict:
+    def generate_image(
+        self, prompt: str, engine: str = "stable-diffusion-xl-1024-v1-0"
+    ) -> dict:
         """Generate an image using Stability AI API.
 
         Args:
@@ -28,8 +31,17 @@ class StabilityAIConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
-        payload = {"text_prompts": [{"text": prompt}], "cfg_scale": 7, "samples": 1, "steps": 30}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "text_prompts": [{"text": prompt}],
+            "cfg_scale": 7,
+            "samples": 1,
+            "steps": 30,
+        }
         try:
             url = f"{self.BASE_URL}/generation/{engine}/text-to-image"
             response = requests.post(url, json=payload, headers=headers, timeout=60)
@@ -39,4 +51,3 @@ class StabilityAIConnector:
         except requests.RequestException as e:
             logger.error("Stability AI error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -1,8 +1,12 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-TOOL_DIR = os.path.join(REPO_ROOT, 'real-estate-tools', 'real_estate_cashflow_simulator')
+TOOL_DIR = os.path.join(
+    REPO_ROOT, "real-estate-tools", "real_estate_cashflow_simulator"
+)
 sys.path.insert(0, TOOL_DIR)
 
 import pytest
@@ -100,4 +104,6 @@ class TestPortfolioSummary:
         sim = RealEstateCashflowSimulator(tier="pro")
         single = sim.simulate_cashflow(PROPERTY)
         portfolio = sim.portfolio_summary([PROPERTY, PROPERTY])
-        assert abs(portfolio["total_annual_cashflow"] - single["annual_cashflow"] * 2) < 1
+        assert (
+            abs(portfolio["total_annual_cashflow"] - single["annual_cashflow"] * 2) < 1
+        )

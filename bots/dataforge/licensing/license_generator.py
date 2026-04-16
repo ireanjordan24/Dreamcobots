@@ -1,4 +1,5 @@
 """License generator for DataForge AI datasets."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 from datetime import datetime
@@ -53,7 +54,9 @@ class LicenseGenerator:
             "Commercial use of this dataset or its derivatives is strictly prohibited.\n\n"
             "License: CC-BY-NC-4.0 | https://creativecommons.org/licenses/by-nc/4.0/"
         )
-        logger.info("Non-commercial license generated for %s v%s", dataset_name, version)
+        logger.info(
+            "Non-commercial license generated for %s v%s", dataset_name, version
+        )
         return text
 
     def generate_research_only(self, dataset_name: str, version: str = "1.0") -> str:

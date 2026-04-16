@@ -10,8 +10,8 @@ Covers:
   - Main JobTitlesBot (integration, chat, BuddyBot registration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -20,32 +20,33 @@ sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.job_titles_bot.tiers import Tier, get_bot_tier_info, BOT_FEATURES
-from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
-from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
+
 from bots.job_titles_bot.autonomous_trainer import (
     AutonomousTrainer,
     FaceRecord,
     ObjectRecord,
-    ValuationResult,
     TrainingSession,
+    ValuationResult,
 )
 from bots.job_titles_bot.cost_justification import (
-    CostJustificationEngine,
     CostItem,
-    PaymentOption,
     CostJustification,
+    CostJustificationEngine,
+    PaymentOption,
 )
+from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
 from bots.job_titles_bot.job_titles_bot import (
     JobTitlesBot,
     JobTitlesBotError,
     JobTitlesBotTierError,
 )
-
+from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
+from bots.job_titles_bot.tiers import BOT_FEATURES, Tier, get_bot_tier_info
 
 # =============================================================================
 # Tier Tests
 # =============================================================================
+
 
 class TestTierDefinitions:
     def test_all_tiers_exist(self):
@@ -93,6 +94,7 @@ class TestTierDefinitions:
 # =============================================================================
 # Job Titles Database Tests
 # =============================================================================
+
 
 class TestJobTitlesDatabaseInit:
     def test_creates_with_default_data(self):
@@ -270,6 +272,7 @@ class TestJobTitlesDatabaseQuery:
 # Job Bot Generator Tests
 # =============================================================================
 
+
 class TestJobBotGenerator:
     def setup_method(self):
         self.db = JobTitlesDatabase()
@@ -382,19 +385,29 @@ class TestGeneratedJobBotChat:
 
     def test_chat_capabilities_query(self):
         result = self.bot.chat("What can you do?")
-        assert "capabilities" in result["reply"].lower() or "can" in result["reply"].lower()
+        assert (
+            "capabilities" in result["reply"].lower()
+            or "can" in result["reply"].lower()
+        )
 
     def test_chat_status_query(self):
         result = self.bot.chat("status")
-        assert "active" in result["reply"].lower() or "inactive" in result["reply"].lower()
+        assert (
+            "active" in result["reply"].lower() or "inactive" in result["reply"].lower()
+        )
 
     def test_chat_upgrade_query(self):
         result = self.bot.chat("upgrade")
-        assert "version" in result["reply"].lower() or "upgrade" in result["reply"].lower()
+        assert (
+            "version" in result["reply"].lower() or "upgrade" in result["reply"].lower()
+        )
 
     def test_chat_includes_job_title(self):
         result = self.bot.chat("hello")
-        assert "Software Engineer" in result["reply"] or "software engineer" in result["reply"].lower()
+        assert (
+            "Software Engineer" in result["reply"]
+            or "software engineer" in result["reply"].lower()
+        )
 
     def test_describe_returns_dict(self):
         desc = self.bot.describe()
@@ -415,6 +428,7 @@ class TestGeneratedJobBotChat:
 # =============================================================================
 # Autonomous Trainer Tests
 # =============================================================================
+
 
 class TestAutonomousTrainerFace:
     def setup_method(self):
@@ -502,7 +516,11 @@ class TestAutonomousTrainerValuation:
 
     def test_valuate_penny_range_valid(self):
         result = self.trainer.valuate_item("1955 double-die penny")
-        assert result.estimated_min_usd <= result.estimated_value_usd <= result.estimated_max_usd
+        assert (
+            result.estimated_min_usd
+            <= result.estimated_value_usd
+            <= result.estimated_max_usd
+        )
 
     def test_valuate_gold_coin(self):
         result = self.trainer.valuate_item("gold coin from ancient Rome")
@@ -619,6 +637,7 @@ class TestAutonomousTrainerTraining:
 # Cost Justification Engine Tests
 # =============================================================================
 
+
 class TestCostJustificationEngine:
     def setup_method(self):
         self.engine = CostJustificationEngine(token_balance=10000)
@@ -730,6 +749,7 @@ class TestCostJustificationEngine:
 # =============================================================================
 # Main JobTitlesBot Integration Tests
 # =============================================================================
+
 
 class TestJobTitlesBotInstantiation:
     def test_default_tier_is_free(self):
@@ -1003,7 +1023,9 @@ class TestJobTitlesBotChat:
 
     def test_chat_train_query(self):
         result = self.bot.chat("can you train me?")
-        assert "train" in result["reply"].lower() or "training" in result["reply"].lower()
+        assert (
+            "train" in result["reply"].lower() or "training" in result["reply"].lower()
+        )
 
     def test_chat_default_response(self):
         result = self.bot.chat("xyzrandomquery12345")
@@ -1014,6 +1036,7 @@ class TestJobTitlesBotBuddyIntegration:
     def test_register_with_buddy(self):
         """JobTitlesBot can register with BuddyBot."""
         from BuddyAI.buddy_bot import BuddyBot
+
         buddy = BuddyBot()
         bot = JobTitlesBot(tier=Tier.PRO)
         bot.register_with_buddy(buddy)
@@ -1022,6 +1045,7 @@ class TestJobTitlesBotBuddyIntegration:
     def test_buddy_can_route_to_job_bot(self):
         """BuddyBot can route messages to the registered JobTitlesBot."""
         from BuddyAI.buddy_bot import BuddyBot
+
         buddy = BuddyBot()
         bot = JobTitlesBot(tier=Tier.PRO)
         bot.register_with_buddy(buddy)

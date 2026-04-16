@@ -8,8 +8,9 @@ Tests for all placeholder bot implementations:
   - Occupational_bots: feature_1, feature_2, feature_3
 """
 
-import sys
 import os
+import sys
+
 import pytest
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -19,9 +20,12 @@ sys.path.insert(0, REPO_ROOT)
 # Real_Estate_bots
 # ============================================================
 
-from Real_Estate_bots.feature_1 import PropertyListingAggregatorBot, EXAMPLES as RE1_EXAMPLES
-from Real_Estate_bots.feature_2 import PropertyViewingSchedulerBot, EXAMPLES as RE2_EXAMPLES
-from Real_Estate_bots.feature_3 import MarketAnalysisBot, EXAMPLES as RE3_EXAMPLES
+from Real_Estate_bots.feature_1 import EXAMPLES as RE1_EXAMPLES
+from Real_Estate_bots.feature_1 import PropertyListingAggregatorBot
+from Real_Estate_bots.feature_2 import EXAMPLES as RE2_EXAMPLES
+from Real_Estate_bots.feature_2 import PropertyViewingSchedulerBot
+from Real_Estate_bots.feature_3 import EXAMPLES as RE3_EXAMPLES
+from Real_Estate_bots.feature_3 import MarketAnalysisBot
 
 
 class TestPropertyListingAggregatorBot:
@@ -313,9 +317,12 @@ class TestMarketAnalysisBot:
 # Fiverr_bots
 # ============================================================
 
-from Fiverr_bots.feature_1 import FiverrServiceListingBot, EXAMPLES as FI1_EXAMPLES
-from Fiverr_bots.feature_2 import FiverrOrderManagerBot, EXAMPLES as FI2_EXAMPLES
-from Fiverr_bots.feature_3 import FiverrReviewGeneratorBot, EXAMPLES as FI3_EXAMPLES
+from Fiverr_bots.feature_1 import EXAMPLES as FI1_EXAMPLES
+from Fiverr_bots.feature_1 import FiverrServiceListingBot
+from Fiverr_bots.feature_2 import EXAMPLES as FI2_EXAMPLES
+from Fiverr_bots.feature_2 import FiverrOrderManagerBot
+from Fiverr_bots.feature_3 import EXAMPLES as FI3_EXAMPLES
+from Fiverr_bots.feature_3 import FiverrReviewGeneratorBot
 
 
 class TestFiverrServiceListingBot:
@@ -600,9 +607,12 @@ class TestFiverrReviewGeneratorBot:
 # Marketing_bots
 # ============================================================
 
-from Marketing_bots.feature_1 import SocialMediaPostingBot, EXAMPLES as MK1_EXAMPLES
-from Marketing_bots.feature_2 import EmailCampaignBot, EXAMPLES as MK2_EXAMPLES
-from Marketing_bots.feature_3 import CustomerFeedbackBot, EXAMPLES as MK3_EXAMPLES
+from Marketing_bots.feature_1 import EXAMPLES as MK1_EXAMPLES
+from Marketing_bots.feature_1 import SocialMediaPostingBot
+from Marketing_bots.feature_2 import EXAMPLES as MK2_EXAMPLES
+from Marketing_bots.feature_2 import EmailCampaignBot
+from Marketing_bots.feature_3 import EXAMPLES as MK3_EXAMPLES
+from Marketing_bots.feature_3 import CustomerFeedbackBot
 
 
 class TestSocialMediaPostingBot:
@@ -864,9 +874,12 @@ class TestCustomerFeedbackBot:
 # Business_bots
 # ============================================================
 
-from Business_bots.feature_1 import MeetingSchedulerBot, EXAMPLES as BU1_EXAMPLES
-from Business_bots.feature_2 import ProjectManagementBot, EXAMPLES as BU2_EXAMPLES
-from Business_bots.feature_3 import InvoicingBot, EXAMPLES as BU3_EXAMPLES
+from Business_bots.feature_1 import EXAMPLES as BU1_EXAMPLES
+from Business_bots.feature_1 import MeetingSchedulerBot
+from Business_bots.feature_2 import EXAMPLES as BU2_EXAMPLES
+from Business_bots.feature_2 import ProjectManagementBot
+from Business_bots.feature_3 import EXAMPLES as BU3_EXAMPLES
+from Business_bots.feature_3 import InvoicingBot
 
 
 class TestMeetingSchedulerBot:
@@ -987,7 +1000,9 @@ class TestProjectManagementBot:
     def test_get_at_risk_projects(self):
         bot = ProjectManagementBot(tier="ENTERPRISE")
         at_risk = bot.get_at_risk_projects(50)
-        assert all(p["status"] == "in_progress" and p["progress_pct"] < 50 for p in at_risk)
+        assert all(
+            p["status"] == "in_progress" and p["progress_pct"] < 50 for p in at_risk
+        )
 
     def test_free_tier_limits_projects(self):
         bot = ProjectManagementBot(tier="FREE")
@@ -1128,9 +1143,12 @@ class TestInvoicingBot:
 # App_bots
 # ============================================================
 
-from App_bots.feature_1 import UserOnboardingBot, EXAMPLES as AP1_EXAMPLES
-from App_bots.feature_2 import UserSupportBot, EXAMPLES as AP2_EXAMPLES
-from App_bots.feature_3 import FeatureUpdateBot, EXAMPLES as AP3_EXAMPLES
+from App_bots.feature_1 import EXAMPLES as AP1_EXAMPLES
+from App_bots.feature_1 import UserOnboardingBot
+from App_bots.feature_2 import EXAMPLES as AP2_EXAMPLES
+from App_bots.feature_2 import UserSupportBot
+from App_bots.feature_3 import EXAMPLES as AP3_EXAMPLES
+from App_bots.feature_3 import FeatureUpdateBot
 
 
 class TestUserOnboardingBot:
@@ -1257,7 +1275,9 @@ class TestUserSupportBot:
 
     def test_create_ticket_on_pro(self):
         bot = UserSupportBot(tier="PRO")
-        ticket = bot.create_ticket("user@test.com", "Billing Issue", "I was charged twice")
+        ticket = bot.create_ticket(
+            "user@test.com", "Billing Issue", "I was charged twice"
+        )
         assert "ticket_id" in ticket
         assert ticket["status"] == "open"
 
@@ -1384,9 +1404,12 @@ class TestFeatureUpdateBot:
 # Occupational_bots
 # ============================================================
 
-from Occupational_bots.feature_1 import JobSearchBot, EXAMPLES as OC1_EXAMPLES
-from Occupational_bots.feature_2 import ResumeBuildingBot, EXAMPLES as OC2_EXAMPLES
-from Occupational_bots.feature_3 import InterviewPrepBot, EXAMPLES as OC3_EXAMPLES
+from Occupational_bots.feature_1 import EXAMPLES as OC1_EXAMPLES
+from Occupational_bots.feature_1 import JobSearchBot
+from Occupational_bots.feature_2 import EXAMPLES as OC2_EXAMPLES
+from Occupational_bots.feature_2 import ResumeBuildingBot
+from Occupational_bots.feature_3 import EXAMPLES as OC3_EXAMPLES
+from Occupational_bots.feature_3 import InterviewPrepBot
 
 
 class TestJobSearchBot:
@@ -1669,7 +1692,11 @@ class TestInterviewPrepBot:
 
     def test_ai_coaching_on_enterprise(self):
         bot = InterviewPrepBot(tier="ENTERPRISE")
-        result = bot.get_ai_coaching_feedback(1, "I led a team of 5 engineers to deliver a product that increased revenue by 30%. " * 5)
+        result = bot.get_ai_coaching_feedback(
+            1,
+            "I led a team of 5 engineers to deliver a product that increased revenue by 30%. "
+            * 5,
+        )
         assert "feedback" in result
         assert isinstance(result["feedback"], list)
 

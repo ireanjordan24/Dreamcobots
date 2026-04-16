@@ -1,4 +1,5 @@
 """Cohere NLP API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,10 +29,16 @@ class CohereConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"model": model, "prompt": prompt}
         try:
-            response = requests.post(f"{self.BASE_URL}/generate", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/generate", json=payload, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("Cohere text generated.")
             return {"status": "success", "data": response.json()}
@@ -49,12 +56,20 @@ class CohereConnector:
             API response dict with embeddings or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/embed", json={"texts": texts}, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/embed",
+                json={"texts": texts},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Cohere embed error: %s", e)
             return {"status": "error", "message": str(e)}
-

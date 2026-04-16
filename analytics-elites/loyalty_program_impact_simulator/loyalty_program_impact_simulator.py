@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Loyalty Program Impact Simulator - model the financial impact of loyalty programs."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -26,7 +31,9 @@ class LoyaltyProgramImpactSimulator:
 
     def _check_limit(self):
         if self._scenario_limit and self._scenario_count >= self._scenario_limit:
-            raise PermissionError(f"Scenario limit ({self._scenario_limit}) reached. Upgrade to Pro.")
+            raise PermissionError(
+                f"Scenario limit ({self._scenario_limit}) reached. Upgrade to Pro."
+            )
 
     def simulate_roi(self, params: dict) -> dict:
         """
@@ -81,7 +88,11 @@ class LoyaltyProgramImpactSimulator:
             "clv_without_loyalty": round(clv_base, 2),
             "clv_with_loyalty": round(clv_loyalty, 2),
             "clv_lift": round(clv_loyalty - clv_base, 2),
-            "clv_lift_pct": round(((clv_loyalty - clv_base) / clv_base) * 100, 2) if clv_base else 0.0,
+            "clv_lift_pct": (
+                round(((clv_loyalty - clv_base) / clv_base) * 100, 2)
+                if clv_base
+                else 0.0
+            ),
         }
 
     def estimate_churn_reduction(self, params: dict) -> dict:

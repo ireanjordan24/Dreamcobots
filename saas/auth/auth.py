@@ -23,7 +23,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Optional
 
-
 # ---------------------------------------------------------------------------
 # Subscription tiers
 # ---------------------------------------------------------------------------
@@ -49,8 +48,8 @@ class User:
     tier: Tier = Tier.FREE
     created_at: float = field(default_factory=time.time)
     is_active: bool = True
-    bot_quota: int = 5           # bots allowed to upload / run per day
-    runs_today: int = 0          # reset daily
+    bot_quota: int = 5  # bots allowed to upload / run per day
+    runs_today: int = 0  # reset daily
     stripe_customer_id: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -120,7 +119,9 @@ def _verify_token(token: str) -> Optional[str]:
         if len(parts) != 2:
             return None
         payload, sig = parts
-        expected = hmac.new(_SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        expected = hmac.new(
+            _SECRET_KEY.encode(), payload.encode(), hashlib.sha256
+        ).hexdigest()
         if not hmac.compare_digest(sig, expected):
             return None
         uid_part, expiry_str = payload.rsplit(":", 1)
@@ -202,7 +203,10 @@ class AuthService:
             failure.
         """
         if not username or not email or not password:
-            return {"success": False, "error": "username, email and password are required"}
+            return {
+                "success": False,
+                "error": "username, email and password are required",
+            }
         if len(password) < 8:
             return {"success": False, "error": "password must be at least 8 characters"}
         if self.registry.get_by_email(email):

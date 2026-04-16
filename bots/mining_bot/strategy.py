@@ -9,6 +9,7 @@ Supports three primary strategies:
 The AdaptiveStrategyEngine selects the highest-profitability strategy and coin
 in real-time based on provided market data.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -30,11 +31,11 @@ class CoinProfile:
 
     symbol: str
     algorithm: str
-    network_difficulty: float     # current network difficulty
-    block_reward: float           # coin units per block
-    coin_price_usd: float         # current USD price
-    network_hashrate: float       # H/s  (total network)
-    pool_fee_pct: float = 1.0     # pool fee percentage (0–100)
+    network_difficulty: float  # current network difficulty
+    block_reward: float  # coin units per block
+    coin_price_usd: float  # current USD price
+    network_hashrate: float  # H/s  (total network)
+    pool_fee_pct: float = 1.0  # pool fee percentage (0–100)
     merged_pair: Optional[str] = None  # symbol of merged-mining partner, if any
 
     @property
@@ -42,8 +43,9 @@ class CoinProfile:
         """Rough USD revenue per TH/s per day (simplified model)."""
         if self.network_hashrate <= 0 or self.network_difficulty <= 0:
             return 0.0
-        blocks_per_day = 86_400 / max(self.network_difficulty * 2**32 /
-                                      max(self.network_hashrate, 1), 1)
+        blocks_per_day = 86_400 / max(
+            self.network_difficulty * 2**32 / max(self.network_hashrate, 1), 1
+        )
         return blocks_per_day * self.block_reward * self.coin_price_usd
 
 
@@ -70,6 +72,7 @@ class MiningStrategyError(Exception):
 # ---------------------------------------------------------------------------
 # Standalone helper used by StrategyEngine
 # ---------------------------------------------------------------------------
+
 
 def coin_revenue(coin: CoinProfile, hashrate_ths: float) -> float:
     """Raw gross daily revenue for *coin* at *hashrate_ths* TH/s."""
@@ -220,7 +223,7 @@ class StrategyEngine:
         # Merged mining: try all algorithm-compatible pairs
         if StrategyType.MERGED in self.available_strategies:
             for i, primary in enumerate(coins):
-                for secondary in coins[i + 1:]:
+                for secondary in coins[i + 1 :]:
                     if primary.algorithm == secondary.algorithm:
                         results.append(self.evaluate_merged(primary, secondary))
 
@@ -269,4 +272,3 @@ class AdaptiveStrategyEngine(StrategyEngine):
             "all_results": all_results,
             "reasoning": reasoning,
         }
-

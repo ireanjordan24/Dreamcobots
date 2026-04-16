@@ -14,14 +14,12 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
-from bots.LeadGenBot.main import get_leads
-from bots.EnrichmentBot.main import enrich
-from bots.OutreachBot.main import outreach
-from bots.FollowUpBot.main import follow_up
 from bots.CloserBot.main import attempt_close
-
+from bots.EnrichmentBot.main import enrich
+from bots.FollowUpBot.main import follow_up
+from bots.LeadGenBot.main import get_leads
+from bots.OutreachBot.main import outreach
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Pipeline

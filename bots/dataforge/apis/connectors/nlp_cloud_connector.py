@@ -1,4 +1,5 @@
 """NLP Cloud API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -17,7 +18,9 @@ class NLPCloudConnector:
         if not self.api_key:
             logger.warning("NLP_CLOUD_API_KEY not set.")
 
-    def sentiment_analysis(self, text: str, model: str = "distilbert-base-uncased-finetuned-sst-2-english") -> dict:
+    def sentiment_analysis(
+        self, text: str, model: str = "distilbert-base-uncased-finetuned-sst-2-english"
+    ) -> dict:
         """Analyze sentiment of text using NLP Cloud.
 
         Args:
@@ -28,13 +31,21 @@ class NLPCloudConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Token {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Token {self.api_key}",
+            "Content-Type": "application/json",
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/{model}/sentiment", json={"text": text}, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/{model}/sentiment",
+                json={"text": text},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("NLP Cloud sentiment analysis completed.")
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("NLP Cloud error: %s", e)
             return {"status": "error", "message": str(e)}
-

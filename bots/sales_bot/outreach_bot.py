@@ -22,10 +22,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401  # GLOBAL AI SOURCES FLOW
 
-
 # ---------------------------------------------------------------------------
 # Errors
 # ---------------------------------------------------------------------------
+
 
 class OutreachBotError(Exception):
     """Raised when a non-recoverable outreach error occurs."""
@@ -34,6 +34,7 @@ class OutreachBotError(Exception):
 # ---------------------------------------------------------------------------
 # Bot
 # ---------------------------------------------------------------------------
+
 
 class OutreachBot:
     """Outreach Sales Bot — sends personalised emails to scraped leads.
@@ -133,6 +134,7 @@ class OutreachBot:
 # ---------------------------------------------------------------------------
 # Legacy alias expected by problem-statement code snippets
 # ---------------------------------------------------------------------------
+
 
 class Bot(OutreachBot):
     """Alias retained for backwards-compatibility with problem-statement usage."""

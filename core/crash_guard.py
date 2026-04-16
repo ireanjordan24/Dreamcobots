@@ -1,4 +1,5 @@
 """CrashGuard: decorator and context manager for safe bot execution."""
+
 import logging
 import traceback
 from contextlib import contextmanager

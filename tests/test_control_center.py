@@ -1,18 +1,21 @@
 """Tests for bots/control_center/control_center.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.control_center.control_center import ControlCenter
+
 from bots.affiliate_bot.affiliate_bot import AffiliateBot
-from bots.mining_bot.mining_bot import MiningBot
+from bots.control_center.control_center import ControlCenter
 from bots.deal_finder_bot.deal_finder_bot import DealFinderBot
+from bots.mining_bot.mining_bot import MiningBot
 from bots.money_finder_bot.money_finder_bot import MoneyFinderBot
 
 
@@ -160,7 +163,13 @@ class TestGetMonitoringDashboard:
     def test_has_required_keys(self):
         cc = ControlCenter()
         result = cc.get_monitoring_dashboard()
-        for key in ("dashboard", "registered_bots", "bot_status", "income_summary", "health"):
+        for key in (
+            "dashboard",
+            "registered_bots",
+            "bot_status",
+            "income_summary",
+            "health",
+        ):
             assert key in result
 
     def test_health_is_healthy_with_no_errors(self):
@@ -201,7 +210,9 @@ class TestHeartbeatMonitoring:
 
     def test_record_heartbeat_updates_registered_bot_status(self):
         from tiers import Tier
+
         from bots.mining_bot.mining_bot import MiningBot
+
         cc = ControlCenter()
         cc.register_bot("mining", MiningBot(tier=Tier.FREE))
         cc.record_heartbeat("mining", status="active")
@@ -250,12 +261,16 @@ class TestHeartbeatMonitoring:
 class TestGitHubWebhookHandling:
     def test_handle_github_event_returns_dict(self):
         cc = ControlCenter()
-        result = cc.handle_github_event("push", {"ref": "refs/heads/main", "commits": []})
+        result = cc.handle_github_event(
+            "push", {"ref": "refs/heads/main", "commits": []}
+        )
         assert isinstance(result, dict)
 
     def test_handle_push_event(self):
         cc = ControlCenter()
-        result = cc.handle_github_event("push", {"ref": "refs/heads/main", "commits": [{}, {}]})
+        result = cc.handle_github_event(
+            "push", {"ref": "refs/heads/main", "commits": [{}, {}]}
+        )
         assert result["event"] == "push"
         assert result["commit_count"] == 2
         assert result["ref"] == "refs/heads/main"

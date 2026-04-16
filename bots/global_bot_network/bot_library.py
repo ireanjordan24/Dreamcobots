@@ -11,8 +11,8 @@ as the single source of truth for "which bots exist in DreamCo."
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -21,10 +21,10 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class BotCategory(Enum):
     FINANCE = "finance"
@@ -59,6 +59,7 @@ class BotStatus(Enum):
 # ---------------------------------------------------------------------------
 # Bot entry
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BotEntry:
@@ -133,6 +134,7 @@ class BotEntry:
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
 class BotLibraryError(Exception):
     """Base exception for BotLibrary errors."""
 
@@ -148,6 +150,7 @@ class BotNotFound(BotLibraryError):
 # ---------------------------------------------------------------------------
 # Bot Library
 # ---------------------------------------------------------------------------
+
 
 class BotLibrary:
     """
@@ -234,12 +237,14 @@ class BotLibrary:
         q = query.lower()
         results = []
         for entry in self._bots.values():
-            haystack = " ".join([
-                entry.bot_id,
-                entry.display_name,
-                entry.description,
-                " ".join(entry.capabilities),
-            ]).lower()
+            haystack = " ".join(
+                [
+                    entry.bot_id,
+                    entry.display_name,
+                    entry.description,
+                    " ".join(entry.capabilities),
+                ]
+            ).lower()
             if q in haystack:
                 results.append(entry.to_dict())
         return results
@@ -253,7 +258,9 @@ class BotLibrary:
         by_category: dict[str, int] = {}
         by_status: dict[str, int] = {}
         for entry in self._bots.values():
-            by_category[entry.category.value] = by_category.get(entry.category.value, 0) + 1
+            by_category[entry.category.value] = (
+                by_category.get(entry.category.value, 0) + 1
+            )
             by_status[entry.status.value] = by_status.get(entry.status.value, 0) + 1
         return {
             "total_bots": len(self._bots),
@@ -377,8 +384,12 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.big_bro_ai.big_bro_ai",
         class_name="BigBroAI",
         capabilities=[
-            "mentorship", "bot_factory", "personality_engine",
-            "courses", "memory_system", "sales_monetization",
+            "mentorship",
+            "bot_factory",
+            "personality_engine",
+            "courses",
+            "memory_system",
+            "sales_monetization",
         ],
     ),
     BotEntry(
@@ -495,8 +506,13 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.dreamco_empire_os.empire_os",
         class_name="EmpireOS",
         capabilities=[
-            "ai_leaders", "bot_fleet", "marketplace", "deal_analyzer",
-            "revenue_tracker", "cost_tracking", "orchestration",
+            "ai_leaders",
+            "bot_fleet",
+            "marketplace",
+            "deal_analyzer",
+            "revenue_tracker",
+            "cost_tracking",
+            "orchestration",
         ],
     ),
     BotEntry(
@@ -516,8 +532,12 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.financial_literacy_bot.financial_literacy_bot",
         class_name="FinancialLiteracyBot",
         capabilities=[
-            "credit_tips", "credit_alerts", "investment_calculator",
-            "opm_strategies", "education_paths", "community",
+            "credit_tips",
+            "credit_alerts",
+            "investment_calculator",
+            "opm_strategies",
+            "education_paths",
+            "community",
         ],
     ),
     BotEntry(
@@ -528,8 +548,12 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.fiverr_bot.fiverr_bot",
         class_name="FiverrBot",
         capabilities=[
-            "freelancer_registration", "gig_posting", "proposals",
-            "milestones", "stripe_payments", "admin_dashboard",
+            "freelancer_registration",
+            "gig_posting",
+            "proposals",
+            "milestones",
+            "stripe_payments",
+            "admin_dashboard",
         ],
     ),
     BotEntry(
@@ -548,7 +572,12 @@ _DREAMCO_BOTS: list[BotEntry] = [
         category=BotCategory.JOB,
         module_path="bots.job_titles_bot.job_titles_bot",
         class_name="JobTitlesBot",
-        capabilities=["job_database", "role_generation", "cost_justification", "trainer"],
+        capabilities=[
+            "job_database",
+            "role_generation",
+            "cost_justification",
+            "trainer",
+        ],
     ),
     BotEntry(
         bot_id="mining_bot",
@@ -606,8 +635,12 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.open_claw_bot.open_claw_bot",
         class_name="OpenClawBot",
         capabilities=[
-            "strategy_engine", "ai_models", "client_manager",
-            "data_analysis", "ml_ensemble", "realtime_signals",
+            "strategy_engine",
+            "ai_models",
+            "client_manager",
+            "data_analysis",
+            "ml_ensemble",
+            "realtime_signals",
         ],
     ),
     BotEntry(
@@ -757,12 +790,26 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.enterprise_integrations_bot.enterprise_integrations_bot",
         class_name="EnterpriseIntegrationsBot",
         capabilities=[
-            "google_cloud_ai", "ibm_watson", "azure_ai", "nvidia_ai", "aws_ai",
-            "databricks", "palantir", "snowflake", "tableau",
-            "slack", "teams", "zoom",
-            "dream_llm", "dream_vision", "dream_voice", "dream_code",
-            "dream_analytics", "dream_collab",
-            "subscription_resales", "multi_provider_routing",
+            "google_cloud_ai",
+            "ibm_watson",
+            "azure_ai",
+            "nvidia_ai",
+            "aws_ai",
+            "databricks",
+            "palantir",
+            "snowflake",
+            "tableau",
+            "slack",
+            "teams",
+            "zoom",
+            "dream_llm",
+            "dream_vision",
+            "dream_voice",
+            "dream_code",
+            "dream_analytics",
+            "dream_collab",
+            "subscription_resales",
+            "multi_provider_routing",
         ],
     ),
     BotEntry(
@@ -778,10 +825,17 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.stack_and_profit_bot.stack_and_profit_bot",
         class_name="StackAndProfitBot",
         capabilities=[
-            "deal_scanning", "penny_deals", "receipt_cashback",
-            "flip_finding", "coupon_stacking", "profit_calculator",
-            "ai_ranking", "deal_alerts", "affiliate_links",
-            "referral_system", "premium_subscription",
+            "deal_scanning",
+            "penny_deals",
+            "receipt_cashback",
+            "flip_finding",
+            "coupon_stacking",
+            "profit_calculator",
+            "ai_ranking",
+            "deal_alerts",
+            "affiliate_links",
+            "referral_system",
+            "premium_subscription",
         ],
     ),
     BotEntry(

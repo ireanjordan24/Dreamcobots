@@ -10,6 +10,7 @@ unified retail intelligence layer:
 * Enterprise-Grade Features (551–580) for scalability
 * Behavioral Settings (581–600) for customer intelligence
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -77,9 +78,7 @@ class RetailIntelligenceNetwork:
         actions: List[str] = []
 
         # Clearance decision
-        clearance_candidates = self.in_store.get_clearance_candidates(
-            {sku: stock_pct}
-        )
+        clearance_candidates = self.in_store.get_clearance_candidates({sku: stock_pct})
         if clearance_candidates:
             actions.append("trigger_clearance_pricing")
 

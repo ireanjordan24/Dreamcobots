@@ -1,16 +1,25 @@
 """
 Dreamcobots FraudDetectionBot — tier-aware transaction fraud detection and risk analysis.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.fraud_detection_bot.tiers import FRAUD_DETECTION_FEATURES, get_fraud_detection_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.fraud_detection_bot.tiers import (
+    FRAUD_DETECTION_FEATURES,
+    get_fraud_detection_tier_info,
+)
 
 
 class FraudDetectionBotTierError(Exception):
@@ -115,7 +124,9 @@ class FraudDetectionBot:
                 risk_score += 0.25
                 reasons.append("Suspicious merchant pattern detected by ML model")
             # Behavioral analytics component
-            user_tx_count = sum(1 for t in self._transactions if t.get("user_id") == user_id)
+            user_tx_count = sum(
+                1 for t in self._transactions if t.get("user_id") == user_id
+            )
             if user_tx_count > 10:
                 risk_score += 0.1
                 reasons.append("High transaction frequency for user")
@@ -170,7 +181,11 @@ class FraudDetectionBot:
             risk_score += 0.3
         if self.tier == Tier.ENTERPRISE:
             # Behavioral analytics adjustment
-            user_flagged = sum(1 for t in self._transactions if t.get("user_id") == user_id and t.get("fraud_flag"))
+            user_flagged = sum(
+                1
+                for t in self._transactions
+                if t.get("user_id") == user_id and t.get("fraud_flag")
+            )
             if user_flagged > 0:
                 risk_score += 0.2
 

@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -34,6 +35,7 @@ class LeaderStatus(Enum):
 @dataclass
 class AILeader:
     """Represents a high-level AI decision-making agent."""
+
     leader_id: str
     name: str
     role: LeaderRole
@@ -42,7 +44,9 @@ class AILeader:
     decisions_made: int = 0
     revenue_influenced_usd: float = 0.0
     specialties: list = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     last_active: Optional[str] = None
 
 
@@ -107,7 +111,9 @@ class AILeaders:
         # Update performance score (rolling weighted average)
         increment = 10.0 if success else -5.0
         leader.performance_score = round(
-            (leader.performance_score * (leader.decisions_made - 1) + increment) / leader.decisions_made, 2
+            (leader.performance_score * (leader.decisions_made - 1) + increment)
+            / leader.decisions_made,
+            2,
         )
 
         entry = {
@@ -149,9 +155,11 @@ class AILeaders:
             "active_leaders": len(active),
             "total_decisions": sum(l.decisions_made for l in leaders),
             "total_revenue_influenced_usd": round(total_revenue, 2),
-            "avg_performance_score": round(
-                sum(l.performance_score for l in leaders) / len(leaders), 2
-            ) if leaders else 0.0,
+            "avg_performance_score": (
+                round(sum(l.performance_score for l in leaders) / len(leaders), 2)
+                if leaders
+                else 0.0
+            ),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 

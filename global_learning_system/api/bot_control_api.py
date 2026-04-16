@@ -39,15 +39,23 @@ class BotControlAPI:
             self._routes[full_path] = {}
         self._routes[full_path][method.upper()] = handler
 
-    def dispatch(self, path: str, method: str = "GET", payload: Optional[Dict] = None) -> APIResponse:
+    def dispatch(
+        self, path: str, method: str = "GET", payload: Optional[Dict] = None
+    ) -> APIResponse:
         """Dispatch a request to the matching handler."""
         handlers = self._routes.get(path, {})
         handler = handlers.get(method.upper())
         if handler is None:
-            return APIResponse(status="error", error=f"Route {method} {path} not found.")
+            return APIResponse(
+                status="error", error=f"Route {method} {path} not found."
+            )
         try:
             result = handler(payload) if payload is not None else handler()
-            return result if isinstance(result, APIResponse) else APIResponse(status="ok", data=result)
+            return (
+                result
+                if isinstance(result, APIResponse)
+                else APIResponse(status="ok", data=result)
+            )
         except Exception as exc:  # noqa: BLE001
             return APIResponse(status="error", error=str(exc))
 
@@ -76,10 +84,14 @@ class BotControlAPI:
     # ------------------------------------------------------------------
 
     def _health_handler(self) -> APIResponse:
-        return APIResponse(status="ok", data={"service": "bot_control_api", "healthy": True})
+        return APIResponse(
+            status="ok", data={"service": "bot_control_api", "healthy": True}
+        )
 
     def _list_bots_handler(self) -> APIResponse:
-        return APIResponse(status="ok", data={"bots": [], "message": "Connect to BotUpdater."})
+        return APIResponse(
+            status="ok", data={"bots": [], "message": "Connect to BotUpdater."}
+        )
 
     def _deploy_handler(self, payload: Optional[Dict]) -> APIResponse:
         p = payload or {}
@@ -96,15 +108,24 @@ class BotControlAPI:
         p = payload or {}
         return APIResponse(
             status="ok",
-            data={"deployment_id": p.get("deployment_id", ""), "message": "Connect to StrategyDeployer.rollback()."},
+            data={
+                "deployment_id": p.get("deployment_id", ""),
+                "message": "Connect to StrategyDeployer.rollback().",
+            },
         )
 
     def _retrain_handler(self, payload: Optional[Dict]) -> APIResponse:
         p = payload or {}
         return APIResponse(
             status="ok",
-            data={"bot_name": p.get("bot_name", ""), "message": "Connect to BotUpdater.trigger_retrain()."},
+            data={
+                "bot_name": p.get("bot_name", ""),
+                "message": "Connect to BotUpdater.trigger_retrain().",
+            },
         )
 
     def _status_handler(self) -> APIResponse:
-        return APIResponse(status="ok", data={"status": "operational", "message": "Connect to BotUpdater."})
+        return APIResponse(
+            status="ok",
+            data={"status": "operational", "message": "Connect to BotUpdater."},
+        )

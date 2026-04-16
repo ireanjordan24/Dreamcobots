@@ -95,6 +95,7 @@ try:
     @app.route("/")
     def dashboard() -> Any:
         from flask import make_response  # noqa: PLC0415
+
         results = _orch.run_all_bots()
         summary = _orch.summary(results)
         html = _render_html(results, summary)
@@ -152,12 +153,14 @@ class DashboardApp:
             scale = val.get("scale", rev >= self._scale_threshold)
             if scale:
                 scaling_events += 1
-            bots.append({
-                "bot_name": r.get("bot_name", r.get("bot", "unknown")),
-                "revenue": rev,
-                "conversion_rate": float(out.get("conversion_rate", 0)),
-                "scaling": scale,
-            })
+            bots.append(
+                {
+                    "bot_name": r.get("bot_name", r.get("bot", "unknown")),
+                    "revenue": rev,
+                    "conversion_rate": float(out.get("conversion_rate", 0)),
+                    "scaling": scale,
+                }
+            )
 
         top_performers = sorted(bots, key=lambda x: x["revenue"], reverse=True)[:5]
 

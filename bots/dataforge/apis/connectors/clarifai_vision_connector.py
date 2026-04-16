@@ -1,4 +1,5 @@
 """Clarifai general detection connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,15 +28,23 @@ class ClarifaiVisionConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Key {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Key {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"inputs": [{"data": {"image": {"url": image_url}}}]}
         model_id = "general-image-detection"
         try:
-            response = requests.post(f"{self.BASE_URL}/models/{model_id}/outputs", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/models/{model_id}/outputs",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Clarifai general detection completed.")
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Clarifai general_detection error: %s", e)
             return {"status": "error", "message": str(e)}
-

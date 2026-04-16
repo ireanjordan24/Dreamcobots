@@ -1,11 +1,14 @@
 """Education Bot - Personalized learning plans, quizzes, and certification paths."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from datetime import datetime
+
 from core.base_bot import BaseBot
 
 
@@ -27,8 +30,9 @@ class EducationBot(BaseBot):
         self.start()
         return self.get_status()
 
-    def create_learning_plan(self, subject: str, current_level: str,
-                             target_level: str, timeframe_weeks: int) -> dict:
+    def create_learning_plan(
+        self, subject: str, current_level: str, target_level: str, timeframe_weeks: int
+    ) -> dict:
         """Create a personalized learning plan for a subject."""
         levels = {"beginner": 1, "intermediate": 2, "advanced": 3, "expert": 4}
         start = levels.get(current_level.lower(), 1)
@@ -39,24 +43,26 @@ class EducationBot(BaseBot):
         level_names = ["beginner", "intermediate", "advanced", "expert"]
         for i in range(gap):
             phase_level = level_names[min(start + i, 3)]
-            phases.append({
-                "phase": i + 1,
-                "level": phase_level,
-                "duration_weeks": weeks_per_level,
-                "topics": [
-                    f"{subject} fundamentals ({phase_level})",
-                    f"Practical {subject} projects",
-                    f"{subject} best practices",
-                    f"Assessment and review",
-                ],
-                "resources": [
-                    f"Book: {subject.title()} Mastery ({phase_level.title()} Edition)",
-                    f"Online course: Udemy - Complete {subject.title()} Course",
-                    f"YouTube: {subject.title()} tutorials by top educators",
-                    f"Practice: Build 2 projects this phase",
-                ],
-                "milestone": f"Complete {phase_level} {subject} assessment with 80%+ score",
-            })
+            phases.append(
+                {
+                    "phase": i + 1,
+                    "level": phase_level,
+                    "duration_weeks": weeks_per_level,
+                    "topics": [
+                        f"{subject} fundamentals ({phase_level})",
+                        f"Practical {subject} projects",
+                        f"{subject} best practices",
+                        f"Assessment and review",
+                    ],
+                    "resources": [
+                        f"Book: {subject.title()} Mastery ({phase_level.title()} Edition)",
+                        f"Online course: Udemy - Complete {subject.title()} Course",
+                        f"YouTube: {subject.title()} tutorials by top educators",
+                        f"Practice: Build 2 projects this phase",
+                    ],
+                    "milestone": f"Complete {phase_level} {subject} assessment with 80%+ score",
+                }
+            )
         return {
             "subject": subject,
             "current_level": current_level,
@@ -71,26 +77,30 @@ class EducationBot(BaseBot):
             ],
         }
 
-    def generate_quiz(self, topic: str, num_questions: int = 5, difficulty: str = "medium") -> dict:
+    def generate_quiz(
+        self, topic: str, num_questions: int = 5, difficulty: str = "medium"
+    ) -> dict:
         """Generate a quiz on a given topic."""
         difficulty_map = {"easy": 1, "medium": 2, "hard": 3}
         diff_level = difficulty_map.get(difficulty.lower(), 2)
         questions = []
         for i in range(num_questions):
-            questions.append({
-                "question_number": i + 1,
-                "question": f"[{difficulty.upper()}] Which of the following best describes {topic} concept #{i + 1}?",
-                "options": [
-                    f"A) The correct answer about {topic}",
-                    f"B) A plausible but incorrect answer",
-                    f"C) An obviously wrong answer",
-                    f"D) Another plausible but incorrect answer",
-                ],
-                "correct_answer": "A",
-                "explanation": f"Option A is correct because it accurately describes the core principle of {topic} concept #{i + 1}.",
-                "difficulty": difficulty,
-                "points": diff_level * 10,
-            })
+            questions.append(
+                {
+                    "question_number": i + 1,
+                    "question": f"[{difficulty.upper()}] Which of the following best describes {topic} concept #{i + 1}?",
+                    "options": [
+                        f"A) The correct answer about {topic}",
+                        f"B) A plausible but incorrect answer",
+                        f"C) An obviously wrong answer",
+                        f"D) Another plausible but incorrect answer",
+                    ],
+                    "correct_answer": "A",
+                    "explanation": f"Option A is correct because it accurately describes the core principle of {topic} concept #{i + 1}.",
+                    "difficulty": difficulty,
+                    "points": diff_level * 10,
+                }
+            )
         return {
             "topic": topic,
             "difficulty": difficulty,
@@ -103,12 +113,24 @@ class EducationBot(BaseBot):
 
     def build_study_schedule(self, subjects_list: list, hours_per_day: float) -> dict:
         """Build a weekly study schedule for multiple subjects."""
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
         schedule = {}
         total_hours_per_week = hours_per_day * 7
-        hours_per_subject = total_hours_per_week / len(subjects_list) if subjects_list else 0
+        hours_per_subject = (
+            total_hours_per_week / len(subjects_list) if subjects_list else 0
+        )
         for i, day in enumerate(days):
-            subject = subjects_list[i % len(subjects_list)] if subjects_list else "Self-study"
+            subject = (
+                subjects_list[i % len(subjects_list)] if subjects_list else "Self-study"
+            )
             schedule[day] = {
                 "subject": subject,
                 "hours": hours_per_day,
@@ -134,46 +156,104 @@ class EducationBot(BaseBot):
 
     def recommend_courses(self, skill: str, level: str) -> list:
         """Recommend courses for a skill at a given level."""
-        platforms = ["Coursera", "Udemy", "edX", "LinkedIn Learning", "Skillshare", "Pluralsight"]
+        platforms = [
+            "Coursera",
+            "Udemy",
+            "edX",
+            "LinkedIn Learning",
+            "Skillshare",
+            "Pluralsight",
+        ]
         courses = []
         for i, platform in enumerate(platforms[:4]):
-            courses.append({
-                "title": f"Complete {skill.title()} {level.title()} Course - {platform}",
-                "platform": platform,
-                "level": level,
-                "duration": f"{8 + i * 4} hours",
-                "rating": round(4.4 + i * 0.1, 1),
-                "price": f"${19.99 + i * 10:.2f}" if i > 0 else "Free with subscription",
-                "certificate": True,
-                "url": f"https://www.{platform.lower()}.com/search?q={skill.replace(' ', '+')}",
-            })
+            courses.append(
+                {
+                    "title": f"Complete {skill.title()} {level.title()} Course - {platform}",
+                    "platform": platform,
+                    "level": level,
+                    "duration": f"{8 + i * 4} hours",
+                    "rating": round(4.4 + i * 0.1, 1),
+                    "price": (
+                        f"${19.99 + i * 10:.2f}" if i > 0 else "Free with subscription"
+                    ),
+                    "certificate": True,
+                    "url": f"https://www.{platform.lower()}.com/search?q={skill.replace(' ', '+')}",
+                }
+            )
         return courses
 
     def map_certification_path(self, target_job: str) -> dict:
         """Map the certification path to a target career."""
         cert_maps = {
             "data scientist": [
-                {"cert": "Python for Data Science (IBM)", "platform": "Coursera", "duration": "3 months"},
-                {"cert": "Google Data Analytics Certificate", "platform": "Coursera", "duration": "6 months"},
-                {"cert": "AWS Certified Machine Learning", "platform": "AWS", "duration": "3 months"},
-                {"cert": "TensorFlow Developer Certificate", "platform": "Google", "duration": "2 months"},
+                {
+                    "cert": "Python for Data Science (IBM)",
+                    "platform": "Coursera",
+                    "duration": "3 months",
+                },
+                {
+                    "cert": "Google Data Analytics Certificate",
+                    "platform": "Coursera",
+                    "duration": "6 months",
+                },
+                {
+                    "cert": "AWS Certified Machine Learning",
+                    "platform": "AWS",
+                    "duration": "3 months",
+                },
+                {
+                    "cert": "TensorFlow Developer Certificate",
+                    "platform": "Google",
+                    "duration": "2 months",
+                },
             ],
             "cybersecurity": [
-                {"cert": "CompTIA Security+", "platform": "CompTIA", "duration": "3 months"},
-                {"cert": "Certified Ethical Hacker (CEH)", "platform": "EC-Council", "duration": "4 months"},
+                {
+                    "cert": "CompTIA Security+",
+                    "platform": "CompTIA",
+                    "duration": "3 months",
+                },
+                {
+                    "cert": "Certified Ethical Hacker (CEH)",
+                    "platform": "EC-Council",
+                    "duration": "4 months",
+                },
                 {"cert": "CISSP", "platform": "ISC2", "duration": "6-12 months"},
             ],
             "project manager": [
-                {"cert": "PMP (Project Management Professional)", "platform": "PMI", "duration": "6 months"},
-                {"cert": "Certified Scrum Master (CSM)", "platform": "Scrum Alliance", "duration": "2 days"},
-                {"cert": "Google Project Management Certificate", "platform": "Coursera", "duration": "6 months"},
+                {
+                    "cert": "PMP (Project Management Professional)",
+                    "platform": "PMI",
+                    "duration": "6 months",
+                },
+                {
+                    "cert": "Certified Scrum Master (CSM)",
+                    "platform": "Scrum Alliance",
+                    "duration": "2 days",
+                },
+                {
+                    "cert": "Google Project Management Certificate",
+                    "platform": "Coursera",
+                    "duration": "6 months",
+                },
             ],
         }
         path_key = next((k for k in cert_maps if k in target_job.lower()), None)
-        certs = cert_maps.get(path_key, [
-            {"cert": f"Foundational {target_job} Certificate", "platform": "Coursera/edX", "duration": "3 months"},
-            {"cert": f"Advanced {target_job} Certification", "platform": "Industry body", "duration": "6 months"},
-        ])
+        certs = cert_maps.get(
+            path_key,
+            [
+                {
+                    "cert": f"Foundational {target_job} Certificate",
+                    "platform": "Coursera/edX",
+                    "duration": "3 months",
+                },
+                {
+                    "cert": f"Advanced {target_job} Certification",
+                    "platform": "Industry body",
+                    "duration": "6 months",
+                },
+            ],
+        )
         return {
             "target_job": target_job,
             "certifications": certs,
@@ -196,7 +276,9 @@ class EducationBot(BaseBot):
             "existing_strengths": sorted(list(strengths)),
             "bonus_skills": sorted(list(extras)),
             "gap_count": len(gaps),
-            "readiness_percent": round(len(strengths) / len(target_set) * 100, 1) if target_set else 100,
+            "readiness_percent": (
+                round(len(strengths) / len(target_set) * 100, 1) if target_set else 100
+            ),
             "priority_skills_to_learn": sorted(list(gaps))[:5],
             "estimated_time_to_close_gaps": f"{len(gaps) * 4}-{len(gaps) * 8} weeks",
         }
@@ -211,7 +293,11 @@ class EducationBot(BaseBot):
         self._progress_tracker[student_id][subject].append(entry)
         history = self._progress_tracker[student_id][subject]
         avg_score = sum(e["score"] for e in history) / len(history)
-        trend = "improving" if len(history) > 1 and history[-1]["score"] > history[-2]["score"] else "stable"
+        trend = (
+            "improving"
+            if len(history) > 1 and history[-1]["score"] > history[-2]["score"]
+            else "stable"
+        )
         return {
             "student_id": student_id,
             "subject": subject,
@@ -219,7 +305,11 @@ class EducationBot(BaseBot):
             "average_score": round(avg_score, 1),
             "sessions_completed": len(history),
             "trend": trend,
-            "recommendation": "Continue current pace" if avg_score >= 70 else "Schedule additional tutoring sessions",
+            "recommendation": (
+                "Continue current pace"
+                if avg_score >= 70
+                else "Schedule additional tutoring sessions"
+            ),
         }
 
     def adapt_to_learning_style(self, style: str, content: str) -> dict:

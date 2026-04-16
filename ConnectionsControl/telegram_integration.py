@@ -8,11 +8,11 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -45,6 +45,7 @@ class TelegramIntegration:
     def send_message(self, text: str) -> TelegramMessage:
         """Simulate sending a Telegram message."""
         import uuid
+
         msg = TelegramMessage(
             message_id=str(uuid.uuid4()),
             chat_id=self._chat_id or "unconfigured",

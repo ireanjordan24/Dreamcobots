@@ -25,17 +25,17 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # ResourceManager
 # ---------------------------------------------------------------------------
+
 
 class ResourceManager:
     """Tool execution layer — performs real-world actions on behalf of agents.
@@ -49,10 +49,10 @@ class ResourceManager:
 
     def __init__(self, extra_tools: dict | None = None) -> None:
         self.tools: dict[str, object] = {
-            "email":   self.send_email,
-            "crm":     self.save_crm,
+            "email": self.send_email,
+            "crm": self.save_crm,
             "payment": self.process_payment,
-            "data":    self.fetch_data,
+            "data": self.fetch_data,
         }
         if extra_tools:
             self.tools.update(extra_tools)
@@ -97,7 +97,12 @@ class ResourceManager:
         """
         recipient = payload.get("email", "unknown")
         subject = payload.get("subject", "(no subject)")
-        return {"tool": "email", "status": "sent", "recipient": recipient, "subject": subject}
+        return {
+            "tool": "email",
+            "status": "sent",
+            "recipient": recipient,
+            "subject": subject,
+        }
 
     def save_crm(self, payload: dict) -> dict:
         """Persist a contact or lead record to CRM.
@@ -123,7 +128,12 @@ class ResourceManager:
         """
         email = payload.get("email", "unknown")
         amount = float(payload.get("amount", 0.0))
-        return {"tool": "payment", "status": "processed", "email": email, "amount": amount}
+        return {
+            "tool": "payment",
+            "status": "processed",
+            "email": email,
+            "amount": amount,
+        }
 
     def fetch_data(self, payload: dict) -> dict:
         """Fetch external data from a configured source.

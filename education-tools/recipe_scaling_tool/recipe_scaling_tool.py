@@ -1,23 +1,28 @@
 # GLOBAL AI SOURCES FLOW
 """Recipe Scaling Tool - scale recipes up or down with unit conversion."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
 
 
 UNIT_CONVERSIONS = {
-    "tsp": {"tbsp": 1/3, "cup": 1/48, "ml": 4.929},
-    "tbsp": {"tsp": 3, "cup": 1/16, "ml": 14.787},
+    "tsp": {"tbsp": 1 / 3, "cup": 1 / 48, "ml": 4.929},
+    "tbsp": {"tsp": 3, "cup": 1 / 16, "ml": 14.787},
     "cup": {"tsp": 48, "tbsp": 16, "ml": 236.588, "liter": 0.237},
     "oz": {"g": 28.3495, "lb": 0.0625},
     "lb": {"oz": 16, "g": 453.592, "kg": 0.453592},
@@ -39,9 +44,13 @@ class RecipeScalingTool:
 
     def _check_limit(self):
         if self._monthly_limit and self._recipe_count >= self._monthly_limit:
-            raise PermissionError(f"Monthly recipe limit ({self._monthly_limit}) reached. Upgrade to Pro.")
+            raise PermissionError(
+                f"Monthly recipe limit ({self._monthly_limit}) reached. Upgrade to Pro."
+            )
 
-    def scale_recipe(self, recipe: dict, original_servings: int, target_servings: int) -> dict:
+    def scale_recipe(
+        self, recipe: dict, original_servings: int, target_servings: int
+    ) -> dict:
         """Scale all ingredient quantities in a recipe."""
         self._check_limit()
         if original_servings <= 0:

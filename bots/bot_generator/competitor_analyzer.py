@@ -10,21 +10,21 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Competitor data model
 # ---------------------------------------------------------------------------
+
 
 def _default_data_path() -> str:
     return os.path.join(
@@ -50,7 +50,11 @@ SIMULATED_COMPETITORS: List[dict] = [
         "rating": 4.1,
         "monthly_price_usd": 199,
         "features": ["pipeline management", "email sequences", "basic reporting"],
-        "weak_points": ["no voice outreach", "limited integrations", "no revenue forecasting"],
+        "weak_points": [
+            "no voice outreach",
+            "limited integrations",
+            "no revenue forecasting",
+        ],
         "reviews_summary": "Good pipeline UX but weak on integrations and reporting.",
         "source": "simulated",
     },
@@ -60,7 +64,11 @@ SIMULATED_COMPETITORS: List[dict] = [
         "rating": 3.5,
         "monthly_price_usd": 79,
         "features": ["live chat", "basic ticketing"],
-        "weak_points": ["no sentiment analysis", "no escalation management", "no 24/7 SLA"],
+        "weak_points": [
+            "no sentiment analysis",
+            "no escalation management",
+            "no 24/7 SLA",
+        ],
         "reviews_summary": "Cheap but limited.  Falls apart at scale.",
         "source": "simulated",
     },
@@ -70,7 +78,11 @@ SIMULATED_COMPETITORS: List[dict] = [
         "rating": 4.0,
         "monthly_price_usd": 99,
         "features": ["web scraping", "export to CSV"],
-        "weak_points": ["no proxy rotation", "rate limits hit frequently", "no deduplication"],
+        "weak_points": [
+            "no proxy rotation",
+            "rate limits hit frequently",
+            "no deduplication",
+        ],
         "reviews_summary": "Fast but unreliable on large scrapes.",
         "source": "simulated",
     },
@@ -90,7 +102,11 @@ SIMULATED_COMPETITORS: List[dict] = [
         "rating": 4.2,
         "monthly_price_usd": 129,
         "features": ["email campaigns", "social posting", "basic analytics"],
-        "weak_points": ["no audience segmentation", "no dynamic content", "no A/B testing"],
+        "weak_points": [
+            "no audience segmentation",
+            "no dynamic content",
+            "no A/B testing",
+        ],
         "reviews_summary": "Easy to use but too basic for serious marketers.",
         "source": "simulated",
     },
@@ -100,6 +116,7 @@ SIMULATED_COMPETITORS: List[dict] = [
 # ---------------------------------------------------------------------------
 # Competitor Analyzer
 # ---------------------------------------------------------------------------
+
 
 class CompetitorAnalyzerError(Exception):
     """Raised when analysis cannot be completed."""
@@ -226,7 +243,11 @@ class CompetitorAnalyzer:
     def list_competitors(self, category: Optional[str] = None) -> List[dict]:
         """Return all stored competitors, optionally filtered by category."""
         if category:
-            return [c for c in self._competitors if c.get("category", "").lower() == category.lower()]
+            return [
+                c
+                for c in self._competitors
+                if c.get("category", "").lower() == category.lower()
+            ]
         return list(self._competitors)
 
     def run(self) -> str:
@@ -244,12 +265,14 @@ class CompetitorAnalyzer:
         """Return competitor records for *category*."""
         if self._simulated:
             return [
-                c for c in SIMULATED_COMPETITORS
+                c
+                for c in SIMULATED_COMPETITORS
                 if c["category"].lower() == category.lower()
             ]
         # Live scraping would be implemented here (GitHub, app stores, SaaS)
         return [
-            c for c in self._competitors
+            c
+            for c in self._competitors
             if c.get("category", "").lower() == category.lower()
         ]
 

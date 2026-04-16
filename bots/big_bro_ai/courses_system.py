@@ -15,10 +15,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Course categories
 # ---------------------------------------------------------------------------
+
 
 class CourseCategory(Enum):
     AI_FUNDAMENTALS = "ai_fundamentals"
@@ -36,6 +36,7 @@ class CourseCategory(Enum):
 # ---------------------------------------------------------------------------
 # Lesson
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Lesson:
@@ -80,9 +81,11 @@ class Lesson:
 # Milestone
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Milestone:
     """A measurable checkpoint within a course."""
+
     milestone_id: str
     title: str
     description: str
@@ -100,6 +103,7 @@ class Milestone:
 # ---------------------------------------------------------------------------
 # Course
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Course:
@@ -163,9 +167,11 @@ class Course:
 # Student enrollment record
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Enrollment:
     """Tracks a user's progress through a course."""
+
     user_id: str
     course_id: str
     completed_lessons: list[str] = field(default_factory=list)
@@ -192,6 +198,7 @@ class Enrollment:
 # ---------------------------------------------------------------------------
 # Courses-as-Systems Engine
 # ---------------------------------------------------------------------------
+
 
 class CoursesSystemError(Exception):
     """Raised when a courses-system operation fails."""
@@ -312,9 +319,7 @@ class CoursesSystem:
         """Return a course by ID, or None."""
         return self._courses.get(course_id)
 
-    def list_courses(
-        self, category: Optional[CourseCategory] = None
-    ) -> list[Course]:
+    def list_courses(self, category: Optional[CourseCategory] = None) -> list[Course]:
         """Return all courses, optionally filtered by category."""
         courses = list(self._courses.values())
         if category is not None:
@@ -360,14 +365,10 @@ class CoursesSystem:
         self._require_course(course_id)
         key = (user_id, course_id)
         if key not in self._enrollments:
-            self._enrollments[key] = Enrollment(
-                user_id=user_id, course_id=course_id
-            )
+            self._enrollments[key] = Enrollment(user_id=user_id, course_id=course_id)
         return self._enrollments[key]
 
-    def complete_lesson(
-        self, user_id: str, course_id: str, lesson_id: str
-    ) -> dict:
+    def complete_lesson(self, user_id: str, course_id: str, lesson_id: str) -> dict:
         """Mark a lesson as completed for *user_id*."""
         key = (user_id, course_id)
         if key not in self._enrollments:

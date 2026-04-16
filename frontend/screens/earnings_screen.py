@@ -43,7 +43,8 @@ class EarningsScreen:
         self.referral_earnings = referral_earnings
         self.premium_revenue = premium_revenue
         self.total_earnings = round(
-            pending_earnings + completed_earnings + referral_earnings + premium_revenue, 2
+            pending_earnings + completed_earnings + referral_earnings + premium_revenue,
+            2,
         )
         self.payout_history = payout_history or []
         self.upcoming_payouts = upcoming_payouts or []
@@ -61,17 +62,41 @@ class EarningsScreen:
                     "color": "green",
                 },
                 "breakdown": {
-                    "pending": {"label": "Pending", "value": f"${self.pending_earnings:,.2f}", "color": "orange"},
-                    "completed": {"label": "Completed", "value": f"${self.completed_earnings:,.2f}", "color": "green"},
-                    "referrals": {"label": "Referrals", "value": f"${self.referral_earnings:,.2f}", "color": "blue"},
-                    "premium": {"label": "Premium", "value": f"${self.premium_revenue:,.2f}", "color": "purple"},
+                    "pending": {
+                        "label": "Pending",
+                        "value": f"${self.pending_earnings:,.2f}",
+                        "color": "orange",
+                    },
+                    "completed": {
+                        "label": "Completed",
+                        "value": f"${self.completed_earnings:,.2f}",
+                        "color": "green",
+                    },
+                    "referrals": {
+                        "label": "Referrals",
+                        "value": f"${self.referral_earnings:,.2f}",
+                        "color": "blue",
+                    },
+                    "premium": {
+                        "label": "Premium",
+                        "value": f"${self.premium_revenue:,.2f}",
+                        "color": "purple",
+                    },
                 },
                 "subscription_badge": {
                     "tier": self.subscription_tier.upper(),
-                    "color": {"free": "grey", "pro": "blue", "enterprise": "gold"}.get(self.subscription_tier, "grey"),
+                    "color": {"free": "grey", "pro": "blue", "enterprise": "gold"}.get(
+                        self.subscription_tier, "grey"
+                    ),
                 },
-                "payout_history": {"items": self.payout_history, "count": len(self.payout_history)},
-                "upcoming_payouts": {"items": self.upcoming_payouts, "count": len(self.upcoming_payouts)},
+                "payout_history": {
+                    "items": self.payout_history,
+                    "count": len(self.payout_history),
+                },
+                "upcoming_payouts": {
+                    "items": self.upcoming_payouts,
+                    "count": len(self.upcoming_payouts),
+                },
             },
             "last_updated": self.last_updated,
         }
@@ -98,11 +123,26 @@ class EarningsScreen:
             referral_earnings=180.00,
             premium_revenue=99.00,
             payout_history=[
-                {"date": "2025-06-01", "amount": 450.00, "method": "PayPal", "status": "completed"},
-                {"date": "2025-05-15", "amount": 320.75, "method": "Direct Deposit", "status": "completed"},
+                {
+                    "date": "2025-06-01",
+                    "amount": 450.00,
+                    "method": "PayPal",
+                    "status": "completed",
+                },
+                {
+                    "date": "2025-05-15",
+                    "amount": 320.75,
+                    "method": "Direct Deposit",
+                    "status": "completed",
+                },
             ],
             upcoming_payouts=[
-                {"date": "2025-07-01", "amount": 127.50, "method": "PayPal", "status": "pending"},
+                {
+                    "date": "2025-07-01",
+                    "amount": 127.50,
+                    "method": "PayPal",
+                    "status": "pending",
+                },
             ],
             subscription_tier="pro",
         )

@@ -10,18 +10,19 @@ Usage
     response = bot.chat("Generate a brand sponsorship pitch for my YouTube channel")
     print(response["message"])
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.creator_economy.tiers import (
-    CE_EXTRA_FEATURES,
-    CE_TOOLS,
-    get_ce_tier_info,
-)
+
+from bots.creator_economy.tiers import CE_EXTRA_FEATURES, CE_TOOLS, get_ce_tier_info
 
 
 class CreatorEconomyTierError(Exception):
@@ -78,9 +79,7 @@ class CreatorEconomyBot:
         self._check_tool_access(active_tool)
 
         self._request_count += 1
-        response_text = (
-            f"[CreatorEconomyBot/{active_tool}] Processed: {message!r}"
-        )
+        response_text = f"[CreatorEconomyBot/{active_tool}] Processed: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
 

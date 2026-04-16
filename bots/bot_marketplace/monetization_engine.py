@@ -7,8 +7,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -50,7 +50,9 @@ class MonetizationEngine:
     ) -> dict:
         """Create an upsell offer linked to a bot listing."""
         if upsell_type not in UPSELL_TYPES:
-            raise ValueError(f"Invalid upsell_type '{upsell_type}'. Must be one of {UPSELL_TYPES}.")
+            raise ValueError(
+                f"Invalid upsell_type '{upsell_type}'. Must be one of {UPSELL_TYPES}."
+            )
         if price_usd < 0:
             raise ValueError("price_usd must be non-negative.")
 
@@ -85,7 +87,9 @@ class MonetizationEngine:
     ) -> dict:
         """Record a bot purchase and compute fee split."""
         if self._catalog is None:
-            raise RuntimeError("MonetizationEngine requires a catalog to look up prices.")
+            raise RuntimeError(
+                "MonetizationEngine requires a catalog to look up prices."
+            )
         listing = self._catalog.get_listing(listing_id)
         gross = listing["price_usd"]
         return self._record_transaction(
@@ -109,7 +113,9 @@ class MonetizationEngine:
         upsell = self._upsells[upsell_id]
         listing_id = upsell["listing_id"]
         if self._catalog is None:
-            raise RuntimeError("MonetizationEngine requires a catalog to look up seller.")
+            raise RuntimeError(
+                "MonetizationEngine requires a catalog to look up seller."
+            )
         listing = self._catalog.get_listing(listing_id)
         return self._record_transaction(
             item_id=upsell_id,
@@ -137,7 +143,9 @@ class MonetizationEngine:
         bot_earnings: dict[str, float] = {}
         for t in seller_txns:
             if t["item_type"] == "bot":
-                bot_earnings[t["item_id"]] = bot_earnings.get(t["item_id"], 0.0) + t["seller_earnings"]
+                bot_earnings[t["item_id"]] = (
+                    bot_earnings.get(t["item_id"], 0.0) + t["seller_earnings"]
+                )
         top_bots = sorted(
             [{"listing_id": k, "earnings": v} for k, v in bot_earnings.items()],
             key=lambda x: x["earnings"],
@@ -199,7 +207,11 @@ class MonetizationEngine:
             "transaction_id": str(uuid.uuid4()),
             "item_id": item_id,
             "item_type": item_type,
-            "listing_id": item_id if item_type == "bot" else self._upsells.get(item_id, {}).get("listing_id"),
+            "listing_id": (
+                item_id
+                if item_type == "bot"
+                else self._upsells.get(item_id, {}).get("listing_id")
+            ),
             "buyer_id": buyer_id,
             "seller_id": seller_id,
             "gross_amount": gross,

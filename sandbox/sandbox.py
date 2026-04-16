@@ -18,6 +18,7 @@ from core.bot_base import BotBase
 @dataclass
 class Scenario:
     """Defines a single test scenario for sandbox execution."""
+
     name: str
     description: str
     task: Dict[str, Any]
@@ -29,6 +30,7 @@ class Scenario:
 @dataclass
 class PerformanceMetrics:
     """Aggregated performance metrics from a sandbox test run."""
+
     scenario_name: str
     total_iterations: int
     passed: int
@@ -206,7 +208,11 @@ class SandboxTester:
         metrics = self._build_metrics(scenario.name, latencies, passed, failed, elapsed)
         self.logger.info(
             "Scenario '%s': pass=%d, fail=%d, avg_latency=%.4fs, ROI=%.1f%%",
-            scenario.name, passed, failed, metrics.avg_latency_seconds, metrics.roi_percent,
+            scenario.name,
+            passed,
+            failed,
+            metrics.avg_latency_seconds,
+            metrics.roi_percent,
         )
         return metrics
 

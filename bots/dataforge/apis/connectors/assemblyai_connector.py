@@ -1,4 +1,5 @@
 """AssemblyAI transcription connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,10 +28,13 @@ class AssemblyAIConnector:
             API response dict with transcript ID or error dict.
         """
         import requests
+
         headers = {"authorization": self.api_key, "content-type": "application/json"}
         payload = {"audio_url": audio_url}
         try:
-            response = requests.post(f"{self.BASE_URL}/transcript", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/transcript", json=payload, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("AssemblyAI transcription submitted.")
             return {"status": "success", "data": response.json()}
@@ -48,12 +52,16 @@ class AssemblyAIConnector:
             API response dict with transcript or error dict.
         """
         import requests
+
         headers = {"authorization": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/transcript/{transcript_id}", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/transcript/{transcript_id}",
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("AssemblyAI get_transcript error: %s", e)
             return {"status": "error", "message": str(e)}
-

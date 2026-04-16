@@ -1,29 +1,32 @@
 """Tests for bots/repo_bot/tiers.py and bots/repo_bot/repo_activity_tracker.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.repo_bot.repo_activity_tracker import (
-    RepoActivityTracker,
-    RepoActivityTrackerTierError,
     CATEGORY_KEYWORDS,
     ISSUE_SCAN_LIMITS,
     PR_SCAN_LIMITS,
+    RepoActivityTracker,
+    RepoActivityTrackerTierError,
     _mock_issues,
     _mock_pull_requests,
 )
-from bots.repo_bot.tiers import get_bot_tier_info, BOT_FEATURES
-
+from bots.repo_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ---------------------------------------------------------------------------
 # Tier info
 # ---------------------------------------------------------------------------
+
 
 class TestTierInfo:
     def test_free_tier_info(self):
@@ -50,6 +53,7 @@ class TestTierInfo:
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestRepoActivityTrackerInstantiation:
     def test_default_tier_is_free(self):
@@ -84,6 +88,7 @@ class TestRepoActivityTrackerInstantiation:
 # ---------------------------------------------------------------------------
 # categorise_item
 # ---------------------------------------------------------------------------
+
 
 class TestCategoriseItem:
     def test_bug_category(self):
@@ -123,13 +128,16 @@ class TestCategoriseItem:
 
     def test_body_text_is_considered(self):
         tracker = RepoActivityTracker()
-        cat = tracker.categorise_item("Ticket 1234", body="There is a crash in production")
+        cat = tracker.categorise_item(
+            "Ticket 1234", body="There is a crash in production"
+        )
         assert cat == "bug"
 
 
 # ---------------------------------------------------------------------------
 # scan_issues
 # ---------------------------------------------------------------------------
+
 
 class TestScanIssues:
     def test_returns_list(self):
@@ -175,7 +183,9 @@ class TestScanIssues:
 
     def test_urgent_label_gives_high_priority(self):
         tracker = RepoActivityTracker()
-        custom = [{"number": 1, "title": "Something happened", "labels": [{"name": "urgent"}]}]
+        custom = [
+            {"number": 1, "title": "Something happened", "labels": [{"name": "urgent"}]}
+        ]
         issues = tracker.scan_issues(raw_issues=custom)
         assert issues[0]["priority"] == "high"
 
@@ -183,6 +193,7 @@ class TestScanIssues:
 # ---------------------------------------------------------------------------
 # scan_pull_requests
 # ---------------------------------------------------------------------------
+
 
 class TestScanPullRequests:
     def test_returns_list(self):
@@ -223,6 +234,7 @@ class TestScanPullRequests:
 # ---------------------------------------------------------------------------
 # generate_action_items
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateActionItems:
     def test_returns_list(self):
@@ -279,6 +291,7 @@ class TestGenerateActionItems:
 # auto_create_bot_stubs (ENTERPRISE only)
 # ---------------------------------------------------------------------------
 
+
 class TestAutoCreateBotStubs:
     def test_raises_on_free_tier(self):
         tracker = RepoActivityTracker(tier=Tier.FREE)
@@ -293,7 +306,11 @@ class TestAutoCreateBotStubs:
     def test_enterprise_returns_stubs_for_bot_requests(self):
         tracker = RepoActivityTracker(tier=Tier.ENTERPRISE)
         issues = [
-            {"number": 102, "title": "Add a new Instagram bot", "category": "bot_request"},
+            {
+                "number": 102,
+                "title": "Add a new Instagram bot",
+                "category": "bot_request",
+            },
         ]
         stubs = tracker.auto_create_bot_stubs(issues)
         assert len(stubs) == 1
@@ -320,7 +337,11 @@ class TestAutoCreateBotStubs:
     def test_stub_content_has_run_method(self):
         tracker = RepoActivityTracker(tier=Tier.ENTERPRISE)
         issues = [
-            {"number": 106, "title": "Create a lead gen bot", "category": "bot_request"},
+            {
+                "number": 106,
+                "title": "Create a lead gen bot",
+                "category": "bot_request",
+            },
         ]
         stubs = tracker.auto_create_bot_stubs(issues)
         assert "def run(" in stubs[0]["stub_content"]
@@ -330,12 +351,21 @@ class TestAutoCreateBotStubs:
 # scan_activity
 # ---------------------------------------------------------------------------
 
+
 class TestScanActivity:
     def test_returns_dict_with_required_keys(self):
         tracker = RepoActivityTracker()
         result = tracker.scan_activity()
-        for key in ("repo", "tier", "issues", "pull_requests", "action_items",
-                    "issues_scanned", "prs_scanned", "timestamp"):
+        for key in (
+            "repo",
+            "tier",
+            "issues",
+            "pull_requests",
+            "action_items",
+            "issues_scanned",
+            "prs_scanned",
+            "timestamp",
+        ):
             assert key in result
 
     def test_counts_match_list_lengths(self):
@@ -365,6 +395,7 @@ class TestScanActivity:
 # get_scan_log
 # ---------------------------------------------------------------------------
 
+
 class TestGetScanLog:
     def test_empty_before_any_scan(self):
         tracker = RepoActivityTracker()
@@ -382,6 +413,7 @@ class TestGetScanLog:
 # ---------------------------------------------------------------------------
 # run() method
 # ---------------------------------------------------------------------------
+
 
 class TestRunMethod:
     def test_run_returns_string(self):

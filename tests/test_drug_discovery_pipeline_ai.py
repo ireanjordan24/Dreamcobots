@@ -1,17 +1,31 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-TOOL_DIR = os.path.join(REPO_ROOT, 'healthcare-tools', 'drug_discovery_pipeline_ai')
+TOOL_DIR = os.path.join(REPO_ROOT, "healthcare-tools", "drug_discovery_pipeline_ai")
 sys.path.insert(0, TOOL_DIR)
 
 import pytest
 from drug_discovery_pipeline_ai import DrugDiscoveryPipelineAI
 
-ASPIRIN = {"name": "Aspirin", "molecular_weight": 180, "logp": 1.2,
-           "h_bond_donors": 1, "h_bond_acceptors": 4, "tpsa": 63.6}
-HEAVY = {"name": "Heavy", "molecular_weight": 600, "logp": 6.5,
-         "h_bond_donors": 7, "h_bond_acceptors": 12, "tpsa": 150}
+ASPIRIN = {
+    "name": "Aspirin",
+    "molecular_weight": 180,
+    "logp": 1.2,
+    "h_bond_donors": 1,
+    "h_bond_acceptors": 4,
+    "tpsa": 63.6,
+}
+HEAVY = {
+    "name": "Heavy",
+    "molecular_weight": 600,
+    "logp": 6.5,
+    "h_bond_donors": 7,
+    "h_bond_acceptors": 12,
+    "tpsa": 150,
+}
 
 
 class TestDrugDiscoveryInstantiation:

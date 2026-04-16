@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,42 +22,297 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "buyer": "techstartup_co",  "gig": "Logo Design",           "rating": 5, "review": "Absolutely stunning logo! Fast delivery and easy to work with.",         "sentiment": "positive", "response_sent": False},
-    {"id": 2,  "buyer": "bloggerpro22",    "gig": "SEO Blog Post",          "rating": 5, "review": "High quality content that ranked on page 1 within 2 weeks!",             "sentiment": "positive", "response_sent": True},
-    {"id": 3,  "buyer": "coffee_brand",    "gig": "Social Media Pack",      "rating": 4, "review": "Great work overall. Could have included more variety but solid quality.", "sentiment": "positive", "response_sent": False},
-    {"id": 4,  "buyer": "researcher_bob",  "gig": "Data Entry Task",        "rating": 5, "review": "Fast, accurate, and professional. Will order again!",                    "sentiment": "positive", "response_sent": False},
-    {"id": 5,  "buyer": "intl_docs_inc",   "gig": "Spanish Translation",    "rating": 5, "review": "Perfect translation. Native-level Spanish with no errors.",              "sentiment": "positive", "response_sent": True},
-    {"id": 6,  "buyer": "realtor_mike",    "gig": "Business Card Design",   "rating": 4, "review": "Nice design but needed a few revisions. Good communication.",            "sentiment": "positive", "response_sent": False},
-    {"id": 7,  "buyer": "ad_agency_x",     "gig": "Google Ads Setup",       "rating": 5, "review": "ROAS doubled after the campaign setup. Incredible work!",                "sentiment": "positive", "response_sent": False},
-    {"id": 8,  "buyer": "podcast_host",    "gig": "Voice Over",             "rating": 5, "review": "Clear, professional voice. Got it on the first try!",                    "sentiment": "positive", "response_sent": True},
-    {"id": 9,  "buyer": "influencer_99",   "gig": "Instagram Content",      "rating": 4, "review": "Good content but some captions felt generic. Would order again.",        "sentiment": "neutral",  "response_sent": False},
-    {"id": 10, "buyer": "retailer_mark",   "gig": "Mailchimp Setup",        "rating": 5, "review": "Open rates went up 40% after the new template. Amazing results!",        "sentiment": "positive", "response_sent": False},
-    {"id": 11, "buyer": "finance_co",      "gig": "PowerPoint Deck",        "rating": 5, "review": "The deck was professional and polished. Loved the design.",              "sentiment": "positive", "response_sent": True},
-    {"id": 12, "buyer": "brand_kit_buyer", "gig": "Social Media Kit",       "rating": 4, "review": "Kit was good. Needed some tweaks but seller was responsive.",            "sentiment": "positive", "response_sent": False},
-    {"id": 13, "buyer": "dev_team_xyz",    "gig": "Bug Fix Service",        "rating": 5, "review": "Found and fixed 3 bugs in under an hour. Super fast!",                   "sentiment": "positive", "response_sent": False},
-    {"id": 14, "buyer": "coach_emma",      "gig": "Ebook Creation",         "rating": 5, "review": "Beautiful ebook with great layout. My clients love it!",                 "sentiment": "positive", "response_sent": True},
-    {"id": 15, "buyer": "seo_agency_v",    "gig": "Keyword Research",       "rating": 3, "review": "The research was okay but I expected more in-depth analysis.",            "sentiment": "neutral",  "response_sent": False},
-    {"id": 16, "buyer": "new_brand_co",    "gig": "About Us Page",          "rating": 5, "review": "Captures our brand voice perfectly! Better than expected.",               "sentiment": "positive", "response_sent": False},
-    {"id": 17, "buyer": "home_decor_shop", "gig": "Pinterest Management",   "rating": 4, "review": "Follower count grew by 500 in 2 weeks. Decent results.",                 "sentiment": "positive", "response_sent": False},
-    {"id": 18, "buyer": "ecom_store_amy",  "gig": "Product Descriptions",   "rating": 5, "review": "Conversion rate improved after updating product pages. Great job!",      "sentiment": "positive", "response_sent": True},
-    {"id": 19, "buyer": "small_biz_jane",  "gig": "WordPress Site",         "rating": 5, "review": "Stunning website! Delivered ahead of schedule. 5 stars!",                "sentiment": "positive", "response_sent": False},
-    {"id": 20, "buyer": "saas_founder",    "gig": "Explainer Video",        "rating": 4, "review": "Good video. Took one revision but the final result was excellent.",      "sentiment": "positive", "response_sent": False},
-    {"id": 21, "buyer": "fashion_brand",   "gig": "Shopify Store",          "rating": 5, "review": "The store looks amazing and is easy to manage. Highly recommend!",       "sentiment": "positive", "response_sent": True},
-    {"id": 22, "buyer": "job_seeker_2025", "gig": "Resume Writing",         "rating": 5, "review": "Got 3 interview calls within a week of using this resume!",              "sentiment": "positive", "response_sent": False},
-    {"id": 23, "buyer": "gamer_youtuber",  "gig": "YouTube Intro",          "rating": 4, "review": "Looks great! Would have liked more color options initially.",             "sentiment": "positive", "response_sent": False},
-    {"id": 24, "buyer": "bizops_lead",     "gig": "Python Automation",      "rating": 5, "review": "Saved us 20 hours per week with this automation. Worth every penny!",    "sentiment": "positive", "response_sent": True},
-    {"id": 25, "buyer": "startup_cto",     "gig": "FastAPI Backend",        "rating": 5, "review": "Excellent code quality with full documentation. Highly recommend!",      "sentiment": "positive", "response_sent": False},
-    {"id": 26, "buyer": "app_startup_x",   "gig": "React Native App",       "rating": 5, "review": "Delivered a fully functional app with clean code and on time!",          "sentiment": "positive", "response_sent": False},
-    {"id": 27, "buyer": "author_lisa",     "gig": "Manuscript Editing",     "rating": 4, "review": "Good editing work. Caught most errors but missed a few minor ones.",     "sentiment": "positive", "response_sent": False},
-    {"id": 28, "buyer": "ecom_cmo",        "gig": "Chatbot Dev",            "rating": 5, "review": "Chatbot increased customer engagement by 30%. Fantastic work!",          "sentiment": "positive", "response_sent": True},
-    {"id": 29, "buyer": "seo_blogger",     "gig": "Guest Blog Posts",       "rating": 4, "review": "Well-written posts. One needed a rewrite but overall great quality.",    "sentiment": "positive", "response_sent": False},
-    {"id": 30, "buyer": "exec_coach_tom",  "gig": "LinkedIn Profile",       "rating": 5, "review": "Profile looks world-class. Connections and opportunities have increased.", "sentiment": "positive", "response_sent": True},
+    {
+        "id": 1,
+        "buyer": "techstartup_co",
+        "gig": "Logo Design",
+        "rating": 5,
+        "review": "Absolutely stunning logo! Fast delivery and easy to work with.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 2,
+        "buyer": "bloggerpro22",
+        "gig": "SEO Blog Post",
+        "rating": 5,
+        "review": "High quality content that ranked on page 1 within 2 weeks!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 3,
+        "buyer": "coffee_brand",
+        "gig": "Social Media Pack",
+        "rating": 4,
+        "review": "Great work overall. Could have included more variety but solid quality.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 4,
+        "buyer": "researcher_bob",
+        "gig": "Data Entry Task",
+        "rating": 5,
+        "review": "Fast, accurate, and professional. Will order again!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 5,
+        "buyer": "intl_docs_inc",
+        "gig": "Spanish Translation",
+        "rating": 5,
+        "review": "Perfect translation. Native-level Spanish with no errors.",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 6,
+        "buyer": "realtor_mike",
+        "gig": "Business Card Design",
+        "rating": 4,
+        "review": "Nice design but needed a few revisions. Good communication.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 7,
+        "buyer": "ad_agency_x",
+        "gig": "Google Ads Setup",
+        "rating": 5,
+        "review": "ROAS doubled after the campaign setup. Incredible work!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 8,
+        "buyer": "podcast_host",
+        "gig": "Voice Over",
+        "rating": 5,
+        "review": "Clear, professional voice. Got it on the first try!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 9,
+        "buyer": "influencer_99",
+        "gig": "Instagram Content",
+        "rating": 4,
+        "review": "Good content but some captions felt generic. Would order again.",
+        "sentiment": "neutral",
+        "response_sent": False,
+    },
+    {
+        "id": 10,
+        "buyer": "retailer_mark",
+        "gig": "Mailchimp Setup",
+        "rating": 5,
+        "review": "Open rates went up 40% after the new template. Amazing results!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 11,
+        "buyer": "finance_co",
+        "gig": "PowerPoint Deck",
+        "rating": 5,
+        "review": "The deck was professional and polished. Loved the design.",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 12,
+        "buyer": "brand_kit_buyer",
+        "gig": "Social Media Kit",
+        "rating": 4,
+        "review": "Kit was good. Needed some tweaks but seller was responsive.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 13,
+        "buyer": "dev_team_xyz",
+        "gig": "Bug Fix Service",
+        "rating": 5,
+        "review": "Found and fixed 3 bugs in under an hour. Super fast!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 14,
+        "buyer": "coach_emma",
+        "gig": "Ebook Creation",
+        "rating": 5,
+        "review": "Beautiful ebook with great layout. My clients love it!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 15,
+        "buyer": "seo_agency_v",
+        "gig": "Keyword Research",
+        "rating": 3,
+        "review": "The research was okay but I expected more in-depth analysis.",
+        "sentiment": "neutral",
+        "response_sent": False,
+    },
+    {
+        "id": 16,
+        "buyer": "new_brand_co",
+        "gig": "About Us Page",
+        "rating": 5,
+        "review": "Captures our brand voice perfectly! Better than expected.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 17,
+        "buyer": "home_decor_shop",
+        "gig": "Pinterest Management",
+        "rating": 4,
+        "review": "Follower count grew by 500 in 2 weeks. Decent results.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 18,
+        "buyer": "ecom_store_amy",
+        "gig": "Product Descriptions",
+        "rating": 5,
+        "review": "Conversion rate improved after updating product pages. Great job!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 19,
+        "buyer": "small_biz_jane",
+        "gig": "WordPress Site",
+        "rating": 5,
+        "review": "Stunning website! Delivered ahead of schedule. 5 stars!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 20,
+        "buyer": "saas_founder",
+        "gig": "Explainer Video",
+        "rating": 4,
+        "review": "Good video. Took one revision but the final result was excellent.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 21,
+        "buyer": "fashion_brand",
+        "gig": "Shopify Store",
+        "rating": 5,
+        "review": "The store looks amazing and is easy to manage. Highly recommend!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 22,
+        "buyer": "job_seeker_2025",
+        "gig": "Resume Writing",
+        "rating": 5,
+        "review": "Got 3 interview calls within a week of using this resume!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 23,
+        "buyer": "gamer_youtuber",
+        "gig": "YouTube Intro",
+        "rating": 4,
+        "review": "Looks great! Would have liked more color options initially.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 24,
+        "buyer": "bizops_lead",
+        "gig": "Python Automation",
+        "rating": 5,
+        "review": "Saved us 20 hours per week with this automation. Worth every penny!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 25,
+        "buyer": "startup_cto",
+        "gig": "FastAPI Backend",
+        "rating": 5,
+        "review": "Excellent code quality with full documentation. Highly recommend!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 26,
+        "buyer": "app_startup_x",
+        "gig": "React Native App",
+        "rating": 5,
+        "review": "Delivered a fully functional app with clean code and on time!",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 27,
+        "buyer": "author_lisa",
+        "gig": "Manuscript Editing",
+        "rating": 4,
+        "review": "Good editing work. Caught most errors but missed a few minor ones.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 28,
+        "buyer": "ecom_cmo",
+        "gig": "Chatbot Dev",
+        "rating": 5,
+        "review": "Chatbot increased customer engagement by 30%. Fantastic work!",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
+    {
+        "id": 29,
+        "buyer": "seo_blogger",
+        "gig": "Guest Blog Posts",
+        "rating": 4,
+        "review": "Well-written posts. One needed a rewrite but overall great quality.",
+        "sentiment": "positive",
+        "response_sent": False,
+    },
+    {
+        "id": 30,
+        "buyer": "exec_coach_tom",
+        "gig": "LinkedIn Profile",
+        "rating": 5,
+        "review": "Profile looks world-class. Connections and opportunities have increased.",
+        "sentiment": "positive",
+        "response_sent": True,
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_reviews": 10,   "auto_request": False, "ai_responses": False},
-    "PRO":        {"price_usd": 29,  "max_reviews": 100,  "auto_request": True,  "ai_responses": False},
-    "ENTERPRISE": {"price_usd": 99,  "max_reviews": None, "auto_request": True,  "ai_responses": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_reviews": 10,
+        "auto_request": False,
+        "ai_responses": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_reviews": 100,
+        "auto_request": True,
+        "ai_responses": False,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_reviews": None,
+        "auto_request": True,
+        "ai_responses": True,
+    },
 }
 
 
@@ -187,10 +442,16 @@ class FiverrReviewGeneratorBot:
     def run(self) -> dict:
         """Run the GLOBAL AI SOURCES FLOW pipeline."""
         result = self._flow.run_pipeline(
-            raw_data={"domain": "fiverr_review_management", "reviews_count": len(EXAMPLES)},
+            raw_data={
+                "domain": "fiverr_review_management",
+                "reviews_count": len(EXAMPLES),
+            },
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "summary": self.get_review_summary()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "summary": self.get_review_summary(),
+        }
 
 
 if __name__ == "__main__":
@@ -264,12 +525,21 @@ def _fiverrreviewgenerator_bot_list_items(self, limit=None):
 
 def _fiverrreviewgenerator_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FiverrReviewGeneratorBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {
+        "bot": "FiverrReviewGeneratorBot",
+        "tier": self.tier.value,
+        "count": len(EXAMPLES),
+    }
 
 
 def _fiverrreviewgenerator_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FiverrReviewGeneratorBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "FiverrReviewGeneratorBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 FiverrReviewGeneratorBot.monthly_price = _fiverrreviewgenerator_bot_monthly_price

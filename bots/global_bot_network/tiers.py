@@ -28,7 +28,7 @@ class TierConfig:
     name: str
     tier: Tier
     price_usd_monthly: float
-    max_bots: Optional[int]            # None = unlimited
+    max_bots: Optional[int]  # None = unlimited
     max_api_integrations: Optional[int]
     max_messages_per_minute: int
     features: list = field(default_factory=list)

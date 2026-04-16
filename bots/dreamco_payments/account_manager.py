@@ -10,18 +10,18 @@ Business types:
   - "auto_dealer"  — Car-flipping automation hints
 """
 
-import uuid
 import datetime
+import uuid
 from typing import Optional
 
 from bots.dreamco_payments.tiers import (
+    FEATURE_AUTO_DEALER_AUTOMATION,
+    FEATURE_CUSTOM_LIMITS,
+    FEATURE_FRAUD_DETECTION,
+    FEATURE_REAL_ESTATE_AUTOMATION,
     Tier,
     TierConfig,
     get_tier_config,
-    FEATURE_FRAUD_DETECTION,
-    FEATURE_CUSTOM_LIMITS,
-    FEATURE_REAL_ESTATE_AUTOMATION,
-    FEATURE_AUTO_DEALER_AUTOMATION,
 )
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -51,14 +51,19 @@ _BUSINESS_HINTS: dict[str, list[str]] = {
 # Simple rule-based fraud signals for mock detection
 _FRAUD_RULES = [
     ("high_amount", lambda d: d.get("amount", 0) > 10_000),
-    ("unknown_currency", lambda d: d.get("currency", "USD") not in {
-        "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "MXN"
-    }),
+    (
+        "unknown_currency",
+        lambda d: d.get("currency", "USD")
+        not in {"USD", "EUR", "GBP", "CAD", "AUD", "JPY", "MXN"},
+    ),
     ("suspicious_country", lambda d: d.get("country", "") in {"XX", "ZZ"}),
     ("velocity_flag", lambda d: d.get("transaction_count_1h", 0) > 20),
-    ("card_mismatch", lambda d: d.get("billing_country") != d.get("ip_country")
-     and d.get("billing_country") is not None
-     and d.get("ip_country") is not None),
+    (
+        "card_mismatch",
+        lambda d: d.get("billing_country") != d.get("ip_country")
+        and d.get("billing_country") is not None
+        and d.get("ip_country") is not None,
+    ),
 ]
 
 
@@ -91,7 +96,9 @@ class AccountManager:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     # ------------------------------------------------------------------
     # User onboarding

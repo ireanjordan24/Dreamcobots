@@ -18,21 +18,23 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from bots.quantum_decision_bot.probability_model import ProbabilityModel
+from bots.quantum_decision_bot.simulation_engine import (
+    run_simulations,
+    summarise_outcomes,
+)
+
 # GLOBAL AI SOURCES FLOW
 from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.quantum_decision_bot.simulation_engine import run_simulations, summarise_outcomes
-from bots.quantum_decision_bot.probability_model import ProbabilityModel
-
 
 # ---------------------------------------------------------------------------
 # Default scenario templates
 # ---------------------------------------------------------------------------
 
 _DEFAULT_SCENARIOS = [
-    {"name": "conservative",   "base_profit": 2_000,  "risk": 2.0, "volatility": 0.1},
-    {"name": "moderate",       "base_profit": 10_000, "risk": 5.0, "volatility": 0.2},
-    {"name": "aggressive",     "base_profit": 50_000, "risk": 8.0, "volatility": 0.35},
+    {"name": "conservative", "base_profit": 2_000, "risk": 2.0, "volatility": 0.1},
+    {"name": "moderate", "base_profit": 10_000, "risk": 5.0, "volatility": 0.2},
+    {"name": "aggressive", "base_profit": 50_000, "risk": 8.0, "volatility": 0.35},
 ]
 
 
@@ -51,6 +53,7 @@ def _merge_context_into_scenario(scenario: dict, context: dict) -> dict:
 # ---------------------------------------------------------------------------
 # QuantumEngine
 # ---------------------------------------------------------------------------
+
 
 class QuantumEngine:
     """

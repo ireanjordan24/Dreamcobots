@@ -1,25 +1,26 @@
 """Tests for bots/saas_upsell/saas_upsell.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from bots.saas_upsell.saas_upsell import (
+    ONBOARDING_STEPS,
+    TIER_MONTHLY_PRICE,
+    MicroBusiness,
     SaaSUpsell,
     Subscriber,
-    MicroBusiness,
     SubscriptionTier,
-    TIER_MONTHLY_PRICE,
-    ONBOARDING_STEPS,
 )
-
 
 # ---------------------------------------------------------------------------
 # Subscriber registration
 # ---------------------------------------------------------------------------
+
 
 class TestRegisterSubscriber:
     def setup_method(self):
@@ -46,6 +47,7 @@ class TestRegisterSubscriber:
 # ---------------------------------------------------------------------------
 # Onboarding tutorial
 # ---------------------------------------------------------------------------
+
 
 class TestOnboarding:
     def setup_method(self):
@@ -86,6 +88,7 @@ class TestOnboarding:
 # Upsell
 # ---------------------------------------------------------------------------
 
+
 class TestUpsell:
     def setup_method(self):
         self.saas = SaaSUpsell()
@@ -122,6 +125,7 @@ class TestUpsell:
 # Micro-business network
 # ---------------------------------------------------------------------------
 
+
 class TestMicroBusiness:
     def setup_method(self):
         self.saas = SaaSUpsell()
@@ -135,7 +139,9 @@ class TestMicroBusiness:
         assert biz.business_id.startswith("biz_")
 
     def test_dreamco_share_calculated(self):
-        biz = self.saas.register_micro_business("Biz", "o@ex.com", 10_000, revenue_share_pct=0.10)
+        biz = self.saas.register_micro_business(
+            "Biz", "o@ex.com", 10_000, revenue_share_pct=0.10
+        )
         assert biz.dreamco_share == pytest.approx(1_000.0)
 
     def test_list_micro_businesses(self):
@@ -147,6 +153,7 @@ class TestMicroBusiness:
 # ---------------------------------------------------------------------------
 # get_revenue_output
 # ---------------------------------------------------------------------------
+
 
 class TestGetRevenueOutput:
     def test_revenue_output_keys(self):
@@ -173,12 +180,19 @@ class TestGetRevenueOutput:
 # Dashboard metrics
 # ---------------------------------------------------------------------------
 
+
 class TestDashboardMetrics:
     def test_metrics_keys(self):
         saas = SaaSUpsell()
         metrics = saas.get_dashboard_metrics()
-        for key in ("mrr_usd", "arr_usd", "total_subscribers", "paid_subscribers",
-                    "tier_breakdown", "micro_business_network_share_usd"):
+        for key in (
+            "mrr_usd",
+            "arr_usd",
+            "total_subscribers",
+            "paid_subscribers",
+            "tier_breakdown",
+            "micro_business_network_share_usd",
+        ):
             assert key in metrics
 
     def test_arr_equals_mrr_times_12(self):

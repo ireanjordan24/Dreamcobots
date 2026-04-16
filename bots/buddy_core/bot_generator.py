@@ -15,7 +15,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from bots.buddy_core.intent_parser import IntentParser, Industry
+from bots.buddy_core.intent_parser import Industry, IntentParser
 from bots.buddy_core.tool_db import ToolDB
 
 
@@ -145,9 +145,7 @@ class BotGenerator:
         """Transition a PENDING bot to READY."""
         bot = self._get_or_raise(bot_id)
         if bot.status not in (BotStatus.PENDING, BotStatus.BUILDING):
-            raise BotGeneratorError(
-                f"Cannot build bot with status {bot.status.value}."
-            )
+            raise BotGeneratorError(f"Cannot build bot with status {bot.status.value}.")
         bot.status = BotStatus.BUILDING
         # Simulate build work
         bot.status = BotStatus.READY

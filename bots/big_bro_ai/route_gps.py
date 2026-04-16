@@ -15,10 +15,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Resource categories
 # ---------------------------------------------------------------------------
+
 
 class ResourceCategory(Enum):
     FINANCIAL = "financial"
@@ -39,18 +39,20 @@ class ResourceCategory(Enum):
 # Route types
 # ---------------------------------------------------------------------------
 
+
 class RouteType(Enum):
-    SERVICE = "service"         # Path to a government / community service
-    OPPORTUNITY = "opportunity" # Income or business opportunity
-    FRANCHISE = "franchise"     # Franchise location
-    CATALOG = "catalog"         # Catalog ordering point
-    EDUCATION = "education"     # Learning resource
-    TECH = "tech"               # Technology resource
+    SERVICE = "service"  # Path to a government / community service
+    OPPORTUNITY = "opportunity"  # Income or business opportunity
+    FRANCHISE = "franchise"  # Franchise location
+    CATALOG = "catalog"  # Catalog ordering point
+    EDUCATION = "education"  # Learning resource
+    TECH = "tech"  # Technology resource
 
 
 # ---------------------------------------------------------------------------
 # Resource record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Resource:
@@ -115,6 +117,7 @@ class Resource:
 # Route (navigation path to a resource)
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Route:
     """
@@ -157,6 +160,7 @@ class Route:
 # ---------------------------------------------------------------------------
 # Route & GPS Intelligence Engine
 # ---------------------------------------------------------------------------
+
 
 class RouteGPSError(Exception):
     """Raised when a routing operation fails."""
@@ -353,12 +357,14 @@ class RouteGPSIntelligence:
         """
         lower_need = need.lower()
         matching_resources = [
-            r for r in self._resources.values()
+            r
+            for r in self._resources.values()
             if (
                 lower_need in r.name.lower()
                 or lower_need in r.description.lower()
                 or any(lower_need in t for t in r.tags)
-            ) and (city is None or r.city == "" or r.city.lower() == city.lower())
+            )
+            and (city is None or r.city == "" or r.city.lower() == city.lower())
         ]
         # Create on-the-fly routes for matching resources
         routes = []

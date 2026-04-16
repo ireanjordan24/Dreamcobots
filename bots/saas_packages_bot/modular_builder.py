@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -20,10 +20,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Module registry
 # ---------------------------------------------------------------------------
+
 
 class AvailableModule:
     AUTH = "AUTH"
@@ -147,9 +147,15 @@ class ModularSaaSBuilder:
         plan = self._get_plan(plan_id)
         module_name = module_name.upper()
         if module_name not in AVAILABLE_MODULES:
-            return {"error": f"Module '{module_name}' is not available.", "available": sorted(AVAILABLE_MODULES)}
+            return {
+                "error": f"Module '{module_name}' is not available.",
+                "available": sorted(AVAILABLE_MODULES),
+            }
         if module_name in plan.modules:
-            return {"error": f"Module '{module_name}' is already in the plan.", "plan_id": plan_id}
+            return {
+                "error": f"Module '{module_name}' is already in the plan.",
+                "plan_id": plan_id,
+            }
         plan.modules[module_name] = config or {}
         return {
             "plan_id": plan_id,
@@ -163,7 +169,10 @@ class ModularSaaSBuilder:
         plan = self._get_plan(plan_id)
         module_name = module_name.upper()
         if module_name not in plan.modules:
-            return {"error": f"Module '{module_name}' is not in the plan.", "plan_id": plan_id}
+            return {
+                "error": f"Module '{module_name}' is not in the plan.",
+                "plan_id": plan_id,
+            }
         del plan.modules[module_name]
         return {
             "plan_id": plan_id,

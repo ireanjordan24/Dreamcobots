@@ -34,20 +34,33 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
-from bots.creative_studio_bot.tiers import BOT_FEATURES, get_bot_tier_info, DAILY_CREATION_LIMITS
+
+from bots.creative_studio_bot.tiers import (
+    BOT_FEATURES,
+    DAILY_CREATION_LIMITS,
+    get_bot_tier_info,
+)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.creative_studio_bot.content_creator import (
+    ArtCreator,
+    FilmCreator,
+    MusicCreator,
+)
+from bots.creative_studio_bot.influencer_engine import (
+    ContentStrategyEngine,
+    MemeGenerator,
+)
 from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.creative_studio_bot.content_creator import MusicCreator, FilmCreator, ArtCreator
-from bots.creative_studio_bot.influencer_engine import ContentStrategyEngine, MemeGenerator
 
 
 class CreativeStudioBotError(Exception):
@@ -99,9 +112,7 @@ class CreativeStudioBot:
         """Raise CreativeStudioBotError if the feature is not available on the current tier."""
         if feature not in BOT_FEATURES[self.tier.value]:
             upgrade = get_upgrade_path(self.tier)
-            upgrade_msg = (
-                f" Upgrade to {upgrade.name} for access." if upgrade else ""
-            )
+            upgrade_msg = f" Upgrade to {upgrade.name} for access." if upgrade else ""
             raise CreativeStudioBotError(
                 f"Feature '{feature}' is not available on the {self.tier.value.upper()} tier.{upgrade_msg}"
             )
@@ -132,7 +143,9 @@ class CreativeStudioBot:
         """
         self._check_feature("music_creation")
         self._check_daily_limit()
-        result = self._music.compose_music(genre, mood, kwargs.get("duration_secs", 120))
+        result = self._music.compose_music(
+            genre, mood, kwargs.get("duration_secs", 120)
+        )
         self._record_creation()
         return result
 
@@ -178,7 +191,9 @@ class CreativeStudioBot:
         """
         self._check_feature("art_generation")
         self._check_daily_limit()
-        result = self._art.generate_artwork(style, subject, kwargs.get("medium", "digital"))
+        result = self._art.generate_artwork(
+            style, subject, kwargs.get("medium", "digital")
+        )
         self._record_creation()
         return result
 
@@ -201,7 +216,9 @@ class CreativeStudioBot:
         """
         self._check_feature("content_calendar")
         self._check_daily_limit()
-        result = self._strategy.create_content_calendar(platform, niche, kwargs.get("weeks", 4))
+        result = self._strategy.create_content_calendar(
+            platform, niche, kwargs.get("weeks", 4)
+        )
         self._record_creation()
         return result
 
@@ -252,13 +269,21 @@ class CreativeStudioBot:
             "price_usd_monthly": self.config.price_usd_monthly,
             "daily_creation_limit": limit,
             "creations_today": self._daily_count,
-            "creations_remaining": (limit - self._daily_count) if limit is not None else "unlimited",
+            "creations_remaining": (
+                (limit - self._daily_count) if limit is not None else "unlimited"
+            ),
             "features": BOT_FEATURES[self.tier.value],
             "commercial_rights": self.tier_info["commercial_rights"],
             "upgrade_available": upgrade is not None,
             "upgrade_to": upgrade.name if upgrade else None,
             "upgrade_price_usd": upgrade.price_usd_monthly if upgrade else None,
-            "modules": ["MusicCreator", "FilmCreator", "ArtCreator", "ContentStrategyEngine", "MemeGenerator"],
+            "modules": [
+                "MusicCreator",
+                "FilmCreator",
+                "ArtCreator",
+                "ContentStrategyEngine",
+                "MemeGenerator",
+            ],
         }
 
     # ------------------------------------------------------------------
@@ -268,7 +293,11 @@ class CreativeStudioBot:
     def describe_tier(self) -> str:
         """Return a human-readable tier description."""
         info = self.tier_info
-        limit_str = str(info["daily_creation_limit"]) if info["daily_creation_limit"] else "Unlimited"
+        limit_str = (
+            str(info["daily_creation_limit"])
+            if info["daily_creation_limit"]
+            else "Unlimited"
+        )
         return (
             f"Creative Studio Bot — {info['name']} Tier\n"
             f"  Price:           ${info['price_usd_monthly']}/month\n"

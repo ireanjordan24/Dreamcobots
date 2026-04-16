@@ -18,34 +18,33 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
+from bots.bot_generator_bot.deployer import BotDeployer
+from bots.bot_generator_bot.parser import BotIntent, BotParser
+from bots.bot_generator_bot.template_engine import TemplateEngine
 from bots.bot_generator_bot.tiers import (
+    FEATURE_ADVANCED_TEMPLATES,
+    FEATURE_AUTO_DEPLOY,
+    FEATURE_BASIC_GENERATION,
+    FEATURE_CUSTOM_DNA,
+    FEATURE_TOOL_INJECTION,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BASIC_GENERATION,
-    FEATURE_TOOL_INJECTION,
-    FEATURE_ADVANCED_TEMPLATES,
-    FEATURE_AUTO_DEPLOY,
-    FEATURE_CUSTOM_DNA,
-    FEATURE_WHITE_LABEL,
 )
-from bots.bot_generator_bot.parser import BotParser, BotIntent
 from bots.bot_generator_bot.tool_injector import ToolInjector
-from bots.bot_generator_bot.template_engine import TemplateEngine
-from bots.bot_generator_bot.deployer import BotDeployer
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class BotGeneratorError(Exception):
     """Base exception for Bot Generator errors."""
@@ -58,6 +57,7 @@ class BotGeneratorTierError(BotGeneratorError):
 # ---------------------------------------------------------------------------
 # Main class
 # ---------------------------------------------------------------------------
+
 
 class BotGeneratorBot:
     """
@@ -269,6 +269,7 @@ def _botgenerator_test_bot(self, bot_name: str) -> str:
     """Test a bot by name. Returns a result string."""
     try:
         import importlib
+
         module_path = f"bots.{bot_name}.{bot_name}"
         try:
             mod = importlib.import_module(module_path)
@@ -278,10 +279,12 @@ def _botgenerator_test_bot(self, bot_name: str) -> str:
             except ModuleNotFoundError:
                 return f"Failed: Module '{bot_name}' not found."
         import inspect
+
         for name, obj in inspect.getmembers(mod, inspect.isclass):
             if hasattr(obj, "run"):
                 try:
                     import unittest.mock as _mock
+
                     with _mock.patch("os.system", return_value=0):
                         instance = obj()
                         result = instance.run()

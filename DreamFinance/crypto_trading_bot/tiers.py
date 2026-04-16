@@ -10,5 +10,14 @@ class TierConfig:
 
 TIERS = {
     "pro": TierConfig("Pro", 99.0, ["multi-exchange execution", "DCA strategy engine"]),
-    "enterprise": TierConfig("Enterprise", 299.0, ["multi-exchange execution", "DCA strategy engine", "grid trading automation", "arbitrage scanning"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        299.0,
+        [
+            "multi-exchange execution",
+            "DCA strategy engine",
+            "grid trading automation",
+            "arbitrage scanning",
+        ],
+    ),
 }

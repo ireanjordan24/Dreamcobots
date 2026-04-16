@@ -1,6 +1,7 @@
 """Tests for bots/biomedical_bot/ — health monitoring, precision medicine, and main bot."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,10 +11,12 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
+from bots.biomedical_bot.biomedical_bot import BiomedicalBot, BiomedicalBotError
 from bots.biomedical_bot.health_monitor import (
+    VITAL_THRESHOLDS,
     WearableHealthMonitor,
     WearableHealthMonitorError,
-    VITAL_THRESHOLDS,
 )
 from bots.biomedical_bot.precision_medicine import (
     NanotechDiseaseDetector,
@@ -21,13 +24,12 @@ from bots.biomedical_bot.precision_medicine import (
     PrecisionMedicineEngine,
     PrecisionMedicineError,
 )
-from bots.biomedical_bot.biomedical_bot import BiomedicalBot, BiomedicalBotError
 from bots.biomedical_bot.tiers import BOT_FEATURES, get_bot_tier_info
-
 
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestBiomedicalTiers:
     def test_bot_features_has_all_tiers(self):
@@ -64,12 +66,15 @@ class TestBiomedicalTiers:
         assert len(BOT_FEATURES[Tier.FREE.value]) >= 3
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
 
 # ===========================================================================
 # VITAL_THRESHOLDS
 # ===========================================================================
+
 
 class TestVitalThresholds:
     def test_heart_rate_threshold(self):
@@ -90,6 +95,7 @@ class TestVitalThresholds:
 # ===========================================================================
 # WearableHealthMonitor — heart rate
 # ===========================================================================
+
 
 class TestWearableHealthMonitorHeartRate:
     def test_default_tier_is_free(self):
@@ -150,6 +156,7 @@ class TestWearableHealthMonitorHeartRate:
 # WearableHealthMonitor — glucose
 # ===========================================================================
 
+
 class TestWearableHealthMonitorGlucose:
     def test_free_tier_cannot_monitor_glucose(self):
         m = WearableHealthMonitor(Tier.FREE)
@@ -193,6 +200,7 @@ class TestWearableHealthMonitorGlucose:
 # ===========================================================================
 # WearableHealthMonitor — vitals & reports
 # ===========================================================================
+
 
 class TestWearableHealthMonitorVitals:
     def test_track_vitals_returns_dict(self):
@@ -246,6 +254,7 @@ class TestWearableHealthMonitorVitals:
 # WearableHealthMonitor — anomaly alerts
 # ===========================================================================
 
+
 class TestWearableHealthMonitorAnomalyAlert:
     def test_alert_anomaly_normal_value(self):
         m = WearableHealthMonitor(Tier.FREE)
@@ -288,6 +297,7 @@ class TestWearableHealthMonitorAnomalyAlert:
 # NanotechDiseaseDetector
 # ===========================================================================
 
+
 class TestNanotechDiseaseDetector:
     def test_free_tier_detect_raises(self):
         d = NanotechDiseaseDetector(Tier.FREE)
@@ -327,7 +337,9 @@ class TestNanotechDiseaseDetector:
 
     def test_enterprise_dna_analysis_returns_dict(self):
         d = NanotechDiseaseDetector(Tier.ENTERPRISE)
-        result = d.analyze_dna_sequence({"variants": ["BRCA1", "MTHFR"], "patient_id": "p1"})
+        result = d.analyze_dna_sequence(
+            {"variants": ["BRCA1", "MTHFR"], "patient_id": "p1"}
+        )
         assert isinstance(result, dict)
 
     def test_enterprise_dna_has_risk_profile(self):
@@ -354,7 +366,10 @@ class TestNanotechDiseaseDetector:
 
     def test_recommend_treatment_enterprise_personalized(self):
         d = NanotechDiseaseDetector(Tier.ENTERPRISE)
-        result = d.recommend_treatment({"patient_id": "p1", "age": 70, "conditions": ["hypertension"]}, "cardiovascular")
+        result = d.recommend_treatment(
+            {"patient_id": "p1", "age": 70, "conditions": ["hypertension"]},
+            "cardiovascular",
+        )
         assert result.get("personalized") is True
         assert result.get("genomic_adjusted") is True
 
@@ -362,6 +377,7 @@ class TestNanotechDiseaseDetector:
 # ===========================================================================
 # PrecisionMedicineEngine
 # ===========================================================================
+
 
 class TestPrecisionMedicineEngine:
     def _sample_patient(self, patient_id="pt1"):
@@ -469,6 +485,7 @@ class TestPrecisionMedicineEngine:
 # BiomedicalBot — all tiers
 # ===========================================================================
 
+
 class TestBiomedicalBotFree:
     def test_init_default_tier(self):
         bot = BiomedicalBot()
@@ -543,13 +560,17 @@ class TestBiomedicalBotPro:
 class TestBiomedicalBotEnterprise:
     def test_enterprise_detect_dna(self):
         bot = BiomedicalBot(Tier.ENTERPRISE)
-        result = bot.detect_disease({"variants": ["BRCA1", "MTHFR"], "patient_id": "p1"})
+        result = bot.detect_disease(
+            {"variants": ["BRCA1", "MTHFR"], "patient_id": "p1"}
+        )
         assert "risk_profile" in result
 
     def test_enterprise_treatment_plan(self):
         bot = BiomedicalBot(Tier.ENTERPRISE)
         # Must have a patient profile first via the medicine engine
-        bot.medicine.create_patient_profile({"patient_id": "p1", "age": 40, "weight_kg": 70, "height_cm": 170})
+        bot.medicine.create_patient_profile(
+            {"patient_id": "p1", "age": 40, "weight_kg": 70, "height_cm": 170}
+        )
         result = bot.get_treatment_plan("p1", "diabetes")
         assert result["personalized"] is True
 
@@ -576,6 +597,7 @@ class TestBiomedicalBotEnterprise:
 # Dashboard
 # ===========================================================================
 
+
 class TestMedicalDashboard:
     def test_dashboard_returns_dict(self):
         bot = BiomedicalBot(Tier.FREE)
@@ -589,9 +611,16 @@ class TestMedicalDashboard:
             assert len(dashboard["features"]) > 0
 
     def test_dashboard_price(self):
-        assert BiomedicalBot(Tier.FREE).get_medical_dashboard()["price_usd_monthly"] == 0.0
-        assert BiomedicalBot(Tier.PRO).get_medical_dashboard()["price_usd_monthly"] == 49.0
-        assert BiomedicalBot(Tier.ENTERPRISE).get_medical_dashboard()["price_usd_monthly"] == 299.0
+        assert (
+            BiomedicalBot(Tier.FREE).get_medical_dashboard()["price_usd_monthly"] == 0.0
+        )
+        assert (
+            BiomedicalBot(Tier.PRO).get_medical_dashboard()["price_usd_monthly"] == 49.0
+        )
+        assert (
+            BiomedicalBot(Tier.ENTERPRISE).get_medical_dashboard()["price_usd_monthly"]
+            == 299.0
+        )
 
     def test_describe_tier_returns_string(self):
         bot = BiomedicalBot(Tier.FREE)

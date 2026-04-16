@@ -9,6 +9,23 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["credit scoring models", "default probability estimation", "fraud pattern detection"]),
-    "elite": TierConfig("Elite", 2500.0, ["credit scoring models", "default probability estimation", "fraud pattern detection", "real-time decisioning"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        [
+            "credit scoring models",
+            "default probability estimation",
+            "fraud pattern detection",
+        ],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "credit scoring models",
+            "default probability estimation",
+            "fraud pattern detection",
+            "real-time decisioning",
+        ],
+    ),
 }

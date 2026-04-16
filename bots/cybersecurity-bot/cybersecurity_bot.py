@@ -1,8 +1,10 @@
 """Cybersecurity Bot - Security audits, vulnerability assessments, and compliance checks."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -33,18 +35,55 @@ class CybersecurityBot(BaseBot):
 
     def scan_vulnerabilities(self, system_info: dict) -> dict:
         """Perform a simulated vulnerability assessment (NOT real penetration testing)."""
-        self.log(f"Simulated vulnerability scan for: {system_info.get('name', 'system')}")
+        self.log(
+            f"Simulated vulnerability scan for: {system_info.get('name', 'system')}"
+        )
         os_type = system_info.get("os", "unknown")
         services = system_info.get("open_services", [])
         findings = []
         if "http" in services and "https" not in services:
-            findings.append({"severity": "HIGH", "finding": "HTTP without HTTPS redirect", "cve": "N/A", "remediation": "Enable HTTPS and redirect HTTP to HTTPS"})
+            findings.append(
+                {
+                    "severity": "HIGH",
+                    "finding": "HTTP without HTTPS redirect",
+                    "cve": "N/A",
+                    "remediation": "Enable HTTPS and redirect HTTP to HTTPS",
+                }
+            )
         if "ftp" in services:
-            findings.append({"severity": "MEDIUM", "finding": "FTP service detected (cleartext protocol)", "cve": "N/A", "remediation": "Replace FTP with SFTP or FTPS"})
+            findings.append(
+                {
+                    "severity": "MEDIUM",
+                    "finding": "FTP service detected (cleartext protocol)",
+                    "cve": "N/A",
+                    "remediation": "Replace FTP with SFTP or FTPS",
+                }
+            )
         if "telnet" in services:
-            findings.append({"severity": "CRITICAL", "finding": "Telnet service running (insecure)", "cve": "N/A", "remediation": "Disable Telnet; use SSH instead"})
-        findings.append({"severity": "LOW", "finding": "Default error pages may reveal server info", "cve": "N/A", "remediation": "Configure custom error pages"})
-        findings.append({"severity": "MEDIUM", "finding": "Missing security headers (CSP, HSTS, X-Frame-Options)", "cve": "N/A", "remediation": "Add security headers to web server config"})
+            findings.append(
+                {
+                    "severity": "CRITICAL",
+                    "finding": "Telnet service running (insecure)",
+                    "cve": "N/A",
+                    "remediation": "Disable Telnet; use SSH instead",
+                }
+            )
+        findings.append(
+            {
+                "severity": "LOW",
+                "finding": "Default error pages may reveal server info",
+                "cve": "N/A",
+                "remediation": "Configure custom error pages",
+            }
+        )
+        findings.append(
+            {
+                "severity": "MEDIUM",
+                "finding": "Missing security headers (CSP, HSTS, X-Frame-Options)",
+                "cve": "N/A",
+                "remediation": "Add security headers to web server config",
+            }
+        )
         return {
             "disclaimer": SECURITY_DISCLAIMER,
             "system": system_info.get("name", "Target System"),
@@ -55,7 +94,10 @@ class CybersecurityBot(BaseBot):
             "medium": sum(1 for f in findings if f["severity"] == "MEDIUM"),
             "low": sum(1 for f in findings if f["severity"] == "LOW"),
             "findings": findings,
-            "next_steps": ["Prioritize CRITICAL and HIGH findings", "Engage certified penetration tester for full assessment"],
+            "next_steps": [
+                "Prioritize CRITICAL and HIGH findings",
+                "Engage certified penetration tester for full assessment",
+            ],
         }
 
     def security_audit(self, org_name: str, industry: str) -> dict:
@@ -68,34 +110,73 @@ class CybersecurityBot(BaseBot):
                 "access_control": {
                     "score": 72,
                     "items": [
-                        {"check": "Multi-factor authentication (MFA) enabled", "status": "required"},
-                        {"check": "Privileged access management (PAM) in place", "status": "required"},
-                        {"check": "Regular access reviews (quarterly)", "status": "required"},
-                        {"check": "Zero Trust architecture implemented", "status": "recommended"},
-                        {"check": "Single Sign-On (SSO) deployed", "status": "recommended"},
+                        {
+                            "check": "Multi-factor authentication (MFA) enabled",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Privileged access management (PAM) in place",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Regular access reviews (quarterly)",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Zero Trust architecture implemented",
+                            "status": "recommended",
+                        },
+                        {
+                            "check": "Single Sign-On (SSO) deployed",
+                            "status": "recommended",
+                        },
                     ],
                 },
                 "data_protection": {
                     "score": 65,
                     "items": [
-                        {"check": "Data encrypted at rest (AES-256)", "status": "required"},
-                        {"check": "Data encrypted in transit (TLS 1.3)", "status": "required"},
-                        {"check": "Data classification policy in place", "status": "required"},
-                        {"check": "DLP (Data Loss Prevention) tools deployed", "status": "recommended"},
+                        {
+                            "check": "Data encrypted at rest (AES-256)",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Data encrypted in transit (TLS 1.3)",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Data classification policy in place",
+                            "status": "required",
+                        },
+                        {
+                            "check": "DLP (Data Loss Prevention) tools deployed",
+                            "status": "recommended",
+                        },
                     ],
                 },
                 "incident_response": {
                     "score": 55,
                     "items": [
-                        {"check": "Incident response plan documented", "status": "required"},
-                        {"check": "IR team and contacts identified", "status": "required"},
-                        {"check": "Tabletop exercise conducted in last 12 months", "status": "recommended"},
+                        {
+                            "check": "Incident response plan documented",
+                            "status": "required",
+                        },
+                        {
+                            "check": "IR team and contacts identified",
+                            "status": "required",
+                        },
+                        {
+                            "check": "Tabletop exercise conducted in last 12 months",
+                            "status": "recommended",
+                        },
                         {"check": "SIEM/SOC in place", "status": "recommended"},
                     ],
                 },
             },
             "overall_score": 64,
-            "critical_gaps": ["MFA not universally enforced", "No incident response tabletop exercise"],
+            "critical_gaps": [
+                "MFA not universally enforced",
+                "No incident response tabletop exercise",
+            ],
             "recommendations": [
                 "Implement MFA for all users immediately (30 days)",
                 "Conduct incident response tabletop exercise",
@@ -117,7 +198,12 @@ class CybersecurityBot(BaseBot):
                 "Maximum age: 90 days for privileged, 180 days for standard",
             ],
             "mfa_requirement": "Required for all accounts - use authenticator app (not SMS)",
-            "password_manager": ["1Password", "Bitwarden (free/open source)", "LastPass", "Dashlane"],
+            "password_manager": [
+                "1Password",
+                "Bitwarden (free/open source)",
+                "LastPass",
+                "Dashlane",
+            ],
             "prohibited": [
                 "Dictionary words alone",
                 "Sequential numbers (12345)",
@@ -125,7 +211,11 @@ class CybersecurityBot(BaseBot):
                 "Company name in password",
                 "Previous passwords",
             ],
-            "implementation_tools": ["Azure AD Password Protection", "HaveIBeenPwned API integration", "NIST SP 800-63B compliance"],
+            "implementation_tools": [
+                "Azure AD Password Protection",
+                "HaveIBeenPwned API integration",
+                "NIST SP 800-63B compliance",
+            ],
             "nist_alignment": "Aligned with NIST SP 800-63B Digital Identity Guidelines",
         }
 
@@ -150,9 +240,18 @@ class CybersecurityBot(BaseBot):
                 "Mismatched URLs (hover before clicking)",
             ],
             "simulated_scenarios": [
-                {"type": "CEO Fraud", "description": "Email from 'CEO' requesting urgent wire transfer"},
-                {"type": "IT Help Desk", "description": "Email requesting password reset via suspicious link"},
-                {"type": "Package Delivery", "description": "Fake FedEx/UPS notification with malicious attachment"},
+                {
+                    "type": "CEO Fraud",
+                    "description": "Email from 'CEO' requesting urgent wire transfer",
+                },
+                {
+                    "type": "IT Help Desk",
+                    "description": "Email requesting password reset via suspicious link",
+                },
+                {
+                    "type": "Package Delivery",
+                    "description": "Fake FedEx/UPS notification with malicious attachment",
+                },
             ],
             "response_protocol": [
                 "Do NOT click links or open attachments",
@@ -178,18 +277,24 @@ class CybersecurityBot(BaseBot):
         if data_practices.get("data_deletion_process"):
             passed.append("Data deletion/right-to-be-forgotten process in place")
         else:
-            issues.append("⚠️ No data deletion process - required under GDPR Article 17")
+            issues.append(
+                "⚠️ No data deletion process - required under GDPR Article 17"
+            )
         if data_practices.get("encryption"):
             passed.append("Data encryption implemented")
         else:
-            issues.append("⚠️ No encryption - GDPR Article 32 requires appropriate security measures")
+            issues.append(
+                "⚠️ No encryption - GDPR Article 32 requires appropriate security measures"
+            )
         return {
             "data_practices_reviewed": data_practices,
             "gdpr_passed": len(passed),
             "gdpr_issues": len(issues),
             "compliance_items_passed": passed,
             "compliance_issues": issues,
-            "overall_status": "Compliant" if not issues else f"Non-compliant ({len(issues)} issues)",
+            "overall_status": (
+                "Compliant" if not issues else f"Non-compliant ({len(issues)} issues)"
+            ),
             "next_steps": [
                 "Engage a Data Protection Officer (DPO) if processing >5,000 records",
                 "Conduct Data Protection Impact Assessment (DPIA) for high-risk processing",
@@ -278,11 +383,27 @@ class CybersecurityBot(BaseBot):
         return {
             "system": system_info.get("name", "System"),
             "security_score": score,
-            "rating": "Excellent" if score >= 85 else "Good" if score >= 70 else "Fair" if score >= 50 else "Poor",
+            "rating": (
+                "Excellent"
+                if score >= 85
+                else "Good" if score >= 70 else "Fair" if score >= 50 else "Poor"
+            ),
             "quick_wins": [
-                "Enable MFA (+15 points)" if not system_info.get("mfa_enabled") else None,
-                "Enable disk encryption (+10 points)" if not system_info.get("encryption_at_rest") else None,
-                "Deploy automated patching (+10 points)" if not system_info.get("regular_patches") else None,
+                (
+                    "Enable MFA (+15 points)"
+                    if not system_info.get("mfa_enabled")
+                    else None
+                ),
+                (
+                    "Enable disk encryption (+10 points)"
+                    if not system_info.get("encryption_at_rest")
+                    else None
+                ),
+                (
+                    "Deploy automated patching (+10 points)"
+                    if not system_info.get("regular_patches")
+                    else None
+                ),
             ],
         }
 
@@ -309,5 +430,10 @@ class CybersecurityBot(BaseBot):
                 "Implement network segmentation",
                 "Conduct phishing simulation training monthly",
             ],
-            "threat_feed_sources": ["CISA KEV Catalog", "MITRE ATT&CK", "VirusTotal", "Shodan"],
+            "threat_feed_sources": [
+                "CISA KEV Catalog",
+                "MITRE ATT&CK",
+                "VirusTotal",
+                "Shodan",
+            ],
         }

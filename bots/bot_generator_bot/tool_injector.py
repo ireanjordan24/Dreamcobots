@@ -18,13 +18,15 @@ from typing import Optional
 # Tool registry
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Tool:
     """Represents a single injectable tool."""
+
     name: str
     description: str
-    category: str          # "scraping" | "processing" | "export" | "payment" | "analytics"
-    stub: str              # Minimal Python implementation
+    category: str  # "scraping" | "processing" | "export" | "payment" | "analytics"
+    stub: str  # Minimal Python implementation
     requires_api_key: bool = False
     api_key_env_var: Optional[str] = None
     dependencies: list = field(default_factory=list)
@@ -37,7 +39,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def scrape_google_maps(query: str, location: str, count: int = 20) -> list:\n"
-            "    \"\"\"Return simulated Google Maps business leads.\"\"\"\n"
+            '    """Return simulated Google Maps business leads."""\n'
             "    import random\n"
             "    results = []\n"
             "    for i in range(count):\n"
@@ -59,7 +61,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="processing",
         stub=(
             "def find_email(first: str, last: str, domain: str) -> str:\n"
-            "    \"\"\"Return a probable professional email address.\"\"\"\n"
+            '    """Return a probable professional email address."""\n'
             "    patterns = [\n"
             "        f'{first.lower()}.{last.lower()}@{domain}',\n"
             "        f'{first[0].lower()}{last.lower()}@{domain}',\n"
@@ -76,7 +78,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def scrape_zillow(location: str, listing_type: str = 'for_sale', count: int = 10) -> list:\n"
-            "    \"\"\"Return simulated Zillow property listings.\"\"\"\n"
+            '    """Return simulated Zillow property listings."""\n'
             "    import random\n"
             "    return [\n"
             "        {\n"
@@ -99,7 +101,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def query_mls(zip_code: str, status: str = 'Active') -> list:\n"
-            "    \"\"\"Return MLS listings for a zip code via the Spark API.\"\"\"\n"
+            '    """Return MLS listings for a zip code via the Spark API."""\n'
             "    import os\n"
             "    import requests\n"
             "    api_key = os.environ.get('MLS_API_KEY', '')\n"
@@ -136,7 +138,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def scrape_yelp(term: str, location: str, limit: int = 20) -> list:\n"
-            "    \"\"\"Return business listings from Yelp.\"\"\"\n"
+            '    """Return business listings from Yelp."""\n'
             "    import random\n"
             "    return [\n"
             "        {\n"
@@ -159,7 +161,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def scrape_linkedin(search_query: str, count: int = 10) -> list:\n"
-            "    \"\"\"Return simulated LinkedIn profile data.\"\"\"\n"
+            '    """Return simulated LinkedIn profile data."""\n'
             "    return [\n"
             "        {\n"
             "            'name': f'Professional {i}',\n"
@@ -179,7 +181,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="payment",
         stub=(
             "def create_checkout_session(plan: str, customer_email: str, success_url: str, cancel_url: str) -> str:\n"
-            "    \"\"\"Create a Stripe checkout session and return the URL.\"\"\"\n"
+            '    """Create a Stripe checkout session and return the URL."""\n'
             "    import os\n"
             "    # import stripe  # pip install stripe\n"
             "    # stripe.api_key = os.environ['STRIPE_SECRET_KEY']\n"
@@ -204,7 +206,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="analytics",
         stub=(
             "def track_event(event: str, properties: dict) -> None:\n"
-            "    \"\"\"Log an analytics event.\"\"\"\n"
+            '    """Log an analytics event."""\n'
             "    import json\n"
             "    from datetime import datetime, timezone\n"
             "    entry = {'event': event, 'properties': properties, 'ts': datetime.now(timezone.utc).isoformat()}\n"
@@ -219,7 +221,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="export",
         stub=(
             "def send_email(to: str, subject: str, body: str) -> bool:\n"
-            "    \"\"\"Send an email; returns True on success.\"\"\"\n"
+            '    """Send an email; returns True on success."""\n'
             "    # Configure via SENDGRID_API_KEY or SMTP env vars\n"
             "    print(f'[EMAIL] To: {to} | Subject: {subject}')\n"
             "    return True\n"
@@ -234,7 +236,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="payment",
         stub=(
             "def generate_invoice(customer: str, amount: float, items: list) -> str:\n"
-            "    \"\"\"Return a simulated invoice ID.\"\"\"\n"
+            '    """Return a simulated invoice ID."""\n'
             "    import uuid\n"
             "    invoice_id = str(uuid.uuid4())[:8].upper()\n"
             "    print(f'[INVOICE] #{invoice_id} | {customer} | ${amount:.2f}')\n"
@@ -249,7 +251,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def get_place_details(place_id: str) -> dict:\n"
-            "    \"\"\"Return place details from Google Places API.\"\"\"\n"
+            '    """Return place details from Google Places API."""\n'
             "    return {'place_id': place_id, 'name': 'Sample Place', 'phone': '+1-555-0000'}\n"
         ),
         requires_api_key=True,
@@ -262,7 +264,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="scraping",
         stub=(
             "def search_twitter(query: str, count: int = 10) -> list:\n"
-            "    \"\"\"Return tweets/profiles from the Twitter API v2.\"\"\"\n"
+            '    """Return tweets/profiles from the Twitter API v2."""\n'
             "    import os\n"
             "    import requests\n"
             "    bearer = os.environ.get('TWITTER_BEARER_TOKEN', '')\n"
@@ -306,7 +308,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
         category="analytics",
         stub=(
             "def render_dashboard(data: dict) -> str:\n"
-            "    \"\"\"Return a minimal HTML representation of analytics data.\"\"\"\n"
+            '    """Return a minimal HTML representation of analytics data."""\n'
             "    rows = ''.join(f'<tr><td>{k}</td><td>{v}</td></tr>' for k, v in data.items())\n"
             "    return f'<table>{rows}</table>'\n"
         ),
@@ -319,6 +321,7 @@ _TOOL_REGISTRY: dict[str, Tool] = {
 # ---------------------------------------------------------------------------
 # Tool Injector
 # ---------------------------------------------------------------------------
+
 
 class ToolInjector:
     """
@@ -354,15 +357,17 @@ class ToolInjector:
         for name in tool_names:
             if name in _TOOL_REGISTRY:
                 tool = _TOOL_REGISTRY[name]
-                resolved.append({
-                    "name": tool.name,
-                    "description": tool.description,
-                    "category": tool.category,
-                    "stub": tool.stub,
-                    "requires_api_key": tool.requires_api_key,
-                    "api_key_env_var": tool.api_key_env_var,
-                    "dependencies": tool.dependencies,
-                })
+                resolved.append(
+                    {
+                        "name": tool.name,
+                        "description": tool.description,
+                        "category": tool.category,
+                        "stub": tool.stub,
+                        "requires_api_key": tool.requires_api_key,
+                        "api_key_env_var": tool.api_key_env_var,
+                        "dependencies": tool.dependencies,
+                    }
+                )
             else:
                 missing.append(name)
 

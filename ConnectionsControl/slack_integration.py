@@ -8,12 +8,12 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -41,7 +41,9 @@ class SlackIntegration:
         self._default_channel = default_channel
         self._connected = bool(api_token and default_channel)
 
-    def send_alert(self, channel: str, message: str, severity: str = "info") -> SlackMessage:
+    def send_alert(
+        self, channel: str, message: str, severity: str = "info"
+    ) -> SlackMessage:
         """Send an alert message to a Slack channel."""
         msg = SlackMessage(
             message_id=str(uuid.uuid4()),

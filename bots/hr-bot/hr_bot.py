@@ -1,8 +1,10 @@
 """HR Bot - Job descriptions, resume screening, interview questions, and HR compliance."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -25,7 +27,9 @@ class HRBot(BaseBot):
         self.start()
         return self.get_status()
 
-    def write_job_description(self, role: str, requirements: list, company_culture: str) -> dict:
+    def write_job_description(
+        self, role: str, requirements: list, company_culture: str
+    ) -> dict:
         """Write a complete, EEOC-compliant job description."""
         return {
             "role": role,
@@ -65,7 +69,9 @@ We are looking for a talented {role} to join our growing team. In this role, you
 """,
             "eeoc_compliant": True,
             "inclusive_language_score": 92,
-            "estimated_salary_range": self.benchmark_salary(role, "US National", "mid-level"),
+            "estimated_salary_range": self.benchmark_salary(
+                role, "US National", "mid-level"
+            ),
         }
 
     def screen_resume(self, resume_text: str, job_requirements: list) -> dict:
@@ -83,15 +89,28 @@ We are looking for a talented {role} to join our growing team. In this role, you
             "match_score_percent": round(score, 1),
             "requirements_matched": matched,
             "requirements_missing": missing,
-            "recommendation": "Interview" if score >= 70 else "Phone screen" if score >= 50 else "Pass",
+            "recommendation": (
+                "Interview"
+                if score >= 70
+                else "Phone screen" if score >= 50 else "Pass"
+            ),
             "red_flags": [],
-            "green_flags": ["Resume length appropriate (1-2 pages)"] if len(resume_text) < 3000 else [],
+            "green_flags": (
+                ["Resume length appropriate (1-2 pages)"]
+                if len(resume_text) < 3000
+                else []
+            ),
             "note": "Resume screening is a first-pass filter. Human review required before decisions.",
         }
 
     def generate_interview_questions(self, role: str, level: str) -> dict:
         """Generate role-specific interview questions."""
-        levels = {"entry": "junior", "mid": "mid-level", "senior": "senior", "executive": "executive"}
+        levels = {
+            "entry": "junior",
+            "mid": "mid-level",
+            "senior": "senior",
+            "executive": "executive",
+        }
         lvl = levels.get(level.lower(), "mid-level")
         behavioral = [
             "Tell me about a time you faced a significant challenge in your work. How did you resolve it?",
@@ -108,7 +127,9 @@ We are looking for a talented {role} to join our growing team. In this role, you
         ]
         if lvl in ["senior", "executive"]:
             technical.append(f"How would you build a {role} team from scratch?")
-            technical.append("Tell me about a time you influenced strategy at the organizational level.")
+            technical.append(
+                "Tell me about a time you influenced strategy at the organizational level."
+            )
         return {
             "role": role,
             "level": level,
@@ -174,15 +195,33 @@ We are looking for a talented {role} to join our growing team. In this role, you
                     "rating": None,
                 },
                 "core_competencies": {
-                    "items": ["Communication", "Collaboration", "Problem-solving", "Leadership", "Technical skills"],
+                    "items": [
+                        "Communication",
+                        "Collaboration",
+                        "Problem-solving",
+                        "Leadership",
+                        "Technical skills",
+                    ],
                     "scale": "1=Below expectations, 2=Partially meets, 3=Meets, 4=Exceeds, 5=Outstanding",
                 },
-                "strengths": {"prompt": "List 3 demonstrated strengths with specific examples"},
-                "development_areas": {"prompt": "List 2-3 areas for growth with actionable steps"},
-                "career_goals": {"prompt": "Document employee's stated career goals and how role supports them"},
-                "overall_rating": {"scale": "Below/Partially/Meets/Exceeds/Outstanding expectations"},
-                "manager_comments": {"prompt": "Overall summary and key messages for employee"},
-                "employee_comments": {"prompt": "Employee self-assessment and feedback"},
+                "strengths": {
+                    "prompt": "List 3 demonstrated strengths with specific examples"
+                },
+                "development_areas": {
+                    "prompt": "List 2-3 areas for growth with actionable steps"
+                },
+                "career_goals": {
+                    "prompt": "Document employee's stated career goals and how role supports them"
+                },
+                "overall_rating": {
+                    "scale": "Below/Partially/Meets/Exceeds/Outstanding expectations"
+                },
+                "manager_comments": {
+                    "prompt": "Overall summary and key messages for employee"
+                },
+                "employee_comments": {
+                    "prompt": "Employee self-assessment and feedback"
+                },
             },
             "signatures": {
                 "employee": "[Signature + Date]",
@@ -203,8 +242,17 @@ We are looking for a talented {role} to join our growing team. In this role, you
             "marketing": (60000, 130000),
         }
         role_lower = role.lower()
-        base = next((v for k, v in base_ranges.items() if k in role_lower), (70000, 140000))
-        multipliers = {"entry": 0.75, "junior": 0.85, "mid-level": 1.0, "senior": 1.3, "principal": 1.5, "executive": 2.0}
+        base = next(
+            (v for k, v in base_ranges.items() if k in role_lower), (70000, 140000)
+        )
+        multipliers = {
+            "entry": 0.75,
+            "junior": 0.85,
+            "mid-level": 1.0,
+            "senior": 1.3,
+            "principal": 1.5,
+            "executive": 2.0,
+        }
         mult = multipliers.get(experience.lower(), 1.0)
         low = int(base[0] * mult)
         high = int(base[1] * mult)
@@ -215,7 +263,12 @@ We are looking for a talented {role} to join our growing team. In this role, you
             "salary_range": {"low": f"${low:,}", "high": f"${high:,}"},
             "median": f"${int((low + high) / 2):,}",
             "total_comp_note": "Add 20-30% for full compensation (benefits, equity, bonus)",
-            "sources": ["Levels.fyi", "Glassdoor", "LinkedIn Salary", "Bureau of Labor Statistics"],
+            "sources": [
+                "Levels.fyi",
+                "Glassdoor",
+                "LinkedIn Salary",
+                "Bureau of Labor Statistics",
+            ],
         }
 
     def employee_handbook_section(self, topic: str) -> dict:
@@ -235,11 +288,19 @@ We are looking for a talented {role} to join our growing team. In this role, you
             },
         }
         key = topic.lower().replace(" ", "_")
-        section = sections.get(key, {
-            "title": f"{topic.title()} Policy",
-            "content": f"[Complete {topic} policy content here - consult employment attorney for jurisdiction-specific requirements]",
-        })
-        return {"topic": topic, **section, "last_updated": "2024", "legal_review_required": True}
+        section = sections.get(
+            key,
+            {
+                "title": f"{topic.title()} Policy",
+                "content": f"[Complete {topic} policy content here - consult employment attorney for jurisdiction-specific requirements]",
+            },
+        )
+        return {
+            "topic": topic,
+            **section,
+            "last_updated": "2024",
+            "legal_review_required": True,
+        }
 
     def compliance_check(self, policy_type: str) -> dict:
         """Check HR policies for EEOC, FLSA, and related compliance."""

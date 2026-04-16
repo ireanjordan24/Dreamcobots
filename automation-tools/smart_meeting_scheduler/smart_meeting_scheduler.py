@@ -1,17 +1,22 @@
 # GLOBAL AI SOURCES FLOW
 """Smart Meeting Scheduler - intelligent meeting scheduling and conflict detection."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
-from framework import GlobalAISourcesFlow  # noqa: F401
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
 from datetime import datetime, timedelta
 
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+from framework import GlobalAISourcesFlow  # noqa: F401
+
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -31,7 +36,9 @@ class SmartMeetingScheduler:
 
     def _check_limit(self):
         if self._monthly_limit and self._meeting_count >= self._monthly_limit:
-            raise PermissionError(f"Monthly meeting limit ({self._monthly_limit}) reached. Upgrade to Pro.")
+            raise PermissionError(
+                f"Monthly meeting limit ({self._monthly_limit}) reached. Upgrade to Pro."
+            )
 
     def _has_conflict(self, start: datetime, end: datetime) -> bool:
         for meeting in self._meetings:
@@ -41,7 +48,9 @@ class SmartMeetingScheduler:
                 return True
         return False
 
-    def schedule_meeting(self, title: str, start_iso: str, duration_minutes: int, attendees: list) -> dict:
+    def schedule_meeting(
+        self, title: str, start_iso: str, duration_minutes: int, attendees: list
+    ) -> dict:
         """Schedule a meeting, checking for conflicts."""
         self._check_limit()
         start = datetime.fromisoformat(start_iso)

@@ -2,42 +2,42 @@
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pytest
 
-from bots.bot_marketplace.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    FEATURE_BROWSE,
-    FEATURE_BUY_BOTS,
-    FEATURE_SELL_BOTS,
-    FEATURE_MONETIZE,
-    FEATURE_UPSELL,
-    FEATURE_ANALYTICS,
-    FEATURE_FORTUNE500_INTEGRATION,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-)
-from bots.bot_marketplace.marketplace_catalog import MarketplaceCatalog, BOT_CATEGORIES
-from bots.bot_marketplace.monetization_engine import MonetizationEngine, UPSELL_TYPES
-from bots.bot_marketplace.integration_hub import IntegrationHub, INTEGRATION_PARTNERS
 from bots.bot_marketplace.bot_marketplace import (
     BotMarketplace,
     BotMarketplaceError,
     BotMarketplaceTierError,
 )
-
+from bots.bot_marketplace.integration_hub import INTEGRATION_PARTNERS, IntegrationHub
+from bots.bot_marketplace.marketplace_catalog import BOT_CATEGORIES, MarketplaceCatalog
+from bots.bot_marketplace.monetization_engine import UPSELL_TYPES, MonetizationEngine
+from bots.bot_marketplace.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_BROWSE,
+    FEATURE_BUY_BOTS,
+    FEATURE_FORTUNE500_INTEGRATION,
+    FEATURE_MONETIZE,
+    FEATURE_SELL_BOTS,
+    FEATURE_UPSELL,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # Helpers
 # ===========================================================================
+
 
 def _active_listing(catalog: MarketplaceCatalog, **kwargs) -> dict:
     """Create and immediately approve a listing."""
@@ -57,6 +57,7 @@ def _active_listing(catalog: MarketplaceCatalog, **kwargs) -> dict:
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -135,29 +136,39 @@ class TestTiers:
 # MarketplaceCatalog tests
 # ===========================================================================
 
+
 class TestMarketplaceCatalog:
     def setup_method(self):
         self.catalog = MarketplaceCatalog()
 
     def test_list_bot_returns_pending(self):
         listing = self.catalog.list_bot(
-            seller_id="s1", bot_name="Bot A", category="ANALYTICS",
-            description="desc", price_usd=10.0,
+            seller_id="s1",
+            bot_name="Bot A",
+            category="ANALYTICS",
+            description="desc",
+            price_usd=10.0,
         )
         assert listing["status"] == "PENDING_REVIEW"
 
     def test_approve_listing_sets_active(self):
         listing = self.catalog.list_bot(
-            seller_id="s1", bot_name="Bot B", category="FINANCE",
-            description="desc", price_usd=5.0,
+            seller_id="s1",
+            bot_name="Bot B",
+            category="FINANCE",
+            description="desc",
+            price_usd=5.0,
         )
         approved = self.catalog.approve_listing(listing["listing_id"])
         assert approved["status"] == "ACTIVE"
 
     def test_get_listing_returns_dict(self):
         listing = self.catalog.list_bot(
-            seller_id="s1", bot_name="Bot C", category="CRM",
-            description="desc", price_usd=0.0,
+            seller_id="s1",
+            bot_name="Bot C",
+            category="CRM",
+            description="desc",
+            price_usd=0.0,
         )
         fetched = self.catalog.get_listing(listing["listing_id"])
         assert fetched["listing_id"] == listing["listing_id"]
@@ -172,8 +183,12 @@ class TestMarketplaceCatalog:
         assert all(r["status"] == "ACTIVE" for r in results)
 
     def test_search_by_query(self):
-        _active_listing(self.catalog, bot_name="SuperSearch Bot", description="searches everything")
-        _active_listing(self.catalog, bot_name="OtherBot", description="does other stuff")
+        _active_listing(
+            self.catalog, bot_name="SuperSearch Bot", description="searches everything"
+        )
+        _active_listing(
+            self.catalog, bot_name="OtherBot", description="does other stuff"
+        )
         results = self.catalog.search_listings(query="supersearch")
         assert len(results) == 1
         assert results[0]["bot_name"] == "SuperSearch Bot"
@@ -257,6 +272,7 @@ class TestMarketplaceCatalog:
 # MonetizationEngine tests
 # ===========================================================================
 
+
 class TestMonetizationEngine:
     def setup_method(self):
         self.catalog = MarketplaceCatalog()
@@ -273,13 +289,17 @@ class TestMonetizationEngine:
 
     def test_purchase_bot_platform_fee_15pct(self):
         listing = self._listed_bot(100.0)
-        txn = self.engine.purchase_bot(listing["listing_id"], "buyer1", platform_fee_pct=0.15)
+        txn = self.engine.purchase_bot(
+            listing["listing_id"], "buyer1", platform_fee_pct=0.15
+        )
         assert txn["platform_fee"] == 15.0
         assert txn["seller_earnings"] == 85.0
 
     def test_purchase_bot_platform_fee_10pct(self):
         listing = self._listed_bot(200.0)
-        txn = self.engine.purchase_bot(listing["listing_id"], "buyer1", platform_fee_pct=0.10)
+        txn = self.engine.purchase_bot(
+            listing["listing_id"], "buyer1", platform_fee_pct=0.10
+        )
         assert txn["platform_fee"] == 20.0
         assert txn["seller_earnings"] == 180.0
 
@@ -316,7 +336,9 @@ class TestMonetizationEngine:
         upsell = self.engine.create_upsell(
             listing["listing_id"], "ADVANCED_API", "API Pack", "desc", 49.0
         )
-        txn = self.engine.purchase_upsell(upsell["upsell_id"], "buyer1", platform_fee_pct=0.15)
+        txn = self.engine.purchase_upsell(
+            upsell["upsell_id"], "buyer1", platform_fee_pct=0.15
+        )
         assert txn["gross_amount"] == 49.0
         assert txn["platform_fee"] == pytest.approx(7.35, rel=1e-2)
 
@@ -355,6 +377,7 @@ class TestMonetizationEngine:
 # ===========================================================================
 # IntegrationHub tests
 # ===========================================================================
+
 
 class TestIntegrationHub:
     def setup_method(self):
@@ -414,6 +437,7 @@ class TestIntegrationHub:
 # ===========================================================================
 # BotMarketplace tier-enforcement tests
 # ===========================================================================
+
 
 class TestBotMarketplaceTierEnforcement:
     def test_free_can_browse(self):

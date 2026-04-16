@@ -1,4 +1,5 @@
 """Dashboard data helper for the DreamCobots platform."""
+
 from datetime import datetime
 
 
@@ -21,10 +22,12 @@ class DashboardData:
 
     def add_event(self, event: str):
         """Add a new event to the events log."""
-        self._events.append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "event": event,
-        })
+        self._events.append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "event": event,
+            }
+        )
         if len(self._events) > 200:
             self._events = self._events[-200:]
 

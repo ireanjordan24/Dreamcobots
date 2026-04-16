@@ -9,27 +9,31 @@ Covers:
 - BuddyBot consumption tracking and billing integration
 """
 
-import pytest
 from datetime import date, timedelta
 
+import pytest
+
+from bots.token_billing.billing_system import BillingSystem
+from bots.token_billing.subscription_manager import (
+    SubscriptionError,
+    SubscriptionManager,
+)
 from bots.token_billing.tiers import (
+    FEATURE_ALL_109_MODELS,
+    FEATURE_FULL_CAPACITY,
+    FEATURE_LIMITED_CAPACITY,
     Tier,
     TierConfig,
     get_tier_config,
     list_tiers,
-    FEATURE_ALL_109_MODELS,
-    FEATURE_FULL_CAPACITY,
-    FEATURE_LIMITED_CAPACITY,
 )
-from bots.token_billing.token_manager import TokenManager, InsufficientTokensError
-from bots.token_billing.subscription_manager import SubscriptionManager, SubscriptionError
-from bots.token_billing.billing_system import BillingSystem
+from bots.token_billing.token_manager import InsufficientTokensError, TokenManager
 from BuddyAI.buddy_bot import BuddyBot
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def billing():
@@ -60,6 +64,7 @@ def sub_mgr():
 # ---------------------------------------------------------------------------
 # Tier configuration tests
 # ---------------------------------------------------------------------------
+
 
 class TestTierConfig:
     def test_all_tiers_present(self):
@@ -133,6 +138,7 @@ class TestTierConfig:
 # TokenManager tests
 # ---------------------------------------------------------------------------
 
+
 class TestTokenManager:
     def test_create_account(self, token_mgr):
         account = token_mgr.get_account("alice")
@@ -203,7 +209,9 @@ class TestTokenManager:
 
     def test_ledger_records_transactions(self, token_mgr):
         token_mgr.add_tokens("alice", 100, description="starter pack")
-        token_mgr.deduct_tokens("alice", 10, daily_allowance=50, description="test call")
+        token_mgr.deduct_tokens(
+            "alice", 10, daily_allowance=50, description="test call"
+        )
         ledger = token_mgr.get_ledger("alice")
         assert len(ledger) == 2
         assert ledger[0].delta == 100
@@ -213,6 +221,7 @@ class TestTokenManager:
 # ---------------------------------------------------------------------------
 # SubscriptionManager tests
 # ---------------------------------------------------------------------------
+
 
 class TestSubscriptionManager:
     def test_initialize_free_account(self, sub_mgr):
@@ -262,6 +271,7 @@ class TestSubscriptionManager:
 # BillingSystem tests
 # ---------------------------------------------------------------------------
 
+
 class TestBillingSystem:
     def test_create_account_returns_user_id(self, billing):
         uid = billing.create_account("bob", Tier.FREE)
@@ -301,7 +311,9 @@ class TestBillingSystem:
         assert account["daily_tokens"] == 10_000
 
     def test_create_subscription_enterprise_unlimited(self, billing_with_user):
-        account = billing_with_user.create_subscription("alice", Tier.ENTERPRISE_MONTHLY)
+        account = billing_with_user.create_subscription(
+            "alice", Tier.ENTERPRISE_MONTHLY
+        )
         assert account["daily_tokens"] is None
 
     def test_cancel_subscription(self, billing_with_user):
@@ -336,8 +348,10 @@ class TestBillingSystem:
 # BuddyBot consumption tracking tests
 # ---------------------------------------------------------------------------
 
+
 class _MockBot:
     """Minimal bot stub for testing."""
+
     def chat(self, message: str) -> dict:
         return {"reply": f"echo: {message}"}
 

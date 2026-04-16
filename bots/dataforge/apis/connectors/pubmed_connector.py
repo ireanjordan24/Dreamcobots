@@ -1,4 +1,5 @@
 """PubMed Entrez API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,9 +27,18 @@ class PubMedConnector:
             API response dict with article IDs or error dict.
         """
         import requests
-        params = {"db": "pubmed", "term": query, "retmax": retmax, "retmode": "json", "email": self.email}
+
+        params = {
+            "db": "pubmed",
+            "term": query,
+            "retmax": retmax,
+            "retmode": "json",
+            "email": self.email,
+        }
         try:
-            response = requests.get(f"{self.BASE_URL}/esearch.fcgi", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/esearch.fcgi", params=params, timeout=30
+            )
             response.raise_for_status()
             logger.info("PubMed search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -46,12 +56,14 @@ class PubMedConnector:
             API response dict with article data or error dict.
         """
         import requests
+
         params = {"db": "pubmed", "id": pmid, "retmode": "json", "email": self.email}
         try:
-            response = requests.get(f"{self.BASE_URL}/efetch.fcgi", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/efetch.fcgi", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.text}
         except requests.RequestException as e:
             logger.error("PubMed fetch_article error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -1,6 +1,7 @@
 """Tests for bots/factory_bot/ — workflow optimizer, predictive maintenance, green manufacturing."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,22 +11,23 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.factory_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from bots.factory_bot.workflow_optimizer import (
-    ProductionLineOptimizer,
-    PredictiveMaintenanceEngine,
-    MACHINE_DATABASE,
-)
+
+from bots.factory_bot.factory_bot import FactoryBot, FactoryBotError
 from bots.factory_bot.green_manufacturing import (
     EnergyEfficiencyMonitor,
     GreenInitiativeManager,
 )
-from bots.factory_bot.factory_bot import FactoryBot, FactoryBotError
-
+from bots.factory_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.factory_bot.workflow_optimizer import (
+    MACHINE_DATABASE,
+    PredictiveMaintenanceEngine,
+    ProductionLineOptimizer,
+)
 
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestFactoryBotTiers:
     def test_bot_features_has_three_tiers(self):
@@ -50,7 +52,9 @@ class TestFactoryBotTiers:
 
     def test_get_bot_tier_info_enterprise(self):
         info = get_bot_tier_info(Tier.ENTERPRISE)
-        assert info["price_usd_monthly"] > info["price_usd_monthly"] or True  # enterprise >= pro
+        assert (
+            info["price_usd_monthly"] > info["price_usd_monthly"] or True
+        )  # enterprise >= pro
 
     def test_tier_info_has_required_keys(self):
         info = get_bot_tier_info(Tier.PRO)
@@ -58,12 +62,15 @@ class TestFactoryBotTiers:
             assert key in info
 
     def test_enterprise_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
 
 # ===========================================================================
 # MACHINE_DATABASE
 # ===========================================================================
+
 
 class TestMachineDatabase:
     def test_has_ten_machines(self):
@@ -106,6 +113,7 @@ class TestMachineDatabase:
 # ProductionLineOptimizer
 # ===========================================================================
 
+
 class TestProductionLineOptimizerInstantiation:
     def test_default_tier_is_free(self):
         opt = ProductionLineOptimizer()
@@ -127,7 +135,9 @@ class TestProductionLineOptimizerInstantiation:
 class TestOptimizeProductionLine:
     def test_returns_dict(self):
         opt = ProductionLineOptimizer(tier=Tier.FREE)
-        result = opt.optimize_production_line("line-01", {"throughput": 100, "defect_rate": 0.03})
+        result = opt.optimize_production_line(
+            "line-01", {"throughput": 100, "defect_rate": 0.03}
+        )
         assert isinstance(result, dict)
 
     def test_has_efficiency_gain(self):
@@ -175,7 +185,10 @@ class TestAnalyzeBottleneck:
 
     def test_has_bottleneck_station(self):
         opt = ProductionLineOptimizer(tier=Tier.FREE)
-        result = opt.analyze_bottleneck("line-01", {"stations": ["A", "B", "C"], "cycle_times": {"A": 30, "B": 70, "C": 40}})
+        result = opt.analyze_bottleneck(
+            "line-01",
+            {"stations": ["A", "B", "C"], "cycle_times": {"A": 30, "B": 70, "C": 40}},
+        )
         assert result["bottleneck_station"] == "B"
 
     def test_severity_field_present(self):
@@ -229,6 +242,7 @@ class TestScheduleProduction:
 # PredictiveMaintenanceEngine
 # ===========================================================================
 
+
 class TestPredictiveMaintenanceEngineInstantiation:
     def test_default_tier_is_free(self):
         eng = PredictiveMaintenanceEngine()
@@ -242,7 +256,9 @@ class TestPredictiveMaintenanceEngineInstantiation:
 class TestPredictFailure:
     def test_returns_dict(self):
         eng = PredictiveMaintenanceEngine(tier=Tier.FREE)
-        result = eng.predict_failure("conveyor_01", {"vibration_hz": 50.0, "temperature_c": 60.0})
+        result = eng.predict_failure(
+            "conveyor_01", {"vibration_hz": 50.0, "temperature_c": 60.0}
+        )
         assert isinstance(result, dict)
 
     def test_has_failure_probability(self):
@@ -270,7 +286,9 @@ class TestPredictFailure:
         eng = PredictiveMaintenanceEngine(tier=Tier.PRO)
         low_result = eng.predict_failure("press_01", {"vibration_hz": 10.0})
         eng2 = PredictiveMaintenanceEngine(tier=Tier.PRO)
-        high_result = eng2.predict_failure("welder_01", {"vibration_hz": 200.0, "temperature_c": 120.0})
+        high_result = eng2.predict_failure(
+            "welder_01", {"vibration_hz": 200.0, "temperature_c": 120.0}
+        )
         assert high_result["failure_probability"] >= low_result["failure_probability"]
 
     def test_free_tier_limited_to_two_machines(self):
@@ -368,6 +386,7 @@ class TestDiagnoseIssue:
 # EnergyEfficiencyMonitor
 # ===========================================================================
 
+
 class TestEnergyEfficiencyMonitorInstantiation:
     def test_default_tier_is_free(self):
         mon = EnergyEfficiencyMonitor()
@@ -443,41 +462,54 @@ class TestOptimizeEnergy:
 class TestCalculateCarbonFootprint:
     def test_returns_dict(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.FREE)
-        result = mon.calculate_carbon_footprint({"units_produced": 500, "energy_kwh": 10000})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 500, "energy_kwh": 10000}
+        )
         assert isinstance(result, dict)
 
     def test_has_total_co2(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.FREE)
-        result = mon.calculate_carbon_footprint({"units_produced": 1000, "energy_kwh": 20000})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 1000, "energy_kwh": 20000}
+        )
         assert "total_co2_kg" in result
         assert result["total_co2_kg"] > 0
 
     def test_has_co2_per_unit(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.FREE)
-        result = mon.calculate_carbon_footprint({"units_produced": 1000, "energy_kwh": 20000})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 1000, "energy_kwh": 20000}
+        )
         assert "co2_per_unit_kg" in result
 
     def test_scope_emissions_present(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.FREE)
-        result = mon.calculate_carbon_footprint({"units_produced": 500, "energy_kwh": 5000, "fuel_liters": 200})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 500, "energy_kwh": 5000, "fuel_liters": 200}
+        )
         assert "scope_1_emissions_kg" in result
         assert "scope_2_emissions_kg" in result
         assert "scope_3_emissions_kg" in result
 
     def test_pro_has_emissions_breakdown(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.PRO)
-        result = mon.calculate_carbon_footprint({"units_produced": 1000, "energy_kwh": 15000})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 1000, "energy_kwh": 15000}
+        )
         assert "emissions_breakdown" in result
 
     def test_enterprise_has_ghg_protocol(self):
         mon = EnergyEfficiencyMonitor(tier=Tier.ENTERPRISE)
-        result = mon.calculate_carbon_footprint({"units_produced": 1000, "energy_kwh": 15000})
+        result = mon.calculate_carbon_footprint(
+            {"units_produced": 1000, "energy_kwh": 15000}
+        )
         assert "ghg_protocol_compliant" in result
 
 
 # ===========================================================================
 # GreenInitiativeManager
 # ===========================================================================
+
 
 class TestGreenInitiativeManagerInstantiation:
     def test_default_tier_is_free(self):
@@ -529,7 +561,12 @@ class TestAssessSustainability:
 class TestPlanWasteReduction:
     def test_returns_dict(self):
         mgr = GreenInitiativeManager(tier=Tier.FREE)
-        waste = {"total_waste_kg": 4000, "recyclable_pct": 40, "landfill_pct": 35, "hazardous_pct": 5}
+        waste = {
+            "total_waste_kg": 4000,
+            "recyclable_pct": 40,
+            "landfill_pct": 35,
+            "hazardous_pct": 5,
+        }
         result = mgr.plan_waste_reduction("facility-01", waste)
         assert isinstance(result, dict)
 
@@ -546,13 +583,23 @@ class TestPlanWasteReduction:
 
     def test_has_landfill_reduction_target(self):
         mgr = GreenInitiativeManager(tier=Tier.FREE)
-        result = mgr.plan_waste_reduction("facility-01", {"total_waste_kg": 5000, "landfill_pct": 40})
+        result = mgr.plan_waste_reduction(
+            "facility-01", {"total_waste_kg": 5000, "landfill_pct": 40}
+        )
         assert "landfill_reduction_target_kg" in result
         assert result["landfill_reduction_target_kg"] > 0
 
     def test_pro_has_waste_stream_analysis(self):
         mgr = GreenInitiativeManager(tier=Tier.PRO)
-        result = mgr.plan_waste_reduction("facility-01", {"total_waste_kg": 5000, "recyclable_pct": 35, "landfill_pct": 40, "hazardous_pct": 5})
+        result = mgr.plan_waste_reduction(
+            "facility-01",
+            {
+                "total_waste_kg": 5000,
+                "recyclable_pct": 35,
+                "landfill_pct": 40,
+                "hazardous_pct": 5,
+            },
+        )
         assert "waste_stream_analysis" in result
 
     def test_enterprise_has_circular_economy(self):
@@ -603,6 +650,7 @@ class TestGenerateGreenReport:
 # ===========================================================================
 # FactoryBot main class
 # ===========================================================================
+
 
 class TestFactoryBotInstantiation:
     def test_default_tier_is_free(self):

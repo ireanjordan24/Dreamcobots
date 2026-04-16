@@ -2,7 +2,6 @@
 
 import random
 
-
 FACTS = [
     "A group of flamingos is called a 'flamboyance'.",
     "Honey never spoils – archaeologists have found 3000-year-old honey in Egyptian tombs.",

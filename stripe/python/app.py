@@ -10,10 +10,12 @@ Setup:
     python app.py
 """
 
-import os
 import json
+import os
+
+from flask import Flask, jsonify, request
+
 import stripe
-from flask import Flask, request, jsonify
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -28,6 +30,7 @@ app = Flask(__name__)
 # ---------------------------------------------------------------------------
 # Payment Intent
 # ---------------------------------------------------------------------------
+
 
 def create_payment_intent(amount_in_cents: int, currency: str = "usd") -> dict:
     """Create a Stripe Payment Intent for a one-time charge.
@@ -55,6 +58,7 @@ def create_payment_intent(amount_in_cents: int, currency: str = "usd") -> dict:
 # ---------------------------------------------------------------------------
 # Subscriptions
 # ---------------------------------------------------------------------------
+
 
 def create_subscription(email: str, price_id: str) -> dict:
     """Create a customer and subscribe them to a recurring price.
@@ -102,6 +106,7 @@ def cancel_subscription(subscription_id: str) -> dict:
 # Checkout Sessions
 # ---------------------------------------------------------------------------
 
+
 def create_checkout_session(
     price_id: str,
     success_url: str,
@@ -147,6 +152,7 @@ def create_checkout_session(
 # Payout Tracking
 # ---------------------------------------------------------------------------
 
+
 def list_payouts(limit: int = 10) -> list:
     """Return a list of recent payouts from your Stripe account.
 
@@ -167,6 +173,7 @@ def list_payouts(limit: int = 10) -> list:
 # ---------------------------------------------------------------------------
 # Webhook Handler
 # ---------------------------------------------------------------------------
+
 
 @app.route("/webhook", methods=["POST"])
 def webhook():

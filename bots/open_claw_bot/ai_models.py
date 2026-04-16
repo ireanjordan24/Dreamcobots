@@ -46,7 +46,7 @@ class AIModel:
     name: str
     family: ModelFamily
     version: str = "1.0.0"
-    accuracy: float = 0.0          # 0.0 – 1.0
+    accuracy: float = 0.0  # 0.0 – 1.0
     parameters: dict = field(default_factory=dict)
     status: ModelStatus = ModelStatus.IDLE
     tags: list = field(default_factory=list)
@@ -230,7 +230,11 @@ class AIModelHub:
         leverage = float(features.get("leverage", 1.0))
         exposure = float(features.get("exposure_pct", 10.0))
 
-        score = (volatility * 0.4) + (min(leverage / 10, 1.0) * 0.4) + (exposure / 100 * 0.2)
+        score = (
+            (volatility * 0.4)
+            + (min(leverage / 10, 1.0) * 0.4)
+            + (exposure / 100 * 0.2)
+        )
         if score < 0.25:
             risk = "low"
         elif score < 0.5:
@@ -328,15 +332,15 @@ class AIModelHub:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _pick_model(
-        self, family: ModelFamily, model_id: Optional[str]
-    ) -> AIModel:
+    def _pick_model(self, family: ModelFamily, model_id: Optional[str]) -> AIModel:
         if model_id is not None:
             model = self._get(model_id)
             if not model.is_ready():
                 raise RuntimeError(f"Model '{model_id}' is not in READY state.")
             return model
-        candidates = [m for m in self._models.values() if m.family == family and m.is_ready()]
+        candidates = [
+            m for m in self._models.values() if m.family == family and m.is_ready()
+        ]
         if not candidates:
             raise RuntimeError(f"No ready model found for family '{family.value}'.")
         return max(candidates, key=lambda m: m.accuracy)

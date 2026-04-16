@@ -1,4 +1,5 @@
 """Finnhub financial data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,8 +28,13 @@ class FinnhubConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/quote", params={"symbol": symbol, "token": self.api_key}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/quote",
+                params={"symbol": symbol, "token": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Finnhub quote fetched for %s.", symbol)
             return {"status": "success", "data": response.json()}
@@ -46,11 +52,15 @@ class FinnhubConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/stock/profile2", params={"symbol": symbol, "token": self.api_key}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/stock/profile2",
+                params={"symbol": symbol, "token": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Finnhub get_company_profile error: %s", e)
             return {"status": "error", "message": str(e)}
-

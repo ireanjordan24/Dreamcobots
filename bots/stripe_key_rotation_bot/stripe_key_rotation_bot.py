@@ -44,24 +44,22 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.stripe_key_rotation_bot.tiers import (
+    FEATURE_AUDIT_TRAIL,
+    FEATURE_EMAIL_NOTIFICATION,
+    FEATURE_GITHUB_SECRETS_UPDATE,
+    FEATURE_KEY_VALIDATION,
+    FEATURE_MANUAL_ROTATION,
+    FEATURE_MULTI_ENV_ROTATION,
+    FEATURE_OLD_KEY_DEACTIVATION,
+    FEATURE_PAYMENT_WORKFLOW_TEST,
+    FEATURE_SCHEDULED_ROTATION,
+    FEATURE_SLACK_NOTIFICATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_MANUAL_ROTATION,
-    FEATURE_SCHEDULED_ROTATION,
-    FEATURE_GITHUB_SECRETS_UPDATE,
-    FEATURE_EMAIL_NOTIFICATION,
-    FEATURE_SLACK_NOTIFICATION,
-    FEATURE_AUDIT_TRAIL,
-    FEATURE_KEY_VALIDATION,
-    FEATURE_OLD_KEY_DEACTIVATION,
-    FEATURE_PAYMENT_WORKFLOW_TEST,
-    FEATURE_MULTI_ENV_ROTATION,
 )
-
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -77,6 +75,7 @@ _REDACTED = "[REDACTED]"
 # ---------------------------------------------------------------------------
 # Custom exceptions
 # ---------------------------------------------------------------------------
+
 
 class StripeKeyRotationBotError(Exception):
     """Base exception for StripeKeyRotationBot."""
@@ -98,6 +97,7 @@ class RotationWorkflowError(StripeKeyRotationBotError):
 # Secure key helper
 # ---------------------------------------------------------------------------
 
+
 def _mask_key(key: str) -> str:
     """Return a partially masked key safe for logging — never the full value."""
     if not key:
@@ -116,6 +116,7 @@ def _key_fingerprint(key: str) -> str:
 # ---------------------------------------------------------------------------
 # Main bot class
 # ---------------------------------------------------------------------------
+
 
 class StripeKeyRotationBot:
     """
@@ -157,13 +158,17 @@ class StripeKeyRotationBot:
         self._simulation = simulation_mode
 
         # Secrets are stored only in private attributes; never returned raw.
-        self._stripe_key: str = stripe_api_key or os.environ.get("STRIPE_SECRET_KEY", "")
+        self._stripe_key: str = stripe_api_key or os.environ.get(
+            "STRIPE_SECRET_KEY", ""
+        )
         self._github_token: str = github_token or os.environ.get("GITHUB_TOKEN", "")
         self._github_repo: str = github_repo or os.environ.get(
             "GITHUB_REPO", "DreamCo-Technologies/Dreamcobots"
         )
         self._notify_email: str = notify_email or os.environ.get("NOTIFY_EMAIL", "")
-        self._slack_url: str = slack_webhook_url or os.environ.get("SLACK_WEBHOOK_URL", "")
+        self._slack_url: str = slack_webhook_url or os.environ.get(
+            "SLACK_WEBHOOK_URL", ""
+        )
 
         # Internal state
         self._old_key_fingerprint: str = ""
@@ -236,7 +241,9 @@ class StripeKeyRotationBot:
         self._require(FEATURE_KEY_VALIDATION)
 
         if not self._stripe_key:
-            self._audit("validate_current_key", {"valid": False, "reason": "key_missing"})
+            self._audit(
+                "validate_current_key", {"valid": False, "reason": "key_missing"}
+            )
             return {
                 "valid": False,
                 "masked_key": _REDACTED,
@@ -247,14 +254,18 @@ class StripeKeyRotationBot:
 
         if self._simulation:
             # Accept test keys or any sk_/rk_ key in simulation.
-            valid = self._is_valid_key_format(self._stripe_key) or self._stripe_key.startswith(
+            valid = self._is_valid_key_format(
+                self._stripe_key
+            ) or self._stripe_key.startswith(
                 ("sk_test_", "sk_live_", "rk_test_", "rk_live_")
             )
             self._audit("validate_current_key", {"valid": valid, "simulation": True})
             return {
                 "valid": valid,
                 "masked_key": masked,
-                "message": "Key format valid (simulation)." if valid else "Invalid key format.",
+                "message": (
+                    "Key format valid (simulation)." if valid else "Invalid key format."
+                ),
                 "simulation": True,
             }
 
@@ -265,10 +276,18 @@ class StripeKeyRotationBot:
             stripe.api_key = self._stripe_key
             stripe.Balance.retrieve()
             self._audit("validate_current_key", {"valid": True})
-            return {"valid": True, "masked_key": masked, "message": "Key verified with Stripe API."}
+            return {
+                "valid": True,
+                "masked_key": masked,
+                "message": "Key verified with Stripe API.",
+            }
         except Exception as exc:  # pragma: no cover
             self._audit("validate_current_key", {"valid": False, "error": str(exc)})
-            return {"valid": False, "masked_key": masked, "message": f"Stripe API error: {exc}"}
+            return {
+                "valid": False,
+                "masked_key": masked,
+                "message": f"Stripe API error: {exc}",
+            }
 
     # ------------------------------------------------------------------
     # 2. Rotate key
@@ -393,7 +412,11 @@ class StripeKeyRotationBot:
         if self._simulation:
             self._audit(
                 "update_github_secret",
-                {"secret_name": secret_name, "repo": self._github_repo, "simulation": True},
+                {
+                    "secret_name": secret_name,
+                    "repo": self._github_repo,
+                    "simulation": True,
+                },
             )
             return {
                 "success": True,
@@ -442,7 +465,9 @@ class StripeKeyRotationBot:
 
                 pub_key_bytes = base64.b64decode(pub_key_b64)
                 sealed_box = public.SealedBox(public.PublicKey(pub_key_bytes))
-                encrypted = b64encode(sealed_box.encrypt(self._stripe_key.encode())).decode()
+                encrypted = b64encode(
+                    sealed_box.encrypt(self._stripe_key.encode())
+                ).decode()
             except ImportError:
                 # Fallback: base64-encode (not secure — nacl missing)
                 encrypted = base64.b64encode(self._stripe_key.encode()).decode()
@@ -527,7 +552,11 @@ class StripeKeyRotationBot:
             "validate_payment_workflows",
             {"all_passed": all_passed, "results": results},
         )
-        return {"all_passed": all_passed, "results": results, "simulation": self._simulation}
+        return {
+            "all_passed": all_passed,
+            "results": results,
+            "simulation": self._simulation,
+        }
 
     def _smoke_test_checkout(self) -> bool:
         """Return True if a checkout session can be created with the active key."""
@@ -539,14 +568,16 @@ class StripeKeyRotationBot:
             stripe.api_key = self._stripe_key
             stripe.checkout.Session.create(
                 mode="payment",
-                line_items=[{
-                    "price_data": {
-                        "currency": "usd",
-                        "unit_amount": 100,
-                        "product_data": {"name": "smoke"},
-                    },
-                    "quantity": 1,
-                }],
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "unit_amount": 100,
+                            "product_data": {"name": "smoke"},
+                        },
+                        "quantity": 1,
+                    }
+                ],
                 success_url="https://dreamco.ai/success",
                 cancel_url="https://dreamco.ai/cancel",
             )
@@ -575,8 +606,9 @@ class StripeKeyRotationBot:
         if self._simulation:
             return bool(self._stripe_key)
         try:  # pragma: no cover
-            import stripe  # type: ignore[import]
             import time
+
+            import stripe  # type: ignore[import]
 
             stripe.api_key = self._stripe_key
             payload = b'{"id":"evt_test","type":"ping"}'
@@ -694,12 +726,16 @@ class StripeKeyRotationBot:
         """
         notified: list[str] = []
 
-        if channel in ("email", "all") and self._config.has_feature(FEATURE_EMAIL_NOTIFICATION):
+        if channel in ("email", "all") and self._config.has_feature(
+            FEATURE_EMAIL_NOTIFICATION
+        ):
             result = self._send_email_notification(rotation_id)
             if result:
                 notified.append("email")
 
-        if channel in ("slack", "all") and self._config.has_feature(FEATURE_SLACK_NOTIFICATION):
+        if channel in ("slack", "all") and self._config.has_feature(
+            FEATURE_SLACK_NOTIFICATION
+        ):
             result = self._send_slack_notification(rotation_id)
             if result:
                 notified.append("slack")
@@ -841,7 +877,11 @@ class StripeKeyRotationBot:
         # Step 3 — update GitHub Secret
         try:
             steps["update_github_secret"] = self.update_github_secret(secret_name)
-        except (RotationTierError, RotationValidationError, RotationWorkflowError) as exc:
+        except (
+            RotationTierError,
+            RotationValidationError,
+            RotationWorkflowError,
+        ) as exc:
             steps["update_github_secret"] = {"error": str(exc)}
 
         # Step 4 — validate workflows
@@ -854,12 +894,18 @@ class StripeKeyRotationBot:
         if self._config.has_feature(FEATURE_OLD_KEY_DEACTIVATION):
             try:
                 steps["deactivate_old_key"] = self.deactivate_old_key(old_key_id)
-            except (RotationTierError, RotationValidationError, RotationWorkflowError) as exc:
+            except (
+                RotationTierError,
+                RotationValidationError,
+                RotationWorkflowError,
+            ) as exc:
                 steps["deactivate_old_key"] = {"error": str(exc)}
 
         # Step 6 — notify
         try:
-            steps["notify"] = self.notify(rotation_id=rotation_id, channel=notify_channel)
+            steps["notify"] = self.notify(
+                rotation_id=rotation_id, channel=notify_channel
+            )
         except Exception as exc:
             steps["notify"] = {"error": str(exc)}
 

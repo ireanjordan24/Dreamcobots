@@ -67,7 +67,7 @@ class LessonStep:
     safety_notes: list[str] = field(default_factory=list)
     tools_required: list[str] = field(default_factory=list)
     estimated_minutes: int = 5
-    ar_overlay_hint: str = ""   # Hint for AR/VR overlay display
+    ar_overlay_hint: str = ""  # Hint for AR/VR overlay display
 
     def to_dict(self) -> dict:
         return {
@@ -93,7 +93,7 @@ class Lesson:
     steps: list[LessonStep]
     prerequisites: list[str] = field(default_factory=list)
     estimated_total_minutes: int = 30
-    passing_score: float = 0.7     # 70 % correct to pass
+    passing_score: float = 0.7  # 70 % correct to pass
     tags: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -142,6 +142,7 @@ class LessonProgress:
 # ---------------------------------------------------------------------------
 # Built-in lesson library
 # ---------------------------------------------------------------------------
+
 
 def _build_car_repair_basics() -> Lesson:
     return Lesson(
@@ -245,12 +246,49 @@ def _build_tire_rotation() -> Lesson:
         difficulty=DifficultyLevel.BEGINNER,
         description="Rotate your vehicle's tires to even out wear and extend tire life.",
         steps=[
-            LessonStep(1, "Check Your Manual", "Consult your owner's manual for the recommended rotation pattern.", estimated_minutes=3),
-            LessonStep(2, "Loosen Lug Nuts", "Before lifting the car, loosen each lug nut slightly with the lug wrench.", tools_required=["Lug wrench"], estimated_minutes=5, safety_notes=["Do NOT remove them yet."]),
-            LessonStep(3, "Jack Up the Car", "Place the jack under the designated jack points and raise the vehicle. Secure with jack stands.", tools_required=["Car jack", "Jack stands"], safety_notes=["Never work under a car supported only by a hydraulic jack."], estimated_minutes=10),
-            LessonStep(4, "Rotate Tires", "Follow the rotation pattern: front-to-rear, cross, or X-pattern based on tire type.", estimated_minutes=15),
-            LessonStep(5, "Torque Lug Nuts", "Tighten lug nuts in a star pattern to the manufacturer's spec.", tools_required=["Torque wrench"], estimated_minutes=5),
-            LessonStep(6, "Lower & Verify", "Lower the vehicle, remove jack stands, and double-check lug nut torque.", estimated_minutes=5),
+            LessonStep(
+                1,
+                "Check Your Manual",
+                "Consult your owner's manual for the recommended rotation pattern.",
+                estimated_minutes=3,
+            ),
+            LessonStep(
+                2,
+                "Loosen Lug Nuts",
+                "Before lifting the car, loosen each lug nut slightly with the lug wrench.",
+                tools_required=["Lug wrench"],
+                estimated_minutes=5,
+                safety_notes=["Do NOT remove them yet."],
+            ),
+            LessonStep(
+                3,
+                "Jack Up the Car",
+                "Place the jack under the designated jack points and raise the vehicle. Secure with jack stands.",
+                tools_required=["Car jack", "Jack stands"],
+                safety_notes=[
+                    "Never work under a car supported only by a hydraulic jack."
+                ],
+                estimated_minutes=10,
+            ),
+            LessonStep(
+                4,
+                "Rotate Tires",
+                "Follow the rotation pattern: front-to-rear, cross, or X-pattern based on tire type.",
+                estimated_minutes=15,
+            ),
+            LessonStep(
+                5,
+                "Torque Lug Nuts",
+                "Tighten lug nuts in a star pattern to the manufacturer's spec.",
+                tools_required=["Torque wrench"],
+                estimated_minutes=5,
+            ),
+            LessonStep(
+                6,
+                "Lower & Verify",
+                "Lower the vehicle, remove jack stands, and double-check lug nut torque.",
+                estimated_minutes=5,
+            ),
         ],
         estimated_total_minutes=43,
         tags=["car", "tire", "rotation", "maintenance"],
@@ -265,12 +303,44 @@ def _build_first_aid_cpr() -> Lesson:
         difficulty=DifficultyLevel.BEGINNER,
         description="Learn adult CPR technique: chest compressions and rescue breaths.",
         steps=[
-            LessonStep(1, "Check for Safety", "Ensure the scene is safe before approaching.", safety_notes=["Never put yourself in danger."], estimated_minutes=1),
-            LessonStep(2, "Check Responsiveness", "Tap shoulders firmly and shout 'Are you OK?'", estimated_minutes=1),
-            LessonStep(3, "Call for Help", "Call emergency services (911) or have someone else call while you begin CPR.", estimated_minutes=1),
-            LessonStep(4, "Chest Compressions", "Place heel of hand on centre of chest. Compress 2 inches deep at 100–120 BPM. Do 30 compressions.", ar_overlay_hint="Metronome beat overlay at 110 BPM", estimated_minutes=3),
-            LessonStep(5, "Rescue Breaths", "Tilt head back, lift chin. Pinch nose, give 2 rescue breaths watching for chest rise.", estimated_minutes=2),
-            LessonStep(6, "Continue Cycles", "Repeat 30 compressions + 2 breaths until help arrives or the person recovers.", estimated_minutes=5),
+            LessonStep(
+                1,
+                "Check for Safety",
+                "Ensure the scene is safe before approaching.",
+                safety_notes=["Never put yourself in danger."],
+                estimated_minutes=1,
+            ),
+            LessonStep(
+                2,
+                "Check Responsiveness",
+                "Tap shoulders firmly and shout 'Are you OK?'",
+                estimated_minutes=1,
+            ),
+            LessonStep(
+                3,
+                "Call for Help",
+                "Call emergency services (911) or have someone else call while you begin CPR.",
+                estimated_minutes=1,
+            ),
+            LessonStep(
+                4,
+                "Chest Compressions",
+                "Place heel of hand on centre of chest. Compress 2 inches deep at 100–120 BPM. Do 30 compressions.",
+                ar_overlay_hint="Metronome beat overlay at 110 BPM",
+                estimated_minutes=3,
+            ),
+            LessonStep(
+                5,
+                "Rescue Breaths",
+                "Tilt head back, lift chin. Pinch nose, give 2 rescue breaths watching for chest rise.",
+                estimated_minutes=2,
+            ),
+            LessonStep(
+                6,
+                "Continue Cycles",
+                "Repeat 30 compressions + 2 breaths until help arrives or the person recovers.",
+                estimated_minutes=5,
+            ),
         ],
         estimated_total_minutes=13,
         tags=["healthcare", "cpr", "first aid", "emergency"],
@@ -285,11 +355,39 @@ def _build_basic_investing() -> Lesson:
         difficulty=DifficultyLevel.BEGINNER,
         description="Understand how the stock market works and how to start investing.",
         steps=[
-            LessonStep(1, "What is a Stock?", "A stock represents partial ownership in a company. When the company grows, your share value increases.", estimated_minutes=5),
-            LessonStep(2, "Key Terms", "Learn: ticker symbol, market cap, dividend, P/E ratio, portfolio diversification.", estimated_minutes=8),
-            LessonStep(3, "Opening a Brokerage Account", "Choose a regulated broker, verify identity, and fund the account.", estimated_minutes=10),
-            LessonStep(4, "Placing Your First Trade", "Search for a ticker, review the stock's 52-week range, and place a limit order.", estimated_minutes=7),
-            LessonStep(5, "Risk Management", "Never invest more than you can afford to lose. Diversify across sectors.", safety_notes=["This is educational only — consult a financial advisor for personal advice."], estimated_minutes=8),
+            LessonStep(
+                1,
+                "What is a Stock?",
+                "A stock represents partial ownership in a company. When the company grows, your share value increases.",
+                estimated_minutes=5,
+            ),
+            LessonStep(
+                2,
+                "Key Terms",
+                "Learn: ticker symbol, market cap, dividend, P/E ratio, portfolio diversification.",
+                estimated_minutes=8,
+            ),
+            LessonStep(
+                3,
+                "Opening a Brokerage Account",
+                "Choose a regulated broker, verify identity, and fund the account.",
+                estimated_minutes=10,
+            ),
+            LessonStep(
+                4,
+                "Placing Your First Trade",
+                "Search for a ticker, review the stock's 52-week range, and place a limit order.",
+                estimated_minutes=7,
+            ),
+            LessonStep(
+                5,
+                "Risk Management",
+                "Never invest more than you can afford to lose. Diversify across sectors.",
+                safety_notes=[
+                    "This is educational only — consult a financial advisor for personal advice."
+                ],
+                estimated_minutes=8,
+            ),
         ],
         estimated_total_minutes=38,
         tags=["finance", "investing", "stocks", "beginners"],
@@ -322,7 +420,7 @@ class SkillTrainer:
     def __init__(self, max_skill_tracks: Optional[int] = 3) -> None:
         self.max_skill_tracks = max_skill_tracks
         self._library: dict[str, Lesson] = dict(LESSON_LIBRARY)
-        self._progress: dict[str, LessonProgress] = {}   # progress_id -> LessonProgress
+        self._progress: dict[str, LessonProgress] = {}  # progress_id -> LessonProgress
         self._certificates: list[dict] = []
 
     # ------------------------------------------------------------------
@@ -331,10 +429,7 @@ class SkillTrainer:
 
     def add_lesson(self, lesson: Lesson) -> None:
         """Add a custom lesson to the library."""
-        active_domains = {
-            self._library[lid].domain
-            for lid in self._library
-        }
+        active_domains = {self._library[lid].domain for lid in self._library}
         if (
             self.max_skill_tracks is not None
             and lesson.domain not in active_domains
@@ -395,9 +490,7 @@ class SkillTrainer:
             progress.current_step += 1
         return progress
 
-    def complete_lesson(
-        self, progress_id: str, quiz_score: float
-    ) -> LessonProgress:
+    def complete_lesson(self, progress_id: str, quiz_score: float) -> LessonProgress:
         """
         Mark a lesson as complete and record the quiz score.
 

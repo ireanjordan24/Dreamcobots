@@ -47,7 +47,9 @@ class PlanGenerator:
     # Public API
     # ------------------------------------------------------------------
 
-    def generate_plan(self, business_name: str, industry: str, description: str) -> BusinessPlan:
+    def generate_plan(
+        self, business_name: str, industry: str, description: str
+    ) -> BusinessPlan:
         """Generate a complete business plan."""
         base_revenue = 100_000.0
         growth_rate = 0.35
@@ -68,7 +70,9 @@ class PlanGenerator:
         self._plans.append(plan)
         return plan
 
-    def generate_financial_projections(self, base_revenue: float, growth_rate: float) -> dict:
+    def generate_financial_projections(
+        self, base_revenue: float, growth_rate: float
+    ) -> dict:
         """Project revenue for years 1-5 given a base and annual growth rate."""
         projections = {}
         revenue = base_revenue
@@ -81,7 +85,9 @@ class PlanGenerator:
         """Return total addressable market estimate in USD for the given industry."""
         return _TAM_BY_INDUSTRY.get(industry.lower(), _DEFAULT_TAM)
 
-    def generate_executive_summary(self, business_name: str, industry: str, description: str) -> str:
+    def generate_executive_summary(
+        self, business_name: str, industry: str, description: str
+    ) -> str:
         """Generate an executive summary paragraph."""
         return (
             f"{business_name} is an innovative company operating in the {industry} industry. "
@@ -107,7 +113,8 @@ class PlanGenerator:
             },
             "business_model": plan.revenue_model,
             "financials": plan.financial_projections,
-            "team": "Experienced founding team with domain expertise in " + plan.industry,
+            "team": "Experienced founding team with domain expertise in "
+            + plan.industry,
             "ask": "Seeking seed funding to accelerate growth and product development.",
         }
 

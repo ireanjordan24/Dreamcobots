@@ -10,17 +10,24 @@ Usage
     result = bot.track_habit("morning_run", True)
     print(result)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_lifestyle_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_lifestyle_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _lifestyle_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_lifestyle_tiers)
 LIFESTYLE_FEATURES = _lifestyle_tiers.LIFESTYLE_FEATURES
@@ -58,7 +65,9 @@ class LifestyleBot:
     # Core API
     # ------------------------------------------------------------------
 
-    def track_habit(self, habit_name: str, completed: bool, date: str | None = None) -> dict:
+    def track_habit(
+        self, habit_name: str, completed: bool, date: str | None = None
+    ) -> dict:
         """
         Track a habit completion.
 
@@ -205,9 +214,7 @@ class LifestyleBot:
             else f"{info['requests_per_month']:,}"
         )
         habit_limit = (
-            "Unlimited"
-            if info["habit_limit"] is None
-            else str(info["habit_limit"])
+            "Unlimited" if info["habit_limit"] is None else str(info["habit_limit"])
         )
         lines = [
             f"=== {info['name']} Lifestyle Bot Tier ===",
@@ -232,7 +239,9 @@ class LifestyleBot:
             print(msg)
             return msg
         current_feats = set(LIFESTYLE_FEATURES[self.tier.value])
-        new_feats = [f for f in LIFESTYLE_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f for f in LIFESTYLE_FEATURES[next_cfg.tier.value] if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

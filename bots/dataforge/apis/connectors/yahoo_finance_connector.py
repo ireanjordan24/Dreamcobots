@@ -1,4 +1,5 @@
 """Yahoo Finance API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,9 +26,14 @@ class YahooFinanceConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"https://query1.finance.yahoo.com/v7/finance/quote",
-                params={"symbols": symbol}, headers=self.headers, timeout=30)
+            response = requests.get(
+                f"https://query1.finance.yahoo.com/v7/finance/quote",
+                params={"symbols": symbol},
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Yahoo Finance quote fetched for %s.", symbol)
             return {"status": "success", "data": response.json()}
@@ -47,14 +53,16 @@ class YahooFinanceConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             response = requests.get(
                 f"{self.BASE_URL}/chart/{symbol}",
                 params={"interval": interval, "range": range},
-                headers=self.headers, timeout=30)
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Yahoo Finance get_chart error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -18,7 +18,9 @@ class MarketSignal:
     """A single market performance signal for a deployed strategy."""
 
     strategy_id: str
-    signal_type: str  # "performance_drift" | "volume_change" | "accuracy_drop" | "custom"
+    signal_type: (
+        str  # "performance_drift" | "volume_change" | "accuracy_drop" | "custom"
+    )
     value: float
     threshold: float
     alert: bool
@@ -39,7 +41,12 @@ class MarketAdaptation:
         drift alert.
     """
 
-    VALID_SIGNAL_TYPES = {"performance_drift", "volume_change", "accuracy_drop", "custom"}
+    VALID_SIGNAL_TYPES = {
+        "performance_drift",
+        "volume_change",
+        "accuracy_drop",
+        "custom",
+    }
 
     def __init__(self, drift_threshold: float = 0.05):
         if drift_threshold <= 0:
@@ -131,7 +138,11 @@ class MarketAdaptation:
         alerts = self.get_alerts(strategy_id)
         latest_score = signals[-1].value if signals else baseline
 
-        drift = abs(latest_score - baseline) if baseline is not None and latest_score is not None else 0.0
+        drift = (
+            abs(latest_score - baseline)
+            if baseline is not None and latest_score is not None
+            else 0.0
+        )
         recommendation = (
             "Re-evaluate and retrain strategy."
             if len(alerts) > 0

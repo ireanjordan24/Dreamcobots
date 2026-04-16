@@ -5,12 +5,14 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations
-import sys, os
-import random
-from enum import Enum
-from typing import Optional, List, Dict, Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import random
+import sys
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -33,7 +35,188 @@ class MarketResearchBot:
     # String-keyed to avoid cross-module enum identity issues
     RESULT_LIMITS: Dict[str, int] = {"free": 5, "pro": 25, "enterprise": 100}
 
-    MOCK_DATA: List[Dict[str, Any]] = [{'id': 'BIZ001', 'name': 'Biz 1', 'sector': 'Tech', 'revenue_potential': 8500, 'startup_cost': 1800, 'score': 47.6, 'roi_pct': 13.2}, {'id': 'BIZ002', 'name': 'Biz 2', 'sector': 'Service', 'revenue_potential': 12000, 'startup_cost': 2600, 'score': 50.2, 'roi_pct': 14.4}, {'id': 'BIZ003', 'name': 'Biz 3', 'sector': 'Food', 'revenue_potential': 15500, 'startup_cost': 3400, 'score': 52.8, 'roi_pct': 15.6}, {'id': 'BIZ004', 'name': 'Biz 4', 'sector': 'Retail', 'revenue_potential': 19000, 'startup_cost': 4200, 'score': 55.4, 'roi_pct': 16.8}, {'id': 'BIZ005', 'name': 'Biz 5', 'sector': 'Tech', 'revenue_potential': 22500, 'startup_cost': 5000, 'score': 58.0, 'roi_pct': 18.0}, {'id': 'BIZ006', 'name': 'Biz 6', 'sector': 'Service', 'revenue_potential': 26000, 'startup_cost': 5800, 'score': 60.6, 'roi_pct': 19.2}, {'id': 'BIZ007', 'name': 'Biz 7', 'sector': 'Food', 'revenue_potential': 29500, 'startup_cost': 6600, 'score': 63.2, 'roi_pct': 20.4}, {'id': 'BIZ008', 'name': 'Biz 8', 'sector': 'Retail', 'revenue_potential': 33000, 'startup_cost': 7400, 'score': 65.8, 'roi_pct': 21.6}, {'id': 'BIZ009', 'name': 'Biz 9', 'sector': 'Tech', 'revenue_potential': 36500, 'startup_cost': 8200, 'score': 68.4, 'roi_pct': 22.8}, {'id': 'BIZ010', 'name': 'Biz 10', 'sector': 'Service', 'revenue_potential': 40000, 'startup_cost': 9000, 'score': 71.0, 'roi_pct': 24.0}, {'id': 'BIZ011', 'name': 'Biz 11', 'sector': 'Food', 'revenue_potential': 43500, 'startup_cost': 9800, 'score': 73.6, 'roi_pct': 25.2}, {'id': 'BIZ012', 'name': 'Biz 12', 'sector': 'Retail', 'revenue_potential': 47000, 'startup_cost': 10600, 'score': 76.2, 'roi_pct': 26.4}, {'id': 'BIZ013', 'name': 'Biz 13', 'sector': 'Tech', 'revenue_potential': 50500, 'startup_cost': 11400, 'score': 78.8, 'roi_pct': 27.6}, {'id': 'BIZ014', 'name': 'Biz 14', 'sector': 'Service', 'revenue_potential': 54000, 'startup_cost': 12200, 'score': 81.4, 'roi_pct': 28.8}, {'id': 'BIZ015', 'name': 'Biz 15', 'sector': 'Food', 'revenue_potential': 57500, 'startup_cost': 13000, 'score': 84.0, 'roi_pct': 30.0}, {'id': 'BIZ016', 'name': 'Biz 16', 'sector': 'Retail', 'revenue_potential': 61000, 'startup_cost': 13800, 'score': 86.6, 'roi_pct': 31.2}, {'id': 'BIZ017', 'name': 'Biz 17', 'sector': 'Tech', 'revenue_potential': 64500, 'startup_cost': 14600, 'score': 89.2, 'roi_pct': 32.4}, {'id': 'BIZ018', 'name': 'Biz 18', 'sector': 'Service', 'revenue_potential': 68000, 'startup_cost': 15400, 'score': 91.8, 'roi_pct': 33.6}, {'id': 'BIZ019', 'name': 'Biz 19', 'sector': 'Food', 'revenue_potential': 71500, 'startup_cost': 16200, 'score': 94.4, 'roi_pct': 34.8}, {'id': 'BIZ020', 'name': 'Biz 20', 'sector': 'Retail', 'revenue_potential': 75000, 'startup_cost': 17000, 'score': 97.0, 'roi_pct': 36.0}]
+    MOCK_DATA: List[Dict[str, Any]] = [
+        {
+            "id": "BIZ001",
+            "name": "Biz 1",
+            "sector": "Tech",
+            "revenue_potential": 8500,
+            "startup_cost": 1800,
+            "score": 47.6,
+            "roi_pct": 13.2,
+        },
+        {
+            "id": "BIZ002",
+            "name": "Biz 2",
+            "sector": "Service",
+            "revenue_potential": 12000,
+            "startup_cost": 2600,
+            "score": 50.2,
+            "roi_pct": 14.4,
+        },
+        {
+            "id": "BIZ003",
+            "name": "Biz 3",
+            "sector": "Food",
+            "revenue_potential": 15500,
+            "startup_cost": 3400,
+            "score": 52.8,
+            "roi_pct": 15.6,
+        },
+        {
+            "id": "BIZ004",
+            "name": "Biz 4",
+            "sector": "Retail",
+            "revenue_potential": 19000,
+            "startup_cost": 4200,
+            "score": 55.4,
+            "roi_pct": 16.8,
+        },
+        {
+            "id": "BIZ005",
+            "name": "Biz 5",
+            "sector": "Tech",
+            "revenue_potential": 22500,
+            "startup_cost": 5000,
+            "score": 58.0,
+            "roi_pct": 18.0,
+        },
+        {
+            "id": "BIZ006",
+            "name": "Biz 6",
+            "sector": "Service",
+            "revenue_potential": 26000,
+            "startup_cost": 5800,
+            "score": 60.6,
+            "roi_pct": 19.2,
+        },
+        {
+            "id": "BIZ007",
+            "name": "Biz 7",
+            "sector": "Food",
+            "revenue_potential": 29500,
+            "startup_cost": 6600,
+            "score": 63.2,
+            "roi_pct": 20.4,
+        },
+        {
+            "id": "BIZ008",
+            "name": "Biz 8",
+            "sector": "Retail",
+            "revenue_potential": 33000,
+            "startup_cost": 7400,
+            "score": 65.8,
+            "roi_pct": 21.6,
+        },
+        {
+            "id": "BIZ009",
+            "name": "Biz 9",
+            "sector": "Tech",
+            "revenue_potential": 36500,
+            "startup_cost": 8200,
+            "score": 68.4,
+            "roi_pct": 22.8,
+        },
+        {
+            "id": "BIZ010",
+            "name": "Biz 10",
+            "sector": "Service",
+            "revenue_potential": 40000,
+            "startup_cost": 9000,
+            "score": 71.0,
+            "roi_pct": 24.0,
+        },
+        {
+            "id": "BIZ011",
+            "name": "Biz 11",
+            "sector": "Food",
+            "revenue_potential": 43500,
+            "startup_cost": 9800,
+            "score": 73.6,
+            "roi_pct": 25.2,
+        },
+        {
+            "id": "BIZ012",
+            "name": "Biz 12",
+            "sector": "Retail",
+            "revenue_potential": 47000,
+            "startup_cost": 10600,
+            "score": 76.2,
+            "roi_pct": 26.4,
+        },
+        {
+            "id": "BIZ013",
+            "name": "Biz 13",
+            "sector": "Tech",
+            "revenue_potential": 50500,
+            "startup_cost": 11400,
+            "score": 78.8,
+            "roi_pct": 27.6,
+        },
+        {
+            "id": "BIZ014",
+            "name": "Biz 14",
+            "sector": "Service",
+            "revenue_potential": 54000,
+            "startup_cost": 12200,
+            "score": 81.4,
+            "roi_pct": 28.8,
+        },
+        {
+            "id": "BIZ015",
+            "name": "Biz 15",
+            "sector": "Food",
+            "revenue_potential": 57500,
+            "startup_cost": 13000,
+            "score": 84.0,
+            "roi_pct": 30.0,
+        },
+        {
+            "id": "BIZ016",
+            "name": "Biz 16",
+            "sector": "Retail",
+            "revenue_potential": 61000,
+            "startup_cost": 13800,
+            "score": 86.6,
+            "roi_pct": 31.2,
+        },
+        {
+            "id": "BIZ017",
+            "name": "Biz 17",
+            "sector": "Tech",
+            "revenue_potential": 64500,
+            "startup_cost": 14600,
+            "score": 89.2,
+            "roi_pct": 32.4,
+        },
+        {
+            "id": "BIZ018",
+            "name": "Biz 18",
+            "sector": "Service",
+            "revenue_potential": 68000,
+            "startup_cost": 15400,
+            "score": 91.8,
+            "roi_pct": 33.6,
+        },
+        {
+            "id": "BIZ019",
+            "name": "Biz 19",
+            "sector": "Food",
+            "revenue_potential": 71500,
+            "startup_cost": 16200,
+            "score": 94.4,
+            "roi_pct": 34.8,
+        },
+        {
+            "id": "BIZ020",
+            "name": "Biz 20",
+            "sector": "Retail",
+            "revenue_potential": 75000,
+            "startup_cost": 17000,
+            "score": 97.0,
+            "roi_pct": 36.0,
+        },
+    ]
 
     def __init__(self, tier: Tier = Tier.FREE):
         # Normalize cross-module Tier enum instances by value string
@@ -109,4 +292,3 @@ class MarketResearchBot:
             "items": self.MOCK_DATA,
             "generated_by": "GLOBAL AI SOURCES FLOW",
         }
-

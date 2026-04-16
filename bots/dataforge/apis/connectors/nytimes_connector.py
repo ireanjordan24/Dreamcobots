@@ -1,4 +1,5 @@
 """New York Times API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,14 @@ class NYTimesConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": query, "page": page, "api-key": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/search/v2/articlesearch.json", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search/v2/articlesearch.json",
+                params=params,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("NYTimes article search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -48,12 +54,15 @@ class NYTimesConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/topstories/v2/{section}.json",
-                params={"api-key": self.api_key}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/topstories/v2/{section}.json",
+                params={"api-key": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("NYTimes get_top_stories error: %s", e)
             return {"status": "error", "message": str(e)}
-

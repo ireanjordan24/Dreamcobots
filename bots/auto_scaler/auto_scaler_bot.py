@@ -18,7 +18,6 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -174,7 +173,9 @@ class AutoScalerBot:
 
     def scale_summary(self) -> dict:
         total_revenue = sum(m.revenue_usd for m in self._metrics.values())
-        profitable = [m for m in self._metrics.values() if m.revenue_usd >= self.revenue_threshold]
+        profitable = [
+            m for m in self._metrics.values() if m.revenue_usd >= self.revenue_threshold
+        ]
         return {
             "registered_bots": len(self._metrics),
             "profitable_bots": len(profitable),

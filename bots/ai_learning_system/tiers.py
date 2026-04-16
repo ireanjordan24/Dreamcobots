@@ -7,9 +7,9 @@ Tiers:
   - ENTERPRISE: $999/month, unlimited jobs, Kubernetes, genetic algorithms.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
-from typing import Optional, List
+from enum import Enum
+from typing import List, Optional
 
 
 class Tier(Enum):
@@ -56,6 +56,7 @@ ENTERPRISE_FEATURES: List[str] = PRO_FEATURES + [
 # ---------------------------------------------------------------------------
 # TierConfig dataclass
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TierConfig:

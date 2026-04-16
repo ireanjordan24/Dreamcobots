@@ -7,24 +7,24 @@ from bots.auto_bot_factory.auto_bot_factory import (
     BotBlueprint,
     DeploymentRecord,
 )
-from bots.auto_bot_factory.tiers import Tier, TierConfig, get_tier_config
 from bots.auto_bot_factory.competitor_analyzer import (
+    AnalysisReport,
     CompetitorAnalyzer,
     CompetitorProfile,
     MarketGap,
-    AnalysisReport,
-)
-from bots.auto_bot_factory.strategy_framework import (
-    StrategyFramework,
-    Strategy,
-    StrategyCategory,
 )
 from bots.auto_bot_factory.safety_controller import (
-    SafetyController,
-    SafetyLimitError,
     MAX_BOTS,
     MAX_MESSAGES_PER_CYCLE,
+    SafetyController,
+    SafetyLimitError,
 )
+from bots.auto_bot_factory.strategy_framework import (
+    Strategy,
+    StrategyCategory,
+    StrategyFramework,
+)
+from bots.auto_bot_factory.tiers import Tier, TierConfig, get_tier_config
 
 __all__ = [
     "AutoBotFactory",

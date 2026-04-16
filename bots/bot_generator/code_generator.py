@@ -9,12 +9,10 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 import re
 import textwrap
@@ -22,11 +20,12 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 from bots.bot_generator.request_interface import BotRequest
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Code Generator
 # ---------------------------------------------------------------------------
+
 
 class CodeGeneratorError(Exception):
     """Raised when code generation fails."""
@@ -68,9 +67,7 @@ class CodeGenerator:
 
     def __init__(self, output_dir: Optional[str] = None) -> None:
         if output_dir is None:
-            output_dir = os.path.join(
-                os.path.dirname(__file__), "..", "..", "bots"
-            )
+            output_dir = os.path.join(os.path.dirname(__file__), "..", "..", "bots")
         self.output_dir = os.path.abspath(output_dir)
         self._generation_log: List[dict] = []
 

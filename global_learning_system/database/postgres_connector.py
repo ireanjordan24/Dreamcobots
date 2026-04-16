@@ -70,7 +70,9 @@ class PostgresConnector:
         """Return ``True`` if the connection is open."""
         return self._connected
 
-    def execute(self, sql: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def execute(
+        self, sql: str, params: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
         """
         Execute a SQL statement and return a list of row dicts.
 

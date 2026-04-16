@@ -2,29 +2,39 @@
 Tests for bots/coding_assistant_bot/tiers.py and bots/coding_assistant_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.coding_assistant_bot.tiers import CODING_ASSISTANT_FEATURES, get_coding_assistant_tier_info
+
 from bots.coding_assistant_bot.bot import (
     CodingAssistantBot,
-    CodingAssistantBotTierError,
     CodingAssistantBotRequestLimitError,
+    CodingAssistantBotTierError,
+)
+from bots.coding_assistant_bot.tiers import (
+    CODING_ASSISTANT_FEATURES,
+    get_coding_assistant_tier_info,
 )
 
 
 class TestCodingAssistantTierInfo:
     def test_free_tier_info_keys(self):
         info = get_coding_assistant_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -54,12 +64,16 @@ class TestCodingAssistantBot:
 
     def test_complete_code_tier_value(self):
         bot = CodingAssistantBot(tier=Tier.FREE)
-        result = bot.complete_code({"code": "function hello() {", "language": "javascript"})
+        result = bot.complete_code(
+            {"code": "function hello() {", "language": "javascript"}
+        )
         assert result["tier"] == "free"
 
     def test_complete_code_completion_is_string(self):
         bot = CodingAssistantBot(tier=Tier.PRO)
-        result = bot.complete_code({"code": "def sort_list(lst):", "language": "python"})
+        result = bot.complete_code(
+            {"code": "def sort_list(lst):", "language": "python"}
+        )
         assert isinstance(result["completion"], str)
 
     def test_complete_code_suggestions_is_list(self):

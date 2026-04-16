@@ -7,6 +7,7 @@ methods used by other bot modules and interoperability consumers such as
 the real estate optimisation system, the car-flipping bot, and the
 multi-layered retail intelligence network.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -16,9 +17,9 @@ from typing import Any, Dict, List, Optional
 from .settings import (
     DISCOUNT_DOMINATOR_SETTINGS,
     GROUP_ANALYTICS,
-    get_setting,
-    get_group_settings,
     as_dict,
+    get_group_settings,
+    get_setting,
 )
 
 
@@ -111,32 +112,28 @@ class AdvancedAnalytics:
 
     def get_enabled_features(self) -> List[str]:
         """Return names of analytics settings that are currently ``True``."""
-        return [
-            s.name
-            for s in get_group_settings(GROUP_ANALYTICS)
-            if s.value is True
-        ]
+        return [s.name for s in get_group_settings(GROUP_ANALYTICS) if s.value is True]
 
     def configure_for_real_estate(self) -> None:
         """Apply analytics presets optimised for the real estate system."""
-        DISCOUNT_DOMINATOR_SETTINGS[410].value = True   # real_estate_price_index
-        DISCOUNT_DOMINATOR_SETTINGS[419].value = True   # geo_heatmap_analytics
-        DISCOUNT_DOMINATOR_SETTINGS[407].value = True   # cohort_analysis_enabled
+        DISCOUNT_DOMINATOR_SETTINGS[410].value = True  # real_estate_price_index
+        DISCOUNT_DOMINATOR_SETTINGS[419].value = True  # geo_heatmap_analytics
+        DISCOUNT_DOMINATOR_SETTINGS[407].value = True  # cohort_analysis_enabled
         DISCOUNT_DOMINATOR_SETTINGS[417].value = "rfm_ml"  # clv model
 
     def configure_for_car_flipping(self) -> None:
         """Apply analytics presets optimised for the car-flipping bot."""
-        DISCOUNT_DOMINATOR_SETTINGS[411].value = True   # auto_parts_market_feed
-        DISCOUNT_DOMINATOR_SETTINGS[404].value = True   # competitor_price_monitoring
-        DISCOUNT_DOMINATOR_SETTINGS[418].value = True   # price_elasticity_modelling
-        DISCOUNT_DOMINATOR_SETTINGS[415].value = True   # inventory_turnover_tracking
+        DISCOUNT_DOMINATOR_SETTINGS[411].value = True  # auto_parts_market_feed
+        DISCOUNT_DOMINATOR_SETTINGS[404].value = True  # competitor_price_monitoring
+        DISCOUNT_DOMINATOR_SETTINGS[418].value = True  # price_elasticity_modelling
+        DISCOUNT_DOMINATOR_SETTINGS[415].value = True  # inventory_turnover_tracking
 
     def configure_for_retail_intelligence(self) -> None:
         """Apply analytics presets for the retail intelligence network."""
-        DISCOUNT_DOMINATOR_SETTINGS[412].value = True   # retail_basket_analysis
-        DISCOUNT_DOMINATOR_SETTINGS[413].value = True   # cross_channel_attribution
-        DISCOUNT_DOMINATOR_SETTINGS[425].value = True   # social_sentiment_feed
-        DISCOUNT_DOMINATOR_SETTINGS[427].value = True   # cross_bot_data_sharing
+        DISCOUNT_DOMINATOR_SETTINGS[412].value = True  # retail_basket_analysis
+        DISCOUNT_DOMINATOR_SETTINGS[413].value = True  # cross_channel_attribution
+        DISCOUNT_DOMINATOR_SETTINGS[425].value = True  # social_sentiment_feed
+        DISCOUNT_DOMINATOR_SETTINGS[427].value = True  # cross_bot_data_sharing
 
     def summary(self) -> Dict[str, Any]:
         """Return a human-readable summary dict of key analytics settings."""

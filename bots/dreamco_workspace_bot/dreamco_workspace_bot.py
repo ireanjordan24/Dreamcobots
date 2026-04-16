@@ -1,11 +1,15 @@
 """DreamCo Workspace Bot — GitHub Codespaces competitor for cloud dev workspaces."""
-import sys
-import os
-import uuid
-import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import os
+import sys
+import time
+import uuid
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.dreamco_workspace_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -23,8 +27,14 @@ class WorkspaceEnvironment:
 
     STATUSES = ("starting", "running", "sleeping", "stopped")
 
-    def __init__(self, env_id: str, name: str, image: str,
-                 repo_url: str = "", user_id: str = "user"):
+    def __init__(
+        self,
+        env_id: str,
+        name: str,
+        image: str,
+        repo_url: str = "",
+        user_id: str = "user",
+    ):
         self.env_id = env_id
         self.name = name
         self.image = image
@@ -115,8 +125,9 @@ class DreamCoWorkspaceBot:
     # Environment management
     # ------------------------------------------------------------------
 
-    def create_workspace(self, name: str, image: str = "dreamco/ubuntu-22.04",
-                         repo_url: str = "") -> WorkspaceEnvironment:
+    def create_workspace(
+        self, name: str, image: str = "dreamco/ubuntu-22.04", repo_url: str = ""
+    ) -> WorkspaceEnvironment:
         """
         Create a new cloud workspace environment.
 
@@ -259,7 +270,9 @@ class DreamCoWorkspaceBot:
         return {
             "workspaces_used": len(self._environments),
             "workspaces_limit": limit,
-            "workspaces_remaining": (limit - len(self._environments)) if limit is not None else None,
+            "workspaces_remaining": (
+                (limit - len(self._environments)) if limit is not None else None
+            ),
             "storage_gb": storage,
             "tier": self.tier.value,
         }
@@ -280,14 +293,18 @@ class DreamCoWorkspaceBot:
         """Unified natural-language chat interface."""
         msg = message.lower()
 
-        if any(kw in msg for kw in ("create workspace", "new workspace", "new environment")):
+        if any(
+            kw in msg for kw in ("create workspace", "new workspace", "new environment")
+        ):
             env = self.create_workspace("My Workspace")
             return {
                 "message": f"Workspace '{env.name}' created. Access it at {env.to_dict()['access_url']}",
                 "data": env.to_dict(),
             }
 
-        if any(kw in msg for kw in ("list workspaces", "my workspaces", "environments")):
+        if any(
+            kw in msg for kw in ("list workspaces", "my workspaces", "environments")
+        ):
             workspaces = self.list_workspaces()
             return {
                 "message": f"You have {len(workspaces)} workspace(s).",
@@ -304,7 +321,10 @@ class DreamCoWorkspaceBot:
 
         if "tier" in msg or "features" in msg or "upgrade" in msg:
             info = self.get_tier_info()
-            return {"message": f"Current tier: {info['tier']}. Features: {info['features']}", "data": info}
+            return {
+                "message": f"Current tier: {info['tier']}. Features: {info['features']}",
+                "data": info,
+            }
 
         return {
             "message": (

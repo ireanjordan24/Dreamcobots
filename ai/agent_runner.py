@@ -22,15 +22,14 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
 from ai.router_agent import RouterAgent
+from framework import GlobalAISourcesFlow  # noqa: F401
 from tools.resource_manager import ResourceManager
-
 
 # ---------------------------------------------------------------------------
 # Module-level agent / resource instances (re-used across calls)
@@ -43,6 +42,7 @@ _resources = ResourceManager()
 # ---------------------------------------------------------------------------
 # run()
 # ---------------------------------------------------------------------------
+
 
 def run(task: str, email: str = "client@example.com") -> dict:
     """Execute a full agent cycle for *task*.
@@ -69,10 +69,10 @@ def run(task: str, email: str = "client@example.com") -> dict:
     # Choose resource tool based on task type
     task_type = agent_result.get("task_type", "general")
     tool_map: dict[str, tuple[str, dict]] = {
-        "coding":    ("data",    {"source": "github", "query": task}),
-        "search":    ("data",    {"source": "web",    "query": task}),
-        "real_time": ("data",    {"source": "feed",   "query": task}),
-        "vision":    ("data",    {"source": "vision", "query": task}),
+        "coding": ("data", {"source": "github", "query": task}),
+        "search": ("data", {"source": "web", "query": task}),
+        "real_time": ("data", {"source": "feed", "query": task}),
+        "vision": ("data", {"source": "vision", "query": task}),
     }
     tool_name, tool_payload = tool_map.get(
         task_type,

@@ -7,8 +7,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -70,9 +70,13 @@ class MarketplaceCatalog:
     ) -> dict:
         """Create a new bot listing (starts in PENDING_REVIEW)."""
         if category not in BOT_CATEGORIES:
-            raise ValueError(f"Invalid category '{category}'. Must be one of {BOT_CATEGORIES}.")
+            raise ValueError(
+                f"Invalid category '{category}'. Must be one of {BOT_CATEGORIES}."
+            )
         if bot_type not in BOT_TYPES:
-            raise ValueError(f"Invalid bot_type '{bot_type}'. Must be one of {BOT_TYPES}.")
+            raise ValueError(
+                f"Invalid bot_type '{bot_type}'. Must be one of {BOT_TYPES}."
+            )
         if price_usd < 0:
             raise ValueError("price_usd must be non-negative.")
 
@@ -119,7 +123,8 @@ class MarketplaceCatalog:
         if query:
             q = query.lower()
             results = [
-                l for l in results
+                l
+                for l in results
                 if q in l["bot_name"].lower() or q in l["description"].lower()
             ]
         if category:
@@ -132,7 +137,9 @@ class MarketplaceCatalog:
     def get_featured_bots(self, n: int = 10) -> list:
         """Return the top-n highest-rated active listings."""
         active = [l for l in self._listings.values() if l["status"] == STATUS_ACTIVE]
-        return sorted(active, key=lambda l: self._avg_rating(l["listing_id"]), reverse=True)[:n]
+        return sorted(
+            active, key=lambda l: self._avg_rating(l["listing_id"]), reverse=True
+        )[:n]
 
     def get_popular_bots(self, n: int = 10) -> list:
         """Return the top-n most-purchased active listings."""
@@ -172,7 +179,9 @@ class MarketplaceCatalog:
         """Return aggregate stats for a listing."""
         listing = self._get_or_raise(listing_id)
         ratings = self._ratings[listing_id]
-        avg_rating = (sum(r["rating"] for r in ratings) / len(ratings)) if ratings else 0.0
+        avg_rating = (
+            (sum(r["rating"] for r in ratings) / len(ratings)) if ratings else 0.0
+        )
         return {
             "listing_id": listing_id,
             "avg_rating": round(avg_rating, 2),

@@ -24,14 +24,15 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 
 class BluetoothProfileType(Enum):
     """Standard Bluetooth profiles."""
-    A2DP = "a2dp"           # Advanced Audio Distribution (stereo audio)
-    HFP = "hfp"             # Hands-Free Profile (calls)
-    HID = "hid"             # Human Interface Device (keyboards, mice)
-    OPP = "opp"             # Object Push Profile (file transfer)
-    FTP = "ftp"             # File Transfer Profile
-    PAN = "pan"             # Personal Area Network
-    GATT = "gatt"           # Generic Attribute (BLE sensors)
-    SPP = "spp"             # Serial Port Profile (raw data stream)
+
+    A2DP = "a2dp"  # Advanced Audio Distribution (stereo audio)
+    HFP = "hfp"  # Hands-Free Profile (calls)
+    HID = "hid"  # Human Interface Device (keyboards, mice)
+    OPP = "opp"  # Object Push Profile (file transfer)
+    FTP = "ftp"  # File Transfer Profile
+    PAN = "pan"  # Personal Area Network
+    GATT = "gatt"  # Generic Attribute (BLE sensors)
+    SPP = "spp"  # Serial Port Profile (raw data stream)
 
 
 class BluetoothState(Enum):
@@ -216,9 +217,7 @@ class BluetoothEngine:
         """Initiate a Bluetooth file transfer (OPP/FTP profile)."""
         device = self._get_paired(destination_address)
         if device.state != BluetoothState.CONNECTED:
-            raise RuntimeError(
-                f"Device '{destination_address}' is not connected."
-            )
+            raise RuntimeError(f"Device '{destination_address}' is not connected.")
         self._transfer_counter += 1
         transfer_id = f"bt_xfer_{self._transfer_counter:04d}"
         transfer = FileTransfer(

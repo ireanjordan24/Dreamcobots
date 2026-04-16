@@ -1,7 +1,13 @@
 """Mining Bot — tier-aware cryptocurrency mining management."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.mining_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -16,20 +22,111 @@ class MiningBot:
     COIN_LIMITS = {
         Tier.FREE: ["BTC"],
         Tier.PRO: ["BTC", "ETH", "LTC", "RVN", "ERG"],
-        Tier.ENTERPRISE: ["BTC", "ETH", "LTC", "RVN", "ERG", "FLUX", "KAS", "XMR", "DOGE", "ZEC"],
+        Tier.ENTERPRISE: [
+            "BTC",
+            "ETH",
+            "LTC",
+            "RVN",
+            "ERG",
+            "FLUX",
+            "KAS",
+            "XMR",
+            "DOGE",
+            "ZEC",
+        ],
     }
 
     COIN_DATA = {
-        "BTC": {"name": "Bitcoin", "algorithm": "SHA-256", "hashrate_th": 120.5, "daily_revenue_usd": 8.42, "power_w": 3250, "network_difficulty": "Very High", "price_usd": 65000},
-        "ETH": {"name": "Ethereum", "algorithm": "Ethash", "hashrate_mh": 95.0, "daily_revenue_usd": 4.21, "power_w": 220, "network_difficulty": "High", "price_usd": 3500},
-        "LTC": {"name": "Litecoin", "algorithm": "Scrypt", "hashrate_mh": 1000.0, "daily_revenue_usd": 1.85, "power_w": 1500, "network_difficulty": "Medium", "price_usd": 85},
-        "RVN": {"name": "Ravencoin", "algorithm": "KawPoW", "hashrate_mh": 25.0, "daily_revenue_usd": 1.12, "power_w": 180, "network_difficulty": "Low", "price_usd": 0.025},
-        "ERG": {"name": "Ergo", "algorithm": "Autolykos2", "hashrate_mh": 200.0, "daily_revenue_usd": 2.35, "power_w": 200, "network_difficulty": "Medium", "price_usd": 1.85},
-        "FLUX": {"name": "Flux", "algorithm": "ZelHash", "hashrate_ksol": 50.0, "daily_revenue_usd": 1.60, "power_w": 190, "network_difficulty": "Low", "price_usd": 0.65},
-        "KAS": {"name": "Kaspa", "algorithm": "kHeavyHash", "hashrate_th": 5.0, "daily_revenue_usd": 3.20, "power_w": 2400, "network_difficulty": "Medium", "price_usd": 0.12},
-        "XMR": {"name": "Monero", "algorithm": "RandomX", "hashrate_kh": 14.0, "daily_revenue_usd": 0.95, "power_w": 90, "network_difficulty": "Medium", "price_usd": 175},
-        "DOGE": {"name": "Dogecoin", "algorithm": "Scrypt", "hashrate_mh": 1200.0, "daily_revenue_usd": 1.45, "power_w": 1500, "network_difficulty": "Medium", "price_usd": 0.12},
-        "ZEC": {"name": "Zcash", "algorithm": "Equihash", "hashrate_ksol": 500.0, "daily_revenue_usd": 1.10, "power_w": 1400, "network_difficulty": "Medium", "price_usd": 28},
+        "BTC": {
+            "name": "Bitcoin",
+            "algorithm": "SHA-256",
+            "hashrate_th": 120.5,
+            "daily_revenue_usd": 8.42,
+            "power_w": 3250,
+            "network_difficulty": "Very High",
+            "price_usd": 65000,
+        },
+        "ETH": {
+            "name": "Ethereum",
+            "algorithm": "Ethash",
+            "hashrate_mh": 95.0,
+            "daily_revenue_usd": 4.21,
+            "power_w": 220,
+            "network_difficulty": "High",
+            "price_usd": 3500,
+        },
+        "LTC": {
+            "name": "Litecoin",
+            "algorithm": "Scrypt",
+            "hashrate_mh": 1000.0,
+            "daily_revenue_usd": 1.85,
+            "power_w": 1500,
+            "network_difficulty": "Medium",
+            "price_usd": 85,
+        },
+        "RVN": {
+            "name": "Ravencoin",
+            "algorithm": "KawPoW",
+            "hashrate_mh": 25.0,
+            "daily_revenue_usd": 1.12,
+            "power_w": 180,
+            "network_difficulty": "Low",
+            "price_usd": 0.025,
+        },
+        "ERG": {
+            "name": "Ergo",
+            "algorithm": "Autolykos2",
+            "hashrate_mh": 200.0,
+            "daily_revenue_usd": 2.35,
+            "power_w": 200,
+            "network_difficulty": "Medium",
+            "price_usd": 1.85,
+        },
+        "FLUX": {
+            "name": "Flux",
+            "algorithm": "ZelHash",
+            "hashrate_ksol": 50.0,
+            "daily_revenue_usd": 1.60,
+            "power_w": 190,
+            "network_difficulty": "Low",
+            "price_usd": 0.65,
+        },
+        "KAS": {
+            "name": "Kaspa",
+            "algorithm": "kHeavyHash",
+            "hashrate_th": 5.0,
+            "daily_revenue_usd": 3.20,
+            "power_w": 2400,
+            "network_difficulty": "Medium",
+            "price_usd": 0.12,
+        },
+        "XMR": {
+            "name": "Monero",
+            "algorithm": "RandomX",
+            "hashrate_kh": 14.0,
+            "daily_revenue_usd": 0.95,
+            "power_w": 90,
+            "network_difficulty": "Medium",
+            "price_usd": 175,
+        },
+        "DOGE": {
+            "name": "Dogecoin",
+            "algorithm": "Scrypt",
+            "hashrate_mh": 1200.0,
+            "daily_revenue_usd": 1.45,
+            "power_w": 1500,
+            "network_difficulty": "Medium",
+            "price_usd": 0.12,
+        },
+        "ZEC": {
+            "name": "Zcash",
+            "algorithm": "Equihash",
+            "hashrate_ksol": 500.0,
+            "daily_revenue_usd": 1.10,
+            "power_w": 1400,
+            "network_difficulty": "Medium",
+            "price_usd": 28,
+        },
     }
 
     EXCHANGES = ["Binance", "Coinbase", "Kraken", "KuCoin", "Bybit"]
@@ -95,18 +192,23 @@ class MiningBot:
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             best = max(
                 (c for c in self.COIN_LIMITS[self.tier]),
-                key=lambda c: self.COIN_DATA[c]["daily_revenue_usd"]
+                key=lambda c: self.COIN_DATA[c]["daily_revenue_usd"],
             )
             result["most_profitable_coin"] = best
             result["profit_tracking_enabled"] = True
         if self.tier == Tier.ENTERPRISE:
-            result["portfolio_optimization"] = {coin: self.COIN_DATA[coin]["daily_revenue_usd"] for coin in self.COIN_LIMITS[self.tier]}
+            result["portfolio_optimization"] = {
+                coin: self.COIN_DATA[coin]["daily_revenue_usd"]
+                for coin in self.COIN_LIMITS[self.tier]
+            }
         return result
 
     def auto_withdraw(self, threshold: float) -> dict:
         """Set up auto-withdrawal (PRO+ only)."""
         if self.tier == Tier.FREE:
-            raise MiningBotTierError("Auto-withdraw is not available on the FREE tier. Upgrade to PRO or ENTERPRISE.")
+            raise MiningBotTierError(
+                "Auto-withdraw is not available on the FREE tier. Upgrade to PRO or ENTERPRISE."
+            )
         self._auto_withdraw_threshold = threshold
         return {
             "auto_withdraw_enabled": True,
@@ -119,12 +221,17 @@ class MiningBot:
     def multi_exchange_route(self, amount: float) -> dict:
         """Calculate optimal multi-exchange routing (ENTERPRISE only)."""
         if self.tier != Tier.ENTERPRISE:
-            raise MiningBotTierError("Multi-exchange routing is only available on ENTERPRISE tier.")
+            raise MiningBotTierError(
+                "Multi-exchange routing is only available on ENTERPRISE tier."
+            )
         splits = [round(amount / len(self.EXCHANGES), 2) for _ in self.EXCHANGES]
         splits[-1] = round(amount - sum(splits[:-1]), 2)
         return {
             "total_amount_usd": amount,
-            "routing": [{"exchange": ex, "amount_usd": sp} for ex, sp in zip(self.EXCHANGES, splits)],
+            "routing": [
+                {"exchange": ex, "amount_usd": sp}
+                for ex, sp in zip(self.EXCHANGES, splits)
+            ],
             "estimated_fees_usd": round(amount * 0.001, 2),
             "net_received_usd": round(amount * 0.999, 2),
             "tier": self.tier.value,

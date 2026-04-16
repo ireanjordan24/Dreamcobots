@@ -12,7 +12,6 @@ import ast
 from pathlib import Path
 from typing import List, Tuple
 
-
 # ---------------------------------------------------------------------------
 # Blocked patterns
 # ---------------------------------------------------------------------------
@@ -51,11 +50,32 @@ _BLOCKED_FUNC_NAMES: frozenset[str] = frozenset(
 # appears in _BLOCKED_STRINGS above)
 _ALLOWED_IMPORTS: frozenset[str] = frozenset(
     {
-        "random", "math", "time", "datetime", "json", "re", "uuid",
-        "dataclasses", "enum", "typing", "collections", "itertools",
-        "functools", "operator", "string", "textwrap", "hashlib",
-        "hmac", "secrets", "copy", "pathlib", "io", "base64",
-        "abc", "contextlib", "logging",
+        "random",
+        "math",
+        "time",
+        "datetime",
+        "json",
+        "re",
+        "uuid",
+        "dataclasses",
+        "enum",
+        "typing",
+        "collections",
+        "itertools",
+        "functools",
+        "operator",
+        "string",
+        "textwrap",
+        "hashlib",
+        "hmac",
+        "secrets",
+        "copy",
+        "pathlib",
+        "io",
+        "base64",
+        "abc",
+        "contextlib",
+        "logging",
     }
 )
 

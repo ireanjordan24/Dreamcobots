@@ -17,8 +17,7 @@ import time
 import traceback
 from typing import Any, Dict, Optional
 
-from core.base_bot import BaseBot, RESULT_STATUS_FAILED, RESULT_STATUS_SUCCESS
-
+from core.base_bot import RESULT_STATUS_FAILED, RESULT_STATUS_SUCCESS, BaseBot
 
 # ---------------------------------------------------------------------------
 # BotExecutor
@@ -107,9 +106,7 @@ class BotExecutor:
         self._execution_log.append(entry)
         return entry
 
-    def execute_many(
-        self, bots: list[BaseBot], task: dict | None = None
-    ) -> list[dict]:
+    def execute_many(self, bots: list[BaseBot], task: dict | None = None) -> list[dict]:
         """
         Execute a list of bots sequentially and return all log entries.
 

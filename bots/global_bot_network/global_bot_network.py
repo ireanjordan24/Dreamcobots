@@ -28,102 +28,102 @@ Adheres to the DreamCo bots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
+from typing import Callable, Optional
 
+from bots.global_bot_network.api_gateway import (
+    APIGateway,
+    GatewayResponse,
+    IntegrationDisabled,
+    IntegrationNotFound,
+    IntegrationType,
+)
+from bots.global_bot_network.bot_library import (
+    BotCategory,
+    BotEntry,
+    BotLibrary,
+    BotNotFound,
+    BotStatus,
+)
+from bots.global_bot_network.marketplace import (
+    BotMarketplace,
+    ListingNotFound,
+    ListingStatus,
+    ListingType,
+    MarketplaceError,
+    Purchase,
+)
+from bots.global_bot_network.messaging_network import (
+    BotNotConnected,
+    DeliveryReceipt,
+    MessagingNetwork,
+    RateLimitExceeded,
+)
+from bots.global_bot_network.owner_dashboard import (
+    BotAlreadyKilled,
+    BotNotOwned,
+    OwnerDashboard,
+)
 from bots.global_bot_network.tiers import (
+    FEATURE_ACTIVITY_LOGS,
+    FEATURE_ADVANCED_VERIFICATION,
+    FEATURE_BASIC_DASHBOARD,
+    FEATURE_BASIC_VERIFICATION,
+    FEATURE_BOT_REGISTRY,
+    FEATURE_BOT_SUBSCRIPTIONS,
+    FEATURE_DISCORD_INTEGRATION,
+    FEATURE_EARNINGS_TRACKER,
+    FEATURE_FULL_API_GATEWAY,
+    FEATURE_KILL_SWITCH,
+    FEATURE_MARKETPLACE,
+    FEATURE_MARKETPLACE_SELL,
+    FEATURE_NOTION_INTEGRATION,
+    FEATURE_OPENAI_INTEGRATION,
+    FEATURE_PERMISSIONS,
+    FEATURE_RATE_LIMITING,
+    FEATURE_REALTIME_DASHBOARD,
+    FEATURE_SLACK_INTEGRATION,
+    FEATURE_STRIPE_BILLING,
+    FEATURE_TRELLO_INTEGRATION,
+    FEATURE_TRUSTED_BOT_STATUS,
+    FEATURE_UBP_MESSAGING,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_UBP_MESSAGING,
-    FEATURE_BOT_REGISTRY,
-    FEATURE_BASIC_DASHBOARD,
-    FEATURE_REALTIME_DASHBOARD,
-    FEATURE_EARNINGS_TRACKER,
-    FEATURE_KILL_SWITCH,
-    FEATURE_ACTIVITY_LOGS,
-    FEATURE_RATE_LIMITING,
-    FEATURE_PERMISSIONS,
-    FEATURE_BASIC_VERIFICATION,
-    FEATURE_ADVANCED_VERIFICATION,
-    FEATURE_TRUSTED_BOT_STATUS,
-    FEATURE_SLACK_INTEGRATION,
-    FEATURE_DISCORD_INTEGRATION,
-    FEATURE_OPENAI_INTEGRATION,
-    FEATURE_TRELLO_INTEGRATION,
-    FEATURE_NOTION_INTEGRATION,
-    FEATURE_FULL_API_GATEWAY,
-    FEATURE_MARKETPLACE,
-    FEATURE_MARKETPLACE_SELL,
-    FEATURE_BOT_SUBSCRIPTIONS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_STRIPE_BILLING,
 )
 from bots.global_bot_network.universal_bot_protocol import (
-    UBPMessage,
+    BROADCAST_TARGET,
     MessageType,
     Permission,
     UBPError,
-    UBPValidationError,
+    UBPMessage,
     UBPPermissionError,
-    BROADCAST_TARGET,
+    UBPValidationError,
+    create_broadcast,
     create_message,
     create_ping,
-    create_broadcast,
     validate_message,
 )
-from bots.global_bot_network.messaging_network import (
-    MessagingNetwork,
-    RateLimitExceeded,
-    BotNotConnected,
-    DeliveryReceipt,
-)
-from bots.global_bot_network.api_gateway import (
-    APIGateway,
-    IntegrationType,
-    GatewayResponse,
-    IntegrationNotFound,
-    IntegrationDisabled,
-)
-from bots.global_bot_network.owner_dashboard import (
-    OwnerDashboard,
-    BotNotOwned,
-    BotAlreadyKilled,
-)
-from bots.global_bot_network.bot_library import (
-    BotLibrary,
-    BotEntry,
-    BotCategory,
-    BotStatus,
-    BotNotFound,
-)
 from bots.global_bot_network.verification_system import (
-    VerificationSystem,
+    BotNotRegistered,
+    VerificationError,
     VerificationLevel,
     VerificationMethod,
-    VerificationError,
-    BotNotRegistered,
+    VerificationSystem,
 )
-from bots.global_bot_network.marketplace import (
-    BotMarketplace,
-    ListingType,
-    ListingStatus,
-    Purchase,
-    MarketplaceError,
-    ListingNotFound,
-)
-from typing import Callable, Optional
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class GBNError(Exception):
     """Base exception for the Global Bot Communication Network."""
@@ -140,6 +140,7 @@ class GBNBotLimitError(GBNError):
 # ---------------------------------------------------------------------------
 # Global Bot Communication Network
 # ---------------------------------------------------------------------------
+
 
 class GlobalBotNetwork:
     """
@@ -339,7 +340,9 @@ class GlobalBotNetwork:
 
         return receipt
 
-    def broadcast(self, from_bot: str, message: str, data: Optional[dict] = None) -> DeliveryReceipt:
+    def broadcast(
+        self, from_bot: str, message: str, data: Optional[dict] = None
+    ) -> DeliveryReceipt:
         """Broadcast a message to all connected bots."""
         self._require_feature(FEATURE_UBP_MESSAGING)
         ubp_msg = create_broadcast(from_bot, message, data=data)
@@ -545,7 +548,11 @@ class GlobalBotNetwork:
         if msg.startswith("ping"):
             parts = message.strip().split()
             target = parts[1] if len(parts) > 1 else ""
-            if target and self.messaging_network.is_connected(target) and self._connected_bots:
+            if (
+                target
+                and self.messaging_network.is_connected(target)
+                and self._connected_bots
+            ):
                 receipt = self.ping(self._connected_bots[0], target)
                 return {"response": "gbn", "data": receipt.to_dict()}
             return {"response": "gbn", "message": f"Cannot ping '{target}'."}
@@ -554,7 +561,10 @@ class GlobalBotNetwork:
             if self._connected_bots:
                 receipt = self.broadcast(self._connected_bots[0], message)
                 return {"response": "gbn", "data": receipt.to_dict()}
-            return {"response": "gbn", "message": "No bots connected to broadcast from."}
+            return {
+                "response": "gbn",
+                "message": "No bots connected to broadcast from.",
+            }
 
         if "library" in msg or "search" in msg:
             query = message.replace("library", "").replace("search", "").strip()
@@ -579,6 +589,7 @@ class GlobalBotNetwork:
 # Module-level run helper (pragma: no cover)
 # ---------------------------------------------------------------------------
 
+
 def run() -> None:  # pragma: no cover
     """Quick demo of the Global Bot Communication Network."""
     gbn = GlobalBotNetwork(owner_id="demo_owner", tier=Tier.PRO)
@@ -598,7 +609,13 @@ def run() -> None:  # pragma: no cover
     print("Slack response:", resp.result)
 
     snap = gbn.get_dashboard_snapshot()
-    print("Dashboard:", snap["total_bots"], "bots,", snap["total_earnings_usd"], "USD earned")
+    print(
+        "Dashboard:",
+        snap["total_bots"],
+        "bots,",
+        snap["total_earnings_usd"],
+        "USD earned",
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

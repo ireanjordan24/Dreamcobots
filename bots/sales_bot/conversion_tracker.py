@@ -14,16 +14,16 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Lead status
 # ---------------------------------------------------------------------------
+
 
 class LeadStatus(Enum):
     NEW = "new"
@@ -40,6 +40,7 @@ _DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 # ---------------------------------------------------------------------------
 # Conversion Tracker
 # ---------------------------------------------------------------------------
+
 
 class ConversionTracker:
     """
@@ -132,9 +133,11 @@ class ConversionTracker:
         no_response = by_status.get(LeadStatus.NO_RESPONSE.value, 0)
 
         conversion_rate = round((closed / total * 100), 2) if total > 0 else 0.0
-        reply_rate = round(
-            ((closed + interested) / self._messages_sent * 100), 2
-        ) if self._messages_sent > 0 else 0.0
+        reply_rate = (
+            round(((closed + interested) / self._messages_sent * 100), 2)
+            if self._messages_sent > 0
+            else 0.0
+        )
 
         return {
             "leads_collected": total,
@@ -151,10 +154,7 @@ class ConversionTracker:
 
     def get_leads_by_status(self, status: LeadStatus) -> list[dict]:
         """Return all leads with the given status."""
-        return [
-            lead for lead in self._leads.values()
-            if lead["status"] == status.value
-        ]
+        return [lead for lead in self._leads.values() if lead["status"] == status.value]
 
     def get_conversion_log(self) -> list[dict]:
         """Return the full conversion event log."""

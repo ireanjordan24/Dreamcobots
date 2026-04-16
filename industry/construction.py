@@ -12,14 +12,15 @@ from typing import Any, Dict, List, Optional
 
 from core.bot_base import AutonomyLevel, BotBase, ScalingLevel
 
-
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ConstructionProject:
     """Represents a construction project."""
+
     project_id: str
     name: str
     client: str
@@ -27,7 +28,7 @@ class ConstructionProject:
     start_date: date
     estimated_end_date: date
     budget: float
-    status: str = "planning"   # 'planning', 'active', 'on_hold', 'complete'
+    status: str = "planning"  # 'planning', 'active', 'on_hold', 'complete'
     progress_percent: float = 0.0
     phases: List[str] = field(default_factory=list)
 
@@ -35,11 +36,12 @@ class ConstructionProject:
 @dataclass
 class ResourceAllocation:
     """Tracks resource assignment to a project."""
+
     resource_id: str
     project_id: str
-    resource_type: str   # 'labour', 'equipment', 'material'
+    resource_type: str  # 'labour', 'equipment', 'material'
     quantity: float
-    unit: str            # e.g. 'workers', 'hours', 'tonnes'
+    unit: str  # e.g. 'workers', 'hours', 'tonnes'
     cost_per_unit: float
 
     @property
@@ -51,9 +53,10 @@ class ResourceAllocation:
 @dataclass
 class SafetyCheck:
     """Records a safety compliance check for a project."""
+
     check_id: str
     project_id: str
-    category: str        # e.g. 'PPE', 'scaffolding', 'electrical'
+    category: str  # e.g. 'PPE', 'scaffolding', 'electrical'
     passed: bool
     notes: str = ""
     check_date: date = field(default_factory=date.today)
@@ -62,6 +65,7 @@ class SafetyCheck:
 # ---------------------------------------------------------------------------
 # ConstructionAI bot
 # ---------------------------------------------------------------------------
+
 
 class ConstructionAI(BotBase):
     """
@@ -146,7 +150,9 @@ class ConstructionAI(BotBase):
         current = project.start_date
         for phase in phases:
             end = current + timedelta(days=phase_duration)
-            schedule.append({"phase": phase, "start": current.isoformat(), "end": end.isoformat()})
+            schedule.append(
+                {"phase": phase, "start": current.isoformat(), "end": end.isoformat()}
+            )
             current = end
 
         project.phases = phases
@@ -243,8 +249,10 @@ class ConstructionAI(BotBase):
         active = [p for p in self._projects.values() if p.status == "active"]
         complete = [p for p in self._projects.values() if p.status == "complete"]
         avg_progress = (
-            sum(p.progress_percent for p in self._projects.values()) / len(self._projects)
-            if self._projects else 0.0
+            sum(p.progress_percent for p in self._projects.values())
+            / len(self._projects)
+            if self._projects
+            else 0.0
         )
         return {
             "total_projects": len(self._projects),
@@ -262,8 +270,13 @@ class ConstructionAI(BotBase):
     def _run_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         task_type = task.get("type", "")
         if task_type == "update_progress":
-            ok = self.update_progress(task.get("project_id", ""), float(task.get("progress", 0)))
-            return {"status": "ok" if ok else "error", "message": "progress updated" if ok else "project not found"}
+            ok = self.update_progress(
+                task.get("project_id", ""), float(task.get("progress", 0))
+            )
+            return {
+                "status": "ok" if ok else "error",
+                "message": "progress updated" if ok else "project not found",
+            }
         if task_type == "estimate_cost":
             costs = self.estimate_total_cost(task.get("project_id", ""))
             return {"status": "ok", **costs}

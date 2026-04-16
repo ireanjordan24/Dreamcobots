@@ -1,9 +1,11 @@
 """Resource monitoring for the DreamCobots platform using psutil."""
+
 import threading
 import time
 
 try:
     import psutil
+
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
@@ -40,8 +42,8 @@ class ResourceMonitor:
                 "cpu_percent": psutil.cpu_percent(interval=0.1),
                 "ram_percent": ram.percent,
                 "disk_percent": disk.percent,
-                "ram_total_gb": round(ram.total / (1024 ** 3), 2),
-                "ram_used_gb": round(ram.used / (1024 ** 3), 2),
+                "ram_total_gb": round(ram.total / (1024**3), 2),
+                "ram_used_gb": round(ram.used / (1024**3), 2),
                 "net_bytes_sent": net.bytes_sent,
                 "net_bytes_recv": net.bytes_recv,
             }
@@ -74,7 +76,11 @@ class ResourceMonitor:
         if cpu < 50 and ram < 60:
             return available_bots
         elif cpu < 70 and ram < 75:
-            return [b for i, b in enumerate(available_bots) if i < len(available_bots) // 2 + 1]
+            return [
+                b
+                for i, b in enumerate(available_bots)
+                if i < len(available_bots) // 2 + 1
+            ]
         elif cpu < 85 and ram < 85:
             return available_bots[:3] if len(available_bots) > 3 else available_bots
         else:
@@ -105,4 +111,8 @@ class ResourceMonitor:
     def get_cached_metrics(self) -> dict:
         """Return the most recently cached metrics (non-blocking)."""
         with self._lock:
-            return dict(self._latest_metrics) if self._latest_metrics else self.get_metrics()
+            return (
+                dict(self._latest_metrics)
+                if self._latest_metrics
+                else self.get_metrics()
+            )

@@ -22,10 +22,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Directory enums
 # ---------------------------------------------------------------------------
+
 
 class DirectoryCategory(Enum):
     ELECTRONICS_FIRM = "electronics_firm"
@@ -60,6 +60,7 @@ class ListingStatus(Enum):
 # Forum enums
 # ---------------------------------------------------------------------------
 
+
 class ForumCategory(Enum):
     GENERAL = "general"
     PROTOTYPING = "prototyping"
@@ -83,6 +84,7 @@ class PostType(Enum):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class DirectoryListing:
@@ -191,6 +193,7 @@ class PrototypingTool:
 # Marketplace
 # ---------------------------------------------------------------------------
 
+
 class RDMarketplace:
     """
     R&D Marketplace directory and forum engine for the DreamAIInvent Hub.
@@ -258,17 +261,21 @@ class RDMarketplace:
         if query:
             q = query.lower()
             results = [
-                r for r in results
+                r
+                for r in results
                 if q in r.name.lower()
                 or q in r.description.lower()
                 or any(q in s.lower() for s in r.specialisations)
             ]
         # Active/featured first, sorted by rating
         results = [
-            r for r in results
+            r
+            for r in results
             if r.status in (ListingStatus.ACTIVE, ListingStatus.FEATURED)
         ]
-        results.sort(key=lambda x: (x.status == ListingStatus.FEATURED, x.rating), reverse=True)
+        results.sort(
+            key=lambda x: (x.status == ListingStatus.FEATURED, x.rating), reverse=True
+        )
         return [r.to_dict() for r in results]
 
     def get_listing(self, listing_id: str) -> Optional[DirectoryListing]:
@@ -404,7 +411,11 @@ class RDMarketplace:
                 listing_id="DIR-ELEC-001",
                 name="CircuitCraft Electronics",
                 category=DirectoryCategory.ELECTRONICS_FIRM,
-                services=[ServiceType.DESIGN, ServiceType.MANUFACTURING, ServiceType.TESTING_CERTIFICATION],
+                services=[
+                    ServiceType.DESIGN,
+                    ServiceType.MANUFACTURING,
+                    ServiceType.TESTING_CERTIFICATION,
+                ],
                 description="Full-service electronics ODM — from schematic to mass production.",
                 location="Shenzhen, China",
                 specialisations=["IoT modules", "wearable electronics", "PCB assembly"],
@@ -433,7 +444,11 @@ class RDMarketplace:
                 listing_id="DIR-AI-001",
                 name="NeuralForge Labs",
                 category=DirectoryCategory.AI_SPECIALIST,
-                services=[ServiceType.AI_INTEGRATION, ServiceType.SOFTWARE_FIRMWARE, ServiceType.CONSULTING],
+                services=[
+                    ServiceType.AI_INTEGRATION,
+                    ServiceType.SOFTWARE_FIRMWARE,
+                    ServiceType.CONSULTING,
+                ],
                 description="Embedded AI and computer-vision solutions for robotics and IoT.",
                 location="San Francisco, CA",
                 specialisations=["edge AI", "computer vision", "NLP", "TinyML"],
@@ -446,10 +461,19 @@ class RDMarketplace:
                 listing_id="DIR-ROB-001",
                 name="Apex Robotics Manufacturing",
                 category=DirectoryCategory.ROBOTICS_MANUFACTURER,
-                services=[ServiceType.MANUFACTURING, ServiceType.DESIGN, ServiceType.TESTING_CERTIFICATION],
+                services=[
+                    ServiceType.MANUFACTURING,
+                    ServiceType.DESIGN,
+                    ServiceType.TESTING_CERTIFICATION,
+                ],
                 description="ISO-certified robotics manufacturer for commercial and industrial automation.",
                 location="Detroit, MI",
-                specialisations=["servo systems", "industrial robots", "cobots", "CNC fabrication"],
+                specialisations=[
+                    "servo systems",
+                    "industrial robots",
+                    "cobots",
+                    "CNC fabrication",
+                ],
                 certifications=["ISO 9001", "ISO 13849"],
                 min_order_usd=10000.0,
                 rating=4.8,
@@ -461,10 +485,19 @@ class RDMarketplace:
                 listing_id="DIR-IOT-001",
                 name="SmartEdge IoT",
                 category=DirectoryCategory.IOT_PROVIDER,
-                services=[ServiceType.SOFTWARE_FIRMWARE, ServiceType.AI_INTEGRATION, ServiceType.CONSULTING],
+                services=[
+                    ServiceType.SOFTWARE_FIRMWARE,
+                    ServiceType.AI_INTEGRATION,
+                    ServiceType.CONSULTING,
+                ],
                 description="End-to-end IoT platform: edge devices, cloud integration, and AI analytics.",
                 location="Seattle, WA",
-                specialisations=["MQTT", "LoRaWAN", "edge computing", "device management"],
+                specialisations=[
+                    "MQTT",
+                    "LoRaWAN",
+                    "edge computing",
+                    "device management",
+                ],
                 rating=4.4,
                 review_count=29,
                 status=ListingStatus.ACTIVE,

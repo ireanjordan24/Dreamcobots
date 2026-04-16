@@ -15,10 +15,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Prospectus status
 # ---------------------------------------------------------------------------
+
 
 class ProspectusStatus(Enum):
     DRAFT = "draft"
@@ -31,6 +31,7 @@ class ProspectusStatus(Enum):
 # ---------------------------------------------------------------------------
 # ROI Bridge
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ROIBridge:
@@ -80,9 +81,11 @@ class ROIBridge:
 # Study path
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class StudyPathItem:
     """A single item in a bot's required study path."""
+
     order: int
     topic: str
     domain: str
@@ -102,6 +105,7 @@ class StudyPathItem:
 # ---------------------------------------------------------------------------
 # Full Prospectus document
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Prospectus:
@@ -179,13 +183,9 @@ class Prospectus:
             score += 10
         score += min(len(self.core_skills) * 5, 25)
         score += min(len(self.objectives) * 5, 25)
-        completed_study = sum(
-            1 for s in self.study_path if s.status == "complete"
-        )
+        completed_study = sum(1 for s in self.study_path if s.status == "complete")
         score += min(completed_study * 5, 20)
-        completed_checks = sum(
-            1 for c in self.checklist if c.get("done", False)
-        )
+        completed_checks = sum(1 for c in self.checklist if c.get("done", False))
         score += min(completed_checks * 2, 20)
         self.readiness_score = min(score, 100)
         self._touch()
@@ -289,6 +289,7 @@ class Prospectus:
 # Prospectus System
 # ---------------------------------------------------------------------------
 
+
 class ProspectusSystemError(Exception):
     """Raised when a prospectus operation fails."""
 
@@ -331,9 +332,7 @@ class ProspectusSystem:
         """Return a prospectus by ID, or None."""
         return self._prospectuses.get(prospectus_id)
 
-    def list_all(
-        self, status: Optional[ProspectusStatus] = None
-    ) -> list[Prospectus]:
+    def list_all(self, status: Optional[ProspectusStatus] = None) -> list[Prospectus]:
         """Return all prospectuses, optionally filtered by status."""
         items = list(self._prospectuses.values())
         if status is not None:

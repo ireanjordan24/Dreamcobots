@@ -1,18 +1,19 @@
 """Tests for integrations/sms_sender.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from integrations.sms_sender import SMSSender, SMSRecord
 
+from integrations.sms_sender import SMSRecord, SMSSender
 
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestInstantiation:
     def test_mock_mode_when_no_credentials(self):
@@ -31,6 +32,7 @@ class TestInstantiation:
 # ---------------------------------------------------------------------------
 # send_sms (mock mode)
 # ---------------------------------------------------------------------------
+
 
 class TestSendSMS:
     def setup_method(self):
@@ -64,6 +66,7 @@ class TestSendSMS:
 # send_bulk
 # ---------------------------------------------------------------------------
 
+
 class TestSendBulk:
     def test_bulk_sends_to_all_recipients(self):
         sender = SMSSender(mock=True)
@@ -81,6 +84,7 @@ class TestSendBulk:
 # ---------------------------------------------------------------------------
 # SMSRecord
 # ---------------------------------------------------------------------------
+
 
 class TestSMSRecord:
     def test_to_dict_structure(self):

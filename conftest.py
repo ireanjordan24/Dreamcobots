@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture
 def conversational_data():
     return {

@@ -11,44 +11,45 @@ Covers all modules:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.localized_bot.global_leaderboard import GlobalLeaderboard
+from bots.localized_bot.localization_engine import LocalizationEngine
+from bots.localized_bot.localized_bot import LocalizedBot, LocalizedBotTierError
+from bots.localized_bot.region_database import RegionDatabase
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.localized_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_TRANSLATION,
+    FEATURE_CUSTOM_LOCALE,
+    FEATURE_FULL_TRANSLATION,
+    FEATURE_GLOBAL_LEADERBOARD_VOTE,
+    FEATURE_INDUSTRY_ADAPTION,
+    FEATURE_PRIVATE_REGIONAL_BOTS,
+    FEATURE_REGIONAL_CHALLENGES,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_BASIC_TRANSLATION,
-    FEATURE_FULL_TRANSLATION,
-    FEATURE_INDUSTRY_ADAPTION,
-    FEATURE_REGIONAL_CHALLENGES,
-    FEATURE_GLOBAL_LEADERBOARD_VOTE,
-    FEATURE_CUSTOM_LOCALE,
-    FEATURE_PRIVATE_REGIONAL_BOTS,
-    FEATURE_API_ACCESS,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.localized_bot.region_database import RegionDatabase
-from bots.localized_bot.localization_engine import LocalizationEngine
-from bots.localized_bot.global_leaderboard import GlobalLeaderboard
-from bots.localized_bot.localized_bot import LocalizedBot, LocalizedBotTierError
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -133,11 +134,36 @@ class TestTiers:
 # ===========================================================================
 
 REQUIRED_REGION_IDS = [
-    "US", "UK", "Mexico", "Brazil", "France", "Germany", "Japan", "China",
-    "India", "Nigeria", "South_Africa", "Australia", "Canada", "Saudi_Arabia",
-    "South_Korea", "Russia", "Indonesia", "Argentina", "Spain", "Italy",
-    "Egypt", "Turkey", "Thailand", "Vietnam", "Poland", "Netherlands",
-    "UAE", "Colombia", "Pakistan", "Bangladesh",
+    "US",
+    "UK",
+    "Mexico",
+    "Brazil",
+    "France",
+    "Germany",
+    "Japan",
+    "China",
+    "India",
+    "Nigeria",
+    "South_Africa",
+    "Australia",
+    "Canada",
+    "Saudi_Arabia",
+    "South_Korea",
+    "Russia",
+    "Indonesia",
+    "Argentina",
+    "Spain",
+    "Italy",
+    "Egypt",
+    "Turkey",
+    "Thailand",
+    "Vietnam",
+    "Poland",
+    "Netherlands",
+    "UAE",
+    "Colombia",
+    "Pakistan",
+    "Bangladesh",
 ]
 
 
@@ -170,9 +196,17 @@ class TestRegionDatabase:
 
     def test_region_has_required_fields(self, db):
         region = db.get_region("Germany")
-        for field in ["region_id", "region_name", "country_code", "language_code",
-                      "language_name", "industries", "population_millions",
-                      "timezone", "currency_code"]:
+        for field in [
+            "region_id",
+            "region_name",
+            "country_code",
+            "language_code",
+            "language_name",
+            "industries",
+            "population_millions",
+            "timezone",
+            "currency_code",
+        ]:
             assert field in region, f"Missing field: {field}"
 
     def test_region_industries_list(self, db):
@@ -235,6 +269,7 @@ class TestRegionDatabase:
 # 3. LocalizationEngine
 # ===========================================================================
 
+
 class TestLocalizationEngine:
     @pytest.fixture
     def engine(self):
@@ -246,7 +281,14 @@ class TestLocalizationEngine:
 
     def test_adapt_content_keys(self, engine):
         result = engine.adapt_content("Hello!", "Japan")
-        for key in ["original", "adapted", "region", "language", "cultural_notes", "industry_notes"]:
+        for key in [
+            "original",
+            "adapted",
+            "region",
+            "language",
+            "cultural_notes",
+            "industry_notes",
+        ]:
             assert key in result
 
     def test_adapt_content_original_preserved(self, engine):
@@ -260,7 +302,10 @@ class TestLocalizationEngine:
     def test_adapt_content_with_industry(self, engine):
         result = engine.adapt_content("Deploy app", "US", industry="Technology")
         assert result["industry_notes"] != ""
-        assert "API" in result["industry_notes"] or "innov" in result["industry_notes"].lower()
+        assert (
+            "API" in result["industry_notes"]
+            or "innov" in result["industry_notes"].lower()
+        )
 
     def test_adapt_content_no_industry_empty_notes(self, engine):
         result = engine.adapt_content("Hello!", "UK")
@@ -295,9 +340,18 @@ class TestLocalizationEngine:
 
     def test_generate_regional_bot_config_keys(self, engine):
         config = engine.generate_regional_bot_config("US", "sales_bot")
-        for key in ["bot_type", "region_id", "region_name", "language_code",
-                    "language_name", "timezone", "currency_code", "greeting",
-                    "cultural_notes", "industries"]:
+        for key in [
+            "bot_type",
+            "region_id",
+            "region_name",
+            "language_code",
+            "language_name",
+            "timezone",
+            "currency_code",
+            "greeting",
+            "cultural_notes",
+            "industries",
+        ]:
             assert key in config
 
     def test_generate_regional_bot_config_bot_type(self, engine):
@@ -310,6 +364,7 @@ class TestLocalizationEngine:
 # 4. GlobalLeaderboard
 # ===========================================================================
 
+
 class TestGlobalLeaderboard:
     @pytest.fixture
     def board(self):
@@ -321,8 +376,18 @@ class TestGlobalLeaderboard:
 
     def test_register_bot_fields(self, board):
         result = board.register_bot("MyBot", "user2", "Japan", "Japan bot", "support")
-        for key in ["bot_id", "bot_name", "creator_id", "region_id", "description",
-                    "category", "registered_at", "vote_count", "total_score", "avg_score"]:
+        for key in [
+            "bot_id",
+            "bot_name",
+            "creator_id",
+            "region_id",
+            "description",
+            "category",
+            "registered_at",
+            "vote_count",
+            "total_score",
+            "avg_score",
+        ]:
             assert key in result
 
     def test_register_bot_initial_scores(self, board):
@@ -400,6 +465,7 @@ class TestGlobalLeaderboard:
 # ===========================================================================
 # 5. LocalizedBot (integration + tier enforcement)
 # ===========================================================================
+
 
 class TestLocalizedBotFree:
     @pytest.fixture
@@ -490,15 +556,22 @@ class TestLocalizedBotEnterprise:
 
     def test_all_features_available(self, bot):
         cfg = get_tier_config(Tier.ENTERPRISE)
-        for feat in [FEATURE_API_ACCESS, FEATURE_WHITE_LABEL, FEATURE_ANALYTICS,
-                     FEATURE_CUSTOM_LOCALE, FEATURE_PRIVATE_REGIONAL_BOTS]:
+        for feat in [
+            FEATURE_API_ACCESS,
+            FEATURE_WHITE_LABEL,
+            FEATURE_ANALYTICS,
+            FEATURE_CUSTOM_LOCALE,
+            FEATURE_PRIVATE_REGIONAL_BOTS,
+        ]:
             assert cfg.has_feature(feat)
 
     def test_no_upgrade_from_enterprise(self, bot):
         assert bot.get_upgrade_info() is None
 
     def test_register_and_leaderboard(self, bot):
-        reg = bot.register_regional_bot("EntBot", "ent_user", "Germany", "Enterprise bot", "finance")
+        reg = bot.register_regional_bot(
+            "EntBot", "ent_user", "Germany", "Enterprise bot", "finance"
+        )
         bot.vote_for_bot(reg["bot_id"], "v1", 5)
         lb = bot.get_leaderboard(region_id="Germany")
         assert len(lb) >= 1

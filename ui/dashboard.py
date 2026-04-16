@@ -15,10 +15,11 @@ from typing import Any, Optional
 @dataclass
 class DashboardWidget:
     """A single UI widget (card, table, chart placeholder)."""
+
     widget_id: str
     title: str
     data: Any
-    widget_type: str = "card"   # 'card' | 'table' | 'chart' | 'status'
+    widget_type: str = "card"  # 'card' | 'table' | 'chart' | 'status'
 
 
 class BotDashboard:

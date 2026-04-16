@@ -22,6 +22,7 @@ from typing import Optional
 @dataclass
 class HubCard:
     """A compact Wealth Hub card shown on the home dashboard."""
+
     hub_id: str
     name: str
     treasury_usd: float
@@ -34,6 +35,7 @@ class HubCard:
 @dataclass
 class EarningsSummary:
     """Earnings summary widget."""
+
     today_usd: float = 0.0
     this_week_usd: float = 0.0
     this_month_usd: float = 0.0
@@ -177,22 +179,26 @@ class HomeDashboardScreen:
             active_bot_count=4,
             kyc_verified=True,
         )
-        screen.add_hub(HubCard(
-            hub_id="hub-001",
-            name="Family Wealth Circle",
-            treasury_usd=8_500.00,
-            member_count=5,
-            active_bots=3,
-            last_dividend_usd=320.50,
-            ownership_pct=35.0,
-        ))
-        screen.add_hub(HubCard(
-            hub_id="hub-002",
-            name="Tech Entrepreneurs Pool",
-            treasury_usd=24_200.00,
-            member_count=12,
-            active_bots=5,
-            last_dividend_usd=880.75,
-            ownership_pct=8.3,
-        ))
+        screen.add_hub(
+            HubCard(
+                hub_id="hub-001",
+                name="Family Wealth Circle",
+                treasury_usd=8_500.00,
+                member_count=5,
+                active_bots=3,
+                last_dividend_usd=320.50,
+                ownership_pct=35.0,
+            )
+        )
+        screen.add_hub(
+            HubCard(
+                hub_id="hub-002",
+                name="Tech Entrepreneurs Pool",
+                treasury_usd=24_200.00,
+                member_count=12,
+                active_bots=5,
+                last_dividend_usd=880.75,
+                ownership_pct=8.3,
+            )
+        )
         return screen
