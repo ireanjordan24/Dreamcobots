@@ -785,6 +785,36 @@ _DREAMCO_BOTS: list[BotEntry] = [
         ],
     ),
     BotEntry(
+        bot_id="model_router_bot",
+        display_name="DreamCo Model Router",
+        description=(
+            "AI brain switchboard for all DreamCo bots. Classifies incoming tasks "
+            "and routes them to the optimal AI provider: Anthropic for coding, "
+            "OpenAI for general tasks, Google for vision, Mistral for cost-efficient "
+            "scale, Cohere for search/RAG, and xAI for real-time data. Includes a "
+            "ResourceManager action layer (email, CRM, payments, data) so agents can "
+            "take real-world actions after model inference."
+        ),
+        category=BotCategory.AI,
+        module_path="ai.router_agent",
+        class_name="RouterAgent",
+        capabilities=[
+            "model_routing",
+            "task_classification",
+            "multi_provider",
+            "coding_tasks",
+            "vision_tasks",
+            "search_rag",
+            "real_time_data",
+            "cost_optimisation",
+            "resource_manager",
+            "email_action",
+            "crm_action",
+            "payment_action",
+            "data_fetch",
+        ],
+    ),
+    BotEntry(
         bot_id="quantum_decision_bot",
         display_name="Quantum Decision Bot",
         description=(
