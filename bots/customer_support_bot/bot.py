@@ -1,6 +1,7 @@
 """
 Dreamcobots CustomerSupportBot — tier-aware customer support automation.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

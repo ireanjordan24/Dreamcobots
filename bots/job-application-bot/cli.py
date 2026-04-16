@@ -5,6 +5,7 @@ Command-line interface for the Job Application Bot.
 Provides a menu-driven interaction so users can control the bot without
 writing any code.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import argparse
 import json

@@ -12,6 +12,7 @@ Key capabilities
 
 All features except ``usage_summary`` require the Premium tier.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

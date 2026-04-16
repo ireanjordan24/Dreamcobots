@@ -10,6 +10,7 @@ Usage
     response = bot.chat("Schedule a meeting for Monday 10 AM")
     print(response["message"])
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

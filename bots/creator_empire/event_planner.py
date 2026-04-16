@@ -4,6 +4,7 @@ Event Planner Engine for CreatorEmpire.
 Handles venue research, budget planning, and contract template generation
 for events managed through the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

@@ -8,6 +8,7 @@ with HIPAA best-practice guidelines.
 For production use, replace the in-memory store with an encrypted Redis
 instance or Firebase Firestore with TTL policies configured.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import time
 import uuid

@@ -4,6 +4,7 @@ Streaming Launch System module for the CreatorEmpire bot.
 Handles stream configuration, go-live checklists, channel optimisation
 tips, and monetisation milestones for streamer creators.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

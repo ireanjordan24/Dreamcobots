@@ -10,6 +10,7 @@ Usage
     result = bot.analyze_revenue({"sales": [100, 200, 150]})
     print(result)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

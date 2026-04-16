@@ -9,6 +9,7 @@ Usage:
     python bot.py --init-db     # Only initialise / reseed the database
     python bot.py --demo        # Run a quick demo in the terminal
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import argparse
 import os

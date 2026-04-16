@@ -1,6 +1,7 @@
 """
 Dreamcobots SocialMediaBot — tier-aware social media scheduling and analytics.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

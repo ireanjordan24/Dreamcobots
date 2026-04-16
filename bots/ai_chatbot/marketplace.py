@@ -9,6 +9,7 @@ This module handles:
   and co-branded collateral generation
 * White-label configuration (Premium only)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

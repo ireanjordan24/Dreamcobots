@@ -4,6 +4,7 @@ Online Platform Optimization module for the Discount Dominator (settings 501–5
 Provides the :class:`OnlinePlatformOptimization` facade used by all bots that
 operate on e-commerce and marketplace channels.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

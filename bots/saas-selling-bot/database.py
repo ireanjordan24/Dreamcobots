@@ -3,6 +3,7 @@ Database module for the SaaS Selling Bot.
 Manages a SQLite database of 200 free SaaS tools with categories,
 pricing, descriptions, API details, and affiliate links.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sqlite3
 import json

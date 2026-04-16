@@ -4,6 +4,7 @@ resume_parser.py
 Extracts text from PDF and DOCX resumes, then identifies skills and
 qualifications via keyword matching.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import re
 from pathlib import Path

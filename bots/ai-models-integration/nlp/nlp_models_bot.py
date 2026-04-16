@@ -1,3 +1,4 @@
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 # NLP Models Bot
 # Integrates major Natural Language Processing AI models:
 #   - OpenAI GPT-4 (text completion, chat, summarization)

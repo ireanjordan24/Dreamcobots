@@ -4,6 +4,7 @@ In-Store Tactical Controls module for the Discount Dominator (settings 451–500
 Provides the :class:`InStoreTacticalControls` facade used by all bots that
 have an in-store physical presence component.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

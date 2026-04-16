@@ -4,6 +4,7 @@ Rapper / Artist Module for CreatorEmpire.
 Handles music distribution, AI beat matching, royalty split calculations,
 and release management for the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

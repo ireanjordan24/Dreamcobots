@@ -10,6 +10,7 @@ Usage
     result = bot.scan_vulnerabilities("example.com")
     print(result)
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

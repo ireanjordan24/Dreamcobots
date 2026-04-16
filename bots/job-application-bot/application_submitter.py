@@ -6,6 +6,7 @@ via Selenium.  Each supported site has its own handler method; add a new
 method (and register it in SITE_HANDLERS) to extend support for additional
 platforms.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import time
 from selenium import webdriver

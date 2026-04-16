@@ -1,6 +1,7 @@
 """
 Dreamcobots StockTradingBot — tier-aware stock analysis and trading signals.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

@@ -4,6 +4,7 @@ Legal & Protection Layer for CreatorEmpire.
 Provides contract analysis, royalty calculation, and red-flag scanning
 to protect talent on the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

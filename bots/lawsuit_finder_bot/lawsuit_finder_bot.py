@@ -10,6 +10,7 @@ Usage
     response = bot.chat("Find class action lawsuits against pharmaceutical companies")
     print(response["message"])
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

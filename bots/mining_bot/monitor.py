@@ -10,6 +10,7 @@ Detects and reports:
 Alerts are generated as structured dicts and optionally routed to registered
 callback handlers.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

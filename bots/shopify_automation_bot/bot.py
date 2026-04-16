@@ -1,6 +1,7 @@
 """
 Dreamcobots ShopifyAutomationBot — tier-aware Shopify store automation.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

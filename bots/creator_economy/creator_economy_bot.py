@@ -10,6 +10,7 @@ Usage
     response = bot.chat("Generate a brand sponsorship pitch for my YouTube channel")
     print(response["message"])
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import sys
 import os

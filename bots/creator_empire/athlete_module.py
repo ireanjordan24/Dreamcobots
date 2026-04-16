@@ -4,6 +4,7 @@ Athlete Module for CreatorEmpire.
 Handles highlight reel editing, recruitment profile management, and NIL
 (Name, Image, Likeness) monetization guides for the DreamCo platform.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 import sys

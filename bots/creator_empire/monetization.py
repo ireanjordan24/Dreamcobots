@@ -5,6 +5,7 @@ Supports multiple revenue models: subscriptions (basic/premium), tips,
 pay-per-view, merchandise, direct service fees, brand deals, and more.
 Includes a lightweight revenue ledger for tracking earnings.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

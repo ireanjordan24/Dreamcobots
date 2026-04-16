@@ -4,6 +4,7 @@ Behavioral Settings module for the Discount Dominator (settings 581–600).
 Provides the :class:`BehavioralSettings` facade used by all bots to drive
 customer-centric, data-driven behavioural automation.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 

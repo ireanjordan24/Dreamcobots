@@ -9,6 +9,7 @@ Allows the mining bot to:
 All exchange rates are simulated (no live API calls) to make the module
 fully testable without external dependencies.
 """
+# Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
