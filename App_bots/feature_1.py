@@ -232,9 +232,10 @@ _orig_useronboarding_bot_init = UserOnboardingBot.__init__
 
 
 def _useronboarding_bot_new_init(self, tier=Tier.FREE):
-    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
-    _orig_useronboarding_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    if not isinstance(tier, Tier):
+        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+    _orig_useronboarding_bot_init(self, tier.value.upper())
+    self.tier = tier
 
 
 UserOnboardingBot.__init__ = _useronboarding_bot_new_init
