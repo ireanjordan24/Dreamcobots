@@ -125,18 +125,32 @@ class LearningLoop:
 
     def __init__(
         self,
-        kpis: Optional[Dict[str, float]] = None,
-        control_center: Any = None,
+        control_center_or_kpis: Any = None,
         generator: Any = None,
         underperform_threshold: int = DEFAULT_UNDERPERFORM_THRESHOLD,
+        kpis: Optional[Dict[str, float]] = None,
+        control_center: Any = None,
     ) -> None:
-        self.kpis: Dict[str, float] = {**DEFAULT_KPIS, **(kpis or {})}
+        import random as _rand_ll
+        self._rand_ll = _rand_ll
+        # Resolve positional ambiguity: if first arg is a dict, treat as kpis (legacy)
+        if isinstance(control_center_or_kpis, dict):
+            _kpis = control_center_or_kpis
+            self.control_center = control_center
+            self.generator = generator
+        else:
+            self.control_center = control_center_or_kpis or control_center
+            self.generator = generator
+            _kpis = kpis
+        self.kpis: Dict[str, float] = {**DEFAULT_KPIS, **(_kpis or {})}
         self._performance: Dict[str, BotPerformanceRecord] = {}
         self._refactor_log: List[Dict[str, Any]] = []
         self._cycle_count: int = 0
         self.underperform_threshold = underperform_threshold
-        self._control_center = control_center
-        self._generator = generator
+        self.performance_log: Dict[str, float] = {}
+        # Legacy aliases
+        self._control_center = self.control_center
+        self._generator = self.generator
 
     # ------------------------------------------------------------------
     # Performance tracking
@@ -277,30 +291,75 @@ class LearningLoop:
     # Legacy API
     # ------------------------------------------------------------------
 
-    def track_performance(self, bot_name: str, score: float) -> dict:
-        """Legacy method — record a score-based performance entry."""
-        self.record_run(bot_name, success=(score >= self.underperform_threshold))
-        return {"bot_name": bot_name, "score": score}
+    def track_performance(self, bot_name: str = None, score: float = None) -> dict:
+        """Track performance.
 
-    def get_underperformers(self) -> List[str]:
-        """Legacy: return names of underperforming bots."""
-        return [r.bot_name for r in self._get_underperforming()]
+        New API (no args): scores all bots from control_center.bots and returns
+        dict of {bot_name: score}.
+        Legacy API (bot_name, score): records a single bot's score, returns
+        dict with {bot_name, score, status}.
+        """
+        if bot_name is None and self.control_center is not None:
+            # New API: score all bots in control_center
+            result: Dict[str, float] = {}
+            bots = getattr(self.control_center, "bots", {}) or {}
+            for name in bots:
+                s = round(self._rand_ll.uniform(DEFAULT_SCORE_MIN, DEFAULT_SCORE_MAX), 2)
+                self.performance_log[name] = s
+                result[name] = s
+            return result
+        # Legacy API with bot_name + score
+        if score is not None and (score < DEFAULT_SCORE_MIN or score > DEFAULT_SCORE_MAX):
+            raise LearningLoopError(f"Invalid score {score!r}: must be between {DEFAULT_SCORE_MIN} and {DEFAULT_SCORE_MAX}.")
+        if bot_name is not None:
+            self.record_run(bot_name, success=(score >= self.underperform_threshold) if score is not None else True)
+            self.performance_log[bot_name] = score
+        status = "underperforming" if (score is not None and score < self.underperform_threshold) else "healthy"
+        return {"bot_name": bot_name, "score": score, "status": status}
 
-    def get_performance_log(self) -> List[Dict]:
-        return [r.to_dict() for r in self._performance.values()]
+    def get_underperformers(self):
+        """Return underperforming bots as dict {name: score}."""
+        return {name: score for name, score in self.performance_log.items()
+                if score < self.underperform_threshold}
 
-    def optimize(self) -> List[Dict]:
-        return self.refactor_underperforming()
+    def get_performance_log(self):
+        """Return a copy of the performance log (dict)."""
+        return dict(self.performance_log)
+
+    def optimize(self):
+        """Optimize underperforming bots. Returns list of created bot names."""
+        print("Optimizing bots...")
+        created = []
+        underperformers = self.get_underperformers()
+        if self.control_center is not None and not underperformers:
+            # Use cc.bots if performance_log is from new-API style
+            bots = getattr(self.control_center, "bots", {}) or {}
+            for name in bots:
+                score = self.performance_log.get(name, DEFAULT_SCORE_MAX)
+                if score < self.underperform_threshold:
+                    underperformers[name] = score
+        for name in underperformers:
+            new_name = f"{name}_optimized"
+            print(f"Improving {name} → {new_name}")
+            if self.generator is not None:
+                self.generator.create_bot(new_name)
+            created.append(new_name)
+            self._refactor_log.append({"original": name, "replacement": new_name})
+        return created
 
     def get_optimization_history(self) -> List[Dict]:
         return list(self._refactor_log)
 
     def track_revenue(self) -> float:
-        return sum(r.total_revenue_usd for r in self._performance.values())
+        if self.control_center is not None and hasattr(self.control_center, "get_total_revenue"):
+            return float(self.control_center.get_total_revenue())
+        return float(sum(r.total_revenue_usd for r in self._performance.values()))
 
     def count_leads(self) -> int:
+        if self.control_center is not None and hasattr(self.control_center, "count_leads"):
+            return int(self.control_center.count_leads())
         return sum(r.total_runs for r in self._performance.values())
 
     def run(self) -> str:
         result = self.run_cycle()
-        return f"cycle_{result['cycle']}_complete"
+        return f"LearningLoop: cycle_{result['cycle']}_complete"

@@ -202,3 +202,79 @@ if __name__ == "__main__":
     print(bot.describe_tier())
 
 ReviewCollectorBot = FiverrReviewGeneratorBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class FiverrReviewGeneratorBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_fiverrreviewgenerator_bot_init = FiverrReviewGeneratorBot.__init__
+
+
+def _fiverrreviewgenerator_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_fiverrreviewgenerator_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+FiverrReviewGeneratorBot.__init__ = _fiverrreviewgenerator_bot_new_init
+FiverrReviewGeneratorBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _fiverrreviewgenerator_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _fiverrreviewgenerator_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _fiverrreviewgenerator_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise FiverrReviewGeneratorBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _fiverrreviewgenerator_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _fiverrreviewgenerator_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "FiverrReviewGeneratorBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _fiverrreviewgenerator_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "FiverrReviewGeneratorBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+FiverrReviewGeneratorBot.monthly_price = _fiverrreviewgenerator_bot_monthly_price
+FiverrReviewGeneratorBot.get_tier_info = _fiverrreviewgenerator_bot_get_tier_info
+FiverrReviewGeneratorBot._enforce_tier = _fiverrreviewgenerator_bot_enforce_tier
+FiverrReviewGeneratorBot.list_items = _fiverrreviewgenerator_bot_list_items
+FiverrReviewGeneratorBot.analyze = _fiverrreviewgenerator_bot_analyze
+FiverrReviewGeneratorBot.export_report = _fiverrreviewgenerator_bot_export_report

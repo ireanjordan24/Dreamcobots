@@ -218,3 +218,79 @@ if __name__ == "__main__":
 
 
 SupportBot = UserSupportBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class UserSupportBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_usersupport_bot_init = UserSupportBot.__init__
+
+
+def _usersupport_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_usersupport_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+UserSupportBot.__init__ = _usersupport_bot_new_init
+UserSupportBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _usersupport_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _usersupport_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _usersupport_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise UserSupportBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _usersupport_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _usersupport_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "UserSupportBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _usersupport_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "UserSupportBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+UserSupportBot.monthly_price = _usersupport_bot_monthly_price
+UserSupportBot.get_tier_info = _usersupport_bot_get_tier_info
+UserSupportBot._enforce_tier = _usersupport_bot_enforce_tier
+UserSupportBot.list_items = _usersupport_bot_list_items
+UserSupportBot.analyze = _usersupport_bot_analyze
+UserSupportBot.export_report = _usersupport_bot_export_report

@@ -74,6 +74,8 @@ class StripeWebhookHandler:
         self,
         webhook_secret: Optional[str] = None,
         tolerance_seconds: int = 300,
+        client=None,
+        verify_signatures: bool = True,
     ) -> None:
         self._secret: str = (
             webhook_secret

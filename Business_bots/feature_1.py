@@ -282,3 +282,53 @@ class BusinessLaunchBot:
         self._usage_count += 1
         return {"bot": "BusinessLaunchBot", "tier": self.tier.value,
                 "total_items": len(self.MOCK_DATA), "items": self.MOCK_DATA}
+
+# Expose Tier alias for test compatibility
+Tier = _BizTier
+
+
+# ---------------------------------------------------------------------------
+# BuddyAI integration: bot_id, name, category, chat, end_session for MeetingSchedulerBot
+# ---------------------------------------------------------------------------
+import uuid as _uuid_biz1
+
+
+def _meetingschedulerbot_init_buddy(self, tier: str = "FREE"):
+    _orig_meeting_init(self, tier)
+    if not hasattr(self, "bot_id"):
+        self.bot_id = str(_uuid_biz1.uuid4())
+    self.name = "Meeting Scheduler Bot"
+    self.category = "business"
+    self.domain = "meetings"
+
+
+_orig_meeting_init = MeetingSchedulerBot.__init__
+MeetingSchedulerBot.__init__ = _meetingschedulerbot_init_buddy
+
+
+def _meetingschedulerbot_chat(self, user_input: str, user_id: str = "anonymous") -> str:
+    q = user_input.lower()
+    if any(w in q for w in ("meeting", "schedule", "appointment", "calendar")):
+        return "I can help you schedule a meeting! What time works best?"
+    return "I'm your Meeting Scheduler Bot. I can schedule meetings and manage your calendar."
+
+
+def _meetingschedulerbot_end_session(self, user_id: str) -> None:
+    pass
+
+
+MeetingSchedulerBot.chat = _meetingschedulerbot_chat
+MeetingSchedulerBot.end_session = _meetingschedulerbot_end_session
+
+def _meetingschedulerbot_status(self) -> dict:
+    return {
+        "name": self.name,
+        "category": self.category,
+        "domain": self.domain,
+        "revenue": {"total_revenue_usd": 0.0},
+        "datasets": {"datasets_available": 0, "total_sales": 0},
+        "top_intents": ["meeting", "schedule"],
+    }
+
+
+MeetingSchedulerBot.status = _meetingschedulerbot_status

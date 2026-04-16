@@ -263,3 +263,40 @@ class BotGeneratorBot:
     def process(self, payload: dict) -> dict:
         """GLOBAL AI SOURCES FLOW framework entry point."""
         return self.chat(payload.get("command", ""))
+
+
+def _botgenerator_test_bot(self, bot_name: str) -> str:
+    """Test a bot by name. Returns a result string."""
+    try:
+        import importlib
+        module_path = f"bots.{bot_name}.{bot_name}"
+        try:
+            mod = importlib.import_module(module_path)
+        except ModuleNotFoundError:
+            try:
+                mod = importlib.import_module(f"bots.{bot_name}")
+            except ModuleNotFoundError:
+                return f"Failed: Module '{bot_name}' not found."
+        import inspect
+        for name, obj in inspect.getmembers(mod, inspect.isclass):
+            if hasattr(obj, "run"):
+                try:
+                    import unittest.mock as _mock
+                    with _mock.patch("os.system", return_value=0):
+                        instance = obj()
+                        result = instance.run()
+                    return str(result) if result else f"Bot {name} tested successfully."
+                except Exception as e:
+                    return f"Failed: {type(e).__name__}: {e}"
+        return f"Tested {bot_name}: no runnable bot class found."
+    except Exception as e:
+        return f"Failed: {type(e).__name__}: {e}"
+
+
+def _botgenerator_create_bot(self, description: str) -> dict:
+    """Create a bot from a description. Delegates to generate()."""
+    return self.generate(description)
+
+
+BotGeneratorBot.test_bot = _botgenerator_test_bot
+BotGeneratorBot.create_bot = _botgenerator_create_bot

@@ -178,3 +178,79 @@ if __name__ == "__main__":
     print(bot.describe_tier())
 
 NotificationBot = FeatureUpdateBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class FeatureUpdateBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_featureupdate_bot_init = FeatureUpdateBot.__init__
+
+
+def _featureupdate_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_featureupdate_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+FeatureUpdateBot.__init__ = _featureupdate_bot_new_init
+FeatureUpdateBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _featureupdate_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _featureupdate_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _featureupdate_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise FeatureUpdateBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _featureupdate_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _featureupdate_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "FeatureUpdateBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _featureupdate_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "FeatureUpdateBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+FeatureUpdateBot.monthly_price = _featureupdate_bot_monthly_price
+FeatureUpdateBot.get_tier_info = _featureupdate_bot_get_tier_info
+FeatureUpdateBot._enforce_tier = _featureupdate_bot_enforce_tier
+FeatureUpdateBot.list_items = _featureupdate_bot_list_items
+FeatureUpdateBot.analyze = _featureupdate_bot_analyze
+FeatureUpdateBot.export_report = _featureupdate_bot_export_report

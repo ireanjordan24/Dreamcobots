@@ -189,3 +189,79 @@ if __name__ == "__main__":
 
 
 GigListingBot = FiverrServiceListingBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class FiverrServiceListingBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_fiverrservicelisting_bot_init = FiverrServiceListingBot.__init__
+
+
+def _fiverrservicelisting_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_fiverrservicelisting_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+FiverrServiceListingBot.__init__ = _fiverrservicelisting_bot_new_init
+FiverrServiceListingBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _fiverrservicelisting_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _fiverrservicelisting_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _fiverrservicelisting_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise FiverrServiceListingBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _fiverrservicelisting_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _fiverrservicelisting_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _fiverrservicelisting_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+FiverrServiceListingBot.monthly_price = _fiverrservicelisting_bot_monthly_price
+FiverrServiceListingBot.get_tier_info = _fiverrservicelisting_bot_get_tier_info
+FiverrServiceListingBot._enforce_tier = _fiverrservicelisting_bot_enforce_tier
+FiverrServiceListingBot.list_items = _fiverrservicelisting_bot_list_items
+FiverrServiceListingBot.analyze = _fiverrservicelisting_bot_analyze
+FiverrServiceListingBot.export_report = _fiverrservicelisting_bot_export_report

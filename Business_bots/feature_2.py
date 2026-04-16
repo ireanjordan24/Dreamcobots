@@ -201,3 +201,79 @@ if __name__ == "__main__":
 
 
 CRMBot = ProjectManagementBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class ProjectManagementBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_projectmanagement_bot_init = ProjectManagementBot.__init__
+
+
+def _projectmanagement_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_projectmanagement_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+ProjectManagementBot.__init__ = _projectmanagement_bot_new_init
+ProjectManagementBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _projectmanagement_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _projectmanagement_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _projectmanagement_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise ProjectManagementBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _projectmanagement_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _projectmanagement_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "ProjectManagementBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _projectmanagement_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "ProjectManagementBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+ProjectManagementBot.monthly_price = _projectmanagement_bot_monthly_price
+ProjectManagementBot.get_tier_info = _projectmanagement_bot_get_tier_info
+ProjectManagementBot._enforce_tier = _projectmanagement_bot_enforce_tier
+ProjectManagementBot.list_items = _projectmanagement_bot_list_items
+ProjectManagementBot.analyze = _projectmanagement_bot_analyze
+ProjectManagementBot.export_report = _projectmanagement_bot_export_report

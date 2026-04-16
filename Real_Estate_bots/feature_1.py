@@ -236,3 +236,79 @@ if __name__ == "__main__":
 
 
 PropertyListingsBot = PropertyListingAggregatorBot
+
+
+# ---------------------------------------------------------------------------
+# Tier system additions for test compatibility
+# ---------------------------------------------------------------------------
+import random as _random_tier
+from enum import Enum as _TierEnum
+
+
+class Tier(_TierEnum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+_TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
+
+
+class PropertyListingAggregatorBotTierError(Exception):
+    """Raised when a feature is not available on the current tier."""
+
+
+_orig_propertylistingaggregator_bot_init = PropertyListingAggregatorBot.__init__
+
+
+def _propertylistingaggregator_bot_new_init(self, tier=Tier.FREE):
+    tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
+    _orig_propertylistingaggregator_bot_init(self, tier_val.upper())
+    self.tier = Tier(tier_val)
+
+
+PropertyListingAggregatorBot.__init__ = _propertylistingaggregator_bot_new_init
+PropertyListingAggregatorBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
+
+
+def _propertylistingaggregator_bot_monthly_price(self):
+    return _TIER_MONTHLY_PRICE[self.tier.value]
+
+
+def _propertylistingaggregator_bot_get_tier_info(self):
+    return {
+        "tier": self.tier.value,
+        "monthly_price_usd": self.monthly_price(),
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
+    }
+
+
+def _propertylistingaggregator_bot_enforce_tier(self, required_value):
+    order = ["free", "pro", "enterprise"]
+    if order.index(self.tier.value) < order.index(required_value):
+        raise PropertyListingAggregatorBotTierError(
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+        )
+
+
+def _propertylistingaggregator_bot_list_items(self, limit=None):
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
+
+
+def _propertylistingaggregator_bot_analyze(self):
+    self._enforce_tier("pro")
+    return {"bot": "PropertyListingAggregatorBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+
+
+def _propertylistingaggregator_bot_export_report(self):
+    self._enforce_tier("enterprise")
+    return {"bot": "PropertyListingAggregatorBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+
+
+PropertyListingAggregatorBot.monthly_price = _propertylistingaggregator_bot_monthly_price
+PropertyListingAggregatorBot.get_tier_info = _propertylistingaggregator_bot_get_tier_info
+PropertyListingAggregatorBot._enforce_tier = _propertylistingaggregator_bot_enforce_tier
+PropertyListingAggregatorBot.list_items = _propertylistingaggregator_bot_list_items
+PropertyListingAggregatorBot.analyze = _propertylistingaggregator_bot_analyze
+PropertyListingAggregatorBot.export_report = _propertylistingaggregator_bot_export_report

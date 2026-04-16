@@ -626,3 +626,89 @@ def _lead_to_dict(l: Lead) -> dict:
 
 LeadScraperBot = LeadScraper
 Bot = LeadScraper
+
+# ---------------------------------------------------------------------------
+# Simple requests-based scraper interface for test compatibility
+# ---------------------------------------------------------------------------
+try:
+    import requests
+except ImportError:
+    requests = None  # type: ignore
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None  # type: ignore
+
+import os as _os_lgs
+
+
+_DEFAULT_URL = "https://example.com/business-directory"
+_DEFAULT_DATA_DIR = "data"
+_DEFAULT_NAME = "Real Lead Scraper"
+
+
+_orig_leadscraper_init = LeadScraper.__init__
+
+
+def _leadscraper_new_init(
+    self,
+    tier: Tier = Tier.FREE,
+    url: str = _DEFAULT_URL,
+    data_dir: str = _DEFAULT_DATA_DIR,
+    name: str = _DEFAULT_NAME,
+) -> None:
+    _orig_leadscraper_init(self, tier)
+    self.url = url
+    self.data_dir = data_dir
+    self.name = name
+
+
+def _leadscraper_scrape(self) -> list:
+    """Scrape leads from the configured URL."""
+    global requests, BeautifulSoup
+    if requests is None:
+        return []
+    try:
+        resp = requests.get(self.url, timeout=10)
+        html = resp.text
+        if BeautifulSoup is None:
+            return []
+        soup = BeautifulSoup(html, "html.parser")
+        leads = []
+        for biz in soup.select(".business"):
+            name_tag = biz.find("h2")
+            phone_tag = biz.select_one(".phone")
+            if name_tag:
+                leads.append({
+                    "name": name_tag.get_text(strip=True),
+                    "phone": phone_tag.get_text(strip=True) if phone_tag else "",
+                })
+        return leads
+    except Exception:
+        return []
+
+
+def _leadscraper_save(self, leads: list) -> None:
+    """Save leads to data_dir/leads.txt."""
+    _os_lgs.makedirs(self.data_dir, exist_ok=True)
+    leads_file = _os_lgs.path.join(self.data_dir, "leads.txt")
+    with open(leads_file, "a", encoding="utf-8") as fh:
+        for lead in leads:
+            fh.write(f"{lead.get('name', '')} | {lead.get('phone', '')}\n")
+
+
+def _leadscraper_run(self) -> str:
+    """Scrape and save leads. Return status string."""
+    leads = self.scrape()
+    self.save(leads)
+    return f"Scraped {len(leads)} leads and saved to {self.data_dir}/leads.txt"
+
+
+LeadScraper.__init__ = _leadscraper_new_init
+LeadScraper.scrape = _leadscraper_scrape
+LeadScraper.save = _leadscraper_save
+LeadScraper.run = _leadscraper_run
+
+LeadScraperBot = LeadScraper
+Bot = LeadScraper
