@@ -18,7 +18,12 @@ const NICHE_PAIN_POINTS = {
   real_estate: ['too few leads', 'low listing visibility', 'slow follow-up', 'manual CRM'],
   health_wellness: ['hard to stand out', 'booking friction', 'low retention', 'poor reviews'],
   tech_startups: ['not enough users', 'high churn', 'bad onboarding', 'unclear positioning'],
-  local_business: ['no online presence', 'poor Google ranking', 'no referral system', 'manual invoicing'],
+  local_business: [
+    'no online presence',
+    'poor Google ranking',
+    'no referral system',
+    'manual invoicing',
+  ],
 };
 
 const COMPANY_SUFFIXES = ['Inc.', 'LLC', 'Co.', 'Group', 'Studios', 'Labs', 'Agency', 'Solutions'];
@@ -133,9 +138,7 @@ function run(options = {}) {
   const revenue = Math.floor(Math.random() * (8000 - 3000 + 1)) + 3000;
   const leadsGenerated = Math.floor(Math.random() * (150 - 80 + 1)) + 80;
   const conversionRate =
-    leads.length > 0
-      ? parseFloat((qualifiedLeads.length / leads.length).toFixed(2))
-      : 0;
+    leads.length > 0 ? parseFloat((qualifiedLeads.length / leads.length).toFixed(2)) : 0;
 
   return {
     bot: 'autoClientHunter',

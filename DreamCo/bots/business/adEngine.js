@@ -79,8 +79,7 @@ function run(options = {}) {
   const budget = options.budget || Math.floor(Math.random() * 1000) + 200;
 
   const campaign = generateCampaign(platform, budget);
-  const revenue =
-    Math.floor(Math.random() * (REVENUE_MAX - REVENUE_MIN + 1)) + REVENUE_MIN;
+  const revenue = Math.floor(Math.random() * (REVENUE_MAX - REVENUE_MIN + 1)) + REVENUE_MIN;
   const roi = calculateROI(budget, revenue);
   const leadsGenerated = Math.floor(Math.random() * (LEADS_MAX - LEADS_MIN + 1)) + LEADS_MIN;
   const conversions = campaign.estimated_conversions;

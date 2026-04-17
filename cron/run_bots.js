@@ -16,16 +16,66 @@ const DAY = 24 * HOUR;
  * Each entry is { botName, intervalMs, category, description }.
  */
 const SCHEDULES = [
-  { botName: 'multi_source_lead_scraper', intervalMs: HOUR, category: 'revenue', description: 'Scrape leads hourly' },
-  { botName: 'fiverr_auto_apply', intervalMs: SIX_HOURS, category: 'freelance', description: 'Apply to Fiverr gigs every 6h' },
-  { botName: 'real_estate_scanner', intervalMs: DAY, category: 'real_estate', description: 'Scan listings daily' },
-  { botName: 'crypto_trader', intervalMs: 15 * 60 * 1000, category: 'crypto', description: 'Trade every 15 minutes' },
-  { botName: 'grant_finder', intervalMs: 7 * DAY, category: 'grants', description: 'Search grants weekly' },
-  { botName: 'email_campaign_sender', intervalMs: DAY, category: 'marketing', description: 'Send campaigns daily' },
-  { botName: 'affiliate_link_optimizer', intervalMs: SIX_HOURS, category: 'affiliate', description: 'Optimize affiliate links every 6h' },
-  { botName: 'lead_scorer', intervalMs: 2 * HOUR, category: 'crm', description: 'Rescore leads every 2h' },
-  { botName: 'pricing_optimizer', intervalMs: SIX_HOURS, category: 'monetization', description: 'Adjust prices every 6h' },
-  { botName: 'dashboard_refresher', intervalMs: 30 * 1000, category: 'monitoring', description: 'Refresh dashboard every 30s' },
+  {
+    botName: 'multi_source_lead_scraper',
+    intervalMs: HOUR,
+    category: 'revenue',
+    description: 'Scrape leads hourly',
+  },
+  {
+    botName: 'fiverr_auto_apply',
+    intervalMs: SIX_HOURS,
+    category: 'freelance',
+    description: 'Apply to Fiverr gigs every 6h',
+  },
+  {
+    botName: 'real_estate_scanner',
+    intervalMs: DAY,
+    category: 'real_estate',
+    description: 'Scan listings daily',
+  },
+  {
+    botName: 'crypto_trader',
+    intervalMs: 15 * 60 * 1000,
+    category: 'crypto',
+    description: 'Trade every 15 minutes',
+  },
+  {
+    botName: 'grant_finder',
+    intervalMs: 7 * DAY,
+    category: 'grants',
+    description: 'Search grants weekly',
+  },
+  {
+    botName: 'email_campaign_sender',
+    intervalMs: DAY,
+    category: 'marketing',
+    description: 'Send campaigns daily',
+  },
+  {
+    botName: 'affiliate_link_optimizer',
+    intervalMs: SIX_HOURS,
+    category: 'affiliate',
+    description: 'Optimize affiliate links every 6h',
+  },
+  {
+    botName: 'lead_scorer',
+    intervalMs: 2 * HOUR,
+    category: 'crm',
+    description: 'Rescore leads every 2h',
+  },
+  {
+    botName: 'pricing_optimizer',
+    intervalMs: SIX_HOURS,
+    category: 'monetization',
+    description: 'Adjust prices every 6h',
+  },
+  {
+    botName: 'dashboard_refresher',
+    intervalMs: 30 * 1000,
+    category: 'monitoring',
+    description: 'Refresh dashboard every 30s',
+  },
 ];
 
 /** Active timer handles: botName → intervalHandle */
@@ -50,9 +100,19 @@ function scheduleBot(botName, intervalMs, botFn) {
     let result;
     try {
       result = await botFn();
-      executionHistory.set(botName, { success: true, result, duration: Date.now() - start, runAt: new Date().toISOString() });
+      executionHistory.set(botName, {
+        success: true,
+        result,
+        duration: Date.now() - start,
+        runAt: new Date().toISOString(),
+      });
     } catch (err) {
-      executionHistory.set(botName, { success: false, error: err.message, duration: Date.now() - start, runAt: new Date().toISOString() });
+      executionHistory.set(botName, {
+        success: false,
+        error: err.message,
+        duration: Date.now() - start,
+        runAt: new Date().toISOString(),
+      });
     }
   }, intervalMs);
   activeTimers.set(botName, handle);
@@ -71,12 +131,18 @@ async function runScheduledCycle() {
       // Simulate bot execution
       const result = { simulated: true, bot: schedule.botName, category: schedule.category };
       executionHistory.set(schedule.botName, {
-        success: true, result, duration: Date.now() - start, runAt: new Date().toISOString(),
+        success: true,
+        result,
+        duration: Date.now() - start,
+        runAt: new Date().toISOString(),
       });
       results.push({ botName: schedule.botName, success: true, result });
     } catch (err) {
       executionHistory.set(schedule.botName, {
-        success: false, error: err.message, duration: Date.now() - start, runAt: new Date().toISOString(),
+        success: false,
+        error: err.message,
+        duration: Date.now() - start,
+        runAt: new Date().toISOString(),
       });
       results.push({ botName: schedule.botName, success: false, error: err.message });
     }
@@ -93,7 +159,12 @@ function startScheduler() {
   const bots = [];
   SCHEDULES.forEach((schedule) => {
     scheduleBot(schedule.botName, schedule.intervalMs, async () => {
-      return { bot: schedule.botName, category: schedule.category, ran: true, at: new Date().toISOString() };
+      return {
+        bot: schedule.botName,
+        category: schedule.category,
+        ran: true,
+        at: new Date().toISOString(),
+      };
     });
     started++;
     bots.push(schedule.botName);
