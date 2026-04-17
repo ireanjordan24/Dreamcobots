@@ -74,10 +74,18 @@ function scoreLead(leadId) {
   let score = 0;
 
   // Data completeness (up to 50 points)
-  if (lead.name && lead.name !== 'Unknown') { score += 10; }
-  if (lead.email) { score += 15; }
-  if (lead.phone) { score += 15; }
-  if (lead.source && lead.source !== 'organic') { score += 10; }
+  if (lead.name && lead.name !== 'Unknown') {
+    score += 10;
+  }
+  if (lead.email) {
+    score += 15;
+  }
+  if (lead.phone) {
+    score += 15;
+  }
+  if (lead.source && lead.source !== 'organic') {
+    score += 10;
+  }
 
   // Category value (up to 30 points)
   const categoryBonus = CATEGORY_WEIGHTS[lead.category] || CATEGORY_WEIGHTS.general;
@@ -86,9 +94,13 @@ function scoreLead(leadId) {
   // Recency bonus (up to 20 points)
   const ageMs = Date.now() - new Date(lead.createdAt).getTime();
   const ageHours = ageMs / (1000 * 60 * 60);
-  if (ageHours < 1) { score += 20; }
-  else if (ageHours < 24) { score += 10; }
-  else if (ageHours < 72) { score += 5; }
+  if (ageHours < 1) {
+    score += 20;
+  } else if (ageHours < 24) {
+    score += 10;
+  } else if (ageHours < 72) {
+    score += 5;
+  }
 
   score = Math.min(100, score);
   lead.score = score;
@@ -129,9 +141,15 @@ function getLeads(filter) {
     return all;
   }
   return all.filter((lead) => {
-    if (filter.status && lead.status !== filter.status) { return false; }
-    if (filter.category && lead.category !== filter.category) { return false; }
-    if (typeof filter.minScore === 'number' && lead.score < filter.minScore) { return false; }
+    if (filter.status && lead.status !== filter.status) {
+      return false;
+    }
+    if (filter.category && lead.category !== filter.category) {
+      return false;
+    }
+    if (typeof filter.minScore === 'number' && lead.score < filter.minScore) {
+      return false;
+    }
     return true;
   });
 }
@@ -155,7 +173,18 @@ function exportLeads(format) {
   if (format === 'csv') {
     const headers = 'leadId,name,email,phone,source,category,score,status,soldPrice,createdAt';
     const rows = all.map((l) =>
-      [l.leadId, l.name, l.email, l.phone || '', l.source, l.category, l.score, l.status, l.soldPrice || '', l.createdAt].join(',')
+      [
+        l.leadId,
+        l.name,
+        l.email,
+        l.phone || '',
+        l.source,
+        l.category,
+        l.score,
+        l.status,
+        l.soldPrice || '',
+        l.createdAt,
+      ].join(',')
     );
     return [headers, ...rows].join('\n');
   }

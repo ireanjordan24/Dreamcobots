@@ -15,10 +15,10 @@ const LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3, CRITICAL: 4 };
 
 /** ANSI colour codes for console output. */
 const COLOURS = {
-  DEBUG: '\x1b[36m',    // Cyan
-  INFO: '\x1b[32m',     // Green
-  WARN: '\x1b[33m',     // Yellow
-  ERROR: '\x1b[31m',    // Red
+  DEBUG: '\x1b[36m', // Cyan
+  INFO: '\x1b[32m', // Green
+  WARN: '\x1b[33m', // Yellow
+  ERROR: '\x1b[31m', // Red
   CRITICAL: '\x1b[35m', // Magenta
   RESET: '\x1b[0m',
 };
@@ -32,9 +32,8 @@ const recentLogs = [];
 const MAX_RECENT = 1000;
 
 /** Minimum level from environment (default INFO). */
-const MIN_LEVEL = LEVELS[process.env.LOG_LEVEL] !== undefined
-  ? LEVELS[process.env.LOG_LEVEL]
-  : LEVELS.INFO;
+const MIN_LEVEL =
+  LEVELS[process.env.LOG_LEVEL] !== undefined ? LEVELS[process.env.LOG_LEVEL] : LEVELS.INFO;
 
 /**
  * Ensure the log directory exists.

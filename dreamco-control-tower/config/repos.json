@@ -4,13 +4,7 @@
     "owner": "ireanjordan24",
     "defaultBranch": "main",
     "description": "DreamCo central bot repository",
-    "bots": [
-      "LeadGenerationBot",
-      "RealEstateBot",
-      "SalesBot",
-      "AffiliateBot",
-      "CryptoBot"
-    ],
+    "bots": ["LeadGenerationBot", "RealEstateBot", "SalesBot", "AffiliateBot", "CryptoBot"],
     "autoUpgrade": true,
     "lastSync": null,
     "openPRs": 0,

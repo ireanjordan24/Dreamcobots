@@ -103,9 +103,7 @@ export default function FilterPanel({
       <div className="filter-group filter-price">
         <label htmlFor="filter-price-slider" className="filter-label">
           Max Price:{' '}
-          <strong>
-            {maxPrice >= SLIDER_MAX ? `$${SLIDER_MAX}+` : `$${maxPrice}/mo`}
-          </strong>
+          <strong>{maxPrice >= SLIDER_MAX ? `$${SLIDER_MAX}+` : `$${maxPrice}/mo`}</strong>
         </label>
         <input
           id="filter-price-slider"
