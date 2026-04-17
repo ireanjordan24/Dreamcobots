@@ -1,15 +1,21 @@
 """Tests for bots/money_finder_bot/tiers.py and bots/money_finder_bot/money_finder_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.money_finder_bot.money_finder_bot import MoneyFinderBot, MoneyFinderBotTierError
+
+from bots.money_finder_bot.money_finder_bot import (
+    MoneyFinderBot,
+    MoneyFinderBotTierError,
+)
 
 
 class TestMoneyFinderBotInstantiation:
@@ -83,8 +89,12 @@ class TestCheckGovernmentBenefits:
 
     def test_low_income_gets_more_benefits(self):
         bot = MoneyFinderBot(tier=Tier.PRO)
-        low = bot.check_government_benefits({"annual_income_usd": 15000, "household_size": 2})
-        high = bot.check_government_benefits({"annual_income_usd": 100000, "household_size": 2})
+        low = bot.check_government_benefits(
+            {"annual_income_usd": 15000, "household_size": 2}
+        )
+        high = bot.check_government_benefits(
+            {"annual_income_usd": 100000, "household_size": 2}
+        )
         assert len(low) >= len(high)
 
 
@@ -98,7 +108,9 @@ class TestFindCashbackOpportunities:
     def test_pro_returns_more_than_free(self):
         free_bot = MoneyFinderBot(tier=Tier.FREE)
         pro_bot = MoneyFinderBot(tier=Tier.PRO)
-        assert len(pro_bot.find_cashback_opportunities()) > len(free_bot.find_cashback_opportunities())
+        assert len(pro_bot.find_cashback_opportunities()) > len(
+            free_bot.find_cashback_opportunities()
+        )
 
     def test_records_have_source_and_category(self):
         bot = MoneyFinderBot(tier=Tier.PRO)
@@ -117,7 +129,11 @@ class TestGenerateRecoveryReport:
     def test_has_required_keys(self):
         bot = MoneyFinderBot(tier=Tier.FREE)
         result = bot.generate_recovery_report("John Smith")
-        for key in ("unclaimed_funds_count", "total_unclaimed_usd", "total_recovery_potential_usd"):
+        for key in (
+            "unclaimed_funds_count",
+            "total_unclaimed_usd",
+            "total_recovery_potential_usd",
+        ):
             assert key in result
 
     def test_enterprise_has_international_search(self):

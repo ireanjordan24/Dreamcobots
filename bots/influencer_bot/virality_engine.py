@@ -10,8 +10,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -19,7 +19,6 @@ import uuid
 from typing import List
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Campaign type constants
@@ -220,7 +219,12 @@ class ViralityEngine:
         ValueError
             If content_type is not recognised.
         """
-        valid_types = [CONTENT_POST, CONTENT_STORY, CONTENT_VIDEO_SCRIPT, CONTENT_BOT_SHOWCASE]
+        valid_types = [
+            CONTENT_POST,
+            CONTENT_STORY,
+            CONTENT_VIDEO_SCRIPT,
+            CONTENT_BOT_SHOWCASE,
+        ]
         if content_type not in valid_types:
             raise ValueError(
                 f"Invalid content_type '{content_type}'. Must be one of: {valid_types}"
@@ -237,7 +241,12 @@ class ViralityEngine:
                     "and gives you the inside track on everything I love."
                 ),
                 "call_to_action": "Tap the link in bio to try it FREE today! 👇",
-                "suggested_hashtags": ["#AIBot", "#InfluencerBot", "#DreamCo", "#CoLab"],
+                "suggested_hashtags": [
+                    "#AIBot",
+                    "#InfluencerBot",
+                    "#DreamCo",
+                    "#CoLab",
+                ],
             },
             CONTENT_STORY: {
                 "content_type": CONTENT_STORY,
@@ -307,5 +316,9 @@ class ViralityEngine:
         conversion_rate = conversions / views
 
         # Weighted sum — normalised to 0-100
-        raw = (share_rate * 60) + (conversion_rate * 30) + min(views / 1_000_000, 1.0) * 10
+        raw = (
+            (share_rate * 60)
+            + (conversion_rate * 30)
+            + min(views / 1_000_000, 1.0) * 10
+        )
         return round(min(raw * 100, 100.0), 2)

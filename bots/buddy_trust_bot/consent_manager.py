@@ -46,13 +46,13 @@ class ConsentRecord:
     user_id: str
     consent_type: ConsentType
     status: ConsentStatus
-    granted_at: Optional[float]             # Unix timestamp
+    granted_at: Optional[float]  # Unix timestamp
     revoked_at: Optional[float]
-    expires_at: Optional[float]             # None = no expiry
-    acknowledgment_token: str               # Cryptographic proof of consent
-    details: str                            # Human-readable description
-    ip_address: str = ""                    # Optional origin IP
-    recorded_acknowledgment: bool = False   # True if user explicitly typed/confirmed
+    expires_at: Optional[float]  # None = no expiry
+    acknowledgment_token: str  # Cryptographic proof of consent
+    details: str  # Human-readable description
+    ip_address: str = ""  # Optional origin IP
+    recorded_acknowledgment: bool = False  # True if user explicitly typed/confirmed
 
     def is_active(self) -> bool:
         if self.status != ConsentStatus.GRANTED:
@@ -87,7 +87,7 @@ class ConsentManager:
     """
 
     def __init__(self) -> None:
-        self._records: dict[str, ConsentRecord] = {}   # consent_id -> record
+        self._records: dict[str, ConsentRecord] = {}  # consent_id -> record
         # user_id -> consent_type -> list of consent_ids
         self._user_index: dict[str, dict[str, list[str]]] = {}
 
@@ -148,7 +148,9 @@ class ConsentManager:
             )
         record = self._get_record(consent_id)
         if record.status == ConsentStatus.REVOKED:
-            raise ConsentError(f"Consent {consent_id} has been revoked and cannot be re-activated.")
+            raise ConsentError(
+                f"Consent {consent_id} has been revoked and cannot be re-activated."
+            )
         record.status = ConsentStatus.GRANTED
         record.granted_at = time.time()
         record.recorded_acknowledgment = True
@@ -175,7 +177,9 @@ class ConsentManager:
                 return True
         return False
 
-    def get_active_consent(self, user_id: str, consent_type: ConsentType) -> Optional[ConsentRecord]:
+    def get_active_consent(
+        self, user_id: str, consent_type: ConsentType
+    ) -> Optional[ConsentRecord]:
         """Return the most recent active consent record for the given user and type."""
         type_key = consent_type.value
         consent_ids = self._user_index.get(user_id, {}).get(type_key, [])
@@ -199,7 +203,8 @@ class ConsentManager:
     def count_active_by_type(self, consent_type: ConsentType) -> int:
         """Count active consents for a given type across all users."""
         return sum(
-            1 for r in self._records.values()
+            1
+            for r in self._records.values()
             if r.consent_type == consent_type and r.is_active()
         )
 
@@ -230,7 +235,9 @@ class ConsentManager:
         return self._records[consent_id]
 
     def _index(self, user_id: str, type_key: str, consent_id: str) -> None:
-        self._user_index.setdefault(user_id, {}).setdefault(type_key, []).append(consent_id)
+        self._user_index.setdefault(user_id, {}).setdefault(type_key, []).append(
+            consent_id
+        )
 
     @staticmethod
     def _generate_token(record: ConsentRecord) -> str:
@@ -242,6 +249,7 @@ class ConsentManager:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class ConsentError(Exception):
     """General consent operation error."""

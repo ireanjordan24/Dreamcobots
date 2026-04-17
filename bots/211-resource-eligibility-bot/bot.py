@@ -25,8 +25,8 @@ Usage
 from __future__ import annotations
 
 import math
-import sys
 import os
+import sys
 
 # ---------------------------------------------------------------------------
 # Path setup — allow direct execution from the bot directory
@@ -35,35 +35,35 @@ _BOT_DIR = os.path.dirname(__file__)
 sys.path.insert(0, _BOT_DIR)
 
 from tiers import (
+    DATA_SOURCE_211,
+    DATA_SOURCE_AMERICAN_JOB_CENTERS,
+    DATA_SOURCE_FEEDING_AMERICA,
+    DATA_SOURCE_GOOGLE_MAPS,
+    DATA_SOURCE_HUD,
+    FEATURE_ADVANCED_FILTERING,
+    FEATURE_AFFILIATE_PROGRAMS,
+    FEATURE_AI_RESOURCE_MATCHING,
+    FEATURE_ANALYTICS_DASHBOARD,
+    FEATURE_ARRIVAL_ALERTS,
+    FEATURE_BUILDING_INTEL_PANELS,
+    FEATURE_CROWD_REPORTING,
+    FEATURE_CUSTOM_INTEGRATIONS,
+    FEATURE_FAMILY_GPS,
+    FEATURE_PANIC_BUTTON,
+    FEATURE_REAL_TIME_DATA,
+    FEATURE_RIDESHARE_COST_ESTIMATE,
+    FEATURE_ROUTE_PLANNING,
+    FEATURE_SAFETY_SCORE,
+    FEATURE_SPONSORED_LISTINGS,
+    FEATURE_SUPPLY_ALERTS,
+    FEATURE_WHITE_LABEL,
+    RESOURCE_CATEGORIES,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    RESOURCE_CATEGORIES,
-    FEATURE_BUILDING_INTEL_PANELS,
-    FEATURE_ADVANCED_FILTERING,
-    FEATURE_ROUTE_PLANNING,
-    FEATURE_RIDESHARE_COST_ESTIMATE,
-    FEATURE_CROWD_REPORTING,
-    FEATURE_SUPPLY_ALERTS,
-    FEATURE_SAFETY_SCORE,
-    FEATURE_AI_RESOURCE_MATCHING,
-    FEATURE_REAL_TIME_DATA,
-    FEATURE_FAMILY_GPS,
-    FEATURE_PANIC_BUTTON,
-    FEATURE_ARRIVAL_ALERTS,
-    FEATURE_SPONSORED_LISTINGS,
-    FEATURE_AFFILIATE_PROGRAMS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_CUSTOM_INTEGRATIONS,
-    FEATURE_ANALYTICS_DASHBOARD,
-    DATA_SOURCE_211,
-    DATA_SOURCE_FEEDING_AMERICA,
-    DATA_SOURCE_HUD,
-    DATA_SOURCE_AMERICAN_JOB_CENTERS,
-    DATA_SOURCE_GOOGLE_MAPS,
 )
 
 # ---------------------------------------------------------------------------
@@ -88,7 +88,8 @@ class InvalidLocationError(Exception):
 # ---------------------------------------------------------------------------
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -397,9 +398,15 @@ _SAMPLE_RESOURCES: List[Resource] = [
         lon=-74.0100,
         phone="(555) 000-0002",
         website="https://downtownshelter.example.org",
-        hours={"Mon": "Open 24/7", "Tue": "Open 24/7", "Wed": "Open 24/7",
-               "Thu": "Open 24/7", "Fri": "Open 24/7", "Sat": "Open 24/7",
-               "Sun": "Open 24/7"},
+        hours={
+            "Mon": "Open 24/7",
+            "Tue": "Open 24/7",
+            "Wed": "Open 24/7",
+            "Thu": "Open 24/7",
+            "Fri": "Open 24/7",
+            "Sat": "Open 24/7",
+            "Sun": "Open 24/7",
+        },
         eligibility=["Individuals experiencing homelessness"],
         required_documents=["No documents required for emergency intake"],
         optimal_visit_times=["Arrive before 6 PM for best bed availability"],
@@ -427,13 +434,23 @@ _SAMPLE_RESOURCES: List[Resource] = [
         lon=-74.0150,
         phone="(555) 000-0003",
         website="https://workforcedev.example.org",
-        hours={"Mon": "8am-6pm", "Tue": "8am-6pm", "Wed": "8am-6pm",
-               "Thu": "8am-6pm", "Fri": "8am-4pm"},
+        hours={
+            "Mon": "8am-6pm",
+            "Tue": "8am-6pm",
+            "Wed": "8am-6pm",
+            "Thu": "8am-6pm",
+            "Fri": "8am-4pm",
+        },
         eligibility=["Adults 18+", "Currently unemployed or underemployed"],
-        required_documents=["Government-issued ID", "Social Security card",
-                            "Proof of income (or unemployment confirmation)"],
-        optimal_visit_times=["Monday morning for intake appointments",
-                             "Walk-ins accepted Tue–Thu 10 AM – 2 PM"],
+        required_documents=[
+            "Government-issued ID",
+            "Social Security card",
+            "Proof of income (or unemployment confirmation)",
+        ],
+        optimal_visit_times=[
+            "Monday morning for intake appointments",
+            "Walk-ins accepted Tue–Thu 10 AM – 2 PM",
+        ],
         average_wait_minutes=20,
         instructions=(
             "1. Visit the front desk for an initial skills assessment.\n"
@@ -458,13 +475,22 @@ _SAMPLE_RESOURCES: List[Resource] = [
         lon=-73.9900,
         phone="(555) 000-0004",
         website="https://legalaid.example.org",
-        hours={"Mon": "9am-5pm", "Tue": "9am-5pm", "Wed": "9am-5pm",
-               "Thu": "9am-5pm", "Fri": "9am-3pm"},
-        eligibility=["Income below 125% federal poverty line",
-                     "Residents of the county"],
+        hours={
+            "Mon": "9am-5pm",
+            "Tue": "9am-5pm",
+            "Wed": "9am-5pm",
+            "Thu": "9am-5pm",
+            "Fri": "9am-3pm",
+        },
+        eligibility=[
+            "Income below 125% federal poverty line",
+            "Residents of the county",
+        ],
         required_documents=["Photo ID", "Proof of income", "Case-related documents"],
-        optimal_visit_times=["Call ahead for an appointment",
-                             "Walk-in hours: Mon & Wed 9 AM – 11 AM"],
+        optimal_visit_times=[
+            "Call ahead for an appointment",
+            "Walk-in hours: Mon & Wed 9 AM – 11 AM",
+        ],
         average_wait_minutes=45,
         instructions=(
             "1. Call to schedule an appointment or arrive during walk-in hours.\n"
@@ -489,9 +515,15 @@ _SAMPLE_RESOURCES: List[Resource] = [
         lon=-74.0200,
         phone="(555) 000-0005",
         website="",
-        hours={"Mon": "7pm-7am", "Tue": "7pm-7am", "Wed": "7pm-7am",
-               "Thu": "7pm-7am", "Fri": "7pm-7am", "Sat": "7pm-7am",
-               "Sun": "7pm-7am"},
+        hours={
+            "Mon": "7pm-7am",
+            "Tue": "7pm-7am",
+            "Wed": "7pm-7am",
+            "Thu": "7pm-7am",
+            "Fri": "7pm-7am",
+            "Sat": "7pm-7am",
+            "Sun": "7pm-7am",
+        },
         eligibility=["Anyone needing warmth – no requirements"],
         required_documents=[],
         optimal_visit_times=["Arrive by 8 PM for guaranteed access"],
@@ -573,14 +605,18 @@ _SAFETY_SCORES: Dict[str, float] = {
 # Utility helpers
 # ---------------------------------------------------------------------------
 
+
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Return the great-circle distance in kilometres between two points."""
     r = 6371.0
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat / 2) ** 2
-         + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2))
-         * math.sin(dlon / 2) ** 2)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlon / 2) ** 2
+    )
     return r * 2 * math.asin(math.sqrt(a))
 
 
@@ -773,8 +809,8 @@ class ResourceBot:
         resource = self._get_resource_by_id(resource_id)
 
         dist_km = _haversine_km(origin_lat, origin_lon, resource.lat, resource.lon)
-        drive_min = max(1, int(dist_km / 0.5))   # rough ~30 km/h urban speed
-        walk_min = max(1, int(dist_km / 0.08))   # rough ~5 km/h walking speed
+        drive_min = max(1, int(dist_km / 0.5))  # rough ~30 km/h urban speed
+        walk_min = max(1, int(dist_km / 0.08))  # rough ~5 km/h walking speed
 
         uber_usd: Optional[float] = None
         lyft_usd: Optional[float] = None
@@ -918,7 +954,9 @@ class ResourceBot:
         # Financial literacy tips based on profile
         fin_tips: List[str] = []
         if profile.income_level in ("very_low", "low"):
-            fin_tips.append("Start with a zero-based monthly budget to track every dollar.")
+            fin_tips.append(
+                "Start with a zero-based monthly budget to track every dollar."
+            )
             fin_tips.append("Build a $500 emergency fund before investing.")
         if profile.income_level in ("low", "moderate", "above_moderate"):
             fin_tips.append(
@@ -1147,7 +1185,9 @@ class ResourceBot:
             results = results[:max_r]
         return results
 
-    def get_financial_literacy_resources(self, lat: float, lon: float) -> List[Resource]:
+    def get_financial_literacy_resources(
+        self, lat: float, lon: float
+    ) -> List[Resource]:
         """
         Return a curated layer of financial literacy resources.
 
@@ -1275,9 +1315,7 @@ class ResourceBot:
         for r in self._resources:
             if r.resource_id == resource_id:
                 return r
-        raise ResourceNotFoundError(
-            f"No resource found with ID '{resource_id}'."
-        )
+        raise ResourceNotFoundError(f"No resource found with ID '{resource_id}'.")
 
 
 # ---------------------------------------------------------------------------
@@ -1311,6 +1349,8 @@ if __name__ == "__main__":
 
     # Demo route info
     route = demo_bot.get_route_info(40.7000, -74.0000, "r001")
-    print(f"\nRoute to r001: {route.distance_km} km, "
-          f"~{route.estimated_drive_minutes} min drive, "
-          f"Uber ~${route.uber_estimate_usd}")
+    print(
+        f"\nRoute to r001: {route.distance_km} km, "
+        f"~{route.estimated_drive_minutes} min drive, "
+        f"Uber ~${route.uber_estimate_usd}"
+    )

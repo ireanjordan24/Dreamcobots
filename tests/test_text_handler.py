@@ -1,7 +1,8 @@
 """Tests for TextHandler."""
 
 import pytest
-from BuddyAI.text_handler import TextHandler, ParsedCommand
+
+from BuddyAI.text_handler import ParsedCommand, TextHandler
 
 
 @pytest.fixture

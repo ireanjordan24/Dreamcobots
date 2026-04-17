@@ -19,16 +19,16 @@ via BuddyBot.
 
 from __future__ import annotations
 
-import re
 import random
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Tone / mood
 # ---------------------------------------------------------------------------
+
 
 class ConversationTone(Enum):
     NEUTRAL = "neutral"
@@ -45,6 +45,7 @@ class ConversationTone(Enum):
 # Communication context (adaptive language mode)
 # ---------------------------------------------------------------------------
 
+
 class CommunicationContext(Enum):
     """
     Controls Buddy's language register for the current interaction.
@@ -52,18 +53,46 @@ class CommunicationContext(Enum):
     CASUAL  — slang-friendly, relaxed, uses colloquial expressions.
     BUSINESS — polished, professional; no profanity; structured etiquette.
     """
+
     CASUAL = "casual"
     BUSINESS = "business"
 
 
 # Keywords that signal a professional / business context
-_BUSINESS_CONTEXT_SIGNALS: frozenset[str] = frozenset({
-    "proposal", "contract", "invoice", "client", "deal", "leads", "enterprise",
-    "meeting", "conference", "presentation", "report", "revenue", "budget",
-    "negotiate", "stakeholder", "deliverable", "milestone", "roi", "kpi",
-    "strategy", "partner", "acquisition", "agreement", "pitch", "investor",
-    "quarterly", "annual", "compliance", "legal", "policy",
-})
+_BUSINESS_CONTEXT_SIGNALS: frozenset[str] = frozenset(
+    {
+        "proposal",
+        "contract",
+        "invoice",
+        "client",
+        "deal",
+        "leads",
+        "enterprise",
+        "meeting",
+        "conference",
+        "presentation",
+        "report",
+        "revenue",
+        "budget",
+        "negotiate",
+        "stakeholder",
+        "deliverable",
+        "milestone",
+        "roi",
+        "kpi",
+        "strategy",
+        "partner",
+        "acquisition",
+        "agreement",
+        "pitch",
+        "investor",
+        "quarterly",
+        "annual",
+        "compliance",
+        "legal",
+        "policy",
+    }
+)
 
 # Slang look-up table: user slang → Buddy's casual-friendly translation
 _SLANG_MAP: dict[str, str] = {
@@ -106,11 +135,32 @@ _SLANG_MAP: dict[str, str] = {
 }
 
 # Light profanity word list for business context filtering
-_PROFANITY_WORDS: frozenset[str] = frozenset({
-    "damn", "hell", "ass", "crap", "shit", "fuck", "bitch", "bastard",
-    "damnit", "goddamn", "wtf", "bs", "bullshit", "pissed", "piss",
-    "bloody", "cunt", "dick", "cock", "jackass", "motherfucker", "asshole",
-})
+_PROFANITY_WORDS: frozenset[str] = frozenset(
+    {
+        "damn",
+        "hell",
+        "ass",
+        "crap",
+        "shit",
+        "fuck",
+        "bitch",
+        "bastard",
+        "damnit",
+        "goddamn",
+        "wtf",
+        "bs",
+        "bullshit",
+        "pissed",
+        "piss",
+        "bloody",
+        "cunt",
+        "dick",
+        "cock",
+        "jackass",
+        "motherfucker",
+        "asshole",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -223,8 +273,15 @@ SUPPORTED_LANGUAGES: dict[str, str] = {
 
 # Natural fillers used to make speech feel less robotic
 NATURAL_FILLERS: list[str] = [
-    "uh, ", "um, ", "well, ", "you know, ", "I mean, ",
-    "let me think... ", "hmm, ", "ah, ", "right, ",
+    "uh, ",
+    "um, ",
+    "well, ",
+    "you know, ",
+    "I mean, ",
+    "let me think... ",
+    "hmm, ",
+    "ah, ",
+    "right, ",
 ]
 
 # Humor templates (safe, light, uplifting)
@@ -248,6 +305,7 @@ CONFLICT_RESOLUTION_PROMPTS: list[str] = [
 @dataclass
 class TranslationResult:
     """Result of a translation operation."""
+
     original_text: str
     translated_text: str
     source_language: str
@@ -267,6 +325,7 @@ class TranslationResult:
 @dataclass
 class ConversationTurn:
     """A single conversational exchange."""
+
     user_input: str
     response: str
     tone: ConversationTone
@@ -385,7 +444,7 @@ class ConversationEngine:
         result = text
         for slang, standard in _SLANG_MAP.items():
             # Case-insensitive whole-word replacement
-            pattern = re.compile(r'\b' + re.escape(slang) + r'\b', re.IGNORECASE)
+            pattern = re.compile(r"\b" + re.escape(slang) + r"\b", re.IGNORECASE)
             result = pattern.sub(standard, result)
         return result
 
@@ -439,7 +498,10 @@ class ConversationEngine:
 
         base_response = self._generate_response(user_input, tone)
 
-        if inject_humor or (tone == ConversationTone.HUMOROUS and random.random() < self.humor_probability):
+        if inject_humor or (
+            tone == ConversationTone.HUMOROUS
+            and random.random() < self.humor_probability
+        ):
             base_response = random.choice(HUMOR_RESPONSES) + " " + base_response
 
         # In BUSINESS mode, strip fillers and ensure professional opening
@@ -471,19 +533,30 @@ class ConversationEngine:
         ]
         # Only prepend an opener if the text doesn't already start formally
         lower = text.lstrip().lower()
-        formal_starts = ("certainly", "understood", "absolutely", "of course",
-                         "thank you", "i would", "please", "let me", "i'll")
+        formal_starts = (
+            "certainly",
+            "understood",
+            "absolutely",
+            "of course",
+            "thank you",
+            "i would",
+            "please",
+            "let me",
+            "i'll",
+        )
         if not any(lower.startswith(s) for s in formal_starts):
             text = random.choice(professional_openers) + text
         return text
-
 
     def _generate_response(self, user_input: str, tone: ConversationTone) -> str:
         """Build a tone-appropriate response string."""
         lower = user_input.lower()
 
         # Check for conflict / tension signals
-        if any(k in lower for k in ("argue", "fight", "conflict", "disagree", "upset", "angry")):
+        if any(
+            k in lower
+            for k in ("argue", "fight", "conflict", "disagree", "upset", "angry")
+        ):
             return random.choice(CONFLICT_RESOLUTION_PROMPTS)
 
         tone_prefixes: dict[ConversationTone, list[str]] = {
@@ -526,7 +599,7 @@ class ConversationEngine:
         }
 
         prefix = random.choice(tone_prefixes.get(tone, [""]))
-        return f"{prefix}I heard you say: \"{user_input}\". Let me help you with that."
+        return f'{prefix}I heard you say: "{user_input}". Let me help you with that.'
 
     # ------------------------------------------------------------------
     # Language & translation
@@ -599,7 +672,7 @@ class ConversationEngine:
             Mediation guidance.
         """
         prompt = random.choice(CONFLICT_RESOLUTION_PROMPTS)
-        return f"{prompt} Regarding your situation: \"{situation}\" — let's find common ground."
+        return f'{prompt} Regarding your situation: "{situation}" — let\'s find common ground.'
 
     # ------------------------------------------------------------------
     # History
@@ -620,9 +693,15 @@ class ConversationEngine:
         Returns True if the text likely contains sarcasm.
         """
         sarcasm_signals = [
-            "yeah right", "sure, totally", "oh great", "wow thanks",
-            "because that makes sense", "obviously", "as if",
-            "what a surprise", "who knew",
+            "yeah right",
+            "sure, totally",
+            "oh great",
+            "wow thanks",
+            "because that makes sense",
+            "obviously",
+            "as if",
+            "what a surprise",
+            "who knew",
         ]
         lower = text.lower()
         return any(signal in lower for signal in sarcasm_signals)

@@ -1,8 +1,10 @@
 """Entry point for the government-contract-grant-bot."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 from government_contract_grant_bot import GovernmentContractGrantBot

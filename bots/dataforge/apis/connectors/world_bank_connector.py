@@ -1,4 +1,5 @@
 """World Bank Open Data API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,6 +27,7 @@ class WorldBankConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             url = f"{self.BASE_URL}/country/{country}/indicator/{indicator}?format=json"
             response = requests.get(url, timeout=30)
@@ -46,11 +48,14 @@ class WorldBankConnector:
             API response dict with indicators or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/indicators?format=json&per_page=10&mrv=1&search={query}", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/indicators?format=json&per_page=10&mrv=1&search={query}",
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("World Bank search_indicators error: %s", e)
             return {"status": "error", "message": str(e)}
-

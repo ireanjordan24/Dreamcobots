@@ -1,32 +1,65 @@
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.business_launch_pad.tiers import (
-    Tier, TierConfig, get_tier_config, list_tiers, TIER_CATALOGUE,
-    FEATURE_PLAN_GENERATOR, FEATURE_MARKET_RESEARCH, FEATURE_LEGAL_FORMATION,
-    FEATURE_BRAND_IDENTITY, FEATURE_WEBSITE_SETUP, FEATURE_FINANCIAL_PROJECTIONS,
-    FEATURE_PITCH_DECK, FEATURE_TAM_ANALYSIS, FEATURE_SWOT_ANALYSIS,
-    FEATURE_COMPLIANCE_MONITORING, FEATURE_WHITE_LABEL, FEATURE_API_ACCESS,
-    BOT_FEATURES,
+from bots.business_launch_pad.brand_identity import (
+    BrandIdentity,
+    BrandKit,
+    ColorPalette,
 )
-from bots.business_launch_pad.plan_generator import PlanGenerator, BusinessPlan
-from bots.business_launch_pad.market_research import MarketResearch, Competitor, CustomerPersona, MarketReport
-from bots.business_launch_pad.legal_formation import LegalFormation, LegalEntity, EntityType, FormationStatus
-from bots.business_launch_pad.brand_identity import BrandIdentity, BrandKit, ColorPalette
-from bots.business_launch_pad.website_setup import WebsiteSetup, WebsiteProject, WebsiteTemplate, DomainStatus
 from bots.business_launch_pad.business_launch_pad import (
-    BusinessLaunchPad, BusinessLaunchPadError, BusinessLaunchPadTierError,
+    BusinessLaunchPad,
+    BusinessLaunchPadError,
+    BusinessLaunchPadTierError,
 )
-
+from bots.business_launch_pad.legal_formation import (
+    EntityType,
+    FormationStatus,
+    LegalEntity,
+    LegalFormation,
+)
+from bots.business_launch_pad.market_research import (
+    Competitor,
+    CustomerPersona,
+    MarketReport,
+    MarketResearch,
+)
+from bots.business_launch_pad.plan_generator import BusinessPlan, PlanGenerator
+from bots.business_launch_pad.tiers import (
+    BOT_FEATURES,
+    FEATURE_API_ACCESS,
+    FEATURE_BRAND_IDENTITY,
+    FEATURE_COMPLIANCE_MONITORING,
+    FEATURE_FINANCIAL_PROJECTIONS,
+    FEATURE_LEGAL_FORMATION,
+    FEATURE_MARKET_RESEARCH,
+    FEATURE_PITCH_DECK,
+    FEATURE_PLAN_GENERATOR,
+    FEATURE_SWOT_ANALYSIS,
+    FEATURE_TAM_ANALYSIS,
+    FEATURE_WEBSITE_SETUP,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    list_tiers,
+)
+from bots.business_launch_pad.website_setup import (
+    DomainStatus,
+    WebsiteProject,
+    WebsiteSetup,
+    WebsiteTemplate,
+)
 
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_tier_enum_values(self):
@@ -73,9 +106,17 @@ class TestTiers:
 
     def test_pro_has_all_main_features(self):
         cfg = get_tier_config(Tier.PRO)
-        for feat in [FEATURE_PLAN_GENERATOR, FEATURE_MARKET_RESEARCH, FEATURE_LEGAL_FORMATION,
-                     FEATURE_BRAND_IDENTITY, FEATURE_WEBSITE_SETUP, FEATURE_FINANCIAL_PROJECTIONS,
-                     FEATURE_PITCH_DECK, FEATURE_TAM_ANALYSIS, FEATURE_SWOT_ANALYSIS]:
+        for feat in [
+            FEATURE_PLAN_GENERATOR,
+            FEATURE_MARKET_RESEARCH,
+            FEATURE_LEGAL_FORMATION,
+            FEATURE_BRAND_IDENTITY,
+            FEATURE_WEBSITE_SETUP,
+            FEATURE_FINANCIAL_PROJECTIONS,
+            FEATURE_PITCH_DECK,
+            FEATURE_TAM_ANALYSIS,
+            FEATURE_SWOT_ANALYSIS,
+        ]:
             assert cfg.has_feature(feat), f"PRO missing {feat}"
 
     def test_enterprise_has_white_label(self):
@@ -112,6 +153,7 @@ class TestTiers:
 # ===========================================================================
 # PlanGenerator
 # ===========================================================================
+
 
 class TestPlanGenerator:
     def setup_method(self):
@@ -156,7 +198,9 @@ class TestPlanGenerator:
         assert tam == 1_000_000_000_000.0
 
     def test_executive_summary_contains_name(self):
-        summary = self.pg.generate_executive_summary("FooCo", "finance", "We do finance")
+        summary = self.pg.generate_executive_summary(
+            "FooCo", "finance", "We do finance"
+        )
         assert "FooCo" in summary
 
     def test_executive_summary_contains_industry(self):
@@ -166,7 +210,16 @@ class TestPlanGenerator:
     def test_export_pitch_deck_keys(self):
         plan = self.pg.generate_plan("PitchCo", "technology", "A pitch")
         deck = self.pg.export_pitch_deck(plan)
-        for key in ["title_slide", "problem", "solution", "market_opportunity", "business_model", "financials", "team", "ask"]:
+        for key in [
+            "title_slide",
+            "problem",
+            "solution",
+            "market_opportunity",
+            "business_model",
+            "financials",
+            "team",
+            "ask",
+        ]:
             assert key in deck, f"Missing key: {key}"
 
     def test_list_plans_initially_empty(self):
@@ -190,6 +243,7 @@ class TestPlanGenerator:
 # ===========================================================================
 # MarketResearch
 # ===========================================================================
+
 
 class TestMarketResearch:
     def setup_method(self):
@@ -261,6 +315,7 @@ class TestMarketResearch:
 # ===========================================================================
 # LegalFormation
 # ===========================================================================
+
 
 class TestLegalFormation:
     def setup_method(self):
@@ -350,6 +405,7 @@ class TestLegalFormation:
 # BrandIdentity
 # ===========================================================================
 
+
 class TestBrandIdentity:
     def setup_method(self):
         self.bi = BrandIdentity()
@@ -427,6 +483,7 @@ class TestBrandIdentity:
 # WebsiteSetup
 # ===========================================================================
 
+
 class TestWebsiteSetup:
     def setup_method(self):
         self.ws = WebsiteSetup()
@@ -452,15 +509,21 @@ class TestWebsiteSetup:
         assert result.price_usd == 0.0
 
     def test_create_website_returns_project(self):
-        project = self.ws.create_website("WebCo", "webcobusiness.com", WebsiteTemplate.SAAS)
+        project = self.ws.create_website(
+            "WebCo", "webcobusiness.com", WebsiteTemplate.SAAS
+        )
         assert isinstance(project, WebsiteProject)
 
     def test_create_website_not_launched(self):
-        project = self.ws.create_website("NotLaunchedCo", "notlaunched.com", WebsiteTemplate.BLOG)
+        project = self.ws.create_website(
+            "NotLaunchedCo", "notlaunched.com", WebsiteTemplate.BLOG
+        )
         assert project.launched is False
 
     def test_create_website_has_pages(self):
-        project = self.ws.create_website("PagesCo", "pages.com", WebsiteTemplate.LANDING_PAGE)
+        project = self.ws.create_website(
+            "PagesCo", "pages.com", WebsiteTemplate.LANDING_PAGE
+        )
         assert len(project.pages) > 0
 
     def test_select_template_technology(self):
@@ -476,22 +539,30 @@ class TestWebsiteSetup:
         assert template in WebsiteTemplate
 
     def test_setup_seo_returns_dict(self):
-        project = self.ws.create_website("SEOCo", "seoco.com", WebsiteTemplate.CORPORATE)
+        project = self.ws.create_website(
+            "SEOCo", "seoco.com", WebsiteTemplate.CORPORATE
+        )
         seo = self.ws.setup_seo(project.project_id)
         assert isinstance(seo, dict)
 
     def test_setup_seo_has_keywords(self):
-        project = self.ws.create_website("KeywordCo", "keyword.com", WebsiteTemplate.SAAS)
+        project = self.ws.create_website(
+            "KeywordCo", "keyword.com", WebsiteTemplate.SAAS
+        )
         seo = self.ws.setup_seo(project.project_id)
         assert "keywords" in seo
 
     def test_setup_seo_updates_score(self):
-        project = self.ws.create_website("ScoreCo", "score.com", WebsiteTemplate.LANDING_PAGE)
+        project = self.ws.create_website(
+            "ScoreCo", "score.com", WebsiteTemplate.LANDING_PAGE
+        )
         self.ws.setup_seo(project.project_id)
         assert project.seo_score > 0
 
     def test_launch_website_sets_launched(self):
-        project = self.ws.create_website("LaunchCo", "launch.com", WebsiteTemplate.CORPORATE)
+        project = self.ws.create_website(
+            "LaunchCo", "launch.com", WebsiteTemplate.CORPORATE
+        )
         launched = self.ws.launch_website(project.project_id)
         assert launched.launched is True
 
@@ -516,6 +587,7 @@ class TestWebsiteSetup:
 # ===========================================================================
 # BusinessLaunchPad — main bot
 # ===========================================================================
+
 
 class TestBusinessLaunchPadFree:
     def setup_method(self):
@@ -639,7 +711,11 @@ class TestBusinessLaunchPadEnterprise:
 
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
-        for feat in [FEATURE_WHITE_LABEL, FEATURE_API_ACCESS, FEATURE_COMPLIANCE_MONITORING]:
+        for feat in [
+            FEATURE_WHITE_LABEL,
+            FEATURE_API_ACCESS,
+            FEATURE_COMPLIANCE_MONITORING,
+        ]:
             assert cfg.has_feature(feat)
 
 

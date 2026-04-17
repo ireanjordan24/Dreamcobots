@@ -15,8 +15,8 @@ backed by a real-time data store (Firebase / Socket.IO) in production.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -25,10 +25,10 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class DashboardError(Exception):
     """Base exception for owner dashboard errors."""
@@ -45,6 +45,7 @@ class BotAlreadyKilled(DashboardError):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ActivityLogEntry:
@@ -71,9 +72,9 @@ class ChatMessage:
     """A message in a bot's chat feed."""
 
     bot_id: str
-    direction: str          # "sent" | "received"
+    direction: str  # "sent" | "received"
     content: str
-    peer: str = ""          # bot/user the message was to/from
+    peer: str = ""  # bot/user the message was to/from
     timestamp: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
@@ -145,6 +146,7 @@ class BotControl:
 # Owner Dashboard
 # ---------------------------------------------------------------------------
 
+
 class OwnerDashboard:
     """
     Per-owner dashboard that tracks bots, chat feeds, logs, and earnings.
@@ -210,7 +212,9 @@ class OwnerDashboard:
     # Kill switch
     # ------------------------------------------------------------------
 
-    def kill_bot(self, bot_id: str, reason: str = "Owner initiated kill switch") -> BotControl:
+    def kill_bot(
+        self, bot_id: str, reason: str = "Owner initiated kill switch"
+    ) -> BotControl:
         """
         Immediately disable *bot_id*.
 
@@ -275,7 +279,9 @@ class OwnerDashboard:
         entry = ActivityLogEntry(bot_id=bot_id, event=event, details=details)
         self._activity_logs[bot_id].append(entry)
 
-    def log_activity(self, bot_id: str, event: str, details: Optional[dict] = None) -> None:
+    def log_activity(
+        self, bot_id: str, event: str, details: Optional[dict] = None
+    ) -> None:
         """Manually append to *bot_id*'s activity log."""
         self._log_activity(bot_id, event, details or {})
 
@@ -306,14 +312,13 @@ class OwnerDashboard:
         )
         self._earnings.append(rec)
         self._log_activity(
-            bot_id, "earning_recorded",
+            bot_id,
+            "earning_recorded",
             {"amount_usd": amount_usd, "source": source},
         )
         return rec
 
-    def get_earnings(
-        self, bot_id: Optional[str] = None
-    ) -> list[dict]:
+    def get_earnings(self, bot_id: Optional[str] = None) -> list[dict]:
         """Return earnings records, optionally filtered by bot."""
         records = self._earnings
         if bot_id:
@@ -322,8 +327,9 @@ class OwnerDashboard:
 
     def total_earnings(self, bot_id: Optional[str] = None) -> float:
         """Return total earnings in USD, optionally for a single bot."""
-        return sum(r.amount_usd for r in self._earnings
-                   if bot_id is None or r.bot_id == bot_id)
+        return sum(
+            r.amount_usd for r in self._earnings if bot_id is None or r.bot_id == bot_id
+        )
 
     # ------------------------------------------------------------------
     # Dashboard snapshot

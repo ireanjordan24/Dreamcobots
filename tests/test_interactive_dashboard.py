@@ -12,8 +12,8 @@ Covers:
   8. Dashboard snapshot & render
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -21,17 +21,17 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 from bots.big_bro_ai.interactive_dashboard import (
-    InteractiveDashboard,
-    BotSpeed,
-    BotIdea,
     Achievement,
+    BotIdea,
+    BotSpeed,
+    InteractiveDashboard,
     progress_bar,
 )
-
 
 # ===========================================================================
 # 1. Progress Bar
 # ===========================================================================
+
 
 class TestProgressBar:
     def test_empty_bar(self):
@@ -63,6 +63,7 @@ class TestProgressBar:
 # ===========================================================================
 # 2. Achievement System
 # ===========================================================================
+
 
 class TestAchievements:
     def setup_method(self):
@@ -104,6 +105,7 @@ class TestAchievements:
 # ===========================================================================
 # 3. XP & Level
 # ===========================================================================
+
 
 class TestXPAndLevel:
     def setup_method(self):
@@ -152,6 +154,7 @@ class TestXPAndLevel:
 # 4. Hustle Simulator
 # ===========================================================================
 
+
 class TestHustleSimulator:
     def setup_method(self):
         self.dashboard = InteractiveDashboard()
@@ -190,6 +193,7 @@ class TestHustleSimulator:
 
     def test_aggressive_speed_increases_profit(self):
         import random as _random
+
         # Use a fixed seed so the revenue/profit values are deterministic
         _random.seed(42)
         self.dashboard.set_bot_speed(BotSpeed.MODERATE)
@@ -204,6 +208,7 @@ class TestHustleSimulator:
 # ===========================================================================
 # 5. Code Gladiator
 # ===========================================================================
+
 
 class TestCodeGladiator:
     def setup_method(self):
@@ -226,7 +231,9 @@ class TestCodeGladiator:
         for digit in range(10):
             self.dashboard = InteractiveDashboard()
             challenge = self.dashboard.code_gladiator_challenge()
-            result = self.dashboard.submit_gladiator_answer(challenge["challenge_id"], digit)
+            result = self.dashboard.submit_gladiator_answer(
+                challenge["challenge_id"], digit
+            )
             if result["result"] == "victory":
                 assert result["xp_earned"] >= 40
                 break
@@ -256,7 +263,9 @@ class TestCodeGladiator:
         for digit in range(10):
             self.dashboard = InteractiveDashboard()
             challenge = self.dashboard.code_gladiator_challenge()
-            result = self.dashboard.submit_gladiator_answer(challenge["challenge_id"], digit)
+            result = self.dashboard.submit_gladiator_answer(
+                challenge["challenge_id"], digit
+            )
             if result["result"] == "victory":
                 achievements = {a["name"]: a for a in self.dashboard.get_achievements()}
                 assert achievements["Code Warrior"]["unlocked"] is True
@@ -266,6 +275,7 @@ class TestCodeGladiator:
 # ===========================================================================
 # 6. Bot Idea Manager
 # ===========================================================================
+
 
 class TestBotIdeaManager:
     def setup_method(self):
@@ -314,6 +324,7 @@ class TestBotIdeaManager:
 # 7. Bot Speed Control
 # ===========================================================================
 
+
 class TestBotSpeedControl:
     def setup_method(self):
         self.dashboard = InteractiveDashboard()
@@ -348,15 +359,27 @@ class TestBotSpeedControl:
 # 8. Dashboard Snapshot & Render
 # ===========================================================================
 
+
 class TestDashboardSnapshot:
     def setup_method(self):
         self.dashboard = InteractiveDashboard()
 
     def test_snapshot_has_required_keys(self):
         snap = self.dashboard.snapshot()
-        for key in ("module", "level", "total_xp", "xp_in_level", "progress_bar",
-                    "xp_to_next_level", "bot_speed", "bot_ideas_count",
-                    "top_bots", "achievements", "big_bro_says", "timestamp"):
+        for key in (
+            "module",
+            "level",
+            "total_xp",
+            "xp_in_level",
+            "progress_bar",
+            "xp_to_next_level",
+            "bot_speed",
+            "bot_ideas_count",
+            "top_bots",
+            "achievements",
+            "big_bro_says",
+            "timestamp",
+        ):
             assert key in snap, f"Missing key: {key}"
 
     def test_snapshot_module_name(self):

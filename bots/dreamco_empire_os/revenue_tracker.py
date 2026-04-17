@@ -10,18 +10,22 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 @dataclass
 class RevenueEntry:
     """A single revenue event."""
+
     entry_id: str
     source: str
     amount_usd: float
     category: str = "general"
     bot_name: Optional[str] = None
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class RevenueTracker:
@@ -58,9 +62,15 @@ class RevenueTracker:
             bot_name=bot_name,
         )
         self._entries.append(entry)
-        return {"entry_id": entry.entry_id, "source": source, "amount_usd": entry.amount_usd}
+        return {
+            "entry_id": entry.entry_id,
+            "source": source,
+            "amount_usd": entry.amount_usd,
+        }
 
-    def record_cost(self, source: str, amount_usd: float, category: str = "general") -> dict:
+    def record_cost(
+        self, source: str, amount_usd: float, category: str = "general"
+    ) -> dict:
         """Record an operational cost."""
         entry = {
             "source": source,
@@ -87,9 +97,13 @@ class RevenueTracker:
 
         for e in self._entries:
             by_source[e.source] = round(by_source.get(e.source, 0.0) + e.amount_usd, 2)
-            by_category[e.category] = round(by_category.get(e.category, 0.0) + e.amount_usd, 2)
+            by_category[e.category] = round(
+                by_category.get(e.category, 0.0) + e.amount_usd, 2
+            )
             if e.bot_name:
-                by_bot[e.bot_name] = round(by_bot.get(e.bot_name, 0.0) + e.amount_usd, 2)
+                by_bot[e.bot_name] = round(
+                    by_bot.get(e.bot_name, 0.0) + e.amount_usd, 2
+                )
 
         return {
             "gross_revenue_usd": round(gross, 2),
@@ -106,7 +120,9 @@ class RevenueTracker:
     def get_top_sources(self, n: int = 5) -> list:
         """Return the top N revenue sources by total amount."""
         summary = self.get_summary()
-        sorted_sources = sorted(summary["revenue_by_source"].items(), key=lambda x: x[1], reverse=True)
+        sorted_sources = sorted(
+            summary["revenue_by_source"].items(), key=lambda x: x[1], reverse=True
+        )
         return [{"source": s, "revenue_usd": v} for s, v in sorted_sources[:n]]
 
     def get_mrr(self) -> float:

@@ -1,4 +1,5 @@
 """Tests for bots/control_tower/control_tower.py"""
+
 import json
 import os
 import sys
@@ -10,6 +11,7 @@ REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from bots.control_tower.control_tower import (
     BotRegistrySync,
     GitHubRepoManager,
@@ -17,7 +19,6 @@ from bots.control_tower.control_tower import (
     _http_get,
     _http_post,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -158,22 +159,33 @@ class TestBotRegistrySync:
     def test_register_multiple_bots(self, tmp_registry):
         sync = BotRegistrySync(registry_path=tmp_registry)
         for i in range(5):
-            sync.register(name=f"Bot{i}", repo_name="Dreamcobots", owner="ireanjordan24")
+            sync.register(
+                name=f"Bot{i}", repo_name="Dreamcobots", owner="ireanjordan24"
+            )
         assert len(sync.load()) == 5
 
     def test_register_sets_default_status_active(self, tmp_registry):
         sync = BotRegistrySync(registry_path=tmp_registry)
-        entry = sync.register(name="Alpha", repo_name="Dreamcobots", owner="ireanjordan24")
+        entry = sync.register(
+            name="Alpha", repo_name="Dreamcobots", owner="ireanjordan24"
+        )
         assert entry["status"] == "active"
 
     def test_register_sets_default_branch_main(self, tmp_registry):
         sync = BotRegistrySync(registry_path=tmp_registry)
-        entry = sync.register(name="Beta", repo_name="Dreamcobots", owner="ireanjordan24")
+        entry = sync.register(
+            name="Beta", repo_name="Dreamcobots", owner="ireanjordan24"
+        )
         assert entry["branch"] == "main"
 
     def test_save_and_reload(self, tmp_registry):
         sync = BotRegistrySync(registry_path=tmp_registry)
-        sync.register(name="Gamma", repo_name="Dreamcobots", owner="ireanjordan24", tier="enterprise")
+        sync.register(
+            name="Gamma",
+            repo_name="Dreamcobots",
+            owner="ireanjordan24",
+            tier="enterprise",
+        )
         sync2 = BotRegistrySync(registry_path=tmp_registry)
         assert sync2.get("Gamma")["tier"] == "enterprise"
 
@@ -217,7 +229,9 @@ class TestHeartbeatClient:
             captured["data"] = data
             return {"ok": True}
 
-        with mock.patch("bots.control_tower.control_tower._http_post", side_effect=fake_post):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_post", side_effect=fake_post
+        ):
             client.ping("LeadBot", status="active", metadata={"version": "2.0"})
 
         assert "heartbeat" in captured["url"].lower()
@@ -234,7 +248,9 @@ class TestHeartbeatClient:
             received.update(data)
             return {}
 
-        with mock.patch("bots.control_tower.control_tower._http_post", side_effect=fake_post):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_post", side_effect=fake_post
+        ):
             client.ping("TestBot")
 
         assert "timestamp" in received
@@ -262,7 +278,9 @@ class TestGitHubRepoManager:
                 "html_url": "https://github.com/test/repo/pull/1",
             }
         ]
-        with mock.patch("bots.control_tower.control_tower._http_get", return_value=mock_prs):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_get", return_value=mock_prs
+        ):
             result = mgr.get_open_prs("owner", "repo")
         assert len(result) == 1
         assert result[0]["number"] == 1
@@ -272,10 +290,25 @@ class TestGitHubRepoManager:
     def test_get_open_prs_filters_out_pull_requests_from_issues(self):
         mgr = GitHubRepoManager(token="fake-token")
         mock_issues = [
-            {"number": 10, "title": "Issue A", "user": {"login": "user1"}, "labels": [], "html_url": "url1"},
-            {"number": 11, "title": "PR B", "user": {"login": "user2"}, "labels": [], "html_url": "url2", "pull_request": {}},
+            {
+                "number": 10,
+                "title": "Issue A",
+                "user": {"login": "user1"},
+                "labels": [],
+                "html_url": "url1",
+            },
+            {
+                "number": 11,
+                "title": "PR B",
+                "user": {"login": "user2"},
+                "labels": [],
+                "html_url": "url2",
+                "pull_request": {},
+            },
         ]
-        with mock.patch("bots.control_tower.control_tower._http_get", return_value=mock_issues):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_get", return_value=mock_issues
+        ):
             result = mgr.get_open_issues("owner", "repo")
         assert len(result) == 1
         assert result[0]["number"] == 10
@@ -292,7 +325,9 @@ class TestGitHubRepoManager:
                 "html_url": "https://github.com/test/repo/commit/abc1234",
             }
         ]
-        with mock.patch("bots.control_tower.control_tower._http_get", return_value=mock_commits):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_get", return_value=mock_commits
+        ):
             result = mgr.get_latest_commit("owner", "repo")
         assert result is not None
         assert result["sha"] == "abc1234"  # truncated to 7 chars
@@ -320,7 +355,9 @@ class TestGitHubRepoManager:
                 }
             ]
         }
-        with mock.patch("bots.control_tower.control_tower._http_get", return_value=mock_data):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_get", return_value=mock_data
+        ):
             result = mgr.get_workflow_runs("owner", "repo")
         assert len(result) == 1
         assert result[0]["id"] == 99
@@ -328,9 +365,13 @@ class TestGitHubRepoManager:
 
     def test_get_repo_status_returns_full_snapshot(self):
         mgr = GitHubRepoManager(token="fake-token")
-        with mock.patch.object(mgr, "get_open_prs", return_value=[{"number": 1, "title": "PR"}]):
+        with mock.patch.object(
+            mgr, "get_open_prs", return_value=[{"number": 1, "title": "PR"}]
+        ):
             with mock.patch.object(mgr, "get_open_issues", return_value=[]):
-                with mock.patch.object(mgr, "get_latest_commit", return_value={"sha": "abc1234"}):
+                with mock.patch.object(
+                    mgr, "get_latest_commit", return_value={"sha": "abc1234"}
+                ):
                     with mock.patch.object(mgr, "get_workflow_runs", return_value=[]):
                         status = mgr.get_repo_status("owner", "repo")
 
@@ -342,7 +383,11 @@ class TestGitHubRepoManager:
 
     def test_get_repo_status_detects_conflict_in_pr_title(self):
         mgr = GitHubRepoManager(token="fake-token")
-        with mock.patch.object(mgr, "get_open_prs", return_value=[{"number": 2, "title": "Resolve conflict in main"}]):
+        with mock.patch.object(
+            mgr,
+            "get_open_prs",
+            return_value=[{"number": 2, "title": "Resolve conflict in main"}],
+        ):
             with mock.patch.object(mgr, "get_open_issues", return_value=[]):
                 with mock.patch.object(mgr, "get_latest_commit", return_value=None):
                     with mock.patch.object(mgr, "get_workflow_runs", return_value=[]):
@@ -352,7 +397,12 @@ class TestGitHubRepoManager:
 
     def test_create_pull_request_calls_github_api(self):
         mgr = GitHubRepoManager(token="fake-token")
-        mock_response = {"number": 42, "html_url": "https://github.com/pr/42", "title": "My PR", "head": {"ref": "feature"}}
+        mock_response = {
+            "number": 42,
+            "html_url": "https://github.com/pr/42",
+            "title": "My PR",
+            "head": {"ref": "feature"},
+        }
         captured = {}
 
         def fake_post(url, data, token=""):
@@ -360,7 +410,9 @@ class TestGitHubRepoManager:
             captured["data"] = data
             return mock_response
 
-        with mock.patch("bots.control_tower.control_tower._http_post", side_effect=fake_post):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_post", side_effect=fake_post
+        ):
             result = mgr.create_pull_request(
                 owner="owner",
                 repo="repo",
@@ -383,7 +435,9 @@ class TestGitHubRepoManager:
             captured["url"] = url
             return {"message": "ok"}
 
-        with mock.patch("bots.control_tower.control_tower._http_post", side_effect=fake_post):
+        with mock.patch(
+            "bots.control_tower.control_tower._http_post", side_effect=fake_post
+        ):
             mgr.re_run_workflow("owner", "repo", run_id=12345)
 
         assert "12345" in captured["url"]
@@ -399,11 +453,15 @@ class TestHttpHelpers:
     def test_http_get_error_returns_dict_with_error_key(self):
         import urllib.error as ue
 
-        with mock.patch("urllib.request.urlopen", side_effect=Exception("network error")):
+        with mock.patch(
+            "urllib.request.urlopen", side_effect=Exception("network error")
+        ):
             result = _http_get("http://nonexistent.example.com/api")
         assert "error" in result
 
     def test_http_post_error_returns_dict_with_error_key(self):
-        with mock.patch("urllib.request.urlopen", side_effect=Exception("network error")):
+        with mock.patch(
+            "urllib.request.urlopen", side_effect=Exception("network error")
+        ):
             result = _http_post("http://nonexistent.example.com/api", {"key": "value"})
         assert "error" in result

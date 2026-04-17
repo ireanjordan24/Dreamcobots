@@ -1,4 +1,5 @@
 """AWS Rekognition vision connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,16 @@ class AWSRekognitionConnector:
         """
         try:
             import boto3
-            client = boto3.client("rekognition", region_name=self.region,
-                                  aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
-            response = client.detect_faces(Image={"Bytes": image_bytes}, Attributes=["ALL"])
+
+            client = boto3.client(
+                "rekognition",
+                region_name=self.region,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+            )
+            response = client.detect_faces(
+                Image={"Bytes": image_bytes}, Attributes=["ALL"]
+            )
             logger.info("AWS Rekognition face detection completed.")
             return {"status": "success", "data": response}
         except Exception as e:
@@ -48,12 +56,16 @@ class AWSRekognitionConnector:
         """
         try:
             import boto3
-            client = boto3.client("rekognition", region_name=self.region,
-                                  aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
+
+            client = boto3.client(
+                "rekognition",
+                region_name=self.region,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+            )
             response = client.detect_labels(Image={"Bytes": image_bytes}, MaxLabels=10)
             logger.info("AWS Rekognition label detection completed.")
             return {"status": "success", "data": response}
         except Exception as e:
             logger.error("AWS Rekognition detect_labels error: %s", e)
             return {"status": "error", "message": str(e)}
-

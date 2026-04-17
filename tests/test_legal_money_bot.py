@@ -1,6 +1,7 @@
 """Tests for bots/legal_money_bot/tiers.py and bots/legal_money_bot/legal_money_bot.py"""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,13 +11,14 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.legal_money_bot.legal_money_bot import LegalMoneyBot, LegalMoneyBotTierError
 from bots.legal_money_bot.tiers import BOT_FEATURES, get_bot_tier_info
-
 
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestInstantiation:
     def test_default_tier_is_free(self):
@@ -46,13 +48,16 @@ class TestInstantiation:
 
     def test_disclaimer_present(self):
         assert "LEGAL DISCLAIMER" in LegalMoneyBot.DISCLAIMER
-        assert "not legal advice" in LegalMoneyBot.DISCLAIMER.lower() or \
-               "NOT legal advice" in LegalMoneyBot.DISCLAIMER
+        assert (
+            "not legal advice" in LegalMoneyBot.DISCLAIMER.lower()
+            or "NOT legal advice" in LegalMoneyBot.DISCLAIMER
+        )
 
 
 # ---------------------------------------------------------------------------
 # Tiers module
 # ---------------------------------------------------------------------------
+
 
 class TestTiersModule:
     def test_bot_features_has_all_tiers(self):
@@ -96,6 +101,7 @@ class TestTiersModule:
 # ---------------------------------------------------------------------------
 # Claim Finder
 # ---------------------------------------------------------------------------
+
 
 class TestClaimFinder:
     def test_free_returns_list(self):
@@ -178,6 +184,7 @@ class TestClaimFinder:
 # Smart Questionnaire
 # ---------------------------------------------------------------------------
 
+
 class TestSmartQuestionnaire:
     def test_returns_questions_for_valid_case(self):
         bot = LegalMoneyBot(tier=Tier.FREE)
@@ -231,6 +238,7 @@ class TestSmartQuestionnaire:
 # ---------------------------------------------------------------------------
 # Eligibility Scoring
 # ---------------------------------------------------------------------------
+
 
 class TestEligibilityScoring:
     def test_free_raises_tier_error(self):
@@ -298,6 +306,7 @@ class TestEligibilityScoring:
 # Settlement Maximizer
 # ---------------------------------------------------------------------------
 
+
 class TestSettlementMaximizer:
     def test_free_raises_tier_error(self):
         bot = LegalMoneyBot(tier=Tier.FREE)
@@ -353,6 +362,7 @@ class TestSettlementMaximizer:
 # ---------------------------------------------------------------------------
 # Lawyer Matching
 # ---------------------------------------------------------------------------
+
 
 class TestLawyerMatching:
     def test_free_raises_tier_error(self):
@@ -420,6 +430,7 @@ class TestLawyerMatching:
 # ---------------------------------------------------------------------------
 # Auto-Filing
 # ---------------------------------------------------------------------------
+
 
 class TestAutoFiling:
     def test_free_raises_tier_error(self):
@@ -514,6 +525,7 @@ class TestAutoFiling:
 # Referral Tracking
 # ---------------------------------------------------------------------------
 
+
 class TestReferralTracking:
     def test_free_raises_tier_error(self):
         bot = LegalMoneyBot(tier=Tier.FREE)
@@ -574,6 +586,7 @@ class TestReferralTracking:
 # Notifications
 # ---------------------------------------------------------------------------
 
+
 class TestNotifications:
     def test_free_raises_tier_error(self):
         bot = LegalMoneyBot(tier=Tier.FREE)
@@ -620,6 +633,7 @@ class TestNotifications:
 # Analytics (ENTERPRISE+)
 # ---------------------------------------------------------------------------
 
+
 class TestAnalytics:
     def test_free_raises_tier_error(self):
         bot = LegalMoneyBot(tier=Tier.FREE)
@@ -665,6 +679,7 @@ class TestAnalytics:
 # Summary & describe_tier
 # ---------------------------------------------------------------------------
 
+
 class TestSummary:
     def test_get_summary_all_tiers(self):
         for tier in Tier:
@@ -702,6 +717,7 @@ class TestSummary:
 # ---------------------------------------------------------------------------
 # Chat interface
 # ---------------------------------------------------------------------------
+
 
 class TestChatInterface:
     def test_claim_search_message(self):
@@ -767,9 +783,11 @@ class TestChatInterface:
 # Bot Library registration
 # ---------------------------------------------------------------------------
 
+
 class TestBotLibraryRegistration:
     def test_legal_money_bot_in_library(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         bot_ids = [e["bot_id"] for e in lib.list_bots()]
@@ -777,6 +795,7 @@ class TestBotLibraryRegistration:
 
     def test_legal_money_bot_capabilities(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("legal_money_bot")
@@ -786,7 +805,8 @@ class TestBotLibraryRegistration:
         assert "auto_filing" in entry.capabilities
 
     def test_legal_money_bot_category(self):
-        from bots.global_bot_network.bot_library import BotLibrary, BotCategory
+        from bots.global_bot_network.bot_library import BotCategory, BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("legal_money_bot")

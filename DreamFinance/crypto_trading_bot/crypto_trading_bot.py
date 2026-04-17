@@ -1,16 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Crypto Trading Bot — financial intelligence bot."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
 _tiers_spec = importlib.util.spec_from_file_location(
-    '_local_tiers_crypto_trading_bot', os.path.join(_TOOL_DIR, 'tiers.py'))
+    "_local_tiers_crypto_trading_bot", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -31,12 +35,22 @@ class CryptoTradingBot:
 
     def execute_trade(self, exchange: str, order: dict) -> dict:
         """Execute trade — Crypto Trading Bot."""
-        return {"exchange": exchange, "order_id": f"{exchange.upper()}-{hash(str(order)) % 1000000:06d}", "status": "filled", "price": order.get("price", 0), "qty": order.get("qty", 0), "disclaimer": DISCLAIMER}
+        return {
+            "exchange": exchange,
+            "order_id": f"{exchange.upper()}-{hash(str(order)) % 1000000:06d}",
+            "status": "filled",
+            "price": order.get("price", 0),
+            "qty": order.get("qty", 0),
+            "disclaimer": DISCLAIMER,
+        }
 
     def dca_buy(self, symbol: str, amount: float, intervals: int) -> list:
         """Dca buy — Crypto Trading Bot."""
         chunk = round(amount / intervals, 8)
-        return [{"symbol": symbol, "interval": i + 1, "amount": chunk, "action": "buy"} for i in range(intervals)]
+        return [
+            {"symbol": symbol, "interval": i + 1, "amount": chunk, "action": "buy"}
+            for i in range(intervals)
+        ]
 
     def setup_grid(self, symbol: str, params: dict) -> dict:
         """Setup grid — Crypto Trading Bot."""
@@ -45,9 +59,14 @@ class CryptoTradingBot:
         grids = params.get("grids", 10)
         step = round((upper - lower) / grids, 4)
         levels = [round(lower + i * step, 4) for i in range(grids + 1)]
-        return {"symbol": symbol, "levels": levels, "step": step, "grids": grids, "disclaimer": DISCLAIMER}
+        return {
+            "symbol": symbol,
+            "levels": levels,
+            "step": step,
+            "grids": grids,
+            "disclaimer": DISCLAIMER,
+        }
 
     def run(self) -> str:
         """Return running status string."""
         return f"CryptoTradingBot running: {self.tier} tier"
-

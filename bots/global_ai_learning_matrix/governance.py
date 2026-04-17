@@ -2,9 +2,10 @@
 """Governance layer for the Global AI Learning Matrix."""
 
 from __future__ import annotations
+
+import uuid
 from dataclasses import dataclass, field
 from typing import Optional
-import uuid
 
 
 @dataclass
@@ -26,18 +27,90 @@ class GovernanceAlert:
 
 
 _DEFAULT_POLICIES: list[GovernancePolicy] = [
-    GovernancePolicy("pol-001", "Data Privacy", "Ensure PII is anonymized before model training.", True, "critical"),
-    GovernancePolicy("pol-002", "Bias Detection", "Run fairness audits on all trained models.", True, "high"),
-    GovernancePolicy("pol-003", "Model Drift", "Alert when model accuracy drops > 5% from baseline.", True, "high"),
-    GovernancePolicy("pol-004", "Regulatory Compliance", "Validate outputs against GDPR/CCPA/HIPAA rules.", True, "critical"),
-    GovernancePolicy("pol-005", "Security Scanning", "Scan model artifacts for adversarial vulnerabilities.", True, "high"),
-    GovernancePolicy("pol-006", "Explainability", "All production models must expose feature attribution.", True, "medium"),
-    GovernancePolicy("pol-007", "Data Lineage", "Track provenance of all training datasets.", True, "medium"),
-    GovernancePolicy("pol-008", "Resource Quota", "Cap GPU/CPU spend per project per month.", True, "low"),
-    GovernancePolicy("pol-009", "Access Control", "Enforce role-based access to model artifacts.", True, "high"),
-    GovernancePolicy("pol-010", "Audit Logging", "Immutable logs for all inference requests.", True, "medium"),
-    GovernancePolicy("pol-011", "Model Versioning", "Every deployed model must have a semantic version.", False, "low"),
-    GovernancePolicy("pol-012", "Environmental Impact", "Report carbon footprint for training runs.", False, "low"),
+    GovernancePolicy(
+        "pol-001",
+        "Data Privacy",
+        "Ensure PII is anonymized before model training.",
+        True,
+        "critical",
+    ),
+    GovernancePolicy(
+        "pol-002",
+        "Bias Detection",
+        "Run fairness audits on all trained models.",
+        True,
+        "high",
+    ),
+    GovernancePolicy(
+        "pol-003",
+        "Model Drift",
+        "Alert when model accuracy drops > 5% from baseline.",
+        True,
+        "high",
+    ),
+    GovernancePolicy(
+        "pol-004",
+        "Regulatory Compliance",
+        "Validate outputs against GDPR/CCPA/HIPAA rules.",
+        True,
+        "critical",
+    ),
+    GovernancePolicy(
+        "pol-005",
+        "Security Scanning",
+        "Scan model artifacts for adversarial vulnerabilities.",
+        True,
+        "high",
+    ),
+    GovernancePolicy(
+        "pol-006",
+        "Explainability",
+        "All production models must expose feature attribution.",
+        True,
+        "medium",
+    ),
+    GovernancePolicy(
+        "pol-007",
+        "Data Lineage",
+        "Track provenance of all training datasets.",
+        True,
+        "medium",
+    ),
+    GovernancePolicy(
+        "pol-008",
+        "Resource Quota",
+        "Cap GPU/CPU spend per project per month.",
+        True,
+        "low",
+    ),
+    GovernancePolicy(
+        "pol-009",
+        "Access Control",
+        "Enforce role-based access to model artifacts.",
+        True,
+        "high",
+    ),
+    GovernancePolicy(
+        "pol-010",
+        "Audit Logging",
+        "Immutable logs for all inference requests.",
+        True,
+        "medium",
+    ),
+    GovernancePolicy(
+        "pol-011",
+        "Model Versioning",
+        "Every deployed model must have a semantic version.",
+        False,
+        "low",
+    ),
+    GovernancePolicy(
+        "pol-012",
+        "Environmental Impact",
+        "Report carbon footprint for training runs.",
+        False,
+        "low",
+    ),
 ]
 
 
@@ -45,7 +118,9 @@ class GovernanceLayer:
     """Manages governance policies and alerts for the AI system."""
 
     def __init__(self):
-        self._policies: dict[str, GovernancePolicy] = {p.policy_id: p for p in _DEFAULT_POLICIES}
+        self._policies: dict[str, GovernancePolicy] = {
+            p.policy_id: p for p in _DEFAULT_POLICIES
+        }
         self._alerts: dict[str, GovernanceAlert] = {}
 
     # --- Policies ---
@@ -92,7 +167,9 @@ class GovernanceLayer:
         """Return a 0-100 score based on enabled policies and unresolved alerts."""
         all_policies = list(self._policies.values())
         enabled_ratio = (
-            sum(1 for p in all_policies if p.enabled) / len(all_policies) if all_policies else 1.0
+            sum(1 for p in all_policies if p.enabled) / len(all_policies)
+            if all_policies
+            else 1.0
         )
 
         all_alerts = list(self._alerts.values())
@@ -101,7 +178,9 @@ class GovernanceLayer:
         else:
             severity_weights = {"critical": 20, "high": 10, "medium": 5, "low": 2}
             unresolved_penalty = sum(
-                severity_weights.get(a.severity, 2) for a in all_alerts if not a.resolved
+                severity_weights.get(a.severity, 2)
+                for a in all_alerts
+                if not a.resolved
             )
             alert_penalty = min(unresolved_penalty, 40)
 

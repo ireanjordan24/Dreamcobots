@@ -2,31 +2,33 @@
 Tests for bots/security_tech_bot/tiers.py and bots/security_tech_bot/security_tech_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'security_tech_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "security_tech_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.security_tech_bot.security_tech_bot import (
     SecurityTechBot,
-    SecurityTechBotTierError,
     SecurityTechBotRequestLimitError,
+    SecurityTechBotTierError,
 )
-
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestSecurityTechBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_sec_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -37,8 +39,15 @@ class TestSecurityTechBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_security_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "security_features", "scan_limit", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "security_features",
+            "scan_limit",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -64,6 +73,7 @@ class TestSecurityTechBotTierInfo:
 # SecurityTechBot tests
 # -----------------------------------------------------------------------
 
+
 class TestSecurityTechBot:
     def test_default_tier_free(self):
         bot = SecurityTechBot()
@@ -77,8 +87,15 @@ class TestSecurityTechBot:
     def test_scan_vulnerabilities_keys(self):
         bot = SecurityTechBot()
         result = bot.scan_vulnerabilities("example.com")
-        for key in ("target", "scan_type", "findings", "total_findings",
-                    "tier", "requests_used", "requests_remaining"):
+        for key in (
+            "target",
+            "scan_type",
+            "findings",
+            "total_findings",
+            "tier",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_scan_basic_free_ok(self):
@@ -106,6 +123,7 @@ class TestSecurityTechBot:
     def test_scan_limit_free(self):
         bot = SecurityTechBot(tier=Tier.FREE)
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_sec_t", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -125,8 +143,15 @@ class TestSecurityTechBot:
     def test_check_password_strength_keys(self):
         bot = SecurityTechBot()
         result = bot.check_password_strength("abc")
-        for key in ("score", "strength", "entropy_bits", "recommendations",
-                    "tier", "requests_used", "requests_remaining"):
+        for key in (
+            "score",
+            "strength",
+            "entropy_bits",
+            "recommendations",
+            "tier",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_weak_password_detected(self):
@@ -152,10 +177,12 @@ class TestSecurityTechBot:
 
     def test_audit_dependencies_pro_ok(self):
         bot = SecurityTechBot(tier=Tier.PRO)
-        result = bot.audit_dependencies([
-            {"name": "requests", "version": "2.0.0"},
-            {"name": "flask", "version": "1.0.0"},
-        ])
+        result = bot.audit_dependencies(
+            [
+                {"name": "requests", "version": "2.0.0"},
+                {"name": "flask", "version": "1.0.0"},
+            ]
+        )
         assert isinstance(result, dict)
         assert "total_checked" in result
         assert result["total_checked"] == 2

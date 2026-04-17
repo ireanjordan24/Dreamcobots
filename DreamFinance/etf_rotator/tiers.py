@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 199.0, ["sector momentum scoring", "factor tilt optimization"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["sector momentum scoring", "factor tilt optimization", "rebalancing signal generation", "advanced analytics"]),
+    "pro": TierConfig(
+        "Pro", 199.0, ["sector momentum scoring", "factor tilt optimization"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "sector momentum scoring",
+            "factor tilt optimization",
+            "rebalancing signal generation",
+            "advanced analytics",
+        ],
+    ),
 }

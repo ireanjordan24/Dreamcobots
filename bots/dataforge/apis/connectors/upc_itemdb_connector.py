@@ -1,4 +1,5 @@
 """UPC ItemDB product lookup connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,11 +26,17 @@ class UPCItemDBConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {}
         if self.user_key:
             headers["user_key"] = self.user_key
         try:
-            response = requests.get(f"{self.BASE_URL}/lookup", params={"upc": upc}, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/lookup",
+                params={"upc": upc},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("UPC ItemDB lookup completed for: %s", upc)
             return {"status": "success", "data": response.json()}
@@ -48,14 +55,19 @@ class UPCItemDBConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {}
         if self.user_key:
             headers["user_key"] = self.user_key
         try:
-            response = requests.get(f"{self.BASE_URL}/search", params={"s": query, "type": type}, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search",
+                params={"s": query, "type": type},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("UPC ItemDB search error: %s", e)
             return {"status": "error", "message": str(e)}
-

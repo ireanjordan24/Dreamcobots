@@ -25,10 +25,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
+
 
 class ModelType(Enum):
     CLASSIFICATION = "classification"
@@ -53,9 +53,11 @@ class TrainingStatus(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Dataset:
     """A dataset used for AI model training."""
+
     dataset_id: str
     name: str
     num_samples: int
@@ -79,10 +81,11 @@ class Dataset:
 @dataclass
 class ModelVersion:
     """A versioned snapshot of an AI model."""
+
     version_id: str
     model_name: str
     version_number: int
-    accuracy: float          # 0.0 – 1.0
+    accuracy: float  # 0.0 – 1.0
     loss: float
     parameters: dict
     training_session_id: str
@@ -108,6 +111,7 @@ class ModelVersion:
 @dataclass
 class TrainingSession:
     """Records a single AI model training run."""
+
     session_id: str
     model_name: str
     model_type: ModelType
@@ -154,6 +158,7 @@ _BASE_ACCURACY: dict[ModelType, float] = {
     ModelType.ROBOTICS_CONTROL: 0.72,
 }
 
+
 def _simulate_accuracy(
     model_type: ModelType,
     epochs: int,
@@ -187,9 +192,13 @@ def _generate_feedback(
     if loss > 0.3:
         tips.append("High loss detected. Reduce learning rate or add regularisation.")
     if epochs < 10:
-        tips.append("Training ran for fewer than 10 epochs — consider longer runs for stability.")
+        tips.append(
+            "Training ran for fewer than 10 epochs — consider longer runs for stability."
+        )
     if learning_rate > 0.1:
-        tips.append("Learning rate seems high; try 0.001 – 0.01 for most architectures.")
+        tips.append(
+            "Learning rate seems high; try 0.001 – 0.01 for most architectures."
+        )
     tips.append(f"Model reached {accuracy * 100:.1f}% accuracy with loss {loss:.4f}.")
     return tips
 
@@ -197,6 +206,7 @@ def _generate_feedback(
 # ---------------------------------------------------------------------------
 # Core class
 # ---------------------------------------------------------------------------
+
 
 class AITrainer:
     """
@@ -229,7 +239,9 @@ class AITrainer:
         metadata: Optional[dict] = None,
     ) -> Dataset:
         """Register a new dataset for training."""
-        dataset_id = f"ds_{hashlib.md5(f'{name}{time.time()}'.encode()).hexdigest()[:10]}"
+        dataset_id = (
+            f"ds_{hashlib.md5(f'{name}{time.time()}'.encode()).hexdigest()[:10]}"
+        )
         ds = Dataset(
             dataset_id=dataset_id,
             name=name,
@@ -355,7 +367,9 @@ class AITrainer:
         versions = self._versions.get(model_name, [])
         target = next((v for v in versions if v.version_id == version_id), None)
         if target is None:
-            raise KeyError(f"Version '{version_id}' for model '{model_name}' not found.")
+            raise KeyError(
+                f"Version '{version_id}' for model '{model_name}' not found."
+            )
 
         # Mark previous deployed version as rolled back
         if model_name in self._deployed:
@@ -382,7 +396,9 @@ class AITrainer:
         """Roll back a model to a previous version."""
         result = self.deploy_version(model_name, version_id)
         result["status"] = "rolled_back"
-        result["message"] = result["message"].replace("is now live", "has been rolled back to")
+        result["message"] = result["message"].replace(
+            "is now live", "has been rolled back to"
+        )
         return result
 
     def get_deployed_version(self, model_name: str) -> Optional[ModelVersion]:

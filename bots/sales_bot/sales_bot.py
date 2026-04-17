@@ -15,34 +15,33 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from typing import Optional
 
+from bots.sales_bot.conversion_tracker import ConversionTracker, LeadStatus
+from bots.sales_bot.followup_bot import FollowUpBot
+from bots.sales_bot.sms_bot import SMSBot
 from bots.sales_bot.tiers import (
+    FEATURE_CONVERSION_TRACKING,
+    FEATURE_FOLLOWUP_BOT,
+    FEATURE_REVENUE_TRACKING,
+    FEATURE_SMS_OUTREACH,
+    FEATURE_VOICE_BOT,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_SMS_OUTREACH,
-    FEATURE_FOLLOWUP_BOT,
-    FEATURE_CONVERSION_TRACKING,
-    FEATURE_VOICE_BOT,
-    FEATURE_REVENUE_TRACKING,
 )
-from bots.sales_bot.sms_bot import SMSBot
-from bots.sales_bot.followup_bot import FollowUpBot
-from bots.sales_bot.conversion_tracker import ConversionTracker, LeadStatus
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class SalesBotError(Exception):
     """Base exception for Sales Bot errors."""
@@ -55,6 +54,7 @@ class SalesBotTierError(SalesBotError):
 # ---------------------------------------------------------------------------
 # Sales Bot
 # ---------------------------------------------------------------------------
+
 
 class SalesBot:
     """
@@ -192,12 +192,22 @@ class SalesBot:
     def mark_interested(self, lead_id: str) -> dict:
         """Mark a lead as interested."""
         updated = self._conversion_tracker.update_status(lead_id, LeadStatus.INTERESTED)
-        return {"lead_id": lead_id, "status": "interested"} if updated else {"error": "not found"}
+        return (
+            {"lead_id": lead_id, "status": "interested"}
+            if updated
+            else {"error": "not found"}
+        )
 
     def mark_no_response(self, lead_id: str) -> dict:
         """Mark a lead as no_response."""
-        updated = self._conversion_tracker.update_status(lead_id, LeadStatus.NO_RESPONSE)
-        return {"lead_id": lead_id, "status": "no_response"} if updated else {"error": "not found"}
+        updated = self._conversion_tracker.update_status(
+            lead_id, LeadStatus.NO_RESPONSE
+        )
+        return (
+            {"lead_id": lead_id, "status": "no_response"}
+            if updated
+            else {"error": "not found"}
+        )
 
     # ------------------------------------------------------------------
     # Reporting

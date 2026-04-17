@@ -11,6 +11,7 @@ Provides:
 All checks are performed locally (no external API calls), using simulated
 heuristics suitable for demonstration and unit-testing.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -28,9 +29,9 @@ class FraudCheckResult:
     """Outcome of a single fraud/scam check."""
 
     passed: bool
-    check_type: str          # "honeypot" | "contract" | "pool"
-    target: str              # address, URL, or contract being checked
-    risk_level: str          # "none" | "low" | "medium" | "high"
+    check_type: str  # "honeypot" | "contract" | "pool"
+    target: str  # address, URL, or contract being checked
+    risk_level: str  # "none" | "low" | "medium" | "high"
     details: str = ""
     flags: List[str] = field(default_factory=list)
 
@@ -112,9 +113,7 @@ class FraudDetector:
         self.enabled = enabled
         self._scam_contracts: Set[str] = set(_KNOWN_SCAM_CONTRACTS)
         if custom_scam_contracts:
-            self._scam_contracts.update(
-                addr.lower() for addr in custom_scam_contracts
-            )
+            self._scam_contracts.update(addr.lower() for addr in custom_scam_contracts)
         self._bad_domains: Set[str] = set(_KNOWN_BAD_POOL_DOMAINS)
         if custom_bad_domains:
             self._bad_domains.update(d.lower() for d in custom_bad_domains)
@@ -211,7 +210,7 @@ class FraudDetector:
         domain = pool_url.lower()
         for prefix in ("https://", "http://", "stratum+tcp://", "stratum+ssl://"):
             if domain.startswith(prefix):
-                domain = domain[len(prefix):]
+                domain = domain[len(prefix) :]
                 break
         domain = domain.split("/")[0].split(":")[0]
 

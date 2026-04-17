@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 199.0, ["news sentiment NLP", "social media pulse tracking"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["news sentiment NLP", "social media pulse tracking", "SEC filing analysis", "priority support"]),
+    "pro": TierConfig(
+        "Pro", 199.0, ["news sentiment NLP", "social media pulse tracking"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "news sentiment NLP",
+            "social media pulse tracking",
+            "SEC filing analysis",
+            "priority support",
+        ],
+    ),
 }

@@ -1,28 +1,31 @@
 """Tests for bots/ai_brain/tiers.py and bots/ai_brain/decision_engine.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.ai_brain.decision_engine import (
+    ACTIONS,
+    BOTTLENECK_ERROR_RATE_THRESHOLD,
+    HIGH_REVENUE_THRESHOLD,
+    LOW_REVENUE_THRESHOLD,
     DecisionEngine,
     DecisionEngineTierError,
-    ACTIONS,
-    LOW_REVENUE_THRESHOLD,
-    HIGH_REVENUE_THRESHOLD,
-    BOTTLENECK_ERROR_RATE_THRESHOLD,
 )
-from bots.ai_brain.tiers import get_bot_tier_info, BOT_FEATURES
-
+from bots.ai_brain.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ---------------------------------------------------------------------------
 # Tier info
 # ---------------------------------------------------------------------------
+
 
 class TestTierInfo:
     def test_free_tier_info(self):
@@ -50,6 +53,7 @@ class TestTierInfo:
 # Instantiation
 # ---------------------------------------------------------------------------
 
+
 class TestDecisionEngineInstantiation:
     def test_default_tier_is_free(self):
         engine = DecisionEngine()
@@ -75,6 +79,7 @@ class TestDecisionEngineInstantiation:
 # ---------------------------------------------------------------------------
 # analyze_revenue
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyzeRevenue:
     def test_empty_data_signals_scale_leads(self):
@@ -120,6 +125,7 @@ class TestAnalyzeRevenue:
 # analyze_crm_trends
 # ---------------------------------------------------------------------------
 
+
 class TestAnalyzeCRMTrends:
     def test_empty_data_returns_no_signals(self):
         engine = DecisionEngine()
@@ -130,35 +136,43 @@ class TestAnalyzeCRMTrends:
 
     def test_lead_bot_bottom_signals_scale_leads(self):
         engine = DecisionEngine()
-        result = engine.analyze_crm_trends({
-            "lead_gen_bot": {"conversion_rate": 0.02},
-            "sales_bot": {"conversion_rate": 0.20},
-        })
+        result = engine.analyze_crm_trends(
+            {
+                "lead_gen_bot": {"conversion_rate": 0.02},
+                "sales_bot": {"conversion_rate": 0.20},
+            }
+        )
         assert "scale_leads" in result["signals"]
         assert result["bottom_bot"] == "lead_gen_bot"
 
     def test_sales_bot_bottom_signals_increase_outreach(self):
         engine = DecisionEngine()
-        result = engine.analyze_crm_trends({
-            "sales_bot": {"conversion_rate": 0.03},
-            "lead_gen_bot": {"conversion_rate": 0.15},
-        })
+        result = engine.analyze_crm_trends(
+            {
+                "sales_bot": {"conversion_rate": 0.03},
+                "lead_gen_bot": {"conversion_rate": 0.15},
+            }
+        )
         assert "increase_outreach" in result["signals"]
 
     def test_top_bot_identified(self):
         engine = DecisionEngine()
-        result = engine.analyze_crm_trends({
-            "lead_gen_bot": {"conversion_rate": 0.05},
-            "sales_bot": {"conversion_rate": 0.30},
-        })
+        result = engine.analyze_crm_trends(
+            {
+                "lead_gen_bot": {"conversion_rate": 0.05},
+                "sales_bot": {"conversion_rate": 0.30},
+            }
+        )
         assert result["top_bot"] == "sales_bot"
 
     def test_real_estate_bot_bottom_signals_focus(self):
         engine = DecisionEngine()
-        result = engine.analyze_crm_trends({
-            "real_estate_bot": {"conversion_rate": 0.01},
-            "sales_bot": {"conversion_rate": 0.25},
-        })
+        result = engine.analyze_crm_trends(
+            {
+                "real_estate_bot": {"conversion_rate": 0.01},
+                "sales_bot": {"conversion_rate": 0.25},
+            }
+        )
         assert "focus_real_estate" in result["signals"]
 
 
@@ -166,44 +180,55 @@ class TestAnalyzeCRMTrends:
 # detect_bottlenecks
 # ---------------------------------------------------------------------------
 
+
 class TestDetectBottlenecks:
     def test_no_bottlenecks_in_healthy_workflow(self):
         engine = DecisionEngine()
-        bottlenecks = engine.detect_bottlenecks({
-            "step_a": {"error_rate": 0.01},
-            "step_b": {"error_rate": 0.02},
-        })
+        bottlenecks = engine.detect_bottlenecks(
+            {
+                "step_a": {"error_rate": 0.01},
+                "step_b": {"error_rate": 0.02},
+            }
+        )
         assert bottlenecks == []
 
     def test_bottleneck_detected_above_threshold(self):
         engine = DecisionEngine()
-        bottlenecks = engine.detect_bottlenecks({
-            "sms_outreach": {"error_rate": 0.18},
-        })
+        bottlenecks = engine.detect_bottlenecks(
+            {
+                "sms_outreach": {"error_rate": 0.18},
+            }
+        )
         assert len(bottlenecks) == 1
         assert bottlenecks[0]["step"] == "sms_outreach"
 
     def test_high_severity_above_25_pct(self):
         engine = DecisionEngine()
-        bottlenecks = engine.detect_bottlenecks({
-            "bad_step": {"error_rate": 0.30},
-        })
+        bottlenecks = engine.detect_bottlenecks(
+            {
+                "bad_step": {"error_rate": 0.30},
+            }
+        )
         assert bottlenecks[0]["severity"] == "high"
 
     def test_medium_severity_between_threshold_and_25_pct(self):
         engine = DecisionEngine()
-        bottlenecks = engine.detect_bottlenecks({
-            "flaky_step": {"error_rate": 0.12},
-        })
+        bottlenecks = engine.detect_bottlenecks(
+            {
+                "flaky_step": {"error_rate": 0.12},
+            }
+        )
         assert bottlenecks[0]["severity"] == "medium"
 
     def test_multiple_bottlenecks(self):
         engine = DecisionEngine()
-        bottlenecks = engine.detect_bottlenecks({
-            "step_a": {"error_rate": 0.15},
-            "step_b": {"error_rate": 0.28},
-            "step_c": {"error_rate": 0.005},
-        })
+        bottlenecks = engine.detect_bottlenecks(
+            {
+                "step_a": {"error_rate": 0.15},
+                "step_b": {"error_rate": 0.28},
+                "step_c": {"error_rate": 0.005},
+            }
+        )
         assert len(bottlenecks) == 2
 
     def test_empty_workflow_returns_empty_list(self):
@@ -214,6 +239,7 @@ class TestDetectBottlenecks:
 # ---------------------------------------------------------------------------
 # make_decision — core logic
 # ---------------------------------------------------------------------------
+
 
 class TestMakeDecision:
     def test_returns_dict_with_required_keys(self):
@@ -307,6 +333,7 @@ class TestMakeDecision:
 # Decision history (PRO/ENTERPRISE only)
 # ---------------------------------------------------------------------------
 
+
 class TestDecisionHistory:
     def test_free_tier_raises_error(self):
         engine = DecisionEngine(tier=Tier.FREE)
@@ -330,6 +357,7 @@ class TestDecisionHistory:
 # ---------------------------------------------------------------------------
 # run() method
 # ---------------------------------------------------------------------------
+
 
 class TestRunMethod:
     def test_run_returns_string(self):

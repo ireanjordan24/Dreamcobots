@@ -1,22 +1,26 @@
 """Tests for Real_Estate_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from Real_Estate_bots.feature_1 import PropertyListingAggregatorBot, EXAMPLES as RE1_EXAMPLES
-from Real_Estate_bots.feature_2 import PropertyViewingSchedulerBot, EXAMPLES as RE2_EXAMPLES
-from Real_Estate_bots.feature_3 import MarketAnalysisBot, EXAMPLES as RE3_EXAMPLES
-
+from Real_Estate_bots.feature_1 import EXAMPLES as RE1_EXAMPLES
+from Real_Estate_bots.feature_1 import PropertyListingAggregatorBot
+from Real_Estate_bots.feature_2 import EXAMPLES as RE2_EXAMPLES
+from Real_Estate_bots.feature_2 import PropertyViewingSchedulerBot
+from Real_Estate_bots.feature_3 import EXAMPLES as RE3_EXAMPLES
+from Real_Estate_bots.feature_3 import MarketAnalysisBot
 
 # ===========================================================================
 # Feature 1: PropertyListingAggregatorBot
 # ===========================================================================
+
 
 class TestPropertyListingAggregatorBotInstantiation:
     def test_default_tier_is_free(self):
@@ -39,7 +43,18 @@ class TestPropertyListingAggregatorBotInstantiation:
         assert len(RE1_EXAMPLES) == 30
 
     def test_examples_have_required_keys(self):
-        required = {"id", "address", "price", "beds", "baths", "sqft", "type", "source", "monthly_rent", "city"}
+        required = {
+            "id",
+            "address",
+            "price",
+            "beds",
+            "baths",
+            "sqft",
+            "type",
+            "source",
+            "monthly_rent",
+            "city",
+        }
         for ex in RE1_EXAMPLES:
             assert required.issubset(ex.keys()), f"Missing keys in example: {ex}"
 
@@ -175,6 +190,7 @@ class TestPropertyListingAggregatorBotMethods:
 # Feature 2: PropertyViewingSchedulerBot
 # ===========================================================================
 
+
 class TestPropertyViewingSchedulerBotInstantiation:
     def test_default_tier_is_free(self):
         bot = PropertyViewingSchedulerBot()
@@ -212,7 +228,10 @@ class TestPropertyViewingSchedulerBotMethods:
         available = next(s for s in RE2_EXAMPLES if s["status"] == "available")
         result = bot.book_viewing(available["id"], "Alice Smith", "alice@example.com")
         assert isinstance(result, dict)
-        assert result.get("status") in ("confirmed", "booked", "scheduled") or "booking_id" in result
+        assert (
+            result.get("status") in ("confirmed", "booked", "scheduled")
+            or "booking_id" in result
+        )
 
     def test_book_viewing_free_tier_limit(self):
         bot = PropertyViewingSchedulerBot(tier="FREE")
@@ -270,6 +289,7 @@ class TestPropertyViewingSchedulerBotMethods:
 # ===========================================================================
 # Feature 3: MarketAnalysisBot
 # ===========================================================================
+
 
 class TestMarketAnalysisBotInstantiation:
     def test_default_tier_is_free(self):

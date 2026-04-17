@@ -21,7 +21,6 @@ from typing import Optional
 
 from bots.crypto_bot.crypto_database import CRYPTO_DATABASE, get_coin
 
-
 # ---------------------------------------------------------------------------
 # Price cache
 # ---------------------------------------------------------------------------
@@ -45,30 +44,70 @@ def _fetch_coingecko(symbols: list[str]) -> dict[str, float]:
     Returns an empty dict on any error so callers can fall back.
     """
     try:
-        import urllib.request
         import json
+        import urllib.request
 
         ids_map = {
-            "BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana",
-            "BNB": "binancecoin", "XRP": "ripple", "ADA": "cardano",
-            "DOGE": "dogecoin", "TON": "the-open-network",
-            "AVAX": "avalanche-2", "DOT": "polkadot", "LINK": "chainlink",
-            "MATIC": "matic-network", "LTC": "litecoin", "ATOM": "cosmos",
-            "UNI": "uniswap", "AAVE": "aave", "XMR": "monero",
-            "ZEC": "zcash", "ALGO": "algorand", "VET": "vechain",
-            "FIL": "filecoin", "ICP": "internet-computer", "NEAR": "near",
-            "FTM": "fantom", "HBAR": "hedera-hashgraph", "XLM": "stellar",
-            "TRX": "tron", "EOS": "eos", "USDT": "tether", "USDC": "usd-coin",
-            "DAI": "dai", "MKR": "maker", "COMP": "compound-coin",
-            "SNX": "havven", "CRV": "curve-dao-token", "GRT": "the-graph",
-            "FET": "fetch-ai", "OCEAN": "ocean-protocol", "RNDR": "render-token",
-            "SHIB": "shiba-inu", "PEPE": "pepe", "SAND": "the-sandbox",
-            "MANA": "decentraland", "AXS": "axie-infinity", "RVN": "ravencoin",
-            "ERG": "ergo", "KAS": "kaspa", "CRO": "crypto-com-chain",
-            "OKB": "okb", "AR": "arweave", "HNT": "helium",
-            "INJ": "injective-protocol", "SUI": "sui", "APT": "aptos",
-            "OP": "optimism", "ARB": "arbitrum", "IMX": "immutable-x",
-            "STX": "blockstack", "KAVA": "kava", "ROSE": "oasis-network",
+            "BTC": "bitcoin",
+            "ETH": "ethereum",
+            "SOL": "solana",
+            "BNB": "binancecoin",
+            "XRP": "ripple",
+            "ADA": "cardano",
+            "DOGE": "dogecoin",
+            "TON": "the-open-network",
+            "AVAX": "avalanche-2",
+            "DOT": "polkadot",
+            "LINK": "chainlink",
+            "MATIC": "matic-network",
+            "LTC": "litecoin",
+            "ATOM": "cosmos",
+            "UNI": "uniswap",
+            "AAVE": "aave",
+            "XMR": "monero",
+            "ZEC": "zcash",
+            "ALGO": "algorand",
+            "VET": "vechain",
+            "FIL": "filecoin",
+            "ICP": "internet-computer",
+            "NEAR": "near",
+            "FTM": "fantom",
+            "HBAR": "hedera-hashgraph",
+            "XLM": "stellar",
+            "TRX": "tron",
+            "EOS": "eos",
+            "USDT": "tether",
+            "USDC": "usd-coin",
+            "DAI": "dai",
+            "MKR": "maker",
+            "COMP": "compound-coin",
+            "SNX": "havven",
+            "CRV": "curve-dao-token",
+            "GRT": "the-graph",
+            "FET": "fetch-ai",
+            "OCEAN": "ocean-protocol",
+            "RNDR": "render-token",
+            "SHIB": "shiba-inu",
+            "PEPE": "pepe",
+            "SAND": "the-sandbox",
+            "MANA": "decentraland",
+            "AXS": "axie-infinity",
+            "RVN": "ravencoin",
+            "ERG": "ergo",
+            "KAS": "kaspa",
+            "CRO": "crypto-com-chain",
+            "OKB": "okb",
+            "AR": "arweave",
+            "HNT": "helium",
+            "INJ": "injective-protocol",
+            "SUI": "sui",
+            "APT": "aptos",
+            "OP": "optimism",
+            "ARB": "arbitrum",
+            "IMX": "immutable-x",
+            "STX": "blockstack",
+            "KAVA": "kava",
+            "ROSE": "oasis-network",
         }
 
         wanted_ids = [ids_map[s] for s in symbols if s in ids_map]
@@ -80,7 +119,9 @@ def _fetch_coingecko(symbols: list[str]) -> dict[str, float]:
             "https://api.coingecko.com/api/v3/simple/price"
             f"?ids={ids_param}&vs_currencies=usd"
         )
-        req = urllib.request.Request(url, headers={"User-Agent": "DreamcobotsCryptoBot/1.0"})
+        req = urllib.request.Request(
+            url, headers={"User-Agent": "DreamcobotsCryptoBot/1.0"}
+        )
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = json.loads(resp.read().decode())
 
@@ -99,6 +140,7 @@ def _fetch_coingecko(symbols: list[str]) -> dict[str, float]:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def get_price(symbol: str, use_live: bool = False) -> Optional[float]:
     """
@@ -187,14 +229,16 @@ def get_market_summary(symbols: list[str], use_live: bool = False) -> list[dict]
             continue
         price = prices.get(sym, coin["price_usd"])
         change = get_price_change_24h(sym)
-        summary.append({
-            "symbol": sym,
-            "name": coin["name"],
-            "category": coin["category"],
-            "price_usd": price,
-            "change_24h_pct": change,
-            "market_cap_usd": coin["market_cap_usd"],
-            "volume_24h_usd": coin["volume_24h_usd"],
-            "circulating_supply": coin["circulating_supply"],
-        })
+        summary.append(
+            {
+                "symbol": sym,
+                "name": coin["name"],
+                "category": coin["category"],
+                "price_usd": price,
+                "change_24h_pct": change,
+                "market_cap_usd": coin["market_cap_usd"],
+                "volume_24h_usd": coin["volume_24h_usd"],
+                "circulating_supply": coin["circulating_supply"],
+            }
+        )
     return summary

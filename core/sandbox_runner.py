@@ -20,7 +20,6 @@ import sys
 import tempfile
 from typing import Any, Dict, Optional
 
-
 # ---------------------------------------------------------------------------
 # SandboxRunner
 # ---------------------------------------------------------------------------
@@ -63,16 +62,27 @@ class SandboxRunner:
             ``{ success, output, error, exit_code, timed_out }``
         """
         import os as _os
+
         # Resolve and validate path to prevent directory traversal
         try:
             resolved = _os.path.realpath(file_path)
         except (TypeError, ValueError):
-            return {"success": False, "error": "invalid file path", "output": "",
-                    "exit_code": -1, "timed_out": False}
+            return {
+                "success": False,
+                "error": "invalid file path",
+                "output": "",
+                "exit_code": -1,
+                "timed_out": False,
+            }
 
         if not _os.path.isfile(resolved):
-            return {"success": False, "error": "file not found", "output": "",
-                    "exit_code": -1, "timed_out": False}
+            return {
+                "success": False,
+                "error": "file not found",
+                "output": "",
+                "exit_code": -1,
+                "timed_out": False,
+            }
 
         try:
             proc = subprocess.run(

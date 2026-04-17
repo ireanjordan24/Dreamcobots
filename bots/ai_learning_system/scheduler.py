@@ -5,14 +5,15 @@ Manages recurring jobs that drive continuous ingestion, re-classification,
 re-ranking, and strategy evolution in the background.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SCHEDULER
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .tiers import FEATURE_SCHEDULER, Tier, TierConfig, get_tier_config
 
 
 class ScheduleFrequency(Enum):
@@ -189,7 +190,8 @@ class AutomationScheduler:
         if as_of is None:
             as_of = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         return [
-            j for j in self._jobs.values()
+            j
+            for j in self._jobs.values()
             if j.next_run <= as_of and j.status != JobStatus.RUNNING
         ]
 

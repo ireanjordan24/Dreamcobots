@@ -9,6 +9,7 @@ Usage
 -----
     from divisions.revenue_simulator import RevenueSimulator
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from divisions.revenue_simulator import RevenueSimulator

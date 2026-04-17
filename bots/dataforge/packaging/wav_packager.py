@@ -1,4 +1,5 @@
 """WAV dataset metadata packager for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import json
 import logging
@@ -29,7 +30,9 @@ class WAVPackager:
         }
         with open(manifest_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2)
-        logger.info("WAV manifest written to %s (%d records)", manifest_path, len(metadata))
+        logger.info(
+            "WAV manifest written to %s (%d records)", manifest_path, len(metadata)
+        )
         return manifest_path
 
     def validate(self, metadata) -> bool:

@@ -1,4 +1,5 @@
 """Central configuration management for Dreamcobots."""
+
 import json
 import os
 from pathlib import Path

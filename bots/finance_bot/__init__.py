@@ -1,7 +1,7 @@
 """Finance Bot package."""
 
-from .finance_bot import FinanceBot, FinanceTierError, FinanceRequestLimitError
-from .tiers import get_finance_tier_info, FINANCE_EXTRA_FEATURES, FINANCE_TOOLS
+from .finance_bot import FinanceBot, FinanceRequestLimitError, FinanceTierError
+from .tiers import FINANCE_EXTRA_FEATURES, FINANCE_TOOLS, get_finance_tier_info
 
 __all__ = [
     "FinanceBot",

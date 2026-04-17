@@ -9,62 +9,67 @@ Covers:
   5. OpenClawBot main class (integration + chat)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.open_claw_bot.ai_models import (
+    DEFAULT_MODELS,
+    AIModel,
+    AIModelHub,
+    InferenceResult,
+    ModelFamily,
+)
+from bots.open_claw_bot.client_manager import (
+    ClientManager,
+    ClientPreferences,
+    ClientProfile,
+    ClientStatus,
+    GoalType,
+)
+from bots.open_claw_bot.open_claw_bot import (
+    OpenClawBot,
+    OpenClawBotError,
+    OpenClawBotTierError,
+)
+from bots.open_claw_bot.strategy_engine import (
+    STRATEGY_RULE_TEMPLATES,
+    DataPoint,
+    RiskLevel,
+    Strategy,
+    StrategyEngine,
+    StrategyStatus,
+    StrategyType,
+)
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.open_claw_bot.tiers import (
+    FEATURE_AI_MODELS,
+    FEATURE_CLIENT_MANAGER,
+    FEATURE_CUSTOM_RULES,
+    FEATURE_ML_ENSEMBLE,
+    FEATURE_REALTIME_SIGNALS,
+    FEATURE_SCENARIO_SIM,
+    FEATURE_STRATEGY_ENGINE,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_STRATEGY_ENGINE,
-    FEATURE_AI_MODELS,
-    FEATURE_CLIENT_MANAGER,
-    FEATURE_CUSTOM_RULES,
-    FEATURE_ML_ENSEMBLE,
-    FEATURE_SCENARIO_SIM,
-    FEATURE_REALTIME_SIGNALS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.open_claw_bot.strategy_engine import (
-    StrategyEngine,
-    Strategy,
-    StrategyType,
-    StrategyStatus,
-    RiskLevel,
-    DataPoint,
-    STRATEGY_RULE_TEMPLATES,
-)
-from bots.open_claw_bot.ai_models import (
-    AIModelHub,
-    AIModel,
-    ModelFamily,
-    InferenceResult,
-    DEFAULT_MODELS,
-)
-from bots.open_claw_bot.client_manager import (
-    ClientManager,
-    ClientProfile,
-    ClientPreferences,
-    ClientStatus,
-    GoalType,
-)
-from bots.open_claw_bot.open_claw_bot import OpenClawBot, OpenClawBotError, OpenClawBotTierError
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -113,6 +118,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Strategy Engine
 # ===========================================================================
+
 
 class TestStrategyEngine:
     def test_generate_balanced_strategy(self):
@@ -179,8 +185,10 @@ class TestStrategyEngine:
         engine.generate_strategy("B", StrategyType.AGGRESSIVE, RiskLevel.HIGH)
         ranked = engine.rank_strategies()
         assert len(ranked) == 2
-        assert (ranked[0].confidence_score * ranked[0].expected_roi_pct >=
-                ranked[1].confidence_score * ranked[1].expected_roi_pct)
+        assert (
+            ranked[0].confidence_score * ranked[0].expected_roi_pct
+            >= ranked[1].confidence_score * ranked[1].expected_roi_pct
+        )
 
     def test_rank_filtered_by_client(self):
         engine = StrategyEngine()
@@ -227,7 +235,9 @@ class TestStrategyEngine:
     def test_simulate_scenario(self):
         engine = StrategyEngine()
         strat = engine.generate_strategy("S", StrategyType.MOMENTUM)
-        sim = engine.simulate_scenario(strat.strategy_id, {"volatility": 0.2, "trend": 0.05})
+        sim = engine.simulate_scenario(
+            strat.strategy_id, {"volatility": 0.2, "trend": 0.05}
+        )
         assert "simulated_roi_pct" in sim
         assert "win_rate" in sim
         assert "max_drawdown_pct" in sim
@@ -240,7 +250,9 @@ class TestStrategyEngine:
     def test_custom_rules_prepended(self):
         engine = StrategyEngine()
         custom = [{"rule": "custom_rule_test", "value": 99}]
-        strat = engine.generate_strategy("S", StrategyType.BALANCED, custom_rules=custom)
+        strat = engine.generate_strategy(
+            "S", StrategyType.BALANCED, custom_rules=custom
+        )
         assert strat.rules[0] == custom[0]
 
     def test_strategy_to_dict(self):
@@ -255,6 +267,7 @@ class TestStrategyEngine:
 # 3. AI Model Hub
 # ===========================================================================
 
+
 class TestAIModelHub:
     def test_default_models_loaded(self):
         hub = AIModelHub(load_defaults=True)
@@ -268,7 +281,9 @@ class TestAIModelHub:
 
     def test_register_custom_model(self):
         hub = AIModelHub(load_defaults=False)
-        model = hub.register_model("MyModel", ModelFamily.SIGNAL_GENERATOR, accuracy=0.90)
+        model = hub.register_model(
+            "MyModel", ModelFamily.SIGNAL_GENERATOR, accuracy=0.90
+        )
         assert model.name == "MyModel"
         assert model.is_ready()
 
@@ -289,12 +304,16 @@ class TestAIModelHub:
 
     def test_classify_risk_low(self):
         hub = AIModelHub()
-        result = hub.classify_risk({"volatility": 0.05, "leverage": 1.0, "exposure_pct": 5.0})
+        result = hub.classify_risk(
+            {"volatility": 0.05, "leverage": 1.0, "exposure_pct": 5.0}
+        )
         assert result.prediction["risk_level"] == "low"
 
     def test_classify_risk_high(self):
         hub = AIModelHub()
-        result = hub.classify_risk({"volatility": 0.8, "leverage": 8.0, "exposure_pct": 60.0})
+        result = hub.classify_risk(
+            {"volatility": 0.8, "leverage": 8.0, "exposure_pct": 60.0}
+        )
         assert result.prediction["risk_level"] in ("high", "extreme")
 
     def test_generate_signals_buy(self):
@@ -347,6 +366,7 @@ class TestAIModelHub:
         model = hub.register_model("Old", ModelFamily.TREND_PREDICTOR)
         hub.deprecate_model(model.model_id)
         from bots.open_claw_bot.ai_models import ModelStatus
+
         assert hub.get_model(model.model_id).status == ModelStatus.DEPRECATED
 
     def test_model_not_found_raises(self):
@@ -376,6 +396,7 @@ class TestAIModelHub:
 # ===========================================================================
 # 4. Client Manager
 # ===========================================================================
+
 
 class TestClientManager:
     def test_add_client(self):
@@ -484,6 +505,7 @@ class TestClientManager:
 # 5. OpenClawBot (integration)
 # ===========================================================================
 
+
 class TestOpenClawBot:
     def test_instantiation_free_tier(self):
         bot = OpenClawBot(tier=Tier.FREE)
@@ -496,8 +518,13 @@ class TestOpenClawBot:
     def test_dashboard_keys(self):
         bot = OpenClawBot(tier=Tier.PRO)
         dash = bot.dashboard()
-        for key in ("tier", "total_strategies", "active_strategies",
-                    "total_clients", "ai_models_ready"):
+        for key in (
+            "tier",
+            "total_strategies",
+            "active_strategies",
+            "total_clients",
+            "ai_models_ready",
+        ):
             assert key in dash
 
     def test_add_client(self):
@@ -515,12 +542,21 @@ class TestOpenClawBot:
         client = bot.add_client("Bob", "bob@x.com")
         strat = bot.generate_strategy("Bob Strat", client_id=client.client_id)
         assert strat.client_id == client.client_id
-        assert strat.strategy_id in bot.client_manager.get_client(client.client_id).strategy_ids
+        assert (
+            strat.strategy_id
+            in bot.client_manager.get_client(client.client_id).strategy_ids
+        )
 
     def test_generate_all_strategy_types(self):
         bot = OpenClawBot(tier=Tier.PRO)
-        for alias in ("aggressive", "balanced", "conservative", "scalping",
-                      "arbitrage", "momentum"):
+        for alias in (
+            "aggressive",
+            "balanced",
+            "conservative",
+            "scalping",
+            "arbitrage",
+            "momentum",
+        ):
             strat = bot.generate_strategy(f"Test {alias}", strategy_type=alias)
             assert strat is not None
 
@@ -550,7 +586,9 @@ class TestOpenClawBot:
 
     def test_assess_risk(self):
         bot = OpenClawBot(tier=Tier.PRO)
-        result = bot.assess_risk({"volatility": 0.1, "leverage": 1.0, "exposure_pct": 5.0})
+        result = bot.assess_risk(
+            {"volatility": 0.1, "leverage": 1.0, "exposure_pct": 5.0}
+        )
         assert "risk_level" in result.prediction
 
     def test_get_signals(self):
@@ -566,7 +604,9 @@ class TestOpenClawBot:
     def test_simulate_scenario(self):
         bot = OpenClawBot(tier=Tier.PRO)
         strat = bot.generate_strategy("Sim", "momentum")
-        sim = bot.simulate_scenario(strat.strategy_id, {"volatility": 0.2, "trend": 0.1})
+        sim = bot.simulate_scenario(
+            strat.strategy_id, {"volatility": 0.2, "trend": 0.1}
+        )
         assert "simulated_roi_pct" in sim
 
     def test_ingest_data(self):
@@ -625,6 +665,7 @@ class TestOpenClawBot:
 
     def test_register_with_buddy(self):
         from BuddyAI.buddy_bot import BuddyBot
+
         orchestrator = BuddyBot()
         bot = OpenClawBot(tier=Tier.PRO)
         bot.register_with_buddy(orchestrator)
@@ -632,6 +673,7 @@ class TestOpenClawBot:
 
     def test_route_via_buddy_orchestrator(self):
         from BuddyAI.buddy_bot import BuddyBot
+
         orchestrator = BuddyBot()
         bot = OpenClawBot(tier=Tier.PRO)
         bot.register_with_buddy(orchestrator)

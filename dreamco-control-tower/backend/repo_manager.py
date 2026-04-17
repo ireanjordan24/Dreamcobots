@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-
 
 _DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), "..", "config", "repos.json")
 _GITHUB_API = "https://api.github.com"
@@ -31,6 +30,7 @@ _GITHUB_API = "https://api.github.com"
 # ---------------------------------------------------------------------------
 # Thin GitHub REST client
 # ---------------------------------------------------------------------------
+
 
 class GitHubClient:
     """Minimal GitHub REST v3 client.
@@ -46,7 +46,10 @@ class GitHubClient:
         self._token = token or os.environ.get("GITHUB_TOKEN")
 
     def _headers(self) -> Dict[str, str]:
-        headers = {"Accept": "application/vnd.github+json", "User-Agent": "DreamCo-Control-Tower/1.0"}
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "DreamCo-Control-Tower/1.0",
+        }
         if self._token:
             headers["Authorization"] = f"token {self._token}"
         return headers
@@ -81,6 +84,7 @@ class GitHubClient:
 # ---------------------------------------------------------------------------
 # Repo Manager
 # ---------------------------------------------------------------------------
+
 
 class RepoManager:
     """Monitor and manage GitHub repositories linked to the Control Tower.
@@ -196,8 +200,8 @@ class RepoManager:
         # Fetch basic repo info
         repo_data = self._client.get(f"/repos/{owner}/{name}")
         if repo_data and isinstance(repo_data, dict):
-            entry["lastCommit"] = (
-                repo_data.get("pushed_at") or repo_data.get("updated_at")
+            entry["lastCommit"] = repo_data.get("pushed_at") or repo_data.get(
+                "updated_at"
             )
             entry["openIssues"] = repo_data.get("open_issues_count", 0)
 
@@ -269,7 +273,8 @@ class RepoManager:
             "title": title,
             "head": head,
             "base": base,
-            "body": body or f"Automated PR created by DreamCo Control Tower on {datetime.now(timezone.utc).isoformat()}",
+            "body": body
+            or f"Automated PR created by DreamCo Control Tower on {datetime.now(timezone.utc).isoformat()}",
         }
         result = self._client.post(f"/repos/{owner}/{repo_name}/pulls", payload)
         if result and isinstance(result, dict):

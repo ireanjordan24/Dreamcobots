@@ -10,17 +10,24 @@ Usage
     task = bot.create_task("daily_report", "daily@08:00", {"action": "send_email"})
     print(task)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_automation_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_automation_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _automation_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_automation_tiers)
 AUTOMATION_FEATURES = _automation_tiers.AUTOMATION_FEATURES
@@ -152,9 +159,7 @@ class AutomationBot:
             else f"{info['requests_per_month']:,}"
         )
         task_limit = (
-            "Unlimited"
-            if info["task_limit"] is None
-            else str(info["task_limit"])
+            "Unlimited" if info["task_limit"] is None else str(info["task_limit"])
         )
         lines = [
             f"=== {info['name']} Automation Bot Tier ===",
@@ -179,7 +184,11 @@ class AutomationBot:
             print(msg)
             return msg
         current_feats = set(AUTOMATION_FEATURES[self.tier.value])
-        new_feats = [f for f in AUTOMATION_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f
+            for f in AUTOMATION_FEATURES[next_cfg.tier.value]
+            if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

@@ -1,4 +1,5 @@
 """Mailchimp email marketing connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -24,8 +25,11 @@ class MailchimpConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.base_url}/lists", auth=("anystring", self.api_key), timeout=30)
+            response = requests.get(
+                f"{self.base_url}/lists", auth=("anystring", self.api_key), timeout=30
+            )
             response.raise_for_status()
             logger.info("Mailchimp lists fetched.")
             return {"status": "success", "data": response.json()}
@@ -45,14 +49,18 @@ class MailchimpConnector:
             API response dict or error dict.
         """
         import requests
+
         payload = {"email_address": email, "status": status}
         try:
-            response = requests.post(f"{self.base_url}/lists/{list_id}/members",
-                json=payload, auth=("anystring", self.api_key), timeout=30)
+            response = requests.post(
+                f"{self.base_url}/lists/{list_id}/members",
+                json=payload,
+                auth=("anystring", self.api_key),
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Mailchimp member added to list %s.", list_id)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Mailchimp add_member error: %s", e)
             return {"status": "error", "message": str(e)}
-

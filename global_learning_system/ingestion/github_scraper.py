@@ -13,6 +13,7 @@ from typing import List, Optional
 
 try:
     import requests as _requests
+
     _REQUESTS_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _REQUESTS_AVAILABLE = False
@@ -56,7 +57,9 @@ class GitHubScraper:
     # Public interface
     # ------------------------------------------------------------------
 
-    def search_repositories(self, query: str, language: Optional[str] = None) -> List[GitHubRepo]:
+    def search_repositories(
+        self, query: str, language: Optional[str] = None
+    ) -> List[GitHubRepo]:
         """
         Search GitHub for repositories matching *query*.
 

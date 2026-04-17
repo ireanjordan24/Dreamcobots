@@ -31,6 +31,7 @@ if _REPO_ROOT not in sys.path:
 try:
     from flask import Flask, jsonify, request  # type: ignore[import]
     from werkzeug.utils import secure_filename  # type: ignore[import]
+
     _FLASK_AVAILABLE = True
 except ImportError:
     _FLASK_AVAILABLE = False
@@ -96,7 +97,14 @@ def _make_routes(flask_app: Any) -> None:  # type: ignore[name-defined]
         result = _lab.process_upload(save_path)
 
         if result["status"] == "approved":
-            register_bot({"name": filename, "path": save_path, "type": "client_bot", "status": "approved"})
+            register_bot(
+                {
+                    "name": filename,
+                    "path": save_path,
+                    "type": "client_bot",
+                    "status": "approved",
+                }
+            )
 
         return jsonify({"path": save_path, **result})
 

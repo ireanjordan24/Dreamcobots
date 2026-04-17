@@ -25,16 +25,17 @@ Usage (programmatic)
 from __future__ import annotations
 
 import importlib
-import sys
 import os
+import sys
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from framework import GlobalAISourcesFlow  # noqa: F401
-
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from bots.control_center.bot_registry import BotRegistry
 from bots.control_center.github_integration import GitHubIntegration
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AutoUpgradeEngine:
@@ -104,7 +105,10 @@ class AutoUpgradeEngine:
                     merge_result = self._github.auto_merge(repo_path)
                     result["steps"]["auto_merge"] = merge_result
         else:
-            result["steps"]["pull"] = {"skipped": True, "reason": "no repo_path configured"}
+            result["steps"]["pull"] = {
+                "skipped": True,
+                "reason": "no repo_path configured",
+            }
 
         # Step 2 — create PR
         if repo_name:
@@ -124,11 +128,13 @@ class AutoUpgradeEngine:
                 )
                 result["steps"]["pr"] = pr_result
         else:
-            result["steps"]["pr"] = {"skipped": True, "reason": "no repo_name configured"}
+            result["steps"]["pr"] = {
+                "skipped": True,
+                "reason": "no repo_name configured",
+            }
 
         result["success"] = all(
-            step.get("success", True)
-            for step in result["steps"].values()
+            step.get("success", True) for step in result["steps"].values()
         )
 
         # Step 3 — update registry

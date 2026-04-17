@@ -24,9 +24,9 @@ Usage
     print(session["checkout_url"])
 """
 
+import datetime
 import os
 import uuid
-import datetime
 from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
@@ -86,6 +86,7 @@ class StripeBot:
         """Attempt to import and configure the stripe library."""
         try:
             import stripe  # noqa: PLC0415
+
             stripe.api_key = self.secret_key
             return stripe
         except ImportError:
@@ -104,7 +105,9 @@ class StripeBot:
     # Customer management
     # ------------------------------------------------------------------
 
-    def create_customer(self, email: str, name: str = "", metadata: Optional[dict] = None) -> dict:
+    def create_customer(
+        self, email: str, name: str = "", metadata: Optional[dict] = None
+    ) -> dict:
         """
         Create a Stripe customer.
 
@@ -338,7 +341,9 @@ class StripeBot:
             }
         else:
             sub_id = self._new_id("sub")
-            future = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
+            future = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+                days=30
+            )
             result = {
                 "id": sub_id,
                 "customer_id": customer_id,
@@ -471,7 +476,9 @@ class StripeBot:
             }
         else:
             pid = self._new_id("po")
-            arrival = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=2)
+            arrival = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+                days=2
+            )
             result = {
                 "id": pid,
                 "status": "pending",
@@ -499,8 +506,12 @@ class StripeBot:
         if not self.simulation_mode and self._stripe:
             bal = self._stripe.Balance.retrieve()
             return {
-                "available": [{"amount": a.amount, "currency": a.currency} for a in bal.available],
-                "pending": [{"amount": p.amount, "currency": p.currency} for p in bal.pending],
+                "available": [
+                    {"amount": a.amount, "currency": a.currency} for a in bal.available
+                ],
+                "pending": [
+                    {"amount": p.amount, "currency": p.currency} for p in bal.pending
+                ],
                 "live": True,
             }
         return {

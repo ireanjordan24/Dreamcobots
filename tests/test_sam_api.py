@@ -1,18 +1,19 @@
 """Tests for bots/government_contract_bot/sam_api.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.government_contract_bot.sam_api import SAMGovAPI
 
+from bots.government_contract_bot.sam_api import SAMGovAPI
 
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestInstantiation:
     def test_mock_when_no_api_key(self):
@@ -27,6 +28,7 @@ class TestInstantiation:
 # ---------------------------------------------------------------------------
 # search_contracts (mock mode)
 # ---------------------------------------------------------------------------
+
 
 class TestSearchContracts:
     def setup_method(self):

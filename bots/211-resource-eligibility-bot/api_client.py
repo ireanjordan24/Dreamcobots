@@ -9,6 +9,7 @@ The client degrades gracefully when no API key is configured: it returns
 clearly marked mock data so the bot can still demonstrate its workflow
 in development/demo environments.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import json
@@ -183,14 +184,17 @@ class APIClient211:
         resources = []
         # The 211 open API returns results under different keys depending on
         # the endpoint version; handle both list and dict payloads.
-        items = raw if isinstance(raw, list) else raw.get("results", raw.get("data", []))
+        items = (
+            raw if isinstance(raw, list) else raw.get("results", raw.get("data", []))
+        )
         for item in items:
             resources.append(
                 {
                     "name": item.get("AgencyName") or item.get("name", "Unknown"),
                     "address": item.get("SiteAddress") or item.get("address", "N/A"),
                     "phone": item.get("Phone") or item.get("phone", "N/A"),
-                    "description": item.get("ServiceDescription") or item.get("description", ""),
+                    "description": item.get("ServiceDescription")
+                    or item.get("description", ""),
                     "url": item.get("URL") or item.get("url", ""),
                 }
             )

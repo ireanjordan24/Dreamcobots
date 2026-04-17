@@ -34,8 +34,18 @@ class FlipFinderScreen:
     def demo(cls) -> "FlipFinderScreen":
         return cls(
             flips=[
-                {"name": "PS4 Console", "buyPrice": 80.0, "sellPrice": 150.0, "profit": 70.0},
-                {"name": "IKEA Shelf", "buyPrice": 15.0, "sellPrice": 55.0, "profit": 40.0},
+                {
+                    "name": "PS4 Console",
+                    "buyPrice": 80.0,
+                    "sellPrice": 150.0,
+                    "profit": 70.0,
+                },
+                {
+                    "name": "IKEA Shelf",
+                    "buyPrice": 15.0,
+                    "sellPrice": 55.0,
+                    "profit": 40.0,
+                },
             ],
             city="Atlanta",
             min_profit=20.0,

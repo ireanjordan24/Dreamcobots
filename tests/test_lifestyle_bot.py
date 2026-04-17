@@ -2,27 +2,33 @@
 Tests for bots/lifestyle_bot/tiers.py and bots/lifestyle_bot/lifestyle_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'lifestyle_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "lifestyle_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.lifestyle_bot.lifestyle_bot import LifestyleBot, LifestyleBotTierError, LifestyleBotRequestLimitError
 
+from bots.lifestyle_bot.lifestyle_bot import (
+    LifestyleBot,
+    LifestyleBotRequestLimitError,
+    LifestyleBotTierError,
+)
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestLifestyleBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_life_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -33,8 +39,15 @@ class TestLifestyleBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_lifestyle_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "lifestyle_features", "habit_limit", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "lifestyle_features",
+            "habit_limit",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -43,7 +56,9 @@ class TestLifestyleBotTierInfo:
 
     def test_enterprise_unlimited(self):
         mod = self._load_tiers()
-        assert mod.get_lifestyle_tier_info(Tier.ENTERPRISE)["requests_per_month"] is None
+        assert (
+            mod.get_lifestyle_tier_info(Tier.ENTERPRISE)["requests_per_month"] is None
+        )
 
     def test_free_fewer_habits_than_pro(self):
         mod = self._load_tiers()
@@ -58,6 +73,7 @@ class TestLifestyleBotTierInfo:
 # LifestyleBot tests
 # -----------------------------------------------------------------------
 
+
 class TestLifestyleBot:
     def test_default_tier_free(self):
         bot = LifestyleBot()
@@ -71,7 +87,13 @@ class TestLifestyleBot:
     def test_track_habit_keys(self):
         bot = LifestyleBot()
         result = bot.track_habit("meditation", False)
-        for key in ("habit_name", "completed", "tier", "requests_used", "requests_remaining"):
+        for key in (
+            "habit_name",
+            "completed",
+            "tier",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_track_habit_increments_count(self):
@@ -83,6 +105,7 @@ class TestLifestyleBot:
     def test_free_habit_limit(self):
         bot = LifestyleBot(tier=Tier.FREE)
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_life_t", os.path.join(BOT_DIR, "tiers.py")
         )

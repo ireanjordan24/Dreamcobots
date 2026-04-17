@@ -2,6 +2,7 @@
 """Country-level lab tracking and monitoring for the Global AI Learning Matrix."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -106,12 +107,18 @@ class CountryMonitor:
         country.lab_count = count
 
     def get_top_countries(self, n: int = 10) -> list[Country]:
-        return sorted(self._countries.values(), key=lambda c: c.lab_count, reverse=True)[:n]
+        return sorted(
+            self._countries.values(), key=lambda c: c.lab_count, reverse=True
+        )[:n]
 
     def get_global_stats(self) -> dict:
         countries = list(self._countries.values())
         total_labs = sum(c.lab_count for c in countries)
-        avg_health = sum(c.health_score for c in countries) / len(countries) if countries else 0.0
+        avg_health = (
+            sum(c.health_score for c in countries) / len(countries)
+            if countries
+            else 0.0
+        )
 
         region_labs: dict[str, int] = {}
         for c in countries:

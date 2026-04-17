@@ -10,8 +10,8 @@ Validates:
   6. CreativeStudioBot — tier gating, daily limits, all public methods, dashboard
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -19,36 +19,36 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 from bots.creative_studio_bot.content_creator import (
-    MusicCreator,
-    FilmCreator,
-    ArtCreator,
     GENRES,
     STYLES,
-)
-from bots.creative_studio_bot.influencer_engine import (
-    ContentStrategyEngine,
-    MemeGenerator,
-    PLATFORMS,
+    ArtCreator,
+    FilmCreator,
+    MusicCreator,
 )
 from bots.creative_studio_bot.creative_studio_bot import (
     CreativeStudioBot,
     CreativeStudioBotError,
 )
+from bots.creative_studio_bot.influencer_engine import (
+    PLATFORMS,
+    ContentStrategyEngine,
+    MemeGenerator,
+)
 from bots.creative_studio_bot.tiers import (
+    BOT_FEATURES,
+    DAILY_CREATION_LIMITS,
     Tier,
     TierConfig,
+    get_bot_tier_info,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    BOT_FEATURES,
-    get_bot_tier_info,
-    DAILY_CREATION_LIMITS,
 )
-
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_tier_enum_values(self):
@@ -105,6 +105,7 @@ class TestTiers:
 # ===========================================================================
 # MusicCreator tests
 # ===========================================================================
+
 
 class TestMusicCreator:
     def setup_method(self):
@@ -195,16 +196,21 @@ class TestMusicCreator:
 # FilmCreator tests
 # ===========================================================================
 
+
 class TestFilmCreator:
     def setup_method(self):
         self.creator = FilmCreator()
 
     def test_generate_script_returns_dict(self):
-        result = self.creator.generate_script("thriller", "A detective solves a mystery")
+        result = self.creator.generate_script(
+            "thriller", "A detective solves a mystery"
+        )
         assert isinstance(result, dict)
 
     def test_generate_script_has_scenes(self):
-        result = self.creator.generate_script("comedy", "Two friends swap lives", num_scenes=3)
+        result = self.creator.generate_script(
+            "comedy", "Two friends swap lives", num_scenes=3
+        )
         assert "scenes" in result
         assert len(result["scenes"]) == 3
 
@@ -213,12 +219,16 @@ class TestFilmCreator:
         assert "heading" in result["scenes"][0]
 
     def test_generate_script_scene_has_dialogue(self):
-        result = self.creator.generate_script("action", "A heist gone wrong", num_scenes=2)
+        result = self.creator.generate_script(
+            "action", "A heist gone wrong", num_scenes=2
+        )
         assert "dialogue" in result["scenes"][0]
         assert len(result["scenes"][0]["dialogue"]) > 0
 
     def test_generate_script_has_three_act_structure(self):
-        result = self.creator.generate_script("sci-fi", "Aliens invade Earth", num_scenes=9)
+        result = self.creator.generate_script(
+            "sci-fi", "Aliens invade Earth", num_scenes=9
+        )
         assert "three_act_structure" in result
         assert "act_1" in result["three_act_structure"]
 
@@ -238,12 +248,16 @@ class TestFilmCreator:
         assert len(board["panels"]) == 3
 
     def test_create_storyboard_panel_has_shot_type(self):
-        script = self.creator.generate_script("thriller", "Dark alley scene", num_scenes=2)
+        script = self.creator.generate_script(
+            "thriller", "Dark alley scene", num_scenes=2
+        )
         board = self.creator.create_storyboard(script)
         assert "shot_type" in board["panels"][0]
 
     def test_create_storyboard_panel_has_lighting(self):
-        script = self.creator.generate_script("romance", "Candlelit dinner", num_scenes=2)
+        script = self.creator.generate_script(
+            "romance", "Candlelit dinner", num_scenes=2
+        )
         board = self.creator.create_storyboard(script)
         assert "lighting" in board["panels"][0]
 
@@ -272,6 +286,7 @@ class TestFilmCreator:
 # ===========================================================================
 # ArtCreator tests
 # ===========================================================================
+
 
 class TestArtCreator:
     def setup_method(self):
@@ -356,6 +371,7 @@ class TestArtCreator:
 # ContentStrategyEngine tests
 # ===========================================================================
 
+
 class TestContentStrategyEngine:
     def setup_method(self):
         self.engine = ContentStrategyEngine()
@@ -396,7 +412,9 @@ class TestContentStrategyEngine:
         assert isinstance(result, dict)
 
     def test_generate_viral_post_has_caption(self):
-        result = self.engine.generate_viral_post("tiktok", "productivity", style="educational")
+        result = self.engine.generate_viral_post(
+            "tiktok", "productivity", style="educational"
+        )
         assert "caption" in result
         assert len(result["caption"]) > 0
 
@@ -405,7 +423,9 @@ class TestContentStrategyEngine:
         assert "hashtags" in result
 
     def test_generate_viral_post_has_cta(self):
-        result = self.engine.generate_viral_post("linkedin", "networking", style="inspirational")
+        result = self.engine.generate_viral_post(
+            "linkedin", "networking", style="inspirational"
+        )
         assert "call_to_action" in result
 
     def test_generate_viral_post_has_predicted_reach(self):
@@ -442,6 +462,7 @@ class TestContentStrategyEngine:
 # MemeGenerator tests
 # ===========================================================================
 
+
 class TestMemeGenerator:
     def setup_method(self):
         self.generator = MemeGenerator()
@@ -468,7 +489,9 @@ class TestMemeGenerator:
         assert "visual_description" in result
 
     def test_generate_meme_has_predicted_engagement(self):
-        result = self.generator.generate_meme("procrastination", target_audience="millennials")
+        result = self.generator.generate_meme(
+            "procrastination", target_audience="millennials"
+        )
         assert "predicted_engagement" in result
 
     def test_analyze_viral_trends_returns_dict(self):
@@ -493,7 +516,12 @@ class TestMemeGenerator:
         assert "trending_topics" in result
 
     def test_predict_viral_score_returns_dict(self):
-        content = {"platform": "instagram", "hook": "Amazing trick!", "visual": True, "hashtags": True}
+        content = {
+            "platform": "instagram",
+            "hook": "Amazing trick!",
+            "visual": True,
+            "hashtags": True,
+        }
         result = self.generator.predict_viral_score(content)
         assert isinstance(result, dict)
 
@@ -522,6 +550,7 @@ class TestMemeGenerator:
 # ===========================================================================
 # CreativeStudioBot integration tests
 # ===========================================================================
+
 
 class TestCreativeStudioBot:
     def test_init_free_tier(self):
@@ -626,6 +655,7 @@ class TestCreativeStudioBot:
 
     def test_framework_flow_attribute(self):
         from framework import GlobalAISourcesFlow
+
         bot = CreativeStudioBot()
         assert hasattr(bot, "flow")
         assert isinstance(bot.flow, GlobalAISourcesFlow)

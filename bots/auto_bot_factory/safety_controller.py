@@ -8,16 +8,15 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Global safety limits
@@ -34,6 +33,7 @@ class SafetyLimitError(Exception):
 # ---------------------------------------------------------------------------
 # Safety Controller
 # ---------------------------------------------------------------------------
+
 
 class SafetyController:
     """
@@ -69,8 +69,7 @@ class SafetyController:
         """Register a bot. Raises SafetyLimitError if bot limit reached."""
         if self._bot_count >= self.max_bots:
             raise SafetyLimitError(
-                f"🚫 Bot limit ({self.max_bots}) reached. "
-                "Cannot register more bots."
+                f"🚫 Bot limit ({self.max_bots}) reached. " "Cannot register more bots."
             )
         self._bots[name] = bot
         self._bot_count += 1
@@ -149,11 +148,13 @@ class SafetyController:
             return result
         except Exception as exc:
             error_msg = str(exc)
-            self._crash_log.append({
-                "bot": name,
-                "error": error_msg,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
+            self._crash_log.append(
+                {
+                    "bot": name,
+                    "error": error_msg,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
             removed = self.unregister_bot(name)
             action = "removed broken bot" if removed else "bot not found for removal"
             self._log_health(name, f"crashed_and_{action}: {error_msg}")
@@ -179,7 +180,8 @@ class SafetyController:
             "bot_limit_reached": self._bot_count >= self.max_bots,
             "messages_sent_this_cycle": self._message_count_this_cycle,
             "max_messages_per_cycle": self.max_messages_per_cycle,
-            "message_limit_reached": self._message_count_this_cycle >= self.max_messages_per_cycle,
+            "message_limit_reached": self._message_count_this_cycle
+            >= self.max_messages_per_cycle,
             "messages_remaining": self.get_messages_remaining(),
             "crash_count": len(self._crash_log),
             "removed_bots": self._removed_bots,
@@ -191,8 +193,10 @@ class SafetyController:
     # ------------------------------------------------------------------
 
     def _log_health(self, name: str, event: str) -> None:
-        self._health_log.append({
-            "bot": name,
-            "event": event,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        self._health_log.append(
+            {
+                "bot": name,
+                "event": event,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )

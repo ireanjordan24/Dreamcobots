@@ -14,11 +14,11 @@ Usage
     print(result)
 """
 
-from bots.dreamco_payments.tiers import Tier, get_tier_config, get_upgrade_path
-from bots.dreamco_payments.payment_processor import PaymentProcessor
-from bots.dreamco_payments.api_manager import APIManager
 from bots.dreamco_payments.account_manager import AccountManager
+from bots.dreamco_payments.api_manager import APIManager
+from bots.dreamco_payments.payment_processor import PaymentProcessor
 from bots.dreamco_payments.reporting_dashboard import ReportingDashboard
+from bots.dreamco_payments.tiers import Tier, get_tier_config, get_upgrade_path
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -133,9 +133,7 @@ class DreamcoPaymentsBot:
         business_type: str = "standard",
     ) -> dict:
         """Delegate to AccountManager.onboard_user."""
-        return self._account_manager.onboard_user(
-            user_id, name, email, business_type
-        )
+        return self._account_manager.onboard_user(user_id, name, email, business_type)
 
     def verify_user(self, user_id: str, verification_docs: dict) -> dict:
         """Delegate to AccountManager.verify_user."""
@@ -145,13 +143,9 @@ class DreamcoPaymentsBot:
         """Delegate to AccountManager.detect_fraud."""
         return self._account_manager.detect_fraud(transaction_data)
 
-    def send_notification(
-        self, user_id: str, event_type: str, message: str
-    ) -> dict:
+    def send_notification(self, user_id: str, event_type: str, message: str) -> dict:
         """Delegate to AccountManager.send_notification."""
-        return self._account_manager.send_notification(
-            user_id, event_type, message
-        )
+        return self._account_manager.send_notification(user_id, event_type, message)
 
     def get_user_profile(self, user_id: str) -> dict:
         """Delegate to AccountManager.get_user_profile."""
@@ -181,13 +175,9 @@ class DreamcoPaymentsBot:
         """Delegate to ReportingDashboard.list_discount_dominator_settings."""
         return self._dashboard.list_discount_dominator_settings(group)
 
-    def update_discount_dominator_setting(
-        self, setting_id: int, value
-    ) -> dict:
+    def update_discount_dominator_setting(self, setting_id: int, value) -> dict:
         """Delegate to ReportingDashboard.update_discount_dominator_setting."""
-        return self._dashboard.update_discount_dominator_setting(
-            setting_id, value
-        )
+        return self._dashboard.update_discount_dominator_setting(setting_id, value)
 
     def export_report(self, format_type: str) -> dict:
         """Delegate to ReportingDashboard.export_report."""

@@ -53,8 +53,10 @@ class DataStore:
         """
         results = []
         for record in self._records:
-            if all(str(record.get(k, "")).lower() == str(v).lower()
-                   for k, v in filters.items()):
+            if all(
+                str(record.get(k, "")).lower() == str(v).lower()
+                for k, v in filters.items()
+            ):
                 results.append(record)
         return results
 
@@ -62,8 +64,7 @@ class DataStore:
         """Return records where *query* appears in any string field value."""
         q = query.lower()
         return [
-            r for r in self._records
-            if any(q in str(v).lower() for v in r.values())
+            r for r in self._records if any(q in str(v).lower() for v in r.values())
         ]
 
     def update(self, record_id: int, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:

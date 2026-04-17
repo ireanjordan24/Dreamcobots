@@ -23,9 +23,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from core.base_bot import BaseBot, RESULT_STATUS_SUCCESS, RESULT_STATUS_FAILED
+from core.base_bot import RESULT_STATUS_FAILED, RESULT_STATUS_SUCCESS, BaseBot
 from core.executor import BotExecutor
-
 
 # ---------------------------------------------------------------------------
 # WorkflowStep

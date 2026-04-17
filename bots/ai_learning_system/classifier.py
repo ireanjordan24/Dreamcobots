@@ -5,15 +5,16 @@ Performs keyword-based classification of ingested records into one of the
 canonical AI/ML learning method types.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_CLASSIFIER
-from .ingestion import IngestedRecord
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .ingestion import IngestedRecord
+from .tiers import FEATURE_CLASSIFIER, Tier, TierConfig, get_tier_config
 
 
 class LearningMethodType(Enum):
@@ -77,23 +78,81 @@ class ClassifierTierError(Exception):
 
 _KEYWORD_RULES: List[tuple] = [
     # (method_type, keywords, base_confidence)
-    (LearningMethodType.FEDERATED_LEARNING,   ["federated", "federated_learning"],                   0.91),
-    (LearningMethodType.META_LEARNING,         ["meta_learning", "meta-learning", "maml", "few_shot"], 0.89),
-    (LearningMethodType.SELF_SUPERVISED,       ["self_supervised", "self-supervised", "contrastive",
-                                                "contrastive_learning", "pretext"],                   0.88),
-    (LearningMethodType.SEMI_SUPERVISED,       ["semi_supervised", "semi-supervised"],                0.87),
-    (LearningMethodType.TRANSFER_LEARNING,     ["transfer_learning", "transfer-learning",
-                                                "pre_trained", "pretrained", "fine_tuning",
-                                                "fine-tuning", "finetune"],                           0.86),
-    (LearningMethodType.REINFORCEMENT,         ["reinforcement_learning", "reinforcement",
-                                                "rlhf", "policy_gradient", "ppo", "q_learning",
-                                                "dqn", "actor_critic", "reward"],                    0.90),
-    (LearningMethodType.UNSUPERVISED,          ["unsupervised_learning", "unsupervised",
-                                                "cluster", "clustering", "gan", "generative",
-                                                "autoencoder", "vae", "diffusion"],                   0.85),
-    (LearningMethodType.SUPERVISED,            ["supervised_learning", "supervised",
-                                                "classification", "regression", "detection",
-                                                "segmentation", "labelled", "labeled"],               0.84),
+    (LearningMethodType.FEDERATED_LEARNING, ["federated", "federated_learning"], 0.91),
+    (
+        LearningMethodType.META_LEARNING,
+        ["meta_learning", "meta-learning", "maml", "few_shot"],
+        0.89,
+    ),
+    (
+        LearningMethodType.SELF_SUPERVISED,
+        [
+            "self_supervised",
+            "self-supervised",
+            "contrastive",
+            "contrastive_learning",
+            "pretext",
+        ],
+        0.88,
+    ),
+    (LearningMethodType.SEMI_SUPERVISED, ["semi_supervised", "semi-supervised"], 0.87),
+    (
+        LearningMethodType.TRANSFER_LEARNING,
+        [
+            "transfer_learning",
+            "transfer-learning",
+            "pre_trained",
+            "pretrained",
+            "fine_tuning",
+            "fine-tuning",
+            "finetune",
+        ],
+        0.86,
+    ),
+    (
+        LearningMethodType.REINFORCEMENT,
+        [
+            "reinforcement_learning",
+            "reinforcement",
+            "rlhf",
+            "policy_gradient",
+            "ppo",
+            "q_learning",
+            "dqn",
+            "actor_critic",
+            "reward",
+        ],
+        0.90,
+    ),
+    (
+        LearningMethodType.UNSUPERVISED,
+        [
+            "unsupervised_learning",
+            "unsupervised",
+            "cluster",
+            "clustering",
+            "gan",
+            "generative",
+            "autoencoder",
+            "vae",
+            "diffusion",
+        ],
+        0.85,
+    ),
+    (
+        LearningMethodType.SUPERVISED,
+        [
+            "supervised_learning",
+            "supervised",
+            "classification",
+            "regression",
+            "detection",
+            "segmentation",
+            "labelled",
+            "labeled",
+        ],
+        0.84,
+    ),
 ]
 
 _DEFAULT_METHOD = LearningMethodType.SUPERVISED
@@ -198,7 +257,8 @@ class LearningMethodClassifier:
             type_counts[key] = type_counts.get(key, 0) + 1
         avg_confidence = (
             sum(m.confidence for m in self._classified) / len(self._classified)
-            if self._classified else 0.0
+            if self._classified
+            else 0.0
         )
         return {
             "total_classified": len(self._classified),

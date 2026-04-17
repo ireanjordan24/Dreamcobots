@@ -1,36 +1,39 @@
 """Tests for bots/quantum_ai_bot/ — quantum circuit simulator, optimizer, and main bot."""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.quantum_ai_bot.quantum_simulator import (
-    QuantumCircuitSimulator,
-    QuantumCircuitSimulatorError,
-    HybridQuantumAIModel,
-    HybridQuantumAIModelError,
-    GATE_TYPES,
-)
+
 from bots.quantum_ai_bot.optimization_engine import (
+    PROBLEM_TYPES,
+    PROVIDERS,
     QuantumOptimizer,
     QuantumOptimizerError,
     QuantumPartnershipManager,
     QuantumPartnershipManagerError,
-    PROBLEM_TYPES,
-    PROVIDERS,
 )
 from bots.quantum_ai_bot.quantum_ai_bot import QuantumAIBot, QuantumAIBotError
+from bots.quantum_ai_bot.quantum_simulator import (
+    GATE_TYPES,
+    HybridQuantumAIModel,
+    HybridQuantumAIModelError,
+    QuantumCircuitSimulator,
+    QuantumCircuitSimulatorError,
+)
 from bots.quantum_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
-
 
 # ===========================================================================
 # QuantumCircuitSimulator
 # ===========================================================================
+
 
 class TestQuantumCircuitSimulatorInit:
     def test_default_tier_is_free(self):
@@ -59,7 +62,13 @@ class TestSimulateCircuit:
     def test_has_required_keys(self):
         sim = QuantumCircuitSimulator(tier=Tier.FREE)
         result = sim.simulate_circuit(2, [{"type": "hadamard"}], 50)
-        for key in ("circuit_id", "qubits", "shots", "state_probabilities", "measurement_counts"):
+        for key in (
+            "circuit_id",
+            "qubits",
+            "shots",
+            "state_probabilities",
+            "measurement_counts",
+        ):
             assert key in result
 
     def test_free_tier_4_qubit_limit(self):
@@ -170,7 +179,12 @@ class TestMeasureQuantumState:
         sim = QuantumCircuitSimulator(tier=Tier.FREE)
         r = sim.simulate_circuit(2, [], 10)
         m = sim.measure_quantum_state(r["circuit_id"])
-        for key in ("circuit_id", "dominant_state", "dominant_probability", "collapsed_state"):
+        for key in (
+            "circuit_id",
+            "dominant_state",
+            "dominant_probability",
+            "collapsed_state",
+        ):
             assert key in m
 
     def test_invalid_circuit_id_raises(self):
@@ -188,6 +202,7 @@ class TestMeasureQuantumState:
 # ===========================================================================
 # HybridQuantumAIModel
 # ===========================================================================
+
 
 class TestHybridQuantumAIModel:
     def test_default_tier(self):
@@ -240,7 +255,13 @@ class TestHybridQuantumAIModel:
 
     def test_evaluate_quantum_advantage_all_problem_types(self):
         model = HybridQuantumAIModel(tier=Tier.PRO)
-        for pt in ("optimization", "machine_learning", "cryptography", "simulation", "search"):
+        for pt in (
+            "optimization",
+            "machine_learning",
+            "cryptography",
+            "simulation",
+            "search",
+        ):
             result = model.evaluate_quantum_advantage(pt)
             assert result["problem_type"] == pt
 
@@ -253,6 +274,7 @@ class TestHybridQuantumAIModel:
 # ===========================================================================
 # QuantumOptimizer
 # ===========================================================================
+
 
 class TestQuantumOptimizer:
     def test_default_tier(self):
@@ -287,8 +309,15 @@ class TestQuantumOptimizer:
 
     def test_solve_optimization_has_required_keys(self):
         opt = QuantumOptimizer(tier=Tier.FREE)
-        result = opt.solve_optimization("traveling_salesman", {"max_dist": 100}, ["a", "b"])
-        for key in ("solution_id", "objective_value", "optimal_solution", "convergence"):
+        result = opt.solve_optimization(
+            "traveling_salesman", {"max_dist": 100}, ["a", "b"]
+        )
+        for key in (
+            "solution_id",
+            "objective_value",
+            "optimal_solution",
+            "convergence",
+        ):
             assert key in result
 
     def test_unknown_problem_raises(self):
@@ -338,6 +367,7 @@ class TestQuantumOptimizer:
 # ===========================================================================
 # QuantumPartnershipManager
 # ===========================================================================
+
 
 class TestQuantumPartnershipManager:
     def test_default_tier(self):
@@ -395,11 +425,15 @@ class TestQuantumPartnershipManager:
     def test_free_resource_estimate_raises(self):
         pm = QuantumPartnershipManager(tier=Tier.FREE)
         with pytest.raises(QuantumPartnershipManagerError):
-            pm.get_quantum_resource_estimate({"qubits": 4, "gates": 10, "shots": 100}, "ibmq_manila")
+            pm.get_quantum_resource_estimate(
+                {"qubits": 4, "gates": 10, "shots": 100}, "ibmq_manila"
+            )
 
     def test_pro_resource_estimate_returns_dict(self):
         pm = QuantumPartnershipManager(tier=Tier.PRO)
-        result = pm.get_quantum_resource_estimate({"qubits": 8, "gates": 20, "shots": 500}, "ibmq_manila")
+        result = pm.get_quantum_resource_estimate(
+            {"qubits": 8, "gates": 20, "shots": 500}, "ibmq_manila"
+        )
         assert isinstance(result, dict)
         for key in ("estimated_cost_usd", "qubit_fidelity", "recommended_shots"):
             assert key in result
@@ -413,6 +447,7 @@ class TestQuantumPartnershipManager:
 # ===========================================================================
 # QuantumAIBot (main bot)
 # ===========================================================================
+
 
 class TestQuantumAIBotInit:
     def test_default_tier_is_free(self):
@@ -498,7 +533,13 @@ class TestQuantumAIBotDashboard:
     def test_dashboard_has_required_keys(self):
         bot = QuantumAIBot(tier=Tier.PRO)
         dash = bot.get_quantum_dashboard()
-        for key in ("bot", "tier", "features", "supported_problem_types", "supported_providers"):
+        for key in (
+            "bot",
+            "tier",
+            "features",
+            "supported_problem_types",
+            "supported_providers",
+        ):
             assert key in dash
 
     def test_dashboard_tier_matches(self):
@@ -520,6 +561,7 @@ class TestQuantumAIBotDashboard:
 # ===========================================================================
 # Tiers module
 # ===========================================================================
+
 
 class TestQuantumAIBotTiers:
     def test_bot_features_has_all_tiers(self):

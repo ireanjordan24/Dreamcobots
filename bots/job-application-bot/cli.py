@@ -5,6 +5,7 @@ Command-line interface for the Job Application Bot.
 Provides a menu-driven interaction so users can control the bot without
 writing any code.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import argparse
@@ -105,9 +106,9 @@ def cmd_parse_resume(config: dict, resume_path: str) -> None:
 
 
 def cmd_login(config: dict, site_filter: str | None, headless: bool = False) -> None:
+    from login_handler import LoginHandler
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
-    from login_handler import LoginHandler
 
     credentials = config.get("credentials", [])
     if site_filter:
@@ -137,11 +138,11 @@ def cmd_apply(
     resume_path: str,
     headless: bool,
 ) -> None:
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
+    from application_submitter import ApplicationSubmitter
     from login_handler import LoginHandler
     from resume_parser import ResumeParser
-    from application_submitter import ApplicationSubmitter
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
 
     options = Options()
     if headless:

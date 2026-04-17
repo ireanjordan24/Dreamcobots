@@ -22,7 +22,11 @@ class ProfitDashboard:
         Display currency label.
     """
 
-    def __init__(self, title: str = "DreamCo Profit Intelligence Dashboard", currency: str = "USD"):
+    def __init__(
+        self,
+        title: str = "DreamCo Profit Intelligence Dashboard",
+        currency: str = "USD",
+    ):
         self.title = title
         self.currency = currency
         self._roi_records: List[Dict[str, Any]] = []
@@ -90,7 +94,9 @@ class ProfitDashboard:
             "total_cost": round(total_cost, 2),
             "total_profit": round(total_profit, 2),
             "roi": round(roi, 6),
-            "market_alert_count": sum(1 for s in self._market_signals if s.get("alert")),
+            "market_alert_count": sum(
+                1 for s in self._market_signals if s.get("alert")
+            ),
         }
 
     def clear(self) -> None:

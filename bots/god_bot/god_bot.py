@@ -15,15 +15,15 @@ Usage
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-from framework import GlobalAISourcesFlow  # noqa: F401 - framework compliance marker
-
 import importlib.util as _util
 import os
 import sys
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
+from framework import GlobalAISourcesFlow  # noqa: F401 - framework compliance marker
 
 # ---------------------------------------------------------------------------
 # Metrics store
@@ -38,7 +38,9 @@ def save_metrics(result: Dict[str, Any]) -> None:
     Each entry is timestamped at the moment it is saved.  In production this
     can be replaced by a database write or an API call.
     """
-    _metrics_store.append({**result, "saved_at": datetime.now(timezone.utc).isoformat()})
+    _metrics_store.append(
+        {**result, "saved_at": datetime.now(timezone.utc).isoformat()}
+    )
 
 
 def get_metrics() -> List[Dict[str, Any]]:
@@ -55,7 +57,12 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 BOT_REGISTRY: List[tuple[str, str]] = [
     (
-        os.path.join(_ROOT, "bots", "government-contract-grant-bot", "government_contract_grant_bot.py"),
+        os.path.join(
+            _ROOT,
+            "bots",
+            "government-contract-grant-bot",
+            "government_contract_grant_bot.py",
+        ),
         "gov_bot",
     ),
     (
@@ -111,6 +118,7 @@ class GodBot:
                 spec.loader.exec_module(module)  # type: ignore[union-attr]
             else:
                 import importlib
+
                 module = importlib.import_module(bot_path)
 
             result: Dict[str, Any] = module.run()  # type: ignore[attr-defined]
@@ -146,7 +154,9 @@ class GodBot:
                 bot_result = entry.get("result", {})
                 total_revenue += bot_result.get("revenue", 0)
                 # Support both "leads" and "leads_generated" keys
-                total_leads += bot_result.get("leads_generated", bot_result.get("leads", 0))
+                total_leads += bot_result.get(
+                    "leads_generated", bot_result.get("leads", 0)
+                )
                 save_metrics({**bot_result, "bot": bot_name})
 
         summary: Dict[str, Any] = {
@@ -163,7 +173,9 @@ class GodBot:
         )
         return summary
 
-    def start(self, interval_minutes: int = 10, max_cycles: Optional[int] = None) -> None:
+    def start(
+        self, interval_minutes: int = 10, max_cycles: Optional[int] = None
+    ) -> None:
         """Run all bots on a recurring schedule.
 
         Parameters

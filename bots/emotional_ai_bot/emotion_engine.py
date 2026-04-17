@@ -1,25 +1,122 @@
 """Emotion Engine — emotion recognition and personality-aware response adaptation."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="EmotionEngine")
 
-EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust", "trust", "anticipation"]
+EMOTIONS = [
+    "joy",
+    "sadness",
+    "anger",
+    "fear",
+    "surprise",
+    "disgust",
+    "trust",
+    "anticipation",
+]
 _FREE_EMOTIONS = EMOTIONS[:4]  # joy, sadness, anger, fear
 
-TONES = ["empathetic", "motivational", "calm", "energetic", "professional", "friendly", "supportive"]
+TONES = [
+    "empathetic",
+    "motivational",
+    "calm",
+    "energetic",
+    "professional",
+    "friendly",
+    "supportive",
+]
 
 _EMOTION_KEYWORDS: dict = {
-    "joy": ["happy", "great", "wonderful", "excited", "love", "amazing", "fantastic", "glad", "elated"],
-    "sadness": ["sad", "unhappy", "depressed", "down", "miserable", "grief", "lonely", "hopeless", "crying"],
-    "anger": ["angry", "furious", "mad", "rage", "hate", "frustrated", "annoyed", "outraged", "irritated"],
-    "fear": ["scared", "afraid", "anxious", "worried", "terrified", "nervous", "panic", "dread", "frightened"],
-    "surprise": ["surprised", "shocked", "unexpected", "wow", "astonished", "amazed", "startled"],
-    "disgust": ["disgusted", "gross", "revolting", "awful", "terrible", "horrible", "nasty", "repulsed"],
-    "trust": ["trust", "believe", "confident", "reliable", "safe", "secure", "faith", "loyal"],
-    "anticipation": ["excited", "eager", "looking forward", "hopeful", "curious", "waiting", "expecting"],
+    "joy": [
+        "happy",
+        "great",
+        "wonderful",
+        "excited",
+        "love",
+        "amazing",
+        "fantastic",
+        "glad",
+        "elated",
+    ],
+    "sadness": [
+        "sad",
+        "unhappy",
+        "depressed",
+        "down",
+        "miserable",
+        "grief",
+        "lonely",
+        "hopeless",
+        "crying",
+    ],
+    "anger": [
+        "angry",
+        "furious",
+        "mad",
+        "rage",
+        "hate",
+        "frustrated",
+        "annoyed",
+        "outraged",
+        "irritated",
+    ],
+    "fear": [
+        "scared",
+        "afraid",
+        "anxious",
+        "worried",
+        "terrified",
+        "nervous",
+        "panic",
+        "dread",
+        "frightened",
+    ],
+    "surprise": [
+        "surprised",
+        "shocked",
+        "unexpected",
+        "wow",
+        "astonished",
+        "amazed",
+        "startled",
+    ],
+    "disgust": [
+        "disgusted",
+        "gross",
+        "revolting",
+        "awful",
+        "terrible",
+        "horrible",
+        "nasty",
+        "repulsed",
+    ],
+    "trust": [
+        "trust",
+        "believe",
+        "confident",
+        "reliable",
+        "safe",
+        "secure",
+        "faith",
+        "loyal",
+    ],
+    "anticipation": [
+        "excited",
+        "eager",
+        "looking forward",
+        "hopeful",
+        "curious",
+        "waiting",
+        "expecting",
+    ],
 }
 
 _TONE_RESPONSE_PREFIX: dict = {
@@ -106,8 +203,14 @@ class EmotionRecognizer:
             "shift_detected": bool(changes),
             "shift_score": round(shift_score, 2),
             "dominant_shift": dominant_shift,
-            "emotional_impact": "high" if shift_score > 0.6 else "moderate" if shift_score > 0.3 else "low",
-            "recommendation": "Monitor closely" if shift_score > 0.6 else "Continue as normal",
+            "emotional_impact": (
+                "high"
+                if shift_score > 0.6
+                else "moderate" if shift_score > 0.3 else "low"
+            ),
+            "recommendation": (
+                "Monitor closely" if shift_score > 0.6 else "Continue as normal"
+            ),
             "tier": self.tier.value,
         }
 
@@ -198,7 +301,9 @@ class PersonalityAdapter:
             "tier": self.tier.value,
         }
 
-    def generate_personalized_response(self, prompt: str, personality_type: str) -> dict:
+    def generate_personalized_response(
+        self, prompt: str, personality_type: str
+    ) -> dict:
         """Generate a response adapted to a personality type (PRO/ENTERPRISE)."""
         if self.tier == Tier.FREE:
             upgrade = get_upgrade_path(self.tier)
@@ -212,7 +317,9 @@ class PersonalityAdapter:
             "assertive": "Here's what you need to know: {prompt}",
             "balanced": "Taking everything into account: {prompt}",
         }
-        template = personality_templates.get(personality_type, personality_templates["balanced"])
+        template = personality_templates.get(
+            personality_type, personality_templates["balanced"]
+        )
         response = template.format(prompt=prompt)
         return {
             "response": response,

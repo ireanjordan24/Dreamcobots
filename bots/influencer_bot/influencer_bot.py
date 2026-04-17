@@ -29,31 +29,33 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.influencer_bot.brand_partnership import BrandPartnership
+from bots.influencer_bot.influencer_database import (
+    PARTNERSHIP_CELEBRITY,
+    InfluencerDatabase,
+)
 from bots.influencer_bot.tiers import (
+    FEATURE_AUDIENCE_ANALYTICS,
+    FEATURE_BASIC_ANALYTICS,
+    FEATURE_CAMPAIGN_MANAGER,
+    FEATURE_CELEBRITY_PARTNERSHIPS,
+    FEATURE_COBRAND_TEMPLATE,
+    FEATURE_CUSTOM_COBRAND,
+    FEATURE_FULL_DATABASE,
+    FEATURE_INFLUENCER_CATALOG,
+    FEATURE_REVENUE_SHARING,
+    FEATURE_VIRALITY_ENGINE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_INFLUENCER_CATALOG,
-    FEATURE_COBRAND_TEMPLATE,
-    FEATURE_BASIC_ANALYTICS,
-    FEATURE_FULL_DATABASE,
-    FEATURE_VIRALITY_ENGINE,
-    FEATURE_CAMPAIGN_MANAGER,
-    FEATURE_AUDIENCE_ANALYTICS,
-    FEATURE_CELEBRITY_PARTNERSHIPS,
-    FEATURE_CUSTOM_COBRAND,
-    FEATURE_REVENUE_SHARING,
 )
-from bots.influencer_bot.influencer_database import InfluencerDatabase, PARTNERSHIP_CELEBRITY
-from bots.influencer_bot.brand_partnership import BrandPartnership
 from bots.influencer_bot.virality_engine import ViralityEngine
-
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -114,7 +116,9 @@ class InfluencerBot:
         influencers = self.database.list_influencers(category=category)
         if not self.config.has_feature(FEATURE_FULL_DATABASE):
             # FREE tier limited to non-celebrity influencers only
-            influencers = [i for i in influencers if i.partnership_tier != PARTNERSHIP_CELEBRITY]
+            influencers = [
+                i for i in influencers if i.partnership_tier != PARTNERSHIP_CELEBRITY
+            ]
         return [i.to_dict() for i in influencers]
 
     def get_influencer(self, influencer_id: str) -> dict:
@@ -158,7 +162,9 @@ class InfluencerBot:
         if inf and inf.partnership_tier == PARTNERSHIP_CELEBRITY:
             self._require_feature(FEATURE_CELEBRITY_PARTNERSHIPS)
 
-        if revenue_share_pct > 0 and not self.config.has_feature(FEATURE_REVENUE_SHARING):
+        if revenue_share_pct > 0 and not self.config.has_feature(
+            FEATURE_REVENUE_SHARING
+        ):
             # Non-enterprise tiers get a fixed default revenue share
             revenue_share_pct = 0.10
 
@@ -254,7 +260,10 @@ class InfluencerBot:
         """Return information about the next available tier."""
         upgrade = get_upgrade_path(self.tier)
         if upgrade is None:
-            return {"message": "You are already on the highest tier.", "upgrade_available": False}
+            return {
+                "message": "You are already on the highest tier.",
+                "upgrade_available": False,
+            }
         return {
             "upgrade_available": True,
             "upgrade_to": upgrade.name,

@@ -31,36 +31,35 @@ from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from bots.fiverr_bot.tiers import (
+    FEATURE_ADMIN_DASHBOARD,
+    FEATURE_AI_PRICING,
+    FEATURE_ANALYTICS,
+    FEATURE_BULK_MESSAGING,
+    FEATURE_CRM_EXPORT,
+    FEATURE_FEATURED_GIGS,
+    FEATURE_FREELANCER_MATCHING,
+    FEATURE_GIG_LISTING,
+    FEATURE_INBOX_AUTOMATION,
+    FEATURE_JOB_POSTINGS,
+    FEATURE_MILESTONES,
+    FEATURE_ORDER_TRACKING,
+    FEATURE_PRICING_OPTIMIZER,
+    FEATURE_PROPOSALS,
+    FEATURE_REVIEW_COLLECTION,
+    FEATURE_STRIPE_PAYMENTS,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_GIG_LISTING,
-    FEATURE_ORDER_TRACKING,
-    FEATURE_INBOX_AUTOMATION,
-    FEATURE_REVIEW_COLLECTION,
-    FEATURE_ANALYTICS,
-    FEATURE_PRICING_OPTIMIZER,
-    FEATURE_CRM_EXPORT,
-    FEATURE_AI_PRICING,
-    FEATURE_WHITE_LABEL,
-    FEATURE_BULK_MESSAGING,
-    FEATURE_FREELANCER_MATCHING,
-    FEATURE_JOB_POSTINGS,
-    FEATURE_PROPOSALS,
-    FEATURE_STRIPE_PAYMENTS,
-    FEATURE_MILESTONES,
-    FEATURE_ADMIN_DASHBOARD,
-    FEATURE_FEATURED_GIGS,
 )
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class FiverrBotError(Exception):
     """Base exception for Fiverr Bot errors."""
@@ -73,6 +72,7 @@ class FiverrBotTierError(FiverrBotError):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 class GigCategory(Enum):
     DATA_ENTRY = "data_entry"
@@ -154,7 +154,7 @@ class Review:
     order_id: str
     gig_id: str
     buyer_username: str
-    rating: float          # 1.0 – 5.0
+    rating: float  # 1.0 – 5.0
     comment: str
     created_at: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
@@ -164,7 +164,7 @@ class Review:
 @dataclass
 class FreelancerProfile:
     username: str
-    skills: list            # e.g. ["python", "web_development", "SEO"]
+    skills: list  # e.g. ["python", "web_development", "SEO"]
     bio: str
     hourly_rate_usd: float
     rating: float = 0.0
@@ -192,8 +192,8 @@ class JobPosting:
     description: str
     category: GigCategory
     budget_usd: float
-    skills_required: list   # skills the client is looking for
-    status: str = "open"    # open | closed | in_progress
+    skills_required: list  # skills the client is looking for
+    status: str = "open"  # open | closed | in_progress
     created_at: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
@@ -289,7 +289,13 @@ GIG_TEMPLATES = {
         ),
         "base_price_usd": 40.0,
         "delivery_days": 3,
-        "tags": ["social media", "content calendar", "Instagram", "Facebook", "scheduling"],
+        "tags": [
+            "social media",
+            "content calendar",
+            "Instagram",
+            "Facebook",
+            "scheduling",
+        ],
     },
     GigCategory.VIRTUAL_ASSISTANT: {
         "title": "Professional Virtual Assistant for Business Tasks",
@@ -338,6 +344,7 @@ GIG_TEMPLATES = {
 # Stripe integration helper (mock when STRIPE_SECRET_KEY not set)
 # ---------------------------------------------------------------------------
 
+
 class _StripeClient:
     """
     Thin wrapper around Stripe API calls.
@@ -377,6 +384,7 @@ class _StripeClient:
             }
         try:
             import stripe  # type: ignore
+
             stripe.api_key = self._key
             intent = stripe.PaymentIntent.create(
                 amount=amount_cents,
@@ -406,6 +414,7 @@ class _StripeClient:
             }
         try:
             import stripe  # type: ignore
+
             stripe.api_key = self._key
             transfer = stripe.Transfer.create(
                 amount=amount_cents,
@@ -421,6 +430,7 @@ class _StripeClient:
 # ---------------------------------------------------------------------------
 # Main class
 # ---------------------------------------------------------------------------
+
 
 class FiverrBot:
     """
@@ -469,7 +479,8 @@ class FiverrBot:
             upgrade = get_upgrade_path(self.tier)
             suggestion = (
                 f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
-                if upgrade else ""
+                if upgrade
+                else ""
             )
             raise FiverrBotTierError(
                 f"Feature '{feature}' is not available on the "
@@ -482,7 +493,8 @@ class FiverrBot:
             upgrade = get_upgrade_path(self.tier)
             suggestion = (
                 f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
-                if upgrade else ""
+                if upgrade
+                else ""
             )
             raise FiverrBotTierError(
                 f"Gig limit of {limit} reached on the {self._config.name} tier.{suggestion}"
@@ -494,7 +506,8 @@ class FiverrBot:
             upgrade = get_upgrade_path(self.tier)
             suggestion = (
                 f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
-                if upgrade else ""
+                if upgrade
+                else ""
             )
             raise FiverrBotTierError(
                 f"Order limit of {limit} reached on the {self._config.name} tier.{suggestion}"
@@ -607,21 +620,25 @@ class FiverrBot:
         fee_pct = self._config.service_fee_pct
         fee_usd = round(order.amount_usd * fee_pct / 100.0, 2)
         net_usd = round(order.amount_usd - fee_usd, 2)
-        self._revenue_log.append({
-            "order_id": order_id,
-            "gig_id": order.gig_id,
-            "amount_usd": order.amount_usd,
-            "buyer": order.buyer_username,
-            "completed_at": order.completed_at,
-        })
-        self._service_fee_log.append({
-            "order_id": order_id,
-            "gross_usd": order.amount_usd,
-            "fee_pct": fee_pct,
-            "fee_usd": fee_usd,
-            "net_usd": net_usd,
-            "recorded_at": order.completed_at,
-        })
+        self._revenue_log.append(
+            {
+                "order_id": order_id,
+                "gig_id": order.gig_id,
+                "amount_usd": order.amount_usd,
+                "buyer": order.buyer_username,
+                "completed_at": order.completed_at,
+            }
+        )
+        self._service_fee_log.append(
+            {
+                "order_id": order_id,
+                "gross_usd": order.amount_usd,
+                "fee_pct": fee_pct,
+                "fee_usd": fee_usd,
+                "net_usd": net_usd,
+                "recorded_at": order.completed_at,
+            }
+        )
         return _order_to_dict(order)
 
     def cancel_order(self, order_id: str) -> dict:
@@ -747,7 +764,9 @@ class FiverrBot:
         """Suggest an optimized price for a gig based on category benchmarks."""
         self._require(FEATURE_PRICING_OPTIMIZER)
         gig = self._get_gig(gig_id)
-        template = GIG_TEMPLATES.get(gig.category, GIG_TEMPLATES[GigCategory.DATA_ENTRY])
+        template = GIG_TEMPLATES.get(
+            gig.category, GIG_TEMPLATES[GigCategory.DATA_ENTRY]
+        )
         base = template["base_price_usd"]
 
         # AI pricing uses additional signals
@@ -781,14 +800,16 @@ class FiverrBot:
         """Return performance analytics across all gigs and orders."""
         self._require(FEATURE_ANALYTICS)
         total_revenue = sum(e["amount_usd"] for e in self._revenue_log)
-        completed = [o for o in self._orders.values() if o.status == OrderStatus.COMPLETED]
+        completed = [
+            o for o in self._orders.values() if o.status == OrderStatus.COMPLETED
+        ]
         avg_rating = (
             round(sum(r.rating for r in self._reviews.values()) / len(self._reviews), 2)
-            if self._reviews else 0.0
+            if self._reviews
+            else 0.0
         )
         conversion_rate = (
-            round(len(completed) / len(self._orders) * 100, 1)
-            if self._orders else 0.0
+            round(len(completed) / len(self._orders) * 100, 1) if self._orders else 0.0
         )
 
         by_category: dict = {}
@@ -976,11 +997,15 @@ class FiverrBot:
             fl_skills = set(fl.skills)
             overlap = required & fl_skills
             if overlap:
-                matches.append({
-                    **_freelancer_to_dict(fl),
-                    "matched_skills": sorted(overlap),
-                    "match_score": round(len(overlap) / max(len(required), 1) * 100, 1),
-                })
+                matches.append(
+                    {
+                        **_freelancer_to_dict(fl),
+                        "matched_skills": sorted(overlap),
+                        "match_score": round(
+                            len(overlap) / max(len(required), 1) * 100, 1
+                        ),
+                    }
+                )
         matches.sort(key=lambda x: x["match_score"], reverse=True)
         return matches
 
@@ -1001,9 +1026,7 @@ class FiverrBot:
         if job_id not in self._job_postings:
             raise FiverrBotError(f"Job '{job_id}' not found.")
         if freelancer_username not in self._freelancers:
-            raise FiverrBotError(
-                f"Freelancer '{freelancer_username}' not registered."
-            )
+            raise FiverrBotError(f"Freelancer '{freelancer_username}' not registered.")
         self._proposal_counter += 1
         proposal_id = f"prop_{self._proposal_counter:04d}"
         proposal = Proposal(
@@ -1021,9 +1044,7 @@ class FiverrBot:
         """Return all proposals for a job."""
         self._require(FEATURE_PROPOSALS)
         return [
-            _proposal_to_dict(p)
-            for p in self._proposals.values()
-            if p.job_id == job_id
+            _proposal_to_dict(p) for p in self._proposals.values() if p.job_id == job_id
         ]
 
     def accept_proposal(self, proposal_id: str) -> dict:
@@ -1118,7 +1139,9 @@ class FiverrBot:
         ms.funded_at = datetime.now(timezone.utc).isoformat()
         return _milestone_to_dict(ms)
 
-    def release_milestone(self, milestone_id: str, destination: str = "freelancer") -> dict:
+    def release_milestone(
+        self, milestone_id: str, destination: str = "freelancer"
+    ) -> dict:
         """
         Release a funded milestone to the freelancer.
 
@@ -1149,15 +1172,17 @@ class FiverrBot:
         )
         ms.status = MilestoneStatus.RELEASED
         ms.released_at = datetime.now(timezone.utc).isoformat()
-        self._service_fee_log.append({
-            "milestone_id": milestone_id,
-            "order_id": ms.order_id,
-            "gross_usd": ms.amount_usd,
-            "fee_pct": fee_pct,
-            "fee_usd": fee_usd,
-            "net_usd": payout_usd,
-            "recorded_at": ms.released_at,
-        })
+        self._service_fee_log.append(
+            {
+                "milestone_id": milestone_id,
+                "order_id": ms.order_id,
+                "gross_usd": ms.amount_usd,
+                "fee_pct": fee_pct,
+                "fee_usd": fee_usd,
+                "net_usd": payout_usd,
+                "recorded_at": ms.released_at,
+            }
+        )
         return {**_milestone_to_dict(ms), "transfer": transfer}
 
     def get_milestones(self, order_id: Optional[str] = None) -> list:
@@ -1182,9 +1207,7 @@ class FiverrBot:
         gig = self._get_gig(gig_id)
         if days < 1:
             raise FiverrBotError("Featured duration must be at least 1 day.")
-        until = (
-            datetime.now(timezone.utc) + timedelta(days=days)
-        ).isoformat()
+        until = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
         gig.featured = True
         gig.featured_until = until
         return {
@@ -1271,9 +1294,12 @@ class FiverrBot:
                 "total": len(self._reviews),
                 "avg_rating": (
                     round(
-                        sum(r.rating for r in self._reviews.values()) / len(self._reviews), 2
+                        sum(r.rating for r in self._reviews.values())
+                        / len(self._reviews),
+                        2,
                     )
-                    if self._reviews else 0.0
+                    if self._reviews
+                    else 0.0
                 ),
             },
             "inbox_messages_sent": len(self._inbox),
@@ -1315,20 +1341,32 @@ class FiverrBot:
         """Natural-language interface for BuddyAI routing."""
         msg = message.lower()
         if "summary" in msg or "stats" in msg or "status" in msg:
-            return {"message": "Fiverr Bot summary retrieved.", "data": self.get_summary()}
+            return {
+                "message": "Fiverr Bot summary retrieved.",
+                "data": self.get_summary(),
+            }
         if "gigs" in msg or "listings" in msg:
             return {"message": "Gig listings retrieved.", "data": self.get_gigs()}
         if "orders" in msg:
             return {"message": "Orders retrieved.", "data": self.get_orders()}
         if "revenue" in msg or "earnings" in msg:
-            return {"message": "Revenue summary retrieved.", "data": self.get_revenue_summary()}
+            return {
+                "message": "Revenue summary retrieved.",
+                "data": self.get_revenue_summary(),
+            }
         if "jobs" in msg or "postings" in msg:
             return {"message": "Job postings retrieved.", "data": self.get_jobs()}
         if "proposals" in msg:
-            return {"message": "Proposals retrieved.", "data": list(self._proposals.values())}
+            return {
+                "message": "Proposals retrieved.",
+                "data": list(self._proposals.values()),
+            }
         if "dashboard" in msg or "admin" in msg:
             if self._config.has_feature(FEATURE_ADMIN_DASHBOARD):
-                return {"message": "Admin dashboard retrieved.", "data": self.get_admin_dashboard()}
+                return {
+                    "message": "Admin dashboard retrieved.",
+                    "data": self.get_admin_dashboard(),
+                }
         return {
             "message": (
                 f"Fiverr Automation Bot online. Tier: {self.tier.value}. "
@@ -1386,7 +1424,8 @@ class FiverrBot:
         cfg = self._config
         gig_limit = "Unlimited" if cfg.is_unlimited_gigs() else str(cfg.max_gigs)
         order_limit = (
-            "Unlimited" if cfg.max_orders_per_month is None
+            "Unlimited"
+            if cfg.max_orders_per_month is None
             else str(cfg.max_orders_per_month)
         )
         lines = [
@@ -1409,6 +1448,7 @@ class FiverrBot:
 # ---------------------------------------------------------------------------
 # Helper serializers
 # ---------------------------------------------------------------------------
+
 
 def _gig_to_dict(g: Gig) -> dict:
     return {

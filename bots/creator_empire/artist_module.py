@@ -4,15 +4,21 @@ Rapper / Artist Module for CreatorEmpire.
 Handles music distribution, AI beat matching, royalty split calculations,
 and release management for the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -25,19 +31,32 @@ class ArtistModuleError(Exception):
 # ---------------------------------------------------------------------------
 
 DISTRIBUTION_PLATFORMS = [
-    "Spotify", "Apple Music", "Tidal", "Amazon Music",
-    "YouTube Music", "SoundCloud", "Bandcamp", "Deezer",
+    "Spotify",
+    "Apple Music",
+    "Tidal",
+    "Amazon Music",
+    "YouTube Music",
+    "SoundCloud",
+    "Bandcamp",
+    "Deezer",
 ]
 
 BEAT_GENRES = [
-    "trap", "drill", "boom_bap", "rnb", "lo_fi",
-    "reggaeton", "afrobeats", "pop_rap",
+    "trap",
+    "drill",
+    "boom_bap",
+    "rnb",
+    "lo_fi",
+    "reggaeton",
+    "afrobeats",
+    "pop_rap",
 ]
 
 
 @dataclass
 class RoyaltySplit:
     """Defines how royalties are split between contributors."""
+
     artist_pct: float
     producer_pct: float
     label_pct: float
@@ -46,8 +65,11 @@ class RoyaltySplit:
 
     def validate(self) -> None:
         total = (
-            self.artist_pct + self.producer_pct + self.label_pct
-            + self.distributor_pct + self.manager_pct
+            self.artist_pct
+            + self.producer_pct
+            + self.label_pct
+            + self.distributor_pct
+            + self.manager_pct
         )
         if abs(total - 100.0) > 0.01:
             raise ArtistModuleError(
@@ -67,6 +89,7 @@ class RoyaltySplit:
 @dataclass
 class BeatMatch:
     """Result of an AI beat matching operation."""
+
     track_title: str
     genre: str
     bpm: int
@@ -88,6 +111,7 @@ class BeatMatch:
 @dataclass
 class MusicRelease:
     """Represents a music release submitted for distribution."""
+
     release_id: str
     talent_id: str
     title: str
@@ -104,7 +128,9 @@ class MusicRelease:
             "title": self.title,
             "genre": self.genre,
             "platforms": self.platforms,
-            "royalty_split": self.royalty_split.to_dict() if self.royalty_split else None,
+            "royalty_split": (
+                self.royalty_split.to_dict() if self.royalty_split else None
+            ),
             "beat_match": self.beat_match.to_dict() if self.beat_match else None,
             "status": self.status,
         }
@@ -164,7 +190,11 @@ class ArtistModule:
             raise ArtistModuleError(f"Release ID '{release_id}' already exists.")
 
         if platforms is None:
-            platforms = DISTRIBUTION_PLATFORMS[:3] if self.tier == Tier.FREE else DISTRIBUTION_PLATFORMS
+            platforms = (
+                DISTRIBUTION_PLATFORMS[:3]
+                if self.tier == Tier.FREE
+                else DISTRIBUTION_PLATFORMS
+            )
 
         if self.tier == Tier.FREE and len(platforms) > 3:
             raise ArtistModuleError(
@@ -214,9 +244,7 @@ class ArtistModule:
         Requires PRO or ENTERPRISE tier.
         """
         if self.tier == Tier.FREE:
-            raise ArtistModuleError(
-                "AI beat matching requires the Pro tier or higher."
-            )
+            raise ArtistModuleError("AI beat matching requires the Pro tier or higher.")
         release = self._get_release(release_id)
         genre = release.genre if release.genre in _BEAT_CATALOG else "trap"
         suggested = _BEAT_CATALOG.get(genre, [])
@@ -265,9 +293,7 @@ class ArtistModule:
         release.royalty_split = split
         return split
 
-    def calculate_royalty_earnings(
-        self, release_id: str, total_revenue: float
-    ) -> dict:
+    def calculate_royalty_earnings(self, release_id: str, total_revenue: float) -> dict:
         """
         Calculate per-party earnings given total revenue for a release.
 
@@ -301,8 +327,12 @@ class ArtistModule:
         return {
             "tier": self.tier.value,
             "total_releases": len(self._releases),
-            "distributed": sum(1 for r in self._releases.values() if r.status == "distributed"),
-            "available_platforms": len(DISTRIBUTION_PLATFORMS) if self.tier != Tier.FREE else 3,
+            "distributed": sum(
+                1 for r in self._releases.values() if r.status == "distributed"
+            ),
+            "available_platforms": (
+                len(DISTRIBUTION_PLATFORMS) if self.tier != Tier.FREE else 3
+            ),
         }
 
     # ------------------------------------------------------------------

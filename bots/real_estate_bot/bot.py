@@ -1,16 +1,22 @@
 """
 Dreamcobots RealEstateBot — tier-aware property search and investment analysis.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.real_estate_bot.tiers import REAL_ESTATE_FEATURES, get_real_estate_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.real_estate_bot.tiers import REAL_ESTATE_FEATURES, get_real_estate_tier_info
 
 
 class RealEstateBotTierError(Exception):
@@ -51,7 +57,15 @@ class RealEstateBot:
             return "unlimited"
         return str(max(limit - self._request_count, 0))
 
-    def _make_deal(self, idx: int, location: str, budget: float, property_type: str, include_score: bool = False, full_analytics: bool = False) -> dict:
+    def _make_deal(
+        self,
+        idx: int,
+        location: str,
+        budget: float,
+        property_type: str,
+        include_score: bool = False,
+        full_analytics: bool = False,
+    ) -> dict:
         base_price = 250000 + idx * 50000
         if budget:
             base_price = min(base_price, budget)
@@ -87,11 +101,26 @@ class RealEstateBot:
         property_type = criteria.get("type", "residential")
 
         if self.tier == Tier.FREE:
-            deals = [self._make_deal(i, location, budget, property_type) for i in range(2)]
+            deals = [
+                self._make_deal(i, location, budget, property_type) for i in range(2)
+            ]
         elif self.tier == Tier.PRO:
-            deals = [self._make_deal(i, location, budget, property_type, include_score=True) for i in range(5)]
+            deals = [
+                self._make_deal(i, location, budget, property_type, include_score=True)
+                for i in range(5)
+            ]
         else:  # ENTERPRISE
-            deals = [self._make_deal(i, location, budget, property_type, include_score=True, full_analytics=True) for i in range(10)]
+            deals = [
+                self._make_deal(
+                    i,
+                    location,
+                    budget,
+                    property_type,
+                    include_score=True,
+                    full_analytics=True,
+                )
+                for i in range(10)
+            ]
 
         return {
             "deals": deals,

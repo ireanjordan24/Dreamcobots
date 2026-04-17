@@ -1,4 +1,5 @@
 """HuggingFace Datasets API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,8 +26,11 @@ class HuggingFaceDatasetsConnector:
             API response dict with dataset info or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/info?dataset={dataset_id}", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/info?dataset={dataset_id}", timeout=30
+            )
             response.raise_for_status()
             logger.info("HuggingFace dataset info loaded for %s.", dataset_id)
             return {"status": "success", "data": response.json()}
@@ -44,11 +48,13 @@ class HuggingFaceDatasetsConnector:
             API response dict with search results or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"https://huggingface.co/api/datasets?search={query}", timeout=30)
+            response = requests.get(
+                f"https://huggingface.co/api/datasets?search={query}", timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("HuggingFace search_datasets error: %s", e)
             return {"status": "error", "message": str(e)}
-

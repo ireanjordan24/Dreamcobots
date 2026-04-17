@@ -77,9 +77,8 @@ class StripeWebhookHandler:
         client=None,
         verify_signatures: bool = True,
     ) -> None:
-        self._secret: str = (
-            webhook_secret
-            or os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+        self._secret: str = webhook_secret or os.environ.get(
+            "STRIPE_WEBHOOK_SECRET", ""
         )
         self._tolerance = tolerance_seconds
         self._handlers: Dict[str, List[Callable[[WebhookEvent], None]]] = {}
@@ -102,9 +101,11 @@ class StripeWebhookHandler:
 
     def on(self, event_type: str) -> Callable:
         """Decorator to register a handler for *event_type*."""
+
         def decorator(fn: Callable[[WebhookEvent], None]) -> Callable:
             self._handlers.setdefault(event_type, []).append(fn)
             return fn
+
         return decorator
 
     def register(self, event_type: str, fn: Callable[[WebhookEvent], None]) -> None:
@@ -242,8 +243,8 @@ class StripeWebhookHandler:
         return [k for k, v in self._handlers.items() if v]
 
 
-import time as _time_wh
 import json as _json_wh
+import time as _time_wh
 
 
 @staticmethod
@@ -262,7 +263,9 @@ def _build_event_payload(event_type: str, data: dict) -> bytes:
 StripeWebhookHandler.build_event_payload = _build_event_payload
 
 
-def _dispatch(self, payload: bytes, sig_header=None, skip_verify: bool = False) -> "WebhookEvent":
+def _dispatch(
+    self, payload: bytes, sig_header=None, skip_verify: bool = False
+) -> "WebhookEvent":
     """Dispatch a webhook event. Alias for process() with skip_verify support."""
     if skip_verify:
         old_mock = self._mock

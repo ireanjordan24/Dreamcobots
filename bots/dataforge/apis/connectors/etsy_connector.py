@@ -1,4 +1,5 @@
 """Etsy Open API v3 connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,10 +29,16 @@ class EtsyConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"x-api-key": self.api_key}
         params = {"keywords": keywords, "limit": limit}
         try:
-            response = requests.get(f"{self.BASE_URL}/application/listings/active", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/application/listings/active",
+                params=params,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Etsy listings search completed for: %s", keywords)
             return {"status": "success", "data": response.json()}
@@ -49,12 +56,16 @@ class EtsyConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"x-api-key": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/application/listings/{listing_id}", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/application/listings/{listing_id}",
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Etsy get_listing error: %s", e)
             return {"status": "error", "message": str(e)}
-

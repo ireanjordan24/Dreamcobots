@@ -90,42 +90,42 @@ describe('GET /api/get-bots', () => {
 
     test('returns all expected bot names', async () => {
       const res = await request(app).get('/api/get-bots');
-      const names = res.body.bots.map(b => b.name);
+      const names = res.body.bots.map((b) => b.name);
       expect(names).toContain('TestBot');
       expect(names).toContain('IdleBot');
     });
 
     test('includes bot status field', async () => {
       const res = await request(app).get('/api/get-bots');
-      res.body.bots.forEach(bot => {
+      res.body.bots.forEach((bot) => {
         expect(bot).toHaveProperty('status');
       });
     });
 
     test('includes bot tier field', async () => {
       const res = await request(app).get('/api/get-bots');
-      res.body.bots.forEach(bot => {
+      res.body.bots.forEach((bot) => {
         expect(bot).toHaveProperty('tier');
       });
     });
 
     test('includes pendingPRs field', async () => {
       const res = await request(app).get('/api/get-bots');
-      res.body.bots.forEach(bot => {
+      res.body.bots.forEach((bot) => {
         expect(bot).toHaveProperty('pendingPRs');
       });
     });
 
     test('includes lastHeartbeat field', async () => {
       const res = await request(app).get('/api/get-bots');
-      res.body.bots.forEach(bot => {
+      res.body.bots.forEach((bot) => {
         expect(bot).toHaveProperty('lastHeartbeat');
       });
     });
 
     test('includes lastUpdate field', async () => {
       const res = await request(app).get('/api/get-bots');
-      res.body.bots.forEach(bot => {
+      res.body.bots.forEach((bot) => {
         expect(bot).toHaveProperty('lastUpdate');
       });
     });
@@ -163,15 +163,15 @@ describe('GET /api/get-bots', () => {
 
     test('reflects bot status correctly', async () => {
       const res = await request(app).get('/api/get-bots');
-      const testBot = res.body.bots.find(b => b.name === 'TestBot');
+      const testBot = res.body.bots.find((b) => b.name === 'TestBot');
       expect(testBot.status).toBe('active');
-      const idleBot = res.body.bots.find(b => b.name === 'IdleBot');
+      const idleBot = res.body.bots.find((b) => b.name === 'IdleBot');
       expect(idleBot.status).toBe('idle');
     });
 
     test('reflects lastHeartbeat value', async () => {
       const res = await request(app).get('/api/get-bots');
-      const idleBot = res.body.bots.find(b => b.name === 'IdleBot');
+      const idleBot = res.body.bots.find((b) => b.name === 'IdleBot');
       expect(idleBot.lastHeartbeat).toBe('2026-01-01T00:00:00.000Z');
     });
 
@@ -258,7 +258,7 @@ describe('POST /api/bot-heartbeat', () => {
   test('updates lastHeartbeat in bots.json', async () => {
     await request(app).post('/api/bot-heartbeat').send({ botName: 'TestBot' });
     const bots = JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
-    const bot = bots.find(b => b.name === 'TestBot');
+    const bot = bots.find((b) => b.name === 'TestBot');
     expect(bot.lastHeartbeat).not.toBeNull();
   });
 

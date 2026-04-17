@@ -1,16 +1,25 @@
 """
 Dreamcobots SocialMediaBot — tier-aware social media scheduling and analytics.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.social_media_bot.tiers import SOCIAL_MEDIA_FEATURES, get_social_media_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.social_media_bot.tiers import (
+    SOCIAL_MEDIA_FEATURES,
+    get_social_media_tier_info,
+)
 
 
 class SocialMediaBotTierError(Exception):
@@ -136,9 +145,27 @@ class SocialMediaBot:
             followers = 25000
             engagement_rate = 0.072
             top_posts = [
-                {"post_id": "sample_1", "likes": 2100, "shares": 450, "comments": 180, "reach": 45000},
-                {"post_id": "sample_2", "likes": 1800, "shares": 380, "comments": 140, "reach": 38000},
-                {"post_id": "sample_3", "likes": 1500, "shares": 310, "comments": 120, "reach": 32000},
+                {
+                    "post_id": "sample_1",
+                    "likes": 2100,
+                    "shares": 450,
+                    "comments": 180,
+                    "reach": 45000,
+                },
+                {
+                    "post_id": "sample_2",
+                    "likes": 1800,
+                    "shares": 380,
+                    "comments": 140,
+                    "reach": 38000,
+                },
+                {
+                    "post_id": "sample_3",
+                    "likes": 1500,
+                    "shares": 310,
+                    "comments": 120,
+                    "reach": 32000,
+                },
             ]
 
         return {
@@ -159,7 +186,11 @@ class SocialMediaBot:
         Returns:
             List of hashtag strings.
         """
-        base_tags = [f"#{topic.replace(' ', '')}", f"#{topic.replace(' ', '')}Tips", f"#DreamcobotsAI"]
+        base_tags = [
+            f"#{topic.replace(' ', '')}",
+            f"#{topic.replace(' ', '')}Tips",
+            f"#DreamcobotsAI",
+        ]
 
         if self.tier == Tier.FREE:
             return base_tags

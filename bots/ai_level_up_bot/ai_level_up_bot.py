@@ -35,29 +35,28 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from bots.ai_level_up_bot.ai_agents_generator import AIAgentsGenerator
+from bots.ai_level_up_bot.ai_companies_database import AICompany, AICompanyDatabase
+from bots.ai_level_up_bot.ai_course_engine import AICourseEngine
+from bots.ai_level_up_bot.ai_skill_tree import AISkillTree
 from bots.ai_level_up_bot.tiers import (
+    FEATURE_AI_AGENTS_GENERATOR,
+    FEATURE_AI_COMPANIES_DATABASE,
+    FEATURE_AI_COURSE_ENGINE,
+    FEATURE_AI_SKILL_TREE,
+    FEATURE_FULL_DATABASE,
+    FEATURE_TOKEN_MARKETPLACE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_AI_COMPANIES_DATABASE,
-    FEATURE_AI_COURSE_ENGINE,
-    FEATURE_TOKEN_MARKETPLACE,
-    FEATURE_AI_SKILL_TREE,
-    FEATURE_AI_AGENTS_GENERATOR,
-    FEATURE_FULL_DATABASE,
 )
-from bots.ai_level_up_bot.ai_companies_database import AICompanyDatabase, AICompany
-from bots.ai_level_up_bot.ai_course_engine import AICourseEngine
 from bots.ai_level_up_bot.token_marketplace import TokenMarketplace
-from bots.ai_level_up_bot.ai_skill_tree import AISkillTree
-from bots.ai_level_up_bot.ai_agents_generator import AIAgentsGenerator
-
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -101,7 +100,9 @@ class AILevelUpBot:
         self.skill_tree = AISkillTree(
             max_level=self.config.max_course_levels,
         )
-        max_agents = None if tier == Tier.ENTERPRISE else (10 if tier == Tier.PRO else 3)
+        max_agents = (
+            None if tier == Tier.ENTERPRISE else (10 if tier == Tier.PRO else 3)
+        )
         self.agents_generator = AIAgentsGenerator(
             max_agents=max_agents,
             created_by=user_id,
@@ -113,7 +114,9 @@ class AILevelUpBot:
 
     def run(self) -> str:
         """Return a status message confirming the bot is online."""
-        return f"{self.bot_name} v{self.version} Online [{self.tier.value.upper()} tier]"
+        return (
+            f"{self.bot_name} v{self.version} Online [{self.tier.value.upper()} tier]"
+        )
 
     def teach_ai_tool(self, tool_name: str) -> dict:
         """Return capabilities and pricing info for a named AI tool.
@@ -159,7 +162,9 @@ class AILevelUpBot:
         self._require_feature(FEATURE_AI_COURSE_ENGINE)
         course = self.course_engine.get_level(level)
         if course is None:
-            return {"error": f"Level {level} is not accessible on the {self.tier.value} tier."}
+            return {
+                "error": f"Level {level} is not accessible on the {self.tier.value} tier."
+            }
         return course.to_dict()
 
     def purchase_tokens(self, service_type: str, units: float) -> dict:

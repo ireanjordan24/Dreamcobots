@@ -5,33 +5,36 @@ Mirrors the broader platform tiers so that chatbot clients benefit from the
 same free / pro / enterprise structure used across all AI model integrations.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import (   # re-export for convenience
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+from tiers import (
+    FEATURE_ANALYTICS_DASHBOARD,  # re-export for convenience
+    FEATURE_API_ACCESS,
+    FEATURE_BASIC_INFERENCE,
+    FEATURE_BATCH_PROCESSING,
+    FEATURE_CUSTOM_MODELS,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_FINE_TUNING,
+    FEATURE_PRIORITY_QUEUE,
+    FEATURE_SLA_GUARANTEE,
+    FEATURE_WHITE_LABEL,
+    NLP_BERT_BASE,
+    NLP_BERT_LARGE,
+    NLP_GPT4,
+    NLP_GPT35,
+    NLP_T5_SMALL,
+    NLP_T5_XL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_BASIC_INFERENCE,
-    FEATURE_BATCH_PROCESSING,
-    FEATURE_FINE_TUNING,
-    FEATURE_CUSTOM_MODELS,
-    FEATURE_API_ACCESS,
-    FEATURE_ANALYTICS_DASHBOARD,
-    FEATURE_PRIORITY_QUEUE,
-    FEATURE_SLA_GUARANTEE,
-    FEATURE_DEDICATED_SUPPORT,
-    FEATURE_WHITE_LABEL,
-    NLP_GPT35,
-    NLP_GPT4,
-    NLP_BERT_BASE,
-    NLP_BERT_LARGE,
-    NLP_T5_SMALL,
-    NLP_T5_XL,
 )
 
 # Chatbot-specific add-ons that stack on top of the base tier configs
@@ -58,8 +61,22 @@ CHATBOT_EXTRA_FEATURES: dict[str, list[str]] = {
 # Chatbot-accessible NLP models per tier
 CHATBOT_MODELS: dict[str, list[str]] = {
     Tier.FREE.value: [NLP_GPT35, NLP_BERT_BASE, NLP_T5_SMALL],
-    Tier.PRO.value: [NLP_GPT35, NLP_GPT4, NLP_BERT_BASE, NLP_BERT_LARGE, NLP_T5_SMALL, NLP_T5_XL],
-    Tier.ENTERPRISE.value: [NLP_GPT35, NLP_GPT4, NLP_BERT_BASE, NLP_BERT_LARGE, NLP_T5_SMALL, NLP_T5_XL],
+    Tier.PRO.value: [
+        NLP_GPT35,
+        NLP_GPT4,
+        NLP_BERT_BASE,
+        NLP_BERT_LARGE,
+        NLP_T5_SMALL,
+        NLP_T5_XL,
+    ],
+    Tier.ENTERPRISE.value: [
+        NLP_GPT35,
+        NLP_GPT4,
+        NLP_BERT_BASE,
+        NLP_BERT_LARGE,
+        NLP_T5_SMALL,
+        NLP_T5_XL,
+    ],
 }
 
 

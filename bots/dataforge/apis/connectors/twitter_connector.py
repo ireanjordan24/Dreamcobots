@@ -1,4 +1,5 @@
 """Twitter/X API v2 connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,10 +29,16 @@ class TwitterConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.bearer_token}"}
         params = {"query": query, "max_results": max(10, max_results)}
         try:
-            response = requests.get(f"{self.BASE_URL}/tweets/search/recent", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/tweets/search/recent",
+                params=params,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Twitter recent tweet search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -50,13 +57,17 @@ class TwitterConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.bearer_token}"}
         try:
-            response = requests.get(f"{self.BASE_URL}/users/{user_id}/tweets",
-                params={"max_results": max(5, max_results)}, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/users/{user_id}/tweets",
+                params={"max_results": max(5, max_results)},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Twitter get_user_tweets error: %s", e)
             return {"status": "error", "message": str(e)}
-

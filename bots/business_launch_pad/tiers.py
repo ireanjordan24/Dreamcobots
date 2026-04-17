@@ -7,8 +7,8 @@ Tiers:
   - ENTERPRISE: Everything unlimited, white-label, API access.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional
 
 

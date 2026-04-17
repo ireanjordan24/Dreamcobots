@@ -1,6 +1,7 @@
 """
 DreamSalesPro Division Module — package initialiser.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from bots.dream_sales_pro.dream_sales_pro_bot import DreamSalesProBot, DSPAccessError

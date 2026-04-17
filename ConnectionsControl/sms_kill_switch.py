@@ -8,12 +8,12 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -22,7 +22,7 @@ class SMSMessage:
     from_number: str
     to_number: str
     body: str
-    direction: str   # "outbound" | "inbound"
+    direction: str  # "outbound" | "inbound"
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -112,5 +112,7 @@ class SMSKillSwitch:
             "is_configured": self.is_configured,
             "kill_active": self._kill_active,
             "recipient_count": len(self._to_numbers),
-            "messages_sent": sum(1 for m in self._message_log if m.direction == "outbound"),
+            "messages_sent": sum(
+                1 for m in self._message_log if m.direction == "outbound"
+            ),
         }

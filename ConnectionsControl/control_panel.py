@@ -6,22 +6,22 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from ConnectionsControl.kill_switch import KillSwitch
-from ConnectionsControl.telegram_integration import TelegramIntegration
-from ConnectionsControl.slack_integration import SlackIntegration
 from ConnectionsControl.discord_integration import DiscordIntegration
-from ConnectionsControl.sms_kill_switch import SMSKillSwitch
-from ConnectionsControl.webhook_manager import WebhookManager
-from ConnectionsControl.rest_api import RestAPIManager
-from ConnectionsControl.zoom_bot import ZoomBot
-from ConnectionsControl.roku_dashboard import RokuDashboard
 from ConnectionsControl.gaming_integration import GamingIntegration
+from ConnectionsControl.kill_switch import KillSwitch
+from ConnectionsControl.rest_api import RestAPIManager
+from ConnectionsControl.roku_dashboard import RokuDashboard
+from ConnectionsControl.slack_integration import SlackIntegration
+from ConnectionsControl.sms_kill_switch import SMSKillSwitch
+from ConnectionsControl.telegram_integration import TelegramIntegration
+from ConnectionsControl.webhook_manager import WebhookManager
+from ConnectionsControl.zoom_bot import ZoomBot
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -35,7 +35,7 @@ class Platform:
 class ControlPanel:
     """Unified control interface aggregating all platform integrations."""
 
-    PLATFORM_NAME_WIDTH = 20   # column width for platform name in control matrix
+    PLATFORM_NAME_WIDTH = 20  # column width for platform name in control matrix
 
     def __init__(self) -> None:
         self._kill_switch = KillSwitch()
@@ -90,7 +90,9 @@ class ControlPanel:
             statuses[name] = {
                 "type": platform.type,
                 "is_active": is_active,
-                "last_ping": platform.last_ping.isoformat() if platform.last_ping else None,
+                "last_ping": (
+                    platform.last_ping.isoformat() if platform.last_ping else None
+                ),
             }
         return statuses
 
@@ -98,7 +100,9 @@ class ControlPanel:
         """Send an alert to all active platforms."""
         results = {}
         if self._slack.is_connected:
-            self._slack.send_alert(self._slack._default_channel or "#alerts", message, severity)
+            self._slack.send_alert(
+                self._slack._default_channel or "#alerts", message, severity
+            )
             results["slack"] = "sent"
         if self._telegram.is_connected:
             self._telegram.send_message(f"[{severity.upper()}] {message}")
@@ -106,26 +110,36 @@ class ControlPanel:
         if self._discord.is_connected:
             self._discord.send_message("alerts", f"[{severity.upper()}] {message}")
             results["discord"] = "sent"
-        self._webhooks.trigger_event("alert", {"message": message, "severity": severity})
+        self._webhooks.trigger_event(
+            "alert", {"message": message, "severity": severity}
+        )
         results["webhooks"] = "triggered"
-        self._alert_log.append({
-            "message": message,
-            "severity": severity,
-            "results": results,
-            "timestamp": datetime.utcnow().isoformat(),
-        })
+        self._alert_log.append(
+            {
+                "message": message,
+                "severity": severity,
+                "results": results,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        )
         return results
 
     def activate_kill_switch(self, reason: str = "") -> dict:
         """Activate the kill switch and notify all platforms."""
         event = self._kill_switch.activate(reason)
         self.broadcast_alert(f"🚨 KILL SWITCH ACTIVATED: {reason}", severity="critical")
-        return {"event_id": event.event_id, "reason": event.reason, "timestamp": event.timestamp.isoformat()}
+        return {
+            "event_id": event.event_id,
+            "reason": event.reason,
+            "timestamp": event.timestamp.isoformat(),
+        }
 
     def deactivate_kill_switch(self) -> dict:
         """Deactivate the kill switch and notify all platforms."""
         event = self._kill_switch.deactivate()
-        self.broadcast_alert("✅ Kill switch deactivated. Operations restored.", severity="info")
+        self.broadcast_alert(
+            "✅ Kill switch deactivated. Operations restored.", severity="info"
+        )
         return {"event_id": event.event_id, "timestamp": event.timestamp.isoformat()}
 
     def get_control_matrix(self) -> str:
@@ -136,7 +150,9 @@ class ControlPanel:
         name_w = max(name_w, self.PLATFORM_NAME_WIDTH)
         type_w = max((len(s["type"]) for s in statuses.values()), default=10)
         # icon (2) + 2 spaces + name + 1 space + brackets + type + 2 spaces = inner width
-        inner = 2 + 2 + name_w + 1 + 1 + type_w + 1 + 2  # "✅  {name:<name_w} [{type}]  "
+        inner = (
+            2 + 2 + name_w + 1 + 1 + type_w + 1 + 2
+        )  # "✅  {name:<name_w} [{type}]  "
         border = "═" * (inner + 2)
         title = "DreamCobots Control Matrix"
         title_line = f"║ {title:^{inner}} ║"

@@ -12,8 +12,8 @@ or network access are required.
 from __future__ import annotations
 
 import json
-import sys
 import os
+import sys
 import time
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -21,19 +21,23 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.stripe_integration.stripe_client import StripeClient, StripeError, _is_placeholder
+from bots.stripe_integration import StripeClient as PublicStripeClient  # noqa
+from bots.stripe_integration import StripeWebhookHandler as PublicWebhookHandler  # noqa
+from bots.stripe_integration.stripe_client import (
+    StripeClient,
+    StripeError,
+    _is_placeholder,
+)
 from bots.stripe_integration.webhook_handler import (
     StripeWebhookHandler,
     WebhookEvent,
     WebhookSignatureError,
 )
-from bots.stripe_integration import StripeClient as PublicStripeClient  # noqa
-from bots.stripe_integration import StripeWebhookHandler as PublicWebhookHandler  # noqa
-
 
 # ===========================================================================
 # Helpers
 # ===========================================================================
+
 
 def _make_client(mock: bool = True) -> StripeClient:
     return StripeClient(secret_key="sk_test_placeholder", mock=mock)
@@ -59,6 +63,7 @@ def _build_payload(event_type: str, data: dict) -> bytes:
 # _is_placeholder
 # ===========================================================================
 
+
 class TestIsPlaceholder:
     def test_empty_string(self):
         assert _is_placeholder("") is True
@@ -76,6 +81,7 @@ class TestIsPlaceholder:
 # ===========================================================================
 # StripeClient — construction & properties
 # ===========================================================================
+
 
 class TestStripeClientConstruction:
     def test_mock_mode_when_placeholder(self):
@@ -111,6 +117,7 @@ class TestStripeClientConstruction:
 # ===========================================================================
 # StripeClient — create_checkout_session
 # ===========================================================================
+
 
 class TestCreateCheckoutSession:
     def test_returns_url(self):
@@ -179,14 +186,19 @@ class TestCreateCheckoutSession:
 
     def test_unique_session_ids(self):
         client = _make_client()
-        id1 = client.create_checkout_session(plan="Pro", amount_cents=4900)["session_id"]
-        id2 = client.create_checkout_session(plan="Pro", amount_cents=4900)["session_id"]
+        id1 = client.create_checkout_session(plan="Pro", amount_cents=4900)[
+            "session_id"
+        ]
+        id2 = client.create_checkout_session(plan="Pro", amount_cents=4900)[
+            "session_id"
+        ]
         assert id1 != id2
 
 
 # ===========================================================================
 # StripeClient — create_payment_intent
 # ===========================================================================
+
 
 class TestCreatePaymentIntent:
     def test_returns_intent_id(self):
@@ -230,6 +242,7 @@ class TestCreatePaymentIntent:
 # ===========================================================================
 # StripeClient — create_subscription
 # ===========================================================================
+
 
 class TestCreateSubscription:
     def test_returns_subscription_id(self):
@@ -277,6 +290,7 @@ class TestCreateSubscription:
 # StripeClient — cancel_subscription
 # ===========================================================================
 
+
 class TestCancelSubscription:
     def test_status_canceled(self):
         client = _make_client()
@@ -297,6 +311,7 @@ class TestCancelSubscription:
 # ===========================================================================
 # StripeClient — create_payment_link
 # ===========================================================================
+
 
 class TestCreatePaymentLink:
     def test_returns_url(self):
@@ -329,6 +344,7 @@ class TestCreatePaymentLink:
 # StripeWebhookHandler — construction
 # ===========================================================================
 
+
 class TestWebhookHandlerConstruction:
     def test_mock_mode_when_placeholder(self):
         handler = _make_handler()
@@ -360,6 +376,7 @@ class TestWebhookHandlerConstruction:
 # StripeWebhookHandler — handler registration
 # ===========================================================================
 
+
 class TestWebhookHandlerRegistration:
     def test_on_decorator(self):
         handler = _make_handler()
@@ -390,6 +407,7 @@ class TestWebhookHandlerRegistration:
 # ===========================================================================
 # StripeWebhookHandler — process
 # ===========================================================================
+
 
 class TestWebhookHandlerProcess:
     def test_process_returns_webhook_event(self):
@@ -461,6 +479,7 @@ class TestWebhookHandlerProcess:
 # StripeWebhookHandler — simulate
 # ===========================================================================
 
+
 class TestWebhookHandlerSimulate:
     def test_simulate_returns_event(self):
         handler = _make_handler()
@@ -486,10 +505,12 @@ class TestWebhookHandlerSimulate:
 # StripeWebhookHandler — signature verification (real secret)
 # ===========================================================================
 
+
 class TestWebhookSignatureVerification:
     def _sign_payload(self, secret: str, payload: bytes) -> str:
         import hashlib
         import hmac as _hmac
+
         ts = str(int(time.time()))
         signed = f"{ts}.".encode() + payload
         sig = _hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
@@ -517,6 +538,7 @@ class TestWebhookSignatureVerification:
         old_ts = str(int(time.time()) - 600)
         import hashlib
         import hmac as _hmac
+
         signed = f"{old_ts}.".encode() + payload
         old_sig = _hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
         with pytest.raises(WebhookSignatureError, match="too old"):
@@ -534,10 +556,12 @@ class TestWebhookSignatureVerification:
 # MultiSourceLeadScraper — Stripe integration
 # ===========================================================================
 
+
 class TestLeadScraperStripe:
     def _scraper(self, tier=None):
-        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
         from bots.multi_source_lead_scraper.lead_scraper import MultiSourceLeadScraper
+        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         t = tier or LeadTier.FREE
         return MultiSourceLeadScraper(t)
 
@@ -547,6 +571,7 @@ class TestLeadScraperStripe:
 
     def test_create_checkout_session_pro(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_checkout_session(LeadTier.PRO)
         assert "url" in result
@@ -554,12 +579,14 @@ class TestLeadScraperStripe:
 
     def test_create_checkout_session_enterprise(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_checkout_session(LeadTier.ENTERPRISE)
         assert result["amount_cents"] == 19900
 
     def test_checkout_session_includes_email(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_checkout_session(
             LeadTier.PRO, customer_email="user@test.com"
@@ -567,33 +594,38 @@ class TestLeadScraperStripe:
         assert result["customer_email"] == "user@test.com"
 
     def test_checkout_session_free_tier_raises(self):
-        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
         from bots.multi_source_lead_scraper.lead_scraper import LeadScraperTierError
+        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         with pytest.raises(LeadScraperTierError):
             scraper.create_checkout_session(LeadTier.FREE)
 
     def test_create_payment_link_pro(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_payment_link(LeadTier.PRO)
         assert result["url"].startswith("https://buy.stripe.com/")
 
     def test_create_payment_link_enterprise(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_payment_link(LeadTier.ENTERPRISE)
         assert result["amount_cents"] == 19900
 
     def test_payment_link_free_tier_raises(self):
-        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
         from bots.multi_source_lead_scraper.lead_scraper import LeadScraperTierError
+        from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         with pytest.raises(LeadScraperTierError):
             scraper.create_payment_link(LeadTier.FREE)
 
     def test_checkout_mode_is_subscription(self):
         from bots.multi_source_lead_scraper.tiers import Tier as LeadTier
+
         scraper = self._scraper()
         result = scraper.create_checkout_session(LeadTier.PRO)
         assert result["mode"] == "subscription"
@@ -608,8 +640,15 @@ if _AI_MODELS_DIR not in sys.path:
     sys.path.insert(0, _AI_MODELS_DIR)
 
 from tiers import Tier as _BotTier  # type: ignore  # noqa: E402
-from bots.car_flipping_bot.car_flipping_bot import CarFlippingBot, CarFlippingBotTierError  # noqa: E402
-from bots.real_estate_bot.real_estate_bot import RealEstateBot, RealEstateBotTierError  # noqa: E402
+
+from bots.car_flipping_bot.car_flipping_bot import (  # noqa: E402
+    CarFlippingBot,
+    CarFlippingBotTierError,
+)
+from bots.real_estate_bot.real_estate_bot import (
+    RealEstateBot,  # noqa: E402
+    RealEstateBotTierError,
+)
 
 
 class TestCarFlippingBotStripe:
@@ -665,6 +704,7 @@ class TestCarFlippingBotStripe:
 # RealEstateBot — Stripe integration
 # ===========================================================================
 
+
 class TestRealEstateBotStripe:
     def test_stripe_client_attached(self):
         bot = RealEstateBot()
@@ -718,13 +758,16 @@ class TestRealEstateBotStripe:
 # DreamcoPayments — api_manager STRIPE_SECRET_KEY integration
 # ===========================================================================
 
+
 class TestDreamcoPaymentsStripeKey:
     def test_stripe_secret_key_env_takes_priority(self, monkeypatch):
         monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_from_stripe_env")
         monkeypatch.delenv("DREAMCO_STRIPE_KEY", raising=False)
         # Re-import the module to pick up env change
         import importlib
+
         import bots.dreamco_payments.api_manager as am
+
         importlib.reload(am)
         assert am.DREAMCO_STRIPE_KEY == "sk_test_from_stripe_env"
 
@@ -732,7 +775,9 @@ class TestDreamcoPaymentsStripeKey:
         monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)
         monkeypatch.setenv("DREAMCO_STRIPE_KEY", "sk_test_dreamco_fallback")
         import importlib
+
         import bots.dreamco_payments.api_manager as am
+
         importlib.reload(am)
         assert am.DREAMCO_STRIPE_KEY == "sk_test_dreamco_fallback"
 
@@ -740,6 +785,8 @@ class TestDreamcoPaymentsStripeKey:
         monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)
         monkeypatch.delenv("DREAMCO_STRIPE_KEY", raising=False)
         import importlib
+
         import bots.dreamco_payments.api_manager as am
+
         importlib.reload(am)
         assert am.DREAMCO_STRIPE_KEY == "sk_test_placeholder_dreamco_stripe_key"

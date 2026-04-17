@@ -1,13 +1,18 @@
 """Email Campaign Manager Bot — tier-aware email campaign creation and drip sequences."""
-import sys, os
+
+import os
 import random
+import sys
 from datetime import datetime
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.email_campaign_manager_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 SUBSCRIBER_LIMITS = {Tier.FREE: 500, Tier.PRO: 10000, Tier.ENTERPRISE: None}
 CAMPAIGN_LIMITS = {Tier.FREE: 2, Tier.PRO: 10, Tier.ENTERPRISE: None}
@@ -27,7 +32,9 @@ class EmailCampaignManagerBot:
     def add_subscriber(self, email: str, name: str, segment: str = "general") -> dict:
         limit = SUBSCRIBER_LIMITS[self.tier]
         if limit is not None and len(self._subscribers) >= limit:
-            raise PermissionError(f"Subscriber limit ({limit}) reached for {self.tier.value} tier")
+            raise PermissionError(
+                f"Subscriber limit ({limit}) reached for {self.tier.value} tier"
+            )
         sub = {
             "email": email,
             "name": name,
@@ -38,10 +45,14 @@ class EmailCampaignManagerBot:
         self._subscribers.append(sub)
         return sub
 
-    def create_campaign(self, name: str, subject: str, audience_segment: str, goal: str = "engagement") -> dict:
+    def create_campaign(
+        self, name: str, subject: str, audience_segment: str, goal: str = "engagement"
+    ) -> dict:
         limit = CAMPAIGN_LIMITS[self.tier]
         if limit is not None and len(self._campaigns) >= limit:
-            raise PermissionError(f"Campaign limit ({limit}) reached for {self.tier.value} tier")
+            raise PermissionError(
+                f"Campaign limit ({limit}) reached for {self.tier.value} tier"
+            )
         campaign_id = f"camp_{len(self._campaigns)+1}"
         camp = {
             "campaign_id": campaign_id,
@@ -56,7 +67,9 @@ class EmailCampaignManagerBot:
         self._campaigns[campaign_id] = camp
         return camp
 
-    def generate_email_content(self, campaign_dict: dict, tone: str = "professional") -> dict:
+    def generate_email_content(
+        self, campaign_dict: dict, tone: str = "professional"
+    ) -> dict:
         subject = campaign_dict.get("subject", "Important Update")
         body = (
             f"Dear Subscriber,\n\nWe have an exciting update about {campaign_dict.get('name', 'our campaign')}. "
@@ -98,7 +111,9 @@ class EmailCampaignManagerBot:
                 "email_num": i + 1,
                 "delay_days": i * 3,
                 "subject": f"Email {i+1}: {trigger}",
-                "type": random.choice(["welcome", "educational", "promotional", "follow_up"]),
+                "type": random.choice(
+                    ["welcome", "educational", "promotional", "follow_up"]
+                ),
             }
             for i in range(num_emails)
         ]
@@ -115,6 +130,11 @@ class EmailCampaignManagerBot:
 
     def run(self) -> dict:
         return self.flow.run_pipeline(
-            raw_data={"bot": "EmailCampaignManagerBot", "tier": self.tier.value, "subscribers": len(self._subscribers), "campaigns": len(self._campaigns)},
+            raw_data={
+                "bot": "EmailCampaignManagerBot",
+                "tier": self.tier.value,
+                "subscribers": len(self._subscribers),
+                "campaigns": len(self._campaigns),
+            },
             learning_method="supervised",
         )

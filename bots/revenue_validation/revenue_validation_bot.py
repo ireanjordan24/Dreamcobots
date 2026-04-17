@@ -19,7 +19,6 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
@@ -89,7 +88,9 @@ class RevenueValidationBot:
     # Public API
     # ------------------------------------------------------------------
 
-    def validate(self, bot_names: Optional[List[str]] = None) -> RevenueValidationReport:
+    def validate(
+        self, bot_names: Optional[List[str]] = None
+    ) -> RevenueValidationReport:
         """Run revenue validation for all (or specified) bots.
 
         Parameters

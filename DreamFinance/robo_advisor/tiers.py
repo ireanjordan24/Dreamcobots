@@ -9,6 +9,24 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 499.0, ["risk profiling questionnaires", "goal-based portfolio construction", "automatic rebalancing"]),
-    "elite": TierConfig("Elite", 2500.0, ["risk profiling questionnaires", "goal-based portfolio construction", "automatic rebalancing", "tax-loss harvesting", "dedicated support"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "risk profiling questionnaires",
+            "goal-based portfolio construction",
+            "automatic rebalancing",
+        ],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "risk profiling questionnaires",
+            "goal-based portfolio construction",
+            "automatic rebalancing",
+            "tax-loss harvesting",
+            "dedicated support",
+        ],
+    ),
 }

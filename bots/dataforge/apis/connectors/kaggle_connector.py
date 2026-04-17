@@ -1,4 +1,5 @@
 """Kaggle datasets API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,8 +29,13 @@ class KaggleConnector:
             API response dict with datasets or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/datasets/list?search={query}", auth=(self.username, self.key), timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/datasets/list?search={query}",
+                auth=(self.username, self.key),
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Kaggle dataset search completed for query: %s", query)
             return {"status": "success", "data": response.json()}
@@ -49,10 +55,10 @@ class KaggleConnector:
         """
         try:
             import kaggle
+
             kaggle.api.dataset_download_files(dataset_ref, path=path, unzip=True)
             logger.info("Kaggle dataset downloaded: %s to %s", dataset_ref, path)
             return {"status": "success", "dataset": dataset_ref, "path": path}
         except Exception as e:
             logger.error("Kaggle download_dataset error: %s", e)
             return {"status": "error", "message": str(e)}
-

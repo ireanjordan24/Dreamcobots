@@ -8,11 +8,11 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -21,14 +21,14 @@ class KPIMetrics:
     active_bots: int
     alerts: int
     throughput: float
-    uptime: float   # percentage 0-100
+    uptime: float  # percentage 0-100
 
 
 class RokuDashboard:
     """Roku TV dashboard for KPI visualization (mock — no network calls)."""
 
-    VALUE_COLUMN_WIDTH = 10   # right-aligned numeric value field width
-    UPTIME_COLUMN_WIDTH = 9   # uptime field is one char narrower (holds the %)
+    VALUE_COLUMN_WIDTH = 10  # right-aligned numeric value field width
+    UPTIME_COLUMN_WIDTH = 9  # uptime field is one char narrower (holds the %)
 
     def __init__(self) -> None:
         self._device_ip: Optional[str] = None

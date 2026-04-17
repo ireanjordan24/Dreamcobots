@@ -9,5 +9,13 @@ class TierConfig:
 
 
 TIERS = {
-    "elite": TierConfig("Elite", 2500.0, ["market making algorithms", "spread optimization engine", "latency arbitrage detection"]),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "market making algorithms",
+            "spread optimization engine",
+            "latency arbitrage detection",
+        ],
+    ),
 }

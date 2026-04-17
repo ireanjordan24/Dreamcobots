@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 299.0, ["drift threshold monitoring", "tax-aware rebalancing"]),
-    "enterprise": TierConfig("Enterprise", 599.0, ["drift threshold monitoring", "tax-aware rebalancing", "multi-account coordination", "wash sale prevention"]),
+    "pro": TierConfig(
+        "Pro", 299.0, ["drift threshold monitoring", "tax-aware rebalancing"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        599.0,
+        [
+            "drift threshold monitoring",
+            "tax-aware rebalancing",
+            "multi-account coordination",
+            "wash sale prevention",
+        ],
+    ),
 }

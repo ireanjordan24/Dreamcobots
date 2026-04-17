@@ -1,9 +1,15 @@
 """Logo Generator Bot — tier-aware logo creation and brand guide generation."""
-import sys, os
+
+import os
 import random
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.logo_generator_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -34,7 +40,18 @@ class LogoGeneratorBot:
         "consulting": ["lightbulb", "chart", "handshake", "gear"],
     }
 
-    ALL_STYLES = ["modern", "vintage", "minimal", "bold", "elegant", "geometric", "handcrafted", "futuristic", "playful", "classic"]
+    ALL_STYLES = [
+        "modern",
+        "vintage",
+        "minimal",
+        "bold",
+        "elegant",
+        "geometric",
+        "handcrafted",
+        "futuristic",
+        "playful",
+        "classic",
+    ]
     FREE_STYLES = ALL_STYLES[:5]
 
     CONCEPT_LIMITS = {Tier.FREE: 3, Tier.PRO: 25, Tier.ENTERPRISE: None}
@@ -55,7 +72,9 @@ class LogoGeneratorBot:
             return self.LOGO_TEMPLATES.get(industry, [])
         return dict(self.LOGO_TEMPLATES)
 
-    def generate_logo(self, business_name: str, industry: str, style: str = "modern", colors=None) -> dict:
+    def generate_logo(
+        self, business_name: str, industry: str, style: str = "modern", colors=None
+    ) -> dict:
         limit = self.CONCEPT_LIMITS[self.tier]
         if self.tier == Tier.FREE and self._concept_count >= 3:
             raise PermissionError("Concept limit reached for FREE tier")
@@ -71,8 +90,25 @@ class LogoGeneratorBot:
             "style": style,
             "concept_id": f"concept_{self._concept_count}",
             "svg_description": f"A {style} logo for {business_name} featuring {random.choice(templates)} design elements",
-            "color_palette": colors or [random.choice(["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8"]), "#FFFFFF", "#333333"],
-            "typography": random.choice(["Sans-serif Bold", "Serif Classic", "Modern Rounded", "Geometric"]),
+            "color_palette": colors
+            or [
+                random.choice(
+                    [
+                        "#FF6B6B",
+                        "#4ECDC4",
+                        "#45B7D1",
+                        "#96CEB4",
+                        "#FFEAA7",
+                        "#DDA0DD",
+                        "#98D8C8",
+                    ]
+                ),
+                "#FFFFFF",
+                "#333333",
+            ],
+            "typography": random.choice(
+                ["Sans-serif Bold", "Serif Classic", "Modern Rounded", "Geometric"]
+            ),
             "tagline_suggestion": f"Your {industry} brand, reimagined",
             "tier_used": self.tier.value,
         }
@@ -85,12 +121,20 @@ class LogoGeneratorBot:
             "primary_color": "#4ECDC4",
             "secondary_color": "#FF6B6B",
             "typography": {"heading": "Montserrat Bold", "body": "Open Sans Regular"},
-            "usage_guidelines": ["Use on white backgrounds", "Maintain minimum size of 32px", "Don't stretch or distort"],
+            "usage_guidelines": [
+                "Use on white backgrounds",
+                "Maintain minimum size of 32px",
+                "Don't stretch or distort",
+            ],
             "tier_used": self.tier.value,
         }
 
     def run(self) -> dict:
         return self.flow.run_pipeline(
-            raw_data={"bot": "LogoGeneratorBot", "tier": self.tier.value, "concepts_generated": self._concept_count},
+            raw_data={
+                "bot": "LogoGeneratorBot",
+                "tier": self.tier.value,
+                "concepts_generated": self._concept_count,
+            },
             learning_method="supervised",
         )

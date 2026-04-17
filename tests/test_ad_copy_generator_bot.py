@@ -1,14 +1,17 @@
 """Tests for bots/ad_copy_generator_bot"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.ad_copy_generator_bot.ad_copy_generator_bot import AdCopyGeneratorBot
 from bots.ad_copy_generator_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
@@ -50,7 +53,14 @@ class TestGenerateAd:
 
     def test_pro_can_use_all_platforms(self):
         bot = AdCopyGeneratorBot(tier=Tier.PRO)
-        for platform in ["google", "facebook", "instagram", "linkedin", "twitter", "tiktok"]:
+        for platform in [
+            "google",
+            "facebook",
+            "instagram",
+            "linkedin",
+            "twitter",
+            "tiktok",
+        ]:
             result = bot.generate_ad("Widget", platform, "users")
             assert result["platform"] == platform
 

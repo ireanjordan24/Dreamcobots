@@ -5,6 +5,7 @@ Tests for bots/dream_real_estate/tiers.py and
 Run with:
     python -m pytest tests/test_dream_real_estate.py -v
 """
+
 # GLOBAL AI SOURCES FLOW
 
 import os
@@ -15,12 +16,11 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.dream_real_estate.tiers import DREtier, get_tier_config, get_upgrade_path
 from bots.dream_real_estate.dream_real_estate_bot import (
-    DreamRealEstateBot,
     DREAccessError,
+    DreamRealEstateBot,
 )
-
+from bots.dream_real_estate.tiers import DREtier, get_tier_config, get_upgrade_path
 
 # ---------------------------------------------------------------------------
 # Tier configuration tests
@@ -268,8 +268,14 @@ class TestDREAcquisitionScan:
         assert r1["deals_found"] == r2["deals_found"]
         # alert_time varies between calls; compare the deterministic fields only
         for a1, a2 in zip(r1["alerts"], r2["alerts"]):
-            for key in ("deal_id", "address", "price_usd", "cap_rate_pct",
-                        "property_type", "status"):
+            for key in (
+                "deal_id",
+                "address",
+                "price_usd",
+                "cap_rate_pct",
+                "property_type",
+                "status",
+            ):
                 assert a1[key] == a2[key]
 
 

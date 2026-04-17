@@ -1,8 +1,10 @@
 """Farewell Bot - Compassionate funeral planning, memorial services, and grief support."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -76,9 +78,15 @@ class FarewellBot(BaseBot):
             "ftc_rights": self.ftc_compliance_guide(),
         }
 
-    def write_obituary(self, name: str, birth_date: str, death_date: str, life_highlights: list) -> dict:
+    def write_obituary(
+        self, name: str, birth_date: str, death_date: str, life_highlights: list
+    ) -> dict:
         """Write a compassionate, personalized obituary."""
-        highlights_text = ". ".join(life_highlights) if life_highlights else "a life well-lived and deeply cherished."
+        highlights_text = (
+            ". ".join(life_highlights)
+            if life_highlights
+            else "a life well-lived and deeply cherished."
+        )
         obituary = f"""
 {name}, beloved [relationship], passed away on {death_date}. Born on {birth_date}, {name} was known for [character traits] and touched the lives of everyone who knew them.
 
@@ -110,7 +118,9 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
             ],
         }
 
-    def memorial_video_concept(self, photos_available: int, music_preference: str) -> dict:
+    def memorial_video_concept(
+        self, photos_available: int, music_preference: str
+    ) -> dict:
         """Create a memorial video concept for a tribute slideshow."""
         return {
             "note": COMPASSIONATE_NOTE,
@@ -120,20 +130,61 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
                 "seconds_per_photo": 4,
                 "music_preference": music_preference,
                 "suggested_structure": [
-                    {"segment": "Intro", "duration": "30 sec", "content": "Name, dates, meaningful quote"},
-                    {"segment": "Early Life", "duration": "1.5 min", "content": "Childhood and family photos"},
-                    {"segment": "Milestones", "duration": "2 min", "content": "Major life events, career, milestones"},
-                    {"segment": "Family & Friends", "duration": "2 min", "content": "Relationships and gatherings"},
-                    {"segment": "Final Years", "duration": "1 min", "content": "Recent photos and memories"},
-                    {"segment": "Tribute", "duration": "30 sec", "content": "Final photo with dates and tribute text"},
+                    {
+                        "segment": "Intro",
+                        "duration": "30 sec",
+                        "content": "Name, dates, meaningful quote",
+                    },
+                    {
+                        "segment": "Early Life",
+                        "duration": "1.5 min",
+                        "content": "Childhood and family photos",
+                    },
+                    {
+                        "segment": "Milestones",
+                        "duration": "2 min",
+                        "content": "Major life events, career, milestones",
+                    },
+                    {
+                        "segment": "Family & Friends",
+                        "duration": "2 min",
+                        "content": "Relationships and gatherings",
+                    },
+                    {
+                        "segment": "Final Years",
+                        "duration": "1 min",
+                        "content": "Recent photos and memories",
+                    },
+                    {
+                        "segment": "Tribute",
+                        "duration": "30 sec",
+                        "content": "Final photo with dates and tribute text",
+                    },
                 ],
-                "diy_tools": ["iMovie (Mac/iOS)", "Windows Video Editor", "Animoto", "Tribute.co"],
+                "diy_tools": [
+                    "iMovie (Mac/iOS)",
+                    "Windows Video Editor",
+                    "Animoto",
+                    "Tribute.co",
+                ],
                 "professional_services": "$200-$800 from local videographers",
             },
             "suggested_songs": {
-                "classical": ["Ave Maria", "Amazing Grace", "Somewhere Over the Rainbow"],
-                "contemporary": ["Hallelujah (Cohen)", "My Way (Sinatra)", "You Are So Beautiful"],
-                "gospel": ["How Great Thou Art", "I Can Only Imagine", "Blessed Assurance"],
+                "classical": [
+                    "Ave Maria",
+                    "Amazing Grace",
+                    "Somewhere Over the Rainbow",
+                ],
+                "contemporary": [
+                    "Hallelujah (Cohen)",
+                    "My Way (Sinatra)",
+                    "You Are So Beautiful",
+                ],
+                "gospel": [
+                    "How Great Thou Art",
+                    "I Can Only Imagine",
+                    "Blessed Assurance",
+                ],
             },
         }
 
@@ -142,9 +193,21 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
         return {
             "note": COMPASSIONATE_NOTE,
             "immediate_support": [
-                {"resource": "National Grief Share Helpline", "phone": "1-800-395-5755", "available": "24/7"},
-                {"resource": "Crisis Text Line", "contact": "Text HOME to 741741", "available": "24/7"},
-                {"resource": "Compassionate Friends (child loss)", "phone": "1-877-969-0010", "available": "M-F 9am-5pm ET"},
+                {
+                    "resource": "National Grief Share Helpline",
+                    "phone": "1-800-395-5755",
+                    "available": "24/7",
+                },
+                {
+                    "resource": "Crisis Text Line",
+                    "contact": "Text HOME to 741741",
+                    "available": "24/7",
+                },
+                {
+                    "resource": "Compassionate Friends (child loss)",
+                    "phone": "1-877-969-0010",
+                    "available": "M-F 9am-5pm ET",
+                },
             ],
             "online_communities": [
                 "GriefShare.org - local and online groups",
@@ -181,14 +244,21 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
             }
             key = service_type.lower().replace(" ", "_")
             low, high = cost_ranges.get(key, (3000, 8000))
-            analyzed.append({
-                "service_type": service_type,
-                "estimated_cost_low": f"${low:,}",
-                "estimated_cost_high": f"${high:,}",
-                "average": f"${(low + high) // 2:,}",
-                "includes": option.get("includes", ["Basic services", "Transportation", "Documentation"]),
-            })
-        analyzed.sort(key=lambda x: int(x["estimated_cost_low"].replace("$", "").replace(",", "")))
+            analyzed.append(
+                {
+                    "service_type": service_type,
+                    "estimated_cost_low": f"${low:,}",
+                    "estimated_cost_high": f"${high:,}",
+                    "average": f"${(low + high) // 2:,}",
+                    "includes": option.get(
+                        "includes",
+                        ["Basic services", "Transportation", "Documentation"],
+                    ),
+                }
+            )
+        analyzed.sort(
+            key=lambda x: int(x["estimated_cost_low"].replace("$", "").replace(",", ""))
+        )
         return {
             "note": COMPASSIONATE_NOTE,
             "options_compared": analyzed,
@@ -226,7 +296,11 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
                 "type": "Outdoor",
                 "capacity": capacity + 50,
                 "cost": "$200-$600",
-                "features": ["Natural setting", "Photo opportunities", "Catering allowed"],
+                "features": [
+                    "Natural setting",
+                    "Photo opportunities",
+                    "Catering allowed",
+                ],
                 "contact": "Parks & Recreation department",
             },
             {
@@ -284,7 +358,11 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
                     "Some religious traditions discourage",
                     "Permanent - cannot be reversed",
                 ],
-                "options": ["Traditional cremation with service", "Direct cremation (minimal)", "Aquamation (water-based, eco-friendly)"],
+                "options": [
+                    "Traditional cremation with service",
+                    "Direct cremation (minimal)",
+                    "Aquamation (water-based, eco-friendly)",
+                ],
             },
             "burial": {
                 "average_cost": "$7,000 - $12,000",
@@ -300,18 +378,45 @@ A [service type] service will be held on [date] at [location]. In lieu of flower
                     "Ongoing cemetery fees",
                     "Less flexibility",
                 ],
-                "options": ["Traditional burial", "Green/natural burial", "Mausoleum/entombment"],
+                "options": [
+                    "Traditional burial",
+                    "Green/natural burial",
+                    "Mausoleum/entombment",
+                ],
             },
-            "recommendation": "Cremation" if budget < 5000 else "Either option is financially feasible",
+            "recommendation": (
+                "Cremation"
+                if budget < 5000
+                else "Either option is financially feasible"
+            ),
             "personal_note": "The most important factor is honoring your loved one's wishes and your family's values.",
         }
 
-    def plan_virtual_funeral(self, platform_preference: str, expected_attendees: int) -> dict:
+    def plan_virtual_funeral(
+        self, platform_preference: str, expected_attendees: int
+    ) -> dict:
         """Plan a virtual funeral or memorial streaming service."""
         platforms = {
-            "zoom": {"cost": "$15-150/month", "max_attendees": 1000, "features": ["Video", "Chat", "Recording", "Breakout rooms"]},
-            "youtube": {"cost": "Free", "max_attendees": "Unlimited", "features": ["Live stream", "Replay", "Chat", "Private link"]},
-            "gatheringus": {"cost": "$199-399 flat", "max_attendees": 500, "features": ["Dedicated memorial platform", "Photo sharing", "Tribute wall", "Recording"]},
+            "zoom": {
+                "cost": "$15-150/month",
+                "max_attendees": 1000,
+                "features": ["Video", "Chat", "Recording", "Breakout rooms"],
+            },
+            "youtube": {
+                "cost": "Free",
+                "max_attendees": "Unlimited",
+                "features": ["Live stream", "Replay", "Chat", "Private link"],
+            },
+            "gatheringus": {
+                "cost": "$199-399 flat",
+                "max_attendees": 500,
+                "features": [
+                    "Dedicated memorial platform",
+                    "Photo sharing",
+                    "Tribute wall",
+                    "Recording",
+                ],
+            },
         }
         platform_key = platform_preference.lower()
         platform_info = platforms.get(platform_key, platforms["zoom"])

@@ -14,30 +14,33 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Relationship tiers
 # ---------------------------------------------------------------------------
 
+
 class RelationshipTier(Enum):
     """Defines how Big Bro treats different users."""
-    CREATOR = "creator"        # Protected at all costs — full loyalty
+
+    CREATOR = "creator"  # Protected at all costs — full loyalty
     INNER_CIRCLE = "inner_circle"  # Loyalty + honesty, no roasting
-    FRIEND = "friend"          # Encouraging, funny, light roasting (opt-in)
-    COMMUNITY = "community"    # Guidance + opportunity
-    NEW_USER = "new_user"      # Polite, curious, explains who Big Bro is
-    HATER = "hater"            # Calm education — never emotional
+    FRIEND = "friend"  # Encouraging, funny, light roasting (opt-in)
+    COMMUNITY = "community"  # Guidance + opportunity
+    NEW_USER = "new_user"  # Polite, curious, explains who Big Bro is
+    HATER = "hater"  # Calm education — never emotional
 
 
 # ---------------------------------------------------------------------------
 # Roast mode
 # ---------------------------------------------------------------------------
 
+
 class RoastMode(Enum):
     """Controls how aggressive the roast/defense system operates."""
-    DEFENDER = "defender"    # Default — shields and redirects
-    FUNNY = "funny"          # Safe, light humor
-    SAVAGE = "savage"        # Opt-in only — controlled dominance
+
+    DEFENDER = "defender"  # Default — shields and redirects
+    FUNNY = "funny"  # Safe, light humor
+    SAVAGE = "savage"  # Opt-in only — controlled dominance
 
 
 # ---------------------------------------------------------------------------
@@ -169,8 +172,7 @@ DREAMCO_PHILOSOPHY: dict[str, str] = {
         "You will always get paid if you build value."
     ),
     "subscriptions": (
-        "If 100 people pay $10, that's $1,000. "
-        "If they pay monthly, that's leverage."
+        "If 100 people pay $10, that's $1,000. " "If they pay monthly, that's leverage."
     ),
     "freedom": (
         "If money stops when you stop, it's not freedom. "

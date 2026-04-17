@@ -38,7 +38,9 @@ class StressTestResult:
         """Throughput: operations per second."""
         if self.total_duration_seconds == 0:
             return 0.0
-        return round((self.successful_ops + self.failed_ops) / self.total_duration_seconds, 2)
+        return round(
+            (self.successful_ops + self.failed_ops) / self.total_duration_seconds, 2
+        )
 
     def to_dict(self) -> dict:
         return {

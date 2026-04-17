@@ -22,8 +22,8 @@ from typing import Optional
 
 class VoiceProfileStatus(Enum):
     ACTIVE = "active"
-    FROZEN = "frozen"       # Owner has locked this profile
-    REVOKED = "revoked"     # Consent revoked — profile unusable
+    FROZEN = "frozen"  # Owner has locked this profile
+    REVOKED = "revoked"  # Consent revoked — profile unusable
 
 
 @dataclass
@@ -37,14 +37,14 @@ class VoiceProfile:
     """
 
     profile_id: str
-    owner_user_id: str          # Person whose voice is captured
+    owner_user_id: str  # Person whose voice is captured
     display_name: str
-    language: str               # e.g. "en-US"
-    accent: str                 # e.g. "Southern American"
-    voice_data_ref: str         # Opaque encrypted reference
-    consent_token: str          # acknowledgment_token from ConsentManager
+    language: str  # e.g. "en-US"
+    accent: str  # e.g. "Southern American"
+    voice_data_ref: str  # Opaque encrypted reference
+    consent_token: str  # acknowledgment_token from ConsentManager
     status: VoiceProfileStatus = VoiceProfileStatus.ACTIVE
-    sample_count: int = 0       # Number of audio samples provided
+    sample_count: int = 0  # Number of audio samples provided
     created_at: float = 0.0
     tags: list = field(default_factory=list)
 
@@ -74,9 +74,9 @@ class VoiceSynthesisResult:
     synthesis_id: str
     profile_id: str
     text: str
-    audio_ref: str          # Opaque reference to synthesised audio
+    audio_ref: str  # Opaque reference to synthesised audio
     duration_seconds: float
-    consent_token: str      # Token verified at time of synthesis
+    consent_token: str  # Token verified at time of synthesis
 
     def to_dict(self) -> dict:
         return {
@@ -104,7 +104,7 @@ class VoiceMimicryEngine:
     def __init__(self, max_profiles: Optional[int], consent_manager) -> None:
         self._max_profiles = max_profiles
         self._consent_manager = consent_manager
-        self._profiles: dict[str, VoiceProfile] = {}   # profile_id -> profile
+        self._profiles: dict[str, VoiceProfile] = {}  # profile_id -> profile
 
     # ------------------------------------------------------------------
     # Profile management
@@ -126,7 +126,10 @@ class VoiceMimicryEngine:
         Raises ``VoiceMimicryError`` if consent is missing or limit exceeded.
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
-        consent = self._consent_manager.require_consent(owner_user_id, ConsentType.VOICE_MIMICRY)
+
+        consent = self._consent_manager.require_consent(
+            owner_user_id, ConsentType.VOICE_MIMICRY
+        )
 
         if self._max_profiles is not None and len(self._profiles) >= self._max_profiles:
             raise VoiceMimicryLimitError(
@@ -134,6 +137,7 @@ class VoiceMimicryEngine:
             )
 
         import time
+
         profile_id = str(uuid.uuid4())
         profile = VoiceProfile(
             profile_id=profile_id,
@@ -192,6 +196,7 @@ class VoiceMimicryEngine:
         the profile itself must be ACTIVE (not frozen or revoked).
         """
         from bots.buddy_trust_bot.consent_manager import ConsentType
+
         consent = self._consent_manager.require_consent(
             requester_user_id, ConsentType.VOICE_MIMICRY
         )
@@ -203,9 +208,10 @@ class VoiceMimicryEngine:
             )
 
         import time
+
         synthesis_id = str(uuid.uuid4())
         words = len(text.split())
-        duration = round(words * 0.4, 2)   # ~150 WPM simulation
+        duration = round(words * 0.4, 2)  # ~150 WPM simulation
 
         return VoiceSynthesisResult(
             synthesis_id=synthesis_id,
@@ -251,6 +257,7 @@ class VoiceMimicryEngine:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class VoiceMimicryError(Exception):
     """General voice mimicry error."""

@@ -9,13 +9,13 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import math
 import uuid
@@ -23,6 +23,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class AlertSeverity(Enum):
@@ -36,8 +38,8 @@ class AlertSeverity(Enum):
 class WorkflowMetrics:
     workflow_id: str
     execution_time: float  # seconds
-    error_rate: float       # 0.0 - 1.0
-    throughput: float       # tasks/sec
+    error_rate: float  # 0.0 - 1.0
+    throughput: float  # tasks/sec
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -59,7 +61,9 @@ class AnomalyDetector:
         self._alerts: List[AnomalyAlert] = []
         self._window_size: int = 20
 
-    def analyze_workflow(self, workflow_id: str, metrics: WorkflowMetrics) -> Optional[AnomalyAlert]:
+    def analyze_workflow(
+        self, workflow_id: str, metrics: WorkflowMetrics
+    ) -> Optional[AnomalyAlert]:
         """Analyze workflow metrics and return an alert if anomaly is detected."""
         if workflow_id not in self._history:
             self._history[workflow_id] = []
@@ -89,7 +93,9 @@ class AnomalyDetector:
         self._alerts.append(alert)
         return alert
 
-    def _compute_deviation_score(self, history: List[WorkflowMetrics], current: WorkflowMetrics) -> float:
+    def _compute_deviation_score(
+        self, history: List[WorkflowMetrics], current: WorkflowMetrics
+    ) -> float:
         """Compute composite z-score deviation across key metrics."""
         scores = []
         for attr in ("execution_time", "error_rate", "throughput"):
@@ -113,7 +119,9 @@ class AnomalyDetector:
             return AlertSeverity.MEDIUM
         return AlertSeverity.LOW
 
-    def _build_description(self, workflow_id: str, score: float, severity: AlertSeverity) -> str:
+    def _build_description(
+        self, workflow_id: str, score: float, severity: AlertSeverity
+    ) -> str:
         return (
             f"Anomaly detected in workflow '{workflow_id}': "
             f"deviation score {score:.2f} ({severity.value})"

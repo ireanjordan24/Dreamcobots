@@ -10,8 +10,9 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 from __future__ import annotations
 
 import copy
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from dataclasses import dataclass, field
@@ -72,7 +73,11 @@ _SKILL_NODES: List[SkillNode] = [
         node_id="L2-PROMPTS",
         level=2,
         title="Prompt Master",
-        skills=["Prompt fundamentals", "Chain-of-thought prompting", "Few-shot prompting"],
+        skills=[
+            "Prompt fundamentals",
+            "Chain-of-thought prompting",
+            "Few-shot prompting",
+        ],
         badge="⚡ Prompt Master",
         reward_description="+5% token discount on all LLM services.",
         token_discount_pct=5.0,
@@ -144,7 +149,12 @@ _SKILL_NODES: List[SkillNode] = [
         node_id="L10-MASTER",
         level=10,
         title="AI Superintelligence Architect",
-        skills=["Advanced architectures", "Multimodal systems", "AI safety", "Future of AI"],
+        skills=[
+            "Advanced architectures",
+            "Multimodal systems",
+            "AI safety",
+            "Future of AI",
+        ],
         badge="🌟 AI Master",
         reward_description="+25% lifetime token discount and DreamCo AI Master Certification.",
         token_discount_pct=25.0,
@@ -206,7 +216,9 @@ class AISkillTree:
         if node is None:
             return {"error": f"Node '{node_id}' not found."}
         if node.status == NodeStatus.LOCKED:
-            return {"error": f"Node '{node_id}' is locked.  Complete prior levels first."}
+            return {
+                "error": f"Node '{node_id}' is locked.  Complete prior levels first."
+            }
 
         node.status = NodeStatus.COMPLETED
 

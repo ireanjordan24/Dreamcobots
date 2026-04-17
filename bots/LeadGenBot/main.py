@@ -12,12 +12,11 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import List, Dict
+from typing import Dict, List
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 
 # ---------------------------------------------------------------------------
 # Public API

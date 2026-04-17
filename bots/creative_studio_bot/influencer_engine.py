@@ -11,9 +11,9 @@ All classes integrate with the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -26,6 +26,7 @@ PLATFORMS = ["instagram", "tiktok", "youtube", "twitter", "linkedin", "facebook"
 # Content Strategy Engine
 # ---------------------------------------------------------------------------
 
+
 class ContentStrategyEngine:
     """AI-powered content calendar creation, viral post generation, and engagement analytics."""
 
@@ -33,7 +34,9 @@ class ContentStrategyEngine:
         self.flow = GlobalAISourcesFlow(bot_name="ContentStrategyEngine")
 
     # ------------------------------------------------------------------
-    def create_content_calendar(self, platform: str, niche: str, weeks: int = 4) -> dict:
+    def create_content_calendar(
+        self, platform: str, niche: str, weeks: int = 4
+    ) -> dict:
         """Generate a weekly content posting schedule.
 
         Parameters
@@ -76,7 +79,15 @@ class ContentStrategyEngine:
         best_times = best_times_by_platform.get(platform, ["12:00 PM"])
 
         calendar = []
-        days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        days_of_week = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ]
 
         for week in range(1, weeks + 1):
             week_schedule = {
@@ -85,18 +96,30 @@ class ContentStrategyEngine:
             }
             posts_per_week = 5 if platform in ("instagram", "facebook") else 4
             for i in range(posts_per_week):
-                week_schedule["posts"].append({
-                    "day": days_of_week[i % 7],
-                    "post_type": random.choice(post_types),
-                    "topic": f"Week {week} {niche} content idea #{i + 1}",
-                    "caption_hook": f"Did you know this about {niche}? 🔥",
-                    "hashtags": [f"#{niche}", f"#{platform}creator", "#trending", "#viral"],
-                    "optimal_time": random.choice(best_times),
-                })
+                week_schedule["posts"].append(
+                    {
+                        "day": days_of_week[i % 7],
+                        "post_type": random.choice(post_types),
+                        "topic": f"Week {week} {niche} content idea #{i + 1}",
+                        "caption_hook": f"Did you know this about {niche}? 🔥",
+                        "hashtags": [
+                            f"#{niche}",
+                            f"#{platform}creator",
+                            "#trending",
+                            "#viral",
+                        ],
+                        "optimal_time": random.choice(best_times),
+                    }
+                )
             calendar.append(week_schedule)
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "create_content_calendar", "platform": platform, "niche": niche, "weeks": weeks},
+            raw_data={
+                "task": "create_content_calendar",
+                "platform": platform,
+                "niche": niche,
+                "weeks": weeks,
+            },
             learning_method="supervised",
         )
 
@@ -110,7 +133,9 @@ class ContentStrategyEngine:
         }
 
     # ------------------------------------------------------------------
-    def generate_viral_post(self, platform: str, topic: str, style: str = "educational") -> dict:
+    def generate_viral_post(
+        self, platform: str, topic: str, style: str = "educational"
+    ) -> dict:
         """Generate high-engagement social media post content.
 
         Parameters
@@ -140,7 +165,12 @@ class ContentStrategyEngine:
         hook = hooks_by_style.get(style, hooks_by_style["educational"])
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "generate_viral_post", "platform": platform, "topic": topic, "style": style},
+            raw_data={
+                "task": "generate_viral_post",
+                "platform": platform,
+                "topic": topic,
+                "style": style,
+            },
             learning_method="supervised",
         )
 
@@ -159,7 +189,13 @@ class ContentStrategyEngine:
                 f"5️⃣ Fifth insight about {topic}\n\n"
                 f"Save this post and share it with someone who needs to see it! 👇"
             ),
-            "hashtags": [f"#{topic.replace(' ', '')}", "#viral", f"#{platform}", "#trending", "#fyp"],
+            "hashtags": [
+                f"#{topic.replace(' ', '')}",
+                "#viral",
+                f"#{platform}",
+                "#trending",
+                "#fyp",
+            ],
             "call_to_action": "Drop a 🔥 if this helped you!",
             "predicted_reach": random.randint(1_000, 100_000),
             "engagement_tips": [
@@ -200,8 +236,14 @@ class ContentStrategyEngine:
         return {
             "engagement_rate_pct": engagement_rate,
             "virality_score": virality_score,
-            "performance_grade": "A" if engagement_rate > 5 else "B" if engagement_rate > 2 else "C",
-            "top_metric": "shares" if shares > comments and shares > likes else "likes" if likes >= comments else "comments",
+            "performance_grade": (
+                "A" if engagement_rate > 5 else "B" if engagement_rate > 2 else "C"
+            ),
+            "top_metric": (
+                "shares"
+                if shares > comments and shares > likes
+                else "likes" if likes >= comments else "comments"
+            ),
             "recommendations": [
                 "Increase posting frequency to 5x/week",
                 "Engage with comments within 30 minutes",
@@ -217,6 +259,7 @@ class ContentStrategyEngine:
 # Meme Generator
 # ---------------------------------------------------------------------------
 
+
 class MemeGenerator:
     """AI-powered meme creation, viral trend analysis, and content virality prediction."""
 
@@ -224,7 +267,9 @@ class MemeGenerator:
         self.flow = GlobalAISourcesFlow(bot_name="MemeGenerator")
 
     # ------------------------------------------------------------------
-    def generate_meme(self, topic: str, style: str = "relatable", target_audience: str = "gen_z") -> dict:
+    def generate_meme(
+        self, topic: str, style: str = "relatable", target_audience: str = "gen_z"
+    ) -> dict:
         """Generate meme content and description.
 
         Parameters
@@ -258,7 +303,12 @@ class MemeGenerator:
         }
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "generate_meme", "topic": topic, "style": style, "target_audience": target_audience},
+            raw_data={
+                "task": "generate_meme",
+                "topic": topic,
+                "style": style,
+                "target_audience": target_audience,
+            },
             learning_method="self_supervised",
         )
 
@@ -293,12 +343,40 @@ class MemeGenerator:
             platform = PLATFORMS[0]
 
         trending_topics_by_platform: dict[str, list[str]] = {
-            "instagram": ["aesthetic photos", "before/after", "day in my life", "GRWM", "recipe reels"],
-            "tiktok": ["POV videos", "dance challenges", "life hacks", "skits", "educational shorts"],
-            "youtube": ["long-form commentary", "tutorials", "vlogs", "gaming", "true crime"],
+            "instagram": [
+                "aesthetic photos",
+                "before/after",
+                "day in my life",
+                "GRWM",
+                "recipe reels",
+            ],
+            "tiktok": [
+                "POV videos",
+                "dance challenges",
+                "life hacks",
+                "skits",
+                "educational shorts",
+            ],
+            "youtube": [
+                "long-form commentary",
+                "tutorials",
+                "vlogs",
+                "gaming",
+                "true crime",
+            ],
             "twitter": ["hot takes", "threads", "breaking news", "memes", "reply guys"],
-            "linkedin": ["career advice", "industry insights", "personal branding", "company culture"],
-            "facebook": ["community events", "nostalgia content", "giveaways", "family content"],
+            "linkedin": [
+                "career advice",
+                "industry insights",
+                "personal branding",
+                "company culture",
+            ],
+            "facebook": [
+                "community events",
+                "nostalgia content",
+                "giveaways",
+                "family content",
+            ],
         }
 
         result = self.flow.run_pipeline(
@@ -306,15 +384,27 @@ class MemeGenerator:
             learning_method="unsupervised",
         )
 
-        trending = trending_topics_by_platform.get(platform, trending_topics_by_platform["instagram"])
+        trending = trending_topics_by_platform.get(
+            platform, trending_topics_by_platform["instagram"]
+        )
 
         return {
             "platform": platform,
             "trending_topics": trending,
-            "trending_formats": random.sample(["video", "image", "carousel", "text", "poll", "live"], k=3),
+            "trending_formats": random.sample(
+                ["video", "image", "carousel", "text", "poll", "live"], k=3
+            ),
             "peak_posting_hours": [f"{h}:00" for h in random.sample(range(6, 23), 3)],
-            "top_hashtags": [f"#trending_{platform}", "#viral", "#fyp", "#explore", "#reels"],
-            "audience_sentiment": random.choice(["positive", "humorous", "educational", "inspirational"]),
+            "top_hashtags": [
+                f"#trending_{platform}",
+                "#viral",
+                "#fyp",
+                "#explore",
+                "#reels",
+            ],
+            "audience_sentiment": random.choice(
+                ["positive", "humorous", "educational", "inspirational"]
+            ),
             "content_longevity_days": random.randint(1, 14),
             "framework_pipeline": result.get("bot_name"),
         }
@@ -341,12 +431,14 @@ class MemeGenerator:
         has_hashtags = bool(content_data.get("hashtags"))
         is_trending_topic = bool(content_data.get("trending_topic"))
 
-        bonus = sum([
-            10 if has_hook else 0,
-            8 if has_visual else 0,
-            5 if has_hashtags else 0,
-            15 if is_trending_topic else 0,
-        ])
+        bonus = sum(
+            [
+                10 if has_hook else 0,
+                8 if has_visual else 0,
+                5 if has_hashtags else 0,
+                15 if is_trending_topic else 0,
+            ]
+        )
 
         score = min(100, base_score + bonus)
 
@@ -364,7 +456,11 @@ class MemeGenerator:
                 "hashtag_bonus": 5 if has_hashtags else 0,
                 "trending_topic_bonus": 15 if is_trending_topic else 0,
             },
-            "prediction_label": "viral" if score >= 75 else "likely_popular" if score >= 50 else "average",
+            "prediction_label": (
+                "viral"
+                if score >= 75
+                else "likely_popular" if score >= 50 else "average"
+            ),
             "estimated_reach_multiplier": round(score / 20, 1),
             "improvement_tips": [
                 "Add a strong hook in the first 3 seconds",

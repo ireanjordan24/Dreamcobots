@@ -26,6 +26,7 @@ Developer notes
   system in production for real ARR/MRR data.
 - To add a new automation task, add a method and update AUTOMATION_REGISTRY.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
@@ -36,8 +37,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from framework import GlobalAISourcesFlow  # noqa: F401
 from bots.dream_sales_pro.tiers import DSPtier, get_tier_config, get_upgrade_path
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Path helpers
@@ -186,8 +187,12 @@ class DreamSalesProBot:
         leads = [
             {
                 "lead_id": f"DSP-LEAD-{rng.randint(10000, 99999)}",
-                "first_name": rng.choice(["Jordan", "Alex", "Taylor", "Morgan", "Casey"]),
-                "last_name": rng.choice(["Smith", "Johnson", "Williams", "Brown", "Davis"]),
+                "first_name": rng.choice(
+                    ["Jordan", "Alex", "Taylor", "Morgan", "Casey"]
+                ),
+                "last_name": rng.choice(
+                    ["Smith", "Johnson", "Williams", "Brown", "Davis"]
+                ),
                 "title": rng.choice(titles),
                 "company": f"{rng.choice(['Apex', 'Nova', 'Peak', 'Crest', 'Vibe'])} {rng.choice(industries)}",
                 "industry": rng.choice(industries),
@@ -257,7 +262,9 @@ class DreamSalesProBot:
                 "opened": opened,
                 "replied": replied,
                 "open_rate_pct": round(opened / delivered * 100, 1) if delivered else 0,
-                "reply_rate_pct": round(replied / delivered * 100, 1) if delivered else 0,
+                "reply_rate_pct": (
+                    round(replied / delivered * 100, 1) if delivered else 0
+                ),
             }
 
         return {
@@ -410,7 +417,9 @@ class DreamSalesProBot:
             "pipeline_id": pipeline_id,
             "stages": stage_data,
             "total_weighted_pipeline_usd": total_weighted,
-            "pipeline_health": "HEALTHY" if total_weighted > 500_000 else "NEEDS ATTENTION",
+            "pipeline_health": (
+                "HEALTHY" if total_weighted > 500_000 else "NEEDS ATTENTION"
+            ),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -471,9 +480,7 @@ class DreamSalesProBot:
         """Raise DSPAccessError if *feature* is not available on current tier."""
         if not self.config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            msg = (
-                f"Feature '{feature}' is not available on the {self.tier.value} tier."
-            )
+            msg = f"Feature '{feature}' is not available on the {self.tier.value} tier."
             if upgrade:
                 msg += f" Upgrade to {upgrade.value} to unlock this feature."
             raise DSPAccessError(msg)

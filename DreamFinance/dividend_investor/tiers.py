@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 99.0, ["dividend aristocrat screening", "yield sustainability scoring"]),
-    "enterprise": TierConfig("Enterprise", 299.0, ["dividend aristocrat screening", "yield sustainability scoring", "DRIP automation", "tax optimization"]),
+    "pro": TierConfig(
+        "Pro", 99.0, ["dividend aristocrat screening", "yield sustainability scoring"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        299.0,
+        [
+            "dividend aristocrat screening",
+            "yield sustainability scoring",
+            "DRIP automation",
+            "tax optimization",
+        ],
+    ),
 }

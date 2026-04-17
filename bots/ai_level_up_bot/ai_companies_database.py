@@ -17,8 +17,9 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from dataclasses import dataclass, field
@@ -488,7 +489,12 @@ _COMPANIES: List[AICompany] = [
     AICompany(
         company_name="UiPath",
         category="AI Agents & Automation",
-        tools=["UiPath Studio", "Autopilot", "Document Understanding", "Process Mining"],
+        tools=[
+            "UiPath Studio",
+            "Autopilot",
+            "Document Understanding",
+            "Process Mining",
+        ],
         pricing="subscription",
         region="USA",
         api_available=True,

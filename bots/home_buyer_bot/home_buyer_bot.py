@@ -8,21 +8,22 @@ and serves as DreamCo's first revenue-generating proof-of-concept bot.
 
 from __future__ import annotations
 
-import os
-import uuid
 import logging
+import os
+import sys
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
 
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: E402
+
 from bots.home_buyer_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: E402
 from framework import GlobalAISourcesFlow  # noqa: F401, E402
-
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -311,7 +312,9 @@ class HomeBuyerBot:
             raise HomeBuyerBotError(f"Lead '{lead_id}' not found.")
         return lead.to_dict()
 
-    def update_lead_status(self, lead_id: str, status: LeadStatus, notes: str = "") -> dict:
+    def update_lead_status(
+        self, lead_id: str, status: LeadStatus, notes: str = ""
+    ) -> dict:
         lead = self._leads.get(lead_id)
         if lead is None:
             raise HomeBuyerBotError(f"Lead '{lead_id}' not found.")
@@ -423,9 +426,7 @@ class HomeBuyerBot:
 
     def revenue_summary(self) -> dict:
         """Return total revenue collected via completed payments."""
-        completed = [
-            p for p in self._payments.values() if p.status == "completed"
-        ]
+        completed = [p for p in self._payments.values() if p.status == "completed"]
         total = sum(p.amount for p in completed)
         return {
             "total_payments": len(self._payments),

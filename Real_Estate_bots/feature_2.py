@@ -9,8 +9,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -22,42 +22,267 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "property": "123 Oak St, Austin TX",          "date": "2025-05-01", "time": "10:00", "agent": "Sarah Johnson",   "status": "available"},
-    {"id": 2,  "property": "456 Maple Ave, Austin TX",       "date": "2025-05-01", "time": "14:00", "agent": "Mike Davis",      "status": "available"},
-    {"id": 3,  "property": "789 Pine Rd, Phoenix AZ",        "date": "2025-05-02", "time": "09:00", "agent": "Lisa Chen",       "status": "booked"},
-    {"id": 4,  "property": "321 Elm Dr, Phoenix AZ",         "date": "2025-05-02", "time": "11:00", "agent": "Tom Williams",    "status": "available"},
-    {"id": 5,  "property": "654 Cedar Ln, Nashville TN",     "date": "2025-05-02", "time": "15:00", "agent": "Anna Martinez",   "status": "available"},
-    {"id": 6,  "property": "987 Birch Blvd, Nashville TN",   "date": "2025-05-03", "time": "10:00", "agent": "James Brown",     "status": "cancelled"},
-    {"id": 7,  "property": "147 Walnut St, Denver CO",       "date": "2025-05-03", "time": "13:00", "agent": "Maria Garcia",    "status": "available"},
-    {"id": 8,  "property": "258 Spruce Ave, Denver CO",      "date": "2025-05-04", "time": "10:00", "agent": "David Lee",       "status": "available"},
-    {"id": 9,  "property": "369 Aspen Ct, Tampa FL",         "date": "2025-05-04", "time": "14:00", "agent": "Jennifer Wilson", "status": "booked"},
-    {"id": 10, "property": "741 Palm Dr, Tampa FL",          "date": "2025-05-05", "time": "09:00", "agent": "Robert Taylor",   "status": "available"},
-    {"id": 11, "property": "852 Peachtree Rd, Atlanta GA",   "date": "2025-05-05", "time": "11:00", "agent": "Patricia Moore",  "status": "available"},
-    {"id": 12, "property": "963 Magnolia St, Atlanta GA",    "date": "2025-05-05", "time": "15:00", "agent": "Charles Anderson","status": "available"},
-    {"id": 13, "property": "159 Mesquite Way, Dallas TX",    "date": "2025-05-06", "time": "10:00", "agent": "Linda Jackson",   "status": "available"},
-    {"id": 14, "property": "267 Bluebonnet St, Dallas TX",   "date": "2025-05-06", "time": "14:00", "agent": "Mark White",      "status": "booked"},
-    {"id": 15, "property": "375 Live Oak Blvd, Houston TX",  "date": "2025-05-07", "time": "09:00", "agent": "Barbara Harris",  "status": "available"},
-    {"id": 16, "property": "483 Bayou Dr, Houston TX",       "date": "2025-05-07", "time": "13:00", "agent": "Steven Martin",   "status": "available"},
-    {"id": 17, "property": "591 Desert Rose, Las Vegas NV",  "date": "2025-05-08", "time": "10:00", "agent": "Nancy Thompson",  "status": "available"},
-    {"id": 18, "property": "628 Cactus Ave, Las Vegas NV",   "date": "2025-05-08", "time": "15:00", "agent": "George Garcia",   "status": "cancelled"},
-    {"id": 19, "property": "714 Lakeside Dr, Charlotte NC",  "date": "2025-05-09", "time": "10:00", "agent": "Betty Robinson",  "status": "available"},
-    {"id": 20, "property": "836 Uptown Blvd, Charlotte NC",  "date": "2025-05-09", "time": "14:00", "agent": "Edward Clark",    "status": "booked"},
-    {"id": 21, "property": "922 Mission St, San Antonio TX", "date": "2025-05-10", "time": "09:00", "agent": "Dorothy Lewis",   "status": "available"},
-    {"id": 22, "property": "1014 River Rd, San Antonio TX",  "date": "2025-05-10", "time": "13:00", "agent": "Ronald Lee",      "status": "available"},
-    {"id": 23, "property": "1126 Sunset Blvd, Orlando FL",   "date": "2025-05-11", "time": "10:00", "agent": "Jessica Walker",  "status": "available"},
-    {"id": 24, "property": "1238 Harbor View, Orlando FL",   "date": "2025-05-11", "time": "14:00", "agent": "Daniel Hall",     "status": "booked"},
-    {"id": 25, "property": "1344 Magnolia Pkwy, Raleigh NC", "date": "2025-05-12", "time": "09:00", "agent": "Helen Allen",     "status": "available"},
-    {"id": 26, "property": "1456 Glenwood Ave, Raleigh NC",  "date": "2025-05-12", "time": "14:00", "agent": "Kevin Young",     "status": "available"},
-    {"id": 27, "property": "1562 Broadway, Salt Lake City UT","date": "2025-05-13","time": "10:00", "agent": "Karen Hernandez", "status": "available"},
-    {"id": 28, "property": "1674 Main St, Salt Lake City UT","date": "2025-05-13", "time": "15:00", "agent": "Brian King",      "status": "cancelled"},
-    {"id": 29, "property": "1786 Garden Way, Indianapolis IN","date": "2025-05-14","time": "10:00", "agent": "Gary Wright",     "status": "available"},
-    {"id": 30, "property": "1892 Canal Blvd, Indianapolis IN","date": "2025-05-14","time": "14:00", "agent": "Sharon Lopez",    "status": "available"},
+    {
+        "id": 1,
+        "property": "123 Oak St, Austin TX",
+        "date": "2025-05-01",
+        "time": "10:00",
+        "agent": "Sarah Johnson",
+        "status": "available",
+    },
+    {
+        "id": 2,
+        "property": "456 Maple Ave, Austin TX",
+        "date": "2025-05-01",
+        "time": "14:00",
+        "agent": "Mike Davis",
+        "status": "available",
+    },
+    {
+        "id": 3,
+        "property": "789 Pine Rd, Phoenix AZ",
+        "date": "2025-05-02",
+        "time": "09:00",
+        "agent": "Lisa Chen",
+        "status": "booked",
+    },
+    {
+        "id": 4,
+        "property": "321 Elm Dr, Phoenix AZ",
+        "date": "2025-05-02",
+        "time": "11:00",
+        "agent": "Tom Williams",
+        "status": "available",
+    },
+    {
+        "id": 5,
+        "property": "654 Cedar Ln, Nashville TN",
+        "date": "2025-05-02",
+        "time": "15:00",
+        "agent": "Anna Martinez",
+        "status": "available",
+    },
+    {
+        "id": 6,
+        "property": "987 Birch Blvd, Nashville TN",
+        "date": "2025-05-03",
+        "time": "10:00",
+        "agent": "James Brown",
+        "status": "cancelled",
+    },
+    {
+        "id": 7,
+        "property": "147 Walnut St, Denver CO",
+        "date": "2025-05-03",
+        "time": "13:00",
+        "agent": "Maria Garcia",
+        "status": "available",
+    },
+    {
+        "id": 8,
+        "property": "258 Spruce Ave, Denver CO",
+        "date": "2025-05-04",
+        "time": "10:00",
+        "agent": "David Lee",
+        "status": "available",
+    },
+    {
+        "id": 9,
+        "property": "369 Aspen Ct, Tampa FL",
+        "date": "2025-05-04",
+        "time": "14:00",
+        "agent": "Jennifer Wilson",
+        "status": "booked",
+    },
+    {
+        "id": 10,
+        "property": "741 Palm Dr, Tampa FL",
+        "date": "2025-05-05",
+        "time": "09:00",
+        "agent": "Robert Taylor",
+        "status": "available",
+    },
+    {
+        "id": 11,
+        "property": "852 Peachtree Rd, Atlanta GA",
+        "date": "2025-05-05",
+        "time": "11:00",
+        "agent": "Patricia Moore",
+        "status": "available",
+    },
+    {
+        "id": 12,
+        "property": "963 Magnolia St, Atlanta GA",
+        "date": "2025-05-05",
+        "time": "15:00",
+        "agent": "Charles Anderson",
+        "status": "available",
+    },
+    {
+        "id": 13,
+        "property": "159 Mesquite Way, Dallas TX",
+        "date": "2025-05-06",
+        "time": "10:00",
+        "agent": "Linda Jackson",
+        "status": "available",
+    },
+    {
+        "id": 14,
+        "property": "267 Bluebonnet St, Dallas TX",
+        "date": "2025-05-06",
+        "time": "14:00",
+        "agent": "Mark White",
+        "status": "booked",
+    },
+    {
+        "id": 15,
+        "property": "375 Live Oak Blvd, Houston TX",
+        "date": "2025-05-07",
+        "time": "09:00",
+        "agent": "Barbara Harris",
+        "status": "available",
+    },
+    {
+        "id": 16,
+        "property": "483 Bayou Dr, Houston TX",
+        "date": "2025-05-07",
+        "time": "13:00",
+        "agent": "Steven Martin",
+        "status": "available",
+    },
+    {
+        "id": 17,
+        "property": "591 Desert Rose, Las Vegas NV",
+        "date": "2025-05-08",
+        "time": "10:00",
+        "agent": "Nancy Thompson",
+        "status": "available",
+    },
+    {
+        "id": 18,
+        "property": "628 Cactus Ave, Las Vegas NV",
+        "date": "2025-05-08",
+        "time": "15:00",
+        "agent": "George Garcia",
+        "status": "cancelled",
+    },
+    {
+        "id": 19,
+        "property": "714 Lakeside Dr, Charlotte NC",
+        "date": "2025-05-09",
+        "time": "10:00",
+        "agent": "Betty Robinson",
+        "status": "available",
+    },
+    {
+        "id": 20,
+        "property": "836 Uptown Blvd, Charlotte NC",
+        "date": "2025-05-09",
+        "time": "14:00",
+        "agent": "Edward Clark",
+        "status": "booked",
+    },
+    {
+        "id": 21,
+        "property": "922 Mission St, San Antonio TX",
+        "date": "2025-05-10",
+        "time": "09:00",
+        "agent": "Dorothy Lewis",
+        "status": "available",
+    },
+    {
+        "id": 22,
+        "property": "1014 River Rd, San Antonio TX",
+        "date": "2025-05-10",
+        "time": "13:00",
+        "agent": "Ronald Lee",
+        "status": "available",
+    },
+    {
+        "id": 23,
+        "property": "1126 Sunset Blvd, Orlando FL",
+        "date": "2025-05-11",
+        "time": "10:00",
+        "agent": "Jessica Walker",
+        "status": "available",
+    },
+    {
+        "id": 24,
+        "property": "1238 Harbor View, Orlando FL",
+        "date": "2025-05-11",
+        "time": "14:00",
+        "agent": "Daniel Hall",
+        "status": "booked",
+    },
+    {
+        "id": 25,
+        "property": "1344 Magnolia Pkwy, Raleigh NC",
+        "date": "2025-05-12",
+        "time": "09:00",
+        "agent": "Helen Allen",
+        "status": "available",
+    },
+    {
+        "id": 26,
+        "property": "1456 Glenwood Ave, Raleigh NC",
+        "date": "2025-05-12",
+        "time": "14:00",
+        "agent": "Kevin Young",
+        "status": "available",
+    },
+    {
+        "id": 27,
+        "property": "1562 Broadway, Salt Lake City UT",
+        "date": "2025-05-13",
+        "time": "10:00",
+        "agent": "Karen Hernandez",
+        "status": "available",
+    },
+    {
+        "id": 28,
+        "property": "1674 Main St, Salt Lake City UT",
+        "date": "2025-05-13",
+        "time": "15:00",
+        "agent": "Brian King",
+        "status": "cancelled",
+    },
+    {
+        "id": 29,
+        "property": "1786 Garden Way, Indianapolis IN",
+        "date": "2025-05-14",
+        "time": "10:00",
+        "agent": "Gary Wright",
+        "status": "available",
+    },
+    {
+        "id": 30,
+        "property": "1892 Canal Blvd, Indianapolis IN",
+        "date": "2025-05-14",
+        "time": "14:00",
+        "agent": "Sharon Lopez",
+        "status": "available",
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_bookings": 3,    "reminders": False, "ai_scheduling": False},
-    "PRO":        {"price_usd": 29,  "max_bookings": 30,   "reminders": True,  "ai_scheduling": False},
-    "ENTERPRISE": {"price_usd": 99,  "max_bookings": None, "reminders": True,  "ai_scheduling": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_bookings": 3,
+        "reminders": False,
+        "ai_scheduling": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_bookings": 30,
+        "reminders": True,
+        "ai_scheduling": False,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_bookings": None,
+        "reminders": True,
+        "ai_scheduling": True,
+    },
 }
 
 
@@ -96,7 +321,9 @@ class PropertyViewingSchedulerBot:
         if slot is None:
             raise ValueError(f"Slot ID {slot_id} not found.")
         if slot["status"] != "available":
-            raise ValueError(f"Slot {slot_id} is not available (status: {slot['status']}).")
+            raise ValueError(
+                f"Slot {slot_id} is not available (status: {slot['status']})."
+            )
         booking = {
             "booking_id": f"BOOK-{slot_id:04d}",
             "slot_id": slot_id,
@@ -114,11 +341,16 @@ class PropertyViewingSchedulerBot:
 
     def cancel_booking(self, booking_id: str) -> dict:
         """Cancel a booking and free up the slot."""
-        booking = next((b for b in self._bookings if b["booking_id"] == booking_id), None)
+        booking = next(
+            (b for b in self._bookings if b["booking_id"] == booking_id), None
+        )
         if booking is None:
             raise ValueError(f"Booking {booking_id} not found.")
         booking["status"] = "cancelled"
-        return {"message": f"Booking {booking_id} cancelled successfully.", "booking": booking}
+        return {
+            "message": f"Booking {booking_id} cancelled successfully.",
+            "booking": booking,
+        }
 
     def get_my_bookings(self) -> list[dict]:
         """Return all bookings made in this session."""
@@ -171,10 +403,16 @@ class PropertyViewingSchedulerBot:
     def run(self) -> dict:
         """Run the GLOBAL AI SOURCES FLOW pipeline and return a summary."""
         result = self._flow.run_pipeline(
-            raw_data={"domain": "property_viewing_scheduling", "slots_count": len(EXAMPLES)},
+            raw_data={
+                "domain": "property_viewing_scheduling",
+                "slots_count": len(EXAMPLES),
+            },
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "calendar": self.get_calendar_summary()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "calendar": self.get_calendar_summary(),
+        }
 
 
 if __name__ == "__main__":
@@ -250,12 +488,21 @@ def _propertyviewingscheduler_bot_list_items(self, limit=None):
 
 def _propertyviewingscheduler_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "PropertyViewingSchedulerBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {
+        "bot": "PropertyViewingSchedulerBot",
+        "tier": self.tier.value,
+        "count": len(EXAMPLES),
+    }
 
 
 def _propertyviewingscheduler_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "PropertyViewingSchedulerBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "PropertyViewingSchedulerBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 PropertyViewingSchedulerBot.monthly_price = _propertyviewingscheduler_bot_monthly_price

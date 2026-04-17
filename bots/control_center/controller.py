@@ -18,8 +18,8 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 from bots.control_center.control_center import ControlCenter
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,9 @@ logger = logging.getLogger(__name__)
 class TaskMessage:
     """Lightweight message passed between bots via the Controller."""
 
-    def __init__(self, sender: str, recipient: str, action: str, payload: dict | None = None) -> None:
+    def __init__(
+        self, sender: str, recipient: str, action: str, payload: dict | None = None
+    ) -> None:
         self.sender = sender
         self.recipient = recipient
         self.action = action
@@ -139,19 +141,31 @@ class Controller:
     # Task management
     # ------------------------------------------------------------------
 
-    def assign_task(self, recipient: str, action: str, payload: dict | None = None, sender: str = "controller") -> TaskMessage:
+    def assign_task(
+        self,
+        recipient: str,
+        action: str,
+        payload: dict | None = None,
+        sender: str = "controller",
+    ) -> TaskMessage:
         """Create a task message and add it to the queue."""
-        msg = TaskMessage(sender=sender, recipient=recipient, action=action, payload=payload)
+        msg = TaskMessage(
+            sender=sender, recipient=recipient, action=action, payload=payload
+        )
         self._task_queue.append(msg)
         logger.debug("Task queued: %s → %s [%s]", sender, recipient, action)
         return msg
 
-    def broadcast_task(self, action: str, payload: dict | None = None) -> List[TaskMessage]:
+    def broadcast_task(
+        self, action: str, payload: dict | None = None
+    ) -> List[TaskMessage]:
         """Broadcast a task to ALL registered bots."""
         msgs = []
         status = self._cc.get_status()
         for bot_name in status.get("bots", {}):
-            msgs.append(self.assign_task(recipient=bot_name, action=action, payload=payload))
+            msgs.append(
+                self.assign_task(recipient=bot_name, action=action, payload=payload)
+            )
         return msgs
 
     def process_tasks(self) -> List[dict]:
@@ -176,12 +190,20 @@ class Controller:
         status = self._cc.get_status()
         bots_meta = status.get("bots", {})
         if msg.recipient not in bots_meta:
-            return {"task": msg.to_dict(), "status": "error", "error": f"Bot '{msg.recipient}' not registered"}
+            return {
+                "task": msg.to_dict(),
+                "status": "error",
+                "error": f"Bot '{msg.recipient}' not registered",
+            }
         # Access the internal bot registry
         bot_entry = self._cc._bots.get(msg.recipient, {})
         bot = bot_entry.get("instance")
         if bot is None:
-            return {"task": msg.to_dict(), "status": "error", "error": "Bot instance missing"}
+            return {
+                "task": msg.to_dict(),
+                "status": "error",
+                "error": "Bot instance missing",
+            }
         try:
             if msg.action == "run" and hasattr(bot, "run"):
                 output = bot.run()
@@ -200,7 +222,9 @@ class Controller:
     # Inter-bot messaging
     # ------------------------------------------------------------------
 
-    def send_message(self, sender: str, recipient: str, action: str, payload: dict | None = None) -> dict:
+    def send_message(
+        self, sender: str, recipient: str, action: str, payload: dict | None = None
+    ) -> dict:
         """
         Send a message from one bot to another, executing immediately.
 
@@ -209,7 +233,9 @@ class Controller:
         dict
             Dispatch result.
         """
-        msg = TaskMessage(sender=sender, recipient=recipient, action=action, payload=payload)
+        msg = TaskMessage(
+            sender=sender, recipient=recipient, action=action, payload=payload
+        )
         result = self._dispatch(msg)
         self._message_log.append({**msg.to_dict(), "result": result})
         return result
@@ -222,7 +248,9 @@ class Controller:
     # Automation loop
     # ------------------------------------------------------------------
 
-    def run_loop(self, iterations: int = 1, interval_seconds: float = 0.0) -> List[dict]:
+    def run_loop(
+        self, iterations: int = 1, interval_seconds: float = 0.0
+    ) -> List[dict]:
         """
         Execute the automation loop *iterations* times.
 
@@ -251,12 +279,14 @@ class Controller:
                 self._loop_count += 1
                 bot_results = self._cc.run_all()
                 task_results = self.process_tasks()
-                all_results.append({
-                    "cycle": self._loop_count,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "bot_results": bot_results,
-                    "task_results": task_results,
-                })
+                all_results.append(
+                    {
+                        "cycle": self._loop_count,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "bot_results": bot_results,
+                        "task_results": task_results,
+                    }
+                )
                 cycle += 1
                 if iterations > 0 and cycle >= iterations:
                     break

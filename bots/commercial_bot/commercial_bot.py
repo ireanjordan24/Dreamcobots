@@ -45,15 +45,18 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.commercial_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: E402
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class CommercialBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -88,6 +91,7 @@ PRICING_TIERS = {
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CommercialScript:
@@ -143,6 +147,7 @@ class AdPerformance:
 # Engine 1 — ScriptEngine
 # ---------------------------------------------------------------------------
 
+
 class ScriptEngine:
     """Generates commercial scripts with hooks, emotional triggers, and CTAs."""
 
@@ -174,9 +179,12 @@ class ScriptEngine:
         if duration_seconds not in allowed:
             duration_seconds = allowed[-1]
 
-        hook = self.HOOKS[0].replace("{pain}", f"{product} problems").replace(
-            "{benefit}", f"more {product}"
-        ).replace("{niche}", product)
+        hook = (
+            self.HOOKS[0]
+            .replace("{pain}", f"{product} problems")
+            .replace("{benefit}", f"more {product}")
+            .replace("{niche}", product)
+        )
 
         body = (
             f"Introducing {business} — built for {target_audience} who demand results. "
@@ -215,6 +223,7 @@ class ScriptEngine:
 # ---------------------------------------------------------------------------
 # Engine 2 — VideoEngine
 # ---------------------------------------------------------------------------
+
 
 class VideoEngine:
     """Builds scene plans and renders video via external APIs (ENTERPRISE)."""
@@ -266,6 +275,7 @@ class VideoEngine:
 # Engine 3 — VoiceEngine
 # ---------------------------------------------------------------------------
 
+
 class VoiceEngine:
     """Generates voiceover scripts in multiple tones and formats."""
 
@@ -302,6 +312,7 @@ class VoiceEngine:
 # Engine 4 — PlatformOptimizer
 # ---------------------------------------------------------------------------
 
+
 class PlatformOptimizer:
     """Adapts ad content for each social platform."""
 
@@ -309,18 +320,26 @@ class PlatformOptimizer:
         "TikTok": {"max_seconds": 60, "aspect_ratio": "9:16", "vibe": "viral, trendy"},
         "YouTube": {"max_seconds": 300, "aspect_ratio": "16:9", "vibe": "informative"},
         "Instagram": {"max_seconds": 90, "aspect_ratio": "1:1", "vibe": "aesthetic"},
-        "Facebook": {"max_seconds": 240, "aspect_ratio": "16:9", "vibe": "conversational"},
+        "Facebook": {
+            "max_seconds": 240,
+            "aspect_ratio": "16:9",
+            "vibe": "conversational",
+        },
     }
 
-    def optimize(self, script: str, platforms: Optional[List[str]] = None) -> Dict[str, Dict]:
+    def optimize(
+        self, script: str, platforms: Optional[List[str]] = None
+    ) -> Dict[str, Dict]:
         if platforms is None:
             platforms = PLATFORMS
         output: Dict[str, Dict] = {}
         for platform in platforms:
             spec = self.PLATFORM_SPECS.get(platform, {})
             words = script.split()
-            target_words = (spec.get("max_seconds", 60) // 2)
-            adapted = " ".join(words[:target_words]) + ("..." if len(words) > target_words else "")
+            target_words = spec.get("max_seconds", 60) // 2
+            adapted = " ".join(words[:target_words]) + (
+                "..." if len(words) > target_words else ""
+            )
             output[platform] = {
                 "adapted_script": adapted,
                 "aspect_ratio": spec.get("aspect_ratio", "16:9"),
@@ -334,12 +353,21 @@ class PlatformOptimizer:
 # Engine 5 — ClientFinder
 # ---------------------------------------------------------------------------
 
+
 class ClientFinder:
     """Discovers potential clients from various sources."""
 
     NICHES = [
-        "restaurant", "real_estate", "car_dealership", "local_service",
-        "ecommerce", "roofing", "plumbing", "gym", "salon", "dental",
+        "restaurant",
+        "real_estate",
+        "car_dealership",
+        "local_service",
+        "ecommerce",
+        "roofing",
+        "plumbing",
+        "gym",
+        "salon",
+        "dental",
     ]
 
     _MOCK_SOURCES = {
@@ -378,6 +406,7 @@ class ClientFinder:
 # ---------------------------------------------------------------------------
 # Engine 6 — ClosingAgent
 # ---------------------------------------------------------------------------
+
 
 class ClosingAgent:
     """Automated outreach, objection handling, and deal closing."""
@@ -420,13 +449,16 @@ class ClosingAgent:
 # Engine 7 — BillingEngine
 # ---------------------------------------------------------------------------
 
+
 class BillingEngine:
     """Stripe subscription management (requires STRIPE_KEY env var in prod)."""
 
     def __init__(self) -> None:
         self._subscriptions: List[Dict] = []
 
-    def create_subscription(self, customer_email: str, package: str = "pro_commercial") -> Dict:
+    def create_subscription(
+        self, customer_email: str, package: str = "pro_commercial"
+    ) -> Dict:
         low, high = PRICING_TIERS.get(package, (300, 1000))
         amount = high if high is not None else low
         record = {
@@ -458,6 +490,7 @@ class BillingEngine:
 # ---------------------------------------------------------------------------
 # Engine 8 — AnalyticsEngine
 # ---------------------------------------------------------------------------
+
 
 class AnalyticsEngine:
     """Tracks ad performance metrics across all platforms."""
@@ -497,15 +530,14 @@ class AnalyticsEngine:
         }
 
     def top_performers(self, n: int = 5) -> List[Dict]:
-        sorted_data = sorted(
-            self._data.values(), key=lambda p: p.revenue, reverse=True
-        )
+        sorted_data = sorted(self._data.values(), key=lambda p: p.revenue, reverse=True)
         return [self.track(p.video_id) for p in sorted_data[:n]]
 
 
 # ---------------------------------------------------------------------------
 # Engine 9 — BulkGenerator
 # ---------------------------------------------------------------------------
+
 
 class BulkGenerator:
     """Mass-produces commercial scripts and video concepts."""
@@ -553,6 +585,7 @@ class BulkGenerator:
 # Engine 10 — SelfHeal
 # ---------------------------------------------------------------------------
 
+
 class SelfHeal:
     """System health monitor and auto-repair."""
 
@@ -561,9 +594,15 @@ class SelfHeal:
             status = {
                 "status": "healthy",
                 "engines": [
-                    "ScriptEngine", "VideoEngine", "VoiceEngine",
-                    "PlatformOptimizer", "ClientFinder", "ClosingAgent",
-                    "BillingEngine", "AnalyticsEngine", "BulkGenerator",
+                    "ScriptEngine",
+                    "VideoEngine",
+                    "VoiceEngine",
+                    "PlatformOptimizer",
+                    "ClientFinder",
+                    "ClosingAgent",
+                    "BillingEngine",
+                    "AnalyticsEngine",
+                    "BulkGenerator",
                 ],
                 "checked_at": datetime.now(timezone.utc).isoformat(),
             }
@@ -583,6 +622,7 @@ class SelfHeal:
 # ---------------------------------------------------------------------------
 # Main CommercialBot orchestrator
 # ---------------------------------------------------------------------------
+
 
 class CommercialBot:
     """
@@ -682,7 +722,9 @@ class CommercialBot:
         self, script: str, tone: str = "excited", platform: str = "TikTok"
     ) -> Dict:
         self._require_tier(Tier.PRO)
-        return self.voice_engine.generate_voiceover(script, tone=tone, platform=platform)
+        return self.voice_engine.generate_voiceover(
+            script, tone=tone, platform=platform
+        )
 
     def find_clients(self, niche: str = "restaurant", limit: int = 10) -> List[Dict]:
         self._require_tier(Tier.PRO)
@@ -734,7 +776,9 @@ class CommercialBot:
             duration_seconds=duration_seconds,
         )
 
-    def create_subscription(self, customer_email: str, package: str = "pro_commercial") -> Dict:
+    def create_subscription(
+        self, customer_email: str, package: str = "pro_commercial"
+    ) -> Dict:
         self._require_tier(Tier.PRO)
         return self.billing.create_subscription(customer_email, package)
 

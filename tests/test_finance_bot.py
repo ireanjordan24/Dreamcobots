@@ -2,34 +2,43 @@
 Tests for bots/finance_bot/tiers.py and bots/finance_bot/finance_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.finance_bot.tiers import (
-    get_finance_tier_info,
-    FINANCE_EXTRA_FEATURES,
-    FINANCE_TOOLS,
-)
+
 from bots.finance_bot.finance_bot import (
     FinanceBot,
-    FinanceTierError,
     FinanceRequestLimitError,
+    FinanceTierError,
+)
+from bots.finance_bot.tiers import (
+    FINANCE_EXTRA_FEATURES,
+    FINANCE_TOOLS,
+    get_finance_tier_info,
 )
 
 
 class TestFinanceTierInfo:
     def test_tier_info_keys(self):
         info = get_finance_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "finance_features", "tools", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "finance_features",
+            "tools",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):

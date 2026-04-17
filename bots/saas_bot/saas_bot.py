@@ -21,29 +21,26 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from bots.saas_bot.tiers import (
+    FEATURE_ANNUAL_BILLING,
+    FEATURE_MULTI_USER,
+    FEATURE_STRIPE_SUBSCRIPTIONS,
+    FEATURE_SUBSCRIPTION_WEBHOOKS,
+    FEATURE_TRIAL_PERIOD,
+    FEATURE_USAGE_ANALYTICS,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_STRIPE_SUBSCRIPTIONS,
-    FEATURE_SUBSCRIPTION_WEBHOOKS,
-    FEATURE_ANNUAL_BILLING,
-    FEATURE_TRIAL_PERIOD,
-    FEATURE_USAGE_ANALYTICS,
-    FEATURE_MULTI_USER,
 )
 from bots.stripe_integration.stripe_client import StripeClient, StripeClientError
-from bots.stripe_integration.webhook_handler import (
-    StripeWebhookHandler,
-    WebhookEvent,
-)
+from bots.stripe_integration.webhook_handler import StripeWebhookHandler, WebhookEvent
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class SaasBotError(Exception):
     """Base exception for SaaS Bot errors."""
@@ -56,6 +53,7 @@ class SaasBotTierError(SaasBotError):
 # ---------------------------------------------------------------------------
 # Subscription record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Subscription:
@@ -80,6 +78,7 @@ class Subscription:
 # ---------------------------------------------------------------------------
 # Main SaaS bot
 # ---------------------------------------------------------------------------
+
 
 class SaasBot:
     """
@@ -163,7 +162,9 @@ class SaasBot:
             upgrade = get_upgrade_path(self.tier)
             msg = f"Feature '{feature}' requires a higher tier."
             if upgrade:
-                msg += f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly:.0f}/mo)."
+                msg += (
+                    f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly:.0f}/mo)."
+                )
             raise SaasBotTierError(msg)
 
     # ------------------------------------------------------------------
@@ -272,9 +273,7 @@ class SaasBot:
         """Return a subscription by its internal ID."""
         return self._subscriptions.get(subscription_id)
 
-    def list_subscriptions(
-        self, status: Optional[str] = None
-    ) -> list[Subscription]:
+    def list_subscriptions(self, status: Optional[str] = None) -> list[Subscription]:
         """
         Return all subscriptions, optionally filtered by status.
 
@@ -350,9 +349,7 @@ class SaasBot:
         """
         self._require_feature(FEATURE_SUBSCRIPTION_WEBHOOKS)
 
-        event = self._webhook_handler.dispatch(
-            payload, sig_header, skip_verify=True
-        )
+        event = self._webhook_handler.dispatch(payload, sig_header, skip_verify=True)
         if event is None:
             return {"received": False, "event_type": None, "event_id": None}
 
@@ -460,7 +457,9 @@ class SaasBot:
             )
         elif "subscri" in msg_lower:
             count = len(self._subscriptions)
-            active = len([s for s in self._subscriptions.values() if s.status == "active"])
+            active = len(
+                [s for s in self._subscriptions.values() if s.status == "active"]
+            )
             response = (
                 f"You have {count} subscription(s) total, {active} active. "
                 "Use create_subscription(email) to add a new subscriber."
@@ -481,7 +480,9 @@ class SaasBot:
                     f"estimated MRR: ${analytics['estimated_monthly_revenue_usd']:.2f}."
                 )
             else:
-                response = "Analytics are available on Professional and Enterprise tiers."
+                response = (
+                    "Analytics are available on Professional and Enterprise tiers."
+                )
         elif "stripe" in msg_lower:
             response = (
                 "Stripe subscription management is fully integrated. "

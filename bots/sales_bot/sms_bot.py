@@ -11,16 +11,15 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from datetime import datetime, timezone
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Default message template
@@ -42,6 +41,7 @@ IRRESISTIBLE_OFFER_TEMPLATE = (
 # ---------------------------------------------------------------------------
 # SMS Bot
 # ---------------------------------------------------------------------------
+
 
 class SMSBot:
     """

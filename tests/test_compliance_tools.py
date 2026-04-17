@@ -1,7 +1,8 @@
 """Tests for the Compliance Tools — ComplianceChecker."""
 
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -11,6 +12,7 @@ def _import_checker():
     tools_dir = os.path.join(os.path.dirname(__file__), "..", "compliance-tools")
     sys.path.insert(0, tools_dir)
     import importlib
+
     return importlib.import_module("compliance_checker")
 
 
@@ -66,7 +68,16 @@ class TestListFrameworks:
 
     def test_all_expected_frameworks(self, checker):
         ids = [fw["id"] for fw in checker.list_frameworks()]
-        for expected in ("GDPR", "CCPA", "HIPAA", "SOC2", "PCI_DSS", "ADA", "OSHA", "ISO_27001"):
+        for expected in (
+            "GDPR",
+            "CCPA",
+            "HIPAA",
+            "SOC2",
+            "PCI_DSS",
+            "ADA",
+            "OSHA",
+            "ISO_27001",
+        ):
             assert expected in ids
 
 
@@ -97,8 +108,16 @@ class TestCheckCompliance:
 
     def test_required_keys(self, checker):
         result = checker.check_compliance("GDPR")
-        for key in ("framework", "score_pct", "passed", "failed", "total_checks",
-                    "risk_level", "findings", "generated_at"):
+        for key in (
+            "framework",
+            "score_pct",
+            "passed",
+            "failed",
+            "total_checks",
+            "risk_level",
+            "findings",
+            "generated_at",
+        ):
             assert key in result
 
     def test_score_zero_no_profile(self, checker):
@@ -209,7 +228,10 @@ class TestValidateEmail:
         assert cc_module.ComplianceChecker.validate_email("user@example.com") is True
 
     def test_valid_email_with_subdomain(self, cc_module):
-        assert cc_module.ComplianceChecker.validate_email("user@mail.example.co.uk") is True
+        assert (
+            cc_module.ComplianceChecker.validate_email("user@mail.example.co.uk")
+            is True
+        )
 
     def test_invalid_no_at(self, cc_module):
         assert cc_module.ComplianceChecker.validate_email("userexample.com") is False
@@ -234,7 +256,9 @@ class TestValidateSSN:
 
 class TestMaskPII:
     def test_masks_email(self, cc_module):
-        result = cc_module.ComplianceChecker.mask_pii("Contact john@example.com for info")
+        result = cc_module.ComplianceChecker.mask_pii(
+            "Contact john@example.com for info"
+        )
         assert "[EMAIL REDACTED]" in result
         assert "john@example.com" not in result
 

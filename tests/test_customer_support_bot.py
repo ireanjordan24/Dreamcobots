@@ -2,29 +2,39 @@
 Tests for bots/customer_support_bot/tiers.py and bots/customer_support_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.customer_support_bot.tiers import CUSTOMER_SUPPORT_FEATURES, get_customer_support_tier_info
+
 from bots.customer_support_bot.bot import (
     CustomerSupportBot,
-    CustomerSupportBotTierError,
     CustomerSupportBotRequestLimitError,
+    CustomerSupportBotTierError,
+)
+from bots.customer_support_bot.tiers import (
+    CUSTOMER_SUPPORT_FEATURES,
+    get_customer_support_tier_info,
 )
 
 
 class TestCustomerSupportTierInfo:
     def test_free_tier_info_keys(self):
         info = get_customer_support_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -53,7 +63,14 @@ class TestCustomerSupportBot:
     def test_handle_ticket_returns_expected_keys(self):
         bot = CustomerSupportBot(tier=Tier.FREE)
         result = bot.handle_ticket({"message": "I need help with billing."})
-        for key in ("ticket_id", "response", "category", "sentiment", "escalated", "tier"):
+        for key in (
+            "ticket_id",
+            "response",
+            "category",
+            "sentiment",
+            "escalated",
+            "tier",
+        ):
             assert key in result
 
     def test_handle_ticket_tier_value(self):
@@ -73,12 +90,16 @@ class TestCustomerSupportBot:
 
     def test_free_tier_invalid_category_redirected(self):
         bot = CustomerSupportBot(tier=Tier.FREE)
-        result = bot.handle_ticket({"message": "Enterprise analytics?", "category": "analytics"})
+        result = bot.handle_ticket(
+            {"message": "Enterprise analytics?", "category": "analytics"}
+        )
         assert result["category"] == "general"
 
     def test_pro_tier_sentiment_analysis(self):
         bot = CustomerSupportBot(tier=Tier.PRO)
-        result = bot.handle_ticket({"message": "I am angry and frustrated with your terrible service!"})
+        result = bot.handle_ticket(
+            {"message": "I am angry and frustrated with your terrible service!"}
+        )
         assert result["sentiment"] == "negative"
 
     def test_pro_tier_positive_sentiment(self):

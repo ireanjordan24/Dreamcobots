@@ -11,6 +11,7 @@ resale and auto-parts arbitrage use-case:
 * Marketplace fee optimiser (setting 525)
 * Dynamic pricing (setting 503)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations

@@ -11,13 +11,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 
-
 # GLOBAL AI SOURCES FLOW
+
 
 @dataclass
 class KillSwitchEvent:
     event_id: str
-    action: str         # "activate" | "deactivate"
+    action: str  # "activate" | "deactivate"
     reason: str
     timestamp: datetime
 
@@ -28,7 +28,7 @@ class KillSwitch:
     def __init__(self) -> None:
         self._active: bool = False
         self._log: List[KillSwitchEvent] = []
-        self._registered_bots: Dict[str, Callable] = {}   # bot_id -> stop_callback
+        self._registered_bots: Dict[str, Callable] = {}  # bot_id -> stop_callback
         self._notifications: List[str] = []
 
     # ------------------------------------------------------------------

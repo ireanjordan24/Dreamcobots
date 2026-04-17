@@ -5,18 +5,18 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import sys
 
-import re
-import hashlib
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import datetime
+import hashlib
+import re
 from enum import Enum
 from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Regulatory frameworks
@@ -27,69 +27,107 @@ FRAMEWORKS = {
         "name": "General Data Protection Regulation",
         "region": "EU",
         "checks": [
-            "data_minimization", "consent_mechanism", "right_to_erasure",
-            "data_breach_notification", "privacy_policy", "data_processor_agreements",
-            "dpo_designation", "cross_border_transfers",
+            "data_minimization",
+            "consent_mechanism",
+            "right_to_erasure",
+            "data_breach_notification",
+            "privacy_policy",
+            "data_processor_agreements",
+            "dpo_designation",
+            "cross_border_transfers",
         ],
     },
     "CCPA": {
         "name": "California Consumer Privacy Act",
         "region": "US-CA",
         "checks": [
-            "opt_out_sale", "privacy_policy", "consumer_request_process",
-            "data_inventory", "employee_training", "third_party_disclosures",
+            "opt_out_sale",
+            "privacy_policy",
+            "consumer_request_process",
+            "data_inventory",
+            "employee_training",
+            "third_party_disclosures",
         ],
     },
     "HIPAA": {
         "name": "Health Insurance Portability and Accountability Act",
         "region": "US",
         "checks": [
-            "phi_encryption", "access_controls", "audit_logs",
-            "baa_agreements", "incident_response_plan", "employee_training",
-            "minimum_necessary_standard", "disposal_procedures",
+            "phi_encryption",
+            "access_controls",
+            "audit_logs",
+            "baa_agreements",
+            "incident_response_plan",
+            "employee_training",
+            "minimum_necessary_standard",
+            "disposal_procedures",
         ],
     },
     "SOC2": {
         "name": "Service Organization Control 2",
         "region": "Global",
         "checks": [
-            "security_policies", "availability_monitoring", "processing_integrity",
-            "confidentiality_controls", "privacy_notice", "change_management",
-            "vendor_management", "incident_response",
+            "security_policies",
+            "availability_monitoring",
+            "processing_integrity",
+            "confidentiality_controls",
+            "privacy_notice",
+            "change_management",
+            "vendor_management",
+            "incident_response",
         ],
     },
     "PCI_DSS": {
         "name": "Payment Card Industry Data Security Standard",
         "region": "Global",
         "checks": [
-            "cardholder_data_encryption", "network_segmentation", "access_control",
-            "vulnerability_management", "monitoring_logging", "security_policy",
-            "firewall_configuration", "anti_malware",
+            "cardholder_data_encryption",
+            "network_segmentation",
+            "access_control",
+            "vulnerability_management",
+            "monitoring_logging",
+            "security_policy",
+            "firewall_configuration",
+            "anti_malware",
         ],
     },
     "ADA": {
         "name": "Americans with Disabilities Act",
         "region": "US",
         "checks": [
-            "wcag_compliance", "alt_text_images", "keyboard_navigation",
-            "color_contrast", "screen_reader_support", "captions_transcripts",
+            "wcag_compliance",
+            "alt_text_images",
+            "keyboard_navigation",
+            "color_contrast",
+            "screen_reader_support",
+            "captions_transcripts",
         ],
     },
     "OSHA": {
         "name": "Occupational Safety and Health Administration",
         "region": "US",
         "checks": [
-            "hazard_communication", "ppe_program", "emergency_action_plan",
-            "recordkeeping", "training_requirements", "incident_reporting",
+            "hazard_communication",
+            "ppe_program",
+            "emergency_action_plan",
+            "recordkeeping",
+            "training_requirements",
+            "incident_reporting",
         ],
     },
     "ISO_27001": {
         "name": "ISO/IEC 27001 Information Security",
         "region": "Global",
         "checks": [
-            "isms_scope", "risk_assessment", "security_controls",
-            "asset_management", "access_management", "cryptography_policy",
-            "physical_security", "supplier_relationships", "incident_management",
+            "isms_scope",
+            "risk_assessment",
+            "security_controls",
+            "asset_management",
+            "access_management",
+            "cryptography_policy",
+            "physical_security",
+            "supplier_relationships",
+            "incident_management",
         ],
     },
 }
@@ -100,6 +138,7 @@ SEVERITY_WEIGHTS = {"critical": 4, "high": 3, "medium": 2, "low": 1}
 # ---------------------------------------------------------------------------
 # Main compliance checker class
 # ---------------------------------------------------------------------------
+
 
 class ComplianceChecker:
     """Evaluates organizational and technical compliance against regulatory
@@ -175,22 +214,22 @@ class ComplianceChecker:
         for check in fw["checks"]:
             is_compliant = bool(profile.get(check, False))
             severity = self._check_severity(check, framework_id)
-            findings.append({
-                "check": check,
-                "label": check.replace("_", " ").title(),
-                "status": "pass" if is_compliant else "fail",
-                "severity": severity,
-                "recommendation": self._recommendation(check, framework_id),
-            })
+            findings.append(
+                {
+                    "check": check,
+                    "label": check.replace("_", " ").title(),
+                    "status": "pass" if is_compliant else "fail",
+                    "severity": severity,
+                    "recommendation": self._recommendation(check, framework_id),
+                }
+            )
             if is_compliant:
                 passed += 1
 
         total = len(fw["checks"])
         score_pct = round((passed / total * 100) if total else 0, 1)
         risk_level = (
-            "low" if score_pct >= 80
-            else "medium" if score_pct >= 50
-            else "high"
+            "low" if score_pct >= 80 else "medium" if score_pct >= 50 else "high"
         )
 
         report = {
@@ -205,12 +244,14 @@ class ComplianceChecker:
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         }
 
-        self._audit_log.append({
-            "action": "check_compliance",
-            "framework": framework_id,
-            "score_pct": score_pct,
-            "timestamp": report["generated_at"],
-        })
+        self._audit_log.append(
+            {
+                "action": "check_compliance",
+                "framework": framework_id,
+                "score_pct": score_pct,
+                "timestamp": report["generated_at"],
+            }
+        )
 
         return report
 
@@ -247,11 +288,13 @@ class ComplianceChecker:
         return {
             "overall_score_pct": overall_pct,
             "overall_risk": (
-                "low" if overall_pct >= 80
-                else "medium" if overall_pct >= 50
-                else "high"
+                "low"
+                if overall_pct >= 80
+                else "medium" if overall_pct >= 50 else "high"
             ),
-            "frameworks_evaluated": [r["framework"] for r in reports if "error" not in r],
+            "frameworks_evaluated": [
+                r["framework"] for r in reports if "error" not in r
+            ],
         }
 
     # ------------------------------------------------------------------
@@ -267,13 +310,13 @@ class ComplianceChecker:
         or IP address literals. For production use, consider the ``email-validator``
         library for full RFC compliance.
         """
-        pattern = r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, email))
 
     @staticmethod
     def validate_ssn(ssn: str) -> bool:
         """Validate US Social Security Number format (does not check real SSNs)."""
-        pattern = r'^\d{3}-\d{2}-\d{4}$'
+        pattern = r"^\d{3}-\d{2}-\d{4}$"
         return bool(re.match(pattern, ssn))
 
     @staticmethod
@@ -281,15 +324,17 @@ class ComplianceChecker:
         """Mask PII patterns (email, SSN, phone) in a text string."""
         # Mask emails
         text = re.sub(
-            r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}',
-            '[EMAIL REDACTED]', text,
+            r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}",
+            "[EMAIL REDACTED]",
+            text,
         )
         # Mask SSNs
-        text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN REDACTED]', text)
+        text = re.sub(r"\b\d{3}-\d{2}-\d{4}\b", "[SSN REDACTED]", text)
         # Mask phone numbers
         text = re.sub(
-            r'\b(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b',
-            '[PHONE REDACTED]', text,
+            r"\b(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b",
+            "[PHONE REDACTED]",
+            text,
         )
         return text
 
@@ -312,12 +357,20 @@ class ComplianceChecker:
 
     def _check_severity(self, check: str, framework: str) -> str:
         critical_checks = {
-            "phi_encryption", "cardholder_data_encryption", "data_breach_notification",
-            "access_controls", "audit_logs", "firewall_configuration",
+            "phi_encryption",
+            "cardholder_data_encryption",
+            "data_breach_notification",
+            "access_controls",
+            "audit_logs",
+            "firewall_configuration",
         }
         high_checks = {
-            "consent_mechanism", "baa_agreements", "risk_assessment",
-            "incident_response_plan", "incident_response", "network_segmentation",
+            "consent_mechanism",
+            "baa_agreements",
+            "risk_assessment",
+            "incident_response_plan",
+            "incident_response",
+            "network_segmentation",
         }
         if check in critical_checks:
             return "critical"
@@ -341,11 +394,13 @@ class ComplianceChecker:
             "wcag_compliance": "Conduct WCAG 2.1 AA audit and remediate accessibility gaps.",
             "risk_assessment": "Perform annual information security risk assessment and document results.",
         }
-        return recs.get(check, f"Review and implement controls for {check.replace('_', ' ')}.")
+        return recs.get(
+            check, f"Review and implement controls for {check.replace('_', ' ')}."
+        )
 
 
 # If run directly, show a sample report
-if __name__ == '__main__':
+if __name__ == "__main__":
     checker = ComplianceChecker()
     frameworks = checker.list_frameworks()
     print(f"Compliance Tools — {len(frameworks)} frameworks available")

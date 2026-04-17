@@ -18,9 +18,9 @@ Usage
     print(link["url"])  # e.g. https://buy.stripe.com/...
 """
 
+import datetime
 import os
 import uuid
-import datetime
 from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
@@ -52,6 +52,7 @@ class PaymentLinks:
     def _load_stripe():
         try:
             import stripe  # noqa: PLC0415
+
             return stripe
         except ImportError:
             return None

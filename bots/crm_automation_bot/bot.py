@@ -1,16 +1,25 @@
 """
 Dreamcobots CRMAutomationBot — tier-aware CRM contact management and pipeline automation.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.crm_automation_bot.tiers import CRM_AUTOMATION_FEATURES, get_crm_automation_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.crm_automation_bot.tiers import (
+    CRM_AUTOMATION_FEATURES,
+    get_crm_automation_tier_info,
+)
 
 
 class CRMAutomationBotTierError(Exception):
@@ -25,7 +34,15 @@ class CRMAutomationBot:
     """Tier-aware CRM contact management and pipeline automation bot."""
 
     FREE_STAGES = ["lead", "prospect", "customer"]
-    FULL_STAGES = ["lead", "prospect", "qualified", "proposal", "negotiation", "customer", "churned"]
+    FULL_STAGES = [
+        "lead",
+        "prospect",
+        "qualified",
+        "proposal",
+        "negotiation",
+        "customer",
+        "churned",
+    ]
 
     CONTACT_LIMITS = {
         "free": 100,
@@ -119,7 +136,9 @@ class CRMAutomationBot:
         Returns:
             {"contact_id": str, "previous_stage": str, "new_stage": str, "tier": str}
         """
-        allowed_stages = self.FREE_STAGES if self.tier == Tier.FREE else self.FULL_STAGES
+        allowed_stages = (
+            self.FREE_STAGES if self.tier == Tier.FREE else self.FULL_STAGES
+        )
 
         if stage not in allowed_stages:
             raise CRMAutomationBotTierError(

@@ -9,8 +9,8 @@ Tests for the DreamCo Core System:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -18,16 +18,15 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 from core.base_bot import (
+    RESULT_STATUS_FAILED,
+    RESULT_STATUS_SUCCESS,
     BaseBot,
     BaseBotError,
-    RESULT_STATUS_SUCCESS,
-    RESULT_STATUS_FAILED,
 )
-from core.executor import BotExecutor
-from core.workflow import WorkflowEngine, WorkflowStep
-from core.money_loop import MoneyLoopEngine
 from core.dreamco_orchestrator import SCALE_THRESHOLD
-
+from core.executor import BotExecutor
+from core.money_loop import MoneyLoopEngine
+from core.workflow import WorkflowEngine, WorkflowStep
 
 # ===========================================================================
 # Helpers — concrete bot implementations for testing
@@ -40,7 +39,9 @@ class EchoBot(BaseBot):
     category = "test"
 
     def run(self, task: dict) -> dict:
-        return self._success(data={"echo": task.get("msg", "")}, metrics={"revenue": 100})
+        return self._success(
+            data={"echo": task.get("msg", "")}, metrics={"revenue": 100}
+        )
 
 
 class RevenueBot(BaseBot):
@@ -187,7 +188,11 @@ class TestBotExecutor:
         bots = [EchoBot(), FailBot(), EchoBot()]
         entries = self.executor.execute_many(bots)
         statuses = [e["status"] for e in entries]
-        assert statuses == [RESULT_STATUS_SUCCESS, RESULT_STATUS_FAILED, RESULT_STATUS_SUCCESS]
+        assert statuses == [
+            RESULT_STATUS_SUCCESS,
+            RESULT_STATUS_FAILED,
+            RESULT_STATUS_SUCCESS,
+        ]
 
     def test_get_log_returns_all_entries(self):
         self.executor.execute(EchoBot())
@@ -200,8 +205,8 @@ class TestBotExecutor:
         assert self.executor.get_log() == []
 
     def test_summary_counts_correctly(self):
-        self.executor.execute(EchoBot())   # success
-        self.executor.execute(FailBot())   # failure
+        self.executor.execute(EchoBot())  # success
+        self.executor.execute(FailBot())  # failure
         summary = self.executor.summary()
         assert summary["total"] == 2
         assert summary["succeeded"] == 1
@@ -313,7 +318,9 @@ class TestWorkflowEngine:
 
 
 class TestMoneyLoopEngine:
-    def _make_loop(self, revenue: float = 200.0, leads: int = 5, cycles: int = 1) -> MoneyLoopEngine:
+    def _make_loop(
+        self, revenue: float = 200.0, leads: int = 5, cycles: int = 1
+    ) -> MoneyLoopEngine:
         workflow = WorkflowEngine(name="money_loop_wf")
         workflow.add_bot(RevenueBot(revenue=revenue, leads=leads))
         return MoneyLoopEngine(workflow=workflow, max_cycles=cycles)
@@ -392,21 +399,25 @@ class TestMoneyLoopEngine:
 class TestSettings:
     def test_settings_import(self):
         from config.settings import settings
+
         assert settings is not None
 
     def test_simulation_mode_default_true(self):
         from config.settings import Settings
+
         s = Settings()
         # Default is True when SIMULATION_MODE env var is unset or "true"
         assert isinstance(s.simulation_mode, bool)
 
     def test_is_real_mode_inverse_of_simulation(self):
         from config.settings import Settings
+
         s = Settings()
         assert s.is_real_mode() == (not s.simulation_mode)
 
     def test_to_dict_has_expected_keys(self):
         from config.settings import settings
+
         d = settings.to_dict()
         assert "simulation_mode" in d
         assert "log_level" in d
@@ -415,10 +426,12 @@ class TestSettings:
 
     def test_active_keys_returns_list(self):
         from config.settings import settings
+
         assert isinstance(settings.active_keys(), list)
 
     def test_has_key_returns_false_for_unset(self):
         from config.settings import Settings
+
         # Create fresh instance with no env keys set
         s = Settings()
         # In CI the API keys are typically not set, so this should be False
@@ -428,10 +441,12 @@ class TestSettings:
 
     def test_money_loop_cycles_positive(self):
         from config.settings import settings
+
         assert settings.money_loop_cycles >= 1
 
     def test_thresholds_positive(self):
         from config.settings import settings
+
         assert settings.scale_threshold_usd > 0
         assert settings.maintain_threshold_usd > 0
         assert settings.scale_threshold_usd > settings.maintain_threshold_usd

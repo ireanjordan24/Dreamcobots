@@ -1,22 +1,26 @@
 """Tests for Fiverr_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from Fiverr_bots.feature_1 import FiverrServiceListingBot, EXAMPLES as FV1_EXAMPLES
-from Fiverr_bots.feature_2 import FiverrOrderManagerBot, EXAMPLES as FV2_EXAMPLES
-from Fiverr_bots.feature_3 import FiverrReviewGeneratorBot, EXAMPLES as FV3_EXAMPLES
-
+from Fiverr_bots.feature_1 import EXAMPLES as FV1_EXAMPLES
+from Fiverr_bots.feature_1 import FiverrServiceListingBot
+from Fiverr_bots.feature_2 import EXAMPLES as FV2_EXAMPLES
+from Fiverr_bots.feature_2 import FiverrOrderManagerBot
+from Fiverr_bots.feature_3 import EXAMPLES as FV3_EXAMPLES
+from Fiverr_bots.feature_3 import FiverrReviewGeneratorBot
 
 # ===========================================================================
 # Feature 1: FiverrServiceListingBot
 # ===========================================================================
+
 
 class TestFiverrServiceListingBotInstantiation:
     def test_default_tier_is_free(self):
@@ -39,7 +43,16 @@ class TestFiverrServiceListingBotInstantiation:
         assert len(FV1_EXAMPLES) == 30
 
     def test_examples_have_required_keys(self):
-        required = {"id", "title", "category", "base_price", "delivery_days", "keywords", "demand", "avg_rating"}
+        required = {
+            "id",
+            "title",
+            "category",
+            "base_price",
+            "delivery_days",
+            "keywords",
+            "demand",
+            "avg_rating",
+        }
         for ex in FV1_EXAMPLES:
             assert required.issubset(ex.keys()), f"Missing keys in example: {ex}"
 
@@ -108,7 +121,11 @@ class TestFiverrServiceListingBotMethods:
         bot = FiverrServiceListingBot(tier="PRO")
         result = bot.estimate_monthly_revenue(1)
         assert isinstance(result, dict)
-        assert "monthly_revenue" in result or "revenue" in result or any("revenue" in k for k in result)
+        assert (
+            "monthly_revenue" in result
+            or "revenue" in result
+            or any("revenue" in k for k in result)
+        )
 
     def test_get_active_listings_returns_list(self):
         bot = FiverrServiceListingBot(tier="PRO")
@@ -138,6 +155,7 @@ class TestFiverrServiceListingBotMethods:
 # ===========================================================================
 # Feature 2: FiverrOrderManagerBot
 # ===========================================================================
+
 
 class TestFiverrOrderManagerBotInstantiation:
     def test_default_tier_is_free(self):
@@ -244,6 +262,7 @@ class TestFiverrOrderManagerBotMethods:
 # ===========================================================================
 # Feature 3: FiverrReviewGeneratorBot
 # ===========================================================================
+
 
 class TestFiverrReviewGeneratorBotInstantiation:
     def test_default_tier_is_free(self):

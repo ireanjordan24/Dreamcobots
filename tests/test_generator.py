@@ -1,19 +1,21 @@
 """Tests for bots/bot_generator_bot/generator.py"""
-import sys
+
 import os
 import shutil
+import sys
 import tempfile
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.bot_generator_bot.generator import Generator, _to_snake_case, _to_class_name
 
+from bots.bot_generator_bot.generator import Generator, _to_class_name, _to_snake_case
 
 # ---------------------------------------------------------------------------
 # Helper utilities
 # ---------------------------------------------------------------------------
+
 
 class TestToSnakeCase:
     def test_simple_name(self):
@@ -44,12 +46,15 @@ class TestToClassName:
         assert _to_class_name("lead-scraper-bot") == "LeadScraperBot"
 
     def test_multiple_words(self):
-        assert _to_class_name("Real Estate Deal Finder Bot") == "RealEstateDealFinderBot"
+        assert (
+            _to_class_name("Real Estate Deal Finder Bot") == "RealEstateDealFinderBot"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Generator with temp bots directory
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def tmp_bots_dir():
@@ -67,6 +72,7 @@ def generator(tmp_bots_dir):
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestGeneratorInstantiation:
     def test_instantiates(self, tmp_bots_dir):
@@ -88,6 +94,7 @@ class TestGeneratorInstantiation:
 # Dry run
 # ---------------------------------------------------------------------------
 
+
 class TestDryRun:
     def test_dry_run_returns_result(self, generator):
         result = generator.create_bot("Test Bot", dry_run=True)
@@ -107,6 +114,7 @@ class TestDryRun:
 # ---------------------------------------------------------------------------
 # Real creation
 # ---------------------------------------------------------------------------
+
 
 class TestBotCreation:
     def test_creates_bot_directory(self, generator, tmp_bots_dir):
@@ -137,7 +145,9 @@ class TestBotCreation:
 
     def test_main_file_has_run_method(self, generator, tmp_bots_dir):
         generator.create_bot("My Scraper Bot", register=False)
-        with open(os.path.join(tmp_bots_dir, "my_scraper_bot", "my_scraper_bot.py")) as f:
+        with open(
+            os.path.join(tmp_bots_dir, "my_scraper_bot", "my_scraper_bot.py")
+        ) as f:
             content = f.read()
         assert "def run(" in content
 
@@ -149,7 +159,15 @@ class TestBotCreation:
 
     def test_result_dict_has_expected_keys(self, generator):
         result = generator.create_bot("KeyBot", register=False)
-        for key in ("bot_name", "module_name", "class_name", "bot_dir", "files", "dry_run", "registered"):
+        for key in (
+            "bot_name",
+            "module_name",
+            "class_name",
+            "bot_dir",
+            "files",
+            "dry_run",
+            "registered",
+        ):
             assert key in result
 
     def test_module_name_is_snake_case(self, generator):
@@ -172,7 +190,9 @@ class TestBotCreation:
         assert summary["total_bots_generated"] == 2
 
     def test_create_bots_bulk(self, generator):
-        results = generator.create_bots_bulk(["Alpha Bot", "Beta Bot", "Gamma Bot"], register=False)
+        results = generator.create_bots_bulk(
+            ["Alpha Bot", "Beta Bot", "Gamma Bot"], register=False
+        )
         assert len(results) == 3
 
     def test_custom_template_used(self, generator, tmp_bots_dir):
@@ -186,6 +206,7 @@ class TestBotCreation:
 # ---------------------------------------------------------------------------
 # Registration (with mock controller)
 # ---------------------------------------------------------------------------
+
 
 class _MockController:
     def __init__(self):

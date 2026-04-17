@@ -11,7 +11,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-
 # ---------------------------------------------------------------------------
 # Supported compliance standards
 # ---------------------------------------------------------------------------
@@ -57,9 +56,7 @@ class ComplianceEngine:
 
         for policy in self.active_policies:
             if policy not in ALL_POLICIES:
-                raise ValueError(
-                    f"Unknown policy '{policy}'. Valid: {ALL_POLICIES}"
-                )
+                raise ValueError(f"Unknown policy '{policy}'. Valid: {ALL_POLICIES}")
 
     # ------------------------------------------------------------------
     # Public interface
@@ -151,7 +148,14 @@ class ComplianceEngine:
         """
         return True
 
-    def _log(self, actor: str, action: str, resource: str, outcome: str, metadata: Optional[Dict[str, Any]] = None) -> AuditEntry:
+    def _log(
+        self,
+        actor: str,
+        action: str,
+        resource: str,
+        outcome: str,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> AuditEntry:
         self._event_counter += 1
         entry = AuditEntry(
             event_id=f"evt_{self._event_counter:06d}",

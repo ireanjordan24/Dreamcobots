@@ -5,14 +5,21 @@ Combines top-ranked methods into hybrid AI strategies using a simulated
 genetic algorithm (selection → crossover → mutation → fitness evaluation).
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_HYBRID_ENGINE, FEATURE_GENETIC_ALGO
-from .analytics import MethodRanking
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .analytics import MethodRanking
+from .tiers import (
+    FEATURE_GENETIC_ALGO,
+    FEATURE_HYBRID_ENGINE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+)
 
 
 @dataclass
@@ -146,7 +153,9 @@ class HybridEvolutionEngine:
         """
         self._check_tier()
 
-        selected = sorted(rankings, key=lambda r: r.composite_score, reverse=True)[:top_n]
+        selected = sorted(rankings, key=lambda r: r.composite_score, reverse=True)[
+            :top_n
+        ]
         if not selected:
             selected = rankings[:top_n]
 
@@ -168,7 +177,9 @@ class HybridEvolutionEngine:
             accuracy=round(min(1.0, metrics["accuracy"]), 4),
             convergence_rate=round(min(1.0, metrics["convergence"]), 4),
             resource_consumption=round(max(0.0, metrics["resource"]), 2),
-            created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
+            created_at=datetime.datetime.now(datetime.timezone.utc).replace(
+                tzinfo=None
+            ),
             metadata={
                 "top_n_selected": len(selected),
                 "genetic_algo": self.config.has_feature(FEATURE_GENETIC_ALGO),
@@ -225,7 +236,9 @@ class HybridEvolutionEngine:
                 accuracy=round(min(1.0, metrics["accuracy"]), 4),
                 convergence_rate=round(min(1.0, metrics["convergence"]), 4),
                 resource_consumption=round(max(0.0, metrics["resource"]), 2),
-                created_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
+                created_at=datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                ),
                 metadata={
                     "evolved_from": current.id,
                     "genetic_algo": self.config.has_feature(FEATURE_GENETIC_ALGO),

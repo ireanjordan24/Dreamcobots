@@ -9,26 +9,28 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401
+
 
 @dataclass
 class FlowStage:
     stage_id: str
-    capacity: float       # max tasks/hour
-    current_load: float   # tasks/hour currently processed
-    cycle_time: float     # seconds per task
+    capacity: float  # max tasks/hour
+    current_load: float  # tasks/hour currently processed
+    cycle_time: float  # seconds per task
 
 
 @dataclass
@@ -36,8 +38,8 @@ class Constraint:
     constraint_id: str
     flow_id: str
     stage_id: str
-    constraint_type: str   # "capacity", "cycle_time", "bottleneck"
-    impact_score: float    # 0.0 - 10.0
+    constraint_type: str  # "capacity", "cycle_time", "bottleneck"
+    impact_score: float  # 0.0 - 10.0
 
 
 class ThroughputMaximizer:
@@ -107,11 +109,13 @@ class ThroughputMaximizer:
                 if c.stage_id == stage.stage_id and c.constraint_type == "capacity":
                     old_cap = stage.capacity
                     stage.capacity *= 1.3
-                    improvements.append({
-                        "stage_id": stage.stage_id,
-                        "old_capacity": old_cap,
-                        "new_capacity": stage.capacity,
-                    })
+                    improvements.append(
+                        {
+                            "stage_id": stage.stage_id,
+                            "old_capacity": old_cap,
+                            "new_capacity": stage.capacity,
+                        }
+                    )
         log_entry = {
             "flow_id": flow_id,
             "improvements": improvements,
@@ -135,7 +139,9 @@ class ThroughputMaximizer:
             "forecasted_throughput_per_hour": round(
                 current_throughput * (1 + growth_rate_per_day * timeframe_days), 2
             ),
-            "projected_growth_pct": round(growth_rate_per_day * timeframe_days * 100, 2),
+            "projected_growth_pct": round(
+                growth_rate_per_day * timeframe_days * 100, 2
+            ),
         }
         return forecast
 
@@ -143,7 +149,9 @@ class ThroughputMaximizer:
         """Return a full report of all optimization actions taken."""
         return {
             "total_flows": len(self._flows),
-            "total_constraints_identified": sum(len(v) for v in self._constraints.values()),
+            "total_constraints_identified": sum(
+                len(v) for v in self._constraints.values()
+            ),
             "optimization_runs": len(self._optimization_log),
             "log": self._optimization_log,
         }

@@ -11,13 +11,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
-from framework import GlobalAISourcesFlow  # noqa: F401
 from bots.job_titles_bot.job_titles_database import JobTitle
-
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Generated bot data class
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class GeneratedJobBot:
@@ -106,7 +106,9 @@ class GeneratedJobBot:
             **self.metadata,
         }
 
-    def upgrade(self, new_version: str, additional_capabilities: Optional[list[str]] = None) -> None:
+    def upgrade(
+        self, new_version: str, additional_capabilities: Optional[list[str]] = None
+    ) -> None:
         """
         Upgrade this bot to *new_version*, optionally adding capabilities.
         Called automatically by Buddy Bot when global features are improved.
@@ -121,6 +123,7 @@ class GeneratedJobBot:
 # ---------------------------------------------------------------------------
 # Generator
 # ---------------------------------------------------------------------------
+
 
 class JobBotGenerator:
     """

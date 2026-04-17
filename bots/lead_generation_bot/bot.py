@@ -1,16 +1,25 @@
 """
 Dreamcobots LeadGenerationBot — tier-aware lead capture and scoring.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.lead_generation_bot.tiers import LEAD_GENERATION_FEATURES, get_lead_generation_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.lead_generation_bot.tiers import (
+    LEAD_GENERATION_FEATURES,
+    get_lead_generation_tier_info,
+)
 
 
 class LeadGenerationBotTierError(Exception):
@@ -136,7 +145,11 @@ class LeadGenerationBot:
         Returns:
             {"format": str, "count": int, "data": list, "tier": str}
         """
-        allowed_formats = {"free": ["csv"], "pro": ["csv", "json"], "enterprise": ["csv", "json", "xml"]}
+        allowed_formats = {
+            "free": ["csv"],
+            "pro": ["csv", "json"],
+            "enterprise": ["csv", "json", "xml"],
+        }
         available = allowed_formats[self.tier.value]
 
         if format.lower() not in available:

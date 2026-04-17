@@ -16,7 +16,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -93,4 +92,3 @@ if __name__ == "__main__":
     from bots.LeadGenBot.main import get_leads
 
     run(get_leads())
-

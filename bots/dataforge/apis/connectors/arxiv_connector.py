@@ -1,4 +1,5 @@
 """ArXiv open access paper search connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,6 +27,7 @@ class ArXivConnector:
             API response dict with papers or error dict.
         """
         import requests
+
         params = {"search_query": query, "max_results": max_results}
         try:
             response = requests.get(f"{self.BASE_URL}/query", params=params, timeout=30)
@@ -35,4 +37,3 @@ class ArXivConnector:
         except requests.RequestException as e:
             logger.error("ArXiv search error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -20,8 +20,8 @@ Message structure:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -31,10 +31,10 @@ from typing import Any, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class MessageType(Enum):
     MESSAGE = "message"
@@ -70,6 +70,7 @@ VALID_PERMISSIONS = {p.value for p in Permission}
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
 class UBPError(Exception):
     """Base exception for Universal Bot Protocol errors."""
 
@@ -85,6 +86,7 @@ class UBPPermissionError(UBPError):
 # ---------------------------------------------------------------------------
 # UBP Message dataclass
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class UBPMessage:
@@ -164,9 +166,7 @@ class UBPMessage:
             permissions=list(payload.get("permissions", DEFAULT_PERMISSIONS)),
             id=payload.get("id", str(uuid.uuid4())),
             data=dict(payload.get("data", {})),
-            timestamp=payload.get(
-                "timestamp", datetime.now(timezone.utc).isoformat()
-            ),
+            timestamp=payload.get("timestamp", datetime.now(timezone.utc).isoformat()),
             metadata=dict(payload.get("metadata", {})),
         )
 
@@ -191,6 +191,7 @@ class UBPMessage:
 # Validation helpers
 # ---------------------------------------------------------------------------
 
+
 def _validate_raw(payload: Any) -> None:
     """Validate a raw dict, raising UBPValidationError on any issue."""
     if not isinstance(payload, dict):
@@ -199,15 +200,11 @@ def _validate_raw(payload: Any) -> None:
     required = ("from", "to", "type")
     missing = [k for k in required if k not in payload]
     if missing:
-        raise UBPValidationError(
-            f"UBP message missing required fields: {missing}"
-        )
+        raise UBPValidationError(f"UBP message missing required fields: {missing}")
 
     for key in ("from", "to", "type"):
         if not isinstance(payload[key], str) or not payload[key].strip():
-            raise UBPValidationError(
-                f"Field '{key}' must be a non-empty string."
-            )
+            raise UBPValidationError(f"Field '{key}' must be a non-empty string.")
 
     perms = payload.get("permissions", [])
     if not isinstance(perms, list):
@@ -215,8 +212,7 @@ def _validate_raw(payload: Any) -> None:
     unknown = [p for p in perms if p not in VALID_PERMISSIONS]
     if unknown:
         raise UBPValidationError(
-            f"Unknown permissions: {unknown}. "
-            f"Valid: {sorted(VALID_PERMISSIONS)}"
+            f"Unknown permissions: {unknown}. " f"Valid: {sorted(VALID_PERMISSIONS)}"
         )
 
 
@@ -242,6 +238,7 @@ def validate_message(payload: dict) -> None:
 # Factory helpers
 # ---------------------------------------------------------------------------
 
+
 def create_message(
     from_bot: str,
     to_bot: str,
@@ -258,7 +255,9 @@ def create_message(
         to_bot=to_bot,
         type=msg_type,
         message=message,
-        permissions=permissions if permissions is not None else list(DEFAULT_PERMISSIONS),
+        permissions=(
+            permissions if permissions is not None else list(DEFAULT_PERMISSIONS)
+        ),
         data=data or {},
         metadata=metadata or {},
     )
@@ -267,7 +266,9 @@ def create_message(
 def create_ping(from_bot: str, to_bot: str) -> UBPMessage:
     """Create a PING message."""
     return create_message(
-        from_bot, to_bot, "ping",
+        from_bot,
+        to_bot,
+        "ping",
         msg_type=MessageType.PING,
         permissions=[Permission.RESPOND.value],
     )
@@ -276,7 +277,9 @@ def create_ping(from_bot: str, to_bot: str) -> UBPMessage:
 def create_pong(from_bot: str, to_bot: str, ping_id: str) -> UBPMessage:
     """Create a PONG reply to a PING."""
     return create_message(
-        from_bot, to_bot, "pong",
+        from_bot,
+        to_bot,
+        "pong",
         msg_type=MessageType.PONG,
         permissions=[Permission.READ.value],
         metadata={"reply_to": ping_id},
@@ -286,16 +289,22 @@ def create_pong(from_bot: str, to_bot: str, ping_id: str) -> UBPMessage:
 def create_error(from_bot: str, to_bot: str, error_msg: str) -> UBPMessage:
     """Create an ERROR message."""
     return create_message(
-        from_bot, to_bot, error_msg,
+        from_bot,
+        to_bot,
+        error_msg,
         msg_type=MessageType.ERROR,
         permissions=[Permission.READ.value],
     )
 
 
-def create_broadcast(from_bot: str, message: str, *, data: Optional[dict] = None) -> UBPMessage:
+def create_broadcast(
+    from_bot: str, message: str, *, data: Optional[dict] = None
+) -> UBPMessage:
     """Create a BROADCAST message to all bots."""
     return create_message(
-        from_bot, BROADCAST_TARGET, message,
+        from_bot,
+        BROADCAST_TARGET,
+        message,
         msg_type=MessageType.BROADCAST,
         data=data or {},
     )

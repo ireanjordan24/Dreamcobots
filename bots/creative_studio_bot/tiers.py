@@ -7,13 +7,21 @@ Tiers:
   - ENTERPRISE: Unlimited creations, commercial rights, white-label, API access.
 """
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
-from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers, TIER_CATALOGUE  # noqa: F401
-
+from tiers import (
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,  # noqa: F401
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ---------------------------------------------------------------------------
 # Feature flags

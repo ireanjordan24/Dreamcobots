@@ -14,7 +14,6 @@ from __future__ import annotations
 import random
 from typing import List
 
-
 # GLOBAL AI SOURCES FLOW
 from framework import GlobalAISourcesFlow  # noqa: F401
 

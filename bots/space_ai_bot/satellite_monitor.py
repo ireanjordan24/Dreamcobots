@@ -1,7 +1,13 @@
 """Satellite Monitor — tier-aware satellite tracking and environmental monitoring."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="SatelliteMonitor")
@@ -223,7 +229,9 @@ class SatelliteMonitor:
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             result["inclination_deg"] = sat["inclination_deg"]
             result["owner"] = sat["owner"]
-            result["ground_track"] = f"lat={round(sat['inclination_deg'] * 0.7, 2)}, lon=-73.45"
+            result["ground_track"] = (
+                f"lat={round(sat['inclination_deg'] * 0.7, 2)}, lon=-73.45"
+            )
 
         if self.tier == Tier.ENTERPRISE:
             result["tle_data_available"] = True

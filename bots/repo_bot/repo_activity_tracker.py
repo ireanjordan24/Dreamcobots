@@ -27,7 +27,9 @@ import sys
 from datetime import datetime, timezone
 from typing import Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config  # noqa: E402
 
 from bots.repo_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: E402
@@ -57,7 +59,15 @@ PR_SCAN_LIMITS: dict[Tier, int | None] = {
 
 CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "bug": ["bug", "error", "crash", "fail", "broken", "fix", "issue", "exception"],
-    "feature": ["feature", "enhancement", "improve", "upgrade", "add", "new", "request"],
+    "feature": [
+        "feature",
+        "enhancement",
+        "improve",
+        "upgrade",
+        "add",
+        "new",
+        "request",
+    ],
     "bot_request": ["bot", "scraper", "automation", "agent", "crawler"],
     "documentation": ["docs", "readme", "document", "example", "guide", "typo"],
     "performance": ["slow", "performance", "speed", "optimise", "optimize", "memory"],
@@ -378,6 +388,7 @@ class RepoActivityTracker:
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+
 def _derive_priority(category: str, labels: list) -> str:
     """Derive item priority from category and any attached labels."""
     label_names = [
@@ -450,6 +461,7 @@ class {class_name}:
 # ---------------------------------------------------------------------------
 # Mock datasets (used when no live API connection is available)
 # ---------------------------------------------------------------------------
+
 
 def _mock_issues() -> list[dict[str, Any]]:
     return [

@@ -22,22 +22,25 @@ to consult a qualified attorney for legal decisions.
 
 from __future__ import annotations
 
-import sys
-import os
-import uuid
 import math
+import os
+import sys
+import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
+
 from bots.legal_money_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class LegalMoneyBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -104,7 +107,10 @@ _MOCK_CLASS_ACTIONS = [
         "deadline": "2025-12-01",
         "estimated_payout_usd": 1_200.0,
         "status": "open",
-        "eligibility_criteria": ["federal_student_loan_2010_2022", "misapplied_payments"],
+        "eligibility_criteria": [
+            "federal_student_loan_2010_2022",
+            "misapplied_payments",
+        ],
         "settlement_fund_usd": 45_000_000,
         "claimants_registered": 9_800,
     },
@@ -320,6 +326,7 @@ _QUESTIONNAIRE_TOPICS = {
 # Main Bot
 # ---------------------------------------------------------------------------
 
+
 class LegalMoneyBot:
     """
     Tier-aware AI-powered legal claim discovery and settlement assistant.
@@ -453,10 +460,13 @@ class LegalMoneyBot:
                 "disclaimer": self.DISCLAIMER,
             }
 
-        questions = _QUESTIONNAIRE_TOPICS.get(case["category"], [
-            "Can you confirm you were affected by the events described in the settlement?",
-            "Do you have supporting documentation?",
-        ])
+        questions = _QUESTIONNAIRE_TOPICS.get(
+            case["category"],
+            [
+                "Can you confirm you were affected by the events described in the settlement?",
+                "Do you have supporting documentation?",
+            ],
+        )
 
         return {
             "case_id": case_id,
@@ -494,7 +504,11 @@ class LegalMoneyBot:
 
         case = next((c for c in _MOCK_CLASS_ACTIONS if c["case_id"] == case_id), None)
         if case is None:
-            return {"case_id": case_id, "error": "Case not found.", "disclaimer": self.DISCLAIMER}
+            return {
+                "case_id": case_id,
+                "error": "Case not found.",
+                "disclaimer": self.DISCLAIMER,
+            }
 
         total_questions = len(answers)
         if total_questions == 0:
@@ -622,22 +636,18 @@ class LegalMoneyBot:
 
         effective_specialty = specialty
         if case_id and not effective_specialty:
-            case = next((c for c in _MOCK_CLASS_ACTIONS if c["case_id"] == case_id), None)
+            case = next(
+                (c for c in _MOCK_CLASS_ACTIONS if c["case_id"] == case_id), None
+            )
             if case:
                 effective_specialty = case["category"]
 
         if effective_specialty:
-            lawyers = [
-                lw for lw in lawyers
-                if effective_specialty in lw["specialties"]
-            ]
+            lawyers = [lw for lw in lawyers if effective_specialty in lw["specialties"]]
 
         if state:
             state_upper = state.upper()
-            lawyers = [
-                lw for lw in lawyers
-                if state_upper in lw["licensed_states"]
-            ]
+            lawyers = [lw for lw in lawyers if state_upper in lw["licensed_states"]]
 
         lawyers.sort(key=lambda lw: lw["rating"], reverse=True)
 
@@ -854,7 +864,9 @@ class LegalMoneyBot:
             "total_potential_payout_usd": round(total_potential, 2),
             "claims_filed_this_session": len(self._filed_claims),
             "referrals_total": len(self._referrals),
-            "notifications_unread": sum(1 for n in self._notifications if not n["read"]),
+            "notifications_unread": sum(
+                1 for n in self._notifications if not n["read"]
+            ),
             "questionnaire_runs": self._questionnaire_count,
             "cases_by_category": categories,
             "tier": self.tier.value,
@@ -898,14 +910,20 @@ class LegalMoneyBot:
         """Natural-language routing for the bot."""
         msg = message.lower()
 
-        if any(kw in msg for kw in ("find claim", "search claim", "discover claim", "class action")):
+        if any(
+            kw in msg
+            for kw in ("find claim", "search claim", "discover claim", "class action")
+        ):
             claims = self.find_claims()
             return {
                 "message": f"Found {len(claims)} active claims you may qualify for.",
                 "data": claims,
             }
 
-        if any(kw in msg for kw in ("questionnaire", "eligibility", "qualify", "am i eligible")):
+        if any(
+            kw in msg
+            for kw in ("questionnaire", "eligibility", "qualify", "am i eligible")
+        ):
             return {
                 "message": (
                     "Use run_eligibility_questionnaire(case_id) to check your "
@@ -914,7 +932,10 @@ class LegalMoneyBot:
                 "data": None,
             }
 
-        if any(kw in msg for kw in ("settle", "tactic", "maximize", "negotiate", "evidence")):
+        if any(
+            kw in msg
+            for kw in ("settle", "tactic", "maximize", "negotiate", "evidence")
+        ):
             if self.tier == Tier.FREE:
                 return {
                     "message": (
@@ -978,6 +999,7 @@ class LegalMoneyBot:
 # Module-level run() helper
 # ---------------------------------------------------------------------------
 
+
 def run(tier: Tier = Tier.FREE) -> None:  # pragma: no cover
     """Quick demo of the LegalMoneyBot."""
     bot = LegalMoneyBot(tier=tier, user_id="demo-user")
@@ -999,7 +1021,9 @@ def run(tier: Tier = Tier.FREE) -> None:  # pragma: no cover
 
         answers = {f"q{i}": True for i in range(len(q["questions"]))}
         score = bot.score_eligibility(claims[0]["case_id"], answers)
-        print(f"Eligibility score: {score['eligibility_score']}/100 — {score['recommendation']}")
+        print(
+            f"Eligibility score: {score['eligibility_score']}/100 — {score['recommendation']}"
+        )
         print()
 
     print("Summary:")

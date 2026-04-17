@@ -11,8 +11,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -23,42 +23,327 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": 1,  "title": "I will design a professional logo for your brand",         "category": "graphic_design",   "base_price": 25,  "delivery_days": 3,  "keywords": ["logo", "brand", "design"],          "demand": "high",   "avg_rating": 4.9},
-    {"id": 2,  "title": "I will write SEO-optimized blog posts for your website",   "category": "content_writing",  "base_price": 30,  "delivery_days": 2,  "keywords": ["SEO", "blog", "writing"],            "demand": "high",   "avg_rating": 4.8},
-    {"id": 3,  "title": "I will build a responsive WordPress website",              "category": "web_development",  "base_price": 100, "delivery_days": 7,  "keywords": ["wordpress", "website", "responsive"], "demand": "high",   "avg_rating": 4.9},
-    {"id": 4,  "title": "I will manage your social media accounts for a week",      "category": "social_media",     "base_price": 50,  "delivery_days": 7,  "keywords": ["social media", "management", "growth"],"demand": "medium","avg_rating": 4.7},
-    {"id": 5,  "title": "I will create a professional explainer video",             "category": "video_editing",    "base_price": 75,  "delivery_days": 5,  "keywords": ["explainer", "video", "animation"],   "demand": "high",   "avg_rating": 4.8},
-    {"id": 6,  "title": "I will do data entry and Excel spreadsheet work",          "category": "data_entry",       "base_price": 10,  "delivery_days": 1,  "keywords": ["data entry", "excel", "spreadsheet"], "demand": "high",   "avg_rating": 4.7},
-    {"id": 7,  "title": "I will write a compelling resume and cover letter",        "category": "resume_writing",   "base_price": 40,  "delivery_days": 2,  "keywords": ["resume", "cover letter", "career"],   "demand": "high",   "avg_rating": 4.9},
-    {"id": 8,  "title": "I will translate documents from English to Spanish",       "category": "translation",      "base_price": 20,  "delivery_days": 1,  "keywords": ["translation", "Spanish", "English"],  "demand": "medium", "avg_rating": 4.8},
-    {"id": 9,  "title": "I will do Python scripting and automation for you",        "category": "programming",      "base_price": 50,  "delivery_days": 3,  "keywords": ["Python", "automation", "scripting"],  "demand": "high",   "avg_rating": 4.9},
-    {"id": 10, "title": "I will create a professional business card design",        "category": "graphic_design",   "base_price": 15,  "delivery_days": 1,  "keywords": ["business card", "design", "print"],   "demand": "medium", "avg_rating": 4.8},
-    {"id": 11, "title": "I will write product descriptions for your e-commerce",    "category": "content_writing",  "base_price": 25,  "delivery_days": 2,  "keywords": ["product description", "e-commerce"],  "demand": "high",   "avg_rating": 4.7},
-    {"id": 12, "title": "I will set up and optimize your Google Ads campaigns",     "category": "digital_marketing","base_price": 80,  "delivery_days": 3,  "keywords": ["Google Ads", "PPC", "advertising"],   "demand": "high",   "avg_rating": 4.8},
-    {"id": 13, "title": "I will create a Shopify store with products",              "category": "web_development",  "base_price": 150, "delivery_days": 5,  "keywords": ["Shopify", "e-commerce", "store"],     "demand": "high",   "avg_rating": 4.9},
-    {"id": 14, "title": "I will record a professional voice-over for your project", "category": "voice_over",       "base_price": 30,  "delivery_days": 1,  "keywords": ["voice over", "narration", "audio"],   "demand": "medium", "avg_rating": 4.8},
-    {"id": 15, "title": "I will edit and proofread your manuscript",                "category": "proofreading",     "base_price": 35,  "delivery_days": 2,  "keywords": ["proofreading", "editing", "grammar"],  "demand": "medium", "avg_rating": 4.9},
-    {"id": 16, "title": "I will create Instagram content and captions for 30 days", "category": "social_media",     "base_price": 60,  "delivery_days": 5,  "keywords": ["Instagram", "content", "captions"],   "demand": "high",   "avg_rating": 4.7},
-    {"id": 17, "title": "I will develop a custom mobile app in React Native",       "category": "programming",      "base_price": 200, "delivery_days": 14, "keywords": ["React Native", "mobile", "app"],       "demand": "high",   "avg_rating": 4.9},
-    {"id": 18, "title": "I will create a 2D animated intro for your YouTube channel","category": "video_editing",   "base_price": 45,  "delivery_days": 3,  "keywords": ["animation", "YouTube", "intro"],      "demand": "medium", "avg_rating": 4.8},
-    {"id": 19, "title": "I will set up your email marketing with Mailchimp",        "category": "digital_marketing","base_price": 55,  "delivery_days": 3,  "keywords": ["email marketing", "Mailchimp", "newsletter"],"demand": "medium","avg_rating": 4.7},
-    {"id": 20, "title": "I will do keyword research for your SEO strategy",         "category": "seo",              "base_price": 35,  "delivery_days": 2,  "keywords": ["keyword research", "SEO", "strategy"], "demand": "high",   "avg_rating": 4.8},
-    {"id": 21, "title": "I will create a professional PowerPoint presentation",     "category": "presentations",    "base_price": 40,  "delivery_days": 2,  "keywords": ["PowerPoint", "presentation", "slides"], "demand": "high",   "avg_rating": 4.8},
-    {"id": 22, "title": "I will write your company's About Us page and bio",        "category": "content_writing",  "base_price": 20,  "delivery_days": 1,  "keywords": ["about us", "bio", "copywriting"],      "demand": "medium", "avg_rating": 4.7},
-    {"id": 23, "title": "I will build a REST API with Python and FastAPI",           "category": "programming",      "base_price": 120, "delivery_days": 7,  "keywords": ["API", "Python", "FastAPI", "backend"],  "demand": "high",   "avg_rating": 4.9},
-    {"id": 24, "title": "I will design a social media kit for your brand",          "category": "graphic_design",   "base_price": 35,  "delivery_days": 2,  "keywords": ["social media kit", "branding"],        "demand": "medium", "avg_rating": 4.8},
-    {"id": 25, "title": "I will create a chatbot for your website",                 "category": "programming",      "base_price": 100, "delivery_days": 5,  "keywords": ["chatbot", "AI", "automation"],         "demand": "high",   "avg_rating": 4.9},
-    {"id": 26, "title": "I will write 5 high-quality guest blog posts for SEO",     "category": "content_writing",  "base_price": 75,  "delivery_days": 4,  "keywords": ["guest post", "blog", "backlinks"],     "demand": "high",   "avg_rating": 4.8},
-    {"id": 27, "title": "I will create an ebook or digital product for you",        "category": "digital_products", "base_price": 60,  "delivery_days": 5,  "keywords": ["ebook", "digital product", "passive income"],"demand": "medium","avg_rating": 4.7},
-    {"id": 28, "title": "I will fix bugs in your Python or JavaScript code",        "category": "programming",      "base_price": 30,  "delivery_days": 1,  "keywords": ["bug fix", "Python", "JavaScript"],     "demand": "high",   "avg_rating": 4.9},
-    {"id": 29, "title": "I will manage and grow your Pinterest account",            "category": "social_media",     "base_price": 40,  "delivery_days": 7,  "keywords": ["Pinterest", "social media", "growth"],  "demand": "low",    "avg_rating": 4.6},
-    {"id": 30, "title": "I will create a professional LinkedIn profile for you",    "category": "career_coaching",  "base_price": 50,  "delivery_days": 2,  "keywords": ["LinkedIn", "profile", "professional"], "demand": "high",   "avg_rating": 4.9},
+    {
+        "id": 1,
+        "title": "I will design a professional logo for your brand",
+        "category": "graphic_design",
+        "base_price": 25,
+        "delivery_days": 3,
+        "keywords": ["logo", "brand", "design"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 2,
+        "title": "I will write SEO-optimized blog posts for your website",
+        "category": "content_writing",
+        "base_price": 30,
+        "delivery_days": 2,
+        "keywords": ["SEO", "blog", "writing"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 3,
+        "title": "I will build a responsive WordPress website",
+        "category": "web_development",
+        "base_price": 100,
+        "delivery_days": 7,
+        "keywords": ["wordpress", "website", "responsive"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 4,
+        "title": "I will manage your social media accounts for a week",
+        "category": "social_media",
+        "base_price": 50,
+        "delivery_days": 7,
+        "keywords": ["social media", "management", "growth"],
+        "demand": "medium",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 5,
+        "title": "I will create a professional explainer video",
+        "category": "video_editing",
+        "base_price": 75,
+        "delivery_days": 5,
+        "keywords": ["explainer", "video", "animation"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 6,
+        "title": "I will do data entry and Excel spreadsheet work",
+        "category": "data_entry",
+        "base_price": 10,
+        "delivery_days": 1,
+        "keywords": ["data entry", "excel", "spreadsheet"],
+        "demand": "high",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 7,
+        "title": "I will write a compelling resume and cover letter",
+        "category": "resume_writing",
+        "base_price": 40,
+        "delivery_days": 2,
+        "keywords": ["resume", "cover letter", "career"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 8,
+        "title": "I will translate documents from English to Spanish",
+        "category": "translation",
+        "base_price": 20,
+        "delivery_days": 1,
+        "keywords": ["translation", "Spanish", "English"],
+        "demand": "medium",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 9,
+        "title": "I will do Python scripting and automation for you",
+        "category": "programming",
+        "base_price": 50,
+        "delivery_days": 3,
+        "keywords": ["Python", "automation", "scripting"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 10,
+        "title": "I will create a professional business card design",
+        "category": "graphic_design",
+        "base_price": 15,
+        "delivery_days": 1,
+        "keywords": ["business card", "design", "print"],
+        "demand": "medium",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 11,
+        "title": "I will write product descriptions for your e-commerce",
+        "category": "content_writing",
+        "base_price": 25,
+        "delivery_days": 2,
+        "keywords": ["product description", "e-commerce"],
+        "demand": "high",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 12,
+        "title": "I will set up and optimize your Google Ads campaigns",
+        "category": "digital_marketing",
+        "base_price": 80,
+        "delivery_days": 3,
+        "keywords": ["Google Ads", "PPC", "advertising"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 13,
+        "title": "I will create a Shopify store with products",
+        "category": "web_development",
+        "base_price": 150,
+        "delivery_days": 5,
+        "keywords": ["Shopify", "e-commerce", "store"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 14,
+        "title": "I will record a professional voice-over for your project",
+        "category": "voice_over",
+        "base_price": 30,
+        "delivery_days": 1,
+        "keywords": ["voice over", "narration", "audio"],
+        "demand": "medium",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 15,
+        "title": "I will edit and proofread your manuscript",
+        "category": "proofreading",
+        "base_price": 35,
+        "delivery_days": 2,
+        "keywords": ["proofreading", "editing", "grammar"],
+        "demand": "medium",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 16,
+        "title": "I will create Instagram content and captions for 30 days",
+        "category": "social_media",
+        "base_price": 60,
+        "delivery_days": 5,
+        "keywords": ["Instagram", "content", "captions"],
+        "demand": "high",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 17,
+        "title": "I will develop a custom mobile app in React Native",
+        "category": "programming",
+        "base_price": 200,
+        "delivery_days": 14,
+        "keywords": ["React Native", "mobile", "app"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 18,
+        "title": "I will create a 2D animated intro for your YouTube channel",
+        "category": "video_editing",
+        "base_price": 45,
+        "delivery_days": 3,
+        "keywords": ["animation", "YouTube", "intro"],
+        "demand": "medium",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 19,
+        "title": "I will set up your email marketing with Mailchimp",
+        "category": "digital_marketing",
+        "base_price": 55,
+        "delivery_days": 3,
+        "keywords": ["email marketing", "Mailchimp", "newsletter"],
+        "demand": "medium",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 20,
+        "title": "I will do keyword research for your SEO strategy",
+        "category": "seo",
+        "base_price": 35,
+        "delivery_days": 2,
+        "keywords": ["keyword research", "SEO", "strategy"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 21,
+        "title": "I will create a professional PowerPoint presentation",
+        "category": "presentations",
+        "base_price": 40,
+        "delivery_days": 2,
+        "keywords": ["PowerPoint", "presentation", "slides"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 22,
+        "title": "I will write your company's About Us page and bio",
+        "category": "content_writing",
+        "base_price": 20,
+        "delivery_days": 1,
+        "keywords": ["about us", "bio", "copywriting"],
+        "demand": "medium",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 23,
+        "title": "I will build a REST API with Python and FastAPI",
+        "category": "programming",
+        "base_price": 120,
+        "delivery_days": 7,
+        "keywords": ["API", "Python", "FastAPI", "backend"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 24,
+        "title": "I will design a social media kit for your brand",
+        "category": "graphic_design",
+        "base_price": 35,
+        "delivery_days": 2,
+        "keywords": ["social media kit", "branding"],
+        "demand": "medium",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 25,
+        "title": "I will create a chatbot for your website",
+        "category": "programming",
+        "base_price": 100,
+        "delivery_days": 5,
+        "keywords": ["chatbot", "AI", "automation"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 26,
+        "title": "I will write 5 high-quality guest blog posts for SEO",
+        "category": "content_writing",
+        "base_price": 75,
+        "delivery_days": 4,
+        "keywords": ["guest post", "blog", "backlinks"],
+        "demand": "high",
+        "avg_rating": 4.8,
+    },
+    {
+        "id": 27,
+        "title": "I will create an ebook or digital product for you",
+        "category": "digital_products",
+        "base_price": 60,
+        "delivery_days": 5,
+        "keywords": ["ebook", "digital product", "passive income"],
+        "demand": "medium",
+        "avg_rating": 4.7,
+    },
+    {
+        "id": 28,
+        "title": "I will fix bugs in your Python or JavaScript code",
+        "category": "programming",
+        "base_price": 30,
+        "delivery_days": 1,
+        "keywords": ["bug fix", "Python", "JavaScript"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
+    {
+        "id": 29,
+        "title": "I will manage and grow your Pinterest account",
+        "category": "social_media",
+        "base_price": 40,
+        "delivery_days": 7,
+        "keywords": ["Pinterest", "social media", "growth"],
+        "demand": "low",
+        "avg_rating": 4.6,
+    },
+    {
+        "id": 30,
+        "title": "I will create a professional LinkedIn profile for you",
+        "category": "career_coaching",
+        "base_price": 50,
+        "delivery_days": 2,
+        "keywords": ["LinkedIn", "profile", "professional"],
+        "demand": "high",
+        "avg_rating": 4.9,
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_gigs": 3,    "ai_titles": False, "keyword_injection": False},
-    "PRO":        {"price_usd": 29,  "max_gigs": 20,   "ai_titles": True,  "keyword_injection": False},
-    "ENTERPRISE": {"price_usd": 99,  "max_gigs": None, "ai_titles": True,  "keyword_injection": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_gigs": 3,
+        "ai_titles": False,
+        "keyword_injection": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_gigs": 20,
+        "ai_titles": True,
+        "keyword_injection": False,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_gigs": None,
+        "ai_titles": True,
+        "keyword_injection": True,
+    },
 }
 
 
@@ -98,8 +383,12 @@ class FiverrServiceListingBot:
         self._active_gigs.append(listing)
         return listing
 
-    def search_templates(self, category: str | None = None, max_price: float | None = None,
-                         demand: str | None = None) -> list[dict]:
+    def search_templates(
+        self,
+        category: str | None = None,
+        max_price: float | None = None,
+        demand: str | None = None,
+    ) -> list[dict]:
         """Search available gig templates by category, price, or demand."""
         results = list(EXAMPLES)
         if category:
@@ -118,7 +407,9 @@ class FiverrServiceListingBot:
         """Return the top N gigs by average rating."""
         return sorted(EXAMPLES, key=lambda x: x["avg_rating"], reverse=True)[:count]
 
-    def estimate_monthly_revenue(self, gig_id: int, orders_per_day: float = 1.0) -> dict:
+    def estimate_monthly_revenue(
+        self, gig_id: int, orders_per_day: float = 1.0
+    ) -> dict:
         """Estimate potential monthly revenue from a gig."""
         gig = next((g for g in EXAMPLES if g["id"] == gig_id), None)
         if gig is None:
@@ -168,7 +459,10 @@ class FiverrServiceListingBot:
     def run(self) -> dict:
         """Run the GLOBAL AI SOURCES FLOW pipeline."""
         result = self._flow.run_pipeline(
-            raw_data={"domain": "fiverr_service_listings", "templates_count": len(EXAMPLES)},
+            raw_data={
+                "domain": "fiverr_service_listings",
+                "templates_count": len(EXAMPLES),
+            },
             learning_method="supervised",
         )
         return {
@@ -251,12 +545,21 @@ def _fiverrservicelisting_bot_list_items(self, limit=None):
 
 def _fiverrservicelisting_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {
+        "bot": "FiverrServiceListingBot",
+        "tier": self.tier.value,
+        "count": len(EXAMPLES),
+    }
 
 
 def _fiverrservicelisting_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "FiverrServiceListingBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 FiverrServiceListingBot.monthly_price = _fiverrservicelisting_bot_monthly_price

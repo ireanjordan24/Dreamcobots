@@ -10,13 +10,18 @@ Usage
     response = bot.chat("Analyze my Q3 cash flow")
     print(response["message"])
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.finance_bot.tiers import (
     FINANCE_EXTRA_FEATURES,
     FINANCE_TOOLS,
@@ -78,9 +83,7 @@ class FinanceBot:
         self._check_tool_access(active_tool)
 
         self._request_count += 1
-        response_text = (
-            f"[FinanceBot/{active_tool}] Processed: {message!r}"
-        )
+        response_text = f"[FinanceBot/{active_tool}] Processed: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
 

@@ -1,6 +1,7 @@
 """Tests for bots/crypto_bot/ — cryptocurrency management system."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,45 +11,46 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.crypto_bot.crypto_bot import CryptoBot, CryptoBotError
 from bots.crypto_bot.crypto_database import (
     CRYPTO_DATABASE,
     get_coin,
+    list_categories,
     list_coins,
     list_mineable_coins,
     search_coins,
-    list_categories,
 )
-from bots.crypto_bot.price_feed import (
-    get_price,
-    get_prices,
-    get_price_change_24h,
-    get_market_summary,
+from bots.crypto_bot.dashboard import (
+    render_full_dashboard,
+    render_market_overview,
+    render_portfolio,
+    render_transactions,
 )
-from bots.crypto_bot.portfolio import Portfolio, PortfolioError, TransactionType
-from bots.crypto_bot.trading import TradingEngine, TradingError
 from bots.crypto_bot.mining import (
-    simulate_mining,
-    mining_leaderboard,
     calculate_break_even,
     get_mining_profile,
+    mining_leaderboard,
+    simulate_mining,
+)
+from bots.crypto_bot.portfolio import Portfolio, PortfolioError, TransactionType
+from bots.crypto_bot.price_feed import (
+    get_market_summary,
+    get_price,
+    get_price_change_24h,
+    get_prices,
 )
 from bots.crypto_bot.prospectus import (
     get_coin_prospectus,
     list_all_prospectuses,
     prospectus_text,
 )
-from bots.crypto_bot.dashboard import (
-    render_portfolio,
-    render_market_overview,
-    render_transactions,
-    render_full_dashboard,
-)
-
+from bots.crypto_bot.trading import TradingEngine, TradingError
 
 # ===========================================================================
 # crypto_database
 # ===========================================================================
+
 
 class TestCryptoDatabase:
     def test_database_has_entries(self):
@@ -114,6 +116,7 @@ class TestCryptoDatabase:
 # price_feed
 # ===========================================================================
 
+
 class TestPriceFeed:
     def test_get_price_btc_returns_float(self):
         price = get_price("BTC")
@@ -160,6 +163,7 @@ class TestPriceFeed:
 # ===========================================================================
 # portfolio
 # ===========================================================================
+
 
 class TestPortfolio:
     def test_default_balance(self):
@@ -240,7 +244,12 @@ class TestPortfolio:
     def test_portfolio_summary_keys(self):
         p = Portfolio()
         summary = p.summary()
-        for key in ("usd_balance", "total_market_value_usd", "holdings", "num_transactions"):
+        for key in (
+            "usd_balance",
+            "total_market_value_usd",
+            "holdings",
+            "num_transactions",
+        ):
             assert key in summary
 
     def test_transaction_history(self):
@@ -261,6 +270,7 @@ class TestPortfolio:
 # ===========================================================================
 # trading
 # ===========================================================================
+
 
 class TestTradingEngine:
     def _engine(self):
@@ -289,7 +299,9 @@ class TestTradingEngine:
         eng = self._engine()
         eng.market_buy("SOL", usd_amount=1_000.0)
         eng.sell_all("SOL")
-        assert eng.portfolio.holdings["SOL"].total_amount == pytest.approx(0.0, abs=1e-8)
+        assert eng.portfolio.holdings["SOL"].total_amount == pytest.approx(
+            0.0, abs=1e-8
+        )
 
     def test_market_buy_zero_raises(self):
         eng = self._engine()
@@ -317,13 +329,19 @@ class TestTradingEngine:
         eng = self._engine()
         eng.market_buy("BTC", usd_amount=5_000.0)
         report = eng.pnl_report()
-        for key in ("holdings", "total_pnl_usd", "total_realised_pnl_usd", "usd_balance"):
+        for key in (
+            "holdings",
+            "total_pnl_usd",
+            "total_realised_pnl_usd",
+            "usd_balance",
+        ):
             assert key in report
 
 
 # ===========================================================================
 # mining
 # ===========================================================================
+
 
 class TestMining:
     def test_simulate_mining_btc_returns_dict(self):
@@ -332,7 +350,12 @@ class TestMining:
 
     def test_simulate_mining_keys(self):
         result = simulate_mining("BTC", duration_hours=24.0)
-        for key in ("coins_mined", "revenue_usd", "electricity_cost_usd", "net_profit_usd"):
+        for key in (
+            "coins_mined",
+            "revenue_usd",
+            "electricity_cost_usd",
+            "net_profit_usd",
+        ):
             assert key in result
 
     def test_coins_mined_positive(self):
@@ -389,6 +412,7 @@ class TestMining:
 # prospectus
 # ===========================================================================
 
+
 class TestProspectus:
     def test_get_coin_prospectus_btc(self):
         p = get_coin_prospectus("BTC")
@@ -398,9 +422,15 @@ class TestProspectus:
     def test_prospectus_has_required_keys(self):
         p = get_coin_prospectus("ETH")
         for key in (
-            "symbol", "name", "category", "current_price_usd",
-            "price_change_24h_pct", "market_cap_usd", "investment_thesis",
-            "risk_label", "tags",
+            "symbol",
+            "name",
+            "category",
+            "current_price_usd",
+            "price_change_24h_pct",
+            "market_cap_usd",
+            "investment_thesis",
+            "risk_label",
+            "tags",
         ):
             assert key in p
 
@@ -443,6 +473,7 @@ class TestProspectus:
 # dashboard
 # ===========================================================================
 
+
 class TestDashboard:
     def _portfolio(self):
         p = Portfolio(initial_usd_balance=10_000.0)
@@ -480,6 +511,7 @@ class TestDashboard:
 # ===========================================================================
 # CryptoBot (main class)
 # ===========================================================================
+
 
 class TestCryptoBotInstantiation:
     def test_default_tier_is_free(self):

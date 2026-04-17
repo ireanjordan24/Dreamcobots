@@ -1,6 +1,7 @@
 """Integration tests for BuddyBot."""
 
 import pytest
+
 from BuddyAI.buddy_bot import BuddyBot
 from BuddyAI.plugins import productivity
 
@@ -12,6 +13,7 @@ def buddy():
     productivity._workflow_queue = productivity.WorkflowQueue()
 
     from BuddyAI.plugins import data_entry
+
     data_entry._stores.clear()
 
     bot = BuddyBot(enable_scheduler=False)
@@ -87,6 +89,13 @@ def test_install_capability_blocked_package(buddy):
 
 def test_capabilities_registered(buddy):
     caps = buddy.task_engine.list_capabilities()
-    for expected in ["add_todo", "list_todos", "complete_todo", "help",
-                     "fetch_api", "data_insert", "install_library"]:
+    for expected in [
+        "add_todo",
+        "list_todos",
+        "complete_todo",
+        "help",
+        "fetch_api",
+        "data_insert",
+        "install_library",
+    ]:
         assert expected in caps, f"Missing capability: {expected}"

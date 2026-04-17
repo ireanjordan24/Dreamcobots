@@ -1,4 +1,5 @@
 """OpenStreetMap Nominatim geocoding connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,8 +26,14 @@ class OpenStreetMapConnector:
             API response dict with place results or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/search", params={"q": query, "format": "json"}, headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search",
+                params={"q": query, "format": "json"},
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("OpenStreetMap place search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -45,11 +52,16 @@ class OpenStreetMapConnector:
             API response dict with location data or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/reverse", params={"lat": lat, "lon": lon, "format": "json"}, headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/reverse",
+                params={"lat": lat, "lon": lon, "format": "json"},
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("OpenStreetMap get_nominatim error: %s", e)
             return {"status": "error", "message": str(e)}
-

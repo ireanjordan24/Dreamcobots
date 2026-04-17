@@ -1,14 +1,17 @@
 """Tests for bots/logo_generator_bot/tiers.py and bots/logo_generator_bot/logo_generator_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.logo_generator_bot.logo_generator_bot import LogoGeneratorBot
 from bots.logo_generator_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
@@ -62,7 +65,17 @@ class TestLogoGeneratorBotGenerate:
     def test_generate_logo_returns_required_keys(self):
         bot = LogoGeneratorBot()
         result = bot.generate_logo("Acme", "tech", "modern")
-        for key in ["business_name", "industry", "style", "concept_id", "svg_description", "color_palette", "typography", "tagline_suggestion", "tier_used"]:
+        for key in [
+            "business_name",
+            "industry",
+            "style",
+            "concept_id",
+            "svg_description",
+            "color_palette",
+            "typography",
+            "tagline_suggestion",
+            "tier_used",
+        ]:
             assert key in result
 
     def test_generate_logo_modern_style(self):

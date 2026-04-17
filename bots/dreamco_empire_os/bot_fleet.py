@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -32,6 +33,7 @@ class BotStatus(Enum):
 @dataclass
 class BotEntry:
     """Registry entry for a single bot in the fleet."""
+
     name: str
     category: str
     status: BotStatus = BotStatus.IDLE
@@ -41,7 +43,9 @@ class BotEntry:
     total_runs: int = 0
     success_runs: int = 0
     is_autonomous: bool = False
-    registered_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    registered_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     last_run: Optional[str] = None
 
     @property

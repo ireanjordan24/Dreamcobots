@@ -9,6 +9,7 @@ Allows the mining bot to:
 All exchange rates are simulated (no live API calls) to make the module
 fully testable without external dependencies.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -28,8 +29,8 @@ class ExchangeQuote:
     exchange: str
     coin: str
     amount_coin: float
-    rate_usd: float          # USD per coin
-    fee_pct: float           # trading fee as percentage
+    rate_usd: float  # USD per coin
+    fee_pct: float  # trading fee as percentage
     is_dex: bool = False
 
     @property
@@ -66,8 +67,8 @@ _SIMULATED_RATES: Dict[str, Dict[str, float]] = {
     # exchange_name -> coin_symbol -> USD rate
     "Binance": {"BTC": 65_000.0, "ETH": 3_500.0, "LTC": 90.0, "DOGE": 0.12},
     "Coinbase": {"BTC": 65_100.0, "ETH": 3_510.0, "LTC": 91.0, "DOGE": 0.121},
-    "Kraken":  {"BTC": 64_900.0, "ETH": 3_490.0, "LTC": 89.5, "DOGE": 0.119},
-    "KuCoin":  {"BTC": 64_950.0, "ETH": 3_505.0, "LTC": 90.5, "DOGE": 0.1205},
+    "Kraken": {"BTC": 64_900.0, "ETH": 3_490.0, "LTC": 89.5, "DOGE": 0.119},
+    "KuCoin": {"BTC": 64_950.0, "ETH": 3_505.0, "LTC": 90.5, "DOGE": 0.1205},
     "UniswapV3_DEX": {"BTC": 64_800.0, "ETH": 3_480.0, "LTC": 88.0, "DOGE": 0.118},
 }
 

@@ -1,15 +1,20 @@
 # GLOBAL AI SOURCES FLOW
 """Algorithmic Trading Bot - technical indicator signals and backtesting engine."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
+
 _TOOL_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, '..', '..'))
+_REPO_ROOT = os.path.normpath(os.path.join(_TOOL_DIR, "..", ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from framework import GlobalAISourcesFlow  # noqa: F401
+
 # Load local tiers.py by path to avoid sys.modules conflicts with other tiers modules
-_tiers_spec = importlib.util.spec_from_file_location('_local_tiers', os.path.join(_TOOL_DIR, 'tiers.py'))
+_tiers_spec = importlib.util.spec_from_file_location(
+    "_local_tiers", os.path.join(_TOOL_DIR, "tiers.py")
+)
 _tiers_mod = importlib.util.module_from_spec(_tiers_spec)
 _tiers_spec.loader.exec_module(_tiers_mod)
 TIERS = _tiers_mod.TIERS
@@ -31,13 +36,15 @@ class AlgorithmicTradingBot:
 
     def _check_limit(self):
         if self._symbol_limit and self._symbol_count >= self._symbol_limit:
-            raise PermissionError(f"Symbol limit ({self._symbol_limit}) reached. Upgrade to a higher tier.")
+            raise PermissionError(
+                f"Symbol limit ({self._symbol_limit}) reached. Upgrade to a higher tier."
+            )
 
     @staticmethod
     def _sma(prices: list, period: int) -> list:
         """Simple Moving Average."""
         return [
-            round(sum(prices[i - period:i]) / period, 4)
+            round(sum(prices[i - period : i]) / period, 4)
             for i in range(period, len(prices) + 1)
         ]
 
@@ -52,16 +59,24 @@ class AlgorithmicTradingBot:
             ema.append(round(price * k + ema[-1] * (1 - k), 4))
         return ema
 
-    def moving_average_signal(self, symbol: str, prices: list, short: int = 10, long: int = 20) -> dict:
+    def moving_average_signal(
+        self, symbol: str, prices: list, short: int = 10, long: int = 20
+    ) -> dict:
         """Generate a buy/sell/hold signal based on SMA crossover."""
         self._check_limit()
         self._symbol_count += 1
         return self._compute_sma_signal(symbol, prices, short, long)
 
-    def _compute_sma_signal(self, symbol: str, prices: list, short: int, long: int) -> dict:
+    def _compute_sma_signal(
+        self, symbol: str, prices: list, short: int, long: int
+    ) -> dict:
         """Internal SMA crossover computation (no limit check, no counter increment)."""
         if len(prices) < long + 1:
-            return {"symbol": symbol, "signal": "insufficient_data", "disclaimer": DISCLAIMER}
+            return {
+                "symbol": symbol,
+                "signal": "insufficient_data",
+                "disclaimer": DISCLAIMER,
+            }
         sma_short = self._sma(prices, short)
         sma_long = self._sma(prices, long)
 
@@ -91,7 +106,11 @@ class AlgorithmicTradingBot:
         if self.tier == "free":
             raise PermissionError("RSI signals require Pro tier or higher.")
         if len(prices) < period + 1:
-            return {"symbol": symbol, "signal": "insufficient_data", "disclaimer": DISCLAIMER}
+            return {
+                "symbol": symbol,
+                "signal": "insufficient_data",
+                "disclaimer": DISCLAIMER,
+            }
         deltas = [prices[i] - prices[i - 1] for i in range(1, len(prices))]
         gains = [d for d in deltas[-period:] if d > 0]
         losses = [-d for d in deltas[-period:] if d < 0]
@@ -109,20 +128,28 @@ class AlgorithmicTradingBot:
             "disclaimer": DISCLAIMER,
         }
 
-    def backtest(self, symbol: str, prices: list, short: int = 10, long: int = 20) -> dict:
+    def backtest(
+        self, symbol: str, prices: list, short: int = 10, long: int = 20
+    ) -> dict:
         """Backtest a moving average crossover strategy (Pro+ only)."""
         if self.tier == "free":
             raise PermissionError("Backtesting requires Pro tier or higher.")
         trades = []
         position = None
         for i in range(long + 1, len(prices)):
-            result = self._compute_sma_signal(symbol, prices[:i+1], short, long)
+            result = self._compute_sma_signal(symbol, prices[: i + 1], short, long)
             sig = result.get("signal")
             if sig == "buy" and position is None:
                 position = {"type": "buy", "price": prices[i], "index": i}
             elif sig == "sell" and position is not None:
                 pnl = round(prices[i] - position["price"], 4)
-                trades.append({"buy_price": position["price"], "sell_price": prices[i], "pnl": pnl})
+                trades.append(
+                    {
+                        "buy_price": position["price"],
+                        "sell_price": prices[i],
+                        "pnl": pnl,
+                    }
+                )
                 position = None
 
         wins = [t for t in trades if t["pnl"] > 0]

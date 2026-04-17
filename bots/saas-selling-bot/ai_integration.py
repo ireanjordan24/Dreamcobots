@@ -3,19 +3,20 @@ AI Integration module for the SaaS Selling Bot.
 Provides personalised recommendations and chatbot capabilities
 using OpenAI's GPT models (with a graceful fallback when no API key is configured).
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import os
 import json
+import os
 
 try:
     import openai
+
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
 
-from database import get_all_tools, search_tools, get_categories
-
+from database import get_all_tools, get_categories, search_tools
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
@@ -63,7 +64,7 @@ def _fallback_recommend(query: str, tools: list) -> str:
     if not filtered:
         filtered = tools[:5]
 
-    lines = [f"Based on your query **\"{query}\"**, here are my top recommendations:\n"]
+    lines = [f'Based on your query **"{query}"**, here are my top recommendations:\n']
     for i, t in enumerate(filtered, 1):
         lines.append(
             f"{i}. **{t['name']}** ({t['category']})\n"

@@ -6,8 +6,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -121,9 +121,7 @@ class ChallengeManager:
         """
         challenge = self._get_challenge(challenge_id)
         if challenge["status"] != "active":
-            raise ChallengeManagerError(
-                f"Challenge '{challenge_id}' is not active."
-            )
+            raise ChallengeManagerError(f"Challenge '{challenge_id}' is not active.")
 
         key = (challenge_id, user_id)
         if key in self._participants:
@@ -207,7 +205,5 @@ class ChallengeManager:
 
     def _get_challenge(self, challenge_id: str) -> dict:
         if challenge_id not in self._challenges:
-            raise ChallengeManagerError(
-                f"Challenge '{challenge_id}' not found."
-            )
+            raise ChallengeManagerError(f"Challenge '{challenge_id}' not found.")
         return self._challenges[challenge_id]

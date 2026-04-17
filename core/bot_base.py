@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional
 
 class AutonomyLevel(Enum):
     """Three configurable levels of bot autonomy."""
+
     MANUAL = "manual"
     SEMI_AUTONOMOUS = "semi_autonomous"
     FULLY_AUTONOMOUS = "fully_autonomous"
@@ -20,6 +21,7 @@ class AutonomyLevel(Enum):
 
 class ScalingLevel(Enum):
     """Adjustable scaling levels for bot operations."""
+
     CONSERVATIVE = "conservative"
     MODERATE = "moderate"
     AGGRESSIVE = "aggressive"
@@ -65,12 +67,16 @@ class BotBase:
 
     def set_autonomy(self, level: AutonomyLevel) -> None:
         """Update the autonomy level."""
-        self.logger.info("%s autonomy changed: %s → %s", self.name, self.autonomy.value, level.value)
+        self.logger.info(
+            "%s autonomy changed: %s → %s", self.name, self.autonomy.value, level.value
+        )
         self.autonomy = level
 
     def set_scaling(self, level: ScalingLevel) -> None:
         """Update the scaling level."""
-        self.logger.info("%s scaling changed: %s → %s", self.name, self.scaling.value, level.value)
+        self.logger.info(
+            "%s scaling changed: %s → %s", self.name, self.scaling.value, level.value
+        )
         self.scaling = level
 
     @property
@@ -85,7 +91,12 @@ class BotBase:
     def start(self) -> None:
         """Start the bot."""
         self._running = True
-        self.logger.info("%s started (autonomy=%s, scaling=%s)", self.name, self.autonomy.value, self.scaling.value)
+        self.logger.info(
+            "%s started (autonomy=%s, scaling=%s)",
+            self.name,
+            self.autonomy.value,
+            self.scaling.value,
+        )
 
     def stop(self) -> None:
         """Stop the bot."""
@@ -142,13 +153,19 @@ class BotBase:
 
     def _run_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Override in subclasses to implement task logic."""
-        return {"status": "ok", "message": f"{self.name} processed task: {task.get('type', 'unknown')}"}
+        return {
+            "status": "ok",
+            "message": f"{self.name} processed task: {task.get('type', 'unknown')}",
+        }
 
     def _semi_autonomous_run(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute with human-confirmation gate before acting."""
         validated = task.get("validated", False)
         if not validated:
-            return {"status": "pending_confirmation", "message": "Task requires human confirmation"}
+            return {
+                "status": "pending_confirmation",
+                "message": "Task requires human confirmation",
+            }
         return self._run_task(task)
 
     def _fully_autonomous_run(self, task: Dict[str, Any]) -> Dict[str, Any]:
@@ -158,7 +175,13 @@ class BotBase:
             result = self._run_task(task)
             if result.get("status") != "transient_error":
                 return result
-            self.logger.warning("%s retry %d/%d for task %s", self.name, attempt, max_retries, task.get("type"))
+            self.logger.warning(
+                "%s retry %d/%d for task %s",
+                self.name,
+                attempt,
+                max_retries,
+                task.get("type"),
+            )
         return result  # type: ignore[return-value]
 
     # ------------------------------------------------------------------
@@ -190,6 +213,7 @@ from abc import ABC, abstractmethod
 
 class BotStatus(str, Enum):
     """Bot lifecycle status states."""
+
     IDLE = "idle"
     RUNNING = "running"
     STOPPED = "stopped"

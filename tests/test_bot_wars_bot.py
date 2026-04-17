@@ -11,41 +11,43 @@ Covers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.bot_wars_bot.tiers import (
-    Tier,
-    TierConfig,
-    TIER_CATALOGUE,
-    get_tier_config,
-    list_tiers,
-    get_upgrade_path,
-    FREE_FEATURES,
-    PRO_FEATURES,
-    ENTERPRISE_FEATURES,
-    FEATURE_VIEW_COMPETITIONS,
-    FEATURE_JOIN_COMPETITIONS,
-    FEATURE_HOST_PRIVATE_TOURNAMENTS,
-)
-from bots.bot_wars_bot.competition_engine import CompetitionEngine, CompetitionEngineError
+from bots.bot_wars_bot.bot_wars_bot import BotWarsBot, BotWarsTierError
 from bots.bot_wars_bot.challenge_manager import (
+    CHALLENGE_TYPES,
     ChallengeManager,
     ChallengeManagerError,
-    CHALLENGE_TYPES,
+)
+from bots.bot_wars_bot.competition_engine import (
+    CompetitionEngine,
+    CompetitionEngineError,
 )
 from bots.bot_wars_bot.drag_drop_builder import (
+    BOT_COMPONENT_TYPES,
     DragDropBuilder,
     DragDropBuilderError,
-    BOT_COMPONENT_TYPES,
 )
-from bots.bot_wars_bot.bot_wars_bot import BotWarsBot, BotWarsTierError
-
+from bots.bot_wars_bot.tiers import (
+    ENTERPRISE_FEATURES,
+    FEATURE_HOST_PRIVATE_TOURNAMENTS,
+    FEATURE_JOIN_COMPETITIONS,
+    FEATURE_VIEW_COMPETITIONS,
+    FREE_FEATURES,
+    PRO_FEATURES,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # Tiers
@@ -198,7 +200,8 @@ class TestCompetitionEngine:
         sub = self.engine.submit_bot(comp["id"], "u1", "Bot", "desc")
         with pytest.raises(CompetitionEngineError):
             self.engine.score_submission(
-                comp["id"], sub["id"],
+                comp["id"],
+                sub["id"],
                 {"creativity": 150, "accuracy": 50, "speed": 50, "innovation": 50},
             )
 
@@ -207,11 +210,13 @@ class TestCompetitionEngine:
         sub1 = self.engine.submit_bot(comp["id"], "u1", "Bot1", "desc")
         sub2 = self.engine.submit_bot(comp["id"], "u2", "Bot2", "desc")
         self.engine.score_submission(
-            comp["id"], sub1["id"],
+            comp["id"],
+            sub1["id"],
             {"creativity": 50, "accuracy": 50, "speed": 50, "innovation": 50},
         )
         self.engine.score_submission(
-            comp["id"], sub2["id"],
+            comp["id"],
+            sub2["id"],
             {"creativity": 90, "accuracy": 90, "speed": 90, "innovation": 90},
         )
         board = self.engine.get_leaderboard(comp["id"])
@@ -221,7 +226,8 @@ class TestCompetitionEngine:
         comp = self.engine.create_competition("WN", "creativity", "desc", 0)
         sub = self.engine.submit_bot(comp["id"], "u1", "WinBot", "desc")
         self.engine.score_submission(
-            comp["id"], sub["id"],
+            comp["id"],
+            sub["id"],
             {"creativity": 100, "accuracy": 100, "speed": 100, "innovation": 100},
         )
         winner = self.engine.get_winner(comp["id"])
@@ -270,7 +276,9 @@ class TestChallengeManager:
         assert len(self.manager.list_active_challenges()) == 2
 
     def test_join_challenge_returns_dict(self):
-        ch = self.manager.create_challenge("Join Test", "real_world_solver", "d", 3, 100)
+        ch = self.manager.create_challenge(
+            "Join Test", "real_world_solver", "d", 3, 100
+        )
         participant = self.manager.join_challenge(ch["id"], "user42")
         assert participant["user_id"] == "user42"
 
@@ -327,7 +335,9 @@ class TestDragDropBuilder:
 
     def test_add_component_returns_dict(self):
         proj = self.builder.create_bot_project("u1", "Bot", "desc")
-        comp = self.builder.add_component(proj["id"], "trigger", {"event": "on_message"})
+        comp = self.builder.add_component(
+            proj["id"], "trigger", {"event": "on_message"}
+        )
         assert comp["component_type"] == "trigger"
         assert "id" in comp
 
@@ -448,7 +458,8 @@ class TestBotWarsBot:
         comp = bot.create_competition("Score Test", "student", "desc", 0)
         sub = bot.submit_bot(comp["id"], "u1", "SBot", "desc")
         scored = bot.score_submission(
-            comp["id"], sub["id"],
+            comp["id"],
+            sub["id"],
             {"creativity": 80, "accuracy": 70, "speed": 60, "innovation": 90},
         )
         assert "total_score" in scored
@@ -457,7 +468,9 @@ class TestBotWarsBot:
         # FREE tier should be able to call get_leaderboard (no tier check)
         bot = BotWarsBot(tier=Tier.FREE)
         # Directly create a competition in the engine to bypass tier gate
-        comp = bot.competition_engine.create_competition("LBTest", "community", "desc", 0)
+        comp = bot.competition_engine.create_competition(
+            "LBTest", "community", "desc", 0
+        )
         board = bot.get_leaderboard(comp["id"])
         assert isinstance(board, list)
 

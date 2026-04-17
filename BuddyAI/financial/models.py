@@ -41,7 +41,9 @@ class Account:
     balance: float = 0.0
     account_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    is_autonomous: bool = False  # True when the account belongs to Buddy in autonomous mode
+    is_autonomous: bool = (
+        False  # True when the account belongs to Buddy in autonomous mode
+    )
 
     def deposit(self, amount: float) -> None:
         """Add funds to the account."""
@@ -100,7 +102,9 @@ class Transaction:
             "status": self.status.value,
             "description": self.description,
             "created_at": self.created_at.isoformat(),
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": (
+                self.completed_at.isoformat() if self.completed_at else None
+            ),
         }
 
 

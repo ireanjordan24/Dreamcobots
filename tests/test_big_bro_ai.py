@@ -17,8 +17,8 @@ Covers all eleven core modules (plus tiers and integration): of the Big Bro AI E
   13. BigBroAI main class (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -26,118 +26,129 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 # ------------------------------------------------------------------
-# Tiers
+# BigBroAI (main)
 # ------------------------------------------------------------------
-from bots.big_bro_ai.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_CORE_MENTOR,
-    FEATURE_BOT_FACTORY,
-    FEATURE_CONTINUOUS_STUDY,
-    FEATURE_FRANCHISE_ENGINE,
-    FEATURE_WHITE_LABEL,
-)
-
-# ------------------------------------------------------------------
-# Personality
-# ------------------------------------------------------------------
-from bots.big_bro_ai.personality import (
-    PersonalityEngine,
-    RelationshipTier,
-    RoastMode,
-    BIG_BRO_CORE_RULES,
-    BIG_BRO_TRAITS,
-    BIG_BRO_SIGNATURES,
-    INTRO_SCRIPT,
-    DREAMCO_PHILOSOPHY,
-)
-
-# ------------------------------------------------------------------
-# Memory System
-# ------------------------------------------------------------------
-from bots.big_bro_ai.memory_system import (
-    MemorySystem,
-    MemorySystemError,
-    UserProfile,
-    MemoryEntry,
-    LifeSituation,
-)
-
-# ------------------------------------------------------------------
-# Mentor Engine
-# ------------------------------------------------------------------
-from bots.big_bro_ai.mentor_engine import (
-    MentorEngine,
-    MentorEngineError,
-    MentorDomain,
-    GrowthStage,
-    MONEY_LESSONS,
-    TECH_LESSONS,
-    RELATIONSHIP_LESSONS,
-    CONFIDENCE_LESSONS,
-)
+from bots.big_bro_ai.big_bro_ai import BigBroAI, BigBroAIError, BigBroTierError
 
 # ------------------------------------------------------------------
 # Bot Factory
 # ------------------------------------------------------------------
 from bots.big_bro_ai.bot_factory import (
+    BotCategory,
     BotFactory,
     BotFactoryError,
-    BotCategory,
-    BotStatus,
     BotProspectus,
+    BotStatus,
     ManufacturedBot,
+)
+
+# ------------------------------------------------------------------
+# Catalog & Franchise
+# ------------------------------------------------------------------
+from bots.big_bro_ai.catalog_franchise import (
+    CatalogCategory,
+    CatalogFranchiseEngine,
+    CatalogFranchiseError,
+    CatalogItem,
+    CatalogOrder,
+    Franchise,
+    FranchiseStatus,
 )
 
 # ------------------------------------------------------------------
 # Continuous Study Engine
 # ------------------------------------------------------------------
 from bots.big_bro_ai.continuous_study import (
+    BUILTIN_MODULES,
     ContinuousStudyEngine,
     ContinuousStudyError,
     KnowledgeDomain,
     KnowledgePattern,
     StudyModule,
-    BUILTIN_MODULES,
-)
-
-# ------------------------------------------------------------------
-# Prospectus System
-# ------------------------------------------------------------------
-from bots.big_bro_ai.prospectus import (
-    ProspectusSystem,
-    ProspectusSystemError,
-    Prospectus,
-    ROIBridge,
-    StudyPathItem,
-    ProspectusStatus,
 )
 
 # ------------------------------------------------------------------
 # Courses System
 # ------------------------------------------------------------------
 from bots.big_bro_ai.courses_system import (
+    Course,
+    CourseCategory,
     CoursesSystem,
     CoursesSystemError,
-    Course,
-    Lesson,
-    CourseCategory,
     Enrollment,
+    Lesson,
+)
+
+# ------------------------------------------------------------------
+# Master Dashboard
+# ------------------------------------------------------------------
+from bots.big_bro_ai.master_dashboard import (
+    PANEL_NAMES,
+    AlertLevel,
+    DashboardAlert,
+    MasterDashboard,
+)
+
+# ------------------------------------------------------------------
+# Memory System
+# ------------------------------------------------------------------
+from bots.big_bro_ai.memory_system import (
+    LifeSituation,
+    MemoryEntry,
+    MemorySystem,
+    MemorySystemError,
+    UserProfile,
+)
+
+# ------------------------------------------------------------------
+# Mentor Engine
+# ------------------------------------------------------------------
+from bots.big_bro_ai.mentor_engine import (
+    CONFIDENCE_LESSONS,
+    MONEY_LESSONS,
+    RELATIONSHIP_LESSONS,
+    TECH_LESSONS,
+    GrowthStage,
+    MentorDomain,
+    MentorEngine,
+    MentorEngineError,
+)
+
+# ------------------------------------------------------------------
+# Personality
+# ------------------------------------------------------------------
+from bots.big_bro_ai.personality import (
+    BIG_BRO_CORE_RULES,
+    BIG_BRO_SIGNATURES,
+    BIG_BRO_TRAITS,
+    DREAMCO_PHILOSOPHY,
+    INTRO_SCRIPT,
+    PersonalityEngine,
+    RelationshipTier,
+    RoastMode,
+)
+
+# ------------------------------------------------------------------
+# Prospectus System
+# ------------------------------------------------------------------
+from bots.big_bro_ai.prospectus import (
+    Prospectus,
+    ProspectusStatus,
+    ProspectusSystem,
+    ProspectusSystemError,
+    ROIBridge,
+    StudyPathItem,
 )
 
 # ------------------------------------------------------------------
 # Route & GPS
 # ------------------------------------------------------------------
 from bots.big_bro_ai.route_gps import (
-    RouteGPSIntelligence,
-    RouteGPSError,
     Resource,
-    Route,
     ResourceCategory,
+    Route,
+    RouteGPSError,
+    RouteGPSIntelligence,
     RouteType,
 )
 
@@ -145,46 +156,35 @@ from bots.big_bro_ai.route_gps import (
 # Sales & Monetization
 # ------------------------------------------------------------------
 from bots.big_bro_ai.sales_monetization import (
-    SalesMonetizationEngine,
-    SalesMonetizationError,
+    PAYMENT_METHODS,
     IncomeStream,
     IncomeStreamType,
+    SalesMonetizationEngine,
+    SalesMonetizationError,
     compound_interest,
-    PAYMENT_METHODS,
 )
 
 # ------------------------------------------------------------------
-# Catalog & Franchise
+# Tiers
 # ------------------------------------------------------------------
-from bots.big_bro_ai.catalog_franchise import (
-    CatalogFranchiseEngine,
-    CatalogFranchiseError,
-    CatalogItem,
-    CatalogCategory,
-    Franchise,
-    FranchiseStatus,
-    CatalogOrder,
+from bots.big_bro_ai.tiers import (
+    FEATURE_BOT_FACTORY,
+    FEATURE_CONTINUOUS_STUDY,
+    FEATURE_CORE_MENTOR,
+    FEATURE_FRANCHISE_ENGINE,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
 )
-
-# ------------------------------------------------------------------
-# Master Dashboard
-# ------------------------------------------------------------------
-from bots.big_bro_ai.master_dashboard import (
-    MasterDashboard,
-    DashboardAlert,
-    AlertLevel,
-    PANEL_NAMES,
-)
-
-# ------------------------------------------------------------------
-# BigBroAI (main)
-# ------------------------------------------------------------------
-from bots.big_bro_ai.big_bro_ai import BigBroAI, BigBroAIError, BigBroTierError
-
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_all_three_tiers_in_catalogue(self):
@@ -254,6 +254,7 @@ class TestTiers:
 # ===========================================================================
 # Personality Engine tests
 # ===========================================================================
+
 
 class TestPersonalityEngine:
     def setup_method(self):
@@ -339,6 +340,7 @@ class TestPersonalityEngine:
 # ===========================================================================
 # Memory System tests
 # ===========================================================================
+
 
 class TestMemorySystem:
     def setup_method(self):
@@ -453,6 +455,7 @@ class TestMemorySystem:
 # Mentor Engine tests
 # ===========================================================================
 
+
 class TestMentorEngine:
     def setup_method(self):
         self.engine = MentorEngine()
@@ -471,13 +474,17 @@ class TestMentorEngine:
         assert result["domain"] == "relationships"
 
     def test_teach_specific_topic(self):
-        result = self.engine.teach("u001", MentorDomain.MONEY, "subscriptions_vs_onetime")
+        result = self.engine.teach(
+            "u001", MentorDomain.MONEY, "subscriptions_vs_onetime"
+        )
         assert result["topic"] == "subscriptions_vs_onetime"
         assert not result["already_learned"]
 
     def test_teach_marks_as_learned(self):
         self.engine.teach("u001", MentorDomain.MONEY, "subscriptions_vs_onetime")
-        result = self.engine.teach("u001", MentorDomain.MONEY, "subscriptions_vs_onetime")
+        result = self.engine.teach(
+            "u001", MentorDomain.MONEY, "subscriptions_vs_onetime"
+        )
         assert result["already_learned"]
 
     def test_teach_advances_through_lessons(self):
@@ -520,6 +527,7 @@ class TestMentorEngine:
 # ===========================================================================
 # Bot Factory tests
 # ===========================================================================
+
 
 class TestBotFactory:
     def setup_method(self):
@@ -622,6 +630,7 @@ class TestBotFactory:
 # Continuous Study Engine tests
 # ===========================================================================
 
+
 class TestContinuousStudyEngine:
     def setup_method(self):
         self.engine = ContinuousStudyEngine(enabled=True)
@@ -697,6 +706,7 @@ class TestContinuousStudyEngine:
 # ===========================================================================
 # Prospectus System tests
 # ===========================================================================
+
 
 class TestProspectusSystem:
     def setup_method(self):
@@ -783,6 +793,7 @@ class TestProspectusSystem:
 # Courses System tests
 # ===========================================================================
 
+
 class TestCoursesSystem:
     def setup_method(self):
         self.cs = CoursesSystem()
@@ -848,6 +859,7 @@ class TestCoursesSystem:
 # Route & GPS Intelligence tests
 # ===========================================================================
 
+
 class TestRouteGPS:
     def setup_method(self):
         self.gps = RouteGPSIntelligence(default_city="Atlanta", default_state="GA")
@@ -881,7 +893,11 @@ class TestRouteGPS:
 
     def test_navigate_with_city_filter(self):
         self.gps.add_resource(
-            "City Resource", ResourceCategory.COMMUNITY, "Local", city="Miami", free=True
+            "City Resource",
+            ResourceCategory.COMMUNITY,
+            "Local",
+            city="Miami",
+            free=True,
         )
         routes = self.gps.navigate("community", city="Miami")
         # Should find Miami-specific + national resources
@@ -908,6 +924,7 @@ class TestRouteGPS:
 # ===========================================================================
 # Sales & Monetization Engine tests
 # ===========================================================================
+
 
 class TestSalesMonetizationEngine:
     def setup_method(self):
@@ -980,6 +997,7 @@ class TestSalesMonetizationEngine:
 # Catalog & Franchise Engine tests
 # ===========================================================================
 
+
 class TestCatalogFranchiseEngine:
     def setup_method(self):
         self.engine = CatalogFranchiseEngine()
@@ -995,7 +1013,9 @@ class TestCatalogFranchiseEngine:
         assert item.item_id.startswith("itm_")
 
     def test_commission_calculation(self):
-        item = self.engine.add_item("T", CatalogCategory.BOTS, "Desc", 100.0, commission_pct=0.30)
+        item = self.engine.add_item(
+            "T", CatalogCategory.BOTS, "Desc", 100.0, commission_pct=0.30
+        )
         assert item.commission_amount() == 30.0
 
     def test_search_catalog_by_category(self):
@@ -1018,7 +1038,9 @@ class TestCatalogFranchiseEngine:
     def test_activate_franchise(self):
         f = self.engine.open_franchise("Marcus", "Atlanta")
         self.engine.activate_franchise(f.franchise_id)
-        assert self.engine.get_franchise(f.franchise_id).status == FranchiseStatus.ACTIVE
+        assert (
+            self.engine.get_franchise(f.franchise_id).status == FranchiseStatus.ACTIVE
+        )
 
     def test_place_order(self):
         items = self.engine.search_catalog()
@@ -1054,6 +1076,7 @@ class TestCatalogFranchiseEngine:
 # Master Dashboard tests
 # ===========================================================================
 
+
 class TestMasterDashboard:
     def setup_method(self):
         self.dashboard = MasterDashboard(big_bro_name="Big Bro", tier="pro")
@@ -1069,7 +1092,9 @@ class TestMasterDashboard:
         assert panel["total_bots"] == 5
 
     def test_add_alert(self):
-        alert = self.dashboard.add_alert(AlertLevel.WARNING, "bot_factory", "Low readiness")
+        alert = self.dashboard.add_alert(
+            AlertLevel.WARNING, "bot_factory", "Low readiness"
+        )
         assert alert.level == AlertLevel.WARNING
 
     def test_get_alerts_filtered(self):
@@ -1112,6 +1137,7 @@ class TestMasterDashboard:
 # ===========================================================================
 # BigBroAI Integration tests
 # ===========================================================================
+
 
 class TestBigBroAI:
     def setup_method(self):
@@ -1159,7 +1185,9 @@ class TestBigBroAI:
 
     def test_log_life_event(self):
         self.big_bro.create_user("u001", "Marcus")
-        entry = self.big_bro.log_life_event("u001", "stress", "School is hard", ["school"])
+        entry = self.big_bro.log_life_event(
+            "u001", "stress", "School is hard", ["school"]
+        )
         assert entry["situation"] == "stress"
 
     def test_teach_money(self):
@@ -1254,7 +1282,9 @@ class TestBigBroAI:
 
     def test_chat_dashboard_request(self):
         response = self.big_bro.chat("show me the dashboard status")
-        assert "Revenue" in response["message"] or "status" in response["message"].lower()
+        assert (
+            "Revenue" in response["message"] or "status" in response["message"].lower()
+        )
 
     def test_chat_upgrade_request(self):
         bb = BigBroAI(tier=Tier.FREE)

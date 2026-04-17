@@ -1,16 +1,25 @@
 """
 Dreamcobots ShopifyAutomationBot — tier-aware Shopify store automation.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.shopify_automation_bot.tiers import SHOPIFY_AUTOMATION_FEATURES, get_shopify_automation_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.shopify_automation_bot.tiers import (
+    SHOPIFY_AUTOMATION_FEATURES,
+    get_shopify_automation_tier_info,
+)
 
 
 class ShopifyAutomationBotTierError(Exception):
@@ -137,7 +146,11 @@ class ShopifyAutomationBot:
         if self.tier == Tier.FREE:
             automated_actions = ["send_confirmation"]
         elif self.tier == Tier.PRO:
-            automated_actions = ["send_confirmation", "update_inventory", "notify_fulfillment"]
+            automated_actions = [
+                "send_confirmation",
+                "update_inventory",
+                "notify_fulfillment",
+            ]
         else:  # ENTERPRISE
             automated_actions = [
                 "send_confirmation",

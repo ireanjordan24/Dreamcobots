@@ -16,7 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 

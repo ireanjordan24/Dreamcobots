@@ -16,16 +16,16 @@ class is fully testable without a real git installation.
 
 from __future__ import annotations
 
-import subprocess
-import sys
 import os
 import re
+import subprocess
+import sys
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 # Allow running from any working directory
 sys.path.insert(0, os.path.dirname(__file__))
-from bot_manager import BotManager, STATUS_UPDATING, STATUS_ACTIVE, STATUS_CONFLICT
+from bot_manager import STATUS_ACTIVE, STATUS_CONFLICT, STATUS_UPDATING, BotManager
 from repo_manager import RepoManager
 
 _PR_TITLE = "🤖 Auto-upgrade from DreamCo Control Tower"
@@ -47,7 +47,9 @@ def _validate_repo_path(repo_path: str, repo_root: str) -> str:
     resolved = os.path.realpath(repo_path)
     root_resolved = os.path.realpath(repo_root)
     if not resolved.startswith(root_resolved + os.sep) and resolved != root_resolved:
-        raise ValueError(f"Repo path '{resolved}' is outside the repo root '{root_resolved}'.")
+        raise ValueError(
+            f"Repo path '{resolved}' is outside the repo root '{root_resolved}'."
+        )
     return resolved
 
 
@@ -55,7 +57,10 @@ def _validate_repo_path(repo_path: str, repo_root: str) -> str:
 # Default command runner (wraps subprocess)
 # ---------------------------------------------------------------------------
 
-def _default_runner(cmd: List[str], cwd: Optional[str] = None) -> "subprocess.CompletedProcess[str]":
+
+def _default_runner(
+    cmd: List[str], cwd: Optional[str] = None
+) -> "subprocess.CompletedProcess[str]":
     """Run *cmd* in *cwd* and return the CompletedProcess result."""
     return subprocess.run(
         cmd,
@@ -68,6 +73,7 @@ def _default_runner(cmd: List[str], cwd: Optional[str] = None) -> "subprocess.Co
 # ---------------------------------------------------------------------------
 # AutoUpgrader
 # ---------------------------------------------------------------------------
+
 
 class AutoUpgrader:
     """Orchestrates automated upgrades for all registered bots.
@@ -127,7 +133,11 @@ class AutoUpgrader:
         """
         bot = self._bm.get_bot(name)
         if bot is None:
-            return {"bot": name, "status": "error", "detail": "Bot not found in registry."}
+            return {
+                "bot": name,
+                "status": "error",
+                "detail": "Bot not found in registry.",
+            }
 
         self._bm.set_status(name, STATUS_UPDATING)
         repo_path = os.path.join(self._repo_root, bot.get("repoPath", ""))
@@ -243,11 +253,21 @@ class AutoUpgrader:
     def _run_test_suite(self, repo_path: str) -> Dict[str, Any]:
         """Try to run tests in *repo_path* (pytest preferred, then npm test)."""
         # Try pytest first
-        pytest_run = self._runner(["python", "-m", "pytest", "--tb=no", "-q"], cwd=repo_path)
+        pytest_run = self._runner(
+            ["python", "-m", "pytest", "--tb=no", "-q"], cwd=repo_path
+        )
         if pytest_run.returncode == 0:
-            return {"runner": "pytest", "success": True, "output": pytest_run.stdout.strip()}
+            return {
+                "runner": "pytest",
+                "success": True,
+                "output": pytest_run.stdout.strip(),
+            }
         if pytest_run.returncode != 2:  # 2 = no tests collected (acceptable)
-            return {"runner": "pytest", "success": False, "output": pytest_run.stderr.strip()}
+            return {
+                "runner": "pytest",
+                "success": False,
+                "output": pytest_run.stderr.strip(),
+            }
 
         # Fall back to npm test
         npm_run = self._runner(["npm", "test", "--if-present"], cwd=repo_path)

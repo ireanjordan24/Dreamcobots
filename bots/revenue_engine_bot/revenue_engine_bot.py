@@ -37,18 +37,20 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.revenue_engine_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
@@ -57,6 +59,7 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class RevenueEngineBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -67,17 +70,19 @@ class RevenueEngineBotTierError(Exception):
 # ---------------------------------------------------------------------------
 
 DAYS_PER_MONTH = 30
-HOT_DEAL_ROI_THRESHOLD = 50    # ROI% → "🔥 Hot" deal
-GOOD_DEAL_ROI_THRESHOLD = 25   # ROI% → "✅ Good" deal
+HOT_DEAL_ROI_THRESHOLD = 50  # ROI% → "🔥 Hot" deal
+GOOD_DEAL_ROI_THRESHOLD = 25  # ROI% → "✅ Good" deal
 
 
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class RevenueRecord:
     """A single tracked revenue event."""
+
     source: str
     amount: float
     description: str
@@ -95,6 +100,7 @@ class RevenueRecord:
 @dataclass
 class ProductListing:
     """A digital product available for sale."""
+
     name: str
     price: float
     description: str = ""
@@ -113,6 +119,7 @@ class ProductListing:
 # ---------------------------------------------------------------------------
 # Sub-engines
 # ---------------------------------------------------------------------------
+
 
 class PaymentEngine:
     """Stripe + PayPal payment processing (simulated)."""
@@ -257,7 +264,8 @@ class AffiliateEngine:
             self._active_niches.append(niche)
 
         matching = [
-            p for p in self.NICHE_PROGRAMS.values()
+            p
+            for p in self.NICHE_PROGRAMS.values()
             if p["category"] == niche or niche in p["name"].lower()
         ]
         if not matching:
@@ -286,12 +294,16 @@ class AffiliateEngine:
         for key in self._active_niches:
             prog = self.NICHE_PROGRAMS.get(key, list(self.NICHE_PROGRAMS.values())[0])
             monthly_sales = daily_clicks * conversion_rate * DAYS_PER_MONTH
-            monthly_earnings = monthly_sales * prog["avg_order_usd"] * prog["commission_pct"]
+            monthly_earnings = (
+                monthly_sales * prog["avg_order_usd"] * prog["commission_pct"]
+            )
             total_monthly += monthly_earnings
-            breakdown.append({
-                "niche": key,
-                "monthly_earnings_usd": round(monthly_earnings, 2),
-            })
+            breakdown.append(
+                {
+                    "niche": key,
+                    "monthly_earnings_usd": round(monthly_earnings, 2),
+                }
+            )
 
         return {
             "active_niches": list(self._active_niches),
@@ -309,18 +321,32 @@ class ProductEngine:
     PRODUCT_LIMITS = {Tier.FREE: 1, Tier.PRO: 10, Tier.ENTERPRISE: None}
 
     DEFAULT_PRODUCTS = [
-        ProductListing("AI Business Starter Pack", 49.0, "Launch your AI-powered business today."),
-        ProductListing("DreamCo Automation Blueprint", 97.0, "Step-by-step automation guide."),
-        ProductListing("Revenue Engine Masterclass", 199.0, "Full training on building income systems."),
-        ProductListing("Prompt Engineering Playbook", 29.0, "100+ prompts for business growth."),
-        ProductListing("AI Side Hustle Bundle", 147.0, "Everything needed to earn with AI."),
+        ProductListing(
+            "AI Business Starter Pack", 49.0, "Launch your AI-powered business today."
+        ),
+        ProductListing(
+            "DreamCo Automation Blueprint", 97.0, "Step-by-step automation guide."
+        ),
+        ProductListing(
+            "Revenue Engine Masterclass",
+            199.0,
+            "Full training on building income systems.",
+        ),
+        ProductListing(
+            "Prompt Engineering Playbook", 29.0, "100+ prompts for business growth."
+        ),
+        ProductListing(
+            "AI Side Hustle Bundle", 147.0, "Everything needed to earn with AI."
+        ),
     ]
 
     def __init__(self, tier: Tier) -> None:
         self._tier = tier
         self._catalog: List[ProductListing] = []
 
-    def add_product(self, name: str, price: float, description: str = "") -> ProductListing:
+    def add_product(
+        self, name: str, price: float, description: str = ""
+    ) -> ProductListing:
         """Add a digital product to the catalog."""
         limit = self.PRODUCT_LIMITS[self._tier]
         if limit is not None and len(self._catalog) >= limit:
@@ -344,14 +370,20 @@ class ProductEngine:
         )
         if product is None:
             product = next(
-                (p for p in self.DEFAULT_PRODUCTS if p.name.lower() == product_name.lower()),
+                (
+                    p
+                    for p in self.DEFAULT_PRODUCTS
+                    if p.name.lower() == product_name.lower()
+                ),
                 None,
             )
         if product is None:
             raise ValueError(f"Product '{product_name}' not found in catalog.")
 
         product.units_sold += 1
-        order_id = f"ORDER-{abs(hash(product_name + str(product.units_sold))) % 10**8:08d}"
+        order_id = (
+            f"ORDER-{abs(hash(product_name + str(product.units_sold))) % 10**8:08d}"
+        )
         return {
             "order_id": order_id,
             "product": product.name,
@@ -379,25 +411,91 @@ class RealEstatePipeline:
 
     DEAL_DATABASE = {
         "austin": [
-            {"address": "123 Main St, Austin TX", "price": 50_000, "arv": 120_000, "repair_cost": 15_000, "type": "wholesale"},
-            {"address": "456 Oak Ave, Austin TX", "price": 175_000, "arv": 260_000, "repair_cost": 25_000, "type": "fix_and_flip"},
-            {"address": "789 River Rd, Austin TX", "price": 220_000, "arv": 310_000, "repair_cost": 30_000, "type": "fix_and_flip"},
+            {
+                "address": "123 Main St, Austin TX",
+                "price": 50_000,
+                "arv": 120_000,
+                "repair_cost": 15_000,
+                "type": "wholesale",
+            },
+            {
+                "address": "456 Oak Ave, Austin TX",
+                "price": 175_000,
+                "arv": 260_000,
+                "repair_cost": 25_000,
+                "type": "fix_and_flip",
+            },
+            {
+                "address": "789 River Rd, Austin TX",
+                "price": 220_000,
+                "arv": 310_000,
+                "repair_cost": 30_000,
+                "type": "fix_and_flip",
+            },
         ],
         "phoenix": [
-            {"address": "1010 Desert Blvd, Phoenix AZ", "price": 80_000, "arv": 160_000, "repair_cost": 20_000, "type": "wholesale"},
-            {"address": "2020 Cactus Dr, Phoenix AZ", "price": 140_000, "arv": 210_000, "repair_cost": 18_000, "type": "fix_and_flip"},
+            {
+                "address": "1010 Desert Blvd, Phoenix AZ",
+                "price": 80_000,
+                "arv": 160_000,
+                "repair_cost": 20_000,
+                "type": "wholesale",
+            },
+            {
+                "address": "2020 Cactus Dr, Phoenix AZ",
+                "price": 140_000,
+                "arv": 210_000,
+                "repair_cost": 18_000,
+                "type": "fix_and_flip",
+            },
         ],
         "dallas": [
-            {"address": "300 Commerce St, Dallas TX", "price": 95_000, "arv": 190_000, "repair_cost": 22_000, "type": "wholesale"},
-            {"address": "500 Elm St, Dallas TX", "price": 210_000, "arv": 295_000, "repair_cost": 28_000, "type": "fix_and_flip"},
+            {
+                "address": "300 Commerce St, Dallas TX",
+                "price": 95_000,
+                "arv": 190_000,
+                "repair_cost": 22_000,
+                "type": "wholesale",
+            },
+            {
+                "address": "500 Elm St, Dallas TX",
+                "price": 210_000,
+                "arv": 295_000,
+                "repair_cost": 28_000,
+                "type": "fix_and_flip",
+            },
         ],
         "atlanta": [
-            {"address": "101 Peach St, Atlanta GA", "price": 70_000, "arv": 145_000, "repair_cost": 16_000, "type": "wholesale"},
-            {"address": "202 Maple Ave, Atlanta GA", "price": 155_000, "arv": 235_000, "repair_cost": 24_000, "type": "fix_and_flip"},
+            {
+                "address": "101 Peach St, Atlanta GA",
+                "price": 70_000,
+                "arv": 145_000,
+                "repair_cost": 16_000,
+                "type": "wholesale",
+            },
+            {
+                "address": "202 Maple Ave, Atlanta GA",
+                "price": 155_000,
+                "arv": 235_000,
+                "repair_cost": 24_000,
+                "type": "fix_and_flip",
+            },
         ],
         "houston": [
-            {"address": "800 Energy Pkwy, Houston TX", "price": 85_000, "arv": 165_000, "repair_cost": 19_000, "type": "wholesale"},
-            {"address": "900 Bayou Dr, Houston TX", "price": 145_000, "arv": 215_000, "repair_cost": 21_000, "type": "fix_and_flip"},
+            {
+                "address": "800 Energy Pkwy, Houston TX",
+                "price": 85_000,
+                "arv": 165_000,
+                "repair_cost": 19_000,
+                "type": "wholesale",
+            },
+            {
+                "address": "900 Bayou Dr, Houston TX",
+                "price": 145_000,
+                "arv": 215_000,
+                "repair_cost": 21_000,
+                "type": "fix_and_flip",
+            },
         ],
     }
 
@@ -430,13 +528,23 @@ class RealEstatePipeline:
             if d["price"] <= max_budget:
                 profit = d["arv"] - d["price"] - d["repair_cost"]
                 roi = round(profit / (d["price"] + d["repair_cost"]) * 100, 1)
-                results.append({
-                    **d,
-                    "market": market,
-                    "estimated_profit_usd": profit,
-                    "roi_pct": roi,
-                    "deal_score": "🔥 Hot" if roi >= HOT_DEAL_ROI_THRESHOLD else ("✅ Good" if roi >= GOOD_DEAL_ROI_THRESHOLD else "⚠️ Marginal"),
-                })
+                results.append(
+                    {
+                        **d,
+                        "market": market,
+                        "estimated_profit_usd": profit,
+                        "roi_pct": roi,
+                        "deal_score": (
+                            "🔥 Hot"
+                            if roi >= HOT_DEAL_ROI_THRESHOLD
+                            else (
+                                "✅ Good"
+                                if roi >= GOOD_DEAL_ROI_THRESHOLD
+                                else "⚠️ Marginal"
+                            )
+                        ),
+                    }
+                )
         return results
 
     def pipeline_summary(self) -> dict:
@@ -452,7 +560,9 @@ class RealEstatePipeline:
             "markets_searched": list(self._searched_markets),
             "total_deals_found": len(all_deals),
             "total_potential_profit_usd": sum(all_deals),
-            "avg_profit_per_deal_usd": round(sum(all_deals) / len(all_deals), 2) if all_deals else 0.0,
+            "avg_profit_per_deal_usd": (
+                round(sum(all_deals) / len(all_deals), 2) if all_deals else 0.0
+            ),
             "tier": self._tier.value,
         }
 
@@ -492,6 +602,7 @@ class RevenueTracker:
 # Main bot
 # ---------------------------------------------------------------------------
 
+
 class RevenueEngineBot:
     """
     Tier-aware DreamCo Revenue Engine.
@@ -528,7 +639,9 @@ class RevenueEngineBot:
     def create_paypal_order(self, amount: float) -> dict:
         """Create a PayPal order (PRO/ENTERPRISE only)."""
         result = self._payment_engine.create_paypal_order(amount)
-        self._revenue_tracker.track("paypal_order", amount, f"PayPal order {result['order_id']}")
+        self._revenue_tracker.track(
+            "paypal_order", amount, f"PayPal order {result['order_id']}"
+        )
         return result
 
     @property
@@ -698,7 +811,9 @@ class RevenueEngineBot:
             lines.append(f"  \u2713 {f}")
         upgrade = get_upgrade_path(self.tier)
         if upgrade:
-            lines.append(f"\nUpgrade to {upgrade.name} for ${upgrade.price_usd_monthly:.2f}/month")
+            lines.append(
+                f"\nUpgrade to {upgrade.name} for ${upgrade.price_usd_monthly:.2f}/month"
+            )
         output = "\n".join(lines)
         print(output)
         return output

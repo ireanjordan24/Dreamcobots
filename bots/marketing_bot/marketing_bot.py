@@ -10,16 +10,21 @@ Usage
     response = bot.chat("Write a Twitter thread about our new product launch")
     print(response["message"])
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.marketing_bot.tiers import (
-    MARKETING_EXTRA_FEATURES,
     MARKETING_CHANNELS,
+    MARKETING_EXTRA_FEATURES,
     get_marketing_tier_info,
 )
 
@@ -78,9 +83,7 @@ class MarketingBot:
         self._check_channel_access(active_channel)
 
         self._request_count += 1
-        response_text = (
-            f"[MarketingBot/{active_channel}] Processed: {message!r}"
-        )
+        response_text = f"[MarketingBot/{active_channel}] Processed: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
 

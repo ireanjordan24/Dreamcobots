@@ -10,5 +10,14 @@ class TierConfig:
 
 TIERS = {
     "pro": TierConfig("Pro", 99.0, ["penny stock screener", "volume spike detection"]),
-    "enterprise": TierConfig("Enterprise", 299.0, ["penny stock screener", "volume spike detection", "SEC filing alerts", "real-time scanning"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        299.0,
+        [
+            "penny stock screener",
+            "volume spike detection",
+            "SEC filing alerts",
+            "real-time scanning",
+        ],
+    ),
 }

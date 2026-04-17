@@ -13,8 +13,9 @@ Architecture
 * Aggregated analytics – surfaces revenue and interaction metrics across bots.
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from typing import Any, Dict, List, Optional, Type
@@ -38,19 +39,49 @@ class BuddyAI:
 
     # Mapping of domain keywords to bot categories for smart routing
     _DOMAIN_KEYWORDS: Dict[str, List[str]] = {
-        "occupational": ["job", "career", "resume", "interview", "hire", "employment", "work"],
-        "business":     ["invoice", "billing", "project", "meeting", "schedule", "business"],
-        "marketing":    ["marketing", "email", "social", "campaign", "feedback", "brand"],
-        "real_estate":  ["property", "house", "listing", "real estate", "mortgage", "viewing"],
-        "side_hustle":  ["hustle", "freelance", "fiverr", "gig", "content", "dropship", "ecommerce"],
-        "app":          ["app", "onboard", "feature", "support", "update", "software"],
+        "occupational": [
+            "job",
+            "career",
+            "resume",
+            "interview",
+            "hire",
+            "employment",
+            "work",
+        ],
+        "business": [
+            "invoice",
+            "billing",
+            "project",
+            "meeting",
+            "schedule",
+            "business",
+        ],
+        "marketing": ["marketing", "email", "social", "campaign", "feedback", "brand"],
+        "real_estate": [
+            "property",
+            "house",
+            "listing",
+            "real estate",
+            "mortgage",
+            "viewing",
+        ],
+        "side_hustle": [
+            "hustle",
+            "freelance",
+            "fiverr",
+            "gig",
+            "content",
+            "dropship",
+            "ecommerce",
+        ],
+        "app": ["app", "onboard", "feature", "support", "update", "software"],
     }
 
     def __init__(self):
-        self._bots: Dict[str, BaseBot] = {}          # bot_id → bot
+        self._bots: Dict[str, BaseBot] = {}  # bot_id → bot
         self._category_index: Dict[str, List[str]] = {}  # category → [bot_ids]
         self._nlp = NLPEngine()
-        self._user_sessions: Dict[str, str] = {}     # user_id → active bot_id
+        self._user_sessions: Dict[str, str] = {}  # user_id → active bot_id
 
     # ------------------------------------------------------------------
     # Bot registration
@@ -63,7 +94,9 @@ class BuddyAI:
         if category not in self._category_index:
             self._category_index[category] = []
         self._category_index[category].append(bot.bot_id)
-        print(f"[BuddyAI] Registered: {bot.name} (category={category}, id={bot.bot_id[:8]}…)")
+        print(
+            f"[BuddyAI] Registered: {bot.name} (category={category}, id={bot.bot_id[:8]}…)"
+        )
 
     def unregister(self, bot_id: str) -> bool:
         """Remove a bot from the registry."""
@@ -78,7 +111,12 @@ class BuddyAI:
 
     def list_bots(self) -> List[Dict[str, str]]:
         return [
-            {"bot_id": b.bot_id, "name": b.name, "category": b.category, "domain": b.domain}
+            {
+                "bot_id": b.bot_id,
+                "name": b.name,
+                "category": b.category,
+                "domain": b.domain,
+            }
             for b in self._bots.values()
         ]
 
@@ -165,13 +203,15 @@ class BuddyAI:
             total_revenue += status["revenue"]["total_revenue_usd"]
             total_datasets += status["datasets"]["datasets_available"]
             total_sales += status["datasets"]["total_sales"]
-            bot_summaries.append({
-                "name": bot.name,
-                "category": bot.category,
-                "revenue_usd": status["revenue"]["total_revenue_usd"],
-                "datasets": status["datasets"]["datasets_available"],
-                "top_intents": status["top_intents"],
-            })
+            bot_summaries.append(
+                {
+                    "name": bot.name,
+                    "category": bot.category,
+                    "revenue_usd": status["revenue"]["total_revenue_usd"],
+                    "datasets": status["datasets"]["datasets_available"],
+                    "top_intents": status["top_intents"],
+                }
+            )
 
         return {
             "registered_bots": len(self._bots),
@@ -188,32 +228,45 @@ class BuddyAI:
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
+
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-    from Occupational_bots.feature_1 import JobSearchBot
-    from Occupational_bots.feature_2 import ResumeBuildingBot
-    from Occupational_bots.feature_3 import InterviewPrepBot
     from Business_bots.feature_1 import MeetingSchedulerBot
     from Business_bots.feature_3 import InvoicingBot
     from Marketing_bots.feature_1 import SocialMediaBot
     from Marketing_bots.feature_3 import CustomerFeedbackBot
+    from Occupational_bots.feature_1 import JobSearchBot
+    from Occupational_bots.feature_2 import ResumeBuildingBot
+    from Occupational_bots.feature_3 import InterviewPrepBot
     from Side_Hustle_bots.feature_1 import ContentCreatorBot
     from Side_Hustle_bots.feature_3 import GigEconomyBot
 
     buddy = BuddyAI()
     for bot in [
-        JobSearchBot(), ResumeBuildingBot(), InterviewPrepBot(),
-        MeetingSchedulerBot(), InvoicingBot(),
-        SocialMediaBot(), CustomerFeedbackBot(),
-        ContentCreatorBot(), GigEconomyBot(),
+        JobSearchBot(),
+        ResumeBuildingBot(),
+        InterviewPrepBot(),
+        MeetingSchedulerBot(),
+        InvoicingBot(),
+        SocialMediaBot(),
+        CustomerFeedbackBot(),
+        ContentCreatorBot(),
+        GigEconomyBot(),
     ]:
         buddy.register(bot)
 
     print("\n--- BuddyAI Demo ---\n")
-    print(buddy.chat("Hello! I'm looking for a software engineering job.", user_id="alice"))
+    print(
+        buddy.chat(
+            "Hello! I'm looking for a software engineering job.", user_id="alice"
+        )
+    )
     print(buddy.chat("Can you help me with my resume?", user_id="bob"))
     print(buddy.chat("I need to schedule a meeting with my team.", user_id="carol"))
-    print(buddy.chat("I want to start a YouTube channel about cooking.", user_id="dave"))
+    print(
+        buddy.chat("I want to start a YouTube channel about cooking.", user_id="dave")
+    )
     print("\n--- Platform Summary ---")
     import json
+
     print(json.dumps(buddy.platform_summary(), indent=2))

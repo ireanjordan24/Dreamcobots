@@ -3,43 +3,60 @@ Tests for bots/ai-models-integration/tiers.py and
 bots/ai-models-integration/ai_models_integration.py
 """
 
-import sys
 import os
+import sys
 
 # Allow imports from the ai-models-integration directory
 AI_MODELS_DIR = os.path.join(
-    os.path.dirname(__file__), '..', 'bots', 'ai-models-integration'
+    os.path.dirname(__file__), "..", "bots", "ai-models-integration"
 )
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 
 # Clear cached modules to prevent cross-test sys.modules pollution.
 # These modules import 'tiers' at load time; if 'tiers' was previously cached
 # from another bot's directory, their Tier class identity would mismatch.
-_MODULES_TO_CLEAR = ('tiers', 'registry', 'models.registry', 'ai_models_integration')
+_MODULES_TO_CLEAR = ("tiers", "registry", "models.registry", "ai_models_integration")
 for _mod in _MODULES_TO_CLEAR:
     sys.modules.pop(_mod, None)
 
 import pytest
-from tiers import (
-    Tier, TierConfig, TIER_CATALOGUE, get_tier_config, get_upgrade_path,
-    list_tiers, FREE_MODELS, PRO_MODELS, ENTERPRISE_MODELS,
-    FEATURE_BASIC_INFERENCE, FEATURE_BATCH_PROCESSING,
-    FEATURE_FINE_TUNING, FEATURE_CUSTOM_MODELS, FEATURE_SLA_GUARANTEE,
-    NLP_GPT35, NLP_GPT4, CV_CLIP, GEN_GPT4V,
+from ai_models_integration import (
+    AIModelsIntegration,
+    RequestLimitExceededError,
+    TierAccessError,
 )
 from models.registry import (
-    MODEL_REGISTRY, get_model_info, list_models_for_tier,
+    MODEL_REGISTRY,
+    get_model_info,
     list_models_by_category,
+    list_models_for_tier,
 )
-from ai_models_integration import (
-    AIModelsIntegration, TierAccessError, RequestLimitExceededError,
+from tiers import (
+    CV_CLIP,
+    ENTERPRISE_MODELS,
+    FEATURE_BASIC_INFERENCE,
+    FEATURE_BATCH_PROCESSING,
+    FEATURE_CUSTOM_MODELS,
+    FEATURE_FINE_TUNING,
+    FEATURE_SLA_GUARANTEE,
+    FREE_MODELS,
+    GEN_GPT4V,
+    NLP_GPT4,
+    NLP_GPT35,
+    PRO_MODELS,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
 )
-
 
 # -----------------------------------------------------------------------
 # Tier catalogue tests
 # -----------------------------------------------------------------------
+
 
 class TestTierCatalogue:
     def test_all_tiers_exist(self):
@@ -127,6 +144,7 @@ class TestTierCatalogue:
 # Model registry tests
 # -----------------------------------------------------------------------
 
+
 class TestModelRegistry:
     def test_registry_not_empty(self):
         assert len(MODEL_REGISTRY) > 0
@@ -194,6 +212,7 @@ class TestModelRegistry:
 # -----------------------------------------------------------------------
 # AIModelsIntegration tests
 # -----------------------------------------------------------------------
+
 
 class TestAIModelsIntegration:
     def test_free_client_can_run_free_model(self):
@@ -283,6 +302,12 @@ class TestAIModelsIntegration:
     def test_result_contains_expected_keys(self):
         client = AIModelsIntegration(tier=Tier.PRO)
         result = client.run_model(NLP_GPT4, {"prompt": "test"})
-        for key in ("model_id", "tier", "input", "output", "requests_used",
-                    "requests_remaining"):
+        for key in (
+            "model_id",
+            "tier",
+            "input",
+            "output",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result

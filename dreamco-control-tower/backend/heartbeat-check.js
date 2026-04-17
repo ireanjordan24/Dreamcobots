@@ -13,13 +13,13 @@
  *   const statuses = await checkAllBots();
  */
 
-import { readFileSync } from "fs";
-import { execSync } from "child_process";
-import { fileURLToPath } from "url";
-import path from "path";
+import { readFileSync } from 'fs';
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_CONFIG = path.join(__dirname, "..", "config", "bots.json");
+const BOTS_CONFIG = path.join(__dirname, '..', 'config', 'bots.json');
 
 // Default HTTP probe timeout in milliseconds.
 const HTTP_TIMEOUT_MS = 5000;
@@ -30,7 +30,7 @@ const HTTP_TIMEOUT_MS = 5000;
 
 function loadBots() {
   try {
-    return JSON.parse(readFileSync(BOTS_CONFIG, "utf8"));
+    return JSON.parse(readFileSync(BOTS_CONFIG, 'utf8'));
   } catch {
     return [];
   }
@@ -68,13 +68,13 @@ async function httpProbe(url) {
 function gitProbe(repoPath) {
   try {
     const branch = execSync(`git -C ${repoPath} rev-parse --abbrev-ref HEAD`, {
-      stdio: "pipe",
-      encoding: "utf8",
+      stdio: 'pipe',
+      encoding: 'utf8',
     }).trim();
-    const lastCommit = execSync(
-      `git -C ${repoPath} log -1 --format="%h %s" --no-merges`,
-      { stdio: "pipe", encoding: "utf8" }
-    ).trim();
+    const lastCommit = execSync(`git -C ${repoPath} log -1 --format="%h %s" --no-merges`, {
+      stdio: 'pipe',
+      encoding: 'utf8',
+    }).trim();
     return { healthy: true, branch, lastCommit };
   } catch {
     return { healthy: false };
@@ -101,14 +101,14 @@ export async function checkBot(botConfig) {
     const gitResult = gitProbe(botConfig.repoPath);
     probe = { reachable: gitResult.healthy, ...gitResult };
   } else {
-    probe = { reachable: false, reason: "no heartbeatUrl or repoPath configured" };
+    probe = { reachable: false, reason: 'no heartbeatUrl or repoPath configured' };
   }
 
   return {
     name: botConfig.name,
     repoName: botConfig.repoName,
     tier: botConfig.tier,
-    status: probe.reachable ? "active" : "offline",
+    status: probe.reachable ? 'active' : 'offline',
     lastHeartbeat: now,
     ...probe,
   };
@@ -130,10 +130,10 @@ export async function checkAllBots() {
 // ---------------------------------------------------------------------------
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   checkAllBots().then((statuses) => {
-    console.log("🫀 DreamCo Control Tower — Heartbeat Report\n");
+    console.log('🫀 DreamCo Control Tower — Heartbeat Report\n');
     statuses.forEach((s) => {
-      const icon = s.status === "active" ? "✅" : "❌";
-      const detail = s.latencyMs != null ? `${s.latencyMs}ms` : s.branch ?? "";
+      const icon = s.status === 'active' ? '✅' : '❌';
+      const detail = s.latencyMs != null ? `${s.latencyMs}ms` : (s.branch ?? '');
       console.log(`  ${icon} ${s.name.padEnd(25)} ${s.status.padEnd(8)} ${detail}`);
     });
     console.log(`\nTimestamp: ${new Date().toISOString()}`);

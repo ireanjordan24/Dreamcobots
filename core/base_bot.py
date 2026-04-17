@@ -25,7 +25,6 @@ import abc
 import time
 from typing import Any, Dict, List
 
-
 # ---------------------------------------------------------------------------
 # Required result shape
 # ---------------------------------------------------------------------------
@@ -65,7 +64,9 @@ class BaseBot(abc.ABC):
     name: str = ""
     category: str = ""
 
-    def __init__(self, name: str = "", description: str = "", version: str = "1.0.0", **kwargs) -> None:
+    def __init__(
+        self, name: str = "", description: str = "", version: str = "1.0.0", **kwargs
+    ) -> None:
         if name:
             self.__class__.name = name
         self.description = description
@@ -119,9 +120,7 @@ class BaseBot(abc.ABC):
         NotImplementedError
             If the subclass does not implement this method.
         """
-        raise NotImplementedError(
-            f"{self.__class__.__name__} must implement run(task)"
-        )
+        raise NotImplementedError(f"{self.__class__.__name__} must implement run(task)")
 
     # ------------------------------------------------------------------
     # Helpers for building compliant result dicts

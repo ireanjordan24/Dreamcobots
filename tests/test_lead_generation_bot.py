@@ -2,29 +2,39 @@
 Tests for bots/lead_generation_bot/tiers.py and bots/lead_generation_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.lead_generation_bot.tiers import LEAD_GENERATION_FEATURES, get_lead_generation_tier_info
+
 from bots.lead_generation_bot.bot import (
     LeadGenerationBot,
-    LeadGenerationBotTierError,
     LeadGenerationBotRequestLimitError,
+    LeadGenerationBotTierError,
+)
+from bots.lead_generation_bot.tiers import (
+    LEAD_GENERATION_FEATURES,
+    get_lead_generation_tier_info,
 )
 
 
 class TestLeadGenerationTierInfo:
     def test_free_tier_info_keys(self):
         info = get_lead_generation_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -111,7 +121,9 @@ class TestLeadGenerationBot:
     def test_enterprise_no_request_limit(self):
         bot = LeadGenerationBot(tier=Tier.ENTERPRISE)
         bot._request_count = 9999
-        result = bot.capture_lead({"name": "Enterprise Lead", "email": "ent@company.com"})
+        result = bot.capture_lead(
+            {"name": "Enterprise Lead", "email": "ent@company.com"}
+        )
         assert "lead_id" in result
 
     def test_get_stats_buddy_integration(self):

@@ -1,3 +1,6 @@
-from .home_flipping_analyzer import HomeFlippingAnalyzerBot, HomeFlippingAnalyzerTierError
+from .home_flipping_analyzer import (
+    HomeFlippingAnalyzerBot,
+    HomeFlippingAnalyzerTierError,
+)
 
 __all__ = ["HomeFlippingAnalyzerBot", "HomeFlippingAnalyzerTierError"]

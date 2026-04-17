@@ -4,15 +4,21 @@ Streamer Module for CreatorEmpire.
 Handles launching streaming accounts on Twitch and YouTube, AI-generated
 overlay templates, and channel setup automation for the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -24,18 +30,20 @@ class StreamerModuleError(Exception):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class OverlayTemplate:
     """AI-generated stream overlay configuration."""
+
     name: str
-    theme: str          # e.g. "gaming", "music", "sports", "talk_show"
+    theme: str  # e.g. "gaming", "music", "sports", "talk_show"
     primary_color: str
     secondary_color: str
     font: str
     alert_animation: str  # e.g. "fade", "slide", "bounce"
-    webcam_border: str   # e.g. "rounded", "hexagon", "neon_glow"
+    webcam_border: str  # e.g. "rounded", "hexagon", "neon_glow"
     chat_box_style: str  # e.g. "minimal", "neon", "retro"
-    tier_required: str   # "free" | "pro" | "enterprise"
+    tier_required: str  # "free" | "pro" | "enterprise"
 
     def to_dict(self) -> dict:
         return {
@@ -54,8 +62,9 @@ class OverlayTemplate:
 @dataclass
 class StreamerAccount:
     """Represents a streamer's platform account setup."""
+
     talent_id: str
-    platform: str          # "twitch" | "youtube"
+    platform: str  # "twitch" | "youtube"
     channel_name: str
     channel_url: str
     overlay: Optional[OverlayTemplate] = None
@@ -212,7 +221,9 @@ class StreamerModule:
             if _TIER_ORDER[o.tier_required] <= tier_level
         ]
 
-    def assign_overlay(self, talent_id: str, platform: str, overlay_name: str) -> StreamerAccount:
+    def assign_overlay(
+        self, talent_id: str, platform: str, overlay_name: str
+    ) -> StreamerAccount:
         """
         Assign a named overlay template to the streamer's account.
 
@@ -231,7 +242,9 @@ class StreamerModule:
         account.overlay = overlay
         return account
 
-    def generate_ai_overlay(self, talent_id: str, platform: str, theme: str) -> OverlayTemplate:
+    def generate_ai_overlay(
+        self, talent_id: str, platform: str, theme: str
+    ) -> OverlayTemplate:
         """
         Generate a custom AI overlay for a streamer (PRO/ENTERPRISE only).
 

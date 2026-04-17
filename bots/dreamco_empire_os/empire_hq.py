@@ -10,12 +10,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 @dataclass
 class EmpireStat:
     """A single empire-wide statistic."""
+
     label: str
     value: float
     unit: str
@@ -51,9 +53,13 @@ class EmpireHQ:
     # Stats
     # ------------------------------------------------------------------
 
-    def update_stat(self, label: str, value: float, unit: str = "", trend: str = "stable") -> None:
+    def update_stat(
+        self, label: str, value: float, unit: str = "", trend: str = "stable"
+    ) -> None:
         """Update or create an empire stat."""
-        self._stats[label] = EmpireStat(label=label, value=value, unit=unit, trend=trend)
+        self._stats[label] = EmpireStat(
+            label=label, value=value, unit=unit, trend=trend
+        )
 
     def record_revenue(self, amount_usd: float) -> None:
         """Record incoming revenue and award XP."""
@@ -105,7 +111,9 @@ class EmpireHQ:
 
     def add_alert(self, message: str) -> None:
         """Add an HQ alert."""
-        self._alerts.append({"message": message, "timestamp": datetime.now(timezone.utc).isoformat()})
+        self._alerts.append(
+            {"message": message, "timestamp": datetime.now(timezone.utc).isoformat()}
+        )
 
     def get_alerts(self) -> list:
         """Return all HQ alerts."""
@@ -125,8 +133,13 @@ class EmpireHQ:
             "revenue_usd": round(self._revenue_usd, 2),
             "cost_usd": round(self._cost_usd, 2),
             "profit_usd": round(profit, 2),
-            "profit_margin_pct": round((profit / self._revenue_usd * 100) if self._revenue_usd > 0 else 0.0, 1),
+            "profit_margin_pct": round(
+                (profit / self._revenue_usd * 100) if self._revenue_usd > 0 else 0.0, 1
+            ),
             "empire_level": self.get_empire_level(),
-            "stats": {k: {"value": v.value, "unit": v.unit, "trend": v.trend} for k, v in self._stats.items()},
+            "stats": {
+                k: {"value": v.value, "unit": v.unit, "trend": v.trend}
+                for k, v in self._stats.items()
+            },
             "alerts": self.get_alerts(),
         }

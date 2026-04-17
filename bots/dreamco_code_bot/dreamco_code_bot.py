@@ -1,11 +1,15 @@
 """DreamCo Code Bot — Replit competitor for code building and execution."""
-import sys
-import os
-import uuid
-import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import os
+import sys
+import time
+import uuid
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.dreamco_code_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -43,14 +47,20 @@ class CodeSession:
 class ExecutionResult:
     """Represents the result of a code execution."""
 
-    def __init__(self, stdout: str, stderr: str, exit_code: int,
-                 execution_time_ms: float, language: str):
+    def __init__(
+        self,
+        stdout: str,
+        stderr: str,
+        exit_code: int,
+        execution_time_ms: float,
+        language: str,
+    ):
         self.stdout = stdout
         self.stderr = stderr
         self.exit_code = exit_code
         self.execution_time_ms = execution_time_ms
         self.language = language
-        self.success = (exit_code == 0)
+        self.success = exit_code == 0
 
     def to_dict(self) -> dict:
         return {
@@ -79,12 +89,28 @@ class DreamCoCodeBot:
 
     FREE_LANGUAGES = ["python", "javascript"]
     PRO_LANGUAGES = [
-        "python", "javascript", "typescript", "ruby", "go",
-        "java", "c", "cpp", "rust", "php",
+        "python",
+        "javascript",
+        "typescript",
+        "ruby",
+        "go",
+        "java",
+        "c",
+        "cpp",
+        "rust",
+        "php",
     ]
     ALL_LANGUAGES = PRO_LANGUAGES + [
-        "kotlin", "swift", "scala", "r", "julia",
-        "bash", "powershell", "lua", "haskell", "elixir",
+        "kotlin",
+        "swift",
+        "scala",
+        "r",
+        "julia",
+        "bash",
+        "powershell",
+        "lua",
+        "haskell",
+        "elixir",
     ]
 
     LANGUAGE_LIMITS = {
@@ -102,8 +128,14 @@ class DreamCoCodeBot:
     # Simulated outputs for demo purposes (mock sandbox)
     _MOCK_OUTPUTS = {
         "python": {"stdout": "Hello from DreamCo Code Bot (Python)\n", "exit_code": 0},
-        "javascript": {"stdout": "Hello from DreamCo Code Bot (JavaScript)\n", "exit_code": 0},
-        "typescript": {"stdout": "Hello from DreamCo Code Bot (TypeScript)\n", "exit_code": 0},
+        "javascript": {
+            "stdout": "Hello from DreamCo Code Bot (JavaScript)\n",
+            "exit_code": 0,
+        },
+        "typescript": {
+            "stdout": "Hello from DreamCo Code Bot (TypeScript)\n",
+            "exit_code": 0,
+        },
         "ruby": {"stdout": "Hello from DreamCo Code Bot (Ruby)\n", "exit_code": 0},
         "go": {"stdout": "Hello from DreamCo Code Bot (Go)\n", "exit_code": 0},
         "java": {"stdout": "Hello from DreamCo Code Bot (Java)\n", "exit_code": 0},
@@ -157,8 +189,9 @@ class DreamCoCodeBot:
     # Code execution
     # ------------------------------------------------------------------
 
-    def execute(self, code: str, language: str,
-                stdin: str = "", session_id: str = None) -> ExecutionResult:
+    def execute(
+        self, code: str, language: str, stdin: str = "", session_id: str = None
+    ) -> ExecutionResult:
         """
         Execute code in the specified language.
 
@@ -187,7 +220,9 @@ class DreamCoCodeBot:
         self._check_execution_limit()
 
         start = time.time()
-        mock = self._MOCK_OUTPUTS.get(language, {"stdout": f"Executed {language} code.\n", "exit_code": 0})
+        mock = self._MOCK_OUTPUTS.get(
+            language, {"stdout": f"Executed {language} code.\n", "exit_code": 0}
+        )
         execution_time_ms = (time.time() - start) * 1000 + 50  # simulate ~50 ms
 
         result = ExecutionResult(
@@ -201,10 +236,12 @@ class DreamCoCodeBot:
         self._execution_count += 1
 
         if session_id and session_id in self._sessions:
-            self._sessions[session_id].history.append({
-                "code": code,
-                "result": result.to_dict(),
-            })
+            self._sessions[session_id].history.append(
+                {
+                    "code": code,
+                    "result": result.to_dict(),
+                }
+            )
 
         return result
 
@@ -356,7 +393,9 @@ class DreamCoCodeBot:
         return {
             "executions_used": self._execution_count,
             "executions_limit": limit,
-            "executions_remaining": (limit - self._execution_count) if limit is not None else None,
+            "executions_remaining": (
+                (limit - self._execution_count) if limit is not None else None
+            ),
             "sessions_active": len(self._sessions),
             "snippets_shared": len(self._snippets),
             "tier": self.tier.value,
@@ -376,7 +415,10 @@ class DreamCoCodeBot:
 
         if any(kw in msg for kw in ("languages", "what languages", "supported")):
             langs = self.list_languages()
-            return {"message": f"Supported languages: {', '.join(langs)}", "data": langs}
+            return {
+                "message": f"Supported languages: {', '.join(langs)}",
+                "data": langs,
+            }
 
         if any(kw in msg for kw in ("execute", "run", "build")):
             lang = "python"
@@ -406,7 +448,10 @@ class DreamCoCodeBot:
 
         if "tier" in msg or "features" in msg or "upgrade" in msg:
             info = self.get_tier_info()
-            return {"message": f"Current tier: {info['tier']}. Features: {info['features']}", "data": info}
+            return {
+                "message": f"Current tier: {info['tier']}. Features: {info['features']}",
+                "data": info,
+            }
 
         return {
             "message": (

@@ -9,10 +9,10 @@ from __future__ import annotations
 from bots.crypto_bot.crypto_database import CRYPTO_DATABASE, get_coin, list_categories
 from bots.crypto_bot.price_feed import get_price, get_price_change_24h
 
-
 # ---------------------------------------------------------------------------
 # Prospectus builder
 # ---------------------------------------------------------------------------
+
 
 def _format_large_number(n: float | None) -> str:
     """Return a human-readable abbreviation for large numbers."""
@@ -62,16 +62,26 @@ def get_coin_prospectus(symbol: str, use_live_price: bool = False) -> dict:
 
     price = get_price(sym, use_live=use_live_price) or coin["price_usd"]
     change_24h = get_price_change_24h(sym)
-    market_cap = coin["circulating_supply"] * price if coin.get("circulating_supply") else coin.get("market_cap_usd", 0)
+    market_cap = (
+        coin["circulating_supply"] * price
+        if coin.get("circulating_supply")
+        else coin.get("market_cap_usd", 0)
+    )
 
     # Build investment thesis points
     thesis = []
     if coin["category"] == "Layer 1":
-        thesis.append("Core blockchain infrastructure — potential to power an entire ecosystem.")
+        thesis.append(
+            "Core blockchain infrastructure — potential to power an entire ecosystem."
+        )
     elif coin["category"] in ("DeFi",):
-        thesis.append("Decentralised finance — eliminates intermediaries in lending/borrowing/trading.")
+        thesis.append(
+            "Decentralised finance — eliminates intermediaries in lending/borrowing/trading."
+        )
     elif coin["category"] in ("Privacy", "Privacy / Mining"):
-        thesis.append("Privacy-preserving — transactions are untraceable and unlinkable.")
+        thesis.append(
+            "Privacy-preserving — transactions are untraceable and unlinkable."
+        )
     elif coin["category"] == "Payments":
         thesis.append("Built for fast, low-cost global payments.")
     elif coin["category"] == "Layer 2":
@@ -83,9 +93,13 @@ def get_coin_prospectus(symbol: str, use_live_price: bool = False) -> dict:
     elif "Storage" in coin["category"]:
         thesis.append("Decentralised storage — disrupts traditional cloud providers.")
     elif "AI" in coin["category"] or "Data" in coin["category"]:
-        thesis.append("AI / Data economy — captures value from the machine-learning wave.")
+        thesis.append(
+            "AI / Data economy — captures value from the machine-learning wave."
+        )
     elif "NFT" in coin["category"] or "Metaverse" in coin["category"]:
-        thesis.append("Digital ownership layer — enables creator economies and virtual worlds.")
+        thesis.append(
+            "Digital ownership layer — enables creator economies and virtual worlds."
+        )
     elif coin["mineable"]:
         thesis.append("Proof-of-work security — backed by real energy expenditure.")
 
@@ -94,7 +108,9 @@ def get_coin_prospectus(symbol: str, use_live_price: bool = False) -> dict:
             f"Scarce supply — hard cap of {_format_supply(coin['max_supply'])} coins."
         )
     else:
-        thesis.append("Inflationary supply — relies on utility demand to maintain value.")
+        thesis.append(
+            "Inflationary supply — relies on utility demand to maintain value."
+        )
 
     if coin["launch_year"] <= 2015:
         thesis.append("Battle-tested — operational for over a decade.")
@@ -108,7 +124,6 @@ def get_coin_prospectus(symbol: str, use_live_price: bool = False) -> dict:
         "launch_year": coin["launch_year"],
         "algorithm": coin["algorithm"],
         "mineable": coin["mineable"],
-
         # Market data
         "current_price_usd": price,
         "price_change_24h_pct": change_24h,
@@ -120,13 +135,10 @@ def get_coin_prospectus(symbol: str, use_live_price: bool = False) -> dict:
         "max_supply_formatted": _format_supply(coin.get("max_supply")),
         "volume_24h_usd": coin.get("volume_24h_usd", 0),
         "volume_24h_formatted": _format_large_number(coin.get("volume_24h_usd", 0)),
-
         # Investment thesis
         "investment_thesis": thesis,
-
         # Risk label
         "risk_label": _risk_label(coin, change_24h),
-
         # Tags
         "tags": _build_tags(coin),
     }
@@ -175,13 +187,11 @@ def list_all_prospectuses(
     use_live_prices : fetch live prices from CoinGecko
     """
     symbols = [
-        sym for sym, data in CRYPTO_DATABASE.items()
+        sym
+        for sym, data in CRYPTO_DATABASE.items()
         if category is None or data["category"].lower() == category.lower()
     ]
-    return [
-        get_coin_prospectus(sym, use_live_price=use_live_prices)
-        for sym in symbols
-    ]
+    return [get_coin_prospectus(sym, use_live_price=use_live_prices) for sym in symbols]
 
 
 def prospectus_text(symbol: str, use_live_price: bool = False) -> str:

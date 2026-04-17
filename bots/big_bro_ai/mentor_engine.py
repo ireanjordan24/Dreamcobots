@@ -15,10 +15,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Mentoring domains
 # ---------------------------------------------------------------------------
+
 
 class MentorDomain(Enum):
     MONEY = "money"
@@ -34,11 +34,12 @@ class MentorDomain(Enum):
 # Growth stage — determines how hard Big Bro pushes
 # ---------------------------------------------------------------------------
 
+
 class GrowthStage(Enum):
-    SEED = "seed"           # Needs encouragement and basics
-    GROWING = "growing"     # Needs direction and accountability
-    BUILDING = "building"   # Needs discipline and strategy
-    SCALING = "scaling"     # Needs optimization and advanced tools
+    SEED = "seed"  # Needs encouragement and basics
+    GROWING = "growing"  # Needs direction and accountability
+    BUILDING = "building"  # Needs discipline and strategy
+    SCALING = "scaling"  # Needs optimization and advanced tools
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +183,7 @@ DISCIPLINE_LESSONS: dict[str, str] = {
 # Mentor Engine
 # ---------------------------------------------------------------------------
 
+
 class MentorEngineError(Exception):
     """Raised when a mentoring operation fails."""
 
@@ -221,7 +223,9 @@ class MentorEngine:
     # Lesson delivery
     # ------------------------------------------------------------------
 
-    def teach(self, user_id: str, domain: MentorDomain, topic: Optional[str] = None) -> dict:
+    def teach(
+        self, user_id: str, domain: MentorDomain, topic: Optional[str] = None
+    ) -> dict:
         """
         Deliver a lesson to *user_id* in *domain*.
 
@@ -293,8 +297,7 @@ class MentorEngine:
         GrowthStage
         """
         total_learned = sum(
-            len(lessons)
-            for lessons in self._user_progress.get(user_id, {}).values()
+            len(lessons) for lessons in self._user_progress.get(user_id, {}).values()
         )
         if total_learned < 3:
             return GrowthStage.SEED

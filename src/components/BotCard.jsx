@@ -50,9 +50,7 @@ export default function BotCard({ bot }) {
   } = bot;
 
   const tierClass = TIER_CLASS[tier] || 'tier--pro';
-  const visibleFeatures = featuresExpanded
-    ? features
-    : features.slice(0, FEATURE_PREVIEW_COUNT);
+  const visibleFeatures = featuresExpanded ? features : features.slice(0, FEATURE_PREVIEW_COUNT);
   const hasMore = features.length > FEATURE_PREVIEW_COUNT;
 
   return (

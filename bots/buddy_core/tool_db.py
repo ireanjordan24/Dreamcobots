@@ -225,7 +225,11 @@ class ToolDB:
     def get_tools_for_industry(self, industry: str) -> list[Tool]:
         """Return all tools tagged for the given industry."""
         lower = industry.lower()
-        return [t for t in _CATALOGUE if lower in t.industry_tags or "general" in t.industry_tags]
+        return [
+            t
+            for t in _CATALOGUE
+            if lower in t.industry_tags or "general" in t.industry_tags
+        ]
 
     def get_tool(self, tool_id: str) -> Optional[Tool]:
         """Return a tool by its ID, or None."""
@@ -236,7 +240,9 @@ class ToolDB:
         lower = industry.lower()
         # Prefer industry-specific tools; add general ones as fill
         specific = [t for t in _CATALOGUE if lower in t.industry_tags]
-        general = [t for t in _CATALOGUE if "general" in t.industry_tags and t not in specific]
+        general = [
+            t for t in _CATALOGUE if "general" in t.industry_tags and t not in specific
+        ]
         combined = specific + general
         # Deduplicate while preserving order
         seen: set[str] = set()

@@ -1,4 +1,5 @@
 """Behavioral/conversation dataset generator for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import random
@@ -8,7 +9,14 @@ logger = logging.getLogger(__name__)
 
 CONV_TYPES = ["sales", "support", "negotiation"]
 EMOTIONS = ["neutral", "frustrated", "happy", "confused", "angry", "satisfied"]
-OUTCOMES = ["resolved", "escalated", "abandoned", "sale_made", "refund_issued", "no_resolution"]
+OUTCOMES = [
+    "resolved",
+    "escalated",
+    "abandoned",
+    "sale_made",
+    "refund_issued",
+    "no_resolution",
+]
 
 SALES_TURNS = [
     ("agent", "Hello! How can I help you today?"),
@@ -34,7 +42,11 @@ NEGOTIATION_TURNS = [
     ("agent", "Let me check with my manager."),
 ]
 
-TURN_POOLS = {"sales": SALES_TURNS, "support": SUPPORT_TURNS, "negotiation": NEGOTIATION_TURNS}
+TURN_POOLS = {
+    "sales": SALES_TURNS,
+    "support": SUPPORT_TURNS,
+    "negotiation": NEGOTIATION_TURNS,
+}
 
 
 class BehavioralDatasetGenerator:
@@ -52,12 +64,14 @@ class BehavioralDatasetGenerator:
         base_turns = TURN_POOLS.get(conv_type, SALES_TURNS)
         turns = []
         for role, text in base_turns:
-            turns.append({
-                "role": role,
-                "text": text,
-                "emotion": random.choice(EMOTIONS),
-                "confidence": round(random.uniform(0.6, 1.0), 2),
-            })
+            turns.append(
+                {
+                    "role": role,
+                    "text": text,
+                    "emotion": random.choice(EMOTIONS),
+                    "confidence": round(random.uniform(0.6, 1.0), 2),
+                }
+            )
         return turns
 
     def generate(self, num_conversations: int = 100) -> list:

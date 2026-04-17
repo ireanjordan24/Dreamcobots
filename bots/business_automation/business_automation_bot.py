@@ -10,13 +10,18 @@ Usage
     response = bot.chat("Schedule a meeting for Monday 10 AM")
     print(response["message"])
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.business_automation.tiers import (
     BA_EXTRA_FEATURES,
     BA_WORKFLOWS,
@@ -78,9 +83,7 @@ class BusinessAutomationBot:
         self._check_workflow_access(active_workflow)
 
         self._request_count += 1
-        response_text = (
-            f"[BusinessAutomation/{active_workflow}] Processed: {message!r}"
-        )
+        response_text = f"[BusinessAutomation/{active_workflow}] Processed: {message!r}"
         self._history.append({"role": "user", "content": message})
         self._history.append({"role": "assistant", "content": response_text})
 

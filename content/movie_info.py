@@ -3,7 +3,6 @@
 
 import random
 
-
 MOVIE_DATABASE = [
     {
         "title": "Inception",
@@ -91,7 +90,11 @@ class MovieInfo:
     def search_by_genre(self, genre):
         """Return all movies matching a genre."""
         genre_lower = genre.lower()
-        results = [m for m in self.database if any(g.lower() == genre_lower for g in m["genre"])]
+        results = [
+            m
+            for m in self.database
+            if any(g.lower() == genre_lower for g in m["genre"])
+        ]
         return [dict(m) for m in results]
 
     def get_top_rated(self, n=5):

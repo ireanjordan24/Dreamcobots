@@ -1,7 +1,15 @@
 """DreamAIInvent Hub package."""
 
-from bots.dreamai_invent_hub.dreamai_invent_hub import DreamAIInventHub, DreamAIInventHubTierError
-from bots.dreamai_invent_hub.tiers import Tier, get_tier_config, list_tiers, get_upgrade_path
+from bots.dreamai_invent_hub.dreamai_invent_hub import (
+    DreamAIInventHub,
+    DreamAIInventHubTierError,
+)
+from bots.dreamai_invent_hub.tiers import (
+    Tier,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 __all__ = [
     "DreamAIInventHub",

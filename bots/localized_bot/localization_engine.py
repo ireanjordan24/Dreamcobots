@@ -12,14 +12,13 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
 from bots.localized_bot.region_database import RegionDatabase
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # Cultural tips keyed by region_id.
 _CULTURAL_TIPS: dict[str, list[str]] = {
@@ -119,9 +118,7 @@ class LocalizationEngine:
             if industry
             else ""
         )
-        adapted = (
-            f"[{region['language_name']} / {region['region_name']}] {content}"
-        )
+        adapted = f"[{region['language_name']} / {region['region_name']}] {content}"
         return {
             "original": content,
             "adapted": adapted,

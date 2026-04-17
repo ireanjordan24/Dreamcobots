@@ -2,72 +2,71 @@
 Tests for bots/211-resource-eligibility-bot/bot.py and tiers.py.
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', '211-resource-eligibility-bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "211-resource-eligibility-bot")
 sys.path.insert(0, BOT_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-
+from bot import (
+    BuildingIntelPanel,
+    FamilyAlert,
+    InvalidLocationError,
+    Resource,
+    ResourceBot,
+    ResourceBotTierError,
+    ResourceFilter,
+    ResourceNotFoundError,
+    ResourcePlan,
+    RouteInfo,
+    UserProfile,
+    _haversine_km,
+)
 from tiers import (
+    DATA_SOURCE_211,
+    DATA_SOURCE_AMERICAN_JOB_CENTERS,
+    DATA_SOURCE_FEEDING_AMERICA,
+    DATA_SOURCE_HUD,
+    ENTERPRISE_FEATURES,
+    ENTERPRISE_MAX_RESULTS,
+    FEATURE_ADVANCED_FILTERING,
+    FEATURE_AFFILIATE_PROGRAMS,
+    FEATURE_AI_RESOURCE_MATCHING,
+    FEATURE_ARRIVAL_ALERTS,
+    FEATURE_BUILDING_INTEL_PANELS,
+    FEATURE_CROWD_REPORTING,
+    FEATURE_FAMILY_GPS,
+    FEATURE_GPS_MAP,
+    FEATURE_PANIC_BUTTON,
+    FEATURE_RESOURCE_SEARCH,
+    FEATURE_RIDESHARE_COST_ESTIMATE,
+    FEATURE_ROUTE_PLANNING,
+    FEATURE_SAFETY_SCORE,
+    FEATURE_SPONSORED_LISTINGS,
+    FEATURE_SUPPLY_ALERTS,
+    FEATURE_WHITE_LABEL,
+    FREE_DATA_SOURCES,
+    FREE_FEATURES,
+    FREE_MAX_RESULTS,
+    PRO_DATA_SOURCES,
+    PRO_FEATURES,
+    PRO_MAX_RESULTS,
+    RESOURCE_CATEGORIES,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
-    list_tiers,
     get_upgrade_path,
-    TIER_CATALOGUE,
-    FREE_FEATURES,
-    PRO_FEATURES,
-    ENTERPRISE_FEATURES,
-    FEATURE_RESOURCE_SEARCH,
-    FEATURE_GPS_MAP,
-    FEATURE_BUILDING_INTEL_PANELS,
-    FEATURE_ADVANCED_FILTERING,
-    FEATURE_ROUTE_PLANNING,
-    FEATURE_RIDESHARE_COST_ESTIMATE,
-    FEATURE_CROWD_REPORTING,
-    FEATURE_SUPPLY_ALERTS,
-    FEATURE_SAFETY_SCORE,
-    FEATURE_AI_RESOURCE_MATCHING,
-    FEATURE_FAMILY_GPS,
-    FEATURE_PANIC_BUTTON,
-    FEATURE_ARRIVAL_ALERTS,
-    FEATURE_SPONSORED_LISTINGS,
-    FEATURE_AFFILIATE_PROGRAMS,
-    FEATURE_WHITE_LABEL,
-    FREE_DATA_SOURCES,
-    PRO_DATA_SOURCES,
-    DATA_SOURCE_211,
-    DATA_SOURCE_FEEDING_AMERICA,
-    DATA_SOURCE_HUD,
-    DATA_SOURCE_AMERICAN_JOB_CENTERS,
-    FREE_MAX_RESULTS,
-    PRO_MAX_RESULTS,
-    ENTERPRISE_MAX_RESULTS,
-    RESOURCE_CATEGORIES,
+    list_tiers,
 )
-from bot import (
-    ResourceBot,
-    ResourceFilter,
-    UserProfile,
-    Resource,
-    BuildingIntelPanel,
-    RouteInfo,
-    ResourcePlan,
-    FamilyAlert,
-    ResourceBotTierError,
-    ResourceNotFoundError,
-    InvalidLocationError,
-    _haversine_km,
-)
-
 
 # ===========================================================================
 # Tier configuration tests
 # ===========================================================================
+
 
 class TestTierConfig:
     def test_all_tiers_present(self):
@@ -183,6 +182,7 @@ class TestTierConfig:
 # Utility helper tests
 # ===========================================================================
 
+
 class TestHaversine:
     def test_same_point_is_zero(self):
         assert _haversine_km(40.0, -74.0, 40.0, -74.0) == pytest.approx(0.0)
@@ -201,6 +201,7 @@ class TestHaversine:
 # ===========================================================================
 # ResourceBot — basic construction & tier info
 # ===========================================================================
+
 
 class TestResourceBotConstruction:
     def test_default_tier_is_free(self):
@@ -241,6 +242,7 @@ class TestResourceBotConstruction:
 # Resource search
 # ===========================================================================
 
+
 class TestResourceSearch:
     def setup_method(self):
         self.free_bot = ResourceBot(tier=Tier.FREE)
@@ -268,12 +270,16 @@ class TestResourceSearch:
         assert len(results) <= PRO_MAX_RESULTS
 
     def test_category_filter(self):
-        results = self.free_bot.search_resources(lat=40.7128, lon=-74.0060, category="food")
+        results = self.free_bot.search_resources(
+            lat=40.7128, lon=-74.0060, category="food"
+        )
         for r in results:
             assert r.category == "food"
 
     def test_category_shelter(self):
-        results = self.free_bot.search_resources(lat=40.7128, lon=-74.0060, category="shelter")
+        results = self.free_bot.search_resources(
+            lat=40.7128, lon=-74.0060, category="shelter"
+        )
         for r in results:
             assert r.category == "shelter"
 
@@ -331,6 +337,7 @@ class TestResourceSearch:
 # Building Intelligence Panel
 # ===========================================================================
 
+
 class TestBuildingIntelPanel:
     def setup_method(self):
         self.free_bot = ResourceBot(tier=Tier.FREE)
@@ -366,7 +373,9 @@ class TestBuildingIntelPanel:
 
     def test_panel_wait_time_label(self):
         panel = self.pro_bot.get_building_intel_panel("r001")
-        assert "minute" in panel.wait_time_label or "wait" in panel.wait_time_label.lower()
+        assert (
+            "minute" in panel.wait_time_label or "wait" in panel.wait_time_label.lower()
+        )
 
     def test_panel_success_instructions(self):
         panel = self.pro_bot.get_building_intel_panel("r001")
@@ -407,12 +416,16 @@ class TestBuildingIntelPanel:
         )
         bot.add_resource(r)
         panel = bot.get_building_intel_panel("r_test_wait")
-        assert "no wait" in panel.wait_time_label.lower() or "minimal" in panel.wait_time_label.lower()
+        assert (
+            "no wait" in panel.wait_time_label.lower()
+            or "minimal" in panel.wait_time_label.lower()
+        )
 
 
 # ===========================================================================
 # Route planning
 # ===========================================================================
+
 
 class TestRoutePlanning:
     def setup_method(self):
@@ -482,6 +495,7 @@ class TestRoutePlanning:
 # Crowd reporting & supply alerts
 # ===========================================================================
 
+
 class TestCrowdAndSupply:
     def setup_method(self):
         self.free_bot = ResourceBot(tier=Tier.FREE)
@@ -520,6 +534,7 @@ class TestCrowdAndSupply:
 # Neighbourhood safety score
 # ===========================================================================
 
+
 class TestSafetyScore:
     def setup_method(self):
         self.free_bot = ResourceBot(tier=Tier.FREE)
@@ -546,6 +561,7 @@ class TestSafetyScore:
 # AI resource matching
 # ===========================================================================
 
+
 class TestAIResourceMatching:
     def setup_method(self):
         self.free_bot = ResourceBot(tier=Tier.FREE)
@@ -554,47 +570,65 @@ class TestAIResourceMatching:
     def test_plan_requires_pro(self):
         profile = UserProfile()
         with pytest.raises(ResourceBotTierError):
-            self.free_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+            self.free_bot.generate_resource_plan(
+                profile=profile, lat=40.7128, lon=-74.0060
+            )
 
     def test_plan_returns_resource_plan(self):
         profile = UserProfile()
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert isinstance(plan, ResourcePlan)
 
     def test_plan_has_summary(self):
         profile = UserProfile()
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert len(plan.summary) > 0
 
     def test_plan_has_priority_categories(self):
         profile = UserProfile()
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert isinstance(plan.priority_categories, list)
         assert len(plan.priority_categories) > 0
 
     def test_homeless_profile_includes_shelter(self):
         profile = UserProfile(housing_status="homeless", income_level="very_low")
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert "shelter" in plan.priority_categories
 
     def test_unemployed_profile_includes_jobs(self):
         profile = UserProfile(employed=False, income_level="low")
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert "job_assistance" in plan.priority_categories
 
     def test_low_income_includes_food(self):
         profile = UserProfile(income_level="very_low")
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert "food" in plan.priority_categories
 
     def test_plan_has_financial_literacy_tips(self):
         profile = UserProfile(income_level="low")
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert len(plan.financial_literacy_tips) > 0
 
     def test_plan_profile_stored(self):
         profile = UserProfile(household_size=4, has_children=True)
-        plan = self.pro_bot.generate_resource_plan(profile=profile, lat=40.7128, lon=-74.0060)
+        plan = self.pro_bot.generate_resource_plan(
+            profile=profile, lat=40.7128, lon=-74.0060
+        )
         assert plan.profile.household_size == 4
 
     def test_plan_invalid_location_raises(self):
@@ -606,6 +640,7 @@ class TestAIResourceMatching:
 # ===========================================================================
 # Family GPS & safety alerts
 # ===========================================================================
+
 
 class TestFamilyGPS:
     def setup_method(self):
@@ -678,6 +713,7 @@ class TestFamilyGPS:
 # Resource layers
 # ===========================================================================
 
+
 class TestResourceLayers:
     def setup_method(self):
         self.bot = ResourceBot(tier=Tier.FREE)
@@ -717,6 +753,7 @@ class TestResourceLayers:
 # ===========================================================================
 # Monetisation — sponsored listings & affiliates
 # ===========================================================================
+
 
 class TestMonetisation:
     def setup_method(self):
@@ -773,6 +810,7 @@ class TestMonetisation:
 # ===========================================================================
 # Custom resource management
 # ===========================================================================
+
 
 class TestResourceManagement:
     def setup_method(self):

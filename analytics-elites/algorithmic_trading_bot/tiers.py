@@ -10,6 +10,17 @@ class TierConfig:
 
 TIERS = {
     "free": TierConfig("Free", 0.0, ["moving average signals", "3 symbols/month"]),
-    "pro": TierConfig("Pro", 99.0, ["RSI signals", "MACD", "backtesting", "10 symbols"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["all indicators", "unlimited symbols", "live trading hooks", "portfolio analytics"]),
+    "pro": TierConfig(
+        "Pro", 99.0, ["RSI signals", "MACD", "backtesting", "10 symbols"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "all indicators",
+            "unlimited symbols",
+            "live trading hooks",
+            "portfolio analytics",
+        ],
+    ),
 }

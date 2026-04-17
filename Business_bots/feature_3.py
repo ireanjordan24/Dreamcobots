@@ -10,8 +10,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -22,42 +22,360 @@ from framework import GlobalAISourcesFlow  # noqa: F401 — GLOBAL AI SOURCES FL
 # ---------------------------------------------------------------------------
 
 EXAMPLES = [
-    {"id": "INV-001", "client": "Acme Corp",          "service": "Website Redesign",         "amount": 5000,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-15", "paid_date": "2025-04-12", "currency": "USD"},
-    {"id": "INV-002", "client": "Beta Tech",           "service": "Mobile App Development",   "amount": 12000, "tax_rate": 0.08, "status": "pending", "due_date": "2025-05-15", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-003", "client": "Gamma LLC",           "service": "SEO Consulting",            "amount": 2500,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-20", "paid_date": "2025-04-18", "currency": "USD"},
-    {"id": "INV-004", "client": "Delta Startup",       "service": "UI/UX Design Package",     "amount": 3500,  "tax_rate": 0.08, "status": "overdue", "due_date": "2025-04-01", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-005", "client": "Epsilon Media",       "service": "Content Marketing Package","amount": 1800,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-10", "paid_date": "2025-04-08", "currency": "USD"},
-    {"id": "INV-006", "client": "Zeta Foods",          "service": "Social Media Management",  "amount": 900,   "tax_rate": 0.08, "status": "pending", "due_date": "2025-05-20", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-007", "client": "Eta Consulting",      "service": "Strategy Workshop",        "amount": 4000,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-05", "paid_date": "2025-04-03", "currency": "USD"},
-    {"id": "INV-008", "client": "Theta Analytics",     "service": "Data Dashboard Build",     "amount": 7500,  "tax_rate": 0.08, "status": "partial", "due_date": "2025-05-10", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-009", "client": "Iota E-commerce",     "service": "Shopify Store Setup",      "amount": 2200,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-25", "paid_date": "2025-04-24", "currency": "USD"},
-    {"id": "INV-010", "client": "Kappa Financial",     "service": "Financial Reporting",      "amount": 3000,  "tax_rate": 0.08, "status": "overdue", "due_date": "2025-03-31", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-011", "client": "Lambda SaaS",         "service": "API Integration",          "amount": 6500,  "tax_rate": 0.08, "status": "pending", "due_date": "2025-05-25", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-012", "client": "Mu Logistics",        "service": "Automation Setup",         "amount": 4500,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-18", "paid_date": "2025-04-17", "currency": "USD"},
-    {"id": "INV-013", "client": "Nu Healthcare",       "service": "HIPAA Compliance Audit",   "amount": 8000,  "tax_rate": 0.08, "status": "pending", "due_date": "2025-06-01", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-014", "client": "Xi Real Estate",      "service": "Property Listing Bot",     "amount": 3200,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-22", "paid_date": "2025-04-21", "currency": "USD"},
-    {"id": "INV-015", "client": "Omicron AI",          "service": "AI Model Fine-tuning",     "amount": 15000, "tax_rate": 0.08, "status": "partial", "due_date": "2025-05-15", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-016", "client": "Pi Retail",           "service": "Email Marketing Setup",    "amount": 1500,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-12", "paid_date": "2025-04-10", "currency": "USD"},
-    {"id": "INV-017", "client": "Rho Education",       "service": "LMS Development",          "amount": 9500,  "tax_rate": 0.08, "status": "overdue", "due_date": "2025-04-05", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-018", "client": "Sigma Fitness",       "service": "App Development",          "amount": 5500,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-28", "paid_date": "2025-04-26", "currency": "USD"},
-    {"id": "INV-019", "client": "Tau Manufacturing",   "service": "ERP Integration",          "amount": 18000, "tax_rate": 0.08, "status": "pending", "due_date": "2025-06-15", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-020", "client": "Upsilon Travel",      "service": "Booking Engine Build",     "amount": 6000,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-30", "paid_date": "2025-04-29", "currency": "USD"},
-    {"id": "INV-021", "client": "Phi Legal",           "service": "Document Automation",      "amount": 4800,  "tax_rate": 0.08, "status": "pending", "due_date": "2025-05-30", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-022", "client": "Chi Media",           "service": "Video Production",         "amount": 7200,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-20", "paid_date": "2025-04-19", "currency": "USD"},
-    {"id": "INV-023", "client": "Psi Security",        "service": "Penetration Testing",      "amount": 11000, "tax_rate": 0.08, "status": "overdue", "due_date": "2025-04-10", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-024", "client": "Omega Events",        "service": "Event Website Development","amount": 2800,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-16", "paid_date": "2025-04-14", "currency": "USD"},
-    {"id": "INV-025", "client": "Alpha Prime",         "service": "CRM Implementation",       "amount": 9000,  "tax_rate": 0.08, "status": "partial", "due_date": "2025-05-20", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-026", "client": "Beta Prime",          "service": "Cloud Migration",          "amount": 22000, "tax_rate": 0.08, "status": "pending", "due_date": "2025-07-01", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-027", "client": "Gamma Prime",         "service": "Brand Strategy",           "amount": 3800,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-24", "paid_date": "2025-04-23", "currency": "USD"},
-    {"id": "INV-028", "client": "Delta Prime",         "service": "DevOps Setup",             "amount": 5200,  "tax_rate": 0.08, "status": "pending", "due_date": "2025-05-28", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-029", "client": "Epsilon Prime",       "service": "AI Consulting",            "amount": 13500, "tax_rate": 0.08, "status": "overdue", "due_date": "2025-04-08", "paid_date": None,         "currency": "USD"},
-    {"id": "INV-030", "client": "Zeta Prime",          "service": "Full Stack Development",   "amount": 8500,  "tax_rate": 0.08, "status": "paid",    "due_date": "2025-04-26", "paid_date": "2025-04-25", "currency": "USD"},
+    {
+        "id": "INV-001",
+        "client": "Acme Corp",
+        "service": "Website Redesign",
+        "amount": 5000,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-15",
+        "paid_date": "2025-04-12",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-002",
+        "client": "Beta Tech",
+        "service": "Mobile App Development",
+        "amount": 12000,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-05-15",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-003",
+        "client": "Gamma LLC",
+        "service": "SEO Consulting",
+        "amount": 2500,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-20",
+        "paid_date": "2025-04-18",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-004",
+        "client": "Delta Startup",
+        "service": "UI/UX Design Package",
+        "amount": 3500,
+        "tax_rate": 0.08,
+        "status": "overdue",
+        "due_date": "2025-04-01",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-005",
+        "client": "Epsilon Media",
+        "service": "Content Marketing Package",
+        "amount": 1800,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-10",
+        "paid_date": "2025-04-08",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-006",
+        "client": "Zeta Foods",
+        "service": "Social Media Management",
+        "amount": 900,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-05-20",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-007",
+        "client": "Eta Consulting",
+        "service": "Strategy Workshop",
+        "amount": 4000,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-05",
+        "paid_date": "2025-04-03",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-008",
+        "client": "Theta Analytics",
+        "service": "Data Dashboard Build",
+        "amount": 7500,
+        "tax_rate": 0.08,
+        "status": "partial",
+        "due_date": "2025-05-10",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-009",
+        "client": "Iota E-commerce",
+        "service": "Shopify Store Setup",
+        "amount": 2200,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-25",
+        "paid_date": "2025-04-24",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-010",
+        "client": "Kappa Financial",
+        "service": "Financial Reporting",
+        "amount": 3000,
+        "tax_rate": 0.08,
+        "status": "overdue",
+        "due_date": "2025-03-31",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-011",
+        "client": "Lambda SaaS",
+        "service": "API Integration",
+        "amount": 6500,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-05-25",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-012",
+        "client": "Mu Logistics",
+        "service": "Automation Setup",
+        "amount": 4500,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-18",
+        "paid_date": "2025-04-17",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-013",
+        "client": "Nu Healthcare",
+        "service": "HIPAA Compliance Audit",
+        "amount": 8000,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-06-01",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-014",
+        "client": "Xi Real Estate",
+        "service": "Property Listing Bot",
+        "amount": 3200,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-22",
+        "paid_date": "2025-04-21",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-015",
+        "client": "Omicron AI",
+        "service": "AI Model Fine-tuning",
+        "amount": 15000,
+        "tax_rate": 0.08,
+        "status": "partial",
+        "due_date": "2025-05-15",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-016",
+        "client": "Pi Retail",
+        "service": "Email Marketing Setup",
+        "amount": 1500,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-12",
+        "paid_date": "2025-04-10",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-017",
+        "client": "Rho Education",
+        "service": "LMS Development",
+        "amount": 9500,
+        "tax_rate": 0.08,
+        "status": "overdue",
+        "due_date": "2025-04-05",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-018",
+        "client": "Sigma Fitness",
+        "service": "App Development",
+        "amount": 5500,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-28",
+        "paid_date": "2025-04-26",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-019",
+        "client": "Tau Manufacturing",
+        "service": "ERP Integration",
+        "amount": 18000,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-06-15",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-020",
+        "client": "Upsilon Travel",
+        "service": "Booking Engine Build",
+        "amount": 6000,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-30",
+        "paid_date": "2025-04-29",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-021",
+        "client": "Phi Legal",
+        "service": "Document Automation",
+        "amount": 4800,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-05-30",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-022",
+        "client": "Chi Media",
+        "service": "Video Production",
+        "amount": 7200,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-20",
+        "paid_date": "2025-04-19",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-023",
+        "client": "Psi Security",
+        "service": "Penetration Testing",
+        "amount": 11000,
+        "tax_rate": 0.08,
+        "status": "overdue",
+        "due_date": "2025-04-10",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-024",
+        "client": "Omega Events",
+        "service": "Event Website Development",
+        "amount": 2800,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-16",
+        "paid_date": "2025-04-14",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-025",
+        "client": "Alpha Prime",
+        "service": "CRM Implementation",
+        "amount": 9000,
+        "tax_rate": 0.08,
+        "status": "partial",
+        "due_date": "2025-05-20",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-026",
+        "client": "Beta Prime",
+        "service": "Cloud Migration",
+        "amount": 22000,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-07-01",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-027",
+        "client": "Gamma Prime",
+        "service": "Brand Strategy",
+        "amount": 3800,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-24",
+        "paid_date": "2025-04-23",
+        "currency": "USD",
+    },
+    {
+        "id": "INV-028",
+        "client": "Delta Prime",
+        "service": "DevOps Setup",
+        "amount": 5200,
+        "tax_rate": 0.08,
+        "status": "pending",
+        "due_date": "2025-05-28",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-029",
+        "client": "Epsilon Prime",
+        "service": "AI Consulting",
+        "amount": 13500,
+        "tax_rate": 0.08,
+        "status": "overdue",
+        "due_date": "2025-04-08",
+        "paid_date": None,
+        "currency": "USD",
+    },
+    {
+        "id": "INV-030",
+        "client": "Zeta Prime",
+        "service": "Full Stack Development",
+        "amount": 8500,
+        "tax_rate": 0.08,
+        "status": "paid",
+        "due_date": "2025-04-26",
+        "paid_date": "2025-04-25",
+        "currency": "USD",
+    },
 ]
 
 TIERS = {
-    "FREE":       {"price_usd": 0,   "max_invoices": 5,    "tax_calc": False, "overdue_alerts": False, "pdf_export": False},
-    "PRO":        {"price_usd": 29,  "max_invoices": 100,  "tax_calc": True,  "overdue_alerts": True,  "pdf_export": False},
-    "ENTERPRISE": {"price_usd": 99,  "max_invoices": None, "tax_calc": True,  "overdue_alerts": True,  "pdf_export": True},
+    "FREE": {
+        "price_usd": 0,
+        "max_invoices": 5,
+        "tax_calc": False,
+        "overdue_alerts": False,
+        "pdf_export": False,
+    },
+    "PRO": {
+        "price_usd": 29,
+        "max_invoices": 100,
+        "tax_calc": True,
+        "overdue_alerts": True,
+        "pdf_export": False,
+    },
+    "ENTERPRISE": {
+        "price_usd": 99,
+        "max_invoices": None,
+        "tax_calc": True,
+        "overdue_alerts": True,
+        "pdf_export": True,
+    },
 }
 
 
@@ -88,7 +406,9 @@ class InvoicingBot:
         result = dict(invoice)
         if self._config["tax_calc"]:
             result["tax_amount"] = round(invoice["amount"] * invoice["tax_rate"], 2)
-            result["total_with_tax"] = round(invoice["amount"] * (1 + invoice["tax_rate"]), 2)
+            result["total_with_tax"] = round(
+                invoice["amount"] * (1 + invoice["tax_rate"]), 2
+            )
         return result
 
     def get_invoices_by_status(self, status: str) -> list[dict]:
@@ -113,13 +433,21 @@ class InvoicingBot:
         if invoice is None:
             raise ValueError(f"Invoice '{invoice_id}' not found.")
         if invoice["status"] != "overdue":
-            return {"sent": False, "reason": f"Invoice is not overdue (status: {invoice['status']})"}
+            return {
+                "sent": False,
+                "reason": f"Invoice is not overdue (status: {invoice['status']})",
+            }
         message = (
             f"Dear {invoice['client']}, this is a reminder that invoice {invoice_id} "
             f"for {invoice['service']} (${invoice['amount']:,.2f}) was due on "
             f"{invoice['due_date']}. Please process payment at your earliest convenience."
         )
-        return {"sent": True, "invoice_id": invoice_id, "client": invoice["client"], "message": message}
+        return {
+            "sent": True,
+            "invoice_id": invoice_id,
+            "client": invoice["client"],
+            "message": message,
+        }
 
     def calculate_tax(self, invoice_id: str) -> dict:
         """Calculate tax for an invoice (PRO/ENTERPRISE)."""
@@ -154,7 +482,11 @@ class InvoicingBot:
             "total_pending": pending,
             "total_overdue": overdue,
             "total_partial": partial,
-            "collection_rate_pct": round(paid / sum(i["amount"] for i in invoices) * 100, 1) if invoices else 0,
+            "collection_rate_pct": (
+                round(paid / sum(i["amount"] for i in invoices) * 100, 1)
+                if invoices
+                else 0
+            ),
             "invoice_count": len(invoices),
             "tier": self.tier,
         }
@@ -193,14 +525,19 @@ class InvoicingBot:
             raw_data={"domain": "invoicing", "invoices_count": len(EXAMPLES)},
             learning_method="supervised",
         )
-        return {"pipeline_complete": result.get("pipeline_complete"), "revenue": self.get_revenue_summary()}
+        return {
+            "pipeline_complete": result.get("pipeline_complete"),
+            "revenue": self.get_revenue_summary(),
+        }
 
 
 if __name__ == "__main__":
     bot = InvoicingBot(tier="PRO")
     revenue = bot.get_revenue_summary()
     print(f"Total invoiced: ${revenue['total_invoiced']:,}")
-    print(f"Total paid: ${revenue['total_paid']:,} (Collection rate: {revenue['collection_rate_pct']}%)")
+    print(
+        f"Total paid: ${revenue['total_paid']:,} (Collection rate: {revenue['collection_rate_pct']}%)"
+    )
     overdue = bot.get_overdue_invoices()
     print(f"Overdue invoices: {len(overdue)}")
     reminder = bot.send_overdue_reminder("INV-004")
@@ -272,7 +609,12 @@ def _invoicing_bot_analyze(self):
 
 def _invoicing_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "InvoicingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "bot": "InvoicingBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 InvoicingBot.monthly_price = _invoicing_bot_monthly_price

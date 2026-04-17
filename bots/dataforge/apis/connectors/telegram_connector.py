@@ -1,4 +1,5 @@
 """Telegram Bot API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,13 @@ class TelegramConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.post(f"{self.BASE_URL}{self.token}/sendMessage",
-                json={"chat_id": chat_id, "text": text}, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}{self.token}/sendMessage",
+                json={"chat_id": chat_id, "text": text},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Telegram message sent to chat %s.", chat_id)
             return {"status": "success", "data": response.json()}
@@ -48,12 +53,15 @@ class TelegramConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}{self.token}/getUpdates",
-                params={"offset": offset}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}{self.token}/getUpdates",
+                params={"offset": offset},
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Telegram get_updates error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -1,4 +1,5 @@
 """UN Data API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,8 +26,11 @@ class UNDataConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/data/{series_code}?format=json", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/data/{series_code}?format=json", timeout=30
+            )
             response.raise_for_status()
             logger.info("UN data fetched for series: %s", series_code)
             return {"status": "success", "data": response.json()}
@@ -44,11 +48,13 @@ class UNDataConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/dataflow?q={query}&format=json", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/dataflow?q={query}&format=json", timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("UN Data search error: %s", e)
             return {"status": "error", "message": str(e)}
-

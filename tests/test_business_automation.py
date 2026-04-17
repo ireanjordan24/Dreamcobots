@@ -3,34 +3,43 @@ Tests for bots/business_automation/tiers.py and
 bots/business_automation/business_automation_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.business_automation.tiers import (
-    get_ba_tier_info,
-    BA_EXTRA_FEATURES,
-    BA_WORKFLOWS,
-)
+
 from bots.business_automation.business_automation_bot import (
     BusinessAutomationBot,
-    BusinessAutomationTierError,
     BusinessAutomationRequestLimitError,
+    BusinessAutomationTierError,
+)
+from bots.business_automation.tiers import (
+    BA_EXTRA_FEATURES,
+    BA_WORKFLOWS,
+    get_ba_tier_info,
 )
 
 
 class TestBATierInfo:
     def test_tier_info_keys(self):
         info = get_ba_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "ba_features", "workflows", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "ba_features",
+            "workflows",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -85,7 +94,13 @@ class TestBusinessAutomationBot:
     def test_chat_result_keys(self):
         bot = BusinessAutomationBot(tier=Tier.FREE)
         result = bot.chat("Schedule a meeting")
-        for key in ("message", "workflow", "tier", "requests_used", "requests_remaining"):
+        for key in (
+            "message",
+            "workflow",
+            "tier",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_chat_increments_request_count(self):

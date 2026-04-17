@@ -1,4 +1,5 @@
 """Google Gemini API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,6 +29,7 @@ class GoogleGeminiConnector:
             API response dict or error dict.
         """
         import requests
+
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         try:
             url = f"{self.BASE_URL}/models/{model}:generateContent?key={self.api_key}"
@@ -38,4 +40,3 @@ class GoogleGeminiConnector:
         except requests.RequestException as e:
             logger.error("Google Gemini error: %s", e)
             return {"status": "error", "message": str(e)}
-

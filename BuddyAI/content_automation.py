@@ -88,9 +88,9 @@ class SaaSIdea:
     target_market: str
     key_features: list[str]
     revenue_model: str
-    viability_score: float        # 0 – 10
+    viability_score: float  # 0 – 10
     estimated_monthly_revenue: float
-    competition_level: str        # low / medium / high
+    competition_level: str  # low / medium / high
 
     def to_dict(self) -> dict:
         return {
@@ -130,9 +130,16 @@ class VideoOutline:
 # ── Template data ──────────────────────────────────────────────────────────
 
 _NICHES = [
-    "personal finance", "productivity", "health & wellness",
-    "remote work", "AI tools", "e-commerce", "investing",
-    "digital marketing", "self-improvement", "passive income",
+    "personal finance",
+    "productivity",
+    "health & wellness",
+    "remote work",
+    "AI tools",
+    "e-commerce",
+    "investing",
+    "digital marketing",
+    "self-improvement",
+    "passive income",
 ]
 
 _BLOG_TEMPLATES = [
@@ -267,15 +274,17 @@ class ContentAutomation:
             f"Frequently asked questions",
         ]
         for i, topic in enumerate(chapter_topics[:chapter_count], start=1):
-            chapters.append({
-                "number": i,
-                "title": topic,
-                "summary": (
-                    f"Chapter {i} explores {topic.lower()}, providing actionable "
-                    f"steps and real-world examples."
-                ),
-                "estimated_pages": random.randint(8, 20),
-            })
+            chapters.append(
+                {
+                    "number": i,
+                    "title": topic,
+                    "summary": (
+                        f"Chapter {i} explores {topic.lower()}, providing actionable "
+                        f"steps and real-world examples."
+                    ),
+                    "estimated_pages": random.randint(8, 20),
+                }
+            )
         total_pages = sum(c["estimated_pages"] for c in chapters)
         ebook = EBook(
             title=title,
@@ -287,7 +296,9 @@ class ContentAutomation:
         )
         logger.info(
             "Generated e-book: %s (%d chapters, ~%d pages)",
-            title, len(chapters), total_pages,
+            title,
+            len(chapters),
+            total_pages,
         )
         self.bus.publish("content.ebook_created", ebook.to_dict())
         return ebook
@@ -328,10 +339,11 @@ class ContentAutomation:
             ideas.append(idea)
             logger.info(
                 "SaaS idea: %s — viability %.1f/10, est. MRR $%.0f",
-                name, viability, est_rev,
+                name,
+                viability,
+                est_rev,
             )
-        self.bus.publish("content.saas_ideas_generated",
-                         [i.to_dict() for i in ideas])
+        self.bus.publish("content.saas_ideas_generated", [i.to_dict() for i in ideas])
         return ideas
 
     # ------------------------------------------------------------------
@@ -382,14 +394,22 @@ class ContentAutomation:
 
     def _fill_template(self, template: str, niche: str) -> str:
         substitutions = {
-            "{verb}": random.choice(["Grow", "Maximize", "Automate", "Scale", "Unlock"]),
+            "{verb}": random.choice(
+                ["Grow", "Maximize", "Automate", "Scale", "Unlock"]
+            ),
             "{noun}": niche.title(),
             "{time_frame}": random.choice(["30 Days", "90 Days", "6 Months"]),
             "{number}": str(random.choice([5, 7, 9, 10, 12])),
-            "{audience}": random.choice(["Beginners", "Entrepreneurs", "Solopreneurs", "Creators"]),
-            "{outcome}": random.choice(["Financial Freedom", "$10k/Month", "Passive Income"]),
+            "{audience}": random.choice(
+                ["Beginners", "Entrepreneurs", "Solopreneurs", "Creators"]
+            ),
+            "{outcome}": random.choice(
+                ["Financial Freedom", "$10k/Month", "Passive Income"]
+            ),
             "{year}": "2025",
-            "{adjective}": random.choice(["Proven", "Simple", "Unconventional", "Smart"]),
+            "{adjective}": random.choice(
+                ["Proven", "Simple", "Unconventional", "Smart"]
+            ),
             "{amount}": random.choice(["5,000", "10,000", "25,000"]),
             "{topic}": niche,
         }
@@ -402,7 +422,14 @@ class ContentAutomation:
     def _keywords_for(niche: str) -> list[str]:
         base = niche.lower().split()
         extras = [
-            "how to", "best", "guide", "tips", "strategies",
-            "income", "earn", "passive", "online",
+            "how to",
+            "best",
+            "guide",
+            "tips",
+            "strategies",
+            "income",
+            "earn",
+            "passive",
+            "online",
         ]
         return base + random.sample(extras, k=4)

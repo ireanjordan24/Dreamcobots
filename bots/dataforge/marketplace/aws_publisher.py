@@ -1,4 +1,5 @@
 """AWS Marketplace publisher for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -32,6 +33,7 @@ class AWSMarketplacePublisher:
             return {"status": "error", "message": "AWS credentials not configured."}
         try:
             import boto3
+
             client = boto3.client(
                 "marketplace-catalog",
                 region_name=self.region,

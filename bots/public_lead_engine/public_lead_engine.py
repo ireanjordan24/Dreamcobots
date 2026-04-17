@@ -21,9 +21,9 @@ Tier-aware:
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -32,28 +32,28 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.public_lead_engine.tiers import (
+    FEATURE_AD_SCORE,
+    FEATURE_AI_OPPORTUNITY_SCORE,
+    FEATURE_ANALYTICS,
+    FEATURE_BULK_SEARCH,
+    FEATURE_CRM_EXPORT,
+    FEATURE_GOOGLE_PLACES_SEARCH,
+    FEATURE_MULTI_API,
+    FEATURE_OUTREACH_DRAFT,
+    FEATURE_RATING_FILTER,
+    FEATURE_SCRIPT_GENERATION,
+    FEATURE_WEAK_MARKETING_FILTER,
+    FEATURE_YELP_SEARCH,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_GOOGLE_PLACES_SEARCH,
-    FEATURE_YELP_SEARCH,
-    FEATURE_RATING_FILTER,
-    FEATURE_WEAK_MARKETING_FILTER,
-    FEATURE_AD_SCORE,
-    FEATURE_SCRIPT_GENERATION,
-    FEATURE_OUTREACH_DRAFT,
-    FEATURE_CRM_EXPORT,
-    FEATURE_MULTI_API,
-    FEATURE_AI_OPPORTUNITY_SCORE,
-    FEATURE_BULK_SEARCH,
-    FEATURE_ANALYTICS,
 )
-
 
 # ---------------------------------------------------------------------------
 # Enums & Data models
 # ---------------------------------------------------------------------------
+
 
 class DataSource(Enum):
     GOOGLE_PLACES = "google_places"
@@ -93,6 +93,7 @@ class PublicBusinessLead:
 
     All data in this record was obtained from public, opt-in business listings.
     """
+
     lead_id: str
     source: DataSource
     name: str
@@ -101,22 +102,25 @@ class PublicBusinessLead:
     address: Optional[str] = None
     phone: Optional[str] = None
     website: Optional[str] = None
-    star_rating: float = 0.0          # From API (e.g. 1.0–5.0)
+    star_rating: float = 0.0  # From API (e.g. 1.0–5.0)
     review_count: int = 0
     has_website: bool = False
     has_social_media: bool = False
     marketing_weakness_score: float = 50.0  # 0-100; higher = weaker marketing
-    ad_opportunity_score: float = 0.0       # 0-100; higher = better opportunity
+    ad_opportunity_score: float = 0.0  # 0-100; higher = better opportunity
     status: LeadStatus = LeadStatus.RAW
     generated_script: Optional[str] = None
     outreach_draft: Optional[str] = None
     tags: list = field(default_factory=list)
-    found_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    found_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class PublicLeadEngineError(Exception):
     """Base exception for Public Lead Engine errors."""
@@ -149,9 +153,16 @@ _SAMPLE_BUSINESSES = [
 ]
 
 _SAMPLE_LOCATIONS = [
-    "Austin, TX", "Nashville, TN", "Portland, OR",
-    "Charlotte, NC", "Las Vegas, NV", "San Diego, CA",
-    "Columbus, OH", "Indianapolis, IN", "Jacksonville, FL", "San Antonio, TX",
+    "Austin, TX",
+    "Nashville, TN",
+    "Portland, OR",
+    "Charlotte, NC",
+    "Las Vegas, NV",
+    "San Diego, CA",
+    "Columbus, OH",
+    "Indianapolis, IN",
+    "Jacksonville, FL",
+    "San Antonio, TX",
 ]
 
 
@@ -180,19 +191,25 @@ def _simulate_api_search(
         if max_rating is not None and rating > max_rating:
             continue
 
-        results.append({
-            "name": f"{name} #{suffix}",
-            "category": category,
-            "location": random.choice(_SAMPLE_LOCATIONS),
-            "address": f"{random.randint(100, 9999)} Main St",
-            "phone": f"+1-{random.randint(200,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
-            "website": f"https://www.{name.lower().replace(' ', '')}{suffix}.com" if has_website else None,
-            "star_rating": rating,
-            "review_count": review_count,
-            "has_website": has_website,
-            "has_social_media": has_social,
-            "source": source,
-        })
+        results.append(
+            {
+                "name": f"{name} #{suffix}",
+                "category": category,
+                "location": random.choice(_SAMPLE_LOCATIONS),
+                "address": f"{random.randint(100, 9999)} Main St",
+                "phone": f"+1-{random.randint(200,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
+                "website": (
+                    f"https://www.{name.lower().replace(' ', '')}{suffix}.com"
+                    if has_website
+                    else None
+                ),
+                "star_rating": rating,
+                "review_count": review_count,
+                "has_website": has_website,
+                "has_social_media": has_social,
+                "source": source,
+            }
+        )
     return results
 
 
@@ -221,6 +238,7 @@ def _compute_marketing_weakness(business: dict) -> float:
 # ---------------------------------------------------------------------------
 # Main bot class
 # ---------------------------------------------------------------------------
+
 
 class PublicLeadEngine:
     """
@@ -264,7 +282,11 @@ class PublicLeadEngine:
     def _require(self, feature: str) -> None:
         if not self._config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            hint = f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)." if upgrade else ""
+            hint = (
+                f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
+                if upgrade
+                else ""
+            )
             raise PublicLeadEngineTierError(
                 f"Feature '{feature}' is not available on the {self._config.name} tier.{hint}"
             )
@@ -345,7 +367,9 @@ class PublicLeadEngine:
 
         return {**log_entry, "lead_ids": new_leads}
 
-    def search_all_sources(self, query: str = "local business", leads_per_source: int = 5) -> dict:
+    def search_all_sources(
+        self, query: str = "local business", leads_per_source: int = 5
+    ) -> dict:
         """Search all available sources for this tier (PRO+)."""
         self._require(FEATURE_YELP_SEARCH)
         sources = self.SOURCE_TIERS.get(self.tier, [DataSource.GOOGLE_PLACES])
@@ -391,12 +415,14 @@ class PublicLeadEngine:
         for lead in self._leads.values():
             if lead.status != LeadStatus.RAW:
                 continue
-            weakness = _compute_marketing_weakness({
-                "star_rating": lead.star_rating,
-                "review_count": lead.review_count,
-                "has_website": lead.has_website,
-                "has_social_media": lead.has_social_media,
-            })
+            weakness = _compute_marketing_weakness(
+                {
+                    "star_rating": lead.star_rating,
+                    "review_count": lead.review_count,
+                    "has_website": lead.has_website,
+                    "has_social_media": lead.has_social_media,
+                }
+            )
             lead.marketing_weakness_score = weakness
             if lead.star_rating <= max_rating and weakness >= min_weakness_score:
                 lead.status = LeadStatus.FILTERED
@@ -425,7 +451,9 @@ class PublicLeadEngine:
                 BusinessCategory.DENTAL: 18,
                 BusinessCategory.HOME_SERVICE: 10,
             }.get(lead.category, 5)
-            lead.ad_opportunity_score = min(100.0, round(score + category_bonus + random.uniform(-5, 5), 1))
+            lead.ad_opportunity_score = min(
+                100.0, round(score + category_bonus + random.uniform(-5, 5), 1)
+            )
             lead.status = LeadStatus.SCORED
             scored += 1
         return {"scored": scored}
@@ -442,8 +470,7 @@ class PublicLeadEngine:
             if lead.status not in (LeadStatus.RAW, LeadStatus.FILTERED):
                 continue
             lead.ad_opportunity_score = min(
-                100.0,
-                round(lead.marketing_weakness_score + random.uniform(0, 20), 1)
+                100.0, round(lead.marketing_weakness_score + random.uniform(0, 20), 1)
             )
             if lead.status == LeadStatus.RAW:
                 lead.status = LeadStatus.FILTERED
@@ -458,7 +485,11 @@ class PublicLeadEngine:
         """Generate ad scripts for the highest-opportunity leads (PRO+)."""
         self._require(FEATURE_SCRIPT_GENERATION)
         candidates = sorted(
-            [l for l in self._leads.values() if l.status in (LeadStatus.FILTERED, LeadStatus.SCORED)],
+            [
+                l
+                for l in self._leads.values()
+                if l.status in (LeadStatus.FILTERED, LeadStatus.SCORED)
+            ],
             key=lambda l: l.ad_opportunity_score,
             reverse=True,
         )[:top_n]
@@ -471,7 +502,11 @@ class PublicLeadEngine:
 
     def _build_script(self, lead: PublicBusinessLead) -> str:
         cat = lead.category.value.replace("_", " ")
-        rating_note = f"Despite a {lead.star_rating}-star rating, " if lead.star_rating < 3.5 else ""
+        rating_note = (
+            f"Despite a {lead.star_rating}-star rating, "
+            if lead.star_rating < 3.5
+            else ""
+        )
         templates = [
             (
                 f"{rating_note}{lead.name} in {lead.location} deserves more customers. "
@@ -561,7 +596,8 @@ class PublicLeadEngine:
         """Export outreach-ready leads to a CRM system (PRO+)."""
         self._require(FEATURE_CRM_EXPORT)
         exportable = [
-            l for l in self._leads.values()
+            l
+            for l in self._leads.values()
             if l.status in (LeadStatus.SCRIPT_READY, LeadStatus.OUTREACH_READY)
         ]
         for lead in exportable:
@@ -594,7 +630,9 @@ class PublicLeadEngine:
 
     def get_top_opportunities(self, n: int = 10) -> list:
         """Return top N leads by ad opportunity score."""
-        ranked = sorted(self._leads.values(), key=lambda l: l.ad_opportunity_score, reverse=True)
+        ranked = sorted(
+            self._leads.values(), key=lambda l: l.ad_opportunity_score, reverse=True
+        )
         return [_lead_to_dict(l) for l in ranked[:n]]
 
     def get_low_rated_businesses(self, max_rating: float = 3.5) -> list:
@@ -619,7 +657,9 @@ class PublicLeadEngine:
             "by_status": by_status,
             "by_source": by_source,
             "by_category": by_category,
-            "avg_star_rating": round(sum(ratings) / len(ratings), 2) if ratings else None,
+            "avg_star_rating": (
+                round(sum(ratings) / len(ratings), 2) if ratings else None
+            ),
             "total_searches": len(self._search_log),
             "total_crm_exports": sum(e["leads_exported"] for e in self._crm_exports),
             "tier": self.tier.value,
@@ -647,20 +687,38 @@ class PublicLeadEngine:
         msg = message.lower()
         if "search" in msg or "find" in msg or "scan" in msg:
             result = self.search_businesses(query="local business", count=10)
-            return {"message": f"Found {result['new_leads']} businesses via {result['source']}.", "data": result}
+            return {
+                "message": f"Found {result['new_leads']} businesses via {result['source']}.",
+                "data": result,
+            }
         if "filter" in msg or "weak" in msg or "low rating" in msg:
             result = self.filter_weak_marketing()
-            return {"message": f"Filtered leads: {result['kept']} kept, {result['rejected']} rejected.", "data": result}
+            return {
+                "message": f"Filtered leads: {result['kept']} kept, {result['rejected']} rejected.",
+                "data": result,
+            }
         if "script" in msg or "commercial" in msg:
             result = self.generate_scripts()
-            return {"message": f"Generated {result['scripts_generated']} ad scripts.", "data": result}
+            return {
+                "message": f"Generated {result['scripts_generated']} ad scripts.",
+                "data": result,
+            }
         if "outreach" in msg or "pitch" in msg:
             result = self.generate_outreach()
-            return {"message": f"Drafted {result['outreach_drafts_generated']} outreach messages (awaiting human approval).", "data": result}
+            return {
+                "message": f"Drafted {result['outreach_drafts_generated']} outreach messages (awaiting human approval).",
+                "data": result,
+            }
         if "top" in msg or "best" in msg or "opportunity" in msg:
-            return {"message": "Top business opportunities.", "data": self.get_top_opportunities()}
+            return {
+                "message": "Top business opportunities.",
+                "data": self.get_top_opportunities(),
+            }
         if "summary" in msg or "stats" in msg or "status" in msg:
-            return {"message": "Public Lead Engine summary.", "data": self.get_summary()}
+            return {
+                "message": "Public Lead Engine summary.",
+                "data": self.get_summary(),
+            }
         return {
             "message": (
                 "Public Lead Engine online (legal mode). "
@@ -678,6 +736,7 @@ class PublicLeadEngine:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _lead_to_dict(lead: PublicBusinessLead) -> dict:
     return {
@@ -707,16 +766,20 @@ def _lead_to_dict(lead: PublicBusinessLead) -> dict:
 # Standalone entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     """Standalone entry point for the Public Lead Engine bot."""
     import json
+
     print("=== Public Lead Engine Bot ===")
     print("DreamCo CineCore™ — Legal Public Business Search Mode\n")
 
     engine = PublicLeadEngine(tier=Tier.PRO)
 
     print("Step 1: Searching businesses via Google Places API...")
-    search = engine.search_businesses(query="restaurant near me", count=8, max_rating=4.0)
+    search = engine.search_businesses(
+        query="restaurant near me", count=8, max_rating=4.0
+    )
     print(f"  Found {search['new_leads']} leads (rating ≤ 4.0)\n")
 
     print("Step 2: Searching via Yelp API...")

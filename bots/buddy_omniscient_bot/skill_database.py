@@ -14,14 +14,15 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Dict
-import uuid
+from typing import Dict, List, Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -141,8 +142,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.SPACE_ENGINEERING,
         organization="DreamCo Space Division / NASA Partner",
         specializations=[
-            "Rocket propulsion", "Orbital mechanics", "Spacecraft systems",
-            "Satellite deployment", "Space robotics",
+            "Rocket propulsion",
+            "Orbital mechanics",
+            "Spacecraft systems",
+            "Satellite deployment",
+            "Space robotics",
         ],
         skills_contributed=[
             "Understanding rocket fuel types",
@@ -162,8 +166,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.BUSINESS,
         organization="Fortune 500 Business Strategist",
         specializations=[
-            "Startup scaling", "Go-to-market strategy", "Revenue modeling",
-            "Brand building", "Investor relations",
+            "Startup scaling",
+            "Go-to-market strategy",
+            "Revenue modeling",
+            "Brand building",
+            "Investor relations",
         ],
         skills_contributed=[
             "Business plan creation in hours",
@@ -183,8 +190,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.ARTS,
         organization="International Digital Arts Academy",
         specializations=[
-            "Digital illustration", "3D modeling", "Motion graphics",
-            "Character design", "Generative AI art",
+            "Digital illustration",
+            "3D modeling",
+            "Motion graphics",
+            "Character design",
+            "Generative AI art",
         ],
         skills_contributed=[
             "Digital drawing for beginners",
@@ -204,8 +214,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.MEDICINE,
         organization="Global Health Innovation Institute",
         specializations=[
-            "Preventive medicine", "Health diagnostics", "Mental wellness",
-            "Nutrition science", "Wearable health tech",
+            "Preventive medicine",
+            "Health diagnostics",
+            "Mental wellness",
+            "Nutrition science",
+            "Wearable health tech",
         ],
         skills_contributed=[
             "Reading basic health metrics",
@@ -225,8 +238,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.SUSTAINABILITY,
         organization="EcoFutures Global",
         specializations=[
-            "Renewable energy", "Carbon footprint reduction", "Circular economy",
-            "Sustainable architecture", "Climate action",
+            "Renewable energy",
+            "Carbon footprint reduction",
+            "Circular economy",
+            "Sustainable architecture",
+            "Climate action",
         ],
         skills_contributed=[
             "Calculating your carbon footprint",
@@ -246,8 +262,11 @@ _EXPERT_PROFILES: List[ExpertProfile] = [
         field=ExpertField.MUSIC,
         organization="Grammy Award-Winning Producer",
         specializations=[
-            "Guitar mastery", "Music production", "Beat making",
-            "Songwriting", "Music theory",
+            "Guitar mastery",
+            "Music production",
+            "Beat making",
+            "Songwriting",
+            "Music theory",
         ],
         skills_contributed=[
             "Guitar solo techniques",
@@ -368,7 +387,10 @@ class SkillDatabase:
                 "Skill uploads are not available on the Free tier. "
                 "Upgrade to Pro to share your skills with the community."
             )
-        if self._max_uploads is not None and self._user_upload_count >= self._max_uploads:
+        if (
+            self._max_uploads is not None
+            and self._user_upload_count >= self._max_uploads
+        ):
             raise PermissionError(
                 f"Upload limit of {self._max_uploads} skills reached. "
                 "Upgrade to Enterprise for unlimited uploads."
@@ -405,7 +427,8 @@ class SkillDatabase:
         if query:
             q = query.lower()
             skills = [
-                s for s in skills
+                s
+                for s in skills
                 if q in s.title.lower()
                 or q in s.description.lower()
                 or any(q in t.lower() for t in s.tags)

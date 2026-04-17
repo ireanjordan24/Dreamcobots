@@ -1,43 +1,60 @@
 """Tests for bots/buyer_network/buyer_network.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.buyer_network.buyer_network import BuyerNetwork, Buyer, Deal, DealStatus, AuctionBid
 
+from bots.buyer_network.buyer_network import (
+    AuctionBid,
+    Buyer,
+    BuyerNetwork,
+    Deal,
+    DealStatus,
+)
 
 # ---------------------------------------------------------------------------
 # Buyer registration
 # ---------------------------------------------------------------------------
+
 
 class TestRegisterBuyer:
     def setup_method(self):
         self.network = BuyerNetwork()
 
     def test_returns_buyer(self):
-        buyer = self.network.register_buyer("Alice", "alice@ex.com", "+1555", ["Chicago"], 150_000)
+        buyer = self.network.register_buyer(
+            "Alice", "alice@ex.com", "+1555", ["Chicago"], 150_000
+        )
         assert isinstance(buyer, Buyer)
 
     def test_buyer_id_assigned(self):
-        buyer = self.network.register_buyer("Bob", "bob@ex.com", "+1556", ["Atlanta"], 100_000)
+        buyer = self.network.register_buyer(
+            "Bob", "bob@ex.com", "+1556", ["Atlanta"], 100_000
+        )
         assert buyer.buyer_id.startswith("buyer_")
 
     def test_buyer_active_by_default(self):
-        buyer = self.network.register_buyer("Carol", "c@ex.com", "+1557", ["Dallas"], 200_000)
+        buyer = self.network.register_buyer(
+            "Carol", "c@ex.com", "+1557", ["Dallas"], 200_000
+        )
         assert buyer.active is True
 
     def test_deactivate_buyer(self):
-        buyer = self.network.register_buyer("Dave", "d@ex.com", "+1558", ["Miami"], 80_000)
+        buyer = self.network.register_buyer(
+            "Dave", "d@ex.com", "+1558", ["Miami"], 80_000
+        )
         result = self.network.deactivate_buyer(buyer.buyer_id)
         assert result is True
         assert not self.network._buyers[buyer.buyer_id].active
 
     def test_list_buyers_excludes_inactive(self):
-        buyer = self.network.register_buyer("Eve", "e@ex.com", "+1559", ["Seattle"], 120_000)
+        buyer = self.network.register_buyer(
+            "Eve", "e@ex.com", "+1559", ["Seattle"], 120_000
+        )
         self.network.deactivate_buyer(buyer.buyer_id)
         buyers = self.network.list_buyers()
         assert all(b["active"] for b in buyers)
@@ -46,6 +63,7 @@ class TestRegisterBuyer:
 # ---------------------------------------------------------------------------
 # Deal submission
 # ---------------------------------------------------------------------------
+
 
 class TestSubmitDeal:
     def setup_method(self):
@@ -77,11 +95,16 @@ class TestSubmitDeal:
 # Buyer matching
 # ---------------------------------------------------------------------------
 
+
 class TestMatchBuyers:
     def setup_method(self):
         self.network = BuyerNetwork()
-        self.network.register_buyer("Alice", "a@ex.com", "+1", ["Chicago"], 150_000, min_beds=2)
-        self.network.register_buyer("Bob", "b@ex.com", "+2", ["Atlanta"], 80_000, min_beds=0)
+        self.network.register_buyer(
+            "Alice", "a@ex.com", "+1", ["Chicago"], 150_000, min_beds=2
+        )
+        self.network.register_buyer(
+            "Bob", "b@ex.com", "+2", ["Atlanta"], 80_000, min_beds=0
+        )
 
     def test_matches_buyer_in_region(self):
         deal = self.network.submit_deal("123 Oak", "Chicago", 90_000, beds=3)
@@ -114,10 +137,13 @@ class TestMatchBuyers:
 # Auction
 # ---------------------------------------------------------------------------
 
+
 class TestAuction:
     def setup_method(self):
         self.network = BuyerNetwork()
-        self.buyer = self.network.register_buyer("Alice", "a@ex.com", "+1", ["Chicago"], 200_000)
+        self.buyer = self.network.register_buyer(
+            "Alice", "a@ex.com", "+1", ["Chicago"], 200_000
+        )
         self.deal = self.network.submit_deal("123 Main", "Chicago", 90_000, beds=3)
 
     def test_place_bid_returns_auction_bid(self):
@@ -130,7 +156,9 @@ class TestAuction:
             self.network.place_bid(self.deal.deal_id, self.buyer.buyer_id, 7_000)
 
     def test_run_auction_selects_highest_bid(self):
-        buyer2 = self.network.register_buyer("Bob", "b@ex.com", "+2", ["Chicago"], 200_000)
+        buyer2 = self.network.register_buyer(
+            "Bob", "b@ex.com", "+2", ["Chicago"], 200_000
+        )
         self.network.place_bid(self.deal.deal_id, self.buyer.buyer_id, 5_000)
         self.network.place_bid(self.deal.deal_id, buyer2.buyer_id, 8_000)
         result = self.network.run_auction(self.deal.deal_id)
@@ -151,6 +179,7 @@ class TestAuction:
 # ---------------------------------------------------------------------------
 # Revenue output
 # ---------------------------------------------------------------------------
+
 
 class TestRevenueOutput:
     def test_revenue_output_keys(self):
@@ -173,11 +202,18 @@ class TestRevenueOutput:
 # Pipeline stats
 # ---------------------------------------------------------------------------
 
+
 class TestPipelineStats:
     def test_stats_keys(self):
         network = BuyerNetwork()
         stats = network.get_pipeline_stats()
-        for key in ("total_deals", "available", "closed", "total_revenue", "active_buyers"):
+        for key in (
+            "total_deals",
+            "available",
+            "closed",
+            "total_revenue",
+            "active_buyers",
+        ):
             assert key in stats
 
     def test_region_filter(self):

@@ -51,12 +51,12 @@ class HighYieldStructure:
     structure_id: str
     name: str
     asset_class: AssetClass
-    min_yield_pct: float          # Expected annual yield lower bound
-    max_yield_pct: float          # Expected annual yield upper bound
-    min_allocation_pct: float     # Minimum portfolio weight
-    max_allocation_pct: float     # Maximum portfolio weight
+    min_yield_pct: float  # Expected annual yield lower bound
+    max_yield_pct: float  # Expected annual yield upper bound
+    min_allocation_pct: float  # Minimum portfolio weight
+    max_allocation_pct: float  # Maximum portfolio weight
     liquidity: LiquidityRating
-    risk_score: float             # 0–10 scale (10 = highest risk)
+    risk_score: float  # 0–10 scale (10 = highest risk)
     description: str = ""
     status: StructureStatus = StructureStatus.ACTIVE
     tags: list = field(default_factory=list)

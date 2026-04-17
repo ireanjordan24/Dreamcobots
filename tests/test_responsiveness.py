@@ -8,6 +8,7 @@ statistics across multiple rounds.
 Run standalone:
     pytest tests/test_responsiveness.py --benchmark-min-rounds=5 -v
 """
+
 import importlib.util
 import os
 import time
@@ -32,7 +33,9 @@ _GOV_BOT_PATH = os.path.join(
     "government-contract-grant-bot",
     "government_contract_grant_bot.py",
 )
-_spec = importlib.util.spec_from_file_location("government_contract_grant_bot", _GOV_BOT_PATH)
+_spec = importlib.util.spec_from_file_location(
+    "government_contract_grant_bot", _GOV_BOT_PATH
+)
 _gov_bot_module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_gov_bot_module)
 GovernmentContractGrantBot = _gov_bot_module.GovernmentContractGrantBot
@@ -41,6 +44,7 @@ GovernmentContractGrantBot = _gov_bot_module.GovernmentContractGrantBot
 # ---------------------------------------------------------------------------
 # Benchmark tests
 # ---------------------------------------------------------------------------
+
 
 def test_gov_bot_initialization_time(benchmark):
     """GovernmentContractGrantBot should initialize within the response threshold."""
@@ -95,6 +99,7 @@ def test_gov_bot_process_grants_time(benchmark, capsys):
 # ---------------------------------------------------------------------------
 # Direct timing test (no benchmark fixture – always runs)
 # ---------------------------------------------------------------------------
+
 
 def test_bot_response_time_direct():
     """Direct wall-clock check: initialisation + run must be under threshold."""

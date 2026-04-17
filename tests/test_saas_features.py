@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 class TestBaseEventBus:
     def setup_method(self):
         from event_bus.base_bus import BaseEventBus
+
         self.bus = BaseEventBus()
 
     def test_publish_calls_subscriber(self):
@@ -84,6 +85,7 @@ class TestRedisQueueBusFallback:
 
     def setup_method(self):
         from event_bus.redis_bus import RedisQueueBus
+
         self.queue = RedisQueueBus(queue_name="test_queue")
         # Force fallback even if Redis happens to be running
         self.queue._redis = None
@@ -117,6 +119,7 @@ class TestRedisEventBusFallback:
 
     def setup_method(self):
         from event_bus.redis_bus import RedisEventBus
+
         self.bus = RedisEventBus()
         self.bus._redis = None  # force fallback
 
@@ -138,6 +141,7 @@ class TestRedisEventBusFallback:
 class TestAuthService:
     def setup_method(self):
         from saas.auth.auth import AuthService, UserRegistry
+
         self.registry = UserRegistry()
         self.auth = AuthService(registry=self.registry)
 
@@ -195,6 +199,7 @@ class TestAuthService:
 
     def test_upgrade_tier_unknown_user(self):
         from saas.auth.user_model import SubscriptionTier
+
         result = self.auth.upgrade_tier("nonexistent_id", SubscriptionTier.PRO)
         assert result["success"] is False
 
@@ -231,6 +236,7 @@ class TestAuthService:
 class TestUserModel:
     def test_tier_features_free(self):
         from saas.auth.user_model import SubscriptionTier, get_tier_features
+
         features = get_tier_features(SubscriptionTier.FREE)
         assert features.max_runs_per_day == 5
         assert features.price_usd_monthly == 0.0
@@ -238,6 +244,7 @@ class TestUserModel:
 
     def test_tier_features_pro(self):
         from saas.auth.user_model import SubscriptionTier, get_tier_features
+
         features = get_tier_features(SubscriptionTier.PRO)
         assert features.max_runs_per_day == 100
         assert features.can_use_redis_queue is True
@@ -245,16 +252,19 @@ class TestUserModel:
 
     def test_tier_features_enterprise(self):
         from saas.auth.user_model import SubscriptionTier, get_tier_features
+
         features = get_tier_features(SubscriptionTier.ENTERPRISE)
         assert features.max_bots == 10_000
         assert features.support_level == "dedicated"
 
     def test_upgrade_path_free_to_pro(self):
         from saas.auth.user_model import SubscriptionTier, get_tier_upgrade_path
+
         assert get_tier_upgrade_path(SubscriptionTier.FREE) == SubscriptionTier.PRO
 
     def test_upgrade_path_enterprise_is_none(self):
         from saas.auth.user_model import SubscriptionTier, get_tier_upgrade_path
+
         assert get_tier_upgrade_path(SubscriptionTier.ENTERPRISE) is None
 
 
@@ -267,6 +277,7 @@ class TestAuthMiddleware:
     def setup_method(self):
         from saas.auth.auth import AuthService, UserRegistry
         from saas.auth.middleware import AuthMiddleware
+
         registry = UserRegistry()
         auth_svc = AuthService(registry=registry)
         self.auth_svc = auth_svc
@@ -291,6 +302,7 @@ class TestAuthMiddleware:
     def test_require_tier_sufficient(self):
         from saas.auth.auth import Tier
         from saas.auth.user_model import SubscriptionTier
+
         r = self.auth_svc.signup("kim", "kim@example.com", "password123")
         self.auth_svc.upgrade_tier(r["user_id"], Tier.PRO)
         user = self.auth_svc.verify_token(r["token"])
@@ -299,6 +311,7 @@ class TestAuthMiddleware:
 
     def test_require_tier_insufficient(self):
         from saas.auth.user_model import SubscriptionTier
+
         r = self.auth_svc.signup("lena", "lena@example.com", "password123")
         user = self.auth_svc.verify_token(r["token"])
         err = self.middleware.require_tier(user, SubscriptionTier.PRO)
@@ -306,11 +319,13 @@ class TestAuthMiddleware:
 
     def test_extract_bearer_token(self):
         from saas.auth.middleware import extract_bearer_token
+
         token = extract_bearer_token("Bearer mytoken123")
         assert token == "mytoken123"
 
     def test_extract_bearer_token_missing(self):
         from saas.auth.middleware import extract_bearer_token
+
         assert extract_bearer_token(None) is None
         assert extract_bearer_token("") is None
 
@@ -318,6 +333,7 @@ class TestAuthMiddleware:
 class TestRateLimiter:
     def setup_method(self):
         from saas.auth.middleware import RateLimiter
+
         self.limiter = RateLimiter(max_requests=3, window_seconds=10)
 
     def test_allows_within_limit(self):
@@ -355,6 +371,7 @@ class TestRateLimiter:
 class TestStripeBillingSimulation:
     def setup_method(self):
         from saas.stripe_billing import StripeBillingService
+
         self.billing = StripeBillingService(simulation_mode=True)
 
     def test_create_customer_returns_id(self):
@@ -364,7 +381,9 @@ class TestStripeBillingSimulation:
 
     def test_create_subscription_free(self):
         cust = self.billing.create_customer("usr_001", "a@b.com")
-        result = self.billing.create_subscription(cust["customer_id"], "free", "usr_001")
+        result = self.billing.create_subscription(
+            cust["customer_id"], "free", "usr_001"
+        )
         assert result["success"] is True
         assert result["tier"] == "free"
         assert result["amount_usd"] == 0.0
@@ -377,7 +396,9 @@ class TestStripeBillingSimulation:
 
     def test_create_subscription_enterprise(self):
         cust = self.billing.create_customer("usr_003", "e@f.com")
-        result = self.billing.create_subscription(cust["customer_id"], "enterprise", "usr_003")
+        result = self.billing.create_subscription(
+            cust["customer_id"], "enterprise", "usr_003"
+        )
         assert result["success"] is True
         assert result["amount_usd"] == 499.0
 
@@ -391,7 +412,9 @@ class TestStripeBillingSimulation:
     def test_upgrade_subscription(self):
         cust = self.billing.create_customer("usr_005", "i@j.com")
         sub = self.billing.create_subscription(cust["customer_id"], "free", "usr_005")
-        upgrade = self.billing.upgrade_subscription(sub["subscription_id"], "pro", "usr_005")
+        upgrade = self.billing.upgrade_subscription(
+            sub["subscription_id"], "pro", "usr_005"
+        )
         assert upgrade["success"] is True
         assert upgrade["new_tier"] == "pro"
 
@@ -421,6 +444,7 @@ class TestStripeBillingSimulation:
 class TestSandboxRunner:
     def setup_method(self):
         from core.sandbox_runner import SandboxRunner
+
         self.runner = SandboxRunner(timeout_seconds=5)
 
     def test_run_code_success(self):
@@ -439,6 +463,7 @@ class TestSandboxRunner:
 
     def test_run_code_timeout(self):
         from core.sandbox_runner import SandboxRunner
+
         fast_runner = SandboxRunner(timeout_seconds=1)
         result = fast_runner.run_code("import time; time.sleep(10)")
         assert result["timed_out"] is True
@@ -469,6 +494,7 @@ class TestSandboxRunner:
 class TestBotValidator:
     def setup_method(self):
         from core.bot_validator import BotValidator
+
         self.validator = BotValidator()
 
     def test_valid_simple_bot(self):
@@ -536,8 +562,8 @@ class TestBotValidator:
 
 class TestBotWorker:
     def setup_method(self):
-        from event_bus.redis_bus import RedisQueueBus
         from core.worker import BotWorker
+        from event_bus.redis_bus import RedisQueueBus
 
         self.queue = RedisQueueBus(queue_name="worker_test_queue")
         self.queue._redis = None  # force fallback
@@ -550,10 +576,12 @@ class TestBotWorker:
         assert result is None
 
     def test_process_one_runs_a_job(self):
-        self.queue.enqueue({
-            "bot_path": "DreamCo.bots.dealBot",
-            "bot_name": "dealBot",
-        })
+        self.queue.enqueue(
+            {
+                "bot_path": "DreamCo.bots.dealBot",
+                "bot_name": "dealBot",
+            }
+        )
         result = self.worker.process_one(timeout=0)
         assert result is not None
         assert "bot" in result
@@ -565,8 +593,11 @@ class TestBotWorker:
 
     def test_run_forever_stops_after_max_jobs(self):
         for _ in range(3):
-            self.queue.enqueue({"bot_path": "DreamCo.bots.dealBot", "bot_name": "dealBot"})
+            self.queue.enqueue(
+                {"bot_path": "DreamCo.bots.dealBot", "bot_name": "dealBot"}
+            )
         from core.worker import BotWorker
+
         w = BotWorker(queue=self.queue, max_jobs=2)
         w.run_forever()
         assert w.jobs_processed == 2
@@ -574,8 +605,8 @@ class TestBotWorker:
 
 class TestWorkerPool:
     def test_pool_processes_jobs(self):
-        from event_bus.redis_bus import RedisQueueBus
         from core.worker import WorkerPool
+        from event_bus.redis_bus import RedisQueueBus
 
         queue = RedisQueueBus(queue_name="pool_test_queue")
         queue._redis = None

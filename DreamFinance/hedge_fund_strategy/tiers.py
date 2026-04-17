@@ -9,6 +9,19 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["long/short equity strategies", "factor exposure analysis"]),
-    "elite": TierConfig("Elite", 2500.0, ["long/short equity strategies", "event-driven alpha signals", "factor exposure analysis", "portfolio construction"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        ["long/short equity strategies", "factor exposure analysis"],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "long/short equity strategies",
+            "event-driven alpha signals",
+            "factor exposure analysis",
+            "portfolio construction",
+        ],
+    ),
 }

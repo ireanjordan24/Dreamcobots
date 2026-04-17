@@ -2,11 +2,11 @@
 AI Side Hustle Bot
 AI-powered tools to help users identify, launch, and monetize side hustles.
 """
-# GLOBAL AI SOURCES FLOW
-from framework import GlobalAISourcesFlow  # noqa: F401 — framework compliance marker
-
 
 import random
+
+# GLOBAL AI SOURCES FLOW
+from framework import GlobalAISourcesFlow  # noqa: F401 — framework compliance marker
 
 HUSTLE_CATEGORIES = [
     "content_creation",
@@ -31,29 +31,74 @@ SUPPORTED_INTEGRATIONS = [
 ]
 
 INCOME_RANGES = {
-    "content_creation":        {"min": 200,  "max": 5000,  "avg": 1500},
-    "freelancing":             {"min": 500,  "max": 10000, "avg": 3000},
-    "dropshipping":            {"min": 100,  "max": 8000,  "avg": 2000},
-    "affiliate_marketing":     {"min": 50,   "max": 15000, "avg": 2500},
-    "digital_products":        {"min": 100,  "max": 20000, "avg": 3500},
-    "social_media_management": {"min": 500,  "max": 6000,  "avg": 2000},
+    "content_creation": {"min": 200, "max": 5000, "avg": 1500},
+    "freelancing": {"min": 500, "max": 10000, "avg": 3000},
+    "dropshipping": {"min": 100, "max": 8000, "avg": 2000},
+    "affiliate_marketing": {"min": 50, "max": 15000, "avg": 2500},
+    "digital_products": {"min": 100, "max": 20000, "avg": 3500},
+    "social_media_management": {"min": 500, "max": 6000, "avg": 2000},
 }
 
 FREELANCE_OPPORTUNITIES = {
     "upwork": [
-        {"title": "Python Script Automation", "budget": "$200–$500", "skills": ["python"], "platform": "upwork"},
-        {"title": "WordPress Website Redesign", "budget": "$300–$800", "skills": ["wordpress", "design"], "platform": "upwork"},
-        {"title": "Social Media Content Calendar", "budget": "$150–$400", "skills": ["social_media", "writing"], "platform": "upwork"},
-        {"title": "Data Entry & Spreadsheet Cleanup", "budget": "$50–$150", "skills": ["excel", "data_entry"], "platform": "upwork"},
+        {
+            "title": "Python Script Automation",
+            "budget": "$200–$500",
+            "skills": ["python"],
+            "platform": "upwork",
+        },
+        {
+            "title": "WordPress Website Redesign",
+            "budget": "$300–$800",
+            "skills": ["wordpress", "design"],
+            "platform": "upwork",
+        },
+        {
+            "title": "Social Media Content Calendar",
+            "budget": "$150–$400",
+            "skills": ["social_media", "writing"],
+            "platform": "upwork",
+        },
+        {
+            "title": "Data Entry & Spreadsheet Cleanup",
+            "budget": "$50–$150",
+            "skills": ["excel", "data_entry"],
+            "platform": "upwork",
+        },
     ],
     "fiverr": [
-        {"title": "Logo Design Package", "budget": "$50–$300", "skills": ["design", "illustrator"], "platform": "fiverr"},
-        {"title": "SEO Blog Posts (5-pack)", "budget": "$75–$250", "skills": ["writing", "seo"], "platform": "fiverr"},
-        {"title": "Video Editing — YouTube Shorts", "budget": "$100–$400", "skills": ["video_editing"], "platform": "fiverr"},
+        {
+            "title": "Logo Design Package",
+            "budget": "$50–$300",
+            "skills": ["design", "illustrator"],
+            "platform": "fiverr",
+        },
+        {
+            "title": "SEO Blog Posts (5-pack)",
+            "budget": "$75–$250",
+            "skills": ["writing", "seo"],
+            "platform": "fiverr",
+        },
+        {
+            "title": "Video Editing — YouTube Shorts",
+            "budget": "$100–$400",
+            "skills": ["video_editing"],
+            "platform": "fiverr",
+        },
     ],
     "toptal": [
-        {"title": "Senior React Developer (Contract)", "budget": "$5,000–$12,000/mo", "skills": ["react", "javascript"], "platform": "toptal"},
-        {"title": "Product Manager Consultant", "budget": "$4,000–$10,000/mo", "skills": ["product_management"], "platform": "toptal"},
+        {
+            "title": "Senior React Developer (Contract)",
+            "budget": "$5,000–$12,000/mo",
+            "skills": ["react", "javascript"],
+            "platform": "toptal",
+        },
+        {
+            "title": "Product Manager Consultant",
+            "budget": "$4,000–$10,000/mo",
+            "skills": ["product_management"],
+            "platform": "toptal",
+        },
     ],
 }
 
@@ -97,7 +142,12 @@ MARKETING_PLAN_TEMPLATES = {
             "Engage in 2 niche communities for 30 min",
             "Repurpose top content across platforms",
         ],
-        "monetization": ["AdSense/YouTube Partner Program", "Sponsorships", "Digital products", "Affiliate links"],
+        "monetization": [
+            "AdSense/YouTube Partner Program",
+            "Sponsorships",
+            "Digital products",
+            "Affiliate links",
+        ],
         "tools": ["CapCut", "Canva", "Buffer", "ConvertKit"],
     },
     "freelancing": {
@@ -108,11 +158,25 @@ MARKETING_PLAN_TEMPLATES = {
             "Engage with 5 LinkedIn posts in your niche",
             "Ask 1 current client for a referral or testimonial",
         ],
-        "monetization": ["Hourly contracts", "Fixed-price projects", "Retainer agreements"],
-        "tools": ["LinkedIn Sales Navigator", "HubSpot CRM (free)", "Calendly", "Invoice Ninja"],
+        "monetization": [
+            "Hourly contracts",
+            "Fixed-price projects",
+            "Retainer agreements",
+        ],
+        "tools": [
+            "LinkedIn Sales Navigator",
+            "HubSpot CRM (free)",
+            "Calendly",
+            "Invoice Ninja",
+        ],
     },
     "dropshipping": {
-        "channels": ["Facebook Ads", "TikTok Ads", "Instagram Shopping", "Google Shopping"],
+        "channels": [
+            "Facebook Ads",
+            "TikTok Ads",
+            "Instagram Shopping",
+            "Google Shopping",
+        ],
         "weekly_actions": [
             "Test 3 new product ads with $5/day budget",
             "Analyze top-performing ad creative",
@@ -130,7 +194,12 @@ MARKETING_PLAN_TEMPLATES = {
             "Add affiliate links to top-performing old posts",
             "Email your list with 1 product recommendation",
         ],
-        "monetization": ["Amazon Associates", "ShareASale", "ClickBank", "CJ Affiliate"],
+        "monetization": [
+            "Amazon Associates",
+            "ShareASale",
+            "ClickBank",
+            "CJ Affiliate",
+        ],
         "tools": ["Ahrefs (free trial)", "WordPress", "Elementor", "ConvertKit"],
     },
     "digital_products": {
@@ -152,7 +221,11 @@ MARKETING_PLAN_TEMPLATES = {
             "Analyze client account insights and report results",
             "Create 1 educational post about SMM to attract clients",
         ],
-        "monetization": ["Monthly retainers ($500–$2,000/mo)", "Per-post packages", "Audits"],
+        "monetization": [
+            "Monthly retainers ($500–$2,000/mo)",
+            "Per-post packages",
+            "Audits",
+        ],
         "tools": ["Buffer", "Later", "Canva", "Meta Business Suite"],
     },
 }
@@ -206,18 +279,28 @@ class AISideHustleBot:
         niche_lower = niche.lower()
         pool = CONTENT_IDEAS_POOL.get(niche_lower, CONTENT_IDEAS_POOL["business"])
 
-        formats = ["Short-form video", "Blog post", "YouTube tutorial", "Carousel post", "Email newsletter"]
+        formats = [
+            "Short-form video",
+            "Blog post",
+            "YouTube tutorial",
+            "Carousel post",
+            "Email newsletter",
+        ]
         ideas = []
         selected = random.sample(pool, min(count, len(pool)))
         for title in selected:
-            ideas.append({
-                "title": title,
-                "niche": niche_lower,
-                "format": random.choice(formats),
-                "estimated_views": f"{random.randint(500, 50000):,}",
-            })
+            ideas.append(
+                {
+                    "title": title,
+                    "niche": niche_lower,
+                    "format": random.choice(formats),
+                    "estimated_views": f"{random.randint(500, 50000):,}",
+                }
+            )
 
-        print(f"[HustleBot] Generated {len(ideas)} content idea(s) for niche '{niche}'.")
+        print(
+            f"[HustleBot] Generated {len(ideas)} content idea(s) for niche '{niche}'."
+        )
         return ideas
 
     def find_freelance_opportunities(self, skills, platform="upwork"):
@@ -307,15 +390,21 @@ class AISideHustleBot:
                   'weekly_actions', 'monetization', 'tools', 'paid_boost'.
         """
         hustle_type = hustle_type.lower()
-        template = MARKETING_PLAN_TEMPLATES.get(hustle_type, MARKETING_PLAN_TEMPLATES["freelancing"])
+        template = MARKETING_PLAN_TEMPLATES.get(
+            hustle_type, MARKETING_PLAN_TEMPLATES["freelancing"]
+        )
 
         paid_boost = []
         if budget >= 50:
-            paid_boost.append(f"Allocate ${min(budget, 200)}/month to Facebook/Instagram ads")
+            paid_boost.append(
+                f"Allocate ${min(budget, 200)}/month to Facebook/Instagram ads"
+            )
         if budget >= 100:
             paid_boost.append("Run A/B tests on top-performing organic content")
         if budget >= 250:
-            paid_boost.append("Invest in SEO tools (Ahrefs, SEMrush) for keyword research")
+            paid_boost.append(
+                "Invest in SEO tools (Ahrefs, SEMrush) for keyword research"
+            )
 
         plan = {
             "hustle_type": hustle_type,
@@ -324,10 +413,14 @@ class AISideHustleBot:
             "weekly_actions": template["weekly_actions"],
             "monetization": template["monetization"],
             "tools": template["tools"],
-            "paid_boost": paid_boost if paid_boost else ["Focus on free organic strategies first"],
+            "paid_boost": (
+                paid_boost if paid_boost else ["Focus on free organic strategies first"]
+            ),
         }
 
-        print(f"[HustleBot] Marketing plan created for '{hustle_type}' with ${budget}/month budget.")
+        print(
+            f"[HustleBot] Marketing plan created for '{hustle_type}' with ${budget}/month budget."
+        )
         return plan
 
     def list_integrations(self):
@@ -360,7 +453,9 @@ class AISideHustleBot:
             choice = input("\nSelect an option (1-7): ").strip()
 
             if choice == "1":
-                niche = input("  Enter your niche (e.g. finance, fitness, tech, business): ").strip()
+                niche = input(
+                    "  Enter your niche (e.g. finance, fitness, tech, business): "
+                ).strip()
                 if niche.lower() == "quit":
                     break
                 try:
@@ -374,15 +469,24 @@ class AISideHustleBot:
                     print(f"     Est. views: {idea['estimated_views']}")
 
             elif choice == "2":
-                skills = input("  Your skills (comma-separated, e.g. python,writing): ").strip()
+                skills = input(
+                    "  Your skills (comma-separated, e.g. python,writing): "
+                ).strip()
                 if skills.lower() == "quit":
                     break
                 platforms_list = list(FREELANCE_OPPORTUNITIES.keys())
-                platform = input(f"  Platform [{', '.join(platforms_list)}] [upwork]: ").strip() or "upwork"
+                platform = (
+                    input(
+                        f"  Platform [{', '.join(platforms_list)}] [upwork]: "
+                    ).strip()
+                    or "upwork"
+                )
                 opps = self.find_freelance_opportunities(skills, platform=platform)
                 print(f"\n  Freelance opportunities on {platform}:")
                 for opp in opps:
-                    print(f"  - {opp['title']} | Budget: {opp['budget']} | Skills: {', '.join(opp['skills'])}")
+                    print(
+                        f"  - {opp['title']} | Budget: {opp['budget']} | Skills: {', '.join(opp['skills'])}"
+                    )
 
             elif choice == "3":
                 cats = self.get_hustle_categories()
@@ -395,7 +499,9 @@ class AISideHustleBot:
                     hours = 10
                 result = self.calculate_income_potential(hustle, hours)
                 print(f"\n  Income potential for '{hustle}' at {hours} hrs/week:")
-                print(f"  Monthly range : ${result['monthly_min']:,} – ${result['monthly_max']:,}")
+                print(
+                    f"  Monthly range : ${result['monthly_min']:,} – ${result['monthly_max']:,}"
+                )
                 print(f"  Monthly avg   : ${result['monthly_avg']:,}")
                 print(f"  Effective rate: ~${result['hourly_rate_avg']:.2f}/hr")
                 print(f"\n  Note: {result['note']}")
@@ -406,7 +512,9 @@ class AISideHustleBot:
                 if hustle.lower() == "quit":
                     break
                 try:
-                    budget = int(input("  Monthly marketing budget in USD [0]: ").strip() or "0")
+                    budget = int(
+                        input("  Monthly marketing budget in USD [0]: ").strip() or "0"
+                    )
                 except ValueError:
                     budget = 0
                 plan = self.create_marketing_plan(hustle, budget=budget)
@@ -449,4 +557,3 @@ def run() -> dict:
     and revenue so the orchestrator can aggregate metrics across all bots.
     """
     return {"status": "success", "leads": 20, "leads_generated": 20, "revenue": 800}
-

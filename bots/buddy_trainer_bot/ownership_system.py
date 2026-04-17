@@ -23,19 +23,24 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+from bots.buddy_trainer_bot.tiers import (
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+)
 from framework import GlobalAISourcesFlow  # noqa: F401
-from bots.buddy_trainer_bot.tiers import Tier, TierConfig, get_tier_config, TIER_CATALOGUE
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
 
+
 class PaymentMethod(Enum):
     CREDIT_CARD = "credit_card"
     PAYPAL = "paypal"
     CRYPTO = "crypto"
-    SPONSORED = "sponsored"          # Free access via sponsorship program
+    SPONSORED = "sponsored"  # Free access via sponsorship program
     DREAMCOIN = "dreamcoin"
 
 
@@ -62,9 +67,11 @@ class TransactionType(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class License:
     """A Buddy bot license held by a user."""
+
     license_id: str
     user_id: str
     tier: Tier
@@ -72,12 +79,15 @@ class License:
     payment_method: PaymentMethod
     amount_paid_usd: float
     activated_at: float = field(default_factory=time.time)
-    expires_at: Optional[float] = None      # None for lifetime / OWNER tier
+    expires_at: Optional[float] = None  # None for lifetime / OWNER tier
     github_buddy_provisioned: bool = False
     notes: str = ""
 
     def is_valid(self) -> bool:
-        if self.status != LicenseStatus.ACTIVE and self.status != LicenseStatus.SPONSORED:
+        if (
+            self.status != LicenseStatus.ACTIVE
+            and self.status != LicenseStatus.SPONSORED
+        ):
             return False
         if self.expires_at is not None and time.time() > self.expires_at:
             return False
@@ -101,13 +111,14 @@ class License:
 @dataclass
 class Transaction:
     """A payment or licensing transaction."""
+
     transaction_id: str
     user_id: str
     transaction_type: TransactionType
     tier: Tier
     amount_usd: float
     payment_method: PaymentMethod
-    status: str          # "completed" | "failed" | "refunded"
+    status: str  # "completed" | "failed" | "refunded"
     timestamp: float = field(default_factory=time.time)
     license_id: Optional[str] = None
     reference: str = ""
@@ -129,9 +140,10 @@ class Transaction:
 @dataclass
 class Sponsorship:
     """A sponsorship grant enabling a user to access Buddy for free."""
+
     sponsorship_id: str
     beneficiary_user_id: str
-    sponsor_user_id: str       # "dreamco_foundation" for platform-funded grants
+    sponsor_user_id: str  # "dreamco_foundation" for platform-funded grants
     tier_granted: Tier
     reason: str
     granted_at: float = field(default_factory=time.time)
@@ -157,6 +169,7 @@ class Sponsorship:
 
 MONTHLY_BILLING_DAYS = 30
 
+
 def _subscription_expiry(days: int = MONTHLY_BILLING_DAYS) -> float:
     return time.time() + days * 86_400
 
@@ -180,6 +193,7 @@ def _process_payment(
 # Core class
 # ---------------------------------------------------------------------------
 
+
 class OwnershipSystem:
     """
     Manages Buddy bot licenses, subscriptions, and sponsorships.
@@ -192,8 +206,8 @@ class OwnershipSystem:
 
     def __init__(self, platform_id: str = "buddy_ownership_v1") -> None:
         self.platform_id = platform_id
-        self._licenses: dict[str, License] = {}          # license_id -> License
-        self._user_licenses: dict[str, list[str]] = {}   # user_id -> [license_ids]
+        self._licenses: dict[str, License] = {}  # license_id -> License
+        self._user_licenses: dict[str, list[str]] = {}  # user_id -> [license_ids]
         self._transactions: list[Transaction] = []
         self._sponsorships: dict[str, Sponsorship] = {}
         self._total_revenue: float = 0.0
@@ -221,7 +235,7 @@ class OwnershipSystem:
         if tier == Tier.OWNER:
             amount = config.price_usd_one_time
             tx_type = TransactionType.ONE_TIME_PURCHASE
-            expires_at = None   # lifetime
+            expires_at = None  # lifetime
         elif tier == Tier.FREE:
             amount = 0.0
             tx_type = TransactionType.SUBSCRIPTION_NEW
@@ -267,13 +281,10 @@ class OwnershipSystem:
         )
         self._transactions.append(tx)
 
-        msg = (
-            f"🎉 Welcome to Buddy {config.name} tier! "
-            + (
-                "Your lifetime OWNER license is active. Buddy bot GitHub system is ready to provision."
-                if tier == Tier.OWNER
-                else f"Your ${amount:.2f}/month subscription is active."
-            )
+        msg = f"🎉 Welcome to Buddy {config.name} tier! " + (
+            "Your lifetime OWNER license is active. Buddy bot GitHub system is ready to provision."
+            if tier == Tier.OWNER
+            else f"Your ${amount:.2f}/month subscription is active."
         )
 
         return {
@@ -296,17 +307,25 @@ class OwnershipSystem:
         """Upgrade a user's active subscription to a higher tier."""
         active = self._get_active_license(user_id)
         if active is None:
-            return {"success": False, "message": "No active license found for this user."}
+            return {
+                "success": False,
+                "message": "No active license found for this user.",
+            }
 
         if list(Tier).index(new_tier) <= list(Tier).index(active.tier):
-            return {"success": False, "message": "New tier must be higher than current tier."}
+            return {
+                "success": False,
+                "message": "New tier must be higher than current tier.",
+            }
 
         # Cancel old license
         active.status = LicenseStatus.CANCELLED
         # Purchase new tier
         result = self.purchase_license(user_id, new_tier, payment_method)
         if result["success"]:
-            result["transaction"]["transaction_type"] = TransactionType.SUBSCRIPTION_UPGRADE.value
+            result["transaction"][
+                "transaction_type"
+            ] = TransactionType.SUBSCRIPTION_UPGRADE.value
         return result
 
     def cancel_subscription(self, user_id: str) -> dict:

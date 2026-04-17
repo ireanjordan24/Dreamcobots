@@ -4,6 +4,7 @@ Streaming Launch System module for the CreatorEmpire bot.
 Handles stream configuration, go-live checklists, channel optimisation
 tips, and monetisation milestones for streamer creators.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -12,11 +13,11 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .tiers import (
-    Tier,
     CREATOR_FEATURES_BY_TIER,
-    FEATURE_STREAM_SETUP,
-    FEATURE_MONETIZATION_BASIC,
     FEATURE_MONETIZATION_ADVANCED,
+    FEATURE_MONETIZATION_BASIC,
+    FEATURE_STREAM_SETUP,
+    Tier,
 )
 
 
@@ -79,29 +80,61 @@ STREAMING_PLATFORMS = ["twitch", "youtube", "kick", "facebook_gaming", "trovo"]
 
 # Supported stream niches
 STREAM_NICHES = [
-    "gaming", "irl", "music", "just_chatting", "sports",
-    "art", "cooking", "fitness", "education", "talk_show",
+    "gaming",
+    "irl",
+    "music",
+    "just_chatting",
+    "sports",
+    "art",
+    "cooking",
+    "fitness",
+    "education",
+    "talk_show",
 ]
 
 # Monetisation milestones per platform
 MONETISATION_MILESTONES: dict[str, list[dict]] = {
     "twitch": [
-        {"milestone": "Affiliate", "requirements": "50 followers, 3 avg viewers, 500 mins broadcast, 7 unique days"},
-        {"milestone": "Partner", "requirements": "~75 avg viewers, consistent schedule, community guidelines"},
+        {
+            "milestone": "Affiliate",
+            "requirements": "50 followers, 3 avg viewers, 500 mins broadcast, 7 unique days",
+        },
+        {
+            "milestone": "Partner",
+            "requirements": "~75 avg viewers, consistent schedule, community guidelines",
+        },
     ],
     "youtube": [
-        {"milestone": "YPP (basic)", "requirements": "500 subscribers, 3 public uploads in 90 days, 3k watch hours or 3M Shorts views"},
-        {"milestone": "YPP (full)", "requirements": "1k subscribers, 4k watch hours or 10M Shorts views in 12 months"},
+        {
+            "milestone": "YPP (basic)",
+            "requirements": "500 subscribers, 3 public uploads in 90 days, 3k watch hours or 3M Shorts views",
+        },
+        {
+            "milestone": "YPP (full)",
+            "requirements": "1k subscribers, 4k watch hours or 10M Shorts views in 12 months",
+        },
     ],
     "kick": [
-        {"milestone": "Kick Partner", "requirements": "75 avg viewers, consistent streaming schedule"},
+        {
+            "milestone": "Kick Partner",
+            "requirements": "75 avg viewers, consistent streaming schedule",
+        },
     ],
     "facebook_gaming": [
-        {"milestone": "Level Up", "requirements": "100 followers, 4 hours streamed, 2 different days"},
-        {"milestone": "Partner Plus", "requirements": "Apply with established audience and consistent content"},
+        {
+            "milestone": "Level Up",
+            "requirements": "100 followers, 4 hours streamed, 2 different days",
+        },
+        {
+            "milestone": "Partner Plus",
+            "requirements": "Apply with established audience and consistent content",
+        },
     ],
     "trovo": [
-        {"milestone": "Partner", "requirements": "Apply with audience data via Trovo partner programme"},
+        {
+            "milestone": "Partner",
+            "requirements": "Apply with audience data via Trovo partner programme",
+        },
     ],
 }
 
@@ -210,7 +243,9 @@ class StreamerEngine:
         config.monetisation_enabled = True
         return config
 
-    def configure_overlay(self, creator_name: str, metadata: Optional[dict] = None) -> StreamConfig:
+    def configure_overlay(
+        self, creator_name: str, metadata: Optional[dict] = None
+    ) -> StreamConfig:
         """Mark stream overlay as configured, optionally storing overlay details."""
         self._check_feature(FEATURE_STREAM_SETUP)
         config = self._get_config(creator_name)
@@ -263,12 +298,15 @@ class StreamerEngine:
                 "Link to your coaching programme or subscription in bio",
             ],
         }
-        return tips_map.get(niche, [
-            "Maintain a consistent streaming schedule",
-            "Engage actively with chat throughout every stream",
-            "Promote upcoming streams on all social channels",
-            "Analyse VOD analytics to improve future content",
-        ])
+        return tips_map.get(
+            niche,
+            [
+                "Maintain a consistent streaming schedule",
+                "Engage actively with chat throughout every stream",
+                "Promote upcoming streams on all social channels",
+                "Analyse VOD analytics to improve future content",
+            ],
+        )
 
     # ------------------------------------------------------------------
     # Internal helpers

@@ -33,13 +33,13 @@ class TierConfig:
     name: str
     tier: Tier
     price_usd_monthly: float
-    max_voice_profiles: Optional[int]    # None = unlimited
-    max_image_avatars: Optional[int]     # None = unlimited
-    max_vault_secrets: Optional[int]     # None = unlimited
+    max_voice_profiles: Optional[int]  # None = unlimited
+    max_image_avatars: Optional[int]  # None = unlimited
+    max_vault_secrets: Optional[int]  # None = unlimited
     max_audit_entries_visible: Optional[int]  # None = unlimited
     features: list
-    encryption_level: str                # e.g. "AES-256", "AES-256-GCM"
-    compliance_frameworks: list          # e.g. ["GDPR", "HIPAA"]
+    encryption_level: str  # e.g. "AES-256", "AES-256-GCM"
+    compliance_frameworks: list  # e.g. ["GDPR", "HIPAA"]
     support_level: str
 
     def has_feature(self, feature: str) -> bool:
@@ -57,14 +57,14 @@ FEATURE_CONSENT_MANAGER = "consent_manager"
 FEATURE_VOICE_MIMICRY = "voice_mimicry"
 FEATURE_IMAGE_SYNTHESIS = "image_synthesis"
 FEATURE_VAULT = "vault"
-FEATURE_VAULT_MODE = "vault_mode"           # Locked vault (ENTERPRISE only)
+FEATURE_VAULT_MODE = "vault_mode"  # Locked vault (ENTERPRISE only)
 FEATURE_AUDIT_LOG = "audit_log"
 FEATURE_FULL_AUDIT = "full_audit_log"
 FEATURE_EXPLAINABLE_AI = "explainable_ai"
 FEATURE_GDPR_TOOLKIT = "gdpr_toolkit"
 FEATURE_HIPAA_TOOLKIT = "hipaa_toolkit"
 FEATURE_TRUST_SEAL = "trust_seal"
-FEATURE_TRUST_SEAL_API = "trust_seal_api"   # Programmatic seal (ENTERPRISE only)
+FEATURE_TRUST_SEAL_API = "trust_seal_api"  # Programmatic seal (ENTERPRISE only)
 FEATURE_WHITE_LABEL = "white_label"
 FEATURE_API_ACCESS = "api_access"
 FEATURE_MILITARY_ENCRYPTION = "military_grade_encryption"

@@ -119,7 +119,9 @@ class MetricsCollector:
             entries = [e for e in entries if e.run_id == run_id]
         return entries
 
-    def summary(self, metric_name: str, experiment_name: Optional[str] = None) -> Dict[str, float]:
+    def summary(
+        self, metric_name: str, experiment_name: Optional[str] = None
+    ) -> Dict[str, float]:
         """
         Return summary statistics (min, max, mean, last) for *metric_name*.
 
@@ -139,7 +141,9 @@ class MetricsCollector:
         ValueError
             If no entries match the given filters.
         """
-        entries = self.get_metrics(experiment_name=experiment_name, metric_name=metric_name)
+        entries = self.get_metrics(
+            experiment_name=experiment_name, metric_name=metric_name
+        )
         if not entries:
             raise ValueError(
                 f"No entries found for metric '{metric_name}'"

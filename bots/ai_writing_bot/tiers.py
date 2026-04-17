@@ -2,24 +2,39 @@
 Tier configuration for the Dreamcobots AI Writing Bot.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import (
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # Bot-specific features per tier
 AI_WRITING_FEATURES: dict[str, list[str]] = {
     Tier.FREE.value: ["5 templates", "1,000 words/month", "basic SEO"],
-    Tier.PRO.value: ["50 templates", "50,000 words/month", "advanced SEO", "tone control", "plagiarism check"],
-    Tier.ENTERPRISE.value: ["unlimited templates", "unlimited words", "brand voice training", "multi-language", "API access"],
+    Tier.PRO.value: [
+        "50 templates",
+        "50,000 words/month",
+        "advanced SEO",
+        "tone control",
+        "plagiarism check",
+    ],
+    Tier.ENTERPRISE.value: [
+        "unlimited templates",
+        "unlimited words",
+        "brand voice training",
+        "multi-language",
+        "API access",
+    ],
 }
 
 

@@ -4,8 +4,15 @@
 class CompliancePackage:
     """Represents a compliance package for a specific industry or domain."""
 
-    def __init__(self, name: str, category: str, requirements: list,
-                 checklist: list, certifications: list, pricing_tiers: dict):
+    def __init__(
+        self,
+        name: str,
+        category: str,
+        requirements: list,
+        checklist: list,
+        certifications: list,
+        pricing_tiers: dict,
+    ):
         """Initialize a compliance package with full metadata."""
         self.name = name
         self.category = category
@@ -49,6 +56,7 @@ class ComplianceManager:
     def _load_packages(self):
         """Load all built-in compliance packages."""
         from compliance.packages import get_all_packages
+
         for pkg in get_all_packages():
             self._packages[pkg.category] = pkg
 

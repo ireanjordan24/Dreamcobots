@@ -65,7 +65,9 @@ class LearningMatrix:
         """
         existing = self._entries.get(entry.method_id)
         if existing is not None and self.decay_factor < 1.0:
-            blended = existing.score * self.decay_factor + entry.score * (1.0 - self.decay_factor)
+            blended = existing.score * self.decay_factor + entry.score * (
+                1.0 - self.decay_factor
+            )
             entry = MatrixEntry(
                 method_id=entry.method_id,
                 method_name=entry.method_name,
@@ -80,7 +82,9 @@ class LearningMatrix:
         """Retrieve an entry by method identifier."""
         return self._entries.get(method_id)
 
-    def rank(self, top_n: Optional[int] = None, category: Optional[str] = None) -> List[MatrixEntry]:
+    def rank(
+        self, top_n: Optional[int] = None, category: Optional[str] = None
+    ) -> List[MatrixEntry]:
         """
         Return entries sorted by score (highest first).
 

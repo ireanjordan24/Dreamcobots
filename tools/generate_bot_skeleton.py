@@ -17,7 +17,6 @@ import argparse
 import os
 import sys
 
-
 BOT_TEMPLATE = '''\
 # GLOBAL AI SOURCES FLOW
 """
@@ -103,7 +102,7 @@ from .{module_name} import {class_name}
 __all__ = ["{class_name}"]
 '''
 
-README_TEMPLATE = '''\
+README_TEMPLATE = """\
 # {bot_name}
 
 Part of the DreamCObots framework, compliant with the
@@ -137,7 +136,7 @@ This bot extends `GlobalAISourcesFlow` and implements all 8 pipeline stages:
 6. Deployment
 7. Profit & Market Intelligence
 8. Governance & Security
-'''
+"""
 
 
 def to_class_name(name: str) -> str:
@@ -152,6 +151,7 @@ def to_class_name(name: str) -> str:
 def to_module_name(name: str) -> str:
     """Convert 'MyBotName' or 'My Bot Name' to 'my_bot_name'."""
     import re
+
     s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
     return s.lower().replace(" ", "_").replace("-", "_")

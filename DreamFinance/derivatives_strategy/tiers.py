@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["options pricing models", "Greeks calculation engine"]),
-    "elite": TierConfig("Elite", 1500.0, ["options pricing models", "Greeks calculation engine", "volatility surface modeling", "portfolio-level Greeks"]),
+    "enterprise": TierConfig(
+        "Enterprise", 999.0, ["options pricing models", "Greeks calculation engine"]
+    ),
+    "elite": TierConfig(
+        "Elite",
+        1500.0,
+        [
+            "options pricing models",
+            "Greeks calculation engine",
+            "volatility surface modeling",
+            "portfolio-level Greeks",
+        ],
+    ),
 }

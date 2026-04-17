@@ -17,7 +17,9 @@ class ReceiptUploadScreen:
             f"Total Cashback: ${self.total_cashback:.2f}",
         ]
         for item in self.matched_items[:3]:
-            lines.append(f"  • {item.get('name', '?')} → ${item.get('cashback', 0):.2f}")
+            lines.append(
+                f"  • {item.get('name', '?')} → ${item.get('cashback', 0):.2f}"
+            )
         return "\n".join(lines)
 
     def to_dict(self) -> dict:

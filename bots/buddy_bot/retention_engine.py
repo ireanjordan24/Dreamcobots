@@ -42,6 +42,7 @@ def _slugify(name: str) -> str:
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class HealthStatus(Enum):
     HEALTHY = "healthy"
     AT_RISK = "at_risk"
@@ -63,6 +64,7 @@ class UpsellStage(Enum):
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ClientHealthRecord:
     """Tracks a retained client's health and engagement metrics."""
@@ -73,8 +75,8 @@ class ClientHealthRecord:
     monthly_value_usd: float
     months_active: int
     last_contact_days_ago: int
-    results_delivered: int           # number of deliverables deployed
-    satisfaction_score: float        # 0.0–10.0
+    results_delivered: int  # number of deliverables deployed
+    satisfaction_score: float  # 0.0–10.0
     health_status: HealthStatus = HealthStatus.HEALTHY
     upsell_stage: UpsellStage = UpsellStage.NOT_READY
     lifetime_value_usd: float = 0.0
@@ -168,6 +170,7 @@ class UpsellOffer:
 # Exceptions
 # ---------------------------------------------------------------------------
 
+
 class RetentionEngineError(Exception):
     """Base exception for RetentionEngine errors."""
 
@@ -239,6 +242,7 @@ _UPSELL_MAP = {
 # ---------------------------------------------------------------------------
 # RetentionEngine
 # ---------------------------------------------------------------------------
+
 
 class RetentionEngine:
     """Maximises client lifetime value through proactive retention and upsells.
@@ -348,7 +352,8 @@ class RetentionEngine:
     def get_at_risk_clients(self) -> list[ClientHealthRecord]:
         """Return all clients with AT_RISK or CHURNING health status."""
         return [
-            r for r in self._clients.values()
+            r
+            for r in self._clients.values()
             if r.health_status in (HealthStatus.AT_RISK, HealthStatus.CHURNING)
         ]
 
@@ -393,9 +398,7 @@ class RetentionEngine:
             client_name=client_name,
             message=message,
             channel=channel,
-            scheduled_at=(
-                datetime.now(timezone.utc).isoformat()
-            ),
+            scheduled_at=(datetime.now(timezone.utc).isoformat()),
         )
         self._checkins.append(checkin)
         return checkin
@@ -429,10 +432,7 @@ class RetentionEngine:
             and record.results_delivered >= 3
         ):
             record.upsell_stage = UpsellStage.READY
-        elif (
-            record.satisfaction_score >= 6.5
-            and record.months_active >= 1
-        ):
+        elif record.satisfaction_score >= 6.5 and record.months_active >= 1:
             record.upsell_stage = UpsellStage.WARM
         else:
             record.upsell_stage = UpsellStage.NOT_READY
@@ -451,9 +451,7 @@ class RetentionEngine:
         UpsellOffer
         """
         if not self.can_upsell_detection:
-            raise RetentionEngineTierError(
-                "Upsell offers require PRO tier or above."
-            )
+            raise RetentionEngineTierError("Upsell offers require PRO tier or above.")
         if client_name not in self._clients:
             raise RetentionEngineError(f"Client not found: {client_name}")
 
@@ -480,7 +478,8 @@ class RetentionEngine:
             new_features=upsell_info["upgrade_features"],
             incentive=(
                 "Upgrade this month and get your first month at 50% off."
-                if record.months_active >= 3 else None
+                if record.months_active >= 3
+                else None
             ),
         )
         self._upsell_offers.append(offer)
@@ -505,9 +504,7 @@ class RetentionEngine:
             Referral ask message and incentive.
         """
         if not self.can_referral_engine:
-            raise RetentionEngineTierError(
-                "Referral engine requires ENTERPRISE tier."
-            )
+            raise RetentionEngineTierError("Referral engine requires ENTERPRISE tier.")
         if client_name not in self._clients:
             raise RetentionEngineError(f"Client not found: {client_name}")
 
@@ -564,7 +561,9 @@ class RetentionEngine:
             "average_ltv_usd": round(avg_ltv, 2),
             "churn_rate_pct": churn_rate,
             "champions": champions,
-            "at_risk": sum(1 for c in clients if c.health_status == HealthStatus.AT_RISK),
+            "at_risk": sum(
+                1 for c in clients if c.health_status == HealthStatus.AT_RISK
+            ),
             "churning": churning,
             "total_referrals": sum(c.referrals_generated for c in clients),
             "health_breakdown": {

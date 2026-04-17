@@ -1,4 +1,5 @@
 """NewsAPI news connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,9 +29,12 @@ class NewsAPIConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"country": country, "category": category, "apiKey": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/top-headlines", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/top-headlines", params=params, timeout=30
+            )
             response.raise_for_status()
             logger.info("NewsAPI top headlines fetched.")
             return {"status": "success", "data": response.json()}
@@ -48,12 +52,14 @@ class NewsAPIConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": query, "apiKey": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/everything", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/everything", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("NewsAPI search_everything error: %s", e)
             return {"status": "error", "message": str(e)}
-

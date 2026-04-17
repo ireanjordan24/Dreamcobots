@@ -9,19 +9,21 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class SystemStatus(Enum):
@@ -35,7 +37,7 @@ class SystemStatus(Enum):
 class System:
     system_id: str
     name: str
-    health_score: float       # 0.0 - 100.0
+    health_score: float  # 0.0 - 100.0
     last_checked: datetime
     status: SystemStatus
     config: dict = field(default_factory=dict)
@@ -95,14 +97,18 @@ class OpsCommander:
         incident = self._incidents[incident_id]
         if response_plan.get("resolve", False):
             incident.resolved = True
-            incident.resolution_notes = response_plan.get("notes", "Resolved by OpsCommander.")
+            incident.resolution_notes = response_plan.get(
+                "notes", "Resolved by OpsCommander."
+            )
             system = self._systems.get(incident.system_id)
             if system:
                 system.health_score = min(100.0, system.health_score + 30.0)
                 system.status = SystemStatus.HEALTHY
         return incident
 
-    def create_incident(self, system_id: str, severity: str, description: str) -> Incident:
+    def create_incident(
+        self, system_id: str, severity: str, description: str
+    ) -> Incident:
         """Record a new incident."""
         incident = Incident(
             incident_id=str(uuid.uuid4()),
@@ -136,7 +142,9 @@ class OpsCommander:
     def get_status_report(self) -> dict:
         """Return a status report across all systems and incidents."""
         total = len(self._systems)
-        healthy = sum(1 for s in self._systems.values() if s.status == SystemStatus.HEALTHY)
+        healthy = sum(
+            1 for s in self._systems.values() if s.status == SystemStatus.HEALTHY
+        )
         open_incidents = sum(1 for i in self._incidents.values() if not i.resolved)
         return {
             "total_systems": total,

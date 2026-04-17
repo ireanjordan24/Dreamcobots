@@ -5,12 +5,14 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
 
 from __future__ import annotations
-import sys, os
-import random
-from enum import Enum
-from typing import Optional, List, Dict, Any
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import random
+import sys
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -33,7 +35,208 @@ class FeatureFlagBot:
     # String-keyed to avoid cross-module enum identity issues
     RESULT_LIMITS: Dict[str, int] = {"free": 5, "pro": 25, "enterprise": 100}
 
-    MOCK_DATA: List[Dict[str, Any]] = [{'id': 'APP001', 'app': 'App 1', 'platform': 'Android', 'users': 1500, 'retention_pct': 31.8, 'revenue_usd': 800, 'score': 42.5, 'category': 'Utility'}, {'id': 'APP002', 'app': 'App 2', 'platform': 'Web', 'users': 2000, 'retention_pct': 33.6, 'revenue_usd': 1100, 'score': 45.0, 'category': 'Game'}, {'id': 'APP003', 'app': 'App 3', 'platform': 'iOS', 'users': 2500, 'retention_pct': 35.4, 'revenue_usd': 1400, 'score': 47.5, 'category': 'Finance'}, {'id': 'APP004', 'app': 'App 4', 'platform': 'Android', 'users': 3000, 'retention_pct': 37.2, 'revenue_usd': 1700, 'score': 50.0, 'category': 'Social'}, {'id': 'APP005', 'app': 'App 5', 'platform': 'Web', 'users': 3500, 'retention_pct': 39.0, 'revenue_usd': 2000, 'score': 52.5, 'category': 'Utility'}, {'id': 'APP006', 'app': 'App 6', 'platform': 'iOS', 'users': 4000, 'retention_pct': 40.8, 'revenue_usd': 2300, 'score': 55.0, 'category': 'Game'}, {'id': 'APP007', 'app': 'App 7', 'platform': 'Android', 'users': 4500, 'retention_pct': 42.6, 'revenue_usd': 2600, 'score': 57.5, 'category': 'Finance'}, {'id': 'APP008', 'app': 'App 8', 'platform': 'Web', 'users': 5000, 'retention_pct': 44.4, 'revenue_usd': 2900, 'score': 60.0, 'category': 'Social'}, {'id': 'APP009', 'app': 'App 9', 'platform': 'iOS', 'users': 5500, 'retention_pct': 46.2, 'revenue_usd': 3200, 'score': 62.5, 'category': 'Utility'}, {'id': 'APP010', 'app': 'App 10', 'platform': 'Android', 'users': 6000, 'retention_pct': 48.0, 'revenue_usd': 3500, 'score': 65.0, 'category': 'Game'}, {'id': 'APP011', 'app': 'App 11', 'platform': 'Web', 'users': 6500, 'retention_pct': 49.8, 'revenue_usd': 3800, 'score': 67.5, 'category': 'Finance'}, {'id': 'APP012', 'app': 'App 12', 'platform': 'iOS', 'users': 7000, 'retention_pct': 51.6, 'revenue_usd': 4100, 'score': 70.0, 'category': 'Social'}, {'id': 'APP013', 'app': 'App 13', 'platform': 'Android', 'users': 7500, 'retention_pct': 53.4, 'revenue_usd': 4400, 'score': 72.5, 'category': 'Utility'}, {'id': 'APP014', 'app': 'App 14', 'platform': 'Web', 'users': 8000, 'retention_pct': 55.2, 'revenue_usd': 4700, 'score': 75.0, 'category': 'Game'}, {'id': 'APP015', 'app': 'App 15', 'platform': 'iOS', 'users': 8500, 'retention_pct': 57.0, 'revenue_usd': 5000, 'score': 77.5, 'category': 'Finance'}, {'id': 'APP016', 'app': 'App 16', 'platform': 'Android', 'users': 9000, 'retention_pct': 58.8, 'revenue_usd': 5300, 'score': 80.0, 'category': 'Social'}, {'id': 'APP017', 'app': 'App 17', 'platform': 'Web', 'users': 9500, 'retention_pct': 60.6, 'revenue_usd': 5600, 'score': 82.5, 'category': 'Utility'}, {'id': 'APP018', 'app': 'App 18', 'platform': 'iOS', 'users': 10000, 'retention_pct': 62.4, 'revenue_usd': 5900, 'score': 85.0, 'category': 'Game'}, {'id': 'APP019', 'app': 'App 19', 'platform': 'Android', 'users': 10500, 'retention_pct': 64.2, 'revenue_usd': 6200, 'score': 87.5, 'category': 'Finance'}, {'id': 'APP020', 'app': 'App 20', 'platform': 'Web', 'users': 11000, 'retention_pct': 66.0, 'revenue_usd': 6500, 'score': 90.0, 'category': 'Social'}]
+    MOCK_DATA: List[Dict[str, Any]] = [
+        {
+            "id": "APP001",
+            "app": "App 1",
+            "platform": "Android",
+            "users": 1500,
+            "retention_pct": 31.8,
+            "revenue_usd": 800,
+            "score": 42.5,
+            "category": "Utility",
+        },
+        {
+            "id": "APP002",
+            "app": "App 2",
+            "platform": "Web",
+            "users": 2000,
+            "retention_pct": 33.6,
+            "revenue_usd": 1100,
+            "score": 45.0,
+            "category": "Game",
+        },
+        {
+            "id": "APP003",
+            "app": "App 3",
+            "platform": "iOS",
+            "users": 2500,
+            "retention_pct": 35.4,
+            "revenue_usd": 1400,
+            "score": 47.5,
+            "category": "Finance",
+        },
+        {
+            "id": "APP004",
+            "app": "App 4",
+            "platform": "Android",
+            "users": 3000,
+            "retention_pct": 37.2,
+            "revenue_usd": 1700,
+            "score": 50.0,
+            "category": "Social",
+        },
+        {
+            "id": "APP005",
+            "app": "App 5",
+            "platform": "Web",
+            "users": 3500,
+            "retention_pct": 39.0,
+            "revenue_usd": 2000,
+            "score": 52.5,
+            "category": "Utility",
+        },
+        {
+            "id": "APP006",
+            "app": "App 6",
+            "platform": "iOS",
+            "users": 4000,
+            "retention_pct": 40.8,
+            "revenue_usd": 2300,
+            "score": 55.0,
+            "category": "Game",
+        },
+        {
+            "id": "APP007",
+            "app": "App 7",
+            "platform": "Android",
+            "users": 4500,
+            "retention_pct": 42.6,
+            "revenue_usd": 2600,
+            "score": 57.5,
+            "category": "Finance",
+        },
+        {
+            "id": "APP008",
+            "app": "App 8",
+            "platform": "Web",
+            "users": 5000,
+            "retention_pct": 44.4,
+            "revenue_usd": 2900,
+            "score": 60.0,
+            "category": "Social",
+        },
+        {
+            "id": "APP009",
+            "app": "App 9",
+            "platform": "iOS",
+            "users": 5500,
+            "retention_pct": 46.2,
+            "revenue_usd": 3200,
+            "score": 62.5,
+            "category": "Utility",
+        },
+        {
+            "id": "APP010",
+            "app": "App 10",
+            "platform": "Android",
+            "users": 6000,
+            "retention_pct": 48.0,
+            "revenue_usd": 3500,
+            "score": 65.0,
+            "category": "Game",
+        },
+        {
+            "id": "APP011",
+            "app": "App 11",
+            "platform": "Web",
+            "users": 6500,
+            "retention_pct": 49.8,
+            "revenue_usd": 3800,
+            "score": 67.5,
+            "category": "Finance",
+        },
+        {
+            "id": "APP012",
+            "app": "App 12",
+            "platform": "iOS",
+            "users": 7000,
+            "retention_pct": 51.6,
+            "revenue_usd": 4100,
+            "score": 70.0,
+            "category": "Social",
+        },
+        {
+            "id": "APP013",
+            "app": "App 13",
+            "platform": "Android",
+            "users": 7500,
+            "retention_pct": 53.4,
+            "revenue_usd": 4400,
+            "score": 72.5,
+            "category": "Utility",
+        },
+        {
+            "id": "APP014",
+            "app": "App 14",
+            "platform": "Web",
+            "users": 8000,
+            "retention_pct": 55.2,
+            "revenue_usd": 4700,
+            "score": 75.0,
+            "category": "Game",
+        },
+        {
+            "id": "APP015",
+            "app": "App 15",
+            "platform": "iOS",
+            "users": 8500,
+            "retention_pct": 57.0,
+            "revenue_usd": 5000,
+            "score": 77.5,
+            "category": "Finance",
+        },
+        {
+            "id": "APP016",
+            "app": "App 16",
+            "platform": "Android",
+            "users": 9000,
+            "retention_pct": 58.8,
+            "revenue_usd": 5300,
+            "score": 80.0,
+            "category": "Social",
+        },
+        {
+            "id": "APP017",
+            "app": "App 17",
+            "platform": "Web",
+            "users": 9500,
+            "retention_pct": 60.6,
+            "revenue_usd": 5600,
+            "score": 82.5,
+            "category": "Utility",
+        },
+        {
+            "id": "APP018",
+            "app": "App 18",
+            "platform": "iOS",
+            "users": 10000,
+            "retention_pct": 62.4,
+            "revenue_usd": 5900,
+            "score": 85.0,
+            "category": "Game",
+        },
+        {
+            "id": "APP019",
+            "app": "App 19",
+            "platform": "Android",
+            "users": 10500,
+            "retention_pct": 64.2,
+            "revenue_usd": 6200,
+            "score": 87.5,
+            "category": "Finance",
+        },
+        {
+            "id": "APP020",
+            "app": "App 20",
+            "platform": "Web",
+            "users": 11000,
+            "retention_pct": 66.0,
+            "revenue_usd": 6500,
+            "score": 90.0,
+            "category": "Social",
+        },
+    ]
 
     def __init__(self, tier: Tier = Tier.FREE):
         # Normalize cross-module Tier enum instances by value string
@@ -109,4 +312,3 @@ class FeatureFlagBot:
             "items": self.MOCK_DATA,
             "generated_by": "GLOBAL AI SOURCES FLOW",
         }
-

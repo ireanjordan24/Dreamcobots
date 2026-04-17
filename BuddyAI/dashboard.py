@@ -78,12 +78,16 @@ class Dashboard:
         print(f"  Total Revenue  : ${summary.get('total_revenue', 0):>10,.2f}")
         print(f"  Total Traffic  : {summary.get('total_traffic', 0):>12,}")
         print(f"  Sources Tracked: {summary.get('source_count', 0):>12}")
-        print(f"  Top Source     : {summary.get('top_source', 'N/A'):>12}  "
-              f"(${summary.get('top_revenue', 0):,.2f})")
+        print(
+            f"  Top Source     : {summary.get('top_source', 'N/A'):>12}  "
+            f"(${summary.get('top_revenue', 0):,.2f})"
+        )
         print(sep)
         by_source = summary.get("by_source", {})
         if by_source:
-            print(f"  {'Source':<14} {'Revenue':>10}  {'Traffic':>10}  {'Engagement':>10}")
+            print(
+                f"  {'Source':<14} {'Revenue':>10}  {'Traffic':>10}  {'Engagement':>10}"
+            )
             print(f"  {'-'*14} {'-'*10}  {'-'*10}  {'-'*10}")
             for src, data in by_source.items():
                 print(
@@ -101,15 +105,15 @@ class Dashboard:
     ) -> str:
         lines: list[str] = []
         lines.append("=" * 70)
-        lines.append(
-            f"BuddyBot Residual Income Report — {summary.get('date', '')}"
-        )
+        lines.append(f"BuddyBot Residual Income Report — {summary.get('date', '')}")
         lines.append("=" * 70)
         lines.append(f"Total Revenue : ${summary.get('total_revenue', 0):,.2f}")
         lines.append(f"Total Traffic : {summary.get('total_traffic', 0):,}")
         lines.append(f"Sources       : {summary.get('source_count', 0)}")
-        lines.append(f"Top Source    : {summary.get('top_source', 'N/A')} "
-                     f"(${summary.get('top_revenue', 0):,.2f})")
+        lines.append(
+            f"Top Source    : {summary.get('top_source', 'N/A')} "
+            f"(${summary.get('top_revenue', 0):,.2f})"
+        )
         lines.append("-" * 70)
         lines.append(
             f"{'Source':<14} {'Revenue':>10}  {'Traffic':>12}  {'Engagement':>12}"
@@ -137,9 +141,7 @@ class Dashboard:
         logger.info("Report saved to %s", filename)
         self.bus.publish("dashboard.report_saved", {"filename": filename})
 
-    def save_report(
-        self, summary: dict[str, Any], filename: str | None = None
-    ) -> str:
+    def save_report(self, summary: dict[str, Any], filename: str | None = None) -> str:
         """Persist a JSON summary report and return the file path."""
         os.makedirs(self.output_dir, exist_ok=True)
         if filename is None:

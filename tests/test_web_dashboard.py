@@ -18,8 +18,8 @@ Covers:
   14. Helper functions (_fetch_github_workflows, _fetch_github_artifacts, _check_quantum_bot_status)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -29,24 +29,25 @@ AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 
 import json
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from ui.web_dashboard import (
-    create_app,
-    _fetch_github_workflows,
-    _fetch_github_artifacts,
-    _check_quantum_bot_status,
-)
+import pytest
+
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
+from ui.web_dashboard import (
+    _check_quantum_bot_status,
+    _fetch_github_artifacts,
+    _fetch_github_workflows,
+    create_app,
+)
 
 
 @pytest.fixture
 def client():
     """Return a Flask test client backed by fresh in-memory components."""
     cc = ControlCenter()
-    db = BotPerformanceDB()          # in-memory
+    db = BotPerformanceDB()  # in-memory
     app = create_app(control_center=cc, db=db)
     app.config["TESTING"] = True
     with app.test_client() as c:
@@ -67,7 +68,9 @@ def client_with_data():
     cc.register_bot("affiliate_bot", _FakeBot())
     cc.add_income_entry("affiliate_bot", 120.50)
     db.record_run("affiliate_bot", kpis={"revenue_usd": 120.5, "tasks_completed": 6})
-    db.record_run("weak_bot", kpis={"revenue_usd": 0.0, "tasks_completed": 0}, status="error")
+    db.record_run(
+        "weak_bot", kpis={"revenue_usd": 0.0, "tasks_completed": 0}, status="error"
+    )
 
     app = create_app(control_center=cc, db=db)
     app.config["TESTING"] = True
@@ -79,6 +82,7 @@ def client_with_data():
 # ===========================================================================
 # 1. App creation
 # ===========================================================================
+
 
 class TestAppCreation:
     def test_create_app_returns_flask_app(self):
@@ -93,6 +97,7 @@ class TestAppCreation:
 # ===========================================================================
 # 2. Landing page
 # ===========================================================================
+
 
 class TestLandingPage:
     def test_get_root_returns_200(self, client):
@@ -115,6 +120,7 @@ class TestLandingPage:
 # ===========================================================================
 # 3. /api/status
 # ===========================================================================
+
 
 class TestApiStatus:
     def test_status_returns_200(self, client):
@@ -151,6 +157,7 @@ class TestApiStatus:
 # 4. /api/bots
 # ===========================================================================
 
+
 class TestApiBots:
     def test_bots_returns_200(self, client):
         resp = client.get("/api/bots")
@@ -172,6 +179,7 @@ class TestApiBots:
 # ===========================================================================
 # 5. /api/bots/register
 # ===========================================================================
+
 
 class TestRegisterBot:
     def test_register_returns_201(self, client):
@@ -212,6 +220,7 @@ class TestRegisterBot:
 # 6. /api/revenue
 # ===========================================================================
 
+
 class TestApiRevenue:
     def test_revenue_returns_200(self, client):
         assert client.get("/api/revenue").status_code == 200
@@ -232,6 +241,7 @@ class TestApiRevenue:
 # ===========================================================================
 # 7. /api/leaderboard
 # ===========================================================================
+
 
 class TestApiLeaderboard:
     def test_leaderboard_returns_200(self, client):
@@ -254,6 +264,7 @@ class TestApiLeaderboard:
 # 8. /api/underperformers
 # ===========================================================================
 
+
 class TestApiUnderperformers:
     def test_underperformers_returns_200(self, client):
         assert client.get("/api/underperformers").status_code == 200
@@ -263,7 +274,9 @@ class TestApiUnderperformers:
         assert "underperformers" in data
 
     def test_underperformers_detects_weak_bot(self, client_with_data):
-        data = json.loads(client_with_data.get("/api/underperformers?threshold=50").data)
+        data = json.loads(
+            client_with_data.get("/api/underperformers?threshold=50").data
+        )
         names = [b["bot_name"] for b in data["underperformers"]]
         assert "weak_bot" in names
 
@@ -271,6 +284,7 @@ class TestApiUnderperformers:
 # ===========================================================================
 # 9. /api/record_run
 # ===========================================================================
+
 
 class TestRecordRun:
     def test_record_run_returns_201(self, client):
@@ -312,6 +326,7 @@ class TestRecordRun:
 # 10. /api/history/<bot_name>
 # ===========================================================================
 
+
 class TestApiHistory:
     def test_history_returns_200(self, client):
         assert client.get("/api/history/some_bot").status_code == 200
@@ -342,6 +357,7 @@ class TestApiHistory:
 # ===========================================================================
 # 11. /api/bots/catalog
 # ===========================================================================
+
 
 class TestBotCatalog:
     def test_catalog_returns_200(self, client):
@@ -374,7 +390,14 @@ class TestBotCatalog:
     def test_catalog_bots_have_required_fields(self, client):
         data = json.loads(client.get("/api/bots/catalog").data)
         for bot in data["catalog"]:
-            for field in ("name", "display_name", "description", "revenue_model", "category", "is_live"):
+            for field in (
+                "name",
+                "display_name",
+                "description",
+                "revenue_model",
+                "category",
+                "is_live",
+            ):
                 assert field in bot, f"Bot '{bot.get('name')}' missing field '{field}'"
 
     def test_catalog_not_live_by_default(self, client):
@@ -390,7 +413,9 @@ class TestBotCatalog:
             content_type="application/json",
         )
         data = json.loads(client.get("/api/bots/catalog").data)
-        lead_gen = next(b for b in data["catalog"] if b["name"] == "multi_source_lead_scraper")
+        lead_gen = next(
+            b for b in data["catalog"] if b["name"] == "multi_source_lead_scraper"
+        )
         assert lead_gen["is_live"] is True
 
     def test_catalog_total_matches_list_length(self, client):
@@ -401,6 +426,7 @@ class TestBotCatalog:
 # ===========================================================================
 # 12. /api/bots/<name>/go_live
 # ===========================================================================
+
 
 class TestGoLive:
     def test_go_live_returns_201(self, client):
@@ -528,6 +554,7 @@ class TestGoLive:
 # 11. /api/github/workflows (read-only, GitHub Actions integration)
 # ===========================================================================
 
+
 class TestGitHubWorkflowsEndpoint:
     def test_endpoint_returns_200(self, client):
         resp = client.get("/api/github/workflows")
@@ -548,6 +575,7 @@ class TestGitHubWorkflowsEndpoint:
     def test_no_exception_without_token(self, client):
         """Endpoint must not raise even when GITHUB_TOKEN is absent."""
         import os
+
         env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
         with patch.dict(os.environ, env, clear=True):
             resp = client.get("/api/github/workflows")
@@ -622,6 +650,7 @@ class TestGitHubWorkflowsEndpoint:
 # 12. /api/github/artifacts (read-only, GitHub Actions integration)
 # ===========================================================================
 
+
 class TestGitHubArtifactsEndpoint:
     def test_endpoint_returns_200(self, client):
         resp = client.get("/api/github/artifacts")
@@ -641,6 +670,7 @@ class TestGitHubArtifactsEndpoint:
 
     def test_no_exception_without_token(self, client):
         import os
+
         env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
         with patch.dict(os.environ, env, clear=True):
             resp = client.get("/api/github/artifacts")
@@ -699,13 +729,21 @@ class TestGitHubArtifactsEndpoint:
             mock_req.get.return_value = mock_resp
             data = _fetch_github_artifacts(repo="owner/repo")
         art = data["artifacts"][0]
-        for key in ("id", "name", "size_in_bytes", "created_at", "expires_at", "expired"):
+        for key in (
+            "id",
+            "name",
+            "size_in_bytes",
+            "created_at",
+            "expires_at",
+            "expired",
+        ):
             assert key in art
 
 
 # ===========================================================================
 # 13. /api/quantum/status (Quantum Bot health check, read-only)
 # ===========================================================================
+
 
 class TestQuantumStatusEndpoint:
     def test_endpoint_returns_200(self, client):
@@ -756,7 +794,9 @@ class TestQuantumStatusEndpoint:
     def test_check_quantum_bot_error_has_reason(self):
         """When import fails the response must contain a reason."""
         import builtins
+
         import ui.web_dashboard as _wdash
+
         real_import = builtins.__import__
 
         def _fail_import(name, *args, **kwargs):
@@ -775,6 +815,7 @@ class TestQuantumStatusEndpoint:
 # ===========================================================================
 # 14. Helper function unit tests (_fetch_github_workflows / _fetch_github_artifacts)
 # ===========================================================================
+
 
 class TestFetchGitHubHelpers:
     def test_fetch_workflows_returns_dict(self):
@@ -819,20 +860,24 @@ class TestFetchGitHubHelpers:
 
     def test_github_headers_include_accept(self):
         from ui.web_dashboard import _github_headers
+
         headers = _github_headers()
         assert "Accept" in headers
         assert headers["Accept"] == "application/vnd.github+json"
 
     def test_github_headers_include_auth_when_token_set(self):
         from ui.web_dashboard import _github_headers
+
         with patch.dict(__import__("os").environ, {"GITHUB_TOKEN": "test_token_xyz"}):
             headers = _github_headers()
         assert "Authorization" in headers
         assert "test_token_xyz" in headers["Authorization"]
 
     def test_github_headers_no_auth_without_token(self):
-        from ui.web_dashboard import _github_headers
         import os
+
+        from ui.web_dashboard import _github_headers
+
         env = {k: v for k, v in os.environ.items() if k != "GITHUB_TOKEN"}
         with patch.dict(os.environ, env, clear=True):
             headers = _github_headers()

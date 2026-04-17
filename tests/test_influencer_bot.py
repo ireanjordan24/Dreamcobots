@@ -11,70 +11,71 @@ Covers all modules:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.influencer_bot.brand_partnership import BrandPartnership
+from bots.influencer_bot.influencer_bot import InfluencerBot, InfluencerBotTierError
+from bots.influencer_bot.influencer_database import (
+    CATEGORY_FITNESS,
+    CATEGORY_GAMING,
+    CATEGORY_MUSIC,
+    CATEGORY_TECH,
+    CATEGORY_WELLNESS,
+    PARTNERSHIP_CELEBRITY,
+    PARTNERSHIP_PREMIUM,
+    PARTNERSHIP_STANDARD,
+    Influencer,
+    InfluencerDatabase,
+)
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.influencer_bot.tiers import (
+    FEATURE_API_ACCESS,
+    FEATURE_AUDIENCE_ANALYTICS,
+    FEATURE_BASIC_ANALYTICS,
+    FEATURE_CAMPAIGN_MANAGER,
+    FEATURE_CELEBRITY_PARTNERSHIPS,
+    FEATURE_COBRAND_TEMPLATE,
+    FEATURE_CUSTOM_COBRAND,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_FULL_DATABASE,
+    FEATURE_INFLUENCER_CATALOG,
+    FEATURE_REVENUE_SHARING,
+    FEATURE_VIRALITY_ENGINE,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_INFLUENCER_CATALOG,
-    FEATURE_COBRAND_TEMPLATE,
-    FEATURE_BASIC_ANALYTICS,
-    FEATURE_FULL_DATABASE,
-    FEATURE_VIRALITY_ENGINE,
-    FEATURE_CAMPAIGN_MANAGER,
-    FEATURE_AUDIENCE_ANALYTICS,
-    FEATURE_CELEBRITY_PARTNERSHIPS,
-    FEATURE_CUSTOM_COBRAND,
-    FEATURE_WHITE_LABEL,
-    FEATURE_REVENUE_SHARING,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
 )
-from bots.influencer_bot.influencer_database import (
-    InfluencerDatabase,
-    Influencer,
-    PARTNERSHIP_STANDARD,
-    PARTNERSHIP_PREMIUM,
-    PARTNERSHIP_CELEBRITY,
-    CATEGORY_FITNESS,
-    CATEGORY_MUSIC,
-    CATEGORY_GAMING,
-    CATEGORY_TECH,
-    CATEGORY_WELLNESS,
-)
-from bots.influencer_bot.brand_partnership import BrandPartnership
 from bots.influencer_bot.virality_engine import (
-    ViralityEngine,
-    CAMPAIGN_TYPES,
     CAMPAIGN_CHALLENGE,
-    CAMPAIGN_PRODUCT_LAUNCH,
+    CAMPAIGN_COLLAB_SERIES,
     CAMPAIGN_EDUCATION_SERIES,
     CAMPAIGN_GIVEAWAY,
-    CAMPAIGN_COLLAB_SERIES,
+    CAMPAIGN_PRODUCT_LAUNCH,
+    CAMPAIGN_TYPES,
+    CONTENT_BOT_SHOWCASE,
     CONTENT_POST,
     CONTENT_STORY,
     CONTENT_VIDEO_SCRIPT,
-    CONTENT_BOT_SHOWCASE,
+    ViralityEngine,
 )
-from bots.influencer_bot.influencer_bot import InfluencerBot, InfluencerBotTierError
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -147,10 +148,18 @@ class TestTiers:
 
     def test_all_feature_flags_defined(self):
         all_flags = [
-            FEATURE_INFLUENCER_CATALOG, FEATURE_COBRAND_TEMPLATE, FEATURE_BASIC_ANALYTICS,
-            FEATURE_FULL_DATABASE, FEATURE_VIRALITY_ENGINE, FEATURE_CAMPAIGN_MANAGER,
-            FEATURE_AUDIENCE_ANALYTICS, FEATURE_CELEBRITY_PARTNERSHIPS, FEATURE_CUSTOM_COBRAND,
-            FEATURE_WHITE_LABEL, FEATURE_REVENUE_SHARING, FEATURE_API_ACCESS,
+            FEATURE_INFLUENCER_CATALOG,
+            FEATURE_COBRAND_TEMPLATE,
+            FEATURE_BASIC_ANALYTICS,
+            FEATURE_FULL_DATABASE,
+            FEATURE_VIRALITY_ENGINE,
+            FEATURE_CAMPAIGN_MANAGER,
+            FEATURE_AUDIENCE_ANALYTICS,
+            FEATURE_CELEBRITY_PARTNERSHIPS,
+            FEATURE_CUSTOM_COBRAND,
+            FEATURE_WHITE_LABEL,
+            FEATURE_REVENUE_SHARING,
+            FEATURE_API_ACCESS,
             FEATURE_DEDICATED_SUPPORT,
         ]
         assert len(all_flags) == 13
@@ -159,6 +168,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Influencer Database
 # ===========================================================================
+
 
 class TestInfluencerDatabase:
     def setup_method(self):
@@ -207,8 +217,14 @@ class TestInfluencerDatabase:
         inf = self.db.get_influencer("inf_001")
         d = inf.to_dict()
         required_keys = [
-            "influencer_id", "name", "category", "audience_size_millions",
-            "platform", "specialty", "engagement_rate_pct", "partnership_tier",
+            "influencer_id",
+            "name",
+            "category",
+            "audience_size_millions",
+            "platform",
+            "specialty",
+            "engagement_rate_pct",
+            "partnership_tier",
         ]
         for key in required_keys:
             assert key in d
@@ -222,6 +238,7 @@ class TestInfluencerDatabase:
 # ===========================================================================
 # 3. Brand Partnership
 # ===========================================================================
+
 
 class TestBrandPartnership:
     def setup_method(self):
@@ -295,7 +312,9 @@ class TestBrandPartnership:
 
     def test_calculate_projected_revenue(self):
         p = self._make_partnership()
-        rev = self.bp.calculate_projected_revenue(p["partnership_id"], monthly_users=1000)
+        rev = self.bp.calculate_projected_revenue(
+            p["partnership_id"], monthly_users=1000
+        )
         assert rev["gross_revenue_usd"] > 0
         assert rev["net_revenue_usd"] < rev["gross_revenue_usd"]
         assert "subscription_revenue_usd" in rev
@@ -303,7 +322,9 @@ class TestBrandPartnership:
 
     def test_revenue_influencer_share(self):
         p = self._make_partnership(rev_share=0.20)
-        rev = self.bp.calculate_projected_revenue(p["partnership_id"], monthly_users=1000)
+        rev = self.bp.calculate_projected_revenue(
+            p["partnership_id"], monthly_users=1000
+        )
         expected_share = round(rev["gross_revenue_usd"] * 0.20, 2)
         assert rev["influencer_share_usd"] == expected_share
 
@@ -315,6 +336,7 @@ class TestBrandPartnership:
 # ===========================================================================
 # 4. Virality Engine
 # ===========================================================================
+
 
 class TestViralityEngine:
     def setup_method(self):
@@ -407,6 +429,7 @@ class TestViralityEngine:
 # ===========================================================================
 # 5. InfluencerBot — Integration
 # ===========================================================================
+
 
 class TestInfluencerBotFree:
     def setup_method(self):

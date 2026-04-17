@@ -21,7 +21,9 @@ class HomeDashboardScreen:
         if self.top_deals:
             lines.append("Top Deals:")
             for d in self.top_deals[:3]:
-                lines.append(f"  • {d.get('name', 'Deal')} — ${d.get('profit', 0):.2f} profit")
+                lines.append(
+                    f"  • {d.get('name', 'Deal')} — ${d.get('profit', 0):.2f} profit"
+                )
         return "\n".join(lines)
 
     def to_dict(self) -> dict:

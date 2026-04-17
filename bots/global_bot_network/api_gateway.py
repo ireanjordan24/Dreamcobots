@@ -17,8 +17,8 @@ built-in mock adapters return realistic stub responses without network calls.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -27,10 +27,10 @@ from typing import Any, Callable, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
-
 # ---------------------------------------------------------------------------
 # Enums & constants
 # ---------------------------------------------------------------------------
+
 
 class IntegrationType(Enum):
     SLACK = "slack"
@@ -44,6 +44,7 @@ class IntegrationType(Enum):
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class APIGatewayError(Exception):
     """Base exception for the API Gateway."""
@@ -60,6 +61,7 @@ class IntegrationDisabled(APIGatewayError):
 # ---------------------------------------------------------------------------
 # Integration registration
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Integration:
@@ -99,6 +101,7 @@ class Integration:
 # ---------------------------------------------------------------------------
 # Built-in mock adapters
 # ---------------------------------------------------------------------------
+
 
 def _slack_adapter(action: str, payload: dict) -> dict:
     """Mock Slack adapter — returns stub responses."""
@@ -156,7 +159,11 @@ def _openai_adapter(action: str, payload: dict) -> dict:
 def _trello_adapter(action: str, payload: dict) -> dict:
     """Mock Trello adapter."""
     if action == "create_card":
-        return {"id": "trello_card_001", "name": payload.get("name", ""), "idList": payload.get("list_id", "")}
+        return {
+            "id": "trello_card_001",
+            "name": payload.get("name", ""),
+            "idList": payload.get("list_id", ""),
+        }
     if action == "get_board":
         return {"id": payload.get("board_id", ""), "name": "DreamCo Board"}
     if action == "move_card":
@@ -167,7 +174,11 @@ def _trello_adapter(action: str, payload: dict) -> dict:
 def _notion_adapter(action: str, payload: dict) -> dict:
     """Mock Notion adapter."""
     if action == "create_page":
-        return {"id": "notion_page_001", "title": payload.get("title", ""), "url": "https://notion.so/mock"}
+        return {
+            "id": "notion_page_001",
+            "title": payload.get("title", ""),
+            "url": "https://notion.so/mock",
+        }
     if action == "query_database":
         return {"results": [], "next_cursor": None}
     if action == "update_page":
@@ -187,6 +198,7 @@ _DEFAULT_ADAPTERS: dict[IntegrationType, Callable] = {
 # ---------------------------------------------------------------------------
 # Request / Response models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class GatewayRequest:
@@ -230,6 +242,7 @@ class GatewayResponse:
 # ---------------------------------------------------------------------------
 # API Gateway
 # ---------------------------------------------------------------------------
+
 
 class APIGateway:
     """
@@ -280,7 +293,9 @@ class APIGateway:
             The registered integration object.
         """
         if adapter is None:
-            adapter = _DEFAULT_ADAPTERS.get(integration_type, lambda a, p: {"error": "no_adapter"})
+            adapter = _DEFAULT_ADAPTERS.get(
+                integration_type, lambda a, p: {"error": "no_adapter"}
+            )
         integration = Integration(
             name=name,
             integration_type=integration_type,

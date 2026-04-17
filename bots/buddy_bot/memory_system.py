@@ -21,10 +21,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
-
 # ---------------------------------------------------------------------------
 # Milestone categories
 # ---------------------------------------------------------------------------
+
 
 class MilestoneCategory(Enum):
     PERSONAL = "personal"
@@ -41,26 +41,29 @@ class MilestoneCategory(Enum):
 
 class RelationshipDepth(Enum):
     """How deeply Buddy knows this user."""
-    ACQUAINTANCE = "acquaintance"     # < 5 interactions
-    CASUAL = "casual"                 # 5–20 interactions
-    FAMILIAR = "familiar"             # 21–100 interactions
-    CLOSE = "close"                   # 101–500 interactions
-    COMPANION = "companion"           # > 500 interactions
+
+    ACQUAINTANCE = "acquaintance"  # < 5 interactions
+    CASUAL = "casual"  # 5–20 interactions
+    FAMILIAR = "familiar"  # 21–100 interactions
+    CLOSE = "close"  # 101–500 interactions
+    COMPANION = "companion"  # > 500 interactions
 
 
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class LifeMilestone:
     """Represents a significant life event for a user."""
+
     milestone_id: str
     user_id: str
     title: str
     description: str
     category: MilestoneCategory
-    date_achieved: str          # ISO date string, e.g. "2024-03-15"
+    date_achieved: str  # ISO date string, e.g. "2024-03-15"
     recurring_annually: bool = False
     celebrated: bool = False
     tags: list[str] = field(default_factory=list)
@@ -82,11 +85,12 @@ class LifeMilestone:
 @dataclass
 class ImportantDate:
     """An anniversary or recurring important date."""
+
     date_id: str
     user_id: str
-    label: str              # e.g. "Wedding Anniversary", "Mom's Birthday"
-    month: int              # 1–12
-    day: int                # 1–31
+    label: str  # e.g. "Wedding Anniversary", "Mom's Birthday"
+    month: int  # 1–12
+    day: int  # 1–31
     year_started: Optional[int] = None
     reminder_days_before: int = 3
     notes: str = ""
@@ -107,6 +111,7 @@ class ImportantDate:
 @dataclass
 class EpisodicMemory:
     """A single 'chapter' in a user's life as remembered by Buddy."""
+
     episode_id: str
     user_id: str
     title: str
@@ -130,6 +135,7 @@ class EpisodicMemory:
 @dataclass
 class UserProfile:
     """Comprehensive memory profile for a single user."""
+
     user_id: str
     display_name: str
     interaction_count: int = 0
@@ -269,8 +275,13 @@ class MemorySystem:
         """
         profile = self.get_profile(user_id)
         allowed = {
-            "display_name", "preferred_language", "personality_preference",
-            "interests", "hobbies", "goals", "custom_data",
+            "display_name",
+            "preferred_language",
+            "personality_preference",
+            "interests",
+            "hobbies",
+            "goals",
+            "custom_data",
         }
         for key, value in kwargs.items():
             if key not in allowed:
@@ -374,10 +385,12 @@ class MemorySystem:
             if ms.milestone_id == milestone_id:
                 ms.celebrated = True
                 return (
-                    f"🎉 Congratulations on \"{ms.title}\", {profile.display_name}! "
+                    f'🎉 Congratulations on "{ms.title}", {profile.display_name}! '
                     "This is a moment worth celebrating!"
                 )
-        raise MemorySystemError(f"Milestone '{milestone_id}' not found for user '{user_id}'.")
+        raise MemorySystemError(
+            f"Milestone '{milestone_id}' not found for user '{user_id}'."
+        )
 
     # ------------------------------------------------------------------
     # Important dates
@@ -503,7 +516,11 @@ class MemorySystem:
         """
         profile = self.get_profile(user_id)
         depth = profile.relationship_depth.value
-        interests = ", ".join(profile.interests[:5]) if profile.interests else "not yet specified"
+        interests = (
+            ", ".join(profile.interests[:5])
+            if profile.interests
+            else "not yet specified"
+        )
         goals = ", ".join(profile.goals[:3]) if profile.goals else "not yet shared"
         jokes = len(profile.inside_jokes)
         milestones = len(profile.milestones)

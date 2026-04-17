@@ -1,6 +1,7 @@
 """Tests for bots/control_center/controller.py"""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -8,12 +9,13 @@ sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.control_center.controller import Controller, TaskMessage
 
+from bots.control_center.controller import Controller, TaskMessage
 
 # ---------------------------------------------------------------------------
 # Simple mock bot for testing
 # ---------------------------------------------------------------------------
+
 
 class _MockBot:
     def __init__(self):
@@ -36,6 +38,7 @@ class _ErrorBot:
 # ---------------------------------------------------------------------------
 # TaskMessage
 # ---------------------------------------------------------------------------
+
 
 class TestTaskMessage:
     def test_creates_with_required_fields(self):
@@ -62,6 +65,7 @@ class TestTaskMessage:
 # Controller instantiation
 # ---------------------------------------------------------------------------
 
+
 class TestControllerInstantiation:
     def test_instantiates(self):
         ctrl = Controller()
@@ -83,6 +87,7 @@ class TestControllerInstantiation:
 # Bot registration
 # ---------------------------------------------------------------------------
 
+
 class TestBotRegistration:
     def test_register_bot(self):
         ctrl = Controller()
@@ -100,6 +105,7 @@ class TestBotRegistration:
 # ---------------------------------------------------------------------------
 # Task assignment & processing
 # ---------------------------------------------------------------------------
+
 
 class TestTaskAssignment:
     def test_assign_task_adds_to_queue(self):
@@ -160,6 +166,7 @@ class TestTaskAssignment:
 # Inter-bot messaging
 # ---------------------------------------------------------------------------
 
+
 class TestInterBotMessaging:
     def test_send_message_ok(self):
         ctrl = Controller()
@@ -185,6 +192,7 @@ class TestInterBotMessaging:
 # ---------------------------------------------------------------------------
 # Automation loop
 # ---------------------------------------------------------------------------
+
 
 class TestAutomationLoop:
     def test_run_loop_one_iteration(self):
@@ -222,6 +230,7 @@ class TestAutomationLoop:
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
+
 
 class TestDashboard:
     def test_get_dashboard_returns_dict(self):

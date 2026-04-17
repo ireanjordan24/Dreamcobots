@@ -45,23 +45,27 @@ Usage
 
 from __future__ import annotations
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.job_titles_bot.tiers import Tier, get_bot_tier_info, get_tier_config, get_upgrade_path
-from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
-from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
 from bots.job_titles_bot.autonomous_trainer import (
     AutonomousTrainer,
     FaceRecord,
     ObjectRecord,
-    ValuationResult,
     TrainingSession,
+    ValuationResult,
 )
 from bots.job_titles_bot.cost_justification import (
-    CostJustificationEngine,
     CostItem,
     CostJustification,
+    CostJustificationEngine,
 )
+from bots.job_titles_bot.job_bot_generator import GeneratedJobBot, JobBotGenerator
+from bots.job_titles_bot.job_titles_database import JobTitle, JobTitlesDatabase
+from bots.job_titles_bot.tiers import (
+    Tier,
+    get_bot_tier_info,
+    get_tier_config,
+    get_upgrade_path,
+)
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class JobTitlesBotError(Exception):
@@ -184,7 +188,9 @@ class JobTitlesBot:
             )
         job = self._db.get(job_title)
         if job is None:
-            raise JobTitlesBotError(f"Job title '{job_title}' not found in the database.")
+            raise JobTitlesBotError(
+                f"Job title '{job_title}' not found in the database."
+            )
         return self._generator.generate(job)
 
     def generate_all_bots(self) -> list[GeneratedJobBot]:
@@ -193,21 +199,27 @@ class JobTitlesBot:
             raise JobTitlesBotTierError("generate_all_bots requires ENTERPRISE tier.")
         return self._generator.generate_all(self._db.all_titles())
 
-    def propagate_buddy_upgrade(self, new_version: str, extra_capabilities: list[str] | None = None) -> int:
+    def propagate_buddy_upgrade(
+        self, new_version: str, extra_capabilities: list[str] | None = None
+    ) -> int:
         """
         Propagate a Buddy Bot upgrade to ALL generated job bots.
         Returns the number of bots upgraded.
         ENTERPRISE only.
         """
         if self.tier != Tier.ENTERPRISE:
-            raise JobTitlesBotTierError("Buddy Bot propagation requires ENTERPRISE tier.")
+            raise JobTitlesBotTierError(
+                "Buddy Bot propagation requires ENTERPRISE tier."
+            )
         count = self._generator.propagate_upgrade(new_version, extra_capabilities)
         self._trainer.upgrade_module(new_version)
         return count
 
     # ── Training ─────────────────────────────────────────────────────────────
 
-    def train(self, trainee: str, skill: str, duration_seconds: int = 60) -> TrainingSession:
+    def train(
+        self, trainee: str, skill: str, duration_seconds: int = 60
+    ) -> TrainingSession:
         """
         Run a training session for *trainee* on *skill*.
         Requires PRO or ENTERPRISE tier.
@@ -229,26 +241,38 @@ class JobTitlesBot:
         return self._trainer.identify_face(raw_encoding)
 
     def register_object(
-        self, category: str, description: str, visual_keywords: list[str], value_usd: float = 0.0
+        self,
+        category: str,
+        description: str,
+        visual_keywords: list[str],
+        value_usd: float = 0.0,
     ) -> ObjectRecord:
         """Register an object for recognition. ENTERPRISE only."""
         if self.tier != Tier.ENTERPRISE:
             raise JobTitlesBotTierError("Object registration requires ENTERPRISE tier.")
-        return self._trainer.register_object(category, description, visual_keywords, value_usd)
+        return self._trainer.register_object(
+            category, description, visual_keywords, value_usd
+        )
 
     def recognize_object(self, description: str) -> list[ObjectRecord]:
         """Recognize an object from a text description. Requires PRO or ENTERPRISE."""
         if self.tier == Tier.FREE:
-            raise JobTitlesBotTierError("Object recognition requires PRO or ENTERPRISE tier.")
+            raise JobTitlesBotTierError(
+                "Object recognition requires PRO or ENTERPRISE tier."
+            )
         return self._trainer.recognize_object(description)
 
-    def valuate_item(self, item_description: str, condition: str = "good") -> ValuationResult:
+    def valuate_item(
+        self, item_description: str, condition: str = "good"
+    ) -> ValuationResult:
         """
         Estimate the market value of a physical item.
         Requires PRO or ENTERPRISE tier.
         """
         if self.tier == Tier.FREE:
-            raise JobTitlesBotTierError("Item valuation requires PRO or ENTERPRISE tier.")
+            raise JobTitlesBotTierError(
+                "Item valuation requires PRO or ENTERPRISE tier."
+            )
         return self._trainer.valuate_item(item_description, condition)
 
     def trainer_stats(self) -> dict:
@@ -280,7 +304,9 @@ class JobTitlesBot:
         line_items : list[CostItem] | None
             Optional detailed line-item breakdown.
         """
-        return self._cost_engine.justify(feature_name, monthly_usd, savings_usd, line_items)
+        return self._cost_engine.justify(
+            feature_name, monthly_usd, savings_usd, line_items
+        )
 
     def format_cost_report(self, justification: CostJustification) -> str:
         """Return a formatted text version of *justification*."""
@@ -323,18 +349,26 @@ class JobTitlesBot:
             query = message.split(":")[-1].strip() if ":" in message else message
             results = self._db.search(query)[:5]
             reply = (
-                f"Found {len(results)} job(s) matching '{query}': "
-                + ", ".join(j.title for j in results)
-            ) if results else f"No jobs found matching '{query}'."
-        elif "valuate" in msg or "value" in msg or "worth" in msg or "antique" in msg or "coin" in msg:
+                (
+                    f"Found {len(results)} job(s) matching '{query}': "
+                    + ", ".join(j.title for j in results)
+                )
+                if results
+                else f"No jobs found matching '{query}'."
+            )
+        elif (
+            "valuate" in msg
+            or "value" in msg
+            or "worth" in msg
+            or "antique" in msg
+            or "coin" in msg
+        ):
             reply = (
                 "Item valuation is available on PRO and ENTERPRISE tiers. "
                 "Send: valuate_item('<description>', condition='good') or upgrade your plan."
             )
         elif "cost" in msg or "price" in msg or "pay" in msg:
-            justification = self._cost_engine.justify(
-                "Job Titles Bot PRO", 49.0, 200.0
-            )
+            justification = self._cost_engine.justify("Job Titles Bot PRO", 49.0, 200.0)
             reply = self._cost_engine.format_report(justification)
         elif "train" in msg:
             reply = (

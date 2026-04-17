@@ -12,8 +12,8 @@ Covers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -21,80 +21,16 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 # ---------------------------------------------------------------------------
-# Tier imports
-# ---------------------------------------------------------------------------
-from bots.buddy_teach_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_SKILL_TRAINING,
-    FEATURE_ITEM_DETECTION,
-    FEATURE_BROADCAST,
-    FEATURE_MULTI_BROADCAST,
-    FEATURE_PERSONALITY,
-    FEATURE_AI_TRAINING,
-    FEATURE_CURRICULUM_BUILDER,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FREE_FEATURES,
-    PRO_FEATURES,
-    ENTERPRISE_FEATURES,
-)
-
-# ---------------------------------------------------------------------------
 # BroadcastEngine imports
 # ---------------------------------------------------------------------------
 from bots.buddy_teach_bot.broadcast_engine import (
     BroadcastEngine,
-    BroadcastTarget,
+    BroadcastEngineError,
     BroadcastSession,
     BroadcastState,
-    DeviceCategory,
+    BroadcastTarget,
     ContentFormat,
-    BroadcastEngineError,
-)
-
-# ---------------------------------------------------------------------------
-# SkillTrainer imports
-# ---------------------------------------------------------------------------
-from bots.buddy_teach_bot.skill_trainer import (
-    SkillTrainer,
-    Lesson,
-    LessonStep,
-    LessonProgress,
-    LessonStatus,
-    SkillDomain,
-    DifficultyLevel,
-    SkillTrainerError,
-    LESSON_LIBRARY,
-)
-
-# ---------------------------------------------------------------------------
-# ItemDetector imports
-# ---------------------------------------------------------------------------
-from bots.buddy_teach_bot.item_detector import (
-    ItemDetector,
-    DetectionResult,
-    ItemCategory,
-    ConditionGrade,
-    TrainingExample,
-    ItemDetectorError,
-    _CONDITION_MULTIPLIERS,
-)
-
-# ---------------------------------------------------------------------------
-# PersonalityEngine imports
-# ---------------------------------------------------------------------------
-from bots.buddy_teach_bot.personality_engine import (
-    PersonalityEngine,
-    ToneStyle,
-    PersonalityTrait,
-    Milestone,
-    UserInteraction,
-    PersonalityEngineError,
+    DeviceCategory,
 )
 
 # ---------------------------------------------------------------------------
@@ -106,10 +42,74 @@ from bots.buddy_teach_bot.buddy_teach_bot import (
     BuddyTeachBotTierError,
 )
 
+# ---------------------------------------------------------------------------
+# ItemDetector imports
+# ---------------------------------------------------------------------------
+from bots.buddy_teach_bot.item_detector import (
+    _CONDITION_MULTIPLIERS,
+    ConditionGrade,
+    DetectionResult,
+    ItemCategory,
+    ItemDetector,
+    ItemDetectorError,
+    TrainingExample,
+)
+
+# ---------------------------------------------------------------------------
+# PersonalityEngine imports
+# ---------------------------------------------------------------------------
+from bots.buddy_teach_bot.personality_engine import (
+    Milestone,
+    PersonalityEngine,
+    PersonalityEngineError,
+    PersonalityTrait,
+    ToneStyle,
+    UserInteraction,
+)
+
+# ---------------------------------------------------------------------------
+# SkillTrainer imports
+# ---------------------------------------------------------------------------
+from bots.buddy_teach_bot.skill_trainer import (
+    LESSON_LIBRARY,
+    DifficultyLevel,
+    Lesson,
+    LessonProgress,
+    LessonStatus,
+    LessonStep,
+    SkillDomain,
+    SkillTrainer,
+    SkillTrainerError,
+)
+
+# ---------------------------------------------------------------------------
+# Tier imports
+# ---------------------------------------------------------------------------
+from bots.buddy_teach_bot.tiers import (
+    ENTERPRISE_FEATURES,
+    FEATURE_AI_TRAINING,
+    FEATURE_API_ACCESS,
+    FEATURE_BROADCAST,
+    FEATURE_CURRICULUM_BUILDER,
+    FEATURE_ITEM_DETECTION,
+    FEATURE_MULTI_BROADCAST,
+    FEATURE_PERSONALITY,
+    FEATURE_SKILL_TRAINING,
+    FEATURE_WHITE_LABEL,
+    FREE_FEATURES,
+    PRO_FEATURES,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ===========================================================================
 # 1. TIERS
 # ===========================================================================
+
 
 class TestTiers:
     def test_all_tiers_exist(self):
@@ -202,6 +202,7 @@ class TestTiers:
 # 2. BROADCAST ENGINE
 # ===========================================================================
 
+
 class TestBroadcastEngine:
     def test_register_target(self):
         engine = BroadcastEngine(max_targets=5)
@@ -248,20 +249,26 @@ class TestBroadcastEngine:
     def test_broadcast_updates_device_state(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        engine.start_broadcast("Lesson", ContentFormat.VIDEO_TUTORIAL, [target.target_id])
+        engine.start_broadcast(
+            "Lesson", ContentFormat.VIDEO_TUTORIAL, [target.target_id]
+        )
         assert engine.get_target(target.target_id).state == BroadcastState.LIVE
 
     def test_pause_broadcast(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("Lesson", ContentFormat.QUIZ, [target.target_id])
+        session = engine.start_broadcast(
+            "Lesson", ContentFormat.QUIZ, [target.target_id]
+        )
         paused = engine.pause_broadcast(session.session_id)
         assert paused.state == BroadcastState.PAUSED
 
     def test_resume_broadcast(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("Lesson", ContentFormat.LIVE_DEMO, [target.target_id])
+        session = engine.start_broadcast(
+            "Lesson", ContentFormat.LIVE_DEMO, [target.target_id]
+        )
         engine.pause_broadcast(session.session_id)
         resumed = engine.resume_broadcast(session.session_id)
         assert resumed.state == BroadcastState.LIVE
@@ -269,7 +276,9 @@ class TestBroadcastEngine:
     def test_end_broadcast(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("Lesson", ContentFormat.STEP_BY_STEP, [target.target_id])
+        session = engine.start_broadcast(
+            "Lesson", ContentFormat.STEP_BY_STEP, [target.target_id]
+        )
         ended = engine.end_broadcast(session.session_id)
         assert ended.state == BroadcastState.ENDED
         assert ended.ended_at is not None
@@ -279,14 +288,18 @@ class TestBroadcastEngine:
     def test_end_broadcast_resets_device_state(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("Lesson", ContentFormat.STEP_BY_STEP, [target.target_id])
+        session = engine.start_broadcast(
+            "Lesson", ContentFormat.STEP_BY_STEP, [target.target_id]
+        )
         engine.end_broadcast(session.session_id)
         assert engine.get_target(target.target_id).state == BroadcastState.IDLE
 
     def test_pause_non_live_session_raises(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("L", ContentFormat.STEP_BY_STEP, [target.target_id])
+        session = engine.start_broadcast(
+            "L", ContentFormat.STEP_BY_STEP, [target.target_id]
+        )
         engine.pause_broadcast(session.session_id)
         with pytest.raises(BroadcastEngineError):
             engine.pause_broadcast(session.session_id)
@@ -294,7 +307,9 @@ class TestBroadcastEngine:
     def test_resume_non_paused_session_raises(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("L", ContentFormat.STEP_BY_STEP, [target.target_id])
+        session = engine.start_broadcast(
+            "L", ContentFormat.STEP_BY_STEP, [target.target_id]
+        )
         with pytest.raises(BroadcastEngineError):
             engine.resume_broadcast(session.session_id)
 
@@ -336,7 +351,9 @@ class TestBroadcastEngine:
 
     def test_target_to_dict(self):
         engine = BroadcastEngine(max_targets=5)
-        target = engine.register_target("AR Headset", DeviceCategory.AR_VR_HEADSET, ar_capable=True)
+        target = engine.register_target(
+            "AR Headset", DeviceCategory.AR_VR_HEADSET, ar_capable=True
+        )
         d = target.to_dict()
         assert d["category"] == DeviceCategory.AR_VR_HEADSET.value
         assert d["ar_capable"] is True
@@ -344,7 +361,9 @@ class TestBroadcastEngine:
     def test_session_to_dict(self):
         engine = BroadcastEngine(max_targets=5)
         target = engine.register_target("TV", DeviceCategory.SMART_TV)
-        session = engine.start_broadcast("L", ContentFormat.AR_OVERLAY, [target.target_id])
+        session = engine.start_broadcast(
+            "L", ContentFormat.AR_OVERLAY, [target.target_id]
+        )
         d = session.to_dict()
         assert d["lesson_title"] == "L"
         assert d["content_format"] == ContentFormat.AR_OVERLAY.value
@@ -365,6 +384,7 @@ class TestBroadcastEngine:
 # ===========================================================================
 # 3. SKILL TRAINER
 # ===========================================================================
+
 
 class TestSkillTrainer:
     def test_default_lessons_loaded(self):
@@ -476,7 +496,9 @@ class TestSkillTrainer:
             domain=SkillDomain.HOME_IMPROVEMENT,
             difficulty=DifficultyLevel.ADVANCED,
             description="Intro to MIG welding.",
-            steps=[LessonStep(1, "Safety", "Wear PPE.", safety_notes=["Arc flash danger."])],
+            steps=[
+                LessonStep(1, "Safety", "Wear PPE.", safety_notes=["Arc flash danger."])
+            ],
         )
         trainer.add_lesson(custom)
         assert trainer.get_lesson("custom-001").title == "Custom Welding"
@@ -553,6 +575,7 @@ class TestSkillTrainer:
 # 4. ITEM DETECTOR
 # ===========================================================================
 
+
 class TestItemDetector:
     def test_detect_penny(self):
         detector = ItemDetector()
@@ -607,7 +630,9 @@ class TestItemDetector:
 
     def test_extra_context_included(self):
         detector = ItemDetector()
-        result = detector.detect_and_value("pokemon card", extra_context="first edition 1999")
+        result = detector.detect_and_value(
+            "pokemon card", extra_context="first edition 1999"
+        )
         assert "first edition" in result.item_description.lower()
 
     def test_result_has_comparables(self):
@@ -676,7 +701,9 @@ class TestItemDetector:
 
     def test_first_edition_pokemon_high_value(self):
         detector = ItemDetector()
-        result = detector.detect_and_value("first edition pokemon card", ConditionGrade.MINT)
+        result = detector.detect_and_value(
+            "first edition pokemon card", ConditionGrade.MINT
+        )
         assert result.estimated_max_usd >= 100.0
 
     def test_black_lotus_mtg(self):
@@ -693,6 +720,7 @@ class TestItemDetector:
 # ===========================================================================
 # 5. PERSONALITY ENGINE
 # ===========================================================================
+
 
 class TestPersonalityEngine:
     def test_default_profile(self):
@@ -752,7 +780,9 @@ class TestPersonalityEngine:
 
     def test_record_milestone(self):
         engine = PersonalityEngine()
-        milestone = engine.record_milestone("First Lesson", "Completed first lesson!", "lesson_completed")
+        milestone = engine.record_milestone(
+            "First Lesson", "Completed first lesson!", "lesson_completed"
+        )
         assert milestone.title == "First Lesson"
         assert milestone.category == "lesson_completed"
 
@@ -781,7 +811,12 @@ class TestPersonalityEngine:
         for _ in range(3):
             engine.process_message("How do I fix my car engine oil?")
         suggestions = engine.proactive_suggestions()
-        assert any("automotive" in s.lower() or "car" in s.lower() or "maintenance" in s.lower() for s in suggestions)
+        assert any(
+            "automotive" in s.lower()
+            or "car" in s.lower()
+            or "maintenance" in s.lower()
+            for s in suggestions
+        )
 
     def test_proactive_suggestions_interaction_count(self):
         engine = PersonalityEngine()
@@ -833,6 +868,7 @@ class TestPersonalityEngine:
 # 6. BUDDY TEACH BOT (integration)
 # ===========================================================================
 
+
 class TestBuddyTeachBotFree:
     def test_init_free(self):
         bot = BuddyTeachBot(Tier.FREE, user_id="user-1")
@@ -861,7 +897,10 @@ class TestBuddyTeachBotFree:
         completed = bot.complete_lesson(progress.progress_id, 0.9)
         assert completed.status == LessonStatus.COMPLETED
         # Celebration message added
-        assert any("Congratulations" in f or "proud" in f.lower() or "YES" in f for f in completed.feedback)
+        assert any(
+            "Congratulations" in f or "proud" in f.lower() or "YES" in f
+            for f in completed.feedback
+        )
 
     def test_detect_item_free(self):
         bot = BuddyTeachBot(Tier.FREE)
@@ -960,7 +999,9 @@ class TestBuddyTeachBotPro:
         tv = bot.add_broadcast_target("TV", DeviceCategory.SMART_TV)
         phone = bot.add_broadcast_target("Phone", DeviceCategory.PHONE)
         tablet = bot.add_broadcast_target("Tablet", DeviceCategory.TABLET)
-        session = bot.start_lesson_broadcast("auto-001", [tv.target_id, phone.target_id, tablet.target_id])
+        session = bot.start_lesson_broadcast(
+            "auto-001", [tv.target_id, phone.target_id, tablet.target_id]
+        )
         assert len(session.target_ids) == 3
 
     def test_broadcast_to_all_devices_pro(self):
@@ -1047,8 +1088,12 @@ class TestBuddyTeachBotEnterprise:
         bot = BuddyTeachBot(Tier.ENTERPRISE, user_id="power-user", bot_name="Max")
         # Register 3 device types
         tv = bot.add_broadcast_target("Smart TV", DeviceCategory.SMART_TV)
-        console = bot.add_broadcast_target("PlayStation 5", DeviceCategory.GAME_CONSOLE, platform="PS5")
-        headset = bot.add_broadcast_target("Quest 3", DeviceCategory.AR_VR_HEADSET, ar_capable=True)
+        console = bot.add_broadcast_target(
+            "PlayStation 5", DeviceCategory.GAME_CONSOLE, platform="PS5"
+        )
+        headset = bot.add_broadcast_target(
+            "Quest 3", DeviceCategory.AR_VR_HEADSET, ar_capable=True
+        )
         # Start lesson
         progress = bot.start_lesson("auto-001")
         bot.advance_step(progress.progress_id)
@@ -1063,7 +1108,9 @@ class TestBuddyTeachBotEnterprise:
         detection = bot.detect_item("first edition pokemon card", ConditionGrade.MINT)
         assert detection.estimated_max_usd > 0
         # Add training data
-        ex = bot.add_training_example(ItemCategory.TRADING_CARD, "charizard holo", ["holo", "rare"])
+        ex = bot.add_training_example(
+            ItemCategory.TRADING_CARD, "charizard holo", ["holo", "rare"]
+        )
         assert ex.category == ItemCategory.TRADING_CARD
         # Chat
         response = bot.chat("This is amazing!")

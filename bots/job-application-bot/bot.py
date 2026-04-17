@@ -10,6 +10,7 @@ Usage (from this directory):
     python bot.py apply --headless
     python bot.py run --headless
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from cli import main

@@ -3,9 +3,9 @@ Tests for bots/ai_brain/ — DecisionEngine, StateManager, MetricsTracker,
 and AIBrain orchestrator.
 """
 
-import sys
-import os
 import json
+import os
+import sys
 import tempfile
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -13,39 +13,39 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.ai_brain.ai_brain import AIBrain, AIBrainError, AIBrainTierError
+from bots.ai_brain.decision_engine import (
+    DECISION_CREATE_RECOVERY_BOT,
+    DECISION_CREATE_SCALING_BOT,
+    DECISION_INCREASE_OUTREACH,
+    DECISION_OPTIMIZE,
+    DECISION_SCALE_LEADS,
+    DECISION_SCALE_SYSTEM,
+    LEADS_THRESHOLD_LOW,
+    REVENUE_THRESHOLD_HIGH,
+    REVENUE_THRESHOLD_LOW,
+    DecisionEngine,
+)
+from bots.ai_brain.metrics_tracker import MetricsTracker
+from bots.ai_brain.state_manager import StateManager, load_state, save_state
 from bots.ai_brain.tiers import (
+    FEATURE_AUTO_SCALE,
+    FEATURE_DECISION_ENGINE,
+    FEATURE_FULL_AUTONOMY,
+    FEATURE_PERSISTENT_MEMORY,
+    FEATURE_REAL_METRICS,
+    FEATURE_RECOVERY_BOT,
     Tier,
     TierConfig,
     get_tier_config,
-    list_tiers,
     get_upgrade_path,
-    FEATURE_DECISION_ENGINE,
-    FEATURE_PERSISTENT_MEMORY,
-    FEATURE_REAL_METRICS,
-    FEATURE_AUTO_SCALE,
-    FEATURE_RECOVERY_BOT,
-    FEATURE_FULL_AUTONOMY,
+    list_tiers,
 )
-from bots.ai_brain.decision_engine import (
-    DecisionEngine,
-    DECISION_SCALE_LEADS,
-    DECISION_INCREASE_OUTREACH,
-    DECISION_SCALE_SYSTEM,
-    DECISION_OPTIMIZE,
-    DECISION_CREATE_SCALING_BOT,
-    DECISION_CREATE_RECOVERY_BOT,
-    LEADS_THRESHOLD_LOW,
-    REVENUE_THRESHOLD_LOW,
-    REVENUE_THRESHOLD_HIGH,
-)
-from bots.ai_brain.state_manager import StateManager, save_state, load_state
-from bots.ai_brain.metrics_tracker import MetricsTracker
-from bots.ai_brain.ai_brain import AIBrain, AIBrainError, AIBrainTierError
-
 
 # ---------------------------------------------------------------------------
 # Framework compliance
 # ---------------------------------------------------------------------------
+
 
 class TestFrameworkCompliance:
     def test_decision_engine_has_framework_marker(self):
@@ -76,6 +76,7 @@ class TestFrameworkCompliance:
 # ---------------------------------------------------------------------------
 # Tiers
 # ---------------------------------------------------------------------------
+
 
 class TestAIBrainTiers:
     def test_three_tiers_exist(self):
@@ -114,6 +115,7 @@ class TestAIBrainTiers:
 # ---------------------------------------------------------------------------
 # Decision Engine
 # ---------------------------------------------------------------------------
+
 
 class TestDecisionEngine:
     def test_low_leads_returns_scale_leads(self):
@@ -209,6 +211,7 @@ class TestDecisionEngine:
 # ---------------------------------------------------------------------------
 # State Manager
 # ---------------------------------------------------------------------------
+
 
 class TestStateManager:
     def _tmp_path(self):
@@ -313,6 +316,7 @@ class TestStateManager:
 # Metrics Tracker
 # ---------------------------------------------------------------------------
 
+
 class TestMetricsTracker:
     def _make_leads_file(self, leads: list, suffix=".json") -> str:
         """Create a temporary leads JSON file."""
@@ -392,6 +396,7 @@ class TestMetricsTracker:
 # ---------------------------------------------------------------------------
 # AI Brain
 # ---------------------------------------------------------------------------
+
 
 class TestAIBrain:
     def test_free_tier_can_think(self):

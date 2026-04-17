@@ -1,11 +1,15 @@
 """Green manufacturing, energy efficiency monitoring and sustainability management for Factory Bot."""
-import sys
+
 import os
 import random
+import sys
 from datetime import datetime
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
+
 from bots.factory_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: F401
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -118,7 +122,9 @@ class EnergyEfficiencyMonitor:
         if self.tier == Tier.ENTERPRISE:
             result["ml_optimization_model"] = "EnergyBERT-v2"
             result["automated_setpoint_adjustment"] = True
-            result["predicted_savings_confidence"] = round(random.uniform(0.87, 0.95), 3)
+            result["predicted_savings_confidence"] = round(
+                random.uniform(0.87, 0.95), 3
+            )
             result["renewable_integration_recommendation"] = {
                 "solar_pv_kw": 250,
                 "estimated_coverage_pct": 35,
@@ -152,7 +158,9 @@ class EnergyEfficiencyMonitor:
             "scope_1_emissions_kg": fuel_co2,
             "scope_2_emissions_kg": electricity_co2,
             "scope_3_emissions_kg": transport_co2,
-            "carbon_intensity": "low" if co2_per_unit < 5 else "medium" if co2_per_unit < 15 else "high",
+            "carbon_intensity": (
+                "low" if co2_per_unit < 5 else "medium" if co2_per_unit < 15 else "high"
+            ),
             "tier": self.tier.value,
         }
 
@@ -190,9 +198,19 @@ class GreenInitiativeManager:
         waste_score = round(random.uniform(50, 80), 1)
         water_score = round(random.uniform(60, 90), 1)
         emissions_score = round(random.uniform(45, 80), 1)
-        overall_score = round((energy_score + waste_score + water_score + emissions_score) / 4, 1)
+        overall_score = round(
+            (energy_score + waste_score + water_score + emissions_score) / 4, 1
+        )
 
-        rating = "Excellent" if overall_score >= 80 else "Good" if overall_score >= 65 else "Fair" if overall_score >= 50 else "Poor"
+        rating = (
+            "Excellent"
+            if overall_score >= 80
+            else (
+                "Good"
+                if overall_score >= 65
+                else "Fair" if overall_score >= 50 else "Poor"
+            )
+        )
 
         recommendations = [
             "Implement energy management system (ISO 50001)",
@@ -250,7 +268,9 @@ class GreenInitiativeManager:
             {
                 "initiative": "Implement material segregation at source",
                 "waste_reduction_kg_monthly": round(landfill_reduction_kg * 0.35, 1),
-                "cost_savings_usd_monthly": round(landfill_reduction_kg * 0.35 * 0.08, 2),
+                "cost_savings_usd_monthly": round(
+                    landfill_reduction_kg * 0.35 * 0.08, 2
+                ),
                 "implementation_weeks": 4,
             },
             {
@@ -274,7 +294,9 @@ class GreenInitiativeManager:
             "target_diversion_rate_pct": diversion_target_pct,
             "landfill_reduction_target_kg": landfill_reduction_kg,
             "waste_reduction_initiatives": initiatives,
-            "total_savings_usd_annually": round(sum(i["cost_savings_usd_monthly"] for i in initiatives) * 12, 2),
+            "total_savings_usd_annually": round(
+                sum(i["cost_savings_usd_monthly"] for i in initiatives) * 12, 2
+            ),
             "tier": self.tier.value,
         }
 
@@ -283,7 +305,12 @@ class GreenInitiativeManager:
                 "recyclable_kg": round(total_waste_kg * recyclable_pct / 100, 1),
                 "landfill_kg": round(total_waste_kg * landfill_pct / 100, 1),
                 "hazardous_kg": round(total_waste_kg * hazardous_pct / 100, 1),
-                "organic_kg": round(total_waste_kg * (100 - recyclable_pct - landfill_pct - hazardous_pct) / 100, 1),
+                "organic_kg": round(
+                    total_waste_kg
+                    * (100 - recyclable_pct - landfill_pct - hazardous_pct)
+                    / 100,
+                    1,
+                ),
             }
             result["zero_waste_certification_path"] = {
                 "current_diversion_rate_pct": recyclable_pct,
@@ -340,7 +367,11 @@ class GreenInitiativeManager:
                 "energy_reduction_achieved_pct": round(random.uniform(5, 14), 1),
                 "carbon_neutral_target_year": 2030,
             }
-            result["sdg_alignment"] = ["SDG 7: Affordable Clean Energy", "SDG 12: Responsible Consumption", "SDG 13: Climate Action"]
+            result["sdg_alignment"] = [
+                "SDG 7: Affordable Clean Energy",
+                "SDG 12: Responsible Consumption",
+                "SDG 13: Climate Action",
+            ]
 
         if self.tier == Tier.ENTERPRISE:
             result["executive_summary"] = (

@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -36,6 +37,7 @@ class SkillLevel(Enum):
 @dataclass
 class Lesson:
     """A single learning module lesson."""
+
     lesson_id: str
     title: str
     domain: LearningDomain
@@ -48,13 +50,16 @@ class Lesson:
 @dataclass
 class LearnerProfile:
     """Tracks a learner's progress across all domains."""
+
     learner_id: str
     name: str
     xp: int = 0
     level: int = 1
     completed_lessons: list = field(default_factory=list)
     domain_scores: dict = field(default_factory=dict)
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def add_xp(self, amount: int) -> None:
         self.xp += amount
@@ -74,27 +79,62 @@ class LearnerProfile:
 
 
 _BUILTIN_LESSONS = [
-    ("lesson_001", "Compound Interest Fundamentals", LearningDomain.FINANCE,
-     "Money compounds. $1,000 at 10% monthly becomes $3,138 in 12 months. "
-     "Start small, reinvest everything, let time do the heavy lifting.", 25),
-    ("lesson_002", "Automating Your First Income Stream", LearningDomain.AUTOMATION,
-     "Automation is leverage. Build a system once, run it forever. "
-     "Pick one repetitive task today and script it.", 30),
-    ("lesson_003", "DreamCo Bot Creation 101", LearningDomain.TECH,
-     "Every bot starts with a clear job: what problem does it solve? "
-     "Define the input, output, and trigger before writing one line of code.", 20),
-    ("lesson_004", "Empire Mindset — Think Long-Term", LearningDomain.MINDSET,
-     "Losers ask 'how do I make $100 today?' Winners ask 'what system makes $100/day forever?' "
-     "Big Bro says: build the machine, not just the product.", 15),
-    ("lesson_005", "Lead Generation Basics", LearningDomain.MARKETING,
-     "Leads are lifeblood. You need a consistent inbound channel: "
-     "SEO, scraping, paid ads, or referrals. Pick one and master it.", 20),
-    ("lesson_006", "Crypto Fundamentals for the Empire", LearningDomain.CRYPTO,
-     "Understand volatility, liquidity, and on-chain signals. "
-     "Never invest more than you can lose. Bots can trade 24/7 while you sleep.", 25),
-    ("lesson_007", "Closing Deals with Confidence", LearningDomain.SALES,
-     "The close is simple: handle objections, show ROI, then be quiet. "
-     "The first person to speak after the ask loses.", 20),
+    (
+        "lesson_001",
+        "Compound Interest Fundamentals",
+        LearningDomain.FINANCE,
+        "Money compounds. $1,000 at 10% monthly becomes $3,138 in 12 months. "
+        "Start small, reinvest everything, let time do the heavy lifting.",
+        25,
+    ),
+    (
+        "lesson_002",
+        "Automating Your First Income Stream",
+        LearningDomain.AUTOMATION,
+        "Automation is leverage. Build a system once, run it forever. "
+        "Pick one repetitive task today and script it.",
+        30,
+    ),
+    (
+        "lesson_003",
+        "DreamCo Bot Creation 101",
+        LearningDomain.TECH,
+        "Every bot starts with a clear job: what problem does it solve? "
+        "Define the input, output, and trigger before writing one line of code.",
+        20,
+    ),
+    (
+        "lesson_004",
+        "Empire Mindset — Think Long-Term",
+        LearningDomain.MINDSET,
+        "Losers ask 'how do I make $100 today?' Winners ask 'what system makes $100/day forever?' "
+        "Big Bro says: build the machine, not just the product.",
+        15,
+    ),
+    (
+        "lesson_005",
+        "Lead Generation Basics",
+        LearningDomain.MARKETING,
+        "Leads are lifeblood. You need a consistent inbound channel: "
+        "SEO, scraping, paid ads, or referrals. Pick one and master it.",
+        20,
+    ),
+    (
+        "lesson_006",
+        "Crypto Fundamentals for the Empire",
+        LearningDomain.CRYPTO,
+        "Understand volatility, liquidity, and on-chain signals. "
+        "Never invest more than you can lose. Bots can trade 24/7 while you sleep.",
+        25,
+    ),
+    (
+        "lesson_007",
+        "Closing Deals with Confidence",
+        LearningDomain.SALES,
+        "The close is simple: handle objections, show ROI, then be quiet. "
+        "The first person to speak after the ask loses.",
+        20,
+    ),
 ]
 
 
@@ -122,8 +162,9 @@ class LearningMatrix:
 
     def _load_builtins(self) -> None:
         for lid, title, domain, content, xp in _BUILTIN_LESSONS:
-            self._lessons[lid] = Lesson(lesson_id=lid, title=title, domain=domain,
-                                        content=content, xp_reward=xp)
+            self._lessons[lid] = Lesson(
+                lesson_id=lid, title=title, domain=domain, content=content, xp_reward=xp
+            )
 
     # ------------------------------------------------------------------
     # Learner management
@@ -151,8 +192,13 @@ class LearningMatrix:
         xp_reward: int = 10,
     ) -> dict:
         """Add a custom lesson to the matrix."""
-        lesson = Lesson(lesson_id=lesson_id, title=title, domain=domain,
-                        content=content, xp_reward=xp_reward)
+        lesson = Lesson(
+            lesson_id=lesson_id,
+            title=title,
+            domain=domain,
+            content=content,
+            xp_reward=xp_reward,
+        )
         self._lessons[lesson_id] = lesson
         return _lesson_to_dict(lesson)
 
@@ -170,7 +216,9 @@ class LearningMatrix:
         learner.add_xp(lesson.xp_reward)
 
         domain_key = lesson.domain.value
-        learner.domain_scores[domain_key] = learner.domain_scores.get(domain_key, 0) + lesson.xp_reward
+        learner.domain_scores[domain_key] = (
+            learner.domain_scores.get(domain_key, 0) + lesson.xp_reward
+        )
 
         return {
             "status": "completed",
@@ -188,8 +236,7 @@ class LearningMatrix:
         completed = set(learner.completed_lessons)
 
         remaining = [
-            lesson for lid, lesson in self._lessons.items()
-            if lid not in completed
+            lesson for lid, lesson in self._lessons.items() if lid not in completed
         ]
         remaining.sort(key=lambda l: learner.domain_scores.get(l.domain.value, 0))
         return [_lesson_to_dict(l) for l in remaining[:5]]
@@ -218,6 +265,7 @@ class LearningMatrix:
 
     def _tip(self) -> str:
         import random
+
         return random.choice(self.BIG_BRO_TIPS)
 
     def _get_learner(self, learner_id: str) -> LearnerProfile:

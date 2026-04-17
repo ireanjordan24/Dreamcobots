@@ -9,17 +9,17 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Scale tier definitions
 # ---------------------------------------------------------------------------
+
 
 class ScaleTier:
     STARTUP = "STARTUP"
@@ -30,9 +30,9 @@ class ScaleTier:
 
 
 _SCALE_TIERS: list = [
-    {"name": ScaleTier.STARTUP,    "min": 1,     "max": 10},
-    {"name": ScaleTier.GROWTH,     "min": 11,    "max": 100},
-    {"name": ScaleTier.SCALE,      "min": 101,   "max": 1_000},
+    {"name": ScaleTier.STARTUP, "min": 1, "max": 10},
+    {"name": ScaleTier.GROWTH, "min": 11, "max": 100},
+    {"name": ScaleTier.SCALE, "min": 101, "max": 1_000},
     {"name": ScaleTier.ENTERPRISE, "min": 1_001, "max": 10_000},
     {"name": ScaleTier.FORTUNE500, "min": 10_001, "max": None},
 ]
@@ -45,15 +45,21 @@ _STORAGE_COST_PER_USER = 0.5
 _BANDWIDTH_COST_PER_USER = 0.3
 # Support cost multiplier by tier
 _SUPPORT_COSTS: dict = {
-    ScaleTier.STARTUP:    0.0,
-    ScaleTier.GROWTH:     50.0,
-    ScaleTier.SCALE:      200.0,
+    ScaleTier.STARTUP: 0.0,
+    ScaleTier.GROWTH: 50.0,
+    ScaleTier.SCALE: 200.0,
     ScaleTier.ENTERPRISE: 800.0,
     ScaleTier.FORTUNE500: 2_500.0,
 }
 
 _INTEGRATION_TYPES = {
-    "ERP", "SALESFORCE", "SAP", "ORACLE", "MICROSOFT_365", "SLACK", "JIRA"
+    "ERP",
+    "SALESFORCE",
+    "SAP",
+    "ORACLE",
+    "MICROSOFT_365",
+    "SLACK",
+    "JIRA",
 }
 
 
@@ -110,17 +116,25 @@ class EnterpriseScaler:
             "current_monthly_cost_usd": current_cost["total_monthly_usd"],
             "projected_monthly_cost_usd": projected_cost["total_monthly_usd"],
             "cost_increase_usd": round(
-                projected_cost["total_monthly_usd"] - current_cost["total_monthly_usd"], 2
+                projected_cost["total_monthly_usd"] - current_cost["total_monthly_usd"],
+                2,
             ),
             "timeline_months": max(1, int(growth_ratio * 2)),
         }
 
     def _build_recommendations(self, tier: str) -> list:
-        base = ["Enable auto-scaling", "Set up monitoring and alerting", "Configure CDN"]
+        base = [
+            "Enable auto-scaling",
+            "Set up monitoring and alerting",
+            "Configure CDN",
+        ]
         tier_extras: dict = {
-            ScaleTier.STARTUP:    [],
-            ScaleTier.GROWTH:     ["Implement load balancing", "Set up staging environment"],
-            ScaleTier.SCALE:      [
+            ScaleTier.STARTUP: [],
+            ScaleTier.GROWTH: [
+                "Implement load balancing",
+                "Set up staging environment",
+            ],
+            ScaleTier.SCALE: [
                 "Implement load balancing",
                 "Database read replicas",
                 "Redis caching layer",
@@ -208,43 +222,76 @@ class EnterpriseScaler:
                 "protocol": "REST/SOAP",
                 "auth": "OAuth 2.0 / API Key",
                 "sync_frequency": "real-time",
-                "features": ["bi-directional sync", "master data management", "financial consolidation"],
+                "features": [
+                    "bi-directional sync",
+                    "master data management",
+                    "financial consolidation",
+                ],
             },
             "SALESFORCE": {
                 "protocol": "Salesforce REST API / Bulk API",
                 "auth": "OAuth 2.0",
                 "sync_frequency": "real-time",
-                "features": ["lead sync", "opportunity mapping", "contact sync", "custom objects"],
+                "features": [
+                    "lead sync",
+                    "opportunity mapping",
+                    "contact sync",
+                    "custom objects",
+                ],
             },
             "SAP": {
                 "protocol": "SAP RFC / REST OData",
                 "auth": "SAP SSO / OAuth 2.0",
                 "sync_frequency": "batch (hourly) or real-time",
-                "features": ["FI/CO integration", "MM sync", "HR data transfer", "S/4HANA support"],
+                "features": [
+                    "FI/CO integration",
+                    "MM sync",
+                    "HR data transfer",
+                    "S/4HANA support",
+                ],
             },
             "ORACLE": {
                 "protocol": "Oracle REST Data Services",
                 "auth": "OAuth 2.0 / JWT",
                 "sync_frequency": "real-time",
-                "features": ["ERP Cloud sync", "HCM integration", "financial data bridge"],
+                "features": [
+                    "ERP Cloud sync",
+                    "HCM integration",
+                    "financial data bridge",
+                ],
             },
             "MICROSOFT_365": {
                 "protocol": "Microsoft Graph API",
                 "auth": "OAuth 2.0 / Azure AD",
                 "sync_frequency": "real-time",
-                "features": ["Teams integration", "SharePoint sync", "Outlook calendar", "SSO"],
+                "features": [
+                    "Teams integration",
+                    "SharePoint sync",
+                    "Outlook calendar",
+                    "SSO",
+                ],
             },
             "SLACK": {
                 "protocol": "Slack API / Webhooks",
                 "auth": "OAuth 2.0",
                 "sync_frequency": "real-time",
-                "features": ["notifications", "slash commands", "workflow builder", "alert routing"],
+                "features": [
+                    "notifications",
+                    "slash commands",
+                    "workflow builder",
+                    "alert routing",
+                ],
             },
             "JIRA": {
                 "protocol": "Jira REST API",
                 "auth": "API Token / OAuth 2.0",
                 "sync_frequency": "real-time",
-                "features": ["issue sync", "project mapping", "sprint tracking", "webhook events"],
+                "features": [
+                    "issue sync",
+                    "project mapping",
+                    "sprint tracking",
+                    "webhook events",
+                ],
             },
         }
 

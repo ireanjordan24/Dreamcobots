@@ -2,29 +2,39 @@
 Tests for bots/shopify_automation_bot/tiers.py and bots/shopify_automation_bot/bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.shopify_automation_bot.tiers import SHOPIFY_AUTOMATION_FEATURES, get_shopify_automation_tier_info
+
 from bots.shopify_automation_bot.bot import (
     ShopifyAutomationBot,
-    ShopifyAutomationBotTierError,
     ShopifyAutomationBotRequestLimitError,
+    ShopifyAutomationBotTierError,
+)
+from bots.shopify_automation_bot.tiers import (
+    SHOPIFY_AUTOMATION_FEATURES,
+    get_shopify_automation_tier_info,
 )
 
 
 class TestShopifyAutomationTierInfo:
     def test_free_tier_info_keys(self):
         info = get_shopify_automation_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "support_level", "bot_features"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "support_level",
+            "bot_features",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -48,7 +58,11 @@ class TestShopifyAutomationBot:
 
     def test_process_order_returns_expected_keys(self):
         bot = ShopifyAutomationBot(tier=Tier.FREE)
-        order = {"order_id": "ORD-001", "items": [{"sku": "ITEM1", "qty": 2}], "customer": {"email": "c@example.com"}}
+        order = {
+            "order_id": "ORD-001",
+            "items": [{"sku": "ITEM1", "qty": 2}],
+            "customer": {"email": "c@example.com"},
+        }
         result = bot.process_order(order)
         for key in ("order_id", "status", "automated_actions", "tier"):
             assert key in result
@@ -72,11 +86,15 @@ class TestShopifyAutomationBot:
     def test_automate_workflow_free_tier_raises(self):
         bot = ShopifyAutomationBot(tier=Tier.FREE)
         with pytest.raises(ShopifyAutomationBotTierError):
-            bot.automate_workflow({"type": "abandoned_cart", "trigger": "cart_abandoned"})
+            bot.automate_workflow(
+                {"type": "abandoned_cart", "trigger": "cart_abandoned"}
+            )
 
     def test_automate_workflow_pro_tier(self):
         bot = ShopifyAutomationBot(tier=Tier.PRO)
-        result = bot.automate_workflow({"type": "abandoned_cart", "trigger": "cart_abandoned"})
+        result = bot.automate_workflow(
+            {"type": "abandoned_cart", "trigger": "cart_abandoned"}
+        )
         assert "tier" in result
 
     def test_request_counter_increments(self):

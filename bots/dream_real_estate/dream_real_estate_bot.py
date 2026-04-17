@@ -27,6 +27,7 @@ Developer notes
 - To add a new automation task, add a method and register it in
   AUTOMATION_REGISTRY at the bottom of this file.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
@@ -38,8 +39,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from framework import GlobalAISourcesFlow  # noqa: F401
 from bots.dream_real_estate.tiers import DREtier, get_tier_config, get_upgrade_path
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Path helpers
@@ -191,7 +192,11 @@ class DreamRealEstateBot:
                 "address": f"{rng.randint(100, 9999)} Main St, {market}",
                 "price_usd": rng.randint(800_000, 5_000_000),
                 "cap_rate_pct": round(rng.uniform(4.5, max_cap_rate), 2),
-                "property_type": property_type if property_type != "all" else rng.choice(["multifamily", "commercial", "industrial"]),
+                "property_type": (
+                    property_type
+                    if property_type != "all"
+                    else rng.choice(["multifamily", "commercial", "industrial"])
+                ),
                 "status": rng.choice(["off-market", "listed", "pre-foreclosure"]),
                 "alert_time": datetime.now(timezone.utc).isoformat(),
             }
@@ -436,9 +441,7 @@ class DreamRealEstateBot:
         """Raise DREAccessError if *feature* is not available on current tier."""
         if not self.config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            msg = (
-                f"Feature '{feature}' is not available on the {self.tier.value} tier."
-            )
+            msg = f"Feature '{feature}' is not available on the {self.tier.value} tier."
             if upgrade:
                 msg += f" Upgrade to {upgrade.value} to unlock this feature."
             raise DREAccessError(msg)

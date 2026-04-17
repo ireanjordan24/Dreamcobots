@@ -11,12 +11,14 @@ Configure .env (see ../../.env.example):
 """
 
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 try:
     import stripe
+
     stripe.api_key = os.environ["STRIPE_SECRET_KEY"]
     _LIVE = True
 except (ImportError, KeyError):

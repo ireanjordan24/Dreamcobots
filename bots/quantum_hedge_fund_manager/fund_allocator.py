@@ -41,7 +41,7 @@ class AllocationSlice:
 
     structure_id: str
     structure_name: str
-    weight_pct: float           # Target portfolio weight (0–100)
+    weight_pct: float  # Target portfolio weight (0–100)
     allocated_amount_usd: float
     expected_yield_pct: float
 
@@ -61,7 +61,7 @@ class FundAllocation:
 
     allocation_id: str
     name: str
-    total_aum_usd: float         # Assets under management
+    total_aum_usd: float  # Assets under management
     strategy: ReallocationStrategy
     slices: list[AllocationSlice] = field(default_factory=list)
     status: AllocationStatus = AllocationStatus.DRAFT
@@ -76,9 +76,7 @@ class FundAllocation:
     def blended_yield_pct(self) -> float:
         if not self.slices:
             return 0.0
-        return sum(
-            s.weight_pct / 100.0 * s.expected_yield_pct for s in self.slices
-        )
+        return sum(s.weight_pct / 100.0 * s.expected_yield_pct for s in self.slices)
 
     @property
     def annual_income_usd(self) -> float:
@@ -177,9 +175,7 @@ class FundAllocator:
             raise FundAllocatorError("No structures available for allocation.")
 
         # Compute weights
-        weights = self._compute_weights(
-            structures, strategy, custom_weights or {}
-        )
+        weights = self._compute_weights(structures, strategy, custom_weights or {})
 
         slices = [
             AllocationSlice(
@@ -236,16 +232,16 @@ class FundAllocator:
                 self._db.get_structure(sl.structure_id) for sl in alloc.slices
             ]
 
-        weights = self._compute_weights(
-            structures, strategy, custom_weights or {}
-        )
+        weights = self._compute_weights(structures, strategy, custom_weights or {})
 
         alloc.slices = [
             AllocationSlice(
                 structure_id=s.structure_id,
                 structure_name=s.name,
                 weight_pct=weights[s.structure_id],
-                allocated_amount_usd=alloc.total_aum_usd * weights[s.structure_id] / 100.0,
+                allocated_amount_usd=alloc.total_aum_usd
+                * weights[s.structure_id]
+                / 100.0,
                 expected_yield_pct=s.mid_yield_pct,
             )
             for s in structures
@@ -284,11 +280,21 @@ class FundAllocator:
         )
 
     def portfolio_summary(self) -> dict:
-        active = [a for a in self._allocations.values() if a.status == AllocationStatus.ACTIVE]
+        active = [
+            a for a in self._allocations.values() if a.status == AllocationStatus.ACTIVE
+        ]
         if not active:
-            return {"total_aum_usd": 0.0, "blended_yield_pct": 0.0, "annual_income_usd": 0.0}
+            return {
+                "total_aum_usd": 0.0,
+                "blended_yield_pct": 0.0,
+                "annual_income_usd": 0.0,
+            }
         total = sum(a.total_aum_usd for a in active)
-        blended = sum(a.total_aum_usd * a.blended_yield_pct for a in active) / total if total else 0.0
+        blended = (
+            sum(a.total_aum_usd * a.blended_yield_pct for a in active) / total
+            if total
+            else 0.0
+        )
         income = sum(a.annual_income_usd for a in active)
         return {
             "total_aum_usd": round(total, 2),
@@ -314,7 +320,9 @@ class FundAllocator:
             total = sum(overrides.values())
             for s in structures:
                 w = overrides.get(s.structure_id, 0.0)
-                weights[s.structure_id] = (w / total * 100.0) if total > 0 else 100.0 / len(structures)
+                weights[s.structure_id] = (
+                    (w / total * 100.0) if total > 0 else 100.0 / len(structures)
+                )
         elif strategy == ReallocationStrategy.EQUAL_WEIGHT:
             w = 100.0 / len(structures)
             for s in structures:
@@ -333,7 +341,10 @@ class FundAllocator:
 
         elif strategy == ReallocationStrategy.RISK_PARITY:
             # Weight inversely proportional to risk score
-            inv_risks = {s.structure_id: 1.0 / s.risk_score if s.risk_score > 0 else 1.0 for s in structures}
+            inv_risks = {
+                s.structure_id: 1.0 / s.risk_score if s.risk_score > 0 else 1.0
+                for s in structures
+            }
             total_inv = sum(inv_risks.values()) or 1.0
             for s in structures:
                 raw = inv_risks[s.structure_id] / total_inv * 100.0
@@ -341,10 +352,20 @@ class FundAllocator:
             total = sum(weights.values())
             weights = {k: v / total * 100.0 for k, v in weights.items()}
 
-        elif strategy in (ReallocationStrategy.MOMENTUM, ReallocationStrategy.MIN_VARIANCE,
-                          ReallocationStrategy.QUANTUM_OPTIMISED):
+        elif strategy in (
+            ReallocationStrategy.MOMENTUM,
+            ReallocationStrategy.MIN_VARIANCE,
+            ReallocationStrategy.QUANTUM_OPTIMISED,
+        ):
             # Placeholder for advanced strategies — use risk-adjusted yield weighting
-            rar = {s.structure_id: s.mid_yield_pct / s.risk_score if s.risk_score > 0 else s.mid_yield_pct for s in structures}
+            rar = {
+                s.structure_id: (
+                    s.mid_yield_pct / s.risk_score
+                    if s.risk_score > 0
+                    else s.mid_yield_pct
+                )
+                for s in structures
+            }
             total_rar = sum(rar.values()) or 1.0
             for s in structures:
                 raw = rar[s.structure_id] / total_rar * 100.0

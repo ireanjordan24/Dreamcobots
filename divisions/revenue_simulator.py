@@ -33,6 +33,7 @@ Developer notes
 - To add a new pricing model, add a ``_model_*`` method and register it
   in ``PRICING_MODELS``.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations

@@ -1,4 +1,5 @@
 """COCO format dataset packager for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import json
 import logging
@@ -35,12 +36,14 @@ class COCOPackager:
             "categories": [],
         }
         for i, ann in enumerate(annotations):
-            coco_data["images"].append({
-                "id": i,
-                "file_name": f"image_{i:05d}.png",
-                "width": 224,
-                "height": 224,
-            })
+            coco_data["images"].append(
+                {
+                    "id": i,
+                    "file_name": f"image_{i:05d}.png",
+                    "width": 224,
+                    "height": 224,
+                }
+            )
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(coco_data, f, indent=2)
         logger.info("COCO packed %d annotations to %s", len(annotations), output_path)

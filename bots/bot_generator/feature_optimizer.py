@@ -9,20 +9,20 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from typing import List, Optional
-from bots.bot_generator.request_interface import BotRequest
 
+from bots.bot_generator.request_interface import BotRequest
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Feature Optimizer
 # ---------------------------------------------------------------------------
+
 
 class FeatureOptimizerError(Exception):
     """Raised when the optimizer cannot process the given input."""
@@ -151,9 +151,7 @@ class FeatureOptimizer:
         )
 
         # Always append DreamCo core optimizations at the end
-        dreamco_additions = [
-            f for f in DREAMCO_CORE_OPTIMIZATIONS if f not in merged
-        ]
+        dreamco_additions = [f for f in DREAMCO_CORE_OPTIMIZATIONS if f not in merged]
 
         optimized_features = merged + dreamco_additions
         priority_score = self._score(
@@ -190,9 +188,7 @@ class FeatureOptimizer:
     # ------------------------------------------------------------------
 
     def _get_category_features(self, category: str) -> List[str]:
-        return list(
-            CATEGORY_FEATURE_MAP.get(category, DEFAULT_HIGH_IMPACT_FEATURES)
-        )
+        return list(CATEGORY_FEATURE_MAP.get(category, DEFAULT_HIGH_IMPACT_FEATURES))
 
     def _extract_competitor_gaps(self, category: str) -> List[str]:
         """Return features missing from competitors for *category*."""

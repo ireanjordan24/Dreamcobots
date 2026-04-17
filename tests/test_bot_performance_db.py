@@ -11,8 +11,8 @@ Covers:
   7. Aggregate stats
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -21,10 +21,10 @@ import pytest
 
 from bots.ai_learning_system.database import BotPerformanceDB
 
-
 # ===========================================================================
 # 1. Initialization
 # ===========================================================================
+
 
 class TestDBInitialization:
     def test_creates_in_memory_db(self):
@@ -49,6 +49,7 @@ class TestDBInitialization:
 # ===========================================================================
 # 2. Recording runs
 # ===========================================================================
+
 
 class TestRecordRun:
     def setup_method(self):
@@ -93,6 +94,7 @@ class TestRecordRun:
 # 3. KPI score computation
 # ===========================================================================
 
+
 class TestKPIScores:
     def setup_method(self):
         self.db = BotPerformanceDB()
@@ -134,14 +136,25 @@ class TestKPIScores:
         assert summary["reliability_score"] == 50.0
 
     def test_composite_higher_for_better_bots(self):
-        self.db.record_run("good_bot", kpis={
-            "revenue_usd": 400.0, "tasks_completed": 8, "error_count": 0,
-            "response_time_ms": 100.0,
-        })
-        self.db.record_run("bad_bot", kpis={
-            "revenue_usd": 0.0, "tasks_completed": 0, "error_count": 5,
-            "response_time_ms": 5000.0,
-        }, status="error")
+        self.db.record_run(
+            "good_bot",
+            kpis={
+                "revenue_usd": 400.0,
+                "tasks_completed": 8,
+                "error_count": 0,
+                "response_time_ms": 100.0,
+            },
+        )
+        self.db.record_run(
+            "bad_bot",
+            kpis={
+                "revenue_usd": 0.0,
+                "tasks_completed": 0,
+                "error_count": 5,
+                "response_time_ms": 5000.0,
+            },
+            status="error",
+        )
         good = self.db.get_kpi_summary("good_bot")
         bad = self.db.get_kpi_summary("bad_bot")
         assert good["composite_score"] > bad["composite_score"]
@@ -155,6 +168,7 @@ class TestKPIScores:
 # ===========================================================================
 # 4. Run history
 # ===========================================================================
+
 
 class TestRunHistory:
     def setup_method(self):
@@ -194,6 +208,7 @@ class TestRunHistory:
 # 5. Leaderboard
 # ===========================================================================
 
+
 class TestLeaderboard:
     def setup_method(self):
         self.db = BotPerformanceDB()
@@ -226,13 +241,18 @@ class TestLeaderboard:
 # 6. Underperformer detection
 # ===========================================================================
 
+
 class TestUnderperformers:
     def setup_method(self):
         self.db = BotPerformanceDB()
         # Good bot
-        self.db.record_run("strong_bot", kpis={"revenue_usd": 400.0, "tasks_completed": 8})
+        self.db.record_run(
+            "strong_bot", kpis={"revenue_usd": 400.0, "tasks_completed": 8}
+        )
         # Weak bot
-        self.db.record_run("weak_bot", kpis={"revenue_usd": 0.0, "tasks_completed": 0}, status="error")
+        self.db.record_run(
+            "weak_bot", kpis={"revenue_usd": 0.0, "tasks_completed": 0}, status="error"
+        )
 
     def teardown_method(self):
         self.db.close()
@@ -261,6 +281,7 @@ class TestUnderperformers:
 # 7. Aggregate stats
 # ===========================================================================
 
+
 class TestAggregateStats:
     def setup_method(self):
         self.db = BotPerformanceDB()
@@ -270,8 +291,12 @@ class TestAggregateStats:
 
     def test_stats_keys(self):
         stats = self.db.get_stats()
-        for key in ("tracked_bots", "total_runs", "avg_composite_score",
-                    "underperformers_below_30"):
+        for key in (
+            "tracked_bots",
+            "total_runs",
+            "avg_composite_score",
+            "underperformers_below_30",
+        ):
             assert key in stats
 
     def test_stats_after_runs(self):

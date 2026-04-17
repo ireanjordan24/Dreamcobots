@@ -8,25 +8,26 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class CompetitorProfile:
     """Profile of a competing bot or SaaS product."""
+
     name: str
     category: str
     source: str
@@ -58,6 +59,7 @@ class CompetitorProfile:
 @dataclass
 class MarketGap:
     """An identified gap in the competitor landscape."""
+
     category: str
     description: str
     opportunity_score: float  # 0-100
@@ -75,6 +77,7 @@ class MarketGap:
 @dataclass
 class AnalysisReport:
     """Full competitor analysis report."""
+
     query: str
     competitors: list[CompetitorProfile] = field(default_factory=list)
     gaps: list[MarketGap] = field(default_factory=list)
@@ -126,7 +129,11 @@ _COMPETITOR_DB: dict[str, list[dict]] = {
             "rating": 3.5,
             "price": 199.0,
             "features": ["SMS outreach", "basic analytics"],
-            "weaknesses": ["no follow-up automation", "no conversion tracking", "crashes"],
+            "weaknesses": [
+                "no follow-up automation",
+                "no conversion tracking",
+                "crashes",
+            ],
             "strengths": ["SMS"],
         },
         {
@@ -195,6 +202,7 @@ _COMMON_GAPS: dict[str, list[str]] = {
 # ---------------------------------------------------------------------------
 # Analyzer
 # ---------------------------------------------------------------------------
+
 
 class CompetitorAnalyzer:
     """

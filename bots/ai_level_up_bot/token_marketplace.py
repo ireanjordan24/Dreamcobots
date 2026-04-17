@@ -11,8 +11,9 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from dataclasses import dataclass, field
@@ -48,16 +49,16 @@ class TokenTransaction:
 # ---------------------------------------------------------------------------
 
 _BASE_PRICES: Dict[str, float] = {
-    "llm_standard": 0.002,      # per 1k tokens
-    "llm_premium": 0.010,       # per 1k tokens (GPT-4 class)
-    "image_gen": 0.040,         # per image
-    "video_gen": 0.200,         # per second of video
-    "voice_gen": 0.030,         # per 1k characters
-    "music_gen": 0.100,         # per track
-    "code_gen": 0.005,          # per 1k tokens
-    "embedding": 0.0001,        # per 1k tokens
-    "search": 0.010,            # per query
-    "course_module": 0.500,     # per module completion
+    "llm_standard": 0.002,  # per 1k tokens
+    "llm_premium": 0.010,  # per 1k tokens (GPT-4 class)
+    "image_gen": 0.040,  # per image
+    "video_gen": 0.200,  # per second of video
+    "voice_gen": 0.030,  # per 1k characters
+    "music_gen": 0.100,  # per track
+    "code_gen": 0.005,  # per 1k tokens
+    "embedding": 0.0001,  # per 1k tokens
+    "search": 0.010,  # per query
+    "course_module": 0.500,  # per module completion
 }
 
 MARKUP_PERCENTAGE = 0.25

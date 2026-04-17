@@ -1,4 +1,5 @@
 """DeepAI API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,8 +28,14 @@ class DeepAIConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.post(f"{self.BASE_URL}/text-generator", data={"text": text}, headers={"api-key": self.api_key}, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/text-generator",
+                data={"text": text},
+                headers={"api-key": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("DeepAI text generation completed.")
             return {"status": "success", "data": response.json()}
@@ -46,12 +53,17 @@ class DeepAIConnector:
             API response dict with summary or error dict.
         """
         import requests
+
         try:
-            response = requests.post(f"{self.BASE_URL}/summarization", data={"text": text}, headers={"api-key": self.api_key}, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/summarization",
+                data={"text": text},
+                headers={"api-key": self.api_key},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("DeepAI summarization completed.")
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("DeepAI summarize error: %s", e)
             return {"status": "error", "message": str(e)}
-

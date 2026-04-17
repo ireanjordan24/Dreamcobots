@@ -26,10 +26,10 @@ from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
+
 
 class RobotCategory(Enum):
     INDUSTRIAL = "industrial"
@@ -64,9 +64,11 @@ class TrainingPhase(Enum):
 # Data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class SensorReading:
     """A single reading from a robot sensor."""
+
     sensor_type: SensorType
     value: float
     unit: str
@@ -85,6 +87,7 @@ class SensorReading:
 @dataclass
 class Robot:
     """A registered robot target."""
+
     robot_id: str
     name: str
     category: RobotCategory
@@ -111,12 +114,13 @@ class Robot:
 @dataclass
 class RobotTrainingCycle:
     """Records one adaptive learning cycle for a robot."""
+
     cycle_id: str
     robot_id: str
     phase: TrainingPhase
     instructions: list[str]
     sensor_readings: list[SensorReading]
-    performance_score: float        # 0.0 – 1.0
+    performance_score: float  # 0.0 – 1.0
     feedback: list[str]
     completed: bool = False
     started_at: float = field(default_factory=time.time)
@@ -160,6 +164,7 @@ _PHASE_MULTIPLIER: dict[TrainingPhase, float] = {
     TrainingPhase.CONVERGED: 0.97,
 }
 
+
 def _simulate_sensor_readings(sensors: list[SensorType]) -> list[SensorReading]:
     """Generate deterministic simulated sensor readings."""
     readings: list[SensorReading] = []
@@ -185,13 +190,19 @@ def _generate_robot_feedback(
     if performance >= 0.90:
         tips.append("Robot is performing excellently. Ready to advance to next phase.")
     elif performance >= 0.75:
-        tips.append("Good performance. Fine-tune motion parameters for better precision.")
+        tips.append(
+            "Good performance. Fine-tune motion parameters for better precision."
+        )
     else:
-        tips.append("Performance below target. Increase training cycles or refine instructions.")
+        tips.append(
+            "Performance below target. Increase training cycles or refine instructions."
+        )
     if phase == TrainingPhase.CALIBRATION:
         tips.append("Calibration phase: ensure sensors are correctly initialised.")
     elif phase == TrainingPhase.EXPLORATION:
-        tips.append("Exploration phase: robot is discovering the environment autonomously.")
+        tips.append(
+            "Exploration phase: robot is discovering the environment autonomously."
+        )
     elif phase == TrainingPhase.CONVERGED:
         tips.append("Training converged! Deploy the control policy to production.")
     if len(instructions) == 0:
@@ -203,6 +214,7 @@ def _generate_robot_feedback(
 # ---------------------------------------------------------------------------
 # Core class
 # ---------------------------------------------------------------------------
+
 
 class RobotTrainer:
     """
@@ -219,7 +231,7 @@ class RobotTrainer:
         self.trainer_id = trainer_id
         self._robots: dict[str, Robot] = {}
         self._cycles: dict[str, list[RobotTrainingCycle]] = {}  # robot_id -> cycles
-        self._policies: dict[str, dict] = {}   # robot_id -> latest control policy
+        self._policies: dict[str, dict] = {}  # robot_id -> latest control policy
 
     # ------------------------------------------------------------------
     # Robot registration
@@ -279,7 +291,11 @@ class RobotTrainer:
         """
         robot = self.get_robot(robot_id)
         cycle_id = f"cycle_{uuid.uuid4().hex[:12]}"
-        instructions = instructions or ["move_forward", "scan_environment", "avoid_obstacle"]
+        instructions = instructions or [
+            "move_forward",
+            "scan_environment",
+            "avoid_obstacle",
+        ]
 
         # Simulate sensor readings
         readings = _simulate_sensor_readings(robot.sensors)
@@ -354,7 +370,9 @@ class RobotTrainer:
     def get_control_policy(self, robot_id: str) -> dict:
         """Return the latest trained control policy for a robot."""
         if robot_id not in self._policies:
-            raise KeyError(f"No policy found for robot '{robot_id}'. Run at least one cycle.")
+            raise KeyError(
+                f"No policy found for robot '{robot_id}'. Run at least one cycle."
+            )
         return self._policies[robot_id]
 
     def list_cycles(self, robot_id: str) -> list[RobotTrainingCycle]:

@@ -1,4 +1,5 @@
 """CoinCap cryptocurrency market data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,8 +26,11 @@ class CoinCapConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/assets", params={"limit": limit}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/assets", params={"limit": limit}, timeout=30
+            )
             response.raise_for_status()
             logger.info("CoinCap assets fetched.")
             return {"status": "success", "data": response.json()}
@@ -44,6 +48,7 @@ class CoinCapConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
             response = requests.get(f"{self.BASE_URL}/assets/{asset_id}", timeout=30)
             response.raise_for_status()
@@ -51,4 +56,3 @@ class CoinCapConnector:
         except requests.RequestException as e:
             logger.error("CoinCap get_asset error: %s", e)
             return {"status": "error", "message": str(e)}
-

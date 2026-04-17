@@ -1,16 +1,37 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 import pytest
-from bots.ai_marketplace.tiers import (
-    Tier, TierConfig, TIER_CATALOGUE, get_tier_config, list_tiers, get_upgrade_path,
-    FEATURE_PLUGIN_INSTALL, FEATURE_ALERTS, FEATURE_ANALYTICS,
-    FEATURE_ENTERPRISE_PLUGINS, FEATURE_CUSTOM_PLUGINS, FEATURE_WHITE_LABEL, FEATURE_API_ACCESS,
+
+from bots.ai_marketplace.ai_marketplace import (
+    AIMarketplace,
+    AIMarketplaceError,
+    AIMarketplaceTierError,
 )
-from bots.ai_marketplace.plugins import PluginRegistry, Plugin, PluginCategory
-from bots.ai_marketplace.subscriptions import SubscriptionManager, SubscriptionPlan, PLAN_CATALOGUE
-from bots.ai_marketplace.skill_packs import SkillPackRegistry, SkillPack
-from bots.ai_marketplace.ai_marketplace import AIMarketplace, AIMarketplaceError, AIMarketplaceTierError
+from bots.ai_marketplace.plugins import Plugin, PluginCategory, PluginRegistry
+from bots.ai_marketplace.skill_packs import SkillPack, SkillPackRegistry
+from bots.ai_marketplace.subscriptions import (
+    PLAN_CATALOGUE,
+    SubscriptionManager,
+    SubscriptionPlan,
+)
+from bots.ai_marketplace.tiers import (
+    FEATURE_ALERTS,
+    FEATURE_ANALYTICS,
+    FEATURE_API_ACCESS,
+    FEATURE_CUSTOM_PLUGINS,
+    FEATURE_ENTERPRISE_PLUGINS,
+    FEATURE_PLUGIN_INSTALL,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 
 class TestTiers:
@@ -294,16 +315,31 @@ class TestPluginRegistry:
         assert top[0].rating >= top[-1].rating
 
     def test_register_plugin(self):
-        p = Plugin("new_plugin", "New Plugin", PluginCategory.TOOLS, "v1.0.0",
-                   "A new plugin", ["feature1"], 4.0, 100, "Author")
+        p = Plugin(
+            "new_plugin",
+            "New Plugin",
+            PluginCategory.TOOLS,
+            "v1.0.0",
+            "A new plugin",
+            ["feature1"],
+            4.0,
+            100,
+            "Author",
+        )
         self.registry.register_plugin(p)
         assert self.registry.get_plugin("new_plugin").name == "New Plugin"
 
     def test_all_plugin_categories(self):
         categories = {p.category for p in self.registry.list_plugins()}
-        expected = {PluginCategory.AI, PluginCategory.SAVINGS, PluginCategory.FINANCE,
-                    PluginCategory.ALERTS, PluginCategory.INTEGRATION, PluginCategory.TOOLS,
-                    PluginCategory.MARKETING}
+        expected = {
+            PluginCategory.AI,
+            PluginCategory.SAVINGS,
+            PluginCategory.FINANCE,
+            PluginCategory.ALERTS,
+            PluginCategory.INTEGRATION,
+            PluginCategory.TOOLS,
+            PluginCategory.MARKETING,
+        }
         assert expected.issubset(categories)
 
 

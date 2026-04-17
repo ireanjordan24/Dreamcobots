@@ -8,9 +8,10 @@ Level (FPL) thresholds defined in config.py.
 No personally-identifiable information is stored here; the engine only
 receives ephemeral income/household values from the session.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-from config import FPL_BASE, FPL_ADDITIONAL_PER_PERSON, PROGRAMS
+from config import FPL_ADDITIONAL_PER_PERSON, FPL_BASE, PROGRAMS
 
 
 def get_fpl(household_size: int) -> float:

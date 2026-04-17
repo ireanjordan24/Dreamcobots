@@ -115,6 +115,7 @@ REQUIRED_STAGES: tuple[str, ...] = (
 # Custom exception
 # ---------------------------------------------------------------------------
 
+
 class FrameworkViolationError(Exception):
     """Raised when a bot does not conform to the Global AI Sources Flow."""
 
@@ -122,6 +123,7 @@ class FrameworkViolationError(Exception):
 # ---------------------------------------------------------------------------
 # Individual stage dataclasses
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class DataIngestionLayer:
@@ -138,12 +140,14 @@ class DataIngestionLayer:
     """
 
     stage_id: str = "data_ingestion"
-    sources: list[str] = field(default_factory=lambda: [
-        "research_papers",
-        "github",
-        "kaggle",
-        "ai_labs",
-    ])
+    sources: list[str] = field(
+        default_factory=lambda: [
+            "research_papers",
+            "github",
+            "kaggle",
+            "ai_labs",
+        ]
+    )
     normalization_enabled: bool = True
     translation_enabled: bool = True
 
@@ -181,7 +185,9 @@ class LearningMethodClassifier:
         "federated_learning",
     )
 
-    def classify(self, ingested: dict[str, Any], method: str = "supervised") -> dict[str, Any]:
+    def classify(
+        self, ingested: dict[str, Any], method: str = "supervised"
+    ) -> dict[str, Any]:
         """Classify learning method and attach routing metadata."""
         if method not in self.supported_methods:
             raise FrameworkViolationError(
@@ -374,6 +380,7 @@ class GovernanceSecurityLayer:
 # ---------------------------------------------------------------------------
 # Orchestrator
 # ---------------------------------------------------------------------------
+
 
 class GlobalAISourcesFlow:
     """

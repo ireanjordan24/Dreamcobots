@@ -1,4 +1,5 @@
 """TensorFlow image classification connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,12 +26,16 @@ class TensorFlowVisionConnector:
             Dict with classification results or error.
         """
         try:
-            import tensorflow as tf
             import numpy as np
+            import tensorflow as tf
             from PIL import Image
+
             mp = model_path or self.model_path
             if not mp:
-                return {"status": "error", "message": "No TensorFlow model path provided."}
+                return {
+                    "status": "error",
+                    "message": "No TensorFlow model path provided.",
+                }
             model = tf.saved_model.load(mp)
             img = Image.open(image_path).resize((224, 224))
             img_array = np.array(img) / 255.0
@@ -44,4 +49,3 @@ class TensorFlowVisionConnector:
         except Exception as e:
             logger.error("TensorFlow classify_image error: %s", e)
             return {"status": "error", "message": str(e)}
-

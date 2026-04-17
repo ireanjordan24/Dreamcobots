@@ -1,8 +1,10 @@
-import sys, os
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-TOOL_DIR = os.path.join(REPO_ROOT, 'automation-tools', 'color_palette_generator')
+TOOL_DIR = os.path.join(REPO_ROOT, "automation-tools", "color_palette_generator")
 sys.path.insert(0, TOOL_DIR)
 
 import pytest

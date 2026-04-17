@@ -1,7 +1,8 @@
 """Working stress test example for the DreamCobots platform."""
-import sys
-import os
+
 import importlib.util
+import os
+import sys
 
 _ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, _ROOT)

@@ -1,36 +1,35 @@
 """Tests for bots/enterprise_integrations_bot — Big Tech & AI integrations hub."""
-import sys
-import os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.enterprise_integrations_bot.enterprise_integrations_bot import (
-    EnterpriseIntegrationsBot,
-    EnterpriseIntegrationsBotTierError,
-    EnterpriseIntegrationsBotError,
-    ProviderNotFoundError,
-    SubscriptionError,
-    ProviderCategory,
-    Provider,
-    Subscription,
-    APICallRecord,
-    _PROVIDERS,
-    _PROVIDER_INDEX,
-)
-from bots.enterprise_integrations_bot.tiers import (
-    get_bot_tier_info,
-    BOT_FEATURES,
-)
 
+from bots.enterprise_integrations_bot.enterprise_integrations_bot import (
+    _PROVIDER_INDEX,
+    _PROVIDERS,
+    APICallRecord,
+    EnterpriseIntegrationsBot,
+    EnterpriseIntegrationsBotError,
+    EnterpriseIntegrationsBotTierError,
+    Provider,
+    ProviderCategory,
+    ProviderNotFoundError,
+    Subscription,
+    SubscriptionError,
+)
+from bots.enterprise_integrations_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 # ===========================================================================
 # Tier tests
 # ===========================================================================
+
 
 class TestTiers:
     def test_all_three_tiers_have_features(self):
@@ -38,7 +37,9 @@ class TestTiers:
             assert len(BOT_FEATURES[tier.value]) > 0
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
     def test_pro_has_more_features_than_free(self):
         assert len(BOT_FEATURES[Tier.PRO.value]) > len(BOT_FEATURES[Tier.FREE.value])
@@ -46,7 +47,13 @@ class TestTiers:
     def test_get_tier_info_returns_expected_keys(self):
         for tier in (Tier.FREE, Tier.PRO, Tier.ENTERPRISE):
             info = get_bot_tier_info(tier)
-            for key in ("tier", "name", "price_usd_monthly", "features", "support_level"):
+            for key in (
+                "tier",
+                "name",
+                "price_usd_monthly",
+                "features",
+                "support_level",
+            ):
                 assert key in info
 
     def test_free_price_is_zero(self):
@@ -72,6 +79,7 @@ class TestTiers:
 # ===========================================================================
 # Instantiation tests
 # ===========================================================================
+
 
 class TestInstantiation:
     def test_default_tier_is_free(self):
@@ -104,6 +112,7 @@ class TestInstantiation:
 # Provider catalogue tests
 # ===========================================================================
 
+
 class TestProviderCatalogue:
     def test_providers_exist(self):
         assert len(_PROVIDERS) > 0
@@ -114,8 +123,13 @@ class TestProviderCatalogue:
 
     def test_big_tech_ai_providers_present(self):
         ids = {p.provider_id for p in _PROVIDERS}
-        for pid in ("google_cloud_ai", "ibm_watson", "microsoft_azure_ai",
-                    "nvidia_ai", "aws_ai"):
+        for pid in (
+            "google_cloud_ai",
+            "ibm_watson",
+            "microsoft_azure_ai",
+            "nvidia_ai",
+            "aws_ai",
+        ):
             assert pid in ids
 
     def test_big_data_analytics_providers_present(self):
@@ -130,15 +144,27 @@ class TestProviderCatalogue:
 
     def test_dream_proprietary_providers_present(self):
         ids = {p.provider_id for p in _PROVIDERS}
-        for pid in ("dream_llm", "dream_vision", "dream_voice",
-                    "dream_code", "dream_analytics", "dream_collab"):
+        for pid in (
+            "dream_llm",
+            "dream_vision",
+            "dream_voice",
+            "dream_code",
+            "dream_analytics",
+            "dream_collab",
+        ):
             assert pid in ids
 
     def test_provider_to_dict_has_required_keys(self):
         for p in _PROVIDERS:
             d = p.to_dict()
-            for key in ("provider_id", "name", "category", "description",
-                        "services", "min_tier"):
+            for key in (
+                "provider_id",
+                "name",
+                "category",
+                "description",
+                "services",
+                "min_tier",
+            ):
                 assert key in d
 
     def test_each_provider_has_services(self):
@@ -149,6 +175,7 @@ class TestProviderCatalogue:
 # ===========================================================================
 # list_providers / get_provider tests
 # ===========================================================================
+
 
 class TestListProviders:
     def test_free_list_providers_non_empty(self):
@@ -198,6 +225,7 @@ class TestListProviders:
 # ===========================================================================
 # call_provider / API routing tests
 # ===========================================================================
+
 
 class TestCallProvider:
     def test_call_google_ai_free(self):
@@ -262,6 +290,7 @@ class TestCallProvider:
 # ===========================================================================
 # Convenience wrapper tests
 # ===========================================================================
+
 
 class TestConvenienceWrappers:
     def test_google_ai_wrapper(self):
@@ -361,6 +390,7 @@ class TestConvenienceWrappers:
 # Multi-provider routing tests
 # ===========================================================================
 
+
 class TestRouteToBase:
     def test_route_to_best_big_tech_ai_free(self):
         bot = EnterpriseIntegrationsBot(tier=Tier.FREE)
@@ -387,6 +417,7 @@ class TestRouteToBase:
 # ===========================================================================
 # Subscription resales tests
 # ===========================================================================
+
 
 class TestSubscriptionResales:
     def test_resell_subscription_pro(self):
@@ -528,15 +559,24 @@ class TestSubscriptionResales:
         bot = EnterpriseIntegrationsBot(tier=Tier.PRO)
         sub = bot.resell_subscription("slack", "pro", 1, 8.0, "b1")
         d = sub.to_dict()
-        for key in ("subscription_id", "provider_id", "plan", "seats",
-                    "price_per_seat_usd", "total_price_usd",
-                    "buyer_id", "status", "resale_markup_pct"):
+        for key in (
+            "subscription_id",
+            "provider_id",
+            "plan",
+            "seats",
+            "price_per_seat_usd",
+            "total_price_usd",
+            "buyer_id",
+            "status",
+            "resale_markup_pct",
+        ):
             assert key in d
 
 
 # ===========================================================================
 # Usage stats tests
 # ===========================================================================
+
 
 class TestUsageStats:
     def test_initial_stats_zero_calls(self):
@@ -593,6 +633,7 @@ class TestUsageStats:
 # Tier info tests
 # ===========================================================================
 
+
 class TestGetTierInfo:
     def test_returns_dict(self):
         bot = EnterpriseIntegrationsBot(tier=Tier.FREE)
@@ -608,6 +649,7 @@ class TestGetTierInfo:
 # ===========================================================================
 # Chat interface tests
 # ===========================================================================
+
 
 class TestChatInterface:
     def test_chat_providers(self):

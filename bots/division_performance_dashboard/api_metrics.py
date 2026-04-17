@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
+
 @dataclass
 class APICall:
     endpoint: str
@@ -11,11 +12,14 @@ class APICall:
     status_code: int
     timestamp: str
 
+
 class APIMetrics:
     def __init__(self):
         self._calls: list = []
 
-    def record_call(self, endpoint, division_id, response_time_ms, status_code) -> APICall:
+    def record_call(
+        self, endpoint, division_id, response_time_ms, status_code
+    ) -> APICall:
         call = APICall(
             endpoint=endpoint,
             division_id=division_id,
@@ -27,13 +31,21 @@ class APIMetrics:
         return call
 
     def get_avg_response_time(self, endpoint: str = None) -> float:
-        calls = self._calls if endpoint is None else [c for c in self._calls if c.endpoint == endpoint]
+        calls = (
+            self._calls
+            if endpoint is None
+            else [c for c in self._calls if c.endpoint == endpoint]
+        )
         if not calls:
             return 0.0
         return sum(c.response_time_ms for c in calls) / len(calls)
 
     def get_error_rate(self, endpoint: str = None) -> float:
-        calls = self._calls if endpoint is None else [c for c in self._calls if c.endpoint == endpoint]
+        calls = (
+            self._calls
+            if endpoint is None
+            else [c for c in self._calls if c.endpoint == endpoint]
+        )
         if not calls:
             return 0.0
         errors = sum(1 for c in calls if c.status_code >= 400)
@@ -48,7 +60,12 @@ class APIMetrics:
     def get_division_api_usage(self, division_id: str) -> dict:
         calls = [c for c in self._calls if c.division_id == division_id]
         if not calls:
-            return {"division_id": division_id, "total_calls": 0, "avg_response_time_ms": 0.0, "error_rate": 0.0}
+            return {
+                "division_id": division_id,
+                "total_calls": 0,
+                "avg_response_time_ms": 0.0,
+                "error_rate": 0.0,
+            }
         errors = sum(1 for c in calls if c.status_code >= 400)
         return {
             "division_id": division_id,

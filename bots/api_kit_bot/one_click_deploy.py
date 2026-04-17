@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -82,7 +82,9 @@ class OneClickDeploy:
         ready time in seconds.
         """
         if target not in DEPLOY_TARGETS:
-            return {"error": f"Unknown deploy target '{target}'. Choose from {DEPLOY_TARGETS}."}
+            return {
+                "error": f"Unknown deploy target '{target}'. Choose from {DEPLOY_TARGETS}."
+            }
 
         deployment_id = f"dep_{uuid.uuid4().hex[:12]}"
         short_id = deployment_id.replace("dep_", "")
@@ -110,7 +112,14 @@ class OneClickDeploy:
         return {
             k: v
             for k, v in record.items()
-            if k not in ("uptime_pct", "requests_total", "p99_latency_ms", "cost_usd_monthly", "previous_endpoint_url")
+            if k
+            not in (
+                "uptime_pct",
+                "requests_total",
+                "p99_latency_ms",
+                "cost_usd_monthly",
+                "previous_endpoint_url",
+            )
         }
 
     def get_deployment(self, deployment_id: str) -> dict:

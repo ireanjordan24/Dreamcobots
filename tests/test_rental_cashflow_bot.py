@@ -1,15 +1,21 @@
 """Tests for bots/rental_cashflow_bot/tiers.py and bots/rental_cashflow_bot/rental_cashflow_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.rental_cashflow_bot.rental_cashflow_bot import RentalCashflowBot, RentalCashflowBotTierError
+
+from bots.rental_cashflow_bot.rental_cashflow_bot import (
+    RentalCashflowBot,
+    RentalCashflowBotTierError,
+)
 from bots.rental_cashflow_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
 
@@ -51,7 +57,9 @@ class TestTiersModule:
             assert key in info
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
 
 class TestAnalyzeProperty:
@@ -63,8 +71,13 @@ class TestAnalyzeProperty:
     def test_has_required_keys(self):
         bot = RentalCashflowBot(tier=Tier.FREE)
         result = bot.analyze_property("RNT001")
-        for key in ("monthly_cashflow_usd", "cap_rate_pct", "gross_rent_multiplier",
-                    "cash_on_cash_return_pct", "annual_noi_usd"):
+        for key in (
+            "monthly_cashflow_usd",
+            "cap_rate_pct",
+            "gross_rent_multiplier",
+            "cash_on_cash_return_pct",
+            "annual_noi_usd",
+        ):
             assert key in result
 
     def test_free_tier_portfolio_limit(self):
@@ -132,8 +145,12 @@ class TestGetPortfolioSummary:
     def test_has_required_keys(self):
         bot = RentalCashflowBot(tier=Tier.PRO)
         result = bot.get_portfolio_summary()
-        for key in ("portfolio_size", "total_monthly_cashflow_usd", "average_cap_rate_pct",
-                    "average_cash_on_cash_pct"):
+        for key in (
+            "portfolio_size",
+            "total_monthly_cashflow_usd",
+            "average_cap_rate_pct",
+            "average_cash_on_cash_pct",
+        ):
             assert key in result
 
     def test_enterprise_summary(self):
@@ -152,7 +169,9 @@ class TestAddProperty:
             "down_payment_pct": 0.20,
             "mortgage_rate_pct": 7.0,
             "mortgage_term_years": 30,
-            "beds": 3, "baths": 2, "sqft": 1500,
+            "beds": 3,
+            "baths": 2,
+            "sqft": 1500,
             "type": "single_family",
             "monthly_rent": 2000,
             "year_built": 2000,
@@ -166,9 +185,16 @@ class TestAddProperty:
 
     def test_free_tier_add_limit(self):
         bot = RentalCashflowBot(tier=Tier.FREE)
-        custom = {"purchase_price": 200000, "monthly_rent": 1800, "down_payment_pct": 0.20,
-                  "mortgage_rate_pct": 7.0, "mortgage_term_years": 30,
-                  "property_tax_annual": 3000, "insurance_annual": 1000, "hoa_monthly": 0}
+        custom = {
+            "purchase_price": 200000,
+            "monthly_rent": 1800,
+            "down_payment_pct": 0.20,
+            "mortgage_rate_pct": 7.0,
+            "mortgage_term_years": 30,
+            "property_tax_annual": 3000,
+            "insurance_annual": 1000,
+            "hoa_monthly": 0,
+        }
         bot.add_property(custom)
         with pytest.raises(RentalCashflowBotTierError):
             bot.add_property(custom)

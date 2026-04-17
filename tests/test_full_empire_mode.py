@@ -1,9 +1,9 @@
 """Tests for Full Empire Mode modules:
-  - bots/lead_gen_bot/maps_scraper.py  (MapsScraperBot)
-  - bots/sales_bot/closer_bot.py       (CloserBot)
-  - bots/real_estate_bot/deal_finder.py (DealFinderBot)
-  - dashboard/app.py                   (Flask dashboard)
-  - bots/ai_learning_system/learning_loop.py (LearningLoop)
+- bots/lead_gen_bot/maps_scraper.py  (MapsScraperBot)
+- bots/sales_bot/closer_bot.py       (CloserBot)
+- bots/real_estate_bot/deal_finder.py (DealFinderBot)
+- dashboard/app.py                   (Flask dashboard)
+- bots/ai_learning_system/learning_loop.py (LearningLoop)
 """
 
 import json
@@ -16,16 +16,20 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.lead_gen_bot.tiers import Tier as LeadTier
-from bots.lead_gen_bot.maps_scraper import MapsScraperBot, MapsScraperBotTierError, Bot as LeadBot
-from bots.sales_bot.tiers import Tier as SalesTier
-from bots.sales_bot.closer_bot import CloserBot, CloserBotTierError, Bot as SalesBot
-from bots.real_estate_bot.deal_finder import DealFinderBot, DealFinderTierError, Bot as DealBot
 from bots.ai_learning_system.learning_loop import LearningLoop
+from bots.lead_gen_bot.maps_scraper import Bot as LeadBot
+from bots.lead_gen_bot.maps_scraper import MapsScraperBot, MapsScraperBotTierError
+from bots.lead_gen_bot.tiers import Tier as LeadTier
+from bots.real_estate_bot.deal_finder import Bot as DealBot
+from bots.real_estate_bot.deal_finder import DealFinderBot, DealFinderTierError
+from bots.sales_bot.closer_bot import Bot as SalesBot
+from bots.sales_bot.closer_bot import CloserBot, CloserBotTierError
+from bots.sales_bot.tiers import Tier as SalesTier
 
 # ---------------------------------------------------------------------------
 # MapsScraperBot
 # ---------------------------------------------------------------------------
+
 
 class TestMapsScraperBotInstantiation:
     def test_default_tier_is_free(self):
@@ -124,6 +128,7 @@ class TestMapsScraperBotDescribeTier:
 # CloserBot
 # ---------------------------------------------------------------------------
 
+
 class TestCloserBotInstantiation:
     def test_default_tier_is_free(self):
         bot = CloserBot()
@@ -159,21 +164,27 @@ class TestCloserBotWithLeads:
 
     def test_run_returns_string(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        self._write_leads(tmp_path, [{"name": "Acme", "phone": "555-0000", "city": "Chicago"}])
+        self._write_leads(
+            tmp_path, [{"name": "Acme", "phone": "555-0000", "city": "Chicago"}]
+        )
         bot = CloserBot()
         result = bot.run()
         assert isinstance(result, str)
 
     def test_run_contains_attempted(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        self._write_leads(tmp_path, [{"name": "Acme", "phone": "555-0000", "city": "Chicago"}])
+        self._write_leads(
+            tmp_path, [{"name": "Acme", "phone": "555-0000", "city": "Chicago"}]
+        )
         bot = CloserBot()
         result = bot.run()
         assert "Attempted" in result
 
     def test_free_tier_max_5_pitches(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        leads = [{"name": f"Biz{i}", "phone": "555-0000", "city": "City"} for i in range(10)]
+        leads = [
+            {"name": f"Biz{i}", "phone": "555-0000", "city": "City"} for i in range(10)
+        ]
         self._write_leads(tmp_path, leads)
         bot = CloserBot(tier=SalesTier.FREE)
         result = bot.run()
@@ -201,6 +212,7 @@ class TestCloserBotDescribeTier:
 # DealFinderBot
 # ---------------------------------------------------------------------------
 
+
 class TestDealFinderBotInstantiation:
     def test_default_tier_is_free(self):
         bot = DealFinderBot()
@@ -208,6 +220,7 @@ class TestDealFinderBotInstantiation:
 
     def test_pro_tier(self):
         from bots.real_estate_bot.tiers import get_bot_tier_info
+
         bot = DealFinderBot(tier=LeadTier.PRO)
         assert bot.tier == LeadTier.PRO
 
@@ -281,10 +294,12 @@ class TestDealFinderBotRun:
 # Dashboard
 # ---------------------------------------------------------------------------
 
+
 class TestDashboardApp:
     def test_home_returns_200(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         from dashboard.app import create_app
+
         flask_app = create_app(leads_path=str(tmp_path / "data" / "leads.json"))
         client = flask_app.test_client()
         response = client.get("/")
@@ -293,6 +308,7 @@ class TestDashboardApp:
     def test_home_contains_dashboard_title(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         from dashboard.app import create_app
+
         flask_app = create_app(leads_path=str(tmp_path / "data" / "leads.json"))
         client = flask_app.test_client()
         response = client.get("/")
@@ -301,6 +317,7 @@ class TestDashboardApp:
     def test_home_shows_zero_leads_when_no_file(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         from dashboard.app import create_app
+
         flask_app = create_app(leads_path=str(tmp_path / "data" / "leads.json"))
         client = flask_app.test_client()
         response = client.get("/")
@@ -314,6 +331,7 @@ class TestDashboardApp:
             for i in range(3):
                 f.write(json.dumps({"name": f"Biz{i}"}) + "\n")
         from dashboard.app import create_app
+
         flask_app = create_app(leads_path=str(leads_file))
         client = flask_app.test_client()
         response = client.get("/")
@@ -322,6 +340,7 @@ class TestDashboardApp:
     def test_api_leads_endpoint(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         from dashboard.app import create_app
+
         flask_app = create_app(leads_path=str(tmp_path / "data" / "leads.json"))
         client = flask_app.test_client()
         response = client.get("/api/leads")
@@ -334,6 +353,7 @@ class TestDashboardApp:
 # ---------------------------------------------------------------------------
 # LearningLoop
 # ---------------------------------------------------------------------------
+
 
 class TestLearningLoopInstantiation:
     def test_default_threshold(self):

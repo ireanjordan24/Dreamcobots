@@ -1,47 +1,57 @@
 """Tests for bots/predictive_expansion/predictive_expansion.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from bots.predictive_expansion.predictive_expansion import (
-    PredictiveExpansion,
-    RegionProfile,
+    CRMFollowUpTask,
+    ExpansionPhase,
     ExpansionScore,
     MarketType,
-    ExpansionPhase,
-    CRMFollowUpTask,
+    PredictiveExpansion,
+    RegionProfile,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _register_sample_region(pe, name="Chicago", score_target="high"):
     """Register a pre-tuned region."""
     if score_target == "high":
         return pe.register_region(
-            name=name, country="USA", market_type=MarketType.URBAN,
-            population=2_700_000, avg_household_income=85_000,
+            name=name,
+            country="USA",
+            market_type=MarketType.URBAN,
+            population=2_700_000,
+            avg_household_income=85_000,
             real_estate_volume_annual=12_000_000_000,
-            digital_adoption_rate=0.90, competition_density=0.30,
+            digital_adoption_rate=0.90,
+            competition_density=0.30,
         )
     else:
         return pe.register_region(
-            name=name, country="USA", market_type=MarketType.RURAL,
-            population=50_000, avg_household_income=30_000,
+            name=name,
+            country="USA",
+            market_type=MarketType.RURAL,
+            population=50_000,
+            avg_household_income=30_000,
             real_estate_volume_annual=200_000_000,
-            digital_adoption_rate=0.40, competition_density=0.80,
+            digital_adoption_rate=0.40,
+            competition_density=0.80,
         )
 
 
 # ---------------------------------------------------------------------------
 # Region registration
 # ---------------------------------------------------------------------------
+
 
 class TestRegisterRegion:
     def test_returns_region_profile(self):
@@ -64,6 +74,7 @@ class TestRegisterRegion:
 # ---------------------------------------------------------------------------
 # score_region
 # ---------------------------------------------------------------------------
+
 
 class TestScoreRegion:
     def test_returns_expansion_score(self):
@@ -98,8 +109,15 @@ class TestScoreRegion:
         region = _register_sample_region(pe)
         score = pe.score_region(region.region_id)
         d = score.to_dict()
-        for key in ("region_id", "region_name", "score", "recommended_phase",
-                    "projected_revenue", "confidence", "rationale"):
+        for key in (
+            "region_id",
+            "region_name",
+            "score",
+            "recommended_phase",
+            "projected_revenue",
+            "confidence",
+            "rationale",
+        ):
             assert key in d
 
     def test_nonexistent_region_raises(self):
@@ -124,6 +142,7 @@ class TestScoreRegion:
 # ---------------------------------------------------------------------------
 # score_all_regions
 # ---------------------------------------------------------------------------
+
 
 class TestScoreAllRegions:
     def test_returns_sorted_by_score_desc(self):
@@ -151,13 +170,17 @@ class TestScoreAllRegions:
 # get_top_regions
 # ---------------------------------------------------------------------------
 
+
 class TestGetTopRegions:
     def test_returns_n_regions(self):
         pe = PredictiveExpansion()
         for i in range(6):
             pe.register_region(
-                name=f"Region{i}", country="USA", market_type=MarketType.URBAN,
-                population=100_000 * (i + 1), avg_household_income=50_000 + i * 5_000,
+                name=f"Region{i}",
+                country="USA",
+                market_type=MarketType.URBAN,
+                population=100_000 * (i + 1),
+                avg_household_income=50_000 + i * 5_000,
                 real_estate_volume_annual=500_000_000 * (i + 1),
                 digital_adoption_rate=0.5 + i * 0.05,
                 competition_density=0.5 - i * 0.05,
@@ -176,6 +199,7 @@ class TestGetTopRegions:
 # ---------------------------------------------------------------------------
 # CRM follow-up (Phase 5)
 # ---------------------------------------------------------------------------
+
 
 class TestCRMFollowup:
     def test_schedule_followup_returns_task(self):
@@ -216,14 +240,22 @@ class TestCRMFollowup:
         region = _register_sample_region(pe)
         task = pe.schedule_crm_followup(region.region_id, "c@ex.com", "Hi")
         d = task.to_dict()
-        for key in ("task_id", "region_id", "contact_email", "follow_up_message",
-                    "scheduled_at", "channel", "status"):
+        for key in (
+            "task_id",
+            "region_id",
+            "contact_email",
+            "follow_up_message",
+            "scheduled_at",
+            "channel",
+            "status",
+        ):
             assert key in d
 
 
 # ---------------------------------------------------------------------------
 # get_revenue_output
 # ---------------------------------------------------------------------------
+
 
 class TestGetRevenueOutput:
     def test_revenue_output_keys(self):

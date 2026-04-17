@@ -2,6 +2,7 @@
 Simple keyword-based NLP engine for FAQ responses.
 Falls back to OpenAI API when OPENAI_API_KEY is set (optional, free-tier upgrade).
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
@@ -36,7 +37,15 @@ FAQ_KB = [
         ),
     },
     {
-        "keywords": ["income", "residual", "passive", "tracking", "financial", "revenue", "earnings"],
+        "keywords": [
+            "income",
+            "residual",
+            "passive",
+            "tracking",
+            "financial",
+            "revenue",
+            "earnings",
+        ],
         "answer": (
             "Our Residual Income Tracking Bots monitor multiple revenue streams in real time, "
             "generate daily reports, and alert you to anomalies. "
@@ -44,7 +53,15 @@ FAQ_KB = [
         ),
     },
     {
-        "keywords": ["government", "contract", "grant", "federal", "sam.gov", "rfp", "proposal"],
+        "keywords": [
+            "government",
+            "contract",
+            "grant",
+            "federal",
+            "sam.gov",
+            "rfp",
+            "proposal",
+        ],
         "answer": (
             "Our Government Contract/Grant Bots scan SAM.gov, Grants.gov, and other portals daily "
             "for opportunities matching your keywords and NAICS codes. "
@@ -52,7 +69,14 @@ FAQ_KB = [
         ),
     },
     {
-        "keywords": ["api", "integration", "connect", "webhook", "zapier", "third party"],
+        "keywords": [
+            "api",
+            "integration",
+            "connect",
+            "webhook",
+            "zapier",
+            "third party",
+        ],
         "answer": (
             "API Integration Demos show how we connect disparate systems — CRMs, ERPs, payment "
             "gateways, social platforms — into seamless automated pipelines. "
@@ -60,7 +84,15 @@ FAQ_KB = [
         ),
     },
     {
-        "keywords": ["ui", "ux", "frontend", "design", "template", "dashboard", "interface"],
+        "keywords": [
+            "ui",
+            "ux",
+            "frontend",
+            "design",
+            "template",
+            "dashboard",
+            "interface",
+        ],
         "answer": (
             "Our UI/UX automation service produces responsive, TailwindCSS-powered dashboards and "
             "client portals. We start from battle-tested templates and customise them for your brand."
@@ -75,7 +107,16 @@ FAQ_KB = [
         ),
     },
     {
-        "keywords": ["contact", "reach", "talk", "speak", "human", "support", "email", "phone"],
+        "keywords": [
+            "contact",
+            "reach",
+            "talk",
+            "speak",
+            "human",
+            "support",
+            "email",
+            "phone",
+        ],
         "answer": (
             "You can reach our team at support@dreamcobots.com or use the Lead Generation form "
             "to request a callback. We typically respond within one business day."
@@ -108,7 +149,9 @@ FALLBACK_RESPONSE = (
 def _keyword_score(text: str, keywords: list) -> int:
     """Return the number of keyword matches in text (case-insensitive)."""
     text_lower = text.lower()
-    return sum(1 for kw in keywords if re.search(r"\b" + re.escape(kw) + r"\b", text_lower))
+    return sum(
+        1 for kw in keywords if re.search(r"\b" + re.escape(kw) + r"\b", text_lower)
+    )
 
 
 def _keyword_faq_response(user_message: str) -> str:
@@ -140,8 +183,8 @@ def get_faq_response(user_message: str) -> str:
 def _openai_response(user_message: str, api_key: str) -> str:
     """Optional: use OpenAI chat completions for richer responses."""
     try:
-        import urllib.request
         import json
+        import urllib.request
 
         system_prompt = (
             "You are a helpful sales assistant for DreamCobots, a company that provides "
@@ -150,14 +193,16 @@ def _openai_response(user_message: str, api_key: str) -> str:
             "Keep responses concise (2-3 sentences) and friendly. "
             "Always end by inviting the user to try a demo or contact sales."
         )
-        payload = json.dumps({
-            "model": "gpt-3.5-turbo",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-            "max_tokens": 150,
-        }).encode()
+        payload = json.dumps(
+            {
+                "model": "gpt-3.5-turbo",
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message},
+                ],
+                "max_tokens": 150,
+            }
+        ).encode()
 
         req = urllib.request.Request(
             "https://api.openai.com/v1/chat/completions",

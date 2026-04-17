@@ -1,4 +1,5 @@
 """Google Dialogflow connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -18,7 +19,9 @@ class DialogflowConnector:
         if not self.project_id:
             logger.warning("DIALOGFLOW_PROJECT_ID not set.")
 
-    def detect_intent(self, session_id: str, text: str, language_code: str = "en") -> dict:
+    def detect_intent(
+        self, session_id: str, text: str, language_code: str = "en"
+    ) -> dict:
         """Detect intent from user text using Dialogflow.
 
         Args:
@@ -30,7 +33,11 @@ class DialogflowConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {
             "queryInput": {"text": {"text": text, "languageCode": language_code}}
         }
@@ -43,4 +50,3 @@ class DialogflowConnector:
         except requests.RequestException as e:
             logger.error("Dialogflow error: %s", e)
             return {"status": "error", "message": str(e)}
-

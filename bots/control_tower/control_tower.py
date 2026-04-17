@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.request
 import urllib.error
 import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -37,6 +37,7 @@ _GITHUB_API = "https://api.github.com"
 # ---------------------------------------------------------------------------
 # HTTP helper (no external dependencies required)
 # ---------------------------------------------------------------------------
+
 
 def _http_get(url: str, token: str = "") -> dict[str, Any]:
     """Perform a simple GET request and return the parsed JSON body."""
@@ -77,13 +78,16 @@ def _http_post(url: str, data: dict[str, Any], token: str = "") -> dict[str, Any
 # Heartbeat
 # ---------------------------------------------------------------------------
 
+
 class HeartbeatClient:
     """Send heartbeat pings from a Python bot to the Control Tower backend."""
 
     def __init__(self, tower_url: str = _DEFAULT_TOWER_URL) -> None:
         self._url = tower_url.rstrip("/")
 
-    def ping(self, bot_name: str, status: str = "active", metadata: Optional[dict] = None) -> dict[str, Any]:
+    def ping(
+        self, bot_name: str, status: str = "active", metadata: Optional[dict] = None
+    ) -> dict[str, Any]:
         """
         Send a heartbeat ping for *bot_name*.
 
@@ -114,6 +118,7 @@ class HeartbeatClient:
 # ---------------------------------------------------------------------------
 # GitHub Repository Manager
 # ---------------------------------------------------------------------------
+
 
 class GitHubRepoManager:
     """
@@ -168,7 +173,9 @@ class GitHubRepoManager:
             ]
         return []
 
-    def get_latest_commit(self, owner: str, repo: str, branch: str = "main") -> Optional[dict[str, Any]]:
+    def get_latest_commit(
+        self, owner: str, repo: str, branch: str = "main"
+    ) -> Optional[dict[str, Any]]:
         """Return the most recent commit on *branch* for *owner/repo*."""
         data = _http_get(
             f"{_GITHUB_API}/repos/{owner}/{repo}/commits?sha={branch}&per_page=1",
@@ -185,7 +192,9 @@ class GitHubRepoManager:
             }
         return None
 
-    def get_workflow_runs(self, owner: str, repo: str, per_page: int = 5) -> list[dict[str, Any]]:
+    def get_workflow_runs(
+        self, owner: str, repo: str, per_page: int = 5
+    ) -> list[dict[str, Any]]:
         """Return the most recent workflow runs for *owner/repo*."""
         data = _http_get(
             f"{_GITHUB_API}/repos/{owner}/{repo}/actions/runs?per_page={per_page}",
@@ -264,6 +273,7 @@ class GitHubRepoManager:
 # Bot Registry Sync
 # ---------------------------------------------------------------------------
 
+
 class BotRegistrySync:
     """
     Synchronise the Python bot ecosystem with the Control Tower's bot registry
@@ -273,7 +283,12 @@ class BotRegistrySync:
     def __init__(self, registry_path: Optional[str] = None) -> None:
         if registry_path is None:
             # Default: look two levels up for the config directory.
-            default = Path(__file__).parent.parent.parent / "dreamco-control-tower" / "config" / "bots.json"
+            default = (
+                Path(__file__).parent.parent.parent
+                / "dreamco-control-tower"
+                / "config"
+                / "bots.json"
+            )
             registry_path = str(default)
         self._path = Path(registry_path)
 
@@ -323,7 +338,9 @@ class BotRegistrySync:
         self.save(bots)
         return entry
 
-    def update_heartbeat(self, name: str, status: str = "active") -> Optional[dict[str, Any]]:
+    def update_heartbeat(
+        self, name: str, status: str = "active"
+    ) -> Optional[dict[str, Any]]:
         """Update the ``lastHeartbeat`` field for the named bot."""
         bots = self.load()
         bot = next((b for b in bots if b["name"] == name), None)

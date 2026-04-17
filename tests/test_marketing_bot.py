@@ -2,34 +2,43 @@
 Tests for bots/marketing_bot/tiers.py and bots/marketing_bot/marketing_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.marketing_bot.tiers import (
-    get_marketing_tier_info,
-    MARKETING_EXTRA_FEATURES,
-    MARKETING_CHANNELS,
-)
+
 from bots.marketing_bot.marketing_bot import (
     MarketingBot,
-    MarketingTierError,
     MarketingRequestLimitError,
+    MarketingTierError,
+)
+from bots.marketing_bot.tiers import (
+    MARKETING_CHANNELS,
+    MARKETING_EXTRA_FEATURES,
+    get_marketing_tier_info,
 )
 
 
 class TestMarketingTierInfo:
     def test_tier_info_keys(self):
         info = get_marketing_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "platform_features", "marketing_features", "channels", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "platform_features",
+            "marketing_features",
+            "channels",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_is_zero(self):
@@ -75,7 +84,13 @@ class TestMarketingBot:
     def test_chat_result_keys(self):
         bot = MarketingBot(tier=Tier.FREE)
         result = bot.chat("Create a social media post")
-        for key in ("message", "channel", "tier", "requests_used", "requests_remaining"):
+        for key in (
+            "message",
+            "channel",
+            "tier",
+            "requests_used",
+            "requests_remaining",
+        ):
             assert key in result
 
     def test_free_cannot_use_paid_ads(self):

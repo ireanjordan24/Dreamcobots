@@ -12,20 +12,24 @@ Provides GitHub API wrappers for the Control Tower:
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
-import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class GitHubIntegration:
     """GitHub API and git operations wrapper for the DreamCo Control Tower."""
 
-    def __init__(self, token: Optional[str] = None, owner: str = "ireanjordan24") -> None:
+    def __init__(
+        self, token: Optional[str] = None, owner: str = "ireanjordan24"
+    ) -> None:
         # Distinguish between None (not provided → fall back to env) and "" (explicitly
         # empty → treat as "no token" to allow safe testing without a live credential).
         self._token = token if token is not None else os.environ.get("GITHUB_TOKEN", "")
@@ -45,8 +49,8 @@ class GitHubIntegration:
         dashboard always has a valid structure to render.
         """
         try:
-            import urllib.request
             import json as _json
+            import urllib.request
 
             headers = {"Accept": "application/vnd.github+json"}
             if self._token:
@@ -58,9 +62,15 @@ class GitHubIntegration:
                 with urllib.request.urlopen(req, timeout=5) as resp:
                     return _json.loads(resp.read())
 
-            pr_data = _gh_get(f"/repos/{self._owner}/{repo_name}/pulls?state=open&per_page=10")
-            commit_data = _gh_get(f"/repos/{self._owner}/{repo_name}/commits?per_page=1")
-            runs_data = _gh_get(f"/repos/{self._owner}/{repo_name}/actions/runs?per_page=1")
+            pr_data = _gh_get(
+                f"/repos/{self._owner}/{repo_name}/pulls?state=open&per_page=10"
+            )
+            commit_data = _gh_get(
+                f"/repos/{self._owner}/{repo_name}/commits?per_page=1"
+            )
+            runs_data = _gh_get(
+                f"/repos/{self._owner}/{repo_name}/actions/runs?per_page=1"
+            )
 
             last_commit = commit_data[0] if commit_data else {}
             last_run = runs_data.get("workflow_runs", [{}])[0]
@@ -95,7 +105,9 @@ class GitHubIntegration:
                 "error": str(exc),
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-        self._event_log.append({"action": "get_repo_status", "repo": repo_name, **status})
+        self._event_log.append(
+            {"action": "get_repo_status", "repo": repo_name, **status}
+        )
         return status
 
     # ------------------------------------------------------------------
@@ -141,7 +153,9 @@ class GitHubIntegration:
                 "error": str(exc),
                 "strategy": strategy,
             }
-        self._event_log.append({"action": "auto_merge", "repo_path": repo_path, **result})
+        self._event_log.append(
+            {"action": "auto_merge", "repo_path": repo_path, **result}
+        )
         return result
 
     # ------------------------------------------------------------------
@@ -161,18 +175,20 @@ class GitHubIntegration:
         Returns the PR URL on success or an error dict on failure.
         """
         try:
-            import urllib.request
             import json as _json
+            import urllib.request
 
             if not self._token:
                 return {"success": False, "error": "GITHUB_TOKEN not configured"}
 
-            payload = _json.dumps({
-                "title": title,
-                "body": body,
-                "head": head,
-                "base": base,
-            }).encode()
+            payload = _json.dumps(
+                {
+                    "title": title,
+                    "body": body,
+                    "head": head,
+                    "base": base,
+                }
+            ).encode()
 
             req = urllib.request.Request(
                 f"https://api.github.com/repos/{self._owner}/{repo_name}/pulls",
@@ -195,7 +211,9 @@ class GitHubIntegration:
         except Exception as exc:
             result = {"success": False, "error": str(exc), "title": title}
 
-        self._event_log.append({"action": "create_pull_request", "repo": repo_name, **result})
+        self._event_log.append(
+            {"action": "create_pull_request", "repo": repo_name, **result}
+        )
         return result
 
     # ------------------------------------------------------------------

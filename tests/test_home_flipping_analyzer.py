@@ -1,15 +1,21 @@
 """Tests for bots/home_flipping_analyzer/tiers.py and bots/home_flipping_analyzer/home_flipping_analyzer.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.home_flipping_analyzer.home_flipping_analyzer import HomeFlippingAnalyzerBot, HomeFlippingAnalyzerTierError
+
+from bots.home_flipping_analyzer.home_flipping_analyzer import (
+    HomeFlippingAnalyzerBot,
+    HomeFlippingAnalyzerTierError,
+)
 from bots.home_flipping_analyzer.tiers import BOT_FEATURES, get_bot_tier_info
 
 
@@ -51,7 +57,9 @@ class TestTiersModule:
             assert key in info
 
     def test_enterprise_has_more_features_than_free(self):
-        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(BOT_FEATURES[Tier.FREE.value])
+        assert len(BOT_FEATURES[Tier.ENTERPRISE.value]) > len(
+            BOT_FEATURES[Tier.FREE.value]
+        )
 
 
 class TestAnalyzeFlip:
@@ -63,7 +71,13 @@ class TestAnalyzeFlip:
     def test_has_required_keys(self):
         bot = HomeFlippingAnalyzerBot(tier=Tier.FREE)
         result = bot.analyze_flip("FLP001")
-        for key in ("arv_usd", "renovation_cost_usd", "estimated_profit_usd", "flip_score", "roi_pct"):
+        for key in (
+            "arv_usd",
+            "renovation_cost_usd",
+            "estimated_profit_usd",
+            "flip_score",
+            "roi_pct",
+        ):
             assert key in result
 
     def test_flip_score_in_range(self):

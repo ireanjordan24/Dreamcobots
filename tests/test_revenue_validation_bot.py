@@ -1,17 +1,18 @@
 """Tests for bots/revenue_validation/revenue_validation_bot.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from bots.revenue_validation.revenue_validation_bot import (
-    RevenueValidationBot,
-    BotRevenueStatus,
-    RevenueValidationReport,
     REQUIRED_FILES,
+    BotRevenueStatus,
+    RevenueValidationBot,
+    RevenueValidationReport,
 )
 
 
@@ -19,7 +20,7 @@ def _make_bot_dir(parent, name, files=None):
     """Helper: create a bot directory with optional files."""
     bot_dir = parent / name
     bot_dir.mkdir(parents=True, exist_ok=True)
-    for f in (files or []):
+    for f in files or []:
         (bot_dir / f).write_text("{}")
     return bot_dir
 

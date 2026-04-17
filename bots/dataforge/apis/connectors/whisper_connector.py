@@ -1,4 +1,5 @@
 """OpenAI Whisper transcription connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,14 +27,17 @@ class WhisperConnector:
         """
         try:
             import whisper
+
             model = whisper.load_model(model_size)
             result = model.transcribe(audio_path)
             logger.info("Whisper transcription completed for %s.", audio_path)
             return {"status": "success", "text": result.get("text", ""), "data": result}
         except ImportError:
             logger.error("openai-whisper library not installed.")
-            return {"status": "error", "message": "openai-whisper library not installed."}
+            return {
+                "status": "error",
+                "message": "openai-whisper library not installed.",
+            }
         except Exception as e:
             logger.error("Whisper transcribe error: %s", e)
             return {"status": "error", "message": str(e)}
-

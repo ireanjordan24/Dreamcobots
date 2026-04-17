@@ -1,7 +1,13 @@
 """Home Flipping Analyzer Bot — tier-aware property flip analysis and ROI calculator."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.home_flipping_analyzer.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -22,7 +28,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 85000,
             "current_condition": "distressed",
             "sqft": 1200,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1968,
             "market": "memphis",
             "arv_estimate": 145000,
@@ -34,7 +41,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 62000,
             "current_condition": "distressed",
             "sqft": 1450,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1955,
             "market": "cleveland",
             "arv_estimate": 128000,
@@ -46,7 +54,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 175000,
             "current_condition": "fair",
             "sqft": 1650,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1978,
             "market": "atlanta",
             "arv_estimate": 265000,
@@ -58,7 +67,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 72000,
             "current_condition": "distressed",
             "sqft": 1100,
-            "beds": 2, "baths": 1,
+            "beds": 2,
+            "baths": 1,
             "year_built": 1962,
             "market": "indianapolis",
             "arv_estimate": 118000,
@@ -70,7 +80,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 210000,
             "current_condition": "fair",
             "sqft": 1800,
-            "beds": 4, "baths": 2,
+            "beds": 4,
+            "baths": 2,
             "year_built": 1985,
             "market": "tampa",
             "arv_estimate": 340000,
@@ -82,7 +93,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 195000,
             "current_condition": "fair",
             "sqft": 1550,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1990,
             "market": "phoenix",
             "arv_estimate": 295000,
@@ -94,7 +106,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 55000,
             "current_condition": "distressed",
             "sqft": 1050,
-            "beds": 2, "baths": 1,
+            "beds": 2,
+            "baths": 1,
             "year_built": 1950,
             "market": "kansas_city",
             "arv_estimate": 105000,
@@ -106,7 +119,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 165000,
             "current_condition": "fair",
             "sqft": 1700,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1982,
             "market": "charlotte",
             "arv_estimate": 265000,
@@ -118,7 +132,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 135000,
             "current_condition": "distressed",
             "sqft": 1350,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1970,
             "market": "dallas",
             "arv_estimate": 230000,
@@ -130,7 +145,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 225000,
             "current_condition": "good",
             "sqft": 1900,
-            "beds": 4, "baths": 2,
+            "beds": 4,
+            "baths": 2,
             "year_built": 1995,
             "market": "nashville",
             "arv_estimate": 355000,
@@ -142,7 +158,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 68000,
             "current_condition": "distressed",
             "sqft": 1300,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1948,
             "market": "pittsburgh",
             "arv_estimate": 122000,
@@ -154,7 +171,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 185000,
             "current_condition": "fair",
             "sqft": 1600,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1998,
             "market": "las_vegas",
             "arv_estimate": 290000,
@@ -166,7 +184,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 80000,
             "current_condition": "distressed",
             "sqft": 1250,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1965,
             "market": "columbus",
             "arv_estimate": 148000,
@@ -178,7 +197,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 245000,
             "current_condition": "good",
             "sqft": 2000,
-            "beds": 4, "baths": 3,
+            "beds": 4,
+            "baths": 3,
             "year_built": 2000,
             "market": "tampa",
             "arv_estimate": 390000,
@@ -190,7 +210,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 35000,
             "current_condition": "distressed",
             "sqft": 1100,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1945,
             "market": "detroit",
             "arv_estimate": 82000,
@@ -202,7 +223,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 285000,
             "current_condition": "fair",
             "sqft": 1750,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1972,
             "market": "denver",
             "arv_estimate": 430000,
@@ -214,7 +236,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 110000,
             "current_condition": "distressed",
             "sqft": 1400,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1975,
             "market": "houston",
             "arv_estimate": 195000,
@@ -226,7 +249,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 320000,
             "current_condition": "good",
             "sqft": 1950,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1988,
             "market": "austin",
             "arv_estimate": 495000,
@@ -238,7 +262,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 260000,
             "current_condition": "fair",
             "sqft": 1600,
-            "beds": 3, "baths": 2,
+            "beds": 3,
+            "baths": 2,
             "year_built": 1980,
             "market": "sacramento",
             "arv_estimate": 395000,
@@ -250,7 +275,8 @@ class HomeFlippingAnalyzerBot:
             "purchase_price": 98000,
             "current_condition": "distressed",
             "sqft": 1300,
-            "beds": 3, "baths": 1,
+            "beds": 3,
+            "baths": 1,
             "year_built": 1960,
             "market": "san_antonio",
             "arv_estimate": 172000,
@@ -286,11 +312,25 @@ class HomeFlippingAnalyzerBot:
     }
 
     MARKET_APPRECIATION = {
-        "austin": 6.2, "atlanta": 4.4, "tampa": 7.1, "phoenix": 4.8,
-        "nashville": 5.5, "charlotte": 5.9, "dallas": 3.8, "houston": 3.1,
-        "denver": 3.2, "las_vegas": 4.9, "memphis": 2.8, "cleveland": 2.5,
-        "indianapolis": 3.1, "kansas_city": 3.0, "pittsburgh": 2.7,
-        "columbus": 3.3, "detroit": 2.1, "sacramento": 4.5, "san_antonio": 3.5,
+        "austin": 6.2,
+        "atlanta": 4.4,
+        "tampa": 7.1,
+        "phoenix": 4.8,
+        "nashville": 5.5,
+        "charlotte": 5.9,
+        "dallas": 3.8,
+        "houston": 3.1,
+        "denver": 3.2,
+        "las_vegas": 4.9,
+        "memphis": 2.8,
+        "cleveland": 2.5,
+        "indianapolis": 3.1,
+        "kansas_city": 3.0,
+        "pittsburgh": 2.7,
+        "columbus": 3.3,
+        "detroit": 2.1,
+        "sacramento": 4.5,
+        "san_antonio": 3.5,
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -355,7 +395,9 @@ class HomeFlippingAnalyzerBot:
 
         return base_arv
 
-    def estimate_renovation_cost(self, property_id: str, renovation_scope: str = "moderate") -> dict:
+    def estimate_renovation_cost(
+        self, property_id: str, renovation_scope: str = "moderate"
+    ) -> dict:
         """Return a detailed renovation cost breakdown.
 
         renovation_scope: 'cosmetic' | 'moderate' | 'full_gut'
@@ -364,7 +406,11 @@ class HomeFlippingAnalyzerBot:
         prop = self._get_property(property_id)
         condition = prop.get("current_condition", "fair")
         sqft = prop.get("sqft", 1200)
-        scope = renovation_scope if renovation_scope in self.RENOVATION_COST_PER_SQFT else "moderate"
+        scope = (
+            renovation_scope
+            if renovation_scope in self.RENOVATION_COST_PER_SQFT
+            else "moderate"
+        )
 
         base_cost_per_sqft = self.RENOVATION_COST_PER_SQFT[scope][condition]
         base_total = sqft * base_cost_per_sqft
@@ -383,7 +429,9 @@ class HomeFlippingAnalyzerBot:
             result["estimated_total_usd"] = round(sum(items.values()), 0)
 
             if self.tier == Tier.ENTERPRISE:
-                result["contractor_bids"] = self._simulate_contractor_bids(result["estimated_total_usd"])
+                result["contractor_bids"] = self._simulate_contractor_bids(
+                    result["estimated_total_usd"]
+                )
 
         return result
 
@@ -396,13 +444,19 @@ class HomeFlippingAnalyzerBot:
         if scope in ("moderate", "full_gut"):
             if scope == "full_gut" or condition == "distressed":
                 items["kitchen"] = self.RENOVATION_ITEM_COSTS["kitchen_full_remodel"]
-                items["bathrooms"] = self.RENOVATION_ITEM_COSTS["bathroom_full_remodel"] * prop.get("baths", 1)
+                items["bathrooms"] = self.RENOVATION_ITEM_COSTS[
+                    "bathroom_full_remodel"
+                ] * prop.get("baths", 1)
             else:
                 items["kitchen"] = self.RENOVATION_ITEM_COSTS["kitchen_cosmetic"]
-                items["bathrooms"] = self.RENOVATION_ITEM_COSTS["bathroom_cosmetic"] * prop.get("baths", 1)
+                items["bathrooms"] = self.RENOVATION_ITEM_COSTS[
+                    "bathroom_cosmetic"
+                ] * prop.get("baths", 1)
 
         items["flooring"] = sqft * self.RENOVATION_ITEM_COSTS["flooring_per_sqft"]
-        items["interior_paint"] = sqft * self.RENOVATION_ITEM_COSTS["paint_interior_per_sqft"]
+        items["interior_paint"] = (
+            sqft * self.RENOVATION_ITEM_COSTS["paint_interior_per_sqft"]
+        )
         items["exterior_paint"] = self.RENOVATION_ITEM_COSTS["paint_exterior"]
         items["landscaping"] = self.RENOVATION_ITEM_COSTS["landscaping"]
 
@@ -423,12 +477,31 @@ class HomeFlippingAnalyzerBot:
     def _simulate_contractor_bids(self, base_cost: float) -> list:
         """Simulate three contractor bids around the base estimate."""
         return [
-            {"contractor": "Budget Pro Renovations", "bid_usd": round(base_cost * 0.88, 0), "timeline_weeks": 12},
-            {"contractor": "Mid-Range Builders LLC", "bid_usd": round(base_cost * 1.00, 0), "timeline_weeks": 10},
-            {"contractor": "Premium Finish Contractors", "bid_usd": round(base_cost * 1.15, 0), "timeline_weeks": 8},
+            {
+                "contractor": "Budget Pro Renovations",
+                "bid_usd": round(base_cost * 0.88, 0),
+                "timeline_weeks": 12,
+            },
+            {
+                "contractor": "Mid-Range Builders LLC",
+                "bid_usd": round(base_cost * 1.00, 0),
+                "timeline_weeks": 10,
+            },
+            {
+                "contractor": "Premium Finish Contractors",
+                "bid_usd": round(base_cost * 1.15, 0),
+                "timeline_weeks": 8,
+            },
         ]
 
-    def _compute_flip_score(self, profit: float, arv: float, reno_cost: float, holding_months: int, market_grade: str) -> int:
+    def _compute_flip_score(
+        self,
+        profit: float,
+        arv: float,
+        reno_cost: float,
+        holding_months: int,
+        market_grade: str,
+    ) -> int:
         """Compute a 0-100 flip score based on multiple factors."""
         score = 0
 
@@ -458,8 +531,17 @@ class HomeFlippingAnalyzerBot:
             score += 5
 
         # Neighborhood grade (max 20 pts)
-        grade_scores = {"A": 20, "A-": 18, "B+": 16, "B": 14, "B-": 12,
-                        "C+": 9, "C": 7, "C-": 5, "D": 2}
+        grade_scores = {
+            "A": 20,
+            "A-": 18,
+            "B+": 16,
+            "B": 14,
+            "B-": 12,
+            "C+": 9,
+            "C": 7,
+            "C-": 5,
+            "D": 2,
+        }
         score += grade_scores.get(market_grade, 7)
 
         return min(100, max(0, score))
@@ -485,18 +567,28 @@ class HomeFlippingAnalyzerBot:
         dom = prop.get("days_on_market", 30)
         holding_months = max(3, round((dom + 90) / 30))  # reno time + sale time
 
-        holding_cost_monthly = purchase_price * 0.008  # ~0.8% of purchase/month (taxes, insurance, utilities)
+        holding_cost_monthly = (
+            purchase_price * 0.008
+        )  # ~0.8% of purchase/month (taxes, insurance, utilities)
         holding_costs_total = holding_cost_monthly * holding_months
 
         closing_costs_buy = purchase_price * 0.02
         closing_costs_sell = arv * 0.06  # agent commission + transfer taxes
 
-        total_costs = purchase_price + reno_cost + holding_costs_total + closing_costs_buy + closing_costs_sell
+        total_costs = (
+            purchase_price
+            + reno_cost
+            + holding_costs_total
+            + closing_costs_buy
+            + closing_costs_sell
+        )
         profit = arv - total_costs
         profit_margin_pct = round(profit / arv * 100, 1) if arv > 0 else 0
         roi_pct = round(profit / (purchase_price + reno_cost) * 100, 1)
 
-        flip_score = self._compute_flip_score(profit, arv, reno_cost, holding_months, prop.get("neighborhood_grade", "C"))
+        flip_score = self._compute_flip_score(
+            profit, arv, reno_cost, holding_months, prop.get("neighborhood_grade", "C")
+        )
 
         result = {
             "property_id": pid,
@@ -520,10 +612,14 @@ class HomeFlippingAnalyzerBot:
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
             result["itemized_renovation"] = reno.get("itemized_costs", {})
-            result["financing_cost_usd"] = round(purchase_price * 0.10 * (holding_months / 12), 0)
+            result["financing_cost_usd"] = round(
+                purchase_price * 0.10 * (holding_months / 12), 0
+            )
             result["flip_score_breakdown"] = {
                 "profit_margin_contribution": min(40, int(profit_margin_pct * 1.5)),
-                "renovation_ratio_contribution": round(reno_cost / arv, 3) if arv else 0,
+                "renovation_ratio_contribution": (
+                    round(reno_cost / arv, 3) if arv else 0
+                ),
                 "holding_period_months": holding_months,
                 "neighborhood_grade": prop.get("neighborhood_grade", "C"),
             }
@@ -533,7 +629,9 @@ class HomeFlippingAnalyzerBot:
             appreciation = self.MARKET_APPRECIATION.get(market, 4.0)
             result["market_timing_score"] = min(100, int(appreciation * 10))
             result["recommended_listing_strategy"] = (
-                "List immediately after renovation" if dom <= 20 else "Season market — list in spring"
+                "List immediately after renovation"
+                if dom <= 20
+                else "Season market — list in spring"
             )
             if "contractor_bids" not in result:
                 result["contractor_bids"] = reno.get("contractor_bids", [])
@@ -548,25 +646,43 @@ class HomeFlippingAnalyzerBot:
             purchase_price = prop["purchase_price"]
             arv = prop["arv_estimate"]
             condition = prop.get("current_condition", "fair")
-            scope_map = {"distressed": "full_gut", "fair": "moderate", "good": "cosmetic"}
+            scope_map = {
+                "distressed": "full_gut",
+                "fair": "moderate",
+                "good": "cosmetic",
+            }
             scope = scope_map.get(condition, "moderate")
             reno_cost_per_sqft = self.RENOVATION_COST_PER_SQFT[scope][condition]
             reno_cost = prop["sqft"] * reno_cost_per_sqft
             dom = prop.get("days_on_market", 30)
             holding_months = max(3, round((dom + 90) / 30))
             holding_costs = purchase_price * 0.008 * holding_months
-            total_costs = purchase_price + reno_cost + holding_costs + purchase_price * 0.02 + arv * 0.06
+            total_costs = (
+                purchase_price
+                + reno_cost
+                + holding_costs
+                + purchase_price * 0.02
+                + arv * 0.06
+            )
             profit = arv - total_costs
-            flip_score = self._compute_flip_score(profit, arv, reno_cost, holding_months, prop.get("neighborhood_grade", "C"))
-            results.append({
-                "property_id": pid,
-                "address": prop["address"],
-                "purchase_price_usd": purchase_price,
-                "arv_usd": arv,
-                "estimated_profit_usd": round(profit, 0),
-                "flip_score": flip_score,
-                "neighborhood_grade": prop.get("neighborhood_grade", "C"),
-            })
+            flip_score = self._compute_flip_score(
+                profit,
+                arv,
+                reno_cost,
+                holding_months,
+                prop.get("neighborhood_grade", "C"),
+            )
+            results.append(
+                {
+                    "property_id": pid,
+                    "address": prop["address"],
+                    "purchase_price_usd": purchase_price,
+                    "arv_usd": arv,
+                    "estimated_profit_usd": round(profit, 0),
+                    "flip_score": flip_score,
+                    "neighborhood_grade": prop.get("neighborhood_grade", "C"),
+                }
+            )
 
         results.sort(key=lambda x: x["flip_score"], reverse=True)
         return results[:limit]

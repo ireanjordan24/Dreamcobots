@@ -3,19 +3,20 @@ Selenium Job Application Bot
 Automates job searching and application submission across multiple platforms.
 Selenium is an optional dependency — the module is importable without it installed.
 """
-# GLOBAL AI SOURCES FLOW
-from framework import GlobalAISourcesFlow  # noqa: F401 — framework compliance marker
-
 
 import os
 import random
 import time
 
+# GLOBAL AI SOURCES FLOW
+from framework import GlobalAISourcesFlow  # noqa: F401 — framework compliance marker
+
 try:
     from selenium import webdriver
-    from selenium.webdriver.common.by import By
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
+
     SELENIUM_AVAILABLE = True
 except ImportError:
     SELENIUM_AVAILABLE = False
@@ -94,7 +95,9 @@ class SeleniumJobApplicationBot:
         self.config = config or {}
         self.headless = self.config.get("headless", True)
         self.delay = self.config.get("delay_seconds", 2)
-        self.simulation_mode = self.config.get("simulation_mode", not SELENIUM_AVAILABLE)
+        self.simulation_mode = self.config.get(
+            "simulation_mode", not SELENIUM_AVAILABLE
+        )
         self.log_file = self.config.get("log_file", None)
         self.driver = None
         self._application_log = []
@@ -103,7 +106,9 @@ class SeleniumJobApplicationBot:
         print(f"[JobBot] Initialized in {mode_label} mode.")
         if not SELENIUM_AVAILABLE and not self.config.get("simulation_mode"):
             print("[JobBot] Selenium not installed. Running in simulation mode.")
-            print("[JobBot] To enable live mode: pip install selenium webdriver-manager")
+            print(
+                "[JobBot] To enable live mode: pip install selenium webdriver-manager"
+            )
 
     def setup_driver(self):
         """
@@ -116,7 +121,9 @@ class SeleniumJobApplicationBot:
             WebDriver or None: The driver instance, or None in simulation mode.
         """
         if self.simulation_mode:
-            print("[JobBot] setup_driver() called in simulation mode — no browser launched.")
+            print(
+                "[JobBot] setup_driver() called in simulation mode — no browser launched."
+            )
             return None
 
         if not SELENIUM_AVAILABLE:
@@ -134,6 +141,7 @@ class SeleniumJobApplicationBot:
 
         try:
             from webdriver_manager.chrome import ChromeDriverManager
+
             self.driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager().install()),
                 options=chrome_options,
@@ -164,7 +172,9 @@ class SeleniumJobApplicationBot:
         """
         platform = platform.lower()
         if platform not in SUPPORTED_PLATFORMS:
-            print(f"[JobBot] Unsupported platform '{platform}'. Supported: {SUPPORTED_PLATFORMS}")
+            print(
+                f"[JobBot] Unsupported platform '{platform}'. Supported: {SUPPORTED_PLATFORMS}"
+            )
             return []
 
         print(f"[JobBot] Searching '{keywords}' in '{location}' on {platform}...")
@@ -172,8 +182,12 @@ class SeleniumJobApplicationBot:
         if self.simulation_mode:
             kw_lower = keywords.lower()
             results = [
-                j for j in SIMULATED_JOBS
-                if (kw_lower in j["title"].lower() or kw_lower in j["description"].lower())
+                j
+                for j in SIMULATED_JOBS
+                if (
+                    kw_lower in j["title"].lower()
+                    or kw_lower in j["description"].lower()
+                )
                 and j["platform"] == platform
             ]
             if not results:
@@ -182,7 +196,9 @@ class SeleniumJobApplicationBot:
             return results
 
         # Live Selenium scraping placeholder — extend per platform as needed
-        print(f"[JobBot] Live scraping not yet implemented for '{platform}'. Returning empty list.")
+        print(
+            f"[JobBot] Live scraping not yet implemented for '{platform}'. Returning empty list."
+        )
         return []
 
     def apply_to_job(self, job, resume_path, cover_letter=None):
@@ -204,19 +220,29 @@ class SeleniumJobApplicationBot:
         company = job.get("company", "Unknown Company")
 
         if not os.path.isfile(resume_path) and not self.simulation_mode:
-            print(f"[JobBot] Resume not found at '{resume_path}'. Skipping {title} @ {company}.")
+            print(
+                f"[JobBot] Resume not found at '{resume_path}'. Skipping {title} @ {company}."
+            )
             return False
 
-        print(f"[JobBot] Applying to: {title} @ {company} ({job.get('platform', 'N/A')})...")
-        time.sleep(self.delay * 0.1)  # Minimal delay (10% of configured delay) for simulation mode to speed up testing
+        print(
+            f"[JobBot] Applying to: {title} @ {company} ({job.get('platform', 'N/A')})..."
+        )
+        time.sleep(
+            self.delay * 0.1
+        )  # Minimal delay (10% of configured delay) for simulation mode to speed up testing
 
         if self.simulation_mode:
             success = random.random() > 0.2  # 80% simulated success rate
             if success:
                 print(f"[JobBot]   ✓ Application submitted (simulated).")
             else:
-                print(f"[JobBot]   ✗ Application failed — already applied or form error (simulated).")
-            self._application_log.append({"job": job, "success": success, "mode": "simulation"})
+                print(
+                    f"[JobBot]   ✗ Application failed — already applied or form error (simulated)."
+                )
+            self._application_log.append(
+                {"job": job, "success": success, "mode": "simulation"}
+            )
             return success
 
         # Live application logic placeholder
@@ -256,7 +282,9 @@ class SeleniumJobApplicationBot:
 
         for job in all_jobs:
             if applied >= max_applications:
-                print(f"[JobBot] Reached max applications ({max_applications}). Stopping.")
+                print(
+                    f"[JobBot] Reached max applications ({max_applications}). Stopping."
+                )
                 break
             success = self.apply_to_job(job, resume_path)
             if success:
@@ -321,7 +349,9 @@ class SeleniumJobApplicationBot:
                     max_apps = int(input("  Max applications [10]: ").strip() or "10")
                 except ValueError:
                     max_apps = 10
-                self.run_job_campaign(keywords, location, resume, max_applications=max_apps)
+                self.run_job_campaign(
+                    keywords, location, resume, max_applications=max_apps
+                )
 
             elif choice == "2":
                 keywords = input("  Job keywords: ").strip()
@@ -331,15 +361,22 @@ class SeleniumJobApplicationBot:
                 if location.lower() == "quit":
                     break
                 platforms = self.get_supported_platforms()
-                platform = input(f"  Platform [{', '.join(platforms)}]: ").strip().lower() or "indeed"
+                platform = (
+                    input(f"  Platform [{', '.join(platforms)}]: ").strip().lower()
+                    or "indeed"
+                )
                 jobs = self.search_jobs(keywords, location, platform=platform)
                 print(f"\n  Results ({len(jobs)} job(s)):")
                 for j in jobs:
-                    print(f"  - {j['title']} @ {j['company']} ({j['location']}) — {j.get('salary', 'N/A')}")
+                    print(
+                        f"  - {j['title']} @ {j['company']} ({j['location']}) — {j.get('salary', 'N/A')}"
+                    )
                     print(f"    {j['url']}")
 
             elif choice == "3":
-                print(f"\n  Supported platforms: {', '.join(self.get_supported_platforms())}")
+                print(
+                    f"\n  Supported platforms: {', '.join(self.get_supported_platforms())}"
+                )
 
             elif choice == "4" or choice.lower() == "quit":
                 print("[JobBot] Goodbye! Good luck with your job search.")
@@ -360,4 +397,3 @@ def run() -> dict:
     and revenue so the orchestrator can aggregate metrics across all bots.
     """
     return {"status": "success", "leads": 15, "leads_generated": 15, "revenue": 600}
-

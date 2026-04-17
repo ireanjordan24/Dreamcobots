@@ -5,6 +5,7 @@ Tests for bots/dream_sales_pro/tiers.py and
 Run with:
     python -m pytest tests/test_dream_sales_pro.py -v
 """
+
 # GLOBAL AI SOURCES FLOW
 
 import os
@@ -15,12 +16,8 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.dream_sales_pro.dream_sales_pro_bot import DreamSalesProBot, DSPAccessError
 from bots.dream_sales_pro.tiers import DSPtier, get_tier_config, get_upgrade_path
-from bots.dream_sales_pro.dream_sales_pro_bot import (
-    DreamSalesProBot,
-    DSPAccessError,
-)
-
 
 # ---------------------------------------------------------------------------
 # Tier configuration tests

@@ -17,7 +17,9 @@ class GrantsLegalScreen:
         for g in self.grants[:2]:
             lines.append(f"  [Grant] {g.get('name', '?')} — ${g.get('amount', 0):,.2f}")
         for lp in self.legal_payouts[:2]:
-            lines.append(f"  [Legal] {lp.get('claimType', '?')} — ${lp.get('amount', 0):,.2f}")
+            lines.append(
+                f"  [Legal] {lp.get('claimType', '?')} — ${lp.get('amount', 0):,.2f}"
+            )
         return "\n".join(lines)
 
     def to_dict(self) -> dict:

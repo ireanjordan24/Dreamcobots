@@ -30,6 +30,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 # ── Base exception ────────────────────────────────────────────────────────────
 
+
 class BotError(Exception):
     """Base exception for all DreamCo bot errors.
 
@@ -76,6 +77,7 @@ class APIError(BotError):
 
 # ── retry decorator ───────────────────────────────────────────────────────────
 
+
 def retry(
     max_attempts: int = 3,
     delay: float = 1.0,
@@ -118,6 +120,7 @@ def retry(
 
 
 # ── safe_run decorator ────────────────────────────────────────────────────────
+
 
 def safe_run(
     fallback: Any = None,

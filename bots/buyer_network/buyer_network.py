@@ -23,8 +23,8 @@ Revenue hook output:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -33,7 +33,6 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -61,7 +60,9 @@ class Buyer:
     regions: List[str]  # e.g. ["Chicago", "Atlanta"]
     max_price: float
     min_beds: int = 0
-    registered_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    registered_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     active: bool = True
 
     def to_dict(self) -> dict:
@@ -89,7 +90,9 @@ class Deal:
     assignment_fee: float = 0.0
     matched_buyers: List[str] = field(default_factory=list)  # buyer_ids
     winning_buyer_id: Optional[str] = None
-    submitted_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    submitted_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     closed_at: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -114,7 +117,9 @@ class AuctionBid:
     deal_id: str
     buyer_id: str
     amount: float
-    submitted_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    submitted_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -242,7 +247,8 @@ class BuyerNetwork:
         """
         deal = self._get_deal(deal_id)
         matched = [
-            b for b in self._buyers.values()
+            b
+            for b in self._buyers.values()
             if b.active
             and deal.region in b.regions
             and b.max_price >= deal.asking_price
@@ -331,7 +337,11 @@ class BuyerNetwork:
         deals = list(self._deals.values())
         if region:
             deals = [d for d in deals if d.region == region]
-        closed = [d for d in deals if d.status in (DealStatus.UNDER_CONTRACT, DealStatus.CLOSED)]
+        closed = [
+            d
+            for d in deals
+            if d.status in (DealStatus.UNDER_CONTRACT, DealStatus.CLOSED)
+        ]
         return {
             "region": region or "all",
             "total_deals": len(deals),

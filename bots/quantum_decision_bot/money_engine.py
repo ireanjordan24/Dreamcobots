@@ -13,12 +13,11 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from bots.quantum_decision_bot.probability_model import ProbabilityModel
+from bots.quantum_decision_bot.quantum_engine import QuantumEngine
+
 # GLOBAL AI SOURCES FLOW
 from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.quantum_decision_bot.quantum_engine import QuantumEngine
-from bots.quantum_decision_bot.probability_model import ProbabilityModel
-
 
 # ---------------------------------------------------------------------------
 # Opportunity catalogue
@@ -120,6 +119,7 @@ _DEFAULT_OPPORTUNITIES = [
 # MoneyEngine
 # ---------------------------------------------------------------------------
 
+
 class MoneyEngine:
     """
     Autonomous money / opportunity scanner.
@@ -177,12 +177,14 @@ class MoneyEngine:
             }
             result = self.engine.decide(context)
             best = result["best_path"]
-            scored.append({
-                **opp,
-                "quantum_score": best["score"],
-                "probability_of_profit": best["probability_of_profit"],
-                "recommended_action": self._build_action(opp, best),
-            })
+            scored.append(
+                {
+                    **opp,
+                    "quantum_score": best["score"],
+                    "probability_of_profit": best["probability_of_profit"],
+                    "recommended_action": self._build_action(opp, best),
+                }
+            )
 
         scored.sort(key=lambda x: x["quantum_score"], reverse=True)
         ranked = scored[:top_n]

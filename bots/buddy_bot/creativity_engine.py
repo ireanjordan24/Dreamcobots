@@ -23,10 +23,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class StoryGenre(Enum):
     ADVENTURE = "adventure"
@@ -77,9 +77,11 @@ class ChallengeCategory(Enum):
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class StoryChapter:
     """A chapter in an interactive story."""
+
     chapter_number: int
     title: str
     content: str
@@ -97,6 +99,7 @@ class StoryChapter:
 @dataclass
 class Song:
     """A generated original song."""
+
     title: str
     mood: SongMood
     theme: str
@@ -124,6 +127,7 @@ class Song:
 @dataclass
 class Achievement:
     """A gamified productivity achievement."""
+
     achievement_id: str
     title: str
     description: str
@@ -151,6 +155,7 @@ class Achievement:
 @dataclass
 class DailyChallenge:
     """A daily gamified task."""
+
     challenge_id: str
     title: str
     description: str
@@ -279,29 +284,139 @@ ART_TIPS: dict[ArtMedium, list[str]] = {
 }
 
 DAILY_CHALLENGE_POOL: list[dict] = [
-    {"title": "Morning Intention", "description": "Write down 3 things you intend to achieve today before opening your phone.", "category": ChallengeCategory.PRODUCTIVITY, "xp": 50},
-    {"title": "5-Minute Journal", "description": "Write 5 minutes of stream-of-consciousness. No editing, no judgment.", "category": ChallengeCategory.MINDFULNESS, "xp": 40},
-    {"title": "Random Act of Kindness", "description": "Do one unexpected kind thing for someone today.", "category": ChallengeCategory.SOCIAL, "xp": 75},
-    {"title": "Digital Detox Hour", "description": "Take 1 hour completely off screens. Walk, read, or just breathe.", "category": ChallengeCategory.WELLNESS, "xp": 60},
-    {"title": "Learn Something New", "description": "Spend 15 minutes learning one thing you knew nothing about yesterday.", "category": ChallengeCategory.LEARNING, "xp": 55},
-    {"title": "Create Something", "description": "Make anything — a sketch, a poem, a voice note. Just create.", "category": ChallengeCategory.CREATIVITY, "xp": 70},
-    {"title": "Move Your Body", "description": "30 minutes of intentional movement — walk, dance, stretch, gym.", "category": ChallengeCategory.FITNESS, "xp": 65},
-    {"title": "Reach Out", "description": "Text or call someone you haven't spoken to in over a month.", "category": ChallengeCategory.SOCIAL, "xp": 80},
-    {"title": "Gratitude List", "description": "List 10 things you are genuinely grateful for right now.", "category": ChallengeCategory.MINDFULNESS, "xp": 45},
-    {"title": "Dopamine Detox", "description": "Avoid social media for the entire day. Notice how you feel.", "category": ChallengeCategory.WELLNESS, "xp": 90},
+    {
+        "title": "Morning Intention",
+        "description": "Write down 3 things you intend to achieve today before opening your phone.",
+        "category": ChallengeCategory.PRODUCTIVITY,
+        "xp": 50,
+    },
+    {
+        "title": "5-Minute Journal",
+        "description": "Write 5 minutes of stream-of-consciousness. No editing, no judgment.",
+        "category": ChallengeCategory.MINDFULNESS,
+        "xp": 40,
+    },
+    {
+        "title": "Random Act of Kindness",
+        "description": "Do one unexpected kind thing for someone today.",
+        "category": ChallengeCategory.SOCIAL,
+        "xp": 75,
+    },
+    {
+        "title": "Digital Detox Hour",
+        "description": "Take 1 hour completely off screens. Walk, read, or just breathe.",
+        "category": ChallengeCategory.WELLNESS,
+        "xp": 60,
+    },
+    {
+        "title": "Learn Something New",
+        "description": "Spend 15 minutes learning one thing you knew nothing about yesterday.",
+        "category": ChallengeCategory.LEARNING,
+        "xp": 55,
+    },
+    {
+        "title": "Create Something",
+        "description": "Make anything — a sketch, a poem, a voice note. Just create.",
+        "category": ChallengeCategory.CREATIVITY,
+        "xp": 70,
+    },
+    {
+        "title": "Move Your Body",
+        "description": "30 minutes of intentional movement — walk, dance, stretch, gym.",
+        "category": ChallengeCategory.FITNESS,
+        "xp": 65,
+    },
+    {
+        "title": "Reach Out",
+        "description": "Text or call someone you haven't spoken to in over a month.",
+        "category": ChallengeCategory.SOCIAL,
+        "xp": 80,
+    },
+    {
+        "title": "Gratitude List",
+        "description": "List 10 things you are genuinely grateful for right now.",
+        "category": ChallengeCategory.MINDFULNESS,
+        "xp": 45,
+    },
+    {
+        "title": "Dopamine Detox",
+        "description": "Avoid social media for the entire day. Notice how you feel.",
+        "category": ChallengeCategory.WELLNESS,
+        "xp": 90,
+    },
 ]
 
 ACHIEVEMENT_CATALOGUE: list[dict] = [
-    {"id": "first_chat", "title": "Hello World", "desc": "Have your first conversation with Buddy.", "xp": 25, "cat": ChallengeCategory.SOCIAL},
-    {"id": "streak_7", "title": "Week Warrior", "desc": "Complete 7 days of daily challenges.", "xp": 200, "cat": ChallengeCategory.PRODUCTIVITY},
-    {"id": "creative_burst", "title": "Creative Burst", "desc": "Use the creativity engine 5 times in one session.", "xp": 150, "cat": ChallengeCategory.CREATIVITY},
-    {"id": "emotionally_aware", "title": "Emotionally Aware", "desc": "Share your emotions with Buddy 10 times.", "xp": 100, "cat": ChallengeCategory.MINDFULNESS},
-    {"id": "milestone_3", "title": "Milestone Maker", "desc": "Record 3 life milestones.", "xp": 175, "cat": ChallengeCategory.PRODUCTIVITY},
-    {"id": "polyglot", "title": "World Speaker", "desc": "Have a conversation in 3 different languages.", "xp": 250, "cat": ChallengeCategory.LEARNING},
-    {"id": "storyteller", "title": "Storyteller", "desc": "Complete an interactive story arc with Buddy.", "xp": 120, "cat": ChallengeCategory.CREATIVITY},
-    {"id": "wellness_30", "title": "Wellness Warrior", "desc": "Complete 30 wellness challenges.", "xp": 500, "cat": ChallengeCategory.WELLNESS},
-    {"id": "companion_level", "title": "True Companion", "desc": "Reach 500 interactions with Buddy.", "xp": 1000, "cat": ChallengeCategory.SOCIAL},
-    {"id": "songwriter", "title": "Songwriter", "desc": "Generate 5 original songs with Buddy.", "xp": 200, "cat": ChallengeCategory.CREATIVITY},
+    {
+        "id": "first_chat",
+        "title": "Hello World",
+        "desc": "Have your first conversation with Buddy.",
+        "xp": 25,
+        "cat": ChallengeCategory.SOCIAL,
+    },
+    {
+        "id": "streak_7",
+        "title": "Week Warrior",
+        "desc": "Complete 7 days of daily challenges.",
+        "xp": 200,
+        "cat": ChallengeCategory.PRODUCTIVITY,
+    },
+    {
+        "id": "creative_burst",
+        "title": "Creative Burst",
+        "desc": "Use the creativity engine 5 times in one session.",
+        "xp": 150,
+        "cat": ChallengeCategory.CREATIVITY,
+    },
+    {
+        "id": "emotionally_aware",
+        "title": "Emotionally Aware",
+        "desc": "Share your emotions with Buddy 10 times.",
+        "xp": 100,
+        "cat": ChallengeCategory.MINDFULNESS,
+    },
+    {
+        "id": "milestone_3",
+        "title": "Milestone Maker",
+        "desc": "Record 3 life milestones.",
+        "xp": 175,
+        "cat": ChallengeCategory.PRODUCTIVITY,
+    },
+    {
+        "id": "polyglot",
+        "title": "World Speaker",
+        "desc": "Have a conversation in 3 different languages.",
+        "xp": 250,
+        "cat": ChallengeCategory.LEARNING,
+    },
+    {
+        "id": "storyteller",
+        "title": "Storyteller",
+        "desc": "Complete an interactive story arc with Buddy.",
+        "xp": 120,
+        "cat": ChallengeCategory.CREATIVITY,
+    },
+    {
+        "id": "wellness_30",
+        "title": "Wellness Warrior",
+        "desc": "Complete 30 wellness challenges.",
+        "xp": 500,
+        "cat": ChallengeCategory.WELLNESS,
+    },
+    {
+        "id": "companion_level",
+        "title": "True Companion",
+        "desc": "Reach 500 interactions with Buddy.",
+        "xp": 1000,
+        "cat": ChallengeCategory.SOCIAL,
+    },
+    {
+        "id": "songwriter",
+        "title": "Songwriter",
+        "desc": "Generate 5 original songs with Buddy.",
+        "xp": 200,
+        "cat": ChallengeCategory.CREATIVITY,
+    },
 ]
 
 
@@ -344,7 +459,9 @@ class CreativityEngine:
     # Storytelling
     # ------------------------------------------------------------------
 
-    def start_story(self, genre: StoryGenre, protagonist_name: str = "Alex") -> StoryChapter:
+    def start_story(
+        self, genre: StoryGenre, protagonist_name: str = "Alex"
+    ) -> StoryChapter:
         """
         Begin an interactive story.
 
@@ -381,7 +498,9 @@ class CreativityEngine:
         self._active_story = [chapter]
         return chapter
 
-    def continue_story(self, choice_index: int, protagonist_name: str = "Alex") -> StoryChapter:
+    def continue_story(
+        self, choice_index: int, protagonist_name: str = "Alex"
+    ) -> StoryChapter:
         """
         Advance the active story based on the user's choice.
 
@@ -408,7 +527,7 @@ class CreativityEngine:
         chosen_path = prev.choices[choice_index]
         chapter_num = len(self._active_story) + 1
         content = (
-            f"{protagonist_name} chose: \"{chosen_path}\"\n\n"
+            f'{protagonist_name} chose: "{chosen_path}"\n\n'
             "The path unfolded in ways no one could have predicted. "
             "Each step revealed new truths, new challenges, and new strengths "
             f"within {protagonist_name} that had been waiting all along."
@@ -417,11 +536,15 @@ class CreativityEngine:
             chapter_number=chapter_num,
             title=f"Chapter {chapter_num} — {chosen_path}",
             content=content,
-            choices=[
-                "Embrace the unknown.",
-                "Seek wisdom from an unexpected source.",
-                "Trust your instincts.",
-            ] if chapter_num < 5 else ["The story reaches its conclusion…"],
+            choices=(
+                [
+                    "Embrace the unknown.",
+                    "Seek wisdom from an unexpected source.",
+                    "Trust your instincts.",
+                ]
+                if chapter_num < 5
+                else ["The story reaches its conclusion…"]
+            ),
         )
         self._active_story.append(chapter)
         return chapter
@@ -527,7 +650,9 @@ class CreativityEngine:
         -------
         str
         """
-        tips = ART_TIPS.get(medium, ["Keep creating — every piece teaches you something."])
+        tips = ART_TIPS.get(
+            medium, ["Keep creating — every piece teaches you something."]
+        )
         return random.choice(tips)
 
     def brainstorm(self, topic: str, count: int = 5) -> list[str]:

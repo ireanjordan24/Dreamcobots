@@ -1,14 +1,17 @@
 """Tests for bots/resume_builder_bot/tiers.py and bots/resume_builder_bot/resume_builder_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.resume_builder_bot.resume_builder_bot import ResumeBuilderBot
 from bots.resume_builder_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
@@ -35,8 +38,21 @@ class TestBuildResume:
 
     def test_build_resume_has_required_keys(self):
         bot = ResumeBuilderBot()
-        result = bot.build_resume("Jane Doe", "Engineer", ["Python"], "BS CS", target_role="Senior Dev")
-        for key in ["name", "contact", "summary", "experience", "skills", "education", "target_role", "template_used", "format", "tier_used"]:
+        result = bot.build_resume(
+            "Jane Doe", "Engineer", ["Python"], "BS CS", target_role="Senior Dev"
+        )
+        for key in [
+            "name",
+            "contact",
+            "summary",
+            "experience",
+            "skills",
+            "education",
+            "target_role",
+            "template_used",
+            "format",
+            "tier_used",
+        ]:
             assert key in result
 
     def test_build_resume_name(self):
@@ -56,7 +72,14 @@ class TestBuildResume:
 
     def test_experience_list_preserved(self):
         bot = ResumeBuilderBot()
-        exp = [{"title": "Dev", "company": "ACME", "duration": "2021-2023", "bullets": ["Did stuff"]}]
+        exp = [
+            {
+                "title": "Dev",
+                "company": "ACME",
+                "duration": "2021-2023",
+                "bullets": ["Did stuff"],
+            }
+        ]
         result = bot.build_resume("Jane", exp, ["Python"], "BS")
         assert result["experience"] == exp
 
@@ -87,7 +110,9 @@ class TestCoverLetter:
 
     def test_cover_letter_works_on_pro(self):
         bot = ResumeBuilderBot(tier=Tier.PRO)
-        result = bot.generate_cover_letter({"name": "Jane", "target_role": "Engineer"}, "Python developer role")
+        result = bot.generate_cover_letter(
+            {"name": "Jane", "target_role": "Engineer"}, "Python developer role"
+        )
         assert "body" in result
         assert "subject" in result
 

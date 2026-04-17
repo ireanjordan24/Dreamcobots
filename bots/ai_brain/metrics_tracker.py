@@ -14,11 +14,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from datetime import datetime, timezone
 from typing import Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Default data paths
@@ -35,6 +34,7 @@ REVENUE_PER_DEAL_USD: float = 100.0
 # ---------------------------------------------------------------------------
 # Metrics Tracker
 # ---------------------------------------------------------------------------
+
 
 class MetricsTracker:
     """
@@ -116,7 +116,11 @@ class MetricsTracker:
         snapshot = {
             "leads": leads,
             "revenue": revenue,
-            "deals": int(round(revenue / self.revenue_per_deal)) if self.revenue_per_deal else 0,
+            "deals": (
+                int(round(revenue / self.revenue_per_deal))
+                if self.revenue_per_deal
+                else 0
+            ),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self._metrics_log.append(snapshot)
@@ -149,4 +153,6 @@ class MetricsTracker:
     def count_deals_closed(self) -> int:
         """Count the number of closed deals."""
         revenue = self.track_revenue()
-        return int(round(revenue / self.revenue_per_deal)) if self.revenue_per_deal else 0
+        return (
+            int(round(revenue / self.revenue_per_deal)) if self.revenue_per_deal else 0
+        )

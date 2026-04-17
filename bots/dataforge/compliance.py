@@ -1,4 +1,5 @@
 """Compliance module: GDPR, CCPA, HIPAA, Biometric, Consent, Anonymization, Licensing."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import re
@@ -69,7 +70,11 @@ class GDPRComplianceChecker:
             logger.info("GDPR: Erased data for user %s", user_id)
         else:
             logger.info("GDPR: No data found for user %s to erase", user_id)
-        return {"user_id": user_id, "erased": erased, "timestamp": datetime.utcnow().isoformat()}
+        return {
+            "user_id": user_id,
+            "erased": erased,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
 
 
 class CCPAComplianceChecker:
@@ -196,7 +201,9 @@ class ConsentManager:
         """Initialize the ConsentManager with an empty consent log."""
         self._consent_log: dict = {}
 
-    def add_consent(self, user_id: str, consent_type: str, granted: bool = True) -> dict:
+    def add_consent(
+        self, user_id: str, consent_type: str, granted: bool = True
+    ) -> dict:
         """Add or update a consent record for a user.
 
         Args:
@@ -213,7 +220,12 @@ class ConsentManager:
             "granted": granted,
             "timestamp": datetime.utcnow().isoformat(),
         }
-        logger.info("Consent recorded: user=%s type=%s granted=%s", user_id, consent_type, granted)
+        logger.info(
+            "Consent recorded: user=%s type=%s granted=%s",
+            user_id,
+            consent_type,
+            granted,
+        )
         return self._consent_log[user_id][consent_type]
 
     def check_consent(self, user_id: str, consent_type: str) -> bool:
@@ -226,8 +238,14 @@ class ConsentManager:
         Returns:
             True if consent is granted, False otherwise.
         """
-        result = self._consent_log.get(user_id, {}).get(consent_type, {}).get("granted", False)
-        logger.debug("Check consent: user=%s type=%s -> %s", user_id, consent_type, result)
+        result = (
+            self._consent_log.get(user_id, {})
+            .get(consent_type, {})
+            .get("granted", False)
+        )
+        logger.debug(
+            "Check consent: user=%s type=%s -> %s", user_id, consent_type, result
+        )
         return result
 
     def revoke_consent(self, user_id: str, consent_type: str) -> bool:
@@ -242,10 +260,14 @@ class ConsentManager:
         """
         if user_id in self._consent_log and consent_type in self._consent_log[user_id]:
             self._consent_log[user_id][consent_type]["granted"] = False
-            self._consent_log[user_id][consent_type]["revoked_at"] = datetime.utcnow().isoformat()
+            self._consent_log[user_id][consent_type][
+                "revoked_at"
+            ] = datetime.utcnow().isoformat()
             logger.info("Consent revoked: user=%s type=%s", user_id, consent_type)
             return True
-        logger.warning("No consent record found to revoke: user=%s type=%s", user_id, consent_type)
+        logger.warning(
+            "No consent record found to revoke: user=%s type=%s", user_id, consent_type
+        )
         return False
 
 

@@ -5,17 +5,20 @@ Reuses the platform-wide FREE / PRO / ENTERPRISE tiers and layers
 creator-economy-specific feature flags on top.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import (   # re-export for convenience
-    Tier,
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+from tiers import (
+    TIER_CATALOGUE,
+    Tier,  # re-export for convenience
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
 )
 
 # ---------------------------------------------------------------------------
@@ -93,11 +96,26 @@ CREATOR_FEATURES_BY_TIER: dict[str, list[str]] = {
 
 MONETIZATION_MODELS_BY_TIER: dict[str, list[str]] = {
     Tier.FREE.value: ["tip_jar", "subscription_basic"],
-    Tier.PRO.value: ["tip_jar", "subscription_basic", "subscription_premium",
-                     "pay_per_view", "merchandise", "direct_service_fee"],
-    Tier.ENTERPRISE.value: ["tip_jar", "subscription_basic", "subscription_premium",
-                            "pay_per_view", "merchandise", "direct_service_fee",
-                            "brand_deal", "licensing", "revenue_share", "nft"],
+    Tier.PRO.value: [
+        "tip_jar",
+        "subscription_basic",
+        "subscription_premium",
+        "pay_per_view",
+        "merchandise",
+        "direct_service_fee",
+    ],
+    Tier.ENTERPRISE.value: [
+        "tip_jar",
+        "subscription_basic",
+        "subscription_premium",
+        "pay_per_view",
+        "merchandise",
+        "direct_service_fee",
+        "brand_deal",
+        "licensing",
+        "revenue_share",
+        "nft",
+    ],
 }
 
 

@@ -1,11 +1,14 @@
 """Legal Bot - Contract generation, document drafting, and compliance guidance."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from datetime import datetime
+
 from core.base_bot import BaseBot
 
 LEGAL_DISCLAIMER = (
@@ -30,10 +33,18 @@ class LegalBot(BaseBot):
     def run(self):
         """Run the legal bot main workflow."""
         self.start()
-        return {"status": "ready", "disclaimer": LEGAL_DISCLAIMER, "capabilities": [
-            "Contract generation", "Document drafting", "Case law search",
-            "Compliance checking", "Deadline tracking", "Cost estimation",
-        ]}
+        return {
+            "status": "ready",
+            "disclaimer": LEGAL_DISCLAIMER,
+            "capabilities": [
+                "Contract generation",
+                "Document drafting",
+                "Case law search",
+                "Compliance checking",
+                "Deadline tracking",
+                "Cost estimation",
+            ],
+        }
 
     def generate_contract(self, contract_type: str, parties: list) -> dict:
         """Generate a contract template for the specified type and parties."""
@@ -106,7 +117,10 @@ class LegalBot(BaseBot):
             red_flags.append("⚠️ Perpetual license/term - clarify scope")
         if "automatic renewal" in contract_text.lower():
             red_flags.append("⚠️ Automatic renewal - add cancellation window")
-        if "indemnify" in contract_text.lower() and "sole discretion" in contract_text.lower():
+        if (
+            "indemnify" in contract_text.lower()
+            and "sole discretion" in contract_text.lower()
+        ):
             red_flags.append("⚠️ Broad indemnification with sole discretion - risky")
         return {
             "disclaimer": LEGAL_DISCLAIMER,
@@ -119,7 +133,11 @@ class LegalBot(BaseBot):
                 {"item": "Governing law specified", "status": "review_manually"},
                 {"item": "Signatures required", "status": "review_manually"},
             ],
-            "red_flags": red_flags if red_flags else ["No automated red flags detected - still needs attorney review"],
+            "red_flags": (
+                red_flags
+                if red_flags
+                else ["No automated red flags detected - still needs attorney review"]
+            ),
             "recommendation": "Have a licensed attorney review before signing",
         }
 
@@ -186,7 +204,10 @@ class LegalBot(BaseBot):
             "power_of_attorney": "GENERAL POWER OF ATTORNEY\n\nI, [Principal], hereby appoint [Agent] as my Attorney-in-Fact...",
         }
         doc_key = doc_type.lower().replace(" ", "_")
-        template = doc_map.get(doc_key, f"[{doc_type.upper()} TEMPLATE - Customize with your specific details]")
+        template = doc_map.get(
+            doc_key,
+            f"[{doc_type.upper()} TEMPLATE - Customize with your specific details]",
+        )
         return {
             "disclaimer": LEGAL_DISCLAIMER,
             "document_type": doc_type,
@@ -211,15 +232,47 @@ class LegalBot(BaseBot):
     def estimate_legal_costs(self, service_type: str) -> dict:
         """Estimate costs for common legal services."""
         estimates = {
-            "nda_review": {"low": "$200", "high": "$500", "avg": "$350", "time": "1-2 hours"},
-            "contract_drafting": {"low": "$500", "high": "$3,000", "avg": "$1,200", "time": "3-8 hours"},
-            "llc_formation": {"low": "$500", "high": "$1,500", "avg": "$800", "time": "1-3 weeks"},
-            "trademark_registration": {"low": "$2,000", "high": "$5,000", "avg": "$3,000", "time": "10-14 months"},
-            "employment_agreement": {"low": "$400", "high": "$1,500", "avg": "$800", "time": "2-4 hours"},
-            "litigation_per_hour": {"low": "$200", "high": "$600", "avg": "$350", "time": "Ongoing"},
+            "nda_review": {
+                "low": "$200",
+                "high": "$500",
+                "avg": "$350",
+                "time": "1-2 hours",
+            },
+            "contract_drafting": {
+                "low": "$500",
+                "high": "$3,000",
+                "avg": "$1,200",
+                "time": "3-8 hours",
+            },
+            "llc_formation": {
+                "low": "$500",
+                "high": "$1,500",
+                "avg": "$800",
+                "time": "1-3 weeks",
+            },
+            "trademark_registration": {
+                "low": "$2,000",
+                "high": "$5,000",
+                "avg": "$3,000",
+                "time": "10-14 months",
+            },
+            "employment_agreement": {
+                "low": "$400",
+                "high": "$1,500",
+                "avg": "$800",
+                "time": "2-4 hours",
+            },
+            "litigation_per_hour": {
+                "low": "$200",
+                "high": "$600",
+                "avg": "$350",
+                "time": "Ongoing",
+            },
         }
         key = service_type.lower().replace(" ", "_")
-        estimate = estimates.get(key, {"low": "$500", "high": "$5,000", "avg": "$2,000", "time": "Varies"})
+        estimate = estimates.get(
+            key, {"low": "$500", "high": "$5,000", "avg": "$2,000", "time": "Varies"}
+        )
         return {
             "disclaimer": LEGAL_DISCLAIMER,
             "service_type": service_type,

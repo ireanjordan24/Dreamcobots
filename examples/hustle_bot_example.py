@@ -10,19 +10,19 @@ Run:
     python examples/hustle_bot_example.py
 """
 
-import sys
-import os
 import json
+import os
+import sys
 
 # Allow imports from the bots directory
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "hustle-bot"))
 
 from hustle_bot import HustleBot
 
-
 # ---------------------------------------------------------------------------
 # Example 1: Goal Setting and Milestone Achievement
 # ---------------------------------------------------------------------------
+
 
 def example_goal_milestones():
     print("=" * 55)
@@ -59,6 +59,7 @@ def example_goal_milestones():
 # Example 2: Scaling Ecosystem Collaboration
 # ---------------------------------------------------------------------------
 
+
 def example_scaling_collaboration():
     print("\n" + "=" * 55)
     print("  Example 2: Scaling Ecosystem Collaboration")
@@ -69,7 +70,9 @@ def example_scaling_collaboration():
     # Hustle Bot identifies untapped markets for outreach
     markets = bot.identify_untapped_markets()
     top_market = markets[0]
-    print(f"\nTop growth opportunity: {top_market['name']} (score {top_market['potential_score']}/10)")
+    print(
+        f"\nTop growth opportunity: {top_market['name']} (score {top_market['potential_score']}/10)"
+    )
     print("Hustle Bot is promoting community-specific benefits …")
 
     # Simulate targeted motivational campaigns for new community members

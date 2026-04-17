@@ -1,4 +1,5 @@
 """Fixer.io currency exchange rate connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,8 +28,13 @@ class FixerConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/latest", params={"access_key": self.api_key, "base": base}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/latest",
+                params={"access_key": self.api_key, "base": base},
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Fixer latest rates fetched for base: %s", base)
             return {"status": "success", "data": response.json()}
@@ -48,12 +54,20 @@ class FixerConnector:
             API response dict with conversion result or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/convert",
-                params={"access_key": self.api_key, "from": from_currency, "to": to_currency, "amount": amount}, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/convert",
+                params={
+                    "access_key": self.api_key,
+                    "from": from_currency,
+                    "to": to_currency,
+                    "amount": amount,
+                },
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Fixer convert error: %s", e)
             return {"status": "error", "message": str(e)}
-

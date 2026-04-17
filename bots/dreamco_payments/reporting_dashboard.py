@@ -21,12 +21,12 @@ import json
 from typing import Any, Optional
 
 from bots.dreamco_payments.tiers import (
+    FEATURE_ADVANCED_REPORTING,
+    FEATURE_ANALYTICS_DASHBOARD,
+    FEATURE_DISCOUNT_DOMINATOR,
     Tier,
     TierConfig,
     get_tier_config,
-    FEATURE_ANALYTICS_DASHBOARD,
-    FEATURE_ADVANCED_REPORTING,
-    FEATURE_DISCOUNT_DOMINATOR,
 )
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -41,8 +41,8 @@ class DashboardTierError(Exception):
 
 _DD_GROUPS: dict[str, tuple[int, int]] = {
     "analytics": (401, 450),
-    "in_store":  (451, 500),
-    "online":    (501, 550),
+    "in_store": (451, 500),
+    "online": (501, 550),
     "enterprise": (551, 580),
     "behavioral": (581, 600),
 }
@@ -155,7 +155,9 @@ class ReportingDashboard:
 
     @staticmethod
     def _now_iso() -> str:
-        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     # ------------------------------------------------------------------
     # Financial summary  (GROWTH+)
@@ -259,9 +261,7 @@ class ReportingDashboard:
             Setting record with id, group, name, value, description.
         """
         if setting_id not in self._settings:
-            raise KeyError(
-                f"Setting ID {setting_id} not found.  Valid range: 401–600."
-            )
+            raise KeyError(f"Setting ID {setting_id} not found.  Valid range: 401–600.")
         return dict(self._settings[setting_id])
 
     def list_discount_dominator_settings(self, group: str) -> list:
@@ -287,9 +287,7 @@ class ReportingDashboard:
         lo, hi = _DD_GROUPS[group]
         return [dict(self._settings[sid]) for sid in range(lo, hi + 1)]
 
-    def update_discount_dominator_setting(
-        self, setting_id: int, value: Any
-    ) -> dict:
+    def update_discount_dominator_setting(self, setting_id: int, value: Any) -> dict:
         """
         Update the value of a Discount Dominator setting.
 
@@ -310,9 +308,7 @@ class ReportingDashboard:
         self._require_feature(FEATURE_DISCOUNT_DOMINATOR)
 
         if setting_id not in self._settings:
-            raise KeyError(
-                f"Setting ID {setting_id} not found.  Valid range: 401–600."
-            )
+            raise KeyError(f"Setting ID {setting_id} not found.  Valid range: 401–600.")
 
         self._settings[setting_id]["value"] = value
         self._settings[setting_id]["updated_at"] = self._now_iso()

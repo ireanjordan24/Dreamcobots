@@ -9,6 +9,7 @@ Usage:
     python bot.py --init-db     # Only initialise / reseed the database
     python bot.py --demo        # Run a quick demo in the terminal
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import argparse
@@ -31,11 +32,15 @@ def run_demo():
     categories = db.get_categories()
 
     conn = db.get_connection()
-    existing = conn.execute("SELECT COUNT(*) FROM tools").fetchone()[0] > len(SAAS_TOOLS)
+    existing = conn.execute("SELECT COUNT(*) FROM tools").fetchone()[0] > len(
+        SAAS_TOOLS
+    )
     conn.close()
     status = "existing" if existing else "freshly seeded"
 
-    print(f"\n📦 Database ({status}): {len(tools)} tools across {len(categories)} categories")
+    print(
+        f"\n📦 Database ({status}): {len(tools)} tools across {len(categories)} categories"
+    )
     for cat in categories:
         print(f"   • {cat['category']}: {cat['count']} tools")
 
@@ -47,18 +52,21 @@ def run_demo():
 
     # AI recommendations (fallback mode)
     from ai_integration import get_recommendations
+
     print("\n🤖 AI Recommendation demo – query: 'project management for remote teams'")
     rec = get_recommendations("project management for remote teams")
     print(rec[:400] + "..." if len(rec) > 400 else rec)
 
     # Payment plans
     from payment import get_plans
+
     print("\n💳 Subscription Plans:")
     for plan in get_plans():
         print(f"   {plan['name']} – ${plan['price_usd']}/month")
 
     # Affiliate tracking demo
-    from affiliate import track_click, get_revenue_dashboard
+    from affiliate import get_revenue_dashboard, track_click
+
     result = track_click(tool_id=1)
     if result.get("success"):
         print(f"\n🔗 Affiliate click tracked for '{result['tool_name']}'")
@@ -77,6 +85,7 @@ def start_server():
     db.init_db()
     # Import app here to avoid circular imports
     from app import app
+
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("DEBUG", "false").lower() == "true"
     print(f"🚀 SaaS Selling Bot is running!")
@@ -102,7 +111,9 @@ def main():
         db.init_db()
         tools = db.get_all_tools()
         cats = db.get_categories()
-        print(f"✅ Database initialised with {len(tools)} tools across {len(cats)} categories.")
+        print(
+            f"✅ Database initialised with {len(tools)} tools across {len(cats)} categories."
+        )
         sys.exit(0)
 
     if args.demo:
@@ -131,30 +142,89 @@ PRICING_TIERS = [
     {
         "name": "Professional",
         "price": "$299/mo",
-        "features": ["All Starter features", "Unlimited tasks", "NLP bot", "Priority support"],
+        "features": [
+            "All Starter features",
+            "Unlimited tasks",
+            "NLP bot",
+            "Priority support",
+        ],
     },
     {
         "name": "Enterprise",
         "price": "$999/mo",
-        "features": ["All Professional features", "Dedicated account manager", "Custom integrations", "SLA guarantee"],
+        "features": [
+            "All Professional features",
+            "Dedicated account manager",
+            "Custom integrations",
+            "SLA guarantee",
+        ],
     },
 ]
 
 SERVICES = [
-    {"slug": "custom-bot", "name": "Custom Automation Bot", "description": "Automate any business workflow."},
-    {"slug": "nlp-bot", "name": "NLP Chatbot", "description": "AI-powered conversational interface."},
-    {"slug": "income-tracking", "name": "Income Tracking Bot", "description": "Monitor and report revenue streams."},
-    {"slug": "contracts", "name": "Contract Search Bot", "description": "Find government contracts and grants."},
-    {"slug": "api-integration", "name": "API Integration Bot", "description": "Connect your tools via API."},
-    {"slug": "ui-ux", "name": "UI/UX Audit Bot", "description": "Analyze and improve your interfaces."},
+    {
+        "slug": "custom-bot",
+        "name": "Custom Automation Bot",
+        "description": "Automate any business workflow.",
+    },
+    {
+        "slug": "nlp-bot",
+        "name": "NLP Chatbot",
+        "description": "AI-powered conversational interface.",
+    },
+    {
+        "slug": "income-tracking",
+        "name": "Income Tracking Bot",
+        "description": "Monitor and report revenue streams.",
+    },
+    {
+        "slug": "contracts",
+        "name": "Contract Search Bot",
+        "description": "Find government contracts and grants.",
+    },
+    {
+        "slug": "api-integration",
+        "name": "API Integration Bot",
+        "description": "Connect your tools via API.",
+    },
+    {
+        "slug": "ui-ux",
+        "name": "UI/UX Audit Bot",
+        "description": "Analyze and improve your interfaces.",
+    },
 ]
 
 _CONTRACT_DATABASE = [
-    {"title": "Automation Software Development", "agency": "DoD", "value": "$2.5M", "deadline": "2025-06-30"},
-    {"title": "AI Platform Integration", "agency": "GSA", "value": "$1.2M", "deadline": "2025-07-15"},
-    {"title": "Data Analytics Dashboard", "agency": "HHS", "value": "$800K", "deadline": "2025-05-01"},
-    {"title": "Cybersecurity Automation Tools", "agency": "DHS", "value": "$3.1M", "deadline": "2025-08-20"},
-    {"title": "Cloud Migration Services", "agency": "DoE", "value": "$1.8M", "deadline": "2025-09-10"},
+    {
+        "title": "Automation Software Development",
+        "agency": "DoD",
+        "value": "$2.5M",
+        "deadline": "2025-06-30",
+    },
+    {
+        "title": "AI Platform Integration",
+        "agency": "GSA",
+        "value": "$1.2M",
+        "deadline": "2025-07-15",
+    },
+    {
+        "title": "Data Analytics Dashboard",
+        "agency": "HHS",
+        "value": "$800K",
+        "deadline": "2025-05-01",
+    },
+    {
+        "title": "Cybersecurity Automation Tools",
+        "agency": "DHS",
+        "value": "$3.1M",
+        "deadline": "2025-08-20",
+    },
+    {
+        "title": "Cloud Migration Services",
+        "agency": "DoE",
+        "value": "$1.8M",
+        "deadline": "2025-09-10",
+    },
 ]
 
 
@@ -182,5 +252,6 @@ def run_contract_search(keyword: str) -> list:
     matches = [c for c in _CONTRACT_DATABASE if keyword_lower in c["title"].lower()]
     if not matches:
         import random
+
         return random.sample(_CONTRACT_DATABASE, min(3, len(_CONTRACT_DATABASE)))
     return matches

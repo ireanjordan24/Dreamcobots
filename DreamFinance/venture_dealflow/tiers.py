@@ -9,6 +9,20 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["deal sourcing automation", "due diligence screening", "portfolio monitoring"]),
-    "elite": TierConfig("Elite", 2500.0, ["deal sourcing automation", "due diligence screening", "portfolio monitoring", "LP reporting", "co-investment network"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        ["deal sourcing automation", "due diligence screening", "portfolio monitoring"],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        2500.0,
+        [
+            "deal sourcing automation",
+            "due diligence screening",
+            "portfolio monitoring",
+            "LP reporting",
+            "co-investment network",
+        ],
+    ),
 }

@@ -9,18 +9,20 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Set
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 @dataclass
@@ -28,16 +30,16 @@ class Agent:
     agent_id: str
     name: str
     skills: Set[str]
-    current_load: float    # hours currently assigned
-    capacity: float        # max hours available
-    success_rate: float    # 0.0 - 1.0
+    current_load: float  # hours currently assigned
+    capacity: float  # max hours available
+    success_rate: float  # 0.0 - 1.0
 
 
 @dataclass
 class Task:
     task_id: str
     required_skills: Set[str]
-    priority: int          # 1 (highest) - 5 (lowest)
+    priority: int  # 1 (highest) - 5 (lowest)
     estimated_hours: float
     deadline: Optional[datetime] = None
 
@@ -47,7 +49,7 @@ class TaskDelegationAI:
 
     def __init__(self) -> None:
         self._agents: Dict[str, Agent] = {}
-        self._task_assignments: Dict[str, str] = {}   # task_id -> agent_id
+        self._task_assignments: Dict[str, str] = {}  # task_id -> agent_id
         self._delegation_log: List[dict] = []
 
     def register_agent(self, agent_id: str, skills: Set[str], capacity: float) -> Agent:
@@ -83,7 +85,11 @@ class TaskDelegationAI:
             "timestamp": datetime.utcnow().isoformat(),
         }
         self._delegation_log.append(log_entry)
-        return {"status": "assigned", "agent_id": best_agent.agent_id, "confidence": round(best_score, 4)}
+        return {
+            "status": "assigned",
+            "agent_id": best_agent.agent_id,
+            "confidence": round(best_score, 4),
+        }
 
     def score_confidence(self, task: Task, agent_id: str) -> float:
         """Score the confidence of assigning a task to an agent."""
@@ -98,14 +104,17 @@ class TaskDelegationAI:
         available = max(agent.capacity - agent.current_load, 0.0)
         capacity_score = min(available / max(task.estimated_hours, 0.1), 1.0)
         # Success rate
-        confidence = (skill_score * 0.5 + capacity_score * 0.3 + agent.success_rate * 0.2)
+        confidence = skill_score * 0.5 + capacity_score * 0.3 + agent.success_rate * 0.2
         return confidence
 
     def rebalance_workload(self) -> dict:
         """Redistribute load to reduce imbalance across agents."""
         if not self._agents:
             return {"status": "no_agents"}
-        loads = {aid: a.current_load / max(a.capacity, 1e-9) for aid, a in self._agents.items()}
+        loads = {
+            aid: a.current_load / max(a.capacity, 1e-9)
+            for aid, a in self._agents.items()
+        }
         avg_utilization = sum(loads.values()) / len(loads)
         overloaded = [aid for aid, u in loads.items() if u > 0.9]
         underloaded = [aid for aid, u in loads.items() if u < 0.3]
@@ -128,7 +137,9 @@ class TaskDelegationAI:
             },
         }
 
-    def update_agent_success_rate(self, agent_id: str, completed: int, attempted: int) -> None:
+    def update_agent_success_rate(
+        self, agent_id: str, completed: int, attempted: int
+    ) -> None:
         """Update an agent's success rate based on outcomes."""
         agent = self._agents.get(agent_id)
         if agent and attempted > 0:

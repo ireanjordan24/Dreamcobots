@@ -7,25 +7,33 @@ framework to ingest, classify, benchmark, evolve, and govern AI learning methods
 """
 
 from __future__ import annotations
-import sys
+
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # CRITICAL — required for framework compliance
-
+from bots.global_ai_learning_matrix.country_monitor import Country, CountryMonitor
+from bots.global_ai_learning_matrix.evolution_engine import (
+    EvolutionEngine,
+    EvolutionStage,
+)
+from bots.global_ai_learning_matrix.governance import GovernanceLayer
+from bots.global_ai_learning_matrix.learning_benchmarks import (
+    LearningBenchmarks,
+    LearningMethod,
+)
 from bots.global_ai_learning_matrix.tiers import (
-    Tier,
-    get_tier_config,
-    TierConfig,
+    FEATURE_CUSTOM_MODELS,
     FEATURE_EVOLUTION_ENGINE,
     FEATURE_GOVERNANCE,
-    FEATURE_CUSTOM_MODELS,
+    Tier,
+    TierConfig,
+    get_tier_config,
 )
-from bots.global_ai_learning_matrix.country_monitor import Country, CountryMonitor
-from bots.global_ai_learning_matrix.learning_benchmarks import LearningMethod, LearningBenchmarks
-from bots.global_ai_learning_matrix.evolution_engine import EvolutionEngine, EvolutionStage
-from bots.global_ai_learning_matrix.governance import GovernanceLayer
+from framework import (
+    GlobalAISourcesFlow,
+)  # CRITICAL — required for framework compliance
 
 
 class GlobalAILearningMatrixError(Exception):
@@ -87,8 +95,16 @@ class GlobalAILearningMatrix:
         ranked = self._benchmarks.rank_methods()
         method_str = ", ".join(f"{m.value}({s:.1f})" for m, s in ranked[:3])
 
-        gov_score = self._governance.get_governance_score() if self._tier_config.has_feature(FEATURE_GOVERNANCE) else "N/A (PRO+)"
-        evo_models = len(self._evolution_engine.list_models()) if self._tier_config.has_feature(FEATURE_EVOLUTION_ENGINE) else "N/A (PRO+)"
+        gov_score = (
+            self._governance.get_governance_score()
+            if self._tier_config.has_feature(FEATURE_GOVERNANCE)
+            else "N/A (PRO+)"
+        )
+        evo_models = (
+            len(self._evolution_engine.list_models())
+            if self._tier_config.has_feature(FEATURE_EVOLUTION_ENGINE)
+            else "N/A (PRO+)"
+        )
 
         lines = [
             "=" * 60,
@@ -123,7 +139,10 @@ class GlobalAILearningMatrix:
         health_score: float,
     ) -> dict:
         max_countries = self._tier_config.max_countries
-        if max_countries is not None and code.upper() not in self._tracked_country_codes:
+        if (
+            max_countries is not None
+            and code.upper() not in self._tracked_country_codes
+        ):
             if len(self._tracked_country_codes) >= max_countries:
                 raise GlobalAILearningMatrixTierError(
                     f"Country limit of {max_countries} reached for the {self._tier.value.upper()} tier. "
@@ -225,11 +244,18 @@ class GlobalAILearningMatrix:
     def get_global_health(self) -> dict:
         global_stats = self._country_monitor.get_global_stats()
         top_countries = [
-            {"code": c.code, "name": c.name, "lab_count": c.lab_count, "health_score": c.health_score}
+            {
+                "code": c.code,
+                "name": c.name,
+                "lab_count": c.lab_count,
+                "health_score": c.health_score,
+            }
             for c in self._country_monitor.get_top_countries(n=5)
         ]
         ranked = self._benchmarks.rank_methods()
-        benchmarks_summary = [{"method": m.value, "overall_score": s} for m, s in ranked[:3]]
+        benchmarks_summary = [
+            {"method": m.value, "overall_score": s} for m, s in ranked[:3]
+        ]
 
         open_alerts: int
         if self._tier_config.has_feature(FEATURE_GOVERNANCE):

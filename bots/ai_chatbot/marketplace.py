@@ -9,6 +9,7 @@ This module handles:
   and co-branded collateral generation
 * White-label configuration (Premium only)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -18,20 +19,22 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from .tiers import Tier, TierConfig, TIER_CONFIGS, require_feature, tier_summary
-
+from .tiers import TIER_CONFIGS, Tier, TierConfig, require_feature, tier_summary
 
 # ---------------------------------------------------------------------------
 # Subscription models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Subscription:
     subscription_id: str = field(default_factory=lambda: f"sub_{uuid.uuid4().hex[:12]}")
     user_id: str = ""
     tier: Tier = Tier.FREE
-    status: str = "active"          # active | cancelled | past_due | trialing
-    started_at: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    status: str = "active"  # active | cancelled | past_due | trialing
+    started_at: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
     renews_at: str = ""
     payment_method: str = ""
 
@@ -48,7 +51,9 @@ class CheckoutSession:
     success_url: str = "https://dreamcobots.io/checkout/success"
     cancel_url: str = "https://dreamcobots.io/checkout/cancel"
     metadata: Dict = field(default_factory=dict)
-    created_at: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -58,33 +63,63 @@ class CheckoutSession:
 LAYOUT_TEMPLATES = {
     "b2b_landing": {
         "name": "B2B Landing Page",
-        "sections": ["Hero", "Value Propositions", "Tier Comparison", "Social Proof", "CTA"],
+        "sections": [
+            "Hero",
+            "Value Propositions",
+            "Tier Comparison",
+            "Social Proof",
+            "CTA",
+        ],
         "target_audience": "enterprise decision-makers",
         "description": "High-conversion landing page targeting business buyers.",
     },
     "developer_portal": {
         "name": "Developer Portal",
-        "sections": ["Quickstart", "API Reference", "SDKs & Libraries", "Tutorials", "Community"],
+        "sections": [
+            "Quickstart",
+            "API Reference",
+            "SDKs & Libraries",
+            "Tutorials",
+            "Community",
+        ],
         "target_audience": "software developers",
         "description": "Documentation-first layout for onboarding technical users.",
     },
     "partner_brief": {
         "name": "Partner Brief",
-        "sections": ["Executive Summary", "Mutual Benefits", "Integration Overview",
-                     "Go-to-Market Plan", "Next Steps"],
+        "sections": [
+            "Executive Summary",
+            "Mutual Benefits",
+            "Integration Overview",
+            "Go-to-Market Plan",
+            "Next Steps",
+        ],
         "target_audience": "potential AI ecosystem partners",
         "description": "One-pager designed for outreach to strategic partners.",
     },
     "enterprise_pitch": {
         "name": "Enterprise Pitch Deck",
-        "sections": ["Problem", "Solution", "Platform Overview", "Tier Pricing",
-                     "Case Studies", "Security & Compliance", "Roadmap"],
+        "sections": [
+            "Problem",
+            "Solution",
+            "Platform Overview",
+            "Tier Pricing",
+            "Case Studies",
+            "Security & Compliance",
+            "Roadmap",
+        ],
         "target_audience": "enterprise CXOs and procurement teams",
         "description": "Sales deck for enterprise accounts.",
     },
     "product_hunt": {
         "name": "Product Hunt Launch",
-        "sections": ["Tagline", "Gallery", "Feature Highlights", "Maker Story", "Offer Code"],
+        "sections": [
+            "Tagline",
+            "Gallery",
+            "Feature Highlights",
+            "Maker Story",
+            "Offer Code",
+        ],
         "target_audience": "early adopters and indie hackers",
         "description": "Launch materials optimised for Product Hunt.",
     },
@@ -97,14 +132,21 @@ class MarketingDocument:
     template_key: str = "b2b_landing"
     title: str = ""
     content: Dict = field(default_factory=dict)
-    created_at: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
-    last_modified: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
-    export_formats: List[str] = field(default_factory=lambda: ["pdf", "notion", "confluence"])
+    created_at: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
+    last_modified: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
+    export_formats: List[str] = field(
+        default_factory=lambda: ["pdf", "notion", "confluence"]
+    )
 
 
 # ---------------------------------------------------------------------------
 # Marketplace class
 # ---------------------------------------------------------------------------
+
 
 class Marketplace:
     """
@@ -132,7 +174,8 @@ class Marketplace:
             "name": cfg.name,
             "monthly_price_usd": cfg.monthly_price_usd,
             "max_messages_per_day": (
-                "Unlimited" if cfg.max_messages_per_day == -1
+                "Unlimited"
+                if cfg.max_messages_per_day == -1
                 else cfg.max_messages_per_day
             ),
             "ai_models": cfg.ai_models,
@@ -153,7 +196,8 @@ class Marketplace:
         """Create or upgrade a user's subscription."""
         renewal_days = 30
         renews_at = (
-            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=renewal_days)
+            datetime.datetime.now(datetime.timezone.utc)
+            + datetime.timedelta(days=renewal_days)
         ).isoformat()
 
         sub = Subscription(
@@ -309,8 +353,10 @@ class Marketplace:
         return {
             "brand_name": brand_name,
             "primary_color": primary_color,
-            "logo_url": logo_url or f"https://assets.dreamcobots.io/{brand_name.lower()}/logo.png",
-            "custom_domain": custom_domain or f"{brand_name.lower().replace(' ', '-')}.dreamcobots.io",
+            "logo_url": logo_url
+            or f"https://assets.dreamcobots.io/{brand_name.lower()}/logo.png",
+            "custom_domain": custom_domain
+            or f"{brand_name.lower().replace(' ', '-')}.dreamcobots.io",
             "powered_by": "Dreamcobots AI Platform",
             "configured_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         }
@@ -320,19 +366,28 @@ class Marketplace:
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _generate_section_content(
-    section: str, brand_name: str, vps: List[str]
-) -> str:
+
+def _generate_section_content(section: str, brand_name: str, vps: List[str]) -> str:
     """Generate placeholder content for a marketing document section."""
     section_lower = section.lower()
     if "hero" in section_lower or "tagline" in section_lower:
         return f"{brand_name} – The AI Chatbot Platform Built for Every Business"
-    if "value" in section_lower or "feature" in section_lower or "highlight" in section_lower:
+    if (
+        "value" in section_lower
+        or "feature" in section_lower
+        or "highlight" in section_lower
+    ):
         return "\n".join(f"• {vp}" for vp in vps)
-    if "tier" in section_lower or "pricing" in section_lower or "offer" in section_lower:
+    if (
+        "tier" in section_lower
+        or "pricing" in section_lower
+        or "offer" in section_lower
+    ):
         return tier_summary()
     if "cta" in section_lower or "next step" in section_lower:
-        return f"Get started with {brand_name} today – Free tier, no credit card required."
+        return (
+            f"Get started with {brand_name} today – Free tier, no credit card required."
+        )
     if "problem" in section_lower:
         return "Businesses waste hours on repetitive support tasks with no scalable AI solution."
     if "solution" in section_lower:

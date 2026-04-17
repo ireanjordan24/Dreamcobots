@@ -10,17 +10,24 @@ Usage
     result = bot.analyze_revenue({"sales": [100, 200, 150]})
     print(result)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_revenue_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_revenue_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _revenue_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_revenue_tiers)
 REVENUE_FEATURES = _revenue_tiers.REVENUE_FEATURES
@@ -144,7 +151,7 @@ class RevenueGrowthBot:
             )
         self._request_count += 1
         forecasts = [
-            {"month": i + 1, "predicted_revenue": 10_000 * (1.05 ** i)}
+            {"month": i + 1, "predicted_revenue": 10_000 * (1.05**i)}
             for i in range(period_months)
         ]
         return {
@@ -169,9 +176,7 @@ class RevenueGrowthBot:
             else f"{info['requests_per_month']:,}"
         )
         product_limit = (
-            "Unlimited"
-            if info["product_limit"] is None
-            else str(info["product_limit"])
+            "Unlimited" if info["product_limit"] is None else str(info["product_limit"])
         )
         lines = [
             f"=== {info['name']} Revenue Growth Bot Tier ===",
@@ -196,7 +201,9 @@ class RevenueGrowthBot:
             print(msg)
             return msg
         current_feats = set(REVENUE_FEATURES[self.tier.value])
-        new_feats = [f for f in REVENUE_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f for f in REVENUE_FEATURES[next_cfg.tier.value] if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

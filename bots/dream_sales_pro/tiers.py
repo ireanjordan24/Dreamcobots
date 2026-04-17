@@ -7,6 +7,7 @@ Pricing tiers for DreamSalesPro bots:
 
 Tiers map directly to the per-bot tier labels in bots.json.
 """
+
 # GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations

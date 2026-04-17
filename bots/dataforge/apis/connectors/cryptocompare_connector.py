@@ -1,4 +1,5 @@
 """CryptoCompare cryptocurrency data connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,6 +29,7 @@ class CryptoCompareConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"fsym": fsym, "tsyms": tsyms}
         if self.api_key:
             params["api_key"] = self.api_key
@@ -40,7 +42,9 @@ class CryptoCompareConnector:
             logger.error("CryptoCompare get_price error: %s", e)
             return {"status": "error", "message": str(e)}
 
-    def get_historical_daily(self, fsym: str, tsym: str = "USD", limit: int = 30) -> dict:
+    def get_historical_daily(
+        self, fsym: str, tsym: str = "USD", limit: int = 30
+    ) -> dict:
         """Get historical daily price data.
 
         Args:
@@ -52,12 +56,14 @@ class CryptoCompareConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"fsym": fsym, "tsym": tsym, "limit": limit}
         try:
-            response = requests.get(f"{self.BASE_URL}/histoday", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/histoday", params=params, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("CryptoCompare get_historical_daily error: %s", e)
             return {"status": "error", "message": str(e)}
-

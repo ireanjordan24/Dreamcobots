@@ -14,12 +14,11 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
+from bots.quantum_decision_bot.probability_model import ProbabilityModel
+from bots.quantum_decision_bot.quantum_engine import QuantumEngine
+
 # GLOBAL AI SOURCES FLOW
 from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.quantum_decision_bot.quantum_engine import QuantumEngine
-from bots.quantum_decision_bot.probability_model import ProbabilityModel
-
 
 # ---------------------------------------------------------------------------
 # Action templates per bot type
@@ -67,7 +66,9 @@ _BOT_ACTION_TEMPLATES: Dict[str, List[str]] = {
 def _build_actions(bot_name: str, best_path: dict) -> List[str]:
     """Format action strings for *bot_name* based on *best_path*."""
     template_key = bot_name.lower()
-    templates = _BOT_ACTION_TEMPLATES.get(template_key, _BOT_ACTION_TEMPLATES["default"])
+    templates = _BOT_ACTION_TEMPLATES.get(
+        template_key, _BOT_ACTION_TEMPLATES["default"]
+    )
     scenario = best_path.get("scenario", "moderate")
     risk = round(best_path.get("risk", 5.0), 1)
     return [t.format(scenario=scenario, risk=risk) for t in templates]
@@ -76,6 +77,7 @@ def _build_actions(bot_name: str, best_path: dict) -> List[str]:
 # ---------------------------------------------------------------------------
 # BotRouter
 # ---------------------------------------------------------------------------
+
 
 class BotRouter:
     """
@@ -159,7 +161,9 @@ class BotRouter:
         """Return a snapshot of the bot network state."""
         bots_routed = list({e["bot"] for e in self._routing_log})
         avg_score = (
-            round(sum(e["score"] for e in self._routing_log) / len(self._routing_log), 4)
+            round(
+                sum(e["score"] for e in self._routing_log) / len(self._routing_log), 4
+            )
             if self._routing_log
             else 0.0
         )

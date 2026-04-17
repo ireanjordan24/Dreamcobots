@@ -10,5 +10,9 @@ class TierConfig:
 
 TIERS = {
     "pro": TierConfig("Pro", 199.0, ["walk-forward analysis"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["walk-forward analysis", "Monte Carlo simulation", "regime detection"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        ["walk-forward analysis", "Monte Carlo simulation", "regime detection"],
+    ),
 }

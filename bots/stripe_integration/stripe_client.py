@@ -30,9 +30,9 @@ Usage
 
 from __future__ import annotations
 
+import datetime
 import os
 import uuid
-import datetime
 from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
@@ -74,10 +74,7 @@ class StripeClient:
         secret_key: Optional[str] = None,
         mock: Optional[bool] = None,
     ) -> None:
-        self._secret_key: str = (
-            secret_key
-            or os.environ.get("STRIPE_SECRET_KEY", "")
-        )
+        self._secret_key: str = secret_key or os.environ.get("STRIPE_SECRET_KEY", "")
         self._publishable_key: str = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
 
         if mock is None:
@@ -88,6 +85,7 @@ class StripeClient:
         if not self._mock:
             try:
                 import stripe as _stripe  # type: ignore
+
                 _stripe.api_key = self._secret_key
                 self._stripe = _stripe
             except ImportError as exc:  # pragma: no cover
@@ -432,14 +430,27 @@ def _create_customer(self, email: str = "", name: str = "") -> dict:
 StripeClient.create_customer = _create_customer
 
 
-def _refund_payment(self, payment_intent_id: str, reason: str = "requested_by_customer") -> dict:
+def _refund_payment(
+    self, payment_intent_id: str, reason: str = "requested_by_customer"
+) -> dict:
     """Refund a payment intent."""
     if self._mock:
         refund_id = self._new_id("re")
-        return {"id": refund_id, "status": "succeeded", "payment_intent": payment_intent_id, "reason": reason}
+        return {
+            "id": refund_id,
+            "status": "succeeded",
+            "payment_intent": payment_intent_id,
+            "reason": reason,
+        }
     try:
-        refund = self._stripe.Refund.create(payment_intent=payment_intent_id, reason=reason)
-        return {"id": refund.id, "status": refund.status, "payment_intent": payment_intent_id}
+        refund = self._stripe.Refund.create(
+            payment_intent=payment_intent_id, reason=reason
+        )
+        return {
+            "id": refund.id,
+            "status": refund.status,
+            "payment_intent": payment_intent_id,
+        }
     except Exception as exc:
         raise StripeError(str(exc)) from exc
 
@@ -447,11 +458,20 @@ def _refund_payment(self, payment_intent_id: str, reason: str = "requested_by_cu
 def _get_balance(self) -> dict:
     """Get Stripe account balance."""
     if self._mock:
-        return {"available": [{"amount": 1000000, "currency": "usd"}], "pending": [{"amount": 50000, "currency": "usd"}]}
+        return {
+            "available": [{"amount": 1000000, "currency": "usd"}],
+            "pending": [{"amount": 50000, "currency": "usd"}],
+        }
     try:
         balance = self._stripe.Balance.retrieve()
-        return {"available": [{"amount": a.amount, "currency": a.currency} for a in balance.available],
-                "pending": [{"amount": p.amount, "currency": p.currency} for p in balance.pending]}
+        return {
+            "available": [
+                {"amount": a.amount, "currency": a.currency} for a in balance.available
+            ],
+            "pending": [
+                {"amount": p.amount, "currency": p.currency} for p in balance.pending
+            ],
+        }
     except Exception as exc:
         raise StripeError(str(exc)) from exc
 
@@ -459,10 +479,20 @@ def _get_balance(self) -> dict:
 def _list_payouts(self, limit: int = 10) -> list:
     """List recent payouts."""
     if self._mock:
-        return [{"id": self._new_id("po"), "amount": 50000, "currency": "usd", "status": "paid"}]
+        return [
+            {
+                "id": self._new_id("po"),
+                "amount": 50000,
+                "currency": "usd",
+                "status": "paid",
+            }
+        ]
     try:
         payouts = self._stripe.Payout.list(limit=limit)
-        return [{"id": p.id, "amount": p.amount, "currency": p.currency, "status": p.status} for p in payouts.data]
+        return [
+            {"id": p.id, "amount": p.amount, "currency": p.currency, "status": p.status}
+            for p in payouts.data
+        ]
     except Exception as exc:
         raise StripeError(str(exc)) from exc
 

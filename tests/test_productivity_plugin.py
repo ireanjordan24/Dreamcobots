@@ -1,8 +1,9 @@
 """Tests for productivity plugin."""
 
 import pytest
-from BuddyAI.task_engine import TaskEngine
+
 from BuddyAI.plugins import productivity
+from BuddyAI.task_engine import TaskEngine
 
 
 @pytest.fixture(autouse=True)

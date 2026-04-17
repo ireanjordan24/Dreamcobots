@@ -1,4 +1,5 @@
 """MonkeyLearn text analysis connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,14 +29,24 @@ class MonkeyLearnConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Token {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Token {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"data": texts}
         try:
-            response = requests.post(f"{self.BASE_URL}/classifiers/{module_id}/classify/", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/classifiers/{module_id}/classify/",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
-            logger.info("MonkeyLearn classification completed for module %s.", module_id)
+            logger.info(
+                "MonkeyLearn classification completed for module %s.", module_id
+            )
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("MonkeyLearn classify error: %s", e)
             return {"status": "error", "message": str(e)}
-

@@ -1,18 +1,19 @@
 """Tests for core/optimizer.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from core.optimizer import Optimizer, OptimizationResult
 
+from core.optimizer import OptimizationResult, Optimizer
 
 # ---------------------------------------------------------------------------
 # improve()
 # ---------------------------------------------------------------------------
+
 
 class TestImprove:
     def setup_method(self):
@@ -46,6 +47,7 @@ class TestImprove:
 # evaluate()
 # ---------------------------------------------------------------------------
 
+
 class TestEvaluate:
     def setup_method(self):
         self.opt = Optimizer()
@@ -57,12 +59,21 @@ class TestEvaluate:
     def test_to_dict_has_required_keys(self):
         result = self.opt.evaluate("test_bot", {"revenue": 200, "conversion_rate": 0.2})
         d = result.to_dict()
-        for key in ("bot_name", "recommendation", "revenue", "conversion_rate",
-                    "leads_generated", "priority_score", "timestamp"):
+        for key in (
+            "bot_name",
+            "recommendation",
+            "revenue",
+            "conversion_rate",
+            "leads_generated",
+            "priority_score",
+            "timestamp",
+        ):
             assert key in d
 
     def test_priority_score_positive_for_high_revenue(self):
-        result = self.opt.evaluate("top_bot", {"revenue": 2_000, "conversion_rate": 0.5, "leads_generated": 20})
+        result = self.opt.evaluate(
+            "top_bot", {"revenue": 2_000, "conversion_rate": 0.5, "leads_generated": 20}
+        )
         assert result.priority_score > 0
 
     def test_history_appended(self):
@@ -74,6 +85,7 @@ class TestEvaluate:
 # ---------------------------------------------------------------------------
 # evaluate_all()
 # ---------------------------------------------------------------------------
+
 
 class TestEvaluateAll:
     def test_returns_sorted_by_priority(self):
@@ -95,6 +107,7 @@ class TestEvaluateAll:
 # get_top_performers()
 # ---------------------------------------------------------------------------
 
+
 class TestTopPerformers:
     def test_returns_n_results(self):
         opt = Optimizer()
@@ -114,6 +127,7 @@ class TestTopPerformers:
 # ---------------------------------------------------------------------------
 # OptimizationResult
 # ---------------------------------------------------------------------------
+
 
 class TestOptimizationResult:
     def test_to_dict_rounds_values(self):

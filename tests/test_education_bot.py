@@ -2,27 +2,33 @@
 Tests for bots/education_bot/tiers.py and bots/education_bot/education_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'education_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "education_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.education_bot.education_bot import EducationBot, EducationBotTierError, EducationBotRequestLimitError
 
+from bots.education_bot.education_bot import (
+    EducationBot,
+    EducationBotRequestLimitError,
+    EducationBotTierError,
+)
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestEducationBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_edu_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -33,8 +39,15 @@ class TestEducationBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_education_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "education_features", "course_limit", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "education_features",
+            "course_limit",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -43,7 +56,9 @@ class TestEducationBotTierInfo:
 
     def test_enterprise_unlimited(self):
         mod = self._load_tiers()
-        assert mod.get_education_tier_info(Tier.ENTERPRISE)["requests_per_month"] is None
+        assert (
+            mod.get_education_tier_info(Tier.ENTERPRISE)["requests_per_month"] is None
+        )
 
     def test_enterprise_unlimited_courses(self):
         mod = self._load_tiers()
@@ -60,6 +75,7 @@ class TestEducationBotTierInfo:
 # EducationBot tests
 # -----------------------------------------------------------------------
 
+
 class TestEducationBot:
     def test_default_tier_free(self):
         bot = EducationBot()
@@ -67,7 +83,9 @@ class TestEducationBot:
 
     def test_create_course_returns_dict(self):
         bot = EducationBot()
-        result = bot.create_course("Intro to Python", ["Variables", "Loops", "Functions"])
+        result = bot.create_course(
+            "Intro to Python", ["Variables", "Loops", "Functions"]
+        )
         assert isinstance(result, dict)
 
     def test_create_course_keys(self):
@@ -87,6 +105,7 @@ class TestEducationBot:
     def test_free_course_limit(self):
         bot = EducationBot(tier=Tier.FREE)
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_edu_t", os.path.join(BOT_DIR, "tiers.py")
         )

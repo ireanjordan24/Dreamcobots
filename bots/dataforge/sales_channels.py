@@ -1,4 +1,5 @@
 """Sales channels for DataForge AI datasets."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 from datetime import datetime
@@ -21,7 +22,9 @@ class SalesChannels:
         """Initialize the SalesChannels with an empty sales log."""
         self._sales_log: list = []
 
-    def _log_sale(self, channel: str, product: str, price: float, metadata: dict = None) -> dict:
+    def _log_sale(
+        self, channel: str, product: str, price: float, metadata: dict = None
+    ) -> dict:
         """Log a sale record internally.
 
         Args:
@@ -41,10 +44,14 @@ class SalesChannels:
             "metadata": metadata or {},
         }
         self._sales_log.append(record)
-        logger.info("Sale recorded: channel=%s product=%s price=%.2f", channel, product, price)
+        logger.info(
+            "Sale recorded: channel=%s product=%s price=%.2f", channel, product, price
+        )
         return record
 
-    def push_to_huggingface(self, dataset_name: str, data: list, token: str = None) -> dict:
+    def push_to_huggingface(
+        self, dataset_name: str, data: list, token: str = None
+    ) -> dict:
         """Push a dataset to HuggingFace Hub for sale or free distribution.
 
         Args:
@@ -66,7 +73,9 @@ class SalesChannels:
         self._log_sale("huggingface", dataset_name, 0.0, result)
         return result
 
-    def push_to_kaggle(self, dataset_name: str, data: list, description: str = "") -> dict:
+    def push_to_kaggle(
+        self, dataset_name: str, data: list, description: str = ""
+    ) -> dict:
         """Push a dataset to Kaggle for sale or competition use.
 
         Args:
@@ -99,7 +108,9 @@ class SalesChannels:
             Result dict with channel, product, price, tier, and status.
         """
         pricing = PRICING.get(pricing_key, {"price": 0.0, "tier": "unknown"})
-        logger.info("Listing %s on AWS Marketplace at $%.2f", product_name, pricing["price"])
+        logger.info(
+            "Listing %s on AWS Marketplace at $%.2f", product_name, pricing["price"]
+        )
         result = {
             "channel": "aws_marketplace",
             "product": product_name,
@@ -110,7 +121,9 @@ class SalesChannels:
         self._log_sale("aws_marketplace", product_name, pricing["price"], result)
         return result
 
-    def sell_direct_api(self, product_name: str, pricing_key: str, buyer_id: str) -> dict:
+    def sell_direct_api(
+        self, product_name: str, pricing_key: str, buyer_id: str
+    ) -> dict:
         """Process a direct API sale for a dataset product.
 
         Args:
@@ -122,7 +135,12 @@ class SalesChannels:
             Result dict with channel, product, buyer_id, price, tier, status, and access_url.
         """
         pricing = PRICING.get(pricing_key, {"price": 0.0, "tier": "unknown"})
-        logger.info("Direct API sale: %s to buyer %s at $%.2f", product_name, buyer_id, pricing["price"])
+        logger.info(
+            "Direct API sale: %s to buyer %s at $%.2f",
+            product_name,
+            buyer_id,
+            pricing["price"],
+        )
         result = {
             "channel": "direct_api",
             "product": product_name,

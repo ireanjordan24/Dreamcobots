@@ -9,8 +9,8 @@ Run:
     python -m pytest tests/test_bots.py
 """
 
-import sys
 import os
+import sys
 import unittest
 
 # ---------------------------------------------------------------------------
@@ -23,13 +23,13 @@ sys.path.insert(0, os.path.join(_REPO_ROOT, "bots", "hustle-bot"))
 sys.path.insert(0, os.path.join(_REPO_ROOT, "bots", "ai-models-integration"))
 
 from government_contract_grant_bot import GovernmentContractGrantBot
-from referral_bot import ReferralBot
 from hustle_bot import HustleBot
-
+from referral_bot import ReferralBot
 
 # ===========================================================================
 # Government Contract & Grant Bot
 # ===========================================================================
+
 
 class TestGovernmentContractGrantBot(unittest.TestCase):
 
@@ -62,6 +62,7 @@ class TestGovernmentContractGrantBot(unittest.TestCase):
 # ===========================================================================
 # Referral Bot
 # ===========================================================================
+
 
 class TestReferralBot(unittest.TestCase):
 
@@ -107,6 +108,7 @@ class TestReferralBot(unittest.TestCase):
 # ===========================================================================
 # Hustle Bot
 # ===========================================================================
+
 
 class TestHustleBot(unittest.TestCase):
 

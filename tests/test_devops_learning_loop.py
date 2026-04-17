@@ -4,8 +4,9 @@ Tests for:
   - bots/ai_learning_system/learning_loop.py  (LearningLoop)
   - BotGeneratorBot.test_bot / BotGeneratorBot.create_bot  (new methods)
 """
-import sys
+
 import os
+import sys
 import types
 import unittest.mock as mock
 
@@ -14,11 +15,11 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.devops_bot.devops_bot import Bot, DevOpsBot
+
 # ---------------------------------------------------------------------------
 # DevOps Bot tests
 # ---------------------------------------------------------------------------
-
-from bots.devops_bot.devops_bot import DevOpsBot, Bot
 
 
 class TestDevOpsBotFrameworkCompliance:
@@ -93,10 +94,10 @@ class TestDevOpsBotRun:
 # ---------------------------------------------------------------------------
 
 from bots.ai_learning_system.learning_loop import (
-    LearningLoop,
-    DEFAULT_UNDERPERFORM_THRESHOLD,
-    DEFAULT_SCORE_MIN,
     DEFAULT_SCORE_MAX,
+    DEFAULT_SCORE_MIN,
+    DEFAULT_UNDERPERFORM_THRESHOLD,
+    LearningLoop,
 )
 
 
@@ -142,7 +143,9 @@ class TestLearningLoopDefaults:
         assert loop.underperform_threshold == DEFAULT_UNDERPERFORM_THRESHOLD
 
     def test_init_custom_threshold(self):
-        loop = LearningLoop(_FakeControlCenter(), _FakeGenerator(), underperform_threshold=50)
+        loop = LearningLoop(
+            _FakeControlCenter(), _FakeGenerator(), underperform_threshold=50
+        )
         assert loop.underperform_threshold == 50
 
     def test_performance_log_empty_on_init(self):

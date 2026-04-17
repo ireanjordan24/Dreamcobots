@@ -5,15 +5,16 @@ Simulates containerized execution of classified AI/ML methods and collects
 performance metrics (accuracy, convergence rate, resource consumption).
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SANDBOX
-from .classifier import ClassifiedMethod
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .classifier import ClassifiedMethod
+from .tiers import FEATURE_SANDBOX, Tier, TierConfig, get_tier_config
 
 
 class SandboxStatus(Enum):
@@ -78,14 +79,14 @@ class SandboxTierError(Exception):
 # ---------------------------------------------------------------------------
 
 _METHOD_METRICS = {
-    "supervised_learning":      (0.88, 0.80, 42.0, 18.5),
-    "unsupervised_learning":    (0.74, 0.65, 55.0, 22.3),
-    "reinforcement_learning":   (0.79, 0.58, 72.0, 45.1),
+    "supervised_learning": (0.88, 0.80, 42.0, 18.5),
+    "unsupervised_learning": (0.74, 0.65, 55.0, 22.3),
+    "reinforcement_learning": (0.79, 0.58, 72.0, 45.1),
     "semi_supervised_learning": (0.83, 0.72, 48.0, 20.8),
     "self_supervised_learning": (0.85, 0.76, 51.0, 24.7),
-    "transfer_learning":        (0.91, 0.88, 38.0, 15.2),
-    "federated_learning":       (0.76, 0.62, 65.0, 38.4),
-    "meta_learning":            (0.82, 0.70, 58.0, 31.9),
+    "transfer_learning": (0.91, 0.88, 38.0, 15.2),
+    "federated_learning": (0.76, 0.62, 65.0, 38.4),
+    "meta_learning": (0.82, 0.70, 58.0, 31.9),
 }
 
 _DEFAULT_METRICS = (0.80, 0.70, 50.0, 25.0)
@@ -194,13 +195,17 @@ class SandboxTestingLayer:
         """Return a summary of sandbox testing activity."""
         completed = [r for r in self._results if r.status == SandboxStatus.COMPLETED]
         avg_accuracy = (
-            sum(r.accuracy for r in completed if r.accuracy is not None) / len(completed)
-            if completed else 0.0
+            sum(r.accuracy for r in completed if r.accuracy is not None)
+            / len(completed)
+            if completed
+            else 0.0
         )
         return {
             "total_runs": len(self._results),
             "completed": len(completed),
-            "failed": len([r for r in self._results if r.status == SandboxStatus.FAILED]),
+            "failed": len(
+                [r for r in self._results if r.status == SandboxStatus.FAILED]
+            ),
             "average_accuracy": round(avg_accuracy, 4),
             "active_containers": self._active_containers,
             "container_limit": self.config.sandbox_containers,

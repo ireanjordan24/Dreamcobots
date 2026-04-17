@@ -1,12 +1,18 @@
 """Quantum Circuit Simulator and Hybrid Quantum-AI Model for the Quantum AI Bot."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config
-from framework import GlobalAISourcesFlow  # noqa: F401
 
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 import math
 import random
 import uuid
+
+from tiers import Tier, get_tier_config
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="QuantumCircuitSimulator")
 
@@ -72,13 +78,15 @@ class QuantumCircuitSimulator:
         self._validate_gates(gates)
 
         circuit_id = str(uuid.uuid4())
-        num_states = 2 ** qubits
+        num_states = 2**qubits
 
         # Cap enumerated states to avoid memory issues with large qubit counts
         max_states = min(num_states, 256)
         amplitudes = [1.0 / math.sqrt(max_states)] * max_states
         for gate in gates:
-            amplitudes = self._apply_gate_effect(gate.get("type", "hadamard"), amplitudes)
+            amplitudes = self._apply_gate_effect(
+                gate.get("type", "hadamard"), amplitudes
+            )
 
         # Normalise
         norm = math.sqrt(sum(a * a for a in amplitudes))
@@ -87,7 +95,8 @@ class QuantumCircuitSimulator:
 
         state_bits = min(qubits, 8)  # limit label width for large circuits
         probabilities = {
-            format(i, f"0{state_bits}b"): round(a * a, 6) for i, a in enumerate(amplitudes)
+            format(i, f"0{state_bits}b"): round(a * a, 6)
+            for i, a in enumerate(amplitudes)
         }
 
         # Simulate counts
@@ -230,6 +239,7 @@ class QuantumCircuitSimulator:
 # Hybrid Quantum-AI Model
 # ---------------------------------------------------------------------------
 
+
 class HybridQuantumAIModelError(Exception):
     """Raised when a tier restriction is violated in HybridQuantumAIModel."""
 
@@ -238,11 +248,31 @@ class HybridQuantumAIModel:
     """Hybrid classical/quantum model for AI-enhanced quantum predictions."""
 
     _QUANTUM_ADVANTAGE_DATA = {
-        "optimization": {"quantum_speedup": "quadratic", "classical_complexity": "O(n^2)", "quantum_complexity": "O(n)"},
-        "machine_learning": {"quantum_speedup": "exponential", "classical_complexity": "O(2^n)", "quantum_complexity": "O(n)"},
-        "cryptography": {"quantum_speedup": "exponential", "classical_complexity": "O(e^n)", "quantum_complexity": "O(n^3)"},
-        "simulation": {"quantum_speedup": "polynomial", "classical_complexity": "O(n^3)", "quantum_complexity": "O(n^2)"},
-        "search": {"quantum_speedup": "quadratic", "classical_complexity": "O(n)", "quantum_complexity": "O(sqrt(n))"},
+        "optimization": {
+            "quantum_speedup": "quadratic",
+            "classical_complexity": "O(n^2)",
+            "quantum_complexity": "O(n)",
+        },
+        "machine_learning": {
+            "quantum_speedup": "exponential",
+            "classical_complexity": "O(2^n)",
+            "quantum_complexity": "O(n)",
+        },
+        "cryptography": {
+            "quantum_speedup": "exponential",
+            "classical_complexity": "O(e^n)",
+            "quantum_complexity": "O(n^3)",
+        },
+        "simulation": {
+            "quantum_speedup": "polynomial",
+            "classical_complexity": "O(n^3)",
+            "quantum_complexity": "O(n^2)",
+        },
+        "search": {
+            "quantum_speedup": "quadratic",
+            "classical_complexity": "O(n)",
+            "quantum_complexity": "O(sqrt(n))",
+        },
     }
 
     def __init__(self, tier: Tier = Tier.FREE):

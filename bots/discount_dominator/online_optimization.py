@@ -4,6 +4,7 @@ Online Platform Optimization module for the Discount Dominator (settings 501–5
 Provides the :class:`OnlinePlatformOptimization` facade used by all bots that
 operate on e-commerce and marketplace channels.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -13,9 +14,9 @@ from typing import Any, Dict, List, Optional
 from .settings import (
     DISCOUNT_DOMINATOR_SETTINGS,
     GROUP_ONLINE,
-    get_setting,
-    get_group_settings,
     as_dict,
+    get_group_settings,
+    get_setting,
 )
 
 
@@ -100,33 +101,29 @@ class OnlinePlatformOptimization:
 
     def get_enabled_features(self) -> List[str]:
         """Return names of online settings that are currently ``True``."""
-        return [
-            s.name
-            for s in get_group_settings(GROUP_ONLINE)
-            if s.value is True
-        ]
+        return [s.name for s in get_group_settings(GROUP_ONLINE) if s.value is True]
 
     def configure_for_marketplace(self) -> None:
         """Apply presets optimised for marketplace (Amazon/eBay) selling."""
         DISCOUNT_DOMINATOR_SETTINGS[501].value = "aggressive"  # seo
-        DISCOUNT_DOMINATOR_SETTINGS[503].value = True    # dynamic_pricing
-        DISCOUNT_DOMINATOR_SETTINGS[504].value = True    # cross_platform_syndication
-        DISCOUNT_DOMINATOR_SETTINGS[506].value = True    # sponsored_ads
-        DISCOUNT_DOMINATOR_SETTINGS[526].value = "mixed" # buy_box_strategy
+        DISCOUNT_DOMINATOR_SETTINGS[503].value = True  # dynamic_pricing
+        DISCOUNT_DOMINATOR_SETTINGS[504].value = True  # cross_platform_syndication
+        DISCOUNT_DOMINATOR_SETTINGS[506].value = True  # sponsored_ads
+        DISCOUNT_DOMINATOR_SETTINGS[526].value = "mixed"  # buy_box_strategy
 
     def configure_for_car_flipping(self) -> None:
         """Apply online presets for the car-flipping and parts arbitrage bot."""
-        DISCOUNT_DOMINATOR_SETTINGS[503].value = True    # dynamic_pricing
-        DISCOUNT_DOMINATOR_SETTINGS[504].value = True    # cross_platform_syndication
-        DISCOUNT_DOMINATOR_SETTINGS[525].value = True    # marketplace_fee_optimiser
-        DISCOUNT_DOMINATOR_SETTINGS[542].value = True    # fraud_scoring_at_checkout
+        DISCOUNT_DOMINATOR_SETTINGS[503].value = True  # dynamic_pricing
+        DISCOUNT_DOMINATOR_SETTINGS[504].value = True  # cross_platform_syndication
+        DISCOUNT_DOMINATOR_SETTINGS[525].value = True  # marketplace_fee_optimiser
+        DISCOUNT_DOMINATOR_SETTINGS[542].value = True  # fraud_scoring_at_checkout
 
     def configure_for_real_estate(self) -> None:
         """Apply online presets for the real estate optimisation system."""
-        DISCOUNT_DOMINATOR_SETTINGS[502].value = True    # listing enhancement
-        DISCOUNT_DOMINATOR_SETTINGS[509].value = True    # recommendation engine
-        DISCOUNT_DOMINATOR_SETTINGS[515].value = True    # social_commerce
-        DISCOUNT_DOMINATOR_SETTINGS[536].value = True    # delivery_promise_engine
+        DISCOUNT_DOMINATOR_SETTINGS[502].value = True  # listing enhancement
+        DISCOUNT_DOMINATOR_SETTINGS[509].value = True  # recommendation engine
+        DISCOUNT_DOMINATOR_SETTINGS[515].value = True  # social_commerce
+        DISCOUNT_DOMINATOR_SETTINGS[536].value = True  # delivery_promise_engine
 
     def generate_coupon(self, segment: str, discount_pct: int) -> Dict[str, Any]:
         """Simulate generating a personalised coupon for a customer segment."""

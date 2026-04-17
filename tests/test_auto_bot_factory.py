@@ -3,50 +3,14 @@ Tests for bots/auto_bot_factory/ — AutoBotFactory, CompetitorAnalyzer,
 StrategyFramework, SafetyController, and tier configuration.
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from bots.auto_bot_factory.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    list_tiers,
-    get_upgrade_path,
-    FEATURE_BOT_GENERATION,
-    FEATURE_COMPETITOR_ANALYSIS,
-    FEATURE_STRATEGY_FRAMEWORK,
-    FEATURE_AUTO_DEPLOY,
-    FEATURE_SAFETY_CONTROLLER,
-    FEATURE_SELF_HEALING,
-    FEATURE_PERSISTENT_MEMORY,
-    FEATURE_REAL_METRICS,
-    FEATURE_DECISION_ENGINE,
-    FEATURE_USAGE_BILLING,
-    FEATURE_FULL_AUTONOMY,
-    FEATURE_GITHUB_DEPLOY,
-)
-from bots.auto_bot_factory.competitor_analyzer import (
-    CompetitorAnalyzer,
-    CompetitorProfile,
-    MarketGap,
-    AnalysisReport,
-)
-from bots.auto_bot_factory.strategy_framework import (
-    StrategyFramework,
-    StrategyCategory,
-    Strategy,
-)
-from bots.auto_bot_factory.safety_controller import (
-    SafetyController,
-    SafetyLimitError,
-    MAX_BOTS,
-    MAX_MESSAGES_PER_CYCLE,
-)
 from bots.auto_bot_factory.auto_bot_factory import (
     AutoBotFactory,
     AutoBotFactoryError,
@@ -54,33 +18,77 @@ from bots.auto_bot_factory.auto_bot_factory import (
     BotBlueprint,
     DeploymentRecord,
 )
-
+from bots.auto_bot_factory.competitor_analyzer import (
+    AnalysisReport,
+    CompetitorAnalyzer,
+    CompetitorProfile,
+    MarketGap,
+)
+from bots.auto_bot_factory.safety_controller import (
+    MAX_BOTS,
+    MAX_MESSAGES_PER_CYCLE,
+    SafetyController,
+    SafetyLimitError,
+)
+from bots.auto_bot_factory.strategy_framework import (
+    Strategy,
+    StrategyCategory,
+    StrategyFramework,
+)
+from bots.auto_bot_factory.tiers import (
+    FEATURE_AUTO_DEPLOY,
+    FEATURE_BOT_GENERATION,
+    FEATURE_COMPETITOR_ANALYSIS,
+    FEATURE_DECISION_ENGINE,
+    FEATURE_FULL_AUTONOMY,
+    FEATURE_GITHUB_DEPLOY,
+    FEATURE_PERSISTENT_MEMORY,
+    FEATURE_REAL_METRICS,
+    FEATURE_SAFETY_CONTROLLER,
+    FEATURE_SELF_HEALING,
+    FEATURE_STRATEGY_FRAMEWORK,
+    FEATURE_USAGE_BILLING,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
 
 # ---------------------------------------------------------------------------
 # Framework compliance
 # ---------------------------------------------------------------------------
 
+
 class TestFrameworkCompliance:
     def test_auto_bot_factory_has_framework_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "auto_bot_factory.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "auto_bot_factory", "auto_bot_factory.py"
+        )
         with open(path) as f:
             text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_competitor_analyzer_has_framework_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "competitor_analyzer.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "auto_bot_factory", "competitor_analyzer.py"
+        )
         with open(path) as f:
             text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_strategy_framework_has_framework_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "strategy_framework.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "auto_bot_factory", "strategy_framework.py"
+        )
         with open(path) as f:
             text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
 
     def test_safety_controller_has_framework_marker(self):
-        path = os.path.join(REPO_ROOT, "bots", "auto_bot_factory", "safety_controller.py")
+        path = os.path.join(
+            REPO_ROOT, "bots", "auto_bot_factory", "safety_controller.py"
+        )
         with open(path) as f:
             text = f.read()
         assert any(m in text for m in ("GlobalAISourcesFlow", "GLOBAL AI SOURCES FLOW"))
@@ -89,6 +97,7 @@ class TestFrameworkCompliance:
 # ---------------------------------------------------------------------------
 # Tiers
 # ---------------------------------------------------------------------------
+
 
 class TestAutoBotFactoryTiers:
     def test_three_tiers_exist(self):
@@ -159,6 +168,7 @@ class TestAutoBotFactoryTiers:
 # ---------------------------------------------------------------------------
 # Competitor Analyzer
 # ---------------------------------------------------------------------------
+
 
 class TestCompetitorAnalyzer:
     def test_analyze_returns_report(self):
@@ -251,6 +261,7 @@ class TestCompetitorAnalyzer:
 # Strategy Framework
 # ---------------------------------------------------------------------------
 
+
 class TestStrategyFramework:
     def test_total_strategies_is_200(self):
         fw = StrategyFramework()
@@ -269,7 +280,9 @@ class TestStrategyFramework:
         fw = StrategyFramework()
         for cat in StrategyCategory:
             strategies = fw.get_by_category(cat)
-            assert len(strategies) == 25, f"{cat.value} has {len(strategies)} strategies"
+            assert (
+                len(strategies) == 25
+            ), f"{cat.value} has {len(strategies)} strategies"
 
     def test_strategy_has_required_fields(self):
         fw = StrategyFramework()
@@ -333,6 +346,7 @@ class TestStrategyFramework:
 # ---------------------------------------------------------------------------
 # Safety Controller
 # ---------------------------------------------------------------------------
+
 
 class TestSafetyController:
     def test_default_limits(self):
@@ -471,6 +485,7 @@ class TestSafetyController:
 # Auto-Bot Factory
 # ---------------------------------------------------------------------------
 
+
 class TestAutoBotFactory:
     def test_create_bot_basic_tier(self):
         factory = AutoBotFactory(tier=Tier.BASIC)
@@ -565,11 +580,13 @@ class TestAutoBotFactory:
 
     def test_process_payload(self):
         factory = AutoBotFactory(tier=Tier.BASIC)
-        result = factory.process({
-            "category": "sales",
-            "purpose": "close deals",
-            "features": ["SMS"],
-        })
+        result = factory.process(
+            {
+                "category": "sales",
+                "purpose": "close deals",
+                "features": ["SMS"],
+            }
+        )
         assert "bot_id" in result
 
     def test_tier_error_on_missing_feature(self):

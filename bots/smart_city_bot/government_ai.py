@@ -1,7 +1,13 @@
 """Smart City Government AI Services — tax, census, and policy modeling."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="SmartCityGovernmentAI")
@@ -15,15 +21,16 @@ class GovernmentAIError(Exception):
 # Tax System AI
 # ---------------------------------------------------------------------------
 
+
 class TaxSystemAI:
     """Tier-aware AI-powered tax calculation and policy optimization."""
 
     TAX_BRACKETS = [
-        {"min": 0,       "max": 20000,  "rate": 0.10},
-        {"min": 20001,   "max": 50000,  "rate": 0.20},
-        {"min": 50001,   "max": 100000, "rate": 0.28},
-        {"min": 100001,  "max": 250000, "rate": 0.35},
-        {"min": 250001,  "max": None,   "rate": 0.42},
+        {"min": 0, "max": 20000, "rate": 0.10},
+        {"min": 20001, "max": 50000, "rate": 0.20},
+        {"min": 50001, "max": 100000, "rate": 0.28},
+        {"min": 100001, "max": 250000, "rate": 0.35},
+        {"min": 250001, "max": None, "rate": 0.42},
     ]
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -33,7 +40,11 @@ class TaxSystemAI:
     def calculate_tax(self, citizen_data: dict) -> dict:
         """Calculate tax liability for a citizen based on their income data."""
         income = citizen_data.get("annual_income", 0)
-        deductions = citizen_data.get("deductions", 0) if self.tier in (Tier.PRO, Tier.ENTERPRISE) else 0
+        deductions = (
+            citizen_data.get("deductions", 0)
+            if self.tier in (Tier.PRO, Tier.ENTERPRISE)
+            else 0
+        )
         taxable_income = max(0, income - deductions)
 
         tax_owed = 0.0
@@ -43,19 +54,23 @@ class TaxSystemAI:
                 break
             lower = bracket["min"]
             upper = bracket["max"] if bracket["max"] else float("inf")
-            amount_in_bracket = min(taxable_income - max(0, lower - 1), upper - lower + 1)
+            amount_in_bracket = min(
+                taxable_income - max(0, lower - 1), upper - lower + 1
+            )
             if amount_in_bracket <= 0:
                 continue
             bracket_tax = amount_in_bracket * bracket["rate"]
             tax_owed += bracket_tax
             if self.tier in (Tier.PRO, Tier.ENTERPRISE):
                 upper_label = "inf" if bracket["max"] is None else str(bracket["max"])
-                breakdown.append({
-                    "bracket": f"${lower}-{upper_label}",
-                    "rate_pct": bracket["rate"] * 100,
-                    "amount_taxed": round(amount_in_bracket, 2),
-                    "tax": round(bracket_tax, 2),
-                })
+                breakdown.append(
+                    {
+                        "bracket": f"${lower}-{upper_label}",
+                        "rate_pct": bracket["rate"] * 100,
+                        "amount_taxed": round(amount_in_bracket, 2),
+                        "tax": round(bracket_tax, 2),
+                    }
+                )
 
         effective_rate = round(tax_owed / income * 100, 2) if income > 0 else 0.0
 
@@ -73,7 +88,9 @@ class TaxSystemAI:
             result["bracket_breakdown"] = breakdown
 
         if self.tier == Tier.ENTERPRISE:
-            result["optimization_opportunities"] = self._find_optimizations(citizen_data)
+            result["optimization_opportunities"] = self._find_optimizations(
+                citizen_data
+            )
 
         return result
 
@@ -146,16 +163,47 @@ class TaxSystemAI:
 # Census Collector
 # ---------------------------------------------------------------------------
 
+
 class CensusCollector:
     """Tier-aware AI-powered census data collection and demographics analysis."""
 
     REGION_DATA = {
-        "city_center":  {"population": 85000,  "households": 34000, "median_age": 32, "avg_income": 68000},
-        "north_district": {"population": 62000, "households": 24800, "median_age": 38, "avg_income": 82000},
-        "south_district": {"population": 74000, "households": 29600, "median_age": 29, "avg_income": 51000},
-        "east_district":  {"population": 48000, "households": 19200, "median_age": 44, "avg_income": 95000},
-        "west_district":  {"population": 53000, "households": 21200, "median_age": 35, "avg_income": 61000},
-        "suburbs":        {"population": 112000,"households": 44800, "median_age": 41, "avg_income": 87000},
+        "city_center": {
+            "population": 85000,
+            "households": 34000,
+            "median_age": 32,
+            "avg_income": 68000,
+        },
+        "north_district": {
+            "population": 62000,
+            "households": 24800,
+            "median_age": 38,
+            "avg_income": 82000,
+        },
+        "south_district": {
+            "population": 74000,
+            "households": 29600,
+            "median_age": 29,
+            "avg_income": 51000,
+        },
+        "east_district": {
+            "population": 48000,
+            "households": 19200,
+            "median_age": 44,
+            "avg_income": 95000,
+        },
+        "west_district": {
+            "population": 53000,
+            "households": 21200,
+            "median_age": 35,
+            "avg_income": 61000,
+        },
+        "suburbs": {
+            "population": 112000,
+            "households": 44800,
+            "median_age": 41,
+            "avg_income": 87000,
+        },
     }
 
     def __init__(self, tier: Tier = Tier.FREE):
@@ -201,7 +249,7 @@ class CensusCollector:
                 "under_18": round(data["population"] * 0.22),
                 "18_to_35": round(data["population"] * 0.28),
                 "36_to_55": round(data["population"] * 0.30),
-                "over_55":  round(data["population"] * 0.20),
+                "over_55": round(data["population"] * 0.20),
             },
             "employment_rate_pct": 92.4,
             "education": {
@@ -261,6 +309,7 @@ class CensusCollector:
 # Policy Modeling Bot
 # ---------------------------------------------------------------------------
 
+
 class PolicyModelingBot:
     """Tier-aware AI-driven policy modeling and simulation."""
 
@@ -284,7 +333,9 @@ class PolicyModelingBot:
         }
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):
-            result["stakeholders_affected"] = policy_data.get("stakeholders", ["citizens", "businesses"])
+            result["stakeholders_affected"] = policy_data.get(
+                "stakeholders", ["citizens", "businesses"]
+            )
             result["implementation_phases"] = 3 if budget_usd > 5_000_000 else 2
             result["risk_level"] = "low" if budget_usd < 5_000_000 else "medium"
 
@@ -315,7 +366,10 @@ class PolicyModelingBot:
 
         if self.tier == Tier.ENTERPRISE:
             result["gdp_impact_pct"] = round(budget / 10_000_000_000 * 100, 4)
-            result["confidence_interval_pct"] = {"low": result["roi_pct"] * 0.8, "high": result["roi_pct"] * 1.2}
+            result["confidence_interval_pct"] = {
+                "low": result["roi_pct"] * 0.8,
+                "high": result["roi_pct"] * 1.2,
+            }
             result["simulation_runs"] = 10000
 
         return result
@@ -327,14 +381,36 @@ class PolicyModelingBot:
                 "Policy recommendation requires PRO or ENTERPRISE tier."
             )
         recommendations = {
-            "transportation": ["Expand public transit", "Build cycling infrastructure", "Congestion pricing"],
-            "housing":        ["Increase affordable housing units", "Streamline permits", "Anti-speculation tax"],
-            "education":      ["Universal pre-K", "STEM curriculum update", "Teacher salary increase"],
-            "healthcare":     ["Expand community clinics", "Mental health funding", "Preventive care programs"],
-            "environment":    ["Green energy subsidies", "EV charging network", "Tree canopy expansion"],
+            "transportation": [
+                "Expand public transit",
+                "Build cycling infrastructure",
+                "Congestion pricing",
+            ],
+            "housing": [
+                "Increase affordable housing units",
+                "Streamline permits",
+                "Anti-speculation tax",
+            ],
+            "education": [
+                "Universal pre-K",
+                "STEM curriculum update",
+                "Teacher salary increase",
+            ],
+            "healthcare": [
+                "Expand community clinics",
+                "Mental health funding",
+                "Preventive care programs",
+            ],
+            "environment": [
+                "Green energy subsidies",
+                "EV charging network",
+                "Tree canopy expansion",
+            ],
         }
 
-        items = recommendations.get(domain, ["Conduct stakeholder analysis", "Commission feasibility study"])
+        items = recommendations.get(
+            domain, ["Conduct stakeholder analysis", "Commission feasibility study"]
+        )
 
         result = {
             "domain": domain,

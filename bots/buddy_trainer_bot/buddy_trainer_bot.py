@@ -25,70 +25,69 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401
-
+from bots.buddy_trainer_bot.ai_trainer import (
+    AITrainer,
+    Dataset,
+    ModelType,
+    ModelVersion,
+    TrainingSession,
+    TrainingStatus,
+)
+from bots.buddy_trainer_bot.github_buddy_system import (
+    BuddyFocusArea,
+    BuddySystem,
+    BuddySystemStatus,
+    GitHubBuddySystem,
+)
+from bots.buddy_trainer_bot.human_trainer import (
+    HumanTrainer,
+    LearnerProfile,
+    LearningGoal,
+    ManagedDataset,
+    SkillLevel,
+    WorkflowType,
+)
+from bots.buddy_trainer_bot.ownership_system import (
+    License,
+    LicenseStatus,
+    OwnershipSystem,
+    PaymentMethod,
+)
+from bots.buddy_trainer_bot.ownership_system import Tier as OwnershipTier
+from bots.buddy_trainer_bot.robot_trainer import (
+    Robot,
+    RobotCategory,
+    RobotTrainer,
+    RobotTrainingCycle,
+    SensorType,
+    TrainingPhase,
+)
 from bots.buddy_trainer_bot.tiers import (
+    FEATURE_ADAPTIVE_LOOPS,
+    FEATURE_AI_DEPLOYMENT,
+    FEATURE_AI_TRAINING,
+    FEATURE_AI_VERSIONING,
+    FEATURE_API_ACCESS,
+    FEATURE_DATA_LABELING,
+    FEATURE_DATASET_MANAGEMENT,
+    FEATURE_GITHUB_BUDDY,
+    FEATURE_GUIDED_WORKFLOWS,
+    FEATURE_HUMAN_COACHING,
+    FEATURE_MULTI_MODEL,
+    FEATURE_OWNERSHIP,
+    FEATURE_ROBOT_TRAINING,
+    FEATURE_SENSOR_FEEDBACK,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_AI_TRAINING,
-    FEATURE_AI_VERSIONING,
-    FEATURE_AI_DEPLOYMENT,
-    FEATURE_ROBOT_TRAINING,
-    FEATURE_ADAPTIVE_LOOPS,
-    FEATURE_SENSOR_FEEDBACK,
-    FEATURE_HUMAN_COACHING,
-    FEATURE_DATA_LABELING,
-    FEATURE_DATASET_MANAGEMENT,
-    FEATURE_GUIDED_WORKFLOWS,
-    FEATURE_GITHUB_BUDDY,
-    FEATURE_MULTI_MODEL,
-    FEATURE_API_ACCESS,
-    FEATURE_OWNERSHIP,
 )
-from bots.buddy_trainer_bot.ai_trainer import (
-    AITrainer,
-    ModelType,
-    TrainingStatus,
-    Dataset,
-    ModelVersion,
-    TrainingSession,
-)
-from bots.buddy_trainer_bot.robot_trainer import (
-    RobotTrainer,
-    RobotCategory,
-    SensorType,
-    TrainingPhase,
-    Robot,
-    RobotTrainingCycle,
-)
-from bots.buddy_trainer_bot.human_trainer import (
-    HumanTrainer,
-    SkillLevel,
-    WorkflowType,
-    LearningGoal,
-    LearnerProfile,
-    ManagedDataset,
-)
-from bots.buddy_trainer_bot.github_buddy_system import (
-    GitHubBuddySystem,
-    BuddySystem,
-    BuddyFocusArea,
-    BuddySystemStatus,
-)
-from bots.buddy_trainer_bot.ownership_system import (
-    OwnershipSystem,
-    License,
-    PaymentMethod,
-    LicenseStatus,
-    Tier as OwnershipTier,
-)
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class BuddyTrainerError(Exception):
@@ -215,7 +214,9 @@ class BuddyTrainerBot:
     ) -> Robot:
         """Register a robot for training."""
         self._require_feature(FEATURE_ROBOT_TRAINING)
-        return self.robot_trainer.register_robot(name, category, manufacturer, model, sensors)
+        return self.robot_trainer.register_robot(
+            name, category, manufacturer, model, sensors
+        )
 
     def train_robot(
         self,
@@ -376,7 +377,11 @@ class BuddyTrainerBot:
         lines = [
             f"Buddy Trainer Bot — {cfg.name} Tier",
             f"Price: ${cfg.price_usd_monthly:.2f}/month"
-            + (f" (or ${cfg.price_usd_one_time:.2f} one-time for Owner)" if cfg.price_usd_one_time else ""),
+            + (
+                f" (or ${cfg.price_usd_one_time:.2f} one-time for Owner)"
+                if cfg.price_usd_one_time
+                else ""
+            ),
             f"AI sessions/day: {cfg.max_ai_sessions_per_day or 'Unlimited'}",
             f"Robot targets: {cfg.max_robot_targets or 'Unlimited'}",
             f"Human learners: {cfg.max_human_learners or 'Unlimited'}",
@@ -411,7 +416,9 @@ class BuddyTrainerBot:
             }
 
         # --- Tier / pricing ---
-        if any(k in msg for k in ("tier", "plan", "pricing", "upgrade", "cost", "price")):
+        if any(
+            k in msg for k in ("tier", "plan", "pricing", "upgrade", "cost", "price")
+        ):
             return {
                 "response": "buddy_trainer_bot",
                 "message": self.describe_tier(),
@@ -419,7 +426,10 @@ class BuddyTrainerBot:
             }
 
         # --- AI training ---
-        if any(k in msg for k in ("train ai", "ai model", "classifier", "nlp model", "train model")):
+        if any(
+            k in msg
+            for k in ("train ai", "ai model", "classifier", "nlp model", "train model")
+        ):
             return {
                 "response": "buddy_trainer_bot",
                 "message": (
@@ -427,7 +437,10 @@ class BuddyTrainerBot:
                     "(1) your model name, (2) model type (e.g. classification, NLP), "
                     "(3) dataset ID. I'll handle training, versioning, and deployment for you."
                 ),
-                "data": {"feature": FEATURE_AI_TRAINING, "available": self.config.has_feature(FEATURE_AI_TRAINING)},
+                "data": {
+                    "feature": FEATURE_AI_TRAINING,
+                    "available": self.config.has_feature(FEATURE_AI_TRAINING),
+                },
             }
 
         # --- Robot training ---
@@ -438,11 +451,17 @@ class BuddyTrainerBot:
                     "I can train robots! Register your robot with its category, manufacturer, "
                     "and sensors. I'll run adaptive training cycles and generate a control policy."
                 ),
-                "data": {"feature": FEATURE_ROBOT_TRAINING, "available": self.config.has_feature(FEATURE_ROBOT_TRAINING)},
+                "data": {
+                    "feature": FEATURE_ROBOT_TRAINING,
+                    "available": self.config.has_feature(FEATURE_ROBOT_TRAINING),
+                },
             }
 
         # --- Human training ---
-        if any(k in msg for k in ("teach me", "how to train", "learn ai", "data label", "dataset")):
+        if any(
+            k in msg
+            for k in ("teach me", "how to train", "learn ai", "data label", "dataset")
+        ):
             return {
                 "response": "buddy_trainer_bot",
                 "message": (
@@ -450,11 +469,17 @@ class BuddyTrainerBot:
                     "(e.g. 'train an image classifier', 'build a chatbot') and I'll create "
                     "a personalised learning path with XP rewards."
                 ),
-                "data": {"feature": FEATURE_HUMAN_COACHING, "available": self.config.has_feature(FEATURE_HUMAN_COACHING)},
+                "data": {
+                    "feature": FEATURE_HUMAN_COACHING,
+                    "available": self.config.has_feature(FEATURE_HUMAN_COACHING),
+                },
             }
 
         # --- GitHub / ownership ---
-        if any(k in msg for k in ("own", "github", "my buddy", "personal buddy", "purchase", "buy")):
+        if any(
+            k in msg
+            for k in ("own", "github", "my buddy", "personal buddy", "purchase", "buy")
+        ):
             return {
                 "response": "buddy_trainer_bot",
                 "message": (
@@ -462,7 +487,10 @@ class BuddyTrainerBot:
                     "hosted on GitHub — full source code, your datasets, and config. "
                     "You have full runtime control. Ask about 'pricing' to see all tiers."
                 ),
-                "data": {"feature": FEATURE_GITHUB_BUDDY, "available": self.config.has_feature(FEATURE_GITHUB_BUDDY)},
+                "data": {
+                    "feature": FEATURE_GITHUB_BUDDY,
+                    "available": self.config.has_feature(FEATURE_GITHUB_BUDDY),
+                },
             }
 
         # --- Apply sponsorship --- (must be checked BEFORE general "sponsor" keyword)
@@ -475,7 +503,10 @@ class BuddyTrainerBot:
             }
 
         # --- Sponsorship / affordability ---
-        if any(k in msg for k in ("free", "afford", "sponsor", "help", "poor", "assistance")):
+        if any(
+            k in msg
+            for k in ("free", "afford", "sponsor", "help", "poor", "assistance")
+        ):
             return {
                 "response": "buddy_trainer_bot",
                 "message": (
@@ -494,7 +525,10 @@ class BuddyTrainerBot:
                     "Ready to deploy! Use deploy_model(model_name, version_id) to push "
                     "your best model version live. I can also rollback if needed."
                 ),
-                "data": {"feature": FEATURE_AI_DEPLOYMENT, "available": self.config.has_feature(FEATURE_AI_DEPLOYMENT)},
+                "data": {
+                    "feature": FEATURE_AI_DEPLOYMENT,
+                    "available": self.config.has_feature(FEATURE_AI_DEPLOYMENT),
+                },
             }
 
         # --- Default friendly response ---

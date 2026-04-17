@@ -12,15 +12,24 @@ All classes integrate with the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
-GENRES = ["pop", "jazz", "classical", "hip-hop", "electronic", "rock", "country", "ambient"]
+GENRES = [
+    "pop",
+    "jazz",
+    "classical",
+    "hip-hop",
+    "electronic",
+    "rock",
+    "country",
+    "ambient",
+]
 
 STYLES = [
     "photorealistic",
@@ -36,6 +45,7 @@ STYLES = [
 # ---------------------------------------------------------------------------
 # Music Creator
 # ---------------------------------------------------------------------------
+
 
 class MusicCreator:
     """AI-assisted music composition, lyric generation, and audio analysis."""
@@ -65,14 +75,46 @@ class MusicCreator:
             genre = GENRES[0]
 
         genre_profiles: dict[str, dict] = {
-            "pop": {"tempo": 120, "instruments": ["guitar", "bass", "drums", "piano"], "key": "C major"},
-            "jazz": {"tempo": 100, "instruments": ["piano", "trumpet", "bass", "drums"], "key": "F major"},
-            "classical": {"tempo": 80, "instruments": ["violin", "cello", "piano", "flute"], "key": "G major"},
-            "hip-hop": {"tempo": 90, "instruments": ["808_bass", "hi_hat", "snare", "synth"], "key": "A minor"},
-            "electronic": {"tempo": 140, "instruments": ["synth_lead", "synth_pad", "drum_machine", "bass"], "key": "D minor"},
-            "rock": {"tempo": 130, "instruments": ["electric_guitar", "bass", "drums", "vocals"], "key": "E minor"},
-            "country": {"tempo": 105, "instruments": ["acoustic_guitar", "fiddle", "banjo", "steel_guitar"], "key": "D major"},
-            "ambient": {"tempo": 60, "instruments": ["synth_pad", "piano", "strings", "reverb_guitar"], "key": "C major"},
+            "pop": {
+                "tempo": 120,
+                "instruments": ["guitar", "bass", "drums", "piano"],
+                "key": "C major",
+            },
+            "jazz": {
+                "tempo": 100,
+                "instruments": ["piano", "trumpet", "bass", "drums"],
+                "key": "F major",
+            },
+            "classical": {
+                "tempo": 80,
+                "instruments": ["violin", "cello", "piano", "flute"],
+                "key": "G major",
+            },
+            "hip-hop": {
+                "tempo": 90,
+                "instruments": ["808_bass", "hi_hat", "snare", "synth"],
+                "key": "A minor",
+            },
+            "electronic": {
+                "tempo": 140,
+                "instruments": ["synth_lead", "synth_pad", "drum_machine", "bass"],
+                "key": "D minor",
+            },
+            "rock": {
+                "tempo": 130,
+                "instruments": ["electric_guitar", "bass", "drums", "vocals"],
+                "key": "E minor",
+            },
+            "country": {
+                "tempo": 105,
+                "instruments": ["acoustic_guitar", "fiddle", "banjo", "steel_guitar"],
+                "key": "D major",
+            },
+            "ambient": {
+                "tempo": 60,
+                "instruments": ["synth_pad", "piano", "strings", "reverb_guitar"],
+                "key": "C major",
+            },
         }
 
         profile = genre_profiles.get(genre, genre_profiles["pop"])
@@ -140,14 +182,21 @@ class MusicCreator:
         ]
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "generate_lyrics", "theme": theme, "style": style, "verses": verses},
+            raw_data={
+                "task": "generate_lyrics",
+                "theme": theme,
+                "style": style,
+                "verses": verses,
+            },
             learning_method="supervised",
         )
 
         return {
             "theme": theme,
             "style": style,
-            "verses": [{"verse_number": i + 1, "lines": verse_lines[i]} for i in range(verses)],
+            "verses": [
+                {"verse_number": i + 1, "lines": verse_lines[i]} for i in range(verses)
+            ],
             "chorus": {"lines": chorus_lines},
             "bridge": {
                 "lines": [
@@ -177,7 +226,9 @@ class MusicCreator:
             learning_method="unsupervised",
         )
 
-        detected_key = random.choice(["C major", "A minor", "G major", "E minor", "F major"])
+        detected_key = random.choice(
+            ["C major", "A minor", "G major", "E minor", "F major"]
+        )
         detected_genre = random.choice(GENRES)
         bpm = random.randint(60, 180)
 
@@ -186,7 +237,9 @@ class MusicCreator:
             "bpm": bpm,
             "genre_classification": detected_genre,
             "genre_confidence": round(random.uniform(0.70, 0.98), 2),
-            "mood": random.choice(["energetic", "calm", "melancholic", "upbeat", "dramatic"]),
+            "mood": random.choice(
+                ["energetic", "calm", "melancholic", "upbeat", "dramatic"]
+            ),
             "time_signature": random.choice(["4/4", "3/4", "6/8"]),
             "dynamic_range_db": round(random.uniform(6.0, 20.0), 1),
             "framework_pipeline": result.get("bot_name"),
@@ -196,6 +249,7 @@ class MusicCreator:
 # ---------------------------------------------------------------------------
 # Film Creator
 # ---------------------------------------------------------------------------
+
 
 class FilmCreator:
     """AI-assisted screenplay generation, storyboarding, and cinematography advice."""
@@ -224,7 +278,16 @@ class FilmCreator:
         num_scenes = max(1, min(20, num_scenes))
 
         scene_types = ["INT.", "EXT."]
-        locations = ["OFFICE", "CITY STREET", "FOREST", "CAFE", "ROOFTOP", "WAREHOUSE", "BEACH", "LABORATORY"]
+        locations = [
+            "OFFICE",
+            "CITY STREET",
+            "FOREST",
+            "CAFE",
+            "ROOFTOP",
+            "WAREHOUSE",
+            "BEACH",
+            "LABORATORY",
+        ]
         times = ["DAY", "NIGHT", "DAWN", "DUSK"]
 
         scenes = []
@@ -232,18 +295,31 @@ class FilmCreator:
             loc = random.choice(locations)
             tod = random.choice(times)
             int_ext = random.choice(scene_types)
-            scenes.append({
-                "scene_number": i + 1,
-                "heading": f"{int_ext} {loc} - {tod}",
-                "action": f"Scene {i + 1} action description based on premise: {premise}",
-                "dialogue": [
-                    {"character": "PROTAGONIST", "line": f"Line reflecting {genre} tone in scene {i + 1}."},
-                    {"character": "ANTAGONIST", "line": f"Counter-response raising tension in scene {i + 1}."},
-                ],
-            })
+            scenes.append(
+                {
+                    "scene_number": i + 1,
+                    "heading": f"{int_ext} {loc} - {tod}",
+                    "action": f"Scene {i + 1} action description based on premise: {premise}",
+                    "dialogue": [
+                        {
+                            "character": "PROTAGONIST",
+                            "line": f"Line reflecting {genre} tone in scene {i + 1}.",
+                        },
+                        {
+                            "character": "ANTAGONIST",
+                            "line": f"Counter-response raising tension in scene {i + 1}.",
+                        },
+                    ],
+                }
+            )
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "generate_script", "genre": genre, "premise": premise, "num_scenes": num_scenes},
+            raw_data={
+                "task": "generate_script",
+                "genre": genre,
+                "premise": premise,
+                "num_scenes": num_scenes,
+            },
             learning_method="supervised",
         )
 
@@ -276,22 +352,43 @@ class FilmCreator:
             Storyboard with per-scene visual descriptions and shot types.
         """
         scenes = script_data.get("scenes", [])
-        shot_types = ["wide shot", "close-up", "medium shot", "over-the-shoulder", "POV", "aerial"]
-        lighting_styles = ["natural", "high-contrast", "soft diffused", "backlighting", "neon", "golden hour"]
+        shot_types = [
+            "wide shot",
+            "close-up",
+            "medium shot",
+            "over-the-shoulder",
+            "POV",
+            "aerial",
+        ]
+        lighting_styles = [
+            "natural",
+            "high-contrast",
+            "soft diffused",
+            "backlighting",
+            "neon",
+            "golden hour",
+        ]
 
         panels = []
         for scene in scenes:
-            panels.append({
-                "scene_number": scene["scene_number"],
-                "heading": scene.get("heading", ""),
-                "shot_type": random.choice(shot_types),
-                "lighting": random.choice(lighting_styles),
-                "visual_description": f"Visual panel for {scene.get('heading', 'scene')} — {scene.get('action', '')}",
-                "color_grade": random.choice(["warm", "cool", "desaturated", "vibrant", "teal-orange"]),
-            })
+            panels.append(
+                {
+                    "scene_number": scene["scene_number"],
+                    "heading": scene.get("heading", ""),
+                    "shot_type": random.choice(shot_types),
+                    "lighting": random.choice(lighting_styles),
+                    "visual_description": f"Visual panel for {scene.get('heading', 'scene')} — {scene.get('action', '')}",
+                    "color_grade": random.choice(
+                        ["warm", "cool", "desaturated", "vibrant", "teal-orange"]
+                    ),
+                }
+            )
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "create_storyboard", "script_title": script_data.get("title", "Unknown")},
+            raw_data={
+                "task": "create_storyboard",
+                "script_title": script_data.get("title", "Unknown"),
+            },
             learning_method="supervised",
         )
 
@@ -318,13 +415,22 @@ class FilmCreator:
         """
         presets: dict[str, dict] = {
             "action": {
-                "camera_angles": ["low angle", "Dutch tilt", "tracking shot", "shaky cam"],
+                "camera_angles": [
+                    "low angle",
+                    "Dutch tilt",
+                    "tracking shot",
+                    "shaky cam",
+                ],
                 "lighting": ["high contrast", "practical lights", "dynamic shadows"],
                 "techniques": ["fast cuts", "slow-motion inserts", "whip pans"],
             },
             "dialogue": {
                 "camera_angles": ["over-the-shoulder", "two-shot", "close-up"],
-                "lighting": ["three-point lighting", "soft key light", "motivated lighting"],
+                "lighting": [
+                    "three-point lighting",
+                    "soft key light",
+                    "motivated lighting",
+                ],
                 "techniques": ["shot-reverse-shot", "dolly zoom", "static framing"],
             },
             "establishing": {
@@ -346,7 +452,12 @@ class FilmCreator:
             "camera_angles": preset["camera_angles"],
             "lighting_setups": preset["lighting"],
             "techniques": preset["techniques"],
-            "lens_recommendations": ["24mm wide", "50mm standard", "85mm portrait", "200mm telephoto"],
+            "lens_recommendations": [
+                "24mm wide",
+                "50mm standard",
+                "85mm portrait",
+                "200mm telephoto",
+            ],
             "framework_pipeline": result.get("bot_name"),
         }
 
@@ -355,6 +466,7 @@ class FilmCreator:
 # Art Creator
 # ---------------------------------------------------------------------------
 
+
 class ArtCreator:
     """AI-assisted artwork generation, 3-D model specs, and color palette design."""
 
@@ -362,7 +474,9 @@ class ArtCreator:
         self.flow = GlobalAISourcesFlow(bot_name="ArtCreator")
 
     # ------------------------------------------------------------------
-    def generate_artwork(self, style: str, subject: str, medium: str = "digital") -> dict:
+    def generate_artwork(
+        self, style: str, subject: str, medium: str = "digital"
+    ) -> dict:
         """Generate artwork description and rendering parameters.
 
         Parameters
@@ -393,7 +507,12 @@ class ArtCreator:
         }
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "generate_artwork", "style": style, "subject": subject, "medium": medium},
+            raw_data={
+                "task": "generate_artwork",
+                "style": style,
+                "subject": subject,
+                "medium": medium,
+            },
             learning_method="self_supervised",
         )
 
@@ -406,7 +525,9 @@ class ArtCreator:
             "render_parameters": {
                 "color_depth": "32-bit",
                 "anti_aliasing": True,
-                "texture_quality": "ultra" if style in ("photorealistic", "3d_render") else "high",
+                "texture_quality": (
+                    "ultra" if style in ("photorealistic", "3d_render") else "high"
+                ),
                 "shading_model": "PBR" if style == "photorealistic" else "stylized",
             },
             "tags": [style, subject, medium, "AI-generated"],
@@ -414,7 +535,9 @@ class ArtCreator:
         }
 
     # ------------------------------------------------------------------
-    def create_3d_model(self, object_type: str, style: str = "realistic", complexity: str = "medium") -> dict:
+    def create_3d_model(
+        self, object_type: str, style: str = "realistic", complexity: str = "medium"
+    ) -> dict:
         """Generate 3-D model specifications.
 
         Parameters
@@ -437,7 +560,12 @@ class ArtCreator:
         poly_count = poly_counts.get(complexity, poly_counts["medium"])
 
         result = self.flow.run_pipeline(
-            raw_data={"task": "create_3d_model", "object_type": object_type, "style": style, "complexity": complexity},
+            raw_data={
+                "task": "create_3d_model",
+                "object_type": object_type,
+                "style": style,
+                "complexity": complexity,
+            },
             learning_method="supervised",
         )
 
@@ -449,7 +577,11 @@ class ArtCreator:
             "texture_resolution": texture_sizes.get(complexity, "2048x2048"),
             "materials": ["base_color", "roughness", "metallic", "normal_map"],
             "rigged": object_type in ("character", "creature", "humanoid"),
-            "animations": ["idle", "walk", "run"] if object_type in ("character", "creature") else [],
+            "animations": (
+                ["idle", "walk", "run"]
+                if object_type in ("character", "creature")
+                else []
+            ),
             "file_formats": ["FBX", "OBJ", "GLTF"],
             "framework_pipeline": result.get("bot_name"),
         }
@@ -506,7 +638,9 @@ class ArtCreator:
             "style": style,
             "palette": palette,
             "color_count": len(palette),
-            "harmony_type": random.choice(["complementary", "analogous", "triadic", "split-complementary"]),
+            "harmony_type": random.choice(
+                ["complementary", "analogous", "triadic", "split-complementary"]
+            ),
             "usage_guidance": f"Use the primary color for main elements, accent for highlights, and background for negative space.",
             "framework_pipeline": result.get("bot_name"),
         }

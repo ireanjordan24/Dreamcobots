@@ -11,44 +11,49 @@ Covers all modules:
   7. AILevelUpBot main class (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.ai_level_up_bot.ai_agents_generator import AgentStatus, AIAgentsGenerator
+from bots.ai_level_up_bot.ai_companies_database import AICompany, AICompanyDatabase
+from bots.ai_level_up_bot.ai_course_engine import (
+    MODE_CODING_LAB,
+    MODE_VIDEO,
+    AICourseEngine,
+)
+from bots.ai_level_up_bot.ai_level_up_bot import AILevelUpBot, AILevelUpTierError
+from bots.ai_level_up_bot.ai_skill_tree import AISkillTree, NodeStatus
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.ai_level_up_bot.tiers import (
+    FEATURE_AI_AGENTS_GENERATOR,
+    FEATURE_AI_COMPANIES_DATABASE,
+    FEATURE_AI_COURSE_ENGINE,
+    FEATURE_AI_SKILL_TREE,
+    FEATURE_API_ACCESS,
+    FEATURE_FULL_DATABASE,
+    FEATURE_TOKEN_MARKETPLACE,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_AI_COMPANIES_DATABASE,
-    FEATURE_AI_COURSE_ENGINE,
-    FEATURE_TOKEN_MARKETPLACE,
-    FEATURE_AI_SKILL_TREE,
-    FEATURE_AI_AGENTS_GENERATOR,
-    FEATURE_FULL_DATABASE,
-    FEATURE_API_ACCESS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.ai_level_up_bot.ai_companies_database import AICompanyDatabase, AICompany
-from bots.ai_level_up_bot.ai_course_engine import AICourseEngine, MODE_VIDEO, MODE_CODING_LAB
-from bots.ai_level_up_bot.token_marketplace import TokenMarketplace, MARKUP_PERCENTAGE
-from bots.ai_level_up_bot.ai_skill_tree import AISkillTree, NodeStatus
-from bots.ai_level_up_bot.ai_agents_generator import AIAgentsGenerator, AgentStatus
-from bots.ai_level_up_bot.ai_level_up_bot import AILevelUpBot, AILevelUpTierError
-
+from bots.ai_level_up_bot.token_marketplace import MARKUP_PERCENTAGE, TokenMarketplace
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -131,6 +136,7 @@ class TestTiers:
 # ===========================================================================
 # 2. AI Companies Database
 # ===========================================================================
+
 
 class TestAICompaniesDatabase:
     def setup_method(self):
@@ -312,7 +318,14 @@ class TestAICompaniesDatabase:
         data = self.db.to_dict_list()
         assert isinstance(data, list)
         assert len(data) >= 100
-        required_fields = {"company_name", "category", "tools", "pricing", "region", "api_available"}
+        required_fields = {
+            "company_name",
+            "category",
+            "tools",
+            "pricing",
+            "region",
+            "api_available",
+        }
         for entry in data[:5]:
             assert required_fields.issubset(entry.keys())
 
@@ -365,6 +378,7 @@ class TestAICompaniesDatabase:
 # ===========================================================================
 # 3. AI Course Engine
 # ===========================================================================
+
 
 class TestAICourseEngine:
     def setup_method(self):
@@ -451,6 +465,7 @@ class TestAICourseEngine:
 # ===========================================================================
 # 4. Token Marketplace
 # ===========================================================================
+
 
 class TestTokenMarketplace:
     def setup_method(self):
@@ -548,6 +563,7 @@ class TestTokenMarketplace:
 # 5. AI Skill Tree
 # ===========================================================================
 
+
 class TestAISkillTree:
     def setup_method(self):
         self.tree = AISkillTree(max_level=10)
@@ -643,6 +659,7 @@ class TestAISkillTree:
 # 6. AI Agents Generator
 # ===========================================================================
 
+
 class TestAIAgentsGenerator:
     def setup_method(self):
         self.gen = AIAgentsGenerator(created_by="test_user")
@@ -733,6 +750,7 @@ class TestAIAgentsGenerator:
 # ===========================================================================
 # 7. AILevelUpBot Integration
 # ===========================================================================
+
 
 class TestAILevelUpBotIntegration:
     def setup_method(self):
@@ -834,7 +852,9 @@ class TestAILevelUpBotIntegration:
         starter = AILevelUpBot(tier=Tier.STARTER)
         results = starter.search_companies("Core AI Models")
         # Starter tier caps companies at max_companies_accessible
-        assert len(results) <= (get_tier_config(Tier.STARTER).max_companies_accessible or 25)
+        assert len(results) <= (
+            get_tier_config(Tier.STARTER).max_companies_accessible or 25
+        )
 
     def test_tier_upgrade_path_shown_in_describe(self):
         starter = AILevelUpBot(tier=Tier.STARTER)

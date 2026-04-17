@@ -10,27 +10,28 @@ Covers:
   6.  Bot Library registration
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from ai.agent_runner import run as agent_run
+
 # ---------------------------------------------------------------------------
 # Module imports
 # ---------------------------------------------------------------------------
-from ai.model_router import ModelRouter, DEFAULT_ROUTES, PROVIDER_INFO
-from ai.task_classifier import TaskClassifier
+from ai.model_router import DEFAULT_ROUTES, PROVIDER_INFO, ModelRouter
 from ai.router_agent import RouterAgent
+from ai.task_classifier import TaskClassifier
 from tools.resource_manager import ResourceManager
-from ai.agent_runner import run as agent_run
-
 
 # ===========================================================================
 # 1. ModelRouter tests
 # ===========================================================================
+
 
 class TestModelRouter:
     def setup_method(self):
@@ -140,12 +141,15 @@ class TestModelRouter:
 
     def test_all_default_providers_have_info(self):
         for provider in DEFAULT_ROUTES.values():
-            assert provider in PROVIDER_INFO, f"Missing PROVIDER_INFO entry for {provider}"
+            assert (
+                provider in PROVIDER_INFO
+            ), f"Missing PROVIDER_INFO entry for {provider}"
 
 
 # ===========================================================================
 # 2. TaskClassifier tests
 # ===========================================================================
+
 
 class TestTaskClassifier:
     def setup_method(self):
@@ -255,6 +259,7 @@ class TestTaskClassifier:
 # 3. RouterAgent tests
 # ===========================================================================
 
+
 class TestRouterAgent:
     def setup_method(self):
         self.agent = RouterAgent()
@@ -328,6 +333,7 @@ class TestRouterAgent:
 # ===========================================================================
 # 4. ResourceManager tests
 # ===========================================================================
+
 
 class TestResourceManager:
     def setup_method(self):
@@ -469,6 +475,7 @@ class TestResourceManager:
 # 5. agent_runner.run() — full end-to-end cycle
 # ===========================================================================
 
+
 class TestAgentRunner:
     def test_run_returns_agent_and_action_result(self):
         result = agent_run("build a lead generation system")
@@ -514,9 +521,11 @@ class TestAgentRunner:
 # 6. Bot Library registration
 # ===========================================================================
 
+
 class TestBotLibraryRegistration:
     def _get_library(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         return lib
@@ -528,6 +537,7 @@ class TestBotLibraryRegistration:
 
     def test_model_router_category_is_ai(self):
         from bots.global_bot_network.bot_library import BotCategory
+
         lib = self._get_library()
         bots = lib.list_bots(category=BotCategory.AI)
         ids = [b["bot_id"] for b in bots]

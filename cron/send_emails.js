@@ -41,7 +41,11 @@ function createCampaign(name, template, audience) {
     sentAt: null,
   };
   (audience || []).forEach((email) => {
-    campaign.recipients.push({ email, emailId: crypto.randomBytes(6).toString('hex'), personalization: {} });
+    campaign.recipients.push({
+      email,
+      emailId: crypto.randomBytes(6).toString('hex'),
+      personalization: {},
+    });
   });
   campaigns.set(campaignId, campaign);
   return campaign;
@@ -88,7 +92,13 @@ function sendCampaign(campaignId) {
     } else {
       sent++;
       campaign.stats.sent++;
-      emailEvents.set(recipient.emailId, { emailId: recipient.emailId, campaignId, email: recipient.email, opens: 0, clicks: [] });
+      emailEvents.set(recipient.emailId, {
+        emailId: recipient.emailId,
+        campaignId,
+        email: recipient.email,
+        opens: 0,
+        clicks: [],
+      });
     }
   });
 
@@ -144,12 +154,14 @@ function getStats(campaignId) {
   if (!campaign) {
     throw new Error(`Campaign '${campaignId}' not found.`);
   }
-  const openRate = campaign.stats.sent > 0
-    ? Number(((campaign.stats.opened / campaign.stats.sent) * 100).toFixed(1))
-    : 0;
-  const clickRate = campaign.stats.opened > 0
-    ? Number(((campaign.stats.clicked / campaign.stats.opened) * 100).toFixed(1))
-    : 0;
+  const openRate =
+    campaign.stats.sent > 0
+      ? Number(((campaign.stats.opened / campaign.stats.sent) * 100).toFixed(1))
+      : 0;
+  const clickRate =
+    campaign.stats.opened > 0
+      ? Number(((campaign.stats.clicked / campaign.stats.opened) * 100).toFixed(1))
+      : 0;
   return {
     campaignId,
     name: campaign.name,
@@ -185,7 +197,7 @@ function generateFollowUp(campaignId) {
       sequence: 3,
       sendAfterDays: 14,
       subject: `Checking in — ${campaign.template.subject}`,
-      body: 'I noticed you opened our email but haven\'t responded. Here\'s what you might be missing...',
+      body: "I noticed you opened our email but haven't responded. Here's what you might be missing...",
     },
   ];
   return { campaignId, followUps };

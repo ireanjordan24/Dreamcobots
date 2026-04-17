@@ -11,18 +11,19 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TextOverlay:
     """Represents a text overlay to be burned into a video frame range."""
+
     text: str
     start_time_seconds: float
     end_time_seconds: float
-    position: Tuple[int, int] = (10, 10)   # (x, y) pixels from top-left
+    position: Tuple[int, int] = (10, 10)  # (x, y) pixels from top-left
     font_size: int = 24
     color: str = "white"
     background_color: Optional[str] = None
@@ -41,6 +42,7 @@ class TextOverlay:
 @dataclass
 class TranslationResult:
     """Holds the result of a translation operation."""
+
     source_text: str
     translated_text: str
     source_language: str
@@ -50,11 +52,12 @@ class TranslationResult:
 @dataclass
 class SpeechSegment:
     """Represents a synthesised speech segment."""
+
     text: str
     voice: str
-    speed: float           # 0.5 (slow) – 2.0 (fast), 1.0 = normal
-    pitch: float           # 0.5 (low) – 2.0 (high), 1.0 = normal
-    audio_format: str      # 'wav', 'mp3', 'ogg'
+    speed: float  # 0.5 (slow) – 2.0 (fast), 1.0 = normal
+    pitch: float  # 0.5 (low) – 2.0 (high), 1.0 = normal
+    audio_format: str  # 'wav', 'mp3', 'ogg'
     segment_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
@@ -63,12 +66,36 @@ class SpeechSegment:
 # ---------------------------------------------------------------------------
 
 _BUILTIN_TRANSLATIONS: Dict[str, Dict[str, str]] = {
-    "hello": {"es": "hola", "fr": "bonjour", "de": "hallo", "zh": "你好", "ar": "مرحبا"},
-    "goodbye": {"es": "adiós", "fr": "au revoir", "de": "auf wiedersehen", "zh": "再见", "ar": "وداعا"},
-    "thank you": {"es": "gracias", "fr": "merci", "de": "danke", "zh": "谢谢", "ar": "شكرا"},
+    "hello": {
+        "es": "hola",
+        "fr": "bonjour",
+        "de": "hallo",
+        "zh": "你好",
+        "ar": "مرحبا",
+    },
+    "goodbye": {
+        "es": "adiós",
+        "fr": "au revoir",
+        "de": "auf wiedersehen",
+        "zh": "再见",
+        "ar": "وداعا",
+    },
+    "thank you": {
+        "es": "gracias",
+        "fr": "merci",
+        "de": "danke",
+        "zh": "谢谢",
+        "ar": "شكرا",
+    },
     "yes": {"es": "sí", "fr": "oui", "de": "ja", "zh": "是", "ar": "نعم"},
     "no": {"es": "no", "fr": "non", "de": "nein", "zh": "否", "ar": "لا"},
-    "welcome": {"es": "bienvenido", "fr": "bienvenue", "de": "willkommen", "zh": "欢迎", "ar": "أهلا وسهلا"},
+    "welcome": {
+        "es": "bienvenido",
+        "fr": "bienvenue",
+        "de": "willkommen",
+        "zh": "欢迎",
+        "ar": "أهلا وسهلا",
+    },
 }
 
 SUPPORTED_LANGUAGES = {"en", "es", "fr", "de", "zh", "ar"}
@@ -77,6 +104,7 @@ SUPPORTED_LANGUAGES = {"en", "es", "fr", "de", "zh", "ar"}
 # ---------------------------------------------------------------------------
 # TextProcessor
 # ---------------------------------------------------------------------------
+
 
 class TextProcessor:
     """
@@ -171,7 +199,9 @@ class TextProcessor:
     # Translation
     # ------------------------------------------------------------------
 
-    def translate(self, text: str, target_language: str, source_language: str = "en") -> TranslationResult:
+    def translate(
+        self, text: str, target_language: str, source_language: str = "en"
+    ) -> TranslationResult:
         """
         Translate *text* from *source_language* to *target_language*.
 

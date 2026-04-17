@@ -4,15 +4,21 @@ Legal & Protection Layer for CreatorEmpire.
 Provides contract analysis, royalty calculation, and red-flag scanning
 to protect talent on the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -81,8 +87,9 @@ _RED_FLAG_PATTERNS: list[dict] = [
 @dataclass
 class RedFlag:
     """A potential issue identified in contract text."""
+
     keyword: str
-    severity: str        # "low" | "medium" | "high"
+    severity: str  # "low" | "medium" | "high"
     explanation: str
     context_snippet: str = ""
 
@@ -98,9 +105,10 @@ class RedFlag:
 @dataclass
 class ContractAnalysis:
     """Result of a contract analysis scan."""
+
     contract_id: str
     red_flags: list[RedFlag] = field(default_factory=list)
-    overall_risk: str = "low"   # "low" | "medium" | "high"
+    overall_risk: str = "low"  # "low" | "medium" | "high"
     recommendations: list[str] = field(default_factory=list)
     word_count: int = 0
 
@@ -120,7 +128,7 @@ class ContractAnalysis:
 # ---------------------------------------------------------------------------
 
 _STREAMING_RATES: dict[str, float] = {
-    "spotify": 0.004,         # USD per stream
+    "spotify": 0.004,  # USD per stream
     "apple_music": 0.01,
     "tidal": 0.0125,
     "amazon_music": 0.004,
@@ -149,7 +157,9 @@ class LegalProtectionLayer:
     # Contract analysis
     # ------------------------------------------------------------------
 
-    def analyze_contract(self, contract_id: str, contract_text: str) -> ContractAnalysis:
+    def analyze_contract(
+        self, contract_id: str, contract_text: str
+    ) -> ContractAnalysis:
         """
         Scan contract text for red flags and return an analysis report.
 
@@ -170,12 +180,14 @@ class LegalProtectionLayer:
                 snippet_start = max(0, idx - 40)
                 snippet_end = min(len(contract_text), idx + len(kw) + 40)
                 snippet = "..." + contract_text[snippet_start:snippet_end] + "..."
-                flags.append(RedFlag(
-                    keyword=kw,
-                    severity=pattern["severity"],
-                    explanation=pattern["explanation"],
-                    context_snippet=snippet,
-                ))
+                flags.append(
+                    RedFlag(
+                        keyword=kw,
+                        severity=pattern["severity"],
+                        explanation=pattern["explanation"],
+                        context_snippet=snippet,
+                    )
+                )
 
         risk = self._compute_risk(flags)
         recommendations = self._build_recommendations(flags, risk)
@@ -193,7 +205,9 @@ class LegalProtectionLayer:
     def get_analysis(self, contract_id: str) -> dict:
         """Return a previously computed analysis."""
         if contract_id not in self._analyses:
-            raise LegalProtectionError(f"No analysis found for contract '{contract_id}'.")
+            raise LegalProtectionError(
+                f"No analysis found for contract '{contract_id}'."
+            )
         return self._analyses[contract_id].to_dict()
 
     def scan_for_red_flags(self, text: str) -> list[dict]:
@@ -207,11 +221,13 @@ class LegalProtectionLayer:
         results = []
         for pattern in _RED_FLAG_PATTERNS:
             if pattern["keyword"] in text_lower:
-                results.append({
-                    "keyword": pattern["keyword"],
-                    "severity": pattern["severity"],
-                    "explanation": pattern["explanation"],
-                })
+                results.append(
+                    {
+                        "keyword": pattern["keyword"],
+                        "severity": pattern["severity"],
+                        "explanation": pattern["explanation"],
+                    }
+                )
         return results
 
     # ------------------------------------------------------------------
@@ -325,11 +341,17 @@ class LegalProtectionLayer:
         if risk == "high":
             recs.append("Consult a qualified entertainment attorney before signing.")
         if any(f.keyword == "in perpetuity" for f in flags):
-            recs.append("Negotiate a 5–7 year license term instead of perpetual rights.")
+            recs.append(
+                "Negotiate a 5–7 year license term instead of perpetual rights."
+            )
         if any(f.keyword == "work for hire" for f in flags):
-            recs.append("Ensure a flat-fee buyout or royalty share is clearly documented.")
+            recs.append(
+                "Ensure a flat-fee buyout or royalty share is clearly documented."
+            )
         if any(f.keyword == "non-compete" for f in flags):
             recs.append("Limit non-compete scope to direct competitors only.")
         if not flags:
-            recs.append("No major red flags detected. Standard legal review recommended.")
+            recs.append(
+                "No major red flags detected. Standard legal review recommended."
+            )
         return recs

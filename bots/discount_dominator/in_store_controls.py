@@ -4,6 +4,7 @@ In-Store Tactical Controls module for the Discount Dominator (settings 451–500
 Provides the :class:`InStoreTacticalControls` facade used by all bots that
 have an in-store physical presence component.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -13,9 +14,9 @@ from typing import Any, Dict, List, Optional
 from .settings import (
     DISCOUNT_DOMINATOR_SETTINGS,
     GROUP_INSTORE,
-    get_setting,
-    get_group_settings,
     as_dict,
+    get_group_settings,
+    get_setting,
 )
 
 
@@ -96,19 +97,15 @@ class InStoreTacticalControls:
 
     def get_enabled_features(self) -> List[str]:
         """Return names of in-store settings that are currently ``True``."""
-        return [
-            s.name
-            for s in get_group_settings(GROUP_INSTORE)
-            if s.value is True
-        ]
+        return [s.name for s in get_group_settings(GROUP_INSTORE) if s.value is True]
 
     def configure_for_retail_intelligence(self) -> None:
         """Apply in-store presets for the multi-layered retail intelligence network."""
-        DISCOUNT_DOMINATOR_SETTINGS[451].value = True   # display_optimisation
-        DISCOUNT_DOMINATOR_SETTINGS[453].value = True   # bundle_discount_rules
-        DISCOUNT_DOMINATOR_SETTINGS[467].value = True   # pos_integration
-        DISCOUNT_DOMINATOR_SETTINGS[472].value = True   # real_time_stock_visibility
-        DISCOUNT_DOMINATOR_SETTINGS[486].value = True   # aisle_traffic_analysis
+        DISCOUNT_DOMINATOR_SETTINGS[451].value = True  # display_optimisation
+        DISCOUNT_DOMINATOR_SETTINGS[453].value = True  # bundle_discount_rules
+        DISCOUNT_DOMINATOR_SETTINGS[467].value = True  # pos_integration
+        DISCOUNT_DOMINATOR_SETTINGS[472].value = True  # real_time_stock_visibility
+        DISCOUNT_DOMINATOR_SETTINGS[486].value = True  # aisle_traffic_analysis
 
     def trigger_flash_sale(self, sku: str, discount_pct: int) -> Dict[str, Any]:
         """Simulate triggering a flash sale for a given SKU.
@@ -133,10 +130,7 @@ class InStoreTacticalControls:
             ``{sku: stock_level_pct}`` mapping where values are 0–100.
         """
         threshold = self.clearance_threshold_pct
-        return [
-            sku for sku, level in inventory_levels.items()
-            if level <= threshold
-        ]
+        return [sku for sku, level in inventory_levels.items() if level <= threshold]
 
     def summary(self) -> Dict[str, Any]:
         """Return a human-readable summary dict of key in-store settings."""

@@ -1,9 +1,10 @@
 """Tests for UserMarketplace."""
-import sys
+
 import os
+import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
 
 class TestUserMarketplace(unittest.TestCase):
@@ -12,6 +13,7 @@ class TestUserMarketplace(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.user_marketplace import UserMarketplace
+
         self.marketplace = UserMarketplace()
 
     def test_user_signup(self):

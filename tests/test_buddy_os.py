@@ -11,76 +11,77 @@ Covers:
   6. BuddyOS main class (integration + chat)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.buddy_os.app_framework import (
+    NVIDIA_MARKUP_PCT,
+    NVIDIA_TOOLS,
+    STARLINK_MARKUP_PCT,
+    STARLINK_PLANS,
+    AppCategory,
+    AppPlatform,
+    AppRegistry,
+    BrowserToolkit,
+    NvidiaToolsHub,
+    SmartDeviceHub,
+    SmartDeviceProtocol,
+    StarlinkManager,
+)
+from bots.buddy_os.bluetooth_engine import (
+    BluetoothDevice,
+    BluetoothEngine,
+    BluetoothProfileType,
+    BluetoothState,
+    FileTransfer,
+)
+from bots.buddy_os.buddy_os import BuddyOS, BuddyOSError, BuddyOSTierError
+from bots.buddy_os.cast_engine import (
+    CastEngine,
+    CastProtocol,
+    CastReceiver,
+    CastSession,
+    CastState,
+    ContentType,
+)
+from bots.buddy_os.device_manager import (
+    DEVICE_COMPATIBILITY_MATRIX,
+    Device,
+    DeviceManager,
+    DevicePlatform,
+    DeviceStatus,
+    DeviceType,
+)
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
 from bots.buddy_os.tiers import (
+    FEATURE_APP_FRAMEWORK,
+    FEATURE_BLUETOOTH,
+    FEATURE_CAST_SCREEN,
+    FEATURE_DEVICE_MANAGER,
+    FEATURE_MULTI_CAST,
+    FEATURE_NVIDIA_TOOLS,
+    FEATURE_STARLINK,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_BLUETOOTH,
-    FEATURE_CAST_SCREEN,
-    FEATURE_DEVICE_MANAGER,
-    FEATURE_MULTI_CAST,
-    FEATURE_APP_FRAMEWORK,
-    FEATURE_STARLINK,
-    FEATURE_NVIDIA_TOOLS,
-    FEATURE_WHITE_LABEL,
 )
-from bots.buddy_os.device_manager import (
-    DeviceManager,
-    Device,
-    DeviceType,
-    DevicePlatform,
-    DeviceStatus,
-    DEVICE_COMPATIBILITY_MATRIX,
-)
-from bots.buddy_os.bluetooth_engine import (
-    BluetoothEngine,
-    BluetoothDevice,
-    BluetoothProfileType,
-    BluetoothState,
-    FileTransfer,
-)
-from bots.buddy_os.cast_engine import (
-    CastEngine,
-    CastReceiver,
-    CastProtocol,
-    CastState,
-    ContentType,
-    CastSession,
-)
-from bots.buddy_os.app_framework import (
-    AppRegistry,
-    BrowserToolkit,
-    SmartDeviceHub,
-    NvidiaToolsHub,
-    StarlinkManager,
-    AppCategory,
-    AppPlatform,
-    SmartDeviceProtocol,
-    NVIDIA_MARKUP_PCT,
-    STARLINK_MARKUP_PCT,
-    NVIDIA_TOOLS,
-    STARLINK_PLANS,
-)
-from bots.buddy_os.buddy_os import BuddyOS, BuddyOSError, BuddyOSTierError
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -130,6 +131,7 @@ class TestTiers:
 # 2. Device Manager
 # ===========================================================================
 
+
 class TestDeviceManager:
     def test_register_phone(self):
         dm = DeviceManager()
@@ -139,7 +141,9 @@ class TestDeviceManager:
 
     def test_register_tv(self):
         dm = DeviceManager()
-        device = dm.register_device("Living Room TV", DeviceType.TV, DevicePlatform.SAMSUNG)
+        device = dm.register_device(
+            "Living Room TV", DeviceType.TV, DevicePlatform.SAMSUNG
+        )
         assert device.device_type == DeviceType.TV
 
     def test_connect_device(self):
@@ -195,7 +199,9 @@ class TestDeviceManager:
         dm = DeviceManager()
         # COMPUTER only supports Apple/Windows/Linux; Samsung is not supported
         with pytest.raises(ValueError):
-            dm.register_device("Samsung PC", DeviceType.COMPUTER, DevicePlatform.SAMSUNG)
+            dm.register_device(
+                "Samsung PC", DeviceType.COMPUTER, DevicePlatform.SAMSUNG
+            )
 
     def test_compatibility_matrix_returned(self):
         dm = DeviceManager()
@@ -219,6 +225,7 @@ class TestDeviceManager:
 # ===========================================================================
 # 3. Bluetooth Engine
 # ===========================================================================
+
 
 class TestBluetoothEngine:
     def test_start_scan(self):
@@ -338,10 +345,13 @@ class TestBluetoothEngine:
 # 4. Cast Engine
 # ===========================================================================
 
+
 class TestCastEngine:
     def test_add_google_cast_receiver(self):
         cast = CastEngine()
-        recv = cast.add_receiver("Living Room TV", CastProtocol.GOOGLE_CAST, ip_address="192.168.1.5")
+        recv = cast.add_receiver(
+            "Living Room TV", CastProtocol.GOOGLE_CAST, ip_address="192.168.1.5"
+        )
         assert recv.protocol == CastProtocol.GOOGLE_CAST
 
     def test_add_airplay_receiver(self):
@@ -352,13 +362,17 @@ class TestCastEngine:
     def test_start_cast_session(self):
         cast = CastEngine()
         recv = cast.add_receiver("TV", CastProtocol.MIRACAST)
-        session = cast.start_cast(recv.receiver_id, ContentType.VIDEO, "https://example.com/v.mp4")
+        session = cast.start_cast(
+            recv.receiver_id, ContentType.VIDEO, "https://example.com/v.mp4"
+        )
         assert session.state == CastState.CASTING
 
     def test_pause_and_resume(self):
         cast = CastEngine()
         recv = cast.add_receiver("TV", CastProtocol.GOOGLE_CAST)
-        session = cast.start_cast(recv.receiver_id, ContentType.VIDEO, "https://example.com/v.mp4")
+        session = cast.start_cast(
+            recv.receiver_id, ContentType.VIDEO, "https://example.com/v.mp4"
+        )
         cast.pause_cast(session.session_id)
         assert cast.get_session(session.session_id).state == CastState.PAUSED
         cast.resume_cast(session.session_id)
@@ -374,14 +388,18 @@ class TestCastEngine:
     def test_seek(self):
         cast = CastEngine()
         recv = cast.add_receiver("TV", CastProtocol.GOOGLE_CAST)
-        session = cast.start_cast(recv.receiver_id, ContentType.VIDEO, "url", duration_seconds=3600)
+        session = cast.start_cast(
+            recv.receiver_id, ContentType.VIDEO, "url", duration_seconds=3600
+        )
         cast.seek(session.session_id, 120.0)
         assert cast.get_session(session.session_id).position_seconds == 120.0
 
     def test_seek_clamped(self):
         cast = CastEngine()
         recv = cast.add_receiver("TV", CastProtocol.GOOGLE_CAST)
-        session = cast.start_cast(recv.receiver_id, ContentType.VIDEO, "url", duration_seconds=60)
+        session = cast.start_cast(
+            recv.receiver_id, ContentType.VIDEO, "url", duration_seconds=60
+        )
         cast.seek(session.session_id, 9999)
         assert cast.get_session(session.session_id).position_seconds == 60.0
 
@@ -429,7 +447,9 @@ class TestCastEngine:
     def test_session_to_dict(self):
         cast = CastEngine()
         recv = cast.add_receiver("TV", CastProtocol.GOOGLE_CAST)
-        session = cast.start_cast(recv.receiver_id, ContentType.VIDEO, "https://example.com")
+        session = cast.start_cast(
+            recv.receiver_id, ContentType.VIDEO, "https://example.com"
+        )
         d = session.to_dict()
         assert d["content_type"] == ContentType.VIDEO.value
 
@@ -437,6 +457,7 @@ class TestCastEngine:
 # ===========================================================================
 # 5. App Framework
 # ===========================================================================
+
 
 class TestAppRegistry:
     def test_install_app(self):
@@ -512,7 +533,9 @@ class TestBrowserToolkit:
 class TestSmartDeviceHub:
     def test_add_device(self):
         hub = SmartDeviceHub()
-        dev = hub.add_device("Smart Light", SmartDeviceProtocol.ZIGBEE, room="Living Room")
+        dev = hub.add_device(
+            "Smart Light", SmartDeviceProtocol.ZIGBEE, room="Living Room"
+        )
         assert dev.name == "Smart Light"
 
     def test_set_online(self):
@@ -584,7 +607,9 @@ class TestStarlinkManager:
     def test_markup_applied_to_plans(self):
         mgr = StarlinkManager()
         for plan in mgr.list_plans():
-            expected = round(plan["base_monthly_usd"] * (1 + STARLINK_MARKUP_PCT / 100), 2)
+            expected = round(
+                plan["base_monthly_usd"] * (1 + STARLINK_MARKUP_PCT / 100), 2
+            )
             assert plan["marked_up_monthly_usd"] == expected
 
     def test_create_subscription(self):
@@ -622,6 +647,7 @@ class TestStarlinkManager:
 # 6. BuddyOS (integration)
 # ===========================================================================
 
+
 class TestBuddyOS:
     def test_instantiation_free_tier(self):
         buddy = BuddyOS(tier=Tier.FREE)
@@ -638,8 +664,13 @@ class TestBuddyOS:
     def test_system_status_keys(self):
         buddy = BuddyOS(tier=Tier.PRO)
         status = buddy.system_status()
-        for key in ("tier", "connected_devices", "bluetooth_paired",
-                    "active_cast_sessions", "installed_apps"):
+        for key in (
+            "tier",
+            "connected_devices",
+            "bluetooth_paired",
+            "active_cast_sessions",
+            "installed_apps",
+        ):
             assert key in status
 
     def test_connect_device_convenience(self):
@@ -718,6 +749,7 @@ class TestBuddyOS:
 
     def test_register_with_buddy(self):
         from BuddyAI.buddy_bot import BuddyBot
+
         orchestrator = BuddyBot()
         buddy_os = BuddyOS(tier=Tier.PRO)
         buddy_os.register_with_buddy(orchestrator)

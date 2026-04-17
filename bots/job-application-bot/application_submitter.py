@@ -6,14 +6,16 @@ via Selenium.  Each supported site has its own handler method; add a new
 method (and register it in SITE_HANDLERS) to extend support for additional
 platforms.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import time
+
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 
 # Configurable timing constants (seconds)
 PAGE_LOAD_WAIT = 3
@@ -111,7 +113,9 @@ class ApplicationSubmitter:
                         )
                     )
                     # Only proceed for Easy Apply buttons (identified by CSS class).
-                    if "jobs-apply-button--top-card" not in apply_button.get_attribute("class"):
+                    if "jobs-apply-button--top-card" not in apply_button.get_attribute(
+                        "class"
+                    ):
                         continue
 
                     apply_button.click()
@@ -126,10 +130,14 @@ class ApplicationSubmitter:
                     submit_btn.click()
                     time.sleep(POST_SUBMIT_WAIT)
 
-                    job_title = self._safe_text(card, By.CSS_SELECTOR, ".job-card-list__title")
+                    job_title = self._safe_text(
+                        card, By.CSS_SELECTOR, ".job-card-list__title"
+                    )
                     self.submitted.append({"site": "linkedin", "job": job_title})
                     submitted += 1
-                    print(f"[ApplicationSubmitter] Applied to LinkedIn job: {job_title}")
+                    print(
+                        f"[ApplicationSubmitter] Applied to LinkedIn job: {job_title}"
+                    )
 
                 except (TimeoutException, NoSuchElementException):
                     # Move on if an individual card fails.
@@ -160,9 +168,7 @@ class ApplicationSubmitter:
                     card.click()
                     time.sleep(ACTION_WAIT)
 
-                    apply_button = self.driver.find_element(
-                        By.ID, "indeedApplyButton"
-                    )
+                    apply_button = self.driver.find_element(By.ID, "indeedApplyButton")
                     apply_button.click()
                     time.sleep(ACTION_WAIT)
 

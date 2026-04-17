@@ -1,9 +1,10 @@
 """Tests for compliance modules."""
-import sys
+
 import os
+import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
 
 class TestGDPRChecker(unittest.TestCase):
@@ -12,11 +13,17 @@ class TestGDPRChecker(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.compliance import GDPRComplianceChecker
+
         self.checker = GDPRComplianceChecker()
 
     def test_gdpr_checker_compliant(self):
         """Test that fully compliant metadata passes GDPR check."""
-        meta = {"consent": True, "anonymized": True, "license": "CC-BY-4.0", "data_subject_rights": True}
+        meta = {
+            "consent": True,
+            "anonymized": True,
+            "license": "CC-BY-4.0",
+            "data_subject_rights": True,
+        }
         result = self.checker.check_compliance(meta)
         self.assertTrue(result["compliant"])
 
@@ -34,6 +41,7 @@ class TestCCPAChecker(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.compliance import CCPAComplianceChecker
+
         self.checker = CCPAComplianceChecker()
 
     def test_ccpa_checker(self):
@@ -49,6 +57,7 @@ class TestHIPAAAnonymizer(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.compliance import HIPAAAnonymizer
+
         self.anon = HIPAAAnonymizer()
 
     def test_hipaa_anonymizer(self):
@@ -65,6 +74,7 @@ class TestConsentManager(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.compliance import ConsentManager
+
         self.mgr = ConsentManager()
 
     def test_consent_manager(self):
@@ -81,6 +91,7 @@ class TestDataAnonymizer(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         from bots.dataforge.licensing.anonymizer import DataAnonymizer
+
         self.anon = DataAnonymizer()
 
     def test_anonymizer(self):

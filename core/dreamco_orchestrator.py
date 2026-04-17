@@ -17,15 +17,15 @@ Usage
 from __future__ import annotations
 
 import importlib
-import sys
 import os
+import sys
 from typing import Any, Dict, List, Optional
 
 # ---------------------------------------------------------------------------
 # Revenue Validator
 # ---------------------------------------------------------------------------
 
-SCALE_THRESHOLD: float = 1000.0   # USD — bots above this are cloned
+SCALE_THRESHOLD: float = 1000.0  # USD — bots above this are cloned
 MAINTAIN_THRESHOLD: float = 100.0  # USD — bots above this are kept
 
 
@@ -159,6 +159,7 @@ class DreamCoOrchestrator:
             if os.path.isfile(bot_path):
                 # File-path import -- handles directories with hyphens (e.g. government-contract-grant-bot)
                 import importlib.util as _util
+
                 spec = _util.spec_from_file_location(bot_name, bot_path)
                 if spec is None or spec.loader is None:
                     raise ImportError(f"Cannot load spec from '{bot_path}'")
@@ -222,11 +223,18 @@ class DreamCoOrchestrator:
                 "multi_source_lead_scraper",
             ),
             (
-                os.path.join(_root, "bots", "government-contract-grant-bot", "government_contract_grant_bot.py"),
+                os.path.join(
+                    _root,
+                    "bots",
+                    "government-contract-grant-bot",
+                    "government_contract_grant_bot.py",
+                ),
                 "gov_contract_grant_bot",
             ),
             (
-                os.path.join(_root, "bots", "ai-models-integration", "ai_models_integration.py"),
+                os.path.join(
+                    _root, "bots", "ai-models-integration", "ai_models_integration.py"
+                ),
                 "ai_models_integration_bot",
             ),
             # Additional bots

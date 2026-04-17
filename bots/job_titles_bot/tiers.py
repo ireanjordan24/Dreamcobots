@@ -8,8 +8,8 @@ Tiers:
                autonomous cost justification, marketplace hiring, white-label.
 """
 
-import sys
 import os
+import sys
 
 # Re-use the shared Tier / TierConfig definitions from ai-models-integration
 _AI_MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
@@ -17,7 +17,6 @@ if _AI_MODELS_DIR not in sys.path:
     sys.path.insert(0, _AI_MODELS_DIR)
 
 from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path  # noqa: E402
-
 
 # ---------------------------------------------------------------------------
 # Bot-level feature catalogue

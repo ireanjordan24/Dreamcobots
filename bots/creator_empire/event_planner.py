@@ -4,15 +4,21 @@ Event Planner Engine for CreatorEmpire.
 Handles venue research, budget planning, and contract template generation
 for events managed through the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -25,12 +31,27 @@ class EventPlannerError(Exception):
 # ---------------------------------------------------------------------------
 
 EVENT_TYPES = [
-    "concert", "meet_and_greet", "pop_up_shop", "listening_party",
-    "sports_showcase", "streaming_event", "charity_gala", "workshop",
-    "launch_party", "tournament",
+    "concert",
+    "meet_and_greet",
+    "pop_up_shop",
+    "listening_party",
+    "sports_showcase",
+    "streaming_event",
+    "charity_gala",
+    "workshop",
+    "launch_party",
+    "tournament",
 ]
 
-VENUE_TYPES = ["arena", "club", "outdoor", "studio", "online", "hotel_ballroom", "community_center"]
+VENUE_TYPES = [
+    "arena",
+    "club",
+    "outdoor",
+    "studio",
+    "online",
+    "hotel_ballroom",
+    "community_center",
+]
 
 _FREE_EVENT_LIMIT = 2
 
@@ -38,6 +59,7 @@ _FREE_EVENT_LIMIT = 2
 @dataclass
 class VenueOption:
     """A venue option returned by venue research."""
+
     name: str
     venue_type: str
     city: str
@@ -61,6 +83,7 @@ class VenueOption:
 @dataclass
 class BudgetPlan:
     """Detailed budget breakdown for an event."""
+
     venue_cost: float = 0.0
     production_cost: float = 0.0
     marketing_cost: float = 0.0
@@ -72,8 +95,12 @@ class BudgetPlan:
 
     def subtotal(self) -> float:
         return (
-            self.venue_cost + self.production_cost + self.marketing_cost
-            + self.staffing_cost + self.catering_cost + self.talent_fees
+            self.venue_cost
+            + self.production_cost
+            + self.marketing_cost
+            + self.staffing_cost
+            + self.catering_cost
+            + self.talent_fees
         )
 
     def contingency(self) -> float:
@@ -101,6 +128,7 @@ class BudgetPlan:
 @dataclass
 class Event:
     """Represents a planned event."""
+
     event_id: str
     talent_id: str
     event_type: str
@@ -132,14 +160,62 @@ class Event:
 # ---------------------------------------------------------------------------
 
 _VENUE_DB: list[dict] = [
-    {"name": "The Marquee", "venue_type": "club", "city": "New York", "capacity": 500, "cost": 5000},
-    {"name": "Madison Square Garden", "venue_type": "arena", "city": "New York", "capacity": 20000, "cost": 150000},
-    {"name": "The Wiltern", "venue_type": "club", "city": "Los Angeles", "capacity": 1850, "cost": 12000},
-    {"name": "Crypto.com Arena", "venue_type": "arena", "city": "Los Angeles", "capacity": 20000, "cost": 200000},
-    {"name": "House of Blues", "venue_type": "club", "city": "Chicago", "capacity": 1400, "cost": 8000},
-    {"name": "United Center", "venue_type": "arena", "city": "Chicago", "capacity": 23500, "cost": 180000},
-    {"name": "Online Virtual Stage", "venue_type": "online", "city": "Virtual", "capacity": 999999, "cost": 2000},
-    {"name": "Community Amphitheater", "venue_type": "outdoor", "city": "Atlanta", "capacity": 3000, "cost": 6000},
+    {
+        "name": "The Marquee",
+        "venue_type": "club",
+        "city": "New York",
+        "capacity": 500,
+        "cost": 5000,
+    },
+    {
+        "name": "Madison Square Garden",
+        "venue_type": "arena",
+        "city": "New York",
+        "capacity": 20000,
+        "cost": 150000,
+    },
+    {
+        "name": "The Wiltern",
+        "venue_type": "club",
+        "city": "Los Angeles",
+        "capacity": 1850,
+        "cost": 12000,
+    },
+    {
+        "name": "Crypto.com Arena",
+        "venue_type": "arena",
+        "city": "Los Angeles",
+        "capacity": 20000,
+        "cost": 200000,
+    },
+    {
+        "name": "House of Blues",
+        "venue_type": "club",
+        "city": "Chicago",
+        "capacity": 1400,
+        "cost": 8000,
+    },
+    {
+        "name": "United Center",
+        "venue_type": "arena",
+        "city": "Chicago",
+        "capacity": 23500,
+        "cost": 180000,
+    },
+    {
+        "name": "Online Virtual Stage",
+        "venue_type": "online",
+        "city": "Virtual",
+        "capacity": 999999,
+        "cost": 2000,
+    },
+    {
+        "name": "Community Amphitheater",
+        "venue_type": "outdoor",
+        "city": "Atlanta",
+        "capacity": 3000,
+        "cost": 6000,
+    },
 ]
 
 # Contract template (simplified)
@@ -261,13 +337,15 @@ class EventPlannerEngine:
                 continue
             if venue_type and v["venue_type"] != venue_type.lower():
                 continue
-            results.append(VenueOption(
-                name=v["name"],
-                venue_type=v["venue_type"],
-                city=v["city"],
-                capacity=v["capacity"],
-                estimated_cost_usd=v["cost"],
-            ).to_dict())
+            results.append(
+                VenueOption(
+                    name=v["name"],
+                    venue_type=v["venue_type"],
+                    city=v["city"],
+                    capacity=v["capacity"],
+                    estimated_cost_usd=v["cost"],
+                ).to_dict()
+            )
         return results
 
     def assign_venue(self, event_id: str, venue_name: str) -> Event:

@@ -10,57 +10,73 @@ Covers:
   - bots/creator_empire/creator_empire.py (CreatorEmpireBot)
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-
 from tiers import Tier
-from bots.creator_empire.tiers import (
-    get_creator_tier_info,
-    CREATOR_ROLES,
-    CREATOR_FEATURES_BY_TIER,
-    MONETIZATION_MODELS_BY_TIER,
-    FEATURE_BASIC_PROFILE,
-    FEATURE_ROLE_ONBOARDING,
-    FEATURE_STREAM_SETUP,
-    FEATURE_EVENT_PLANNER,
-    FEATURE_MONETIZATION_BASIC,
-    FEATURE_MONETIZATION_ADVANCED,
-    FEATURE_SPONSORSHIP_TOOLS,
+
+from bots.creator_empire.creator_empire import CreatorEmpireBot
+from bots.creator_empire.event_planning import (
+    EVENT_STATUS_CANCELLED,
+    EVENT_STATUS_COMPLETED,
+    EVENT_STATUS_LIVE,
+    EVENT_STATUS_PLANNED,
+    EVENT_STATUS_PROMOTED,
+    EVENT_TYPES,
+    EventError,
+    EventPlanningEngine,
+)
+from bots.creator_empire.monetization import (
+    REVENUE_MODEL_INFO,
+    MonetizationEngine,
+    MonetizationError,
 )
 from bots.creator_empire.onboarding import OnboardingEngine, OnboardingError
 from bots.creator_empire.streamer import (
-    StreamerEngine, StreamerError,
-    STREAMING_PLATFORMS, GO_LIVE_CHECKLIST,
+    GO_LIVE_CHECKLIST,
+    STREAMING_PLATFORMS,
+    StreamerEngine,
+    StreamerError,
 )
-from bots.creator_empire.event_planning import (
-    EventPlanningEngine, EventError,
-    EVENT_TYPES, EVENT_STATUS_PLANNED, EVENT_STATUS_PROMOTED,
-    EVENT_STATUS_LIVE, EVENT_STATUS_COMPLETED, EVENT_STATUS_CANCELLED,
+from bots.creator_empire.tiers import (
+    CREATOR_FEATURES_BY_TIER,
+    CREATOR_ROLES,
+    FEATURE_BASIC_PROFILE,
+    FEATURE_EVENT_PLANNER,
+    FEATURE_MONETIZATION_ADVANCED,
+    FEATURE_MONETIZATION_BASIC,
+    FEATURE_ROLE_ONBOARDING,
+    FEATURE_SPONSORSHIP_TOOLS,
+    FEATURE_STREAM_SETUP,
+    MONETIZATION_MODELS_BY_TIER,
+    get_creator_tier_info,
 )
-from bots.creator_empire.monetization import (
-    MonetizationEngine, MonetizationError, REVENUE_MODEL_INFO,
-)
-from bots.creator_empire.creator_empire import CreatorEmpireBot
-
 
 # ===========================================================================
 # Tier configuration tests
 # ===========================================================================
 
+
 class TestCreatorTiers:
     def test_tier_info_keys(self):
         for tier in Tier:
             info = get_creator_tier_info(tier)
-            for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                        "platform_features", "creator_features",
-                        "monetization_models", "support_level"):
+            for key in (
+                "tier",
+                "name",
+                "price_usd_monthly",
+                "requests_per_month",
+                "platform_features",
+                "creator_features",
+                "monetization_models",
+                "support_level",
+            ):
                 assert key in info, f"Missing key '{key}' for {tier}"
 
     def test_free_price_is_zero(self):
@@ -79,7 +95,9 @@ class TestCreatorTiers:
         assert FEATURE_STREAM_SETUP in CREATOR_FEATURES_BY_TIER[Tier.PRO.value]
 
     def test_enterprise_has_sponsorship_tools(self):
-        assert FEATURE_SPONSORSHIP_TOOLS in CREATOR_FEATURES_BY_TIER[Tier.ENTERPRISE.value]
+        assert (
+            FEATURE_SPONSORSHIP_TOOLS in CREATOR_FEATURES_BY_TIER[Tier.ENTERPRISE.value]
+        )
 
     def test_free_lacks_event_planner(self):
         assert FEATURE_EVENT_PLANNER not in CREATOR_FEATURES_BY_TIER[Tier.FREE.value]
@@ -114,6 +132,7 @@ class TestCreatorTiers:
 # ===========================================================================
 # Onboarding engine tests
 # ===========================================================================
+
 
 class TestOnboardingEngine:
     def setup_method(self):
@@ -202,8 +221,16 @@ class TestOnboardingEngine:
     def test_profile_to_dict_has_all_keys(self):
         profile = self.engine.create_profile("Hank", role="podcaster")
         d = profile.to_dict()
-        for key in ("name", "role", "bio", "goals", "platforms",
-                    "tier", "onboarding_complete", "metadata"):
+        for key in (
+            "name",
+            "role",
+            "bio",
+            "goals",
+            "platforms",
+            "tier",
+            "onboarding_complete",
+            "metadata",
+        ):
             assert key in d
 
     def test_all_roles_have_action_plans(self):
@@ -215,6 +242,7 @@ class TestOnboardingEngine:
 # ===========================================================================
 # Streamer engine tests
 # ===========================================================================
+
 
 class TestStreamerEngine:
     def setup_method(self):
@@ -300,13 +328,19 @@ class TestStreamerEngine:
 # Event planning engine tests
 # ===========================================================================
 
+
 class TestEventPlanningEngine:
     def setup_method(self):
         self.engine = EventPlanningEngine(tier=Tier.PRO)
 
-    def _make_event(self, creator="Alex", title="Test Show",
-                    event_type="live_show", date="2025-08-15",
-                    venue="The Venue"):
+    def _make_event(
+        self,
+        creator="Alex",
+        title="Test Show",
+        event_type="live_show",
+        date="2025-08-15",
+        venue="The Venue",
+    ):
         return self.engine.create_event(creator, title, event_type, date, venue)
 
     def test_create_event_returns_event(self):
@@ -420,17 +454,27 @@ class TestEventPlanningEngine:
     def test_all_event_types_accepted(self):
         for event_type in EVENT_TYPES:
             event = self.engine.create_event(
-                "Creator", f"Event: {event_type}",
-                event_type, "2025-09-01", "Venue"
+                "Creator", f"Event: {event_type}", event_type, "2025-09-01", "Venue"
             )
             assert event.event_type == event_type
 
     def test_event_to_dict_has_all_keys(self):
         event = self._make_event()
         d = event.to_dict()
-        for key in ("event_id", "creator_name", "title", "event_type", "date",
-                    "venue_or_platform", "capacity", "ticket_price_usd",
-                    "status", "sponsors", "tasks", "metadata"):
+        for key in (
+            "event_id",
+            "creator_name",
+            "title",
+            "event_type",
+            "date",
+            "venue_or_platform",
+            "capacity",
+            "ticket_price_usd",
+            "status",
+            "sponsors",
+            "tasks",
+            "metadata",
+        ):
             assert key in d
 
     def test_event_not_found_raises(self):
@@ -441,6 +485,7 @@ class TestEventPlanningEngine:
 # ===========================================================================
 # Monetization engine tests
 # ===========================================================================
+
 
 class TestMonetizationEngine:
     def setup_method(self):
@@ -551,12 +596,15 @@ class TestMonetizationEngine:
 # CreatorEmpireBot integration tests
 # ===========================================================================
 
+
 class TestCreatorEmpireBot:
     def setup_method(self):
         self.bot = CreatorEmpireBot(tier=Tier.PRO)
 
     def test_onboard_and_complete(self):
-        profile = self.bot.onboard_creator("Alex", role="streamer", bio="Gaming streamer")
+        profile = self.bot.onboard_creator(
+            "Alex", role="streamer", bio="Gaming streamer"
+        )
         result = self.bot.complete_onboarding("Alex")
         assert result["profile"]["onboarding_complete"] is True
         assert len(result["action_plan"]) > 0
@@ -643,25 +691,34 @@ class TestCreatorEmpireBot:
         self.bot.complete_onboarding("Jordan")
 
         # Streaming
-        cfg = self.bot.setup_stream("Jordan", platform="twitch", niche="gaming",
-                                    schedule=["Mon 18:00", "Thu 18:00"])
+        cfg = self.bot.setup_stream(
+            "Jordan",
+            platform="twitch",
+            niche="gaming",
+            schedule=["Mon 18:00", "Thu 18:00"],
+        )
         self.bot.enable_stream_monetisation("Jordan")
         assert cfg.platform == "twitch"
 
         # Event
         event = self.bot.create_event(
-            "Jordan", "1 Year Anniversary Stream",
-            "charity_stream", "2025-12-31", "twitch.tv/jordan"
+            "Jordan",
+            "1 Year Anniversary Stream",
+            "charity_stream",
+            "2025-12-31",
+            "twitch.tv/jordan",
         )
         self.bot.complete_event_task(event.event_id, 0)
         self.bot.add_event_sponsor(event.event_id, "Logitech")
 
         # Revenue
         self.bot.enable_revenue_model("Jordan", "subscription_basic")
-        self.bot.record_revenue("Jordan", "tip_jar", 100.0, "streamlabs",
-                                 "Anniversary stream tips")
-        self.bot.record_revenue("Jordan", "subscription_basic", 4.99, "twitch",
-                                 "Sub from viewer")
+        self.bot.record_revenue(
+            "Jordan", "tip_jar", 100.0, "streamlabs", "Anniversary stream tips"
+        )
+        self.bot.record_revenue(
+            "Jordan", "subscription_basic", 4.99, "twitch", "Sub from viewer"
+        )
 
         total = self.bot.get_total_revenue("Jordan")
         assert total == pytest.approx(104.99)

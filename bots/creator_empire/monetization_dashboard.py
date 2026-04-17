@@ -4,15 +4,21 @@ Monetization Dashboard for CreatorEmpire.
 Tracks revenue streams, service fees, subscriptions, and payment
 integration for talent managed through the DreamCo platform.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
-import sys
+
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from dataclasses import dataclass, field
 from typing import Optional
+
 from tiers import Tier
 
 
@@ -24,15 +30,17 @@ class MonetizationError(Exception):
 # Subscription / service fee tiers
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ServicePlan:
     """A monetization service plan offered to talent."""
+
     plan_id: str
     name: str
     monthly_fee_usd: float
-    transaction_fee_pct: float   # % taken from each transaction
+    transaction_fee_pct: float  # % taken from each transaction
     features: list[str] = field(default_factory=list)
-    max_active_streams: Optional[int] = None   # None = unlimited
+    max_active_streams: Optional[int] = None  # None = unlimited
 
     def to_dict(self) -> dict:
         return {
@@ -41,7 +49,9 @@ class ServicePlan:
             "monthly_fee_usd": self.monthly_fee_usd,
             "transaction_fee_pct": self.transaction_fee_pct,
             "features": self.features,
-            "max_active_streams": self.max_active_streams if self.max_active_streams else "unlimited",
+            "max_active_streams": (
+                self.max_active_streams if self.max_active_streams else "unlimited"
+            ),
         }
 
 
@@ -105,9 +115,10 @@ PAYMENT_PROVIDERS = ["stripe", "paypal", "venmo_business", "cashapp_business"]
 @dataclass
 class RevenueEntry:
     """A single revenue transaction."""
+
     entry_id: str
     talent_id: str
-    source: str          # e.g. "streaming_royalties", "sponsorship", "event", "merchandise"
+    source: str  # e.g. "streaming_royalties", "sponsorship", "event", "merchandise"
     gross_amount_usd: float
     platform_fee_pct: float
     description: str = ""
@@ -130,6 +141,7 @@ class RevenueEntry:
 @dataclass
 class TalentMonetizationAccount:
     """Tracks the monetization state for a single talent."""
+
     talent_id: str
     service_plan_id: str = "starter"
     connected_processors: list[str] = field(default_factory=list)
@@ -171,7 +183,9 @@ class MonetizationDashboard:
     # Account management
     # ------------------------------------------------------------------
 
-    def register_talent(self, talent_id: str, service_plan_id: str = "starter") -> TalentMonetizationAccount:
+    def register_talent(
+        self, talent_id: str, service_plan_id: str = "starter"
+    ) -> TalentMonetizationAccount:
         """Register a talent with a service plan."""
         if talent_id in self._accounts:
             raise MonetizationError(f"Talent '{talent_id}' is already registered.")
@@ -188,7 +202,9 @@ class MonetizationDashboard:
         self._accounts[talent_id] = account
         return account
 
-    def upgrade_plan(self, talent_id: str, new_plan_id: str) -> TalentMonetizationAccount:
+    def upgrade_plan(
+        self, talent_id: str, new_plan_id: str
+    ) -> TalentMonetizationAccount:
         """Upgrade a talent's service plan."""
         account = self._get_account(talent_id)
         if new_plan_id not in SERVICE_PLANS:
@@ -228,7 +244,11 @@ class MonetizationDashboard:
             raise MonetizationError(f"'{processor}' is already connected.")
 
         account.connected_processors.append(processor.lower())
-        return {"talent_id": talent_id, "processor": processor.lower(), "status": "connected"}
+        return {
+            "talent_id": talent_id,
+            "processor": processor.lower(),
+            "status": "connected",
+        }
 
     # ------------------------------------------------------------------
     # Revenue tracking
@@ -247,7 +267,9 @@ class MonetizationDashboard:
         plan = SERVICE_PLANS[account.service_plan_id]
 
         if any(e.entry_id == entry_id for e in account.revenue_entries):
-            raise MonetizationError(f"Entry ID '{entry_id}' already exists for talent '{talent_id}'.")
+            raise MonetizationError(
+                f"Entry ID '{entry_id}' already exists for talent '{talent_id}'."
+            )
 
         entry = RevenueEntry(
             entry_id=entry_id,

@@ -2,12 +2,13 @@
 # Functionality: Guides entrepreneurs through product sourcing, store setup, and scaling.
 # Use Cases: Side hustlers launching or growing an e-commerce store.
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from framework import BaseBot
-from framework.monetization import PricingPlan, PricingModel
+from framework.monetization import PricingModel, PricingPlan
 
 
 class DropshippingBot(BaseBot):
@@ -48,14 +49,21 @@ class DropshippingBot(BaseBot):
 
     def _setup_plans(self):
         super()._setup_plans()
-        self.monetization.add_plan(PricingPlan(
-            plan_id="ecom_starter",
-            name="E-Commerce Starter",
-            model=PricingModel.ONE_TIME,
-            price_usd=49.99,
-            description="One-time setup guide + niche analysis report.",
-            features=["Niche report", "Supplier list", "Store checklist", "Ad copy templates"],
-        ))
+        self.monetization.add_plan(
+            PricingPlan(
+                plan_id="ecom_starter",
+                name="E-Commerce Starter",
+                model=PricingModel.ONE_TIME,
+                price_usd=49.99,
+                description="One-time setup guide + niche analysis report.",
+                features=[
+                    "Niche report",
+                    "Supplier list",
+                    "Store checklist",
+                    "Ad copy templates",
+                ],
+            )
+        )
 
     def _build_response(self, nlp_result, user_id):
         intent = nlp_result["intent"]
@@ -94,6 +102,8 @@ class DropshippingBot(BaseBot):
 
 if __name__ == "__main__":
     bot = DropshippingBot()
-    print(bot.chat("Hi! I want to start a dropshipping store selling fitness products."))
+    print(
+        bot.chat("Hi! I want to start a dropshipping store selling fitness products.")
+    )
     print(bot.chat("What are the profit margins like?"))
     print(bot.status())

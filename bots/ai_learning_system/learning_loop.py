@@ -9,16 +9,15 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Default KPIs
@@ -39,6 +38,7 @@ DEFAULT_SCORE_MAX: float = 100.0
 # ---------------------------------------------------------------------------
 # BotPerformanceRecord
 # ---------------------------------------------------------------------------
+
 
 class BotPerformanceRecord:
     """Tracks performance metrics for a single bot."""
@@ -96,6 +96,7 @@ class BotPerformanceRecord:
 # Learning Loop Error
 # ---------------------------------------------------------------------------
 
+
 class LearningLoopError(Exception):
     """Raised when the learning loop encounters an unrecoverable state."""
 
@@ -103,6 +104,7 @@ class LearningLoopError(Exception):
 # ---------------------------------------------------------------------------
 # Learning Loop
 # ---------------------------------------------------------------------------
+
 
 class LearningLoop:
     """
@@ -132,6 +134,7 @@ class LearningLoop:
         control_center: Any = None,
     ) -> None:
         import random as _rand_ll
+
         self._rand_ll = _rand_ll
         # Resolve positional ambiguity: if first arg is a dict, treat as kpis (legacy)
         if isinstance(control_center_or_kpis, dict):
@@ -170,8 +173,12 @@ class LearningLoop:
         for cycle in cycle_results:
             bot_results = cycle.get("bot_results", {})
             for bot_name, result in bot_results.items():
-                status = result.get("status", "ok") if isinstance(result, dict) else "ok"
-                revenue = float(result.get("revenue", 0)) if isinstance(result, dict) else 0.0
+                status = (
+                    result.get("status", "ok") if isinstance(result, dict) else "ok"
+                )
+                revenue = (
+                    float(result.get("revenue", 0)) if isinstance(result, dict) else 0.0
+                )
                 self.record_run(bot_name, success=(status != "error"), revenue=revenue)
 
     # ------------------------------------------------------------------
@@ -191,7 +198,8 @@ class LearningLoop:
         min_eff = self.kpis.get("min_efficiency", DEFAULT_KPIS["min_efficiency"])
         min_rev = self.kpis.get("min_revenue_usd", DEFAULT_KPIS["min_revenue_usd"])
         return [
-            rec for rec in self._performance.values()
+            rec
+            for rec in self._performance.values()
             if rec.efficiency >= min_eff and rec.total_revenue_usd >= min_rev
         ]
 
@@ -208,21 +216,27 @@ class LearningLoop:
             if rec.efficiency < min_eff:
                 issues.append(f"efficiency {rec.efficiency:.2f} < min {min_eff}")
             if rec.total_revenue_usd < min_rev:
-                issues.append(f"revenue ${rec.total_revenue_usd:.2f} < min ${min_rev:.2f}")
+                issues.append(
+                    f"revenue ${rec.total_revenue_usd:.2f} < min ${min_rev:.2f}"
+                )
             under_dicts.append({**rec.to_dict(), "issues": issues})
 
         suggestions: List[Dict[str, Any]] = []
         for rec in underperforming:
-            suggestions.append({
-                "type": "refactor",
-                "bot_name": rec.bot_name,
-                "reason": "below KPI thresholds",
-            })
+            suggestions.append(
+                {
+                    "type": "refactor",
+                    "bot_name": rec.bot_name,
+                    "reason": "below KPI thresholds",
+                }
+            )
         if len(healthy) < 3:
-            suggestions.append({
-                "type": "new_bot",
-                "reason": f"only {len(healthy)} healthy bots (need ≥ 3)",
-            })
+            suggestions.append(
+                {
+                    "type": "new_bot",
+                    "reason": f"only {len(healthy)} healthy bots (need ≥ 3)",
+                }
+            )
 
         return {
             "underperforming": under_dicts,
@@ -304,23 +318,43 @@ class LearningLoop:
             result: Dict[str, float] = {}
             bots = getattr(self.control_center, "bots", {}) or {}
             for name in bots:
-                s = round(self._rand_ll.uniform(DEFAULT_SCORE_MIN, DEFAULT_SCORE_MAX), 2)
+                s = round(
+                    self._rand_ll.uniform(DEFAULT_SCORE_MIN, DEFAULT_SCORE_MAX), 2
+                )
                 self.performance_log[name] = s
                 result[name] = s
             return result
         # Legacy API with bot_name + score
-        if score is not None and (score < DEFAULT_SCORE_MIN or score > DEFAULT_SCORE_MAX):
-            raise LearningLoopError(f"Invalid score {score!r}: must be between {DEFAULT_SCORE_MIN} and {DEFAULT_SCORE_MAX}.")
+        if score is not None and (
+            score < DEFAULT_SCORE_MIN or score > DEFAULT_SCORE_MAX
+        ):
+            raise LearningLoopError(
+                f"Invalid score {score!r}: must be between {DEFAULT_SCORE_MIN} and {DEFAULT_SCORE_MAX}."
+            )
         if bot_name is not None:
-            self.record_run(bot_name, success=(score >= self.underperform_threshold) if score is not None else True)
+            self.record_run(
+                bot_name,
+                success=(
+                    (score >= self.underperform_threshold)
+                    if score is not None
+                    else True
+                ),
+            )
             self.performance_log[bot_name] = score
-        status = "underperforming" if (score is not None and score < self.underperform_threshold) else "healthy"
+        status = (
+            "underperforming"
+            if (score is not None and score < self.underperform_threshold)
+            else "healthy"
+        )
         return {"bot_name": bot_name, "score": score, "status": status}
 
     def get_underperformers(self):
         """Return underperforming bots as dict {name: score}."""
-        return {name: score for name, score in self.performance_log.items()
-                if score < self.underperform_threshold}
+        return {
+            name: score
+            for name, score in self.performance_log.items()
+            if score < self.underperform_threshold
+        }
 
     def get_performance_log(self):
         """Return a copy of the performance log (dict)."""
@@ -351,12 +385,16 @@ class LearningLoop:
         return list(self._refactor_log)
 
     def track_revenue(self) -> float:
-        if self.control_center is not None and hasattr(self.control_center, "get_total_revenue"):
+        if self.control_center is not None and hasattr(
+            self.control_center, "get_total_revenue"
+        ):
             return float(self.control_center.get_total_revenue())
         return float(sum(r.total_revenue_usd for r in self._performance.values()))
 
     def count_leads(self) -> int:
-        if self.control_center is not None and hasattr(self.control_center, "count_leads"):
+        if self.control_center is not None and hasattr(
+            self.control_center, "count_leads"
+        ):
             return int(self.control_center.count_leads())
         return sum(r.total_runs for r in self._performance.values())
 

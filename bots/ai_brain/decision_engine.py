@@ -14,16 +14,15 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Decision constants
@@ -51,16 +50,56 @@ BOTTLENECK_ERROR_RATE_THRESHOLD: float = 0.10
 BOTTLENECK_HIGH_SEVERITY_THRESHOLD: float = 0.25
 
 ACTIONS = [
-    {"key": DECISION_SCALE_LEADS,         "label": "Scale Leads",          "description": "Scale lead generation"},
-    {"key": DECISION_INCREASE_OUTREACH,   "label": "Increase Outreach",    "description": "Increase outreach campaigns"},
-    {"key": DECISION_SCALE_SYSTEM,        "label": "Scale System",         "description": "Scale the overall system"},
-    {"key": DECISION_OPTIMIZE,            "label": "Optimize",             "description": "Optimize current operations"},
-    {"key": DECISION_CREATE_SCALING_BOT,  "label": "Create Scaling Bot",   "description": "Create a new scaling bot"},
-    {"key": DECISION_CREATE_RECOVERY_BOT, "label": "Create Recovery Bot",  "description": "Create a recovery bot"},
-    {"key": "fix_bottleneck",             "label": "Fix Bottleneck",       "description": "Fix a workflow bottleneck"},
-    {"key": "optimize_sales",             "label": "Optimize Sales",       "description": "Optimize sales funnel"},
-    {"key": "focus_real_estate",          "label": "Focus Real Estate",    "description": "Focus on real estate revenue"},
-    {"key": "build_new_bot",              "label": "Build New Bot",        "description": "Build a new bot to fill gaps"},
+    {
+        "key": DECISION_SCALE_LEADS,
+        "label": "Scale Leads",
+        "description": "Scale lead generation",
+    },
+    {
+        "key": DECISION_INCREASE_OUTREACH,
+        "label": "Increase Outreach",
+        "description": "Increase outreach campaigns",
+    },
+    {
+        "key": DECISION_SCALE_SYSTEM,
+        "label": "Scale System",
+        "description": "Scale the overall system",
+    },
+    {
+        "key": DECISION_OPTIMIZE,
+        "label": "Optimize",
+        "description": "Optimize current operations",
+    },
+    {
+        "key": DECISION_CREATE_SCALING_BOT,
+        "label": "Create Scaling Bot",
+        "description": "Create a new scaling bot",
+    },
+    {
+        "key": DECISION_CREATE_RECOVERY_BOT,
+        "label": "Create Recovery Bot",
+        "description": "Create a recovery bot",
+    },
+    {
+        "key": "fix_bottleneck",
+        "label": "Fix Bottleneck",
+        "description": "Fix a workflow bottleneck",
+    },
+    {
+        "key": "optimize_sales",
+        "label": "Optimize Sales",
+        "description": "Optimize sales funnel",
+    },
+    {
+        "key": "focus_real_estate",
+        "label": "Focus Real Estate",
+        "description": "Focus on real estate revenue",
+    },
+    {
+        "key": "build_new_bot",
+        "label": "Build New Bot",
+        "description": "Build a new bot to fill gaps",
+    },
 ]
 
 _ACTIONS_MAP: Dict[str, Dict[str, str]] = {a["key"]: a for a in ACTIONS}
@@ -70,6 +109,7 @@ _ACTIONS_MAP: Dict[str, Dict[str, str]] = {a["key"]: a for a in ACTIONS}
 # Errors
 # ---------------------------------------------------------------------------
 
+
 class DecisionEngineTierError(Exception):
     """Raised when an action is not permitted on the current tier."""
 
@@ -77,6 +117,7 @@ class DecisionEngineTierError(Exception):
 # ---------------------------------------------------------------------------
 # Decision Engine
 # ---------------------------------------------------------------------------
+
 
 class DecisionEngine:
     """
@@ -94,9 +135,15 @@ class DecisionEngine:
     ) -> None:
         # Import Tier lazily to handle cross-module enum issues
         try:
-            import sys as _sys
             import os as _os
-            _sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "ai-models-integration"))
+            import sys as _sys
+
+            _sys.path.insert(
+                0,
+                _os.path.join(
+                    _os.path.dirname(__file__), "..", "ai-models-integration"
+                ),
+            )
             from tiers import Tier as _Tier
         except ImportError:
             _Tier = None
@@ -166,12 +213,16 @@ class DecisionEngine:
             "signals": signals,
         }
 
-    def analyze_crm_trends(self, crm_data: Dict[str, Dict[str, float]]) -> Dict[str, Any]:
+    def analyze_crm_trends(
+        self, crm_data: Dict[str, Dict[str, float]]
+    ) -> Dict[str, Any]:
         """Analyse CRM conversion data and return signals."""
         if not crm_data:
             return {"top_bot": None, "bottom_bot": None, "signals": []}
 
-        sorted_bots = sorted(crm_data.items(), key=lambda x: x[1].get("conversion_rate", 0.0))
+        sorted_bots = sorted(
+            crm_data.items(), key=lambda x: x[1].get("conversion_rate", 0.0)
+        )
         bottom_bot = sorted_bots[0][0]
         top_bot = sorted_bots[-1][0]
 
@@ -194,14 +245,22 @@ class DecisionEngine:
             "signals": signals,
         }
 
-    def detect_bottlenecks(self, workflow_data: Dict[str, Dict[str, float]]) -> List[Dict[str, Any]]:
+    def detect_bottlenecks(
+        self, workflow_data: Dict[str, Dict[str, float]]
+    ) -> List[Dict[str, Any]]:
         """Identify bottleneck steps in the workflow."""
         result = []
         for step, info in workflow_data.items():
             error_rate = info.get("error_rate", 0.0)
             if error_rate >= BOTTLENECK_ERROR_RATE_THRESHOLD:
-                severity = "high" if error_rate >= BOTTLENECK_HIGH_SEVERITY_THRESHOLD else "medium"
-                result.append({"step": step, "error_rate": error_rate, "severity": severity})
+                severity = (
+                    "high"
+                    if error_rate >= BOTTLENECK_HIGH_SEVERITY_THRESHOLD
+                    else "medium"
+                )
+                result.append(
+                    {"step": step, "error_rate": error_rate, "severity": severity}
+                )
         return result
 
     def make_decision(
@@ -211,9 +270,13 @@ class DecisionEngine:
         workflow_data: Optional[Dict[str, Dict[str, float]]] = None,
     ) -> Dict[str, Any]:
         """Make a data-driven decision and record it in history."""
-        revenue_analysis = self.analyze_revenue(revenue_data or self.metrics.get("revenue", {}))
+        revenue_analysis = self.analyze_revenue(
+            revenue_data or self.metrics.get("revenue", {})
+        )
         crm_analysis = self.analyze_crm_trends(crm_data or self.metrics.get("crm", {}))
-        bottlenecks = self.detect_bottlenecks(workflow_data or self.metrics.get("workflow", {}))
+        bottlenecks = self.detect_bottlenecks(
+            workflow_data or self.metrics.get("workflow", {})
+        )
 
         scores: Dict[str, float] = {a["key"]: 0.0 for a in ACTIONS}
 
@@ -230,14 +293,22 @@ class DecisionEngine:
         # Score bottleneck fix (PRO/ENTERPRISE only)
         tier_val = self._tier_value()
         if bottlenecks and tier_val in ("pro", "enterprise"):
-            scores["fix_bottleneck"] += 15.0 + sum(1.0 for b in bottlenecks if b["severity"] == "high")
+            scores["fix_bottleneck"] += 15.0 + sum(
+                1.0 for b in bottlenecks if b["severity"] == "high"
+            )
 
         # Default scores
         scores[DECISION_OPTIMIZE] = max(scores[DECISION_OPTIMIZE], 1.0)
 
         all_scores_list = sorted(
-            [{"key": k, "score": v, **(_ACTIONS_MAP.get(k) or {"label": k, "description": k})}
-             for k, v in scores.items()],
+            [
+                {
+                    "key": k,
+                    "score": v,
+                    **(_ACTIONS_MAP.get(k) or {"label": k, "description": k}),
+                }
+                for k, v in scores.items()
+            ],
             key=lambda x: x["score"],
             reverse=True,
         )
@@ -303,7 +374,9 @@ class DecisionEngine:
                     key = DECISION_SCALE_SYSTEM
             else:
                 key = DECISION_OPTIMIZE
-            self._decision_history.append({"decision": key, "revenue": revenue, "leads": leads})
+            self._decision_history.append(
+                {"decision": key, "revenue": revenue, "leads": leads}
+            )
             return key
         result = self.make_decision(
             revenue_data=m.get("revenue", {}),

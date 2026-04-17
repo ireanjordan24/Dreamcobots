@@ -20,27 +20,28 @@ Usage
     deal  = bot.car_flipping.evaluate_vehicle({"purchase_price": 8000, ...})
     sku   = bot.retail.analyse_sku({"sku": "SKU-001", "price": 29.99, ...})
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from .analytics import AdvancedAnalytics
+from .behavioral_settings import BehavioralSettings
+from .car_flipping_bot import CarFlippingBot
+from .enterprise_features import EnterpriseFeatures
+from .in_store_controls import InStoreTacticalControls
+from .online_optimization import OnlinePlatformOptimization
+from .real_estate_optimizer import RealEstateOptimizer
+from .retail_intelligence import RetailIntelligenceNetwork
 from .settings import (
-    DISCOUNT_DOMINATOR_SETTINGS,
     ALL_GROUPS,
+    DISCOUNT_DOMINATOR_SETTINGS,
     apply_settings,
     as_dict,
     reset_all,
 )
-from .analytics import AdvancedAnalytics
-from .in_store_controls import InStoreTacticalControls
-from .online_optimization import OnlinePlatformOptimization
-from .enterprise_features import EnterpriseFeatures
-from .behavioral_settings import BehavioralSettings
-from .real_estate_optimizer import RealEstateOptimizer
-from .car_flipping_bot import CarFlippingBot
-from .retail_intelligence import RetailIntelligenceNetwork
 
 
 class DiscountDominator:

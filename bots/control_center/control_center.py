@@ -1,8 +1,14 @@
 """Control Center — central orchestration dashboard for all Dreamcobots."""
-import sys, os
+
+import os
+import sys
 from datetime import datetime, timezone
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _HEARTBEAT_STALE_SECONDS = 5 * 60  # 5 minutes
@@ -49,11 +55,13 @@ class ControlCenter:
 
     def add_income_entry(self, source: str, amount: float) -> None:
         """Add an income tracking entry."""
-        self._income_log.append({
-            "source": source,
-            "amount_usd": round(amount, 2),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        self._income_log.append(
+            {
+                "source": source,
+                "amount_usd": round(amount, 2),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
 
     def get_income_summary(self) -> dict:
         """Return income summary across all bots and sources."""
@@ -97,7 +105,13 @@ class ControlCenter:
             except Exception as exc:
                 meta["status"] = "error"
                 results[name] = {"bot": name, "status": "error", "error": str(exc)}
-            self._run_log.append({"bot": name, "timestamp": meta["last_run"], "status": results[name]["status"]})
+            self._run_log.append(
+                {
+                    "bot": name,
+                    "timestamp": meta["last_run"],
+                    "status": results[name]["status"],
+                }
+            )
         return results
 
     def get_monitoring_dashboard(self) -> dict:
@@ -111,9 +125,11 @@ class ControlCenter:
             "bot_status": status,
             "income_summary": income,
             "recent_runs": self._run_log[-10:],
-            "health": "healthy" if all(
-                m["status"] != "error" for m in self._bots.values()
-            ) else "degraded",
+            "health": (
+                "healthy"
+                if all(m["status"] != "error" for m in self._bots.values())
+                else "degraded"
+            ),
         }
 
     # ------------------------------------------------------------------
@@ -151,7 +167,9 @@ class ControlCenter:
 
     def get_stale_bots(self) -> list:
         """Return a list of bot names whose heartbeat is stale."""
-        return [name for name, info in self.get_heartbeat_status().items() if info["stale"]]
+        return [
+            name for name, info in self.get_heartbeat_status().items() if info["stale"]
+        ]
 
     # ------------------------------------------------------------------
     # GitHub webhook event handling

@@ -1,4 +1,5 @@
 """NASA Open APIs connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -25,11 +26,14 @@ class NASAConnector:
             API response dict with APOD data or error dict.
         """
         import requests
+
         params = {"api_key": self.api_key}
         if date:
             params["date"] = date
         try:
-            response = requests.get(f"{self.BASE_URL}/planetary/apod", params=params, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/planetary/apod", params=params, timeout=30
+            )
             response.raise_for_status()
             logger.info("NASA APOD fetched.")
             return {"status": "success", "data": response.json()}
@@ -47,11 +51,13 @@ class NASAConnector:
             API response dict with images or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"https://images-api.nasa.gov/search?q={query}", timeout=30)
+            response = requests.get(
+                f"https://images-api.nasa.gov/search?q={query}", timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("NASA search_images error: %s", e)
             return {"status": "error", "message": str(e)}
-

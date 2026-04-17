@@ -1,10 +1,14 @@
 """Maps Scraper Bot — tier-aware Google Maps–style local business lead generator."""
+
 import json
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from bots.lead_gen_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -29,9 +33,17 @@ class MapsScraperBot:
         {"name": "Windy City Plumbing", "phone": "312-555-3333", "city": "Chicago"},
         {"name": "Lakeview Dental Clinic", "phone": "312-555-4444", "city": "Chicago"},
         {"name": "Southside Auto Repair", "phone": "312-555-5555", "city": "Chicago"},
-        {"name": "North Shore Landscaping", "phone": "847-555-6666", "city": "Evanston"},
+        {
+            "name": "North Shore Landscaping",
+            "phone": "847-555-6666",
+            "city": "Evanston",
+        },
         {"name": "Oak Park Bakery", "phone": "708-555-7777", "city": "Oak Park"},
-        {"name": "Naperville Pest Control", "phone": "630-555-8888", "city": "Naperville"},
+        {
+            "name": "Naperville Pest Control",
+            "phone": "630-555-8888",
+            "city": "Naperville",
+        },
     ]
 
     def __init__(self, tier: Tier = Tier.FREE):

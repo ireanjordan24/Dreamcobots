@@ -1,21 +1,23 @@
 """Tests for bots/ci_auto_fix_bot/ci_auto_fix_bot.py"""
+
 import os
 import sys
 import tempfile
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from bots.ci_auto_fix_bot.ci_auto_fix_bot import CIAutoFixBot, FixType
 
+from bots.ci_auto_fix_bot.ci_auto_fix_bot import CIAutoFixBot, FixType
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_bot(tmp_path=None) -> CIAutoFixBot:
     log_dir = str(tmp_path) if tmp_path else tempfile.mkdtemp()
@@ -25,6 +27,7 @@ def make_bot(tmp_path=None) -> CIAutoFixBot:
 # ---------------------------------------------------------------------------
 # Instantiation
 # ---------------------------------------------------------------------------
+
 
 class TestInstantiation:
     def test_instantiates(self):
@@ -48,6 +51,7 @@ class TestInstantiation:
 # analyze_logs
 # ---------------------------------------------------------------------------
 
+
 class TestAnalyzeLogs:
     def test_npm_error_detected(self):
         bot = CIAutoFixBot()
@@ -60,27 +64,44 @@ class TestAnalyzeLogs:
 
     def test_module_not_found(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Module not found: Error: Can't resolve 'express'") == FixType.MISSING_MODULE
+        assert (
+            bot.analyze_logs("Module not found: Error: Can't resolve 'express'")
+            == FixType.MISSING_MODULE
+        )
 
     def test_cannot_find_module(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Cannot find module './config'") == FixType.MISSING_MODULE
+        assert (
+            bot.analyze_logs("Cannot find module './config'") == FixType.MISSING_MODULE
+        )
 
     def test_python_module_not_found(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("ModuleNotFoundError: No module named 'stripe'") == FixType.MISSING_MODULE
+        assert (
+            bot.analyze_logs("ModuleNotFoundError: No module named 'stripe'")
+            == FixType.MISSING_MODULE
+        )
 
     def test_import_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("ImportError: cannot import name 'foo'") == FixType.MISSING_MODULE
+        assert (
+            bot.analyze_logs("ImportError: cannot import name 'foo'")
+            == FixType.MISSING_MODULE
+        )
 
     def test_permission_denied(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Permission denied: '/usr/bin/node'") == FixType.PERMISSIONS
+        assert (
+            bot.analyze_logs("Permission denied: '/usr/bin/node'")
+            == FixType.PERMISSIONS
+        )
 
     def test_eacces_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("EACCES: permission denied, access '/root'") == FixType.PERMISSIONS
+        assert (
+            bot.analyze_logs("EACCES: permission denied, access '/root'")
+            == FixType.PERMISSIONS
+        )
 
     def test_exit_code_128(self):
         bot = CIAutoFixBot()
@@ -88,47 +109,82 @@ class TestAnalyzeLogs:
 
     def test_no_such_file(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("No such file or directory: 'dist/index.js'") == FixType.PATH
+        assert (
+            bot.analyze_logs("No such file or directory: 'dist/index.js'")
+            == FixType.PATH
+        )
 
     def test_enoent(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("ENOENT: no such file or directory, open 'package.json'") == FixType.PATH
+        assert (
+            bot.analyze_logs("ENOENT: no such file or directory, open 'package.json'")
+            == FixType.PATH
+        )
 
     def test_pathspec_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("error: pathspec 'main' did not match any file(s)") == FixType.PATH
+        assert (
+            bot.analyze_logs("error: pathspec 'main' did not match any file(s)")
+            == FixType.PATH
+        )
 
     def test_pip_install_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("pip install failed for requirements.txt not found") == FixType.PIP_INSTALL
+        assert (
+            bot.analyze_logs("pip install failed for requirements.txt not found")
+            == FixType.PIP_INSTALL
+        )
 
     def test_python_format_black_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("would reformat bots/my_bot.py\nblack --check python_bots/ failed") == FixType.PYTHON_FORMAT
+        assert (
+            bot.analyze_logs(
+                "would reformat bots/my_bot.py\nblack --check python_bots/ failed"
+            )
+            == FixType.PYTHON_FORMAT
+        )
 
     def test_python_format_black_check(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Oh no! black --check found formatting issues") == FixType.PYTHON_FORMAT
+        assert (
+            bot.analyze_logs("Oh no! black --check found formatting issues")
+            == FixType.PYTHON_FORMAT
+        )
 
     def test_java_format_gjf_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("google-java-format: 3 files would be reformatted") == FixType.JAVA_FORMAT
+        assert (
+            bot.analyze_logs("google-java-format: 3 files would be reformatted")
+            == FixType.JAVA_FORMAT
+        )
 
     def test_java_format_checkstyle_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Checkstyle violation: line length > 100 in MyBot.java") == FixType.JAVA_FORMAT
+        assert (
+            bot.analyze_logs("Checkstyle violation: line length > 100 in MyBot.java")
+            == FixType.JAVA_FORMAT
+        )
 
     def test_js_format_prettier_check(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("prettier --check failed: Code style issues found") == FixType.JS_FORMAT
+        assert (
+            bot.analyze_logs("prettier --check failed: Code style issues found")
+            == FixType.JS_FORMAT
+        )
 
     def test_js_format_eslint_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("eslint error: 5 problems (3 errors, 2 warnings)") == FixType.JS_FORMAT
+        assert (
+            bot.analyze_logs("eslint error: 5 problems (3 errors, 2 warnings)")
+            == FixType.JS_FORMAT
+        )
 
     def test_unknown_error(self):
         bot = CIAutoFixBot()
-        assert bot.analyze_logs("Something completely different went wrong") == FixType.UNKNOWN
+        assert (
+            bot.analyze_logs("Something completely different went wrong")
+            == FixType.UNKNOWN
+        )
 
     def test_empty_log(self):
         bot = CIAutoFixBot()
@@ -142,18 +198,21 @@ class TestAnalyzeLogs:
 
     def test_multiline_log(self):
         bot = CIAutoFixBot()
-        log = "\n".join([
-            "Step 1 passed",
-            "Step 2 passed",
-            "npm ERR! 404 Not Found - GET https://registry.npmjs.org/...",
-            "npm ERR! code E404",
-        ])
+        log = "\n".join(
+            [
+                "Step 1 passed",
+                "Step 2 passed",
+                "npm ERR! 404 Not Found - GET https://registry.npmjs.org/...",
+                "npm ERR! code E404",
+            ]
+        )
         assert bot.analyze_logs(log) == FixType.INSTALL_DEPS
 
 
 # ---------------------------------------------------------------------------
 # detect_failure_type
 # ---------------------------------------------------------------------------
+
 
 class TestDetectFailureType:
     def test_returns_dict(self):
@@ -194,6 +253,7 @@ class TestDetectFailureType:
 # ---------------------------------------------------------------------------
 # get_fix_commands
 # ---------------------------------------------------------------------------
+
 
 class TestGetFixCommands:
     def test_install_deps_commands(self):
@@ -255,6 +315,7 @@ class TestGetFixCommands:
 # apply_fix
 # ---------------------------------------------------------------------------
 
+
 class TestApplyFix:
     def test_returns_dict(self):
         bot = CIAutoFixBot()
@@ -293,6 +354,7 @@ class TestApplyFix:
 # get_commit_commands
 # ---------------------------------------------------------------------------
 
+
 class TestGetCommitCommands:
     def test_returns_list(self):
         bot = CIAutoFixBot()
@@ -326,6 +388,7 @@ class TestGetCommitCommands:
 # get_retrigger_command
 # ---------------------------------------------------------------------------
 
+
 class TestGetRetriggerCommand:
     def test_returns_string(self):
         bot = CIAutoFixBot()
@@ -346,6 +409,7 @@ class TestGetRetriggerCommand:
 # ---------------------------------------------------------------------------
 # log_fix
 # ---------------------------------------------------------------------------
+
 
 class TestLogFix:
     def test_returns_string(self, tmp_path):
@@ -403,6 +467,7 @@ class TestLogFix:
 # get_fix_history
 # ---------------------------------------------------------------------------
 
+
 class TestGetFixHistory:
     def test_empty_initially(self):
         bot = CIAutoFixBot()
@@ -419,6 +484,7 @@ class TestGetFixHistory:
 # ---------------------------------------------------------------------------
 # escalate
 # ---------------------------------------------------------------------------
+
 
 class TestEscalate:
     def test_returns_dict(self):
@@ -448,7 +514,9 @@ class TestEscalate:
 
     def test_html_url_stored(self):
         bot = CIAutoFixBot()
-        result = bot.escalate("1", "CI", html_url="https://github.com/x/y/actions/runs/1")
+        result = bot.escalate(
+            "1", "CI", html_url="https://github.com/x/y/actions/runs/1"
+        )
         assert result["html_url"] == "https://github.com/x/y/actions/runs/1"
 
     def test_timestamp_present(self):
@@ -460,6 +528,7 @@ class TestEscalate:
 # ---------------------------------------------------------------------------
 # run (full pipeline)
 # ---------------------------------------------------------------------------
+
 
 class TestRun:
     def test_returns_dict(self, tmp_path):
@@ -480,7 +549,9 @@ class TestRun:
 
     def test_unknown_fix_escalates(self, tmp_path):
         bot = make_bot(tmp_path)
-        result = bot.run("something totally unrecognized", run_id="2", workflow_name="CI/CD")
+        result = bot.run(
+            "something totally unrecognized", run_id="2", workflow_name="CI/CD"
+        )
         assert result["escalate"] is True
         assert "escalation" in result
         assert result["escalation"]["escalated"] is True
@@ -503,22 +574,32 @@ class TestRun:
 
     def test_permissions_fix_applied(self, tmp_path):
         bot = make_bot(tmp_path)
-        result = bot.run("Permission denied: cannot open file", run_id="5", workflow_name="CI")
+        result = bot.run(
+            "Permission denied: cannot open file", run_id="5", workflow_name="CI"
+        )
         assert result["fix_type"] == FixType.PERMISSIONS
 
     def test_pip_fix_applied(self, tmp_path):
         bot = make_bot(tmp_path)
-        result = bot.run("pip install -r requirements.txt not found", run_id="6", workflow_name="CI")
+        result = bot.run(
+            "pip install -r requirements.txt not found", run_id="6", workflow_name="CI"
+        )
         assert result["fix_type"] == FixType.PIP_INSTALL
 
     def test_path_fix_applied(self, tmp_path):
         bot = make_bot(tmp_path)
-        result = bot.run("No such file or directory: dist/app.js", run_id="7", workflow_name="CI")
+        result = bot.run(
+            "No such file or directory: dist/app.js", run_id="7", workflow_name="CI"
+        )
         assert result["fix_type"] == FixType.PATH
 
     def test_missing_module_fix_applied(self, tmp_path):
         bot = make_bot(tmp_path)
-        result = bot.run("Module not found: Error: Can't resolve './utils'", run_id="8", workflow_name="CI")
+        result = bot.run(
+            "Module not found: Error: Can't resolve './utils'",
+            run_id="8",
+            workflow_name="CI",
+        )
         assert result["fix_type"] == FixType.MISSING_MODULE
 
     def test_retrigger_contains_workflow_name(self, tmp_path):
@@ -526,17 +607,20 @@ class TestRun:
         result = bot.run("npm ERR! 404", run_id="1", workflow_name="Auto Recovery")
         assert "Auto Recovery" in result["retrigger_command"]
 
-    @pytest.mark.parametrize("log,expected_fix", [
-        ("npm ERR! 404", FixType.INSTALL_DEPS),
-        ("Module not found: foo", FixType.MISSING_MODULE),
-        ("Permission denied: /etc/hosts", FixType.PERMISSIONS),
-        ("No such file or directory: build/", FixType.PATH),
-        ("pip install -r requirements.txt", FixType.PIP_INSTALL),
-        ("would reformat python_bots/my_bot.py", FixType.PYTHON_FORMAT),
-        ("google-java-format: file needs formatting", FixType.JAVA_FORMAT),
-        ("prettier --check: Code style issues found", FixType.JS_FORMAT),
-        ("completely unknown error xyz", FixType.UNKNOWN),
-    ])
+    @pytest.mark.parametrize(
+        "log,expected_fix",
+        [
+            ("npm ERR! 404", FixType.INSTALL_DEPS),
+            ("Module not found: foo", FixType.MISSING_MODULE),
+            ("Permission denied: /etc/hosts", FixType.PERMISSIONS),
+            ("No such file or directory: build/", FixType.PATH),
+            ("pip install -r requirements.txt", FixType.PIP_INSTALL),
+            ("would reformat python_bots/my_bot.py", FixType.PYTHON_FORMAT),
+            ("google-java-format: file needs formatting", FixType.JAVA_FORMAT),
+            ("prettier --check: Code style issues found", FixType.JS_FORMAT),
+            ("completely unknown error xyz", FixType.UNKNOWN),
+        ],
+    )
     def test_all_fix_types(self, tmp_path, log, expected_fix):
         bot = make_bot(tmp_path)
         result = bot.run(log, run_id="99", workflow_name="CI")

@@ -45,7 +45,12 @@ module.exports = {
     },
     // Browser-side scripts that use DOM globals (document, window, prompt, etc.)
     {
-      files: ['dreamco/frontend/**/*.js', 'public/**/*.js', 'frontend/**/*.js'],
+      files: [
+        'dreamco/frontend/**/*.js',
+        'public/**/*.js',
+        'frontend/**/*.js',
+        'dashboard/**/*.js',
+      ],
       env: {
         browser: true,
         node: false,

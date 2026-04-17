@@ -1,4 +1,5 @@
 """Tests for FastAPI backend endpoints."""
+
 import pytest
 from fastapi.testclient import TestClient
 

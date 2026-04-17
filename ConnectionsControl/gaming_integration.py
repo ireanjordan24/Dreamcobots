@@ -8,11 +8,11 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+
+# GLOBAL AI SOURCES FLOW
 
 
 class ConsoleType(Enum):
@@ -37,10 +37,14 @@ class GamingIntegration:
         self._browser_url: Optional[str] = None
         self._configured: bool = False
 
-    def configure(self, console_type: ConsoleType, browser_url: Optional[str] = None) -> None:
+    def configure(
+        self, console_type: ConsoleType, browser_url: Optional[str] = None
+    ) -> None:
         """Configure the console type and optional custom browser URL."""
         self._console_type = console_type
-        self._browser_url = browser_url or self.CONSOLE_BROWSER_URLS.get(console_type, "")
+        self._browser_url = browser_url or self.CONSOLE_BROWSER_URLS.get(
+            console_type, ""
+        )
         self._configured = True
 
     def generate_dashboard_url(self) -> str:

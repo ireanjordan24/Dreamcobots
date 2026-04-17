@@ -14,14 +14,15 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
-import uuid
 
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -244,7 +245,9 @@ class ARVREngine:
             return True
         return False
 
-    def list_holographic_sessions(self, active_only: bool = False) -> List[HolographicSession]:
+    def list_holographic_sessions(
+        self, active_only: bool = False
+    ) -> List[HolographicSession]:
         sessions = list(self._holographic_sessions.values())
         if active_only:
             sessions = [s for s in sessions if s.active]

@@ -31,6 +31,7 @@ class PrivacyEngineError(Exception):
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class PermissionLevel(Enum):
     READ_ONLY = "read_only"
     RESTRICTED = "restricted"
@@ -48,6 +49,7 @@ class ActionCategory(Enum):
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ActivityLog:
@@ -87,6 +89,7 @@ _LEVEL_CATEGORIES: dict[PermissionLevel, list[ActionCategory]] = {
 # ---------------------------------------------------------------------------
 # Permission Manager
 # ---------------------------------------------------------------------------
+
 
 class PermissionManager:
     def __init__(self) -> None:
@@ -130,6 +133,7 @@ class PermissionManager:
 # Activity Logger
 # ---------------------------------------------------------------------------
 
+
 class ActivityLogger:
     def __init__(self) -> None:
         self._logs: list[ActivityLog] = []
@@ -157,14 +161,21 @@ class ActivityLogger:
     def get_logs(
         self, user_id: Optional[str] = None, limit: int = 100
     ) -> list[ActivityLog]:
-        logs = self._logs if user_id is None else [l for l in self._logs if l.user_id == user_id]
+        logs = (
+            self._logs
+            if user_id is None
+            else [l for l in self._logs if l.user_id == user_id]
+        )
         return logs[-limit:]
 
     def get_stats(self) -> dict:
         return {
             "total_logs": len(self._logs),
             "unique_users": len({l.user_id for l in self._logs}),
-            "categories": {cat.value: sum(1 for l in self._logs if l.category == cat) for cat in ActionCategory},
+            "categories": {
+                cat.value: sum(1 for l in self._logs if l.category == cat)
+                for cat in ActionCategory
+            },
         }
 
 
@@ -229,9 +240,7 @@ class SafetyGuardrail:
     def __init__(self) -> None:
         self._pending: dict[str, dict] = {}
 
-    def check_action(
-        self, action: str, category: ActionCategory, user_id: str
-    ) -> dict:
+    def check_action(self, action: str, category: ActionCategory, user_id: str) -> dict:
         requires_confirmation = category in _HIGH_RISK_CATEGORIES
         action_id = str(uuid.uuid4())
         result: dict = {
@@ -239,11 +248,13 @@ class SafetyGuardrail:
             "approved": not requires_confirmation,
             "requires_confirmation": requires_confirmation,
             "reason": (
-                f"Action '{action}' in category '{category.value}' requires "
-                "explicit confirmation."
-            )
-            if requires_confirmation
-            else "Action approved.",
+                (
+                    f"Action '{action}' in category '{category.value}' requires "
+                    "explicit confirmation."
+                )
+                if requires_confirmation
+                else "Action approved."
+            ),
         }
         if requires_confirmation:
             self._pending[action_id] = {
@@ -274,6 +285,7 @@ class SafetyGuardrail:
 # ---------------------------------------------------------------------------
 # PrivacyEngine (facade)
 # ---------------------------------------------------------------------------
+
 
 class PrivacyEngine:
     """Composes all privacy sub-systems."""

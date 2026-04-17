@@ -13,29 +13,36 @@ Run:
 """
 
 import argparse
-import sys
-import time
-import statistics
-import tracemalloc
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ---------------------------------------------------------------------------
 # Allow imports from the bots directory regardless of cwd
 # ---------------------------------------------------------------------------
 import os
+import statistics
+import sys
+import time
+import tracemalloc
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "government-contract-grant-bot"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "referral-bot"))
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(__file__), "..", "bots", "government-contract-grant-bot"
+    ),
+)
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "bots", "referral-bot")
+)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "bots", "hustle-bot"))
 
 from government_contract_grant_bot import GovernmentContractGrantBot
-from referral_bot import ReferralBot
 from hustle_bot import HustleBot
-
+from referral_bot import ReferralBot
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _time_call(fn, *args, **kwargs):
     """Execute fn(*args, **kwargs) and return (result, elapsed_seconds)."""
@@ -57,6 +64,7 @@ def _run_with_memory(fn, *args, **kwargs):
 # ---------------------------------------------------------------------------
 # Individual bot workloads
 # ---------------------------------------------------------------------------
+
 
 def _gcg_workload(_):
     bot = GovernmentContractGrantBot()
@@ -94,6 +102,7 @@ def _hustle_workload(i):
 # Stress runner
 # ---------------------------------------------------------------------------
 
+
 def stress_test(workload_fn, name, iterations, concurrency, quiet=True):
     """
     Run *workload_fn* *iterations* times using up to *concurrency* threads.
@@ -105,6 +114,7 @@ def stress_test(workload_fn, name, iterations, concurrency, quiet=True):
     # Suppress stdout during load (bots print a lot)
     if quiet:
         import io
+
         _devnull = open(os.devnull, "w")
         _old_stdout = sys.stdout
         sys.stdout = _devnull
@@ -112,7 +122,10 @@ def stress_test(workload_fn, name, iterations, concurrency, quiet=True):
     wall_start = time.perf_counter()
     try:
         with ThreadPoolExecutor(max_workers=concurrency) as executor:
-            futures = {executor.submit(_time_call, workload_fn, i): i for i in range(iterations)}
+            futures = {
+                executor.submit(_time_call, workload_fn, i): i
+                for i in range(iterations)
+            }
             for future in as_completed(futures):
                 try:
                     _, elapsed = future.result()
@@ -132,12 +145,16 @@ def stress_test(workload_fn, name, iterations, concurrency, quiet=True):
         "concurrency": concurrency,
         "total_wall_time_s": round(wall_elapsed, 4),
         "throughput_ops_per_s": round(iterations / wall_elapsed, 2),
-        "latency_avg_ms": round(statistics.mean(latencies) * 1000, 2) if latencies else 0,
+        "latency_avg_ms": (
+            round(statistics.mean(latencies) * 1000, 2) if latencies else 0
+        ),
         "latency_min_ms": round(min(latencies) * 1000, 2) if latencies else 0,
         "latency_max_ms": round(max(latencies) * 1000, 2) if latencies else 0,
-        "latency_p95_ms": round(
-            sorted(latencies)[int(len(latencies) * 0.95)] * 1000, 2
-        ) if latencies else 0,
+        "latency_p95_ms": (
+            round(sorted(latencies)[int(len(latencies) * 0.95)] * 1000, 2)
+            if latencies
+            else 0
+        ),
         "success_rate_pct": round((len(latencies) / iterations) * 100, 2),
         "errors": errors,
     }
@@ -157,12 +174,17 @@ def memory_profile(workload_fn, name):
         sys.stdout = _old_stdout
         _devnull.close()
 
-    return {"name": name, "single_run_latency_ms": round(elapsed * 1000, 2), "peak_memory_kb": round(peak_kb, 2)}
+    return {
+        "name": name,
+        "single_run_latency_ms": round(elapsed * 1000, 2),
+        "peak_memory_kb": round(peak_kb, 2),
+    }
 
 
 # ---------------------------------------------------------------------------
 # Report printer
 # ---------------------------------------------------------------------------
+
 
 def print_report(results, memory_results):
     sep = "=" * 60
@@ -173,21 +195,27 @@ def print_report(results, memory_results):
 
     for m in results:
         print(f"\n🤖  {m['name']}")
-        print(f"    Iterations      : {m['iterations']} (concurrency={m['concurrency']})")
+        print(
+            f"    Iterations      : {m['iterations']} (concurrency={m['concurrency']})"
+        )
         print(f"    Wall time       : {m['total_wall_time_s']} s")
         print(f"    Throughput      : {m['throughput_ops_per_s']} ops/s")
-        print(f"    Latency avg/min/max/p95 (ms): "
-              f"{m['latency_avg_ms']} / {m['latency_min_ms']} / "
-              f"{m['latency_max_ms']} / {m['latency_p95_ms']}")
+        print(
+            f"    Latency avg/min/max/p95 (ms): "
+            f"{m['latency_avg_ms']} / {m['latency_min_ms']} / "
+            f"{m['latency_max_ms']} / {m['latency_p95_ms']}"
+        )
         print(f"    Success rate    : {m['success_rate_pct']}%  (errors={m['errors']})")
 
     print(f"\n{'─' * 60}")
     print("  MEMORY PROFILES (single iteration)")
     print(f"{'─' * 60}")
     for mem in memory_results:
-        print(f"    {mem['name']:<40} "
-              f"latency={mem['single_run_latency_ms']} ms  "
-              f"peak={mem['peak_memory_kb']} KB")
+        print(
+            f"    {mem['name']:<40} "
+            f"latency={mem['single_run_latency_ms']} ms  "
+            f"peak={mem['peak_memory_kb']} KB"
+        )
 
     all_ok = all(m["success_rate_pct"] == 100.0 for m in results)
     print(f"\n{'─' * 60}")
@@ -200,6 +228,7 @@ def print_report(results, memory_results):
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def main(iterations=100, concurrency=5):
     bots = [
         ("Government Contract & Grant Bot", _gcg_workload),
@@ -207,7 +236,9 @@ def main(iterations=100, concurrency=5):
         ("Hustle Bot", _hustle_workload),
     ]
 
-    print(f"Running stress test: {iterations} iterations × {concurrency} concurrent workers per bot …")
+    print(
+        f"Running stress test: {iterations} iterations × {concurrency} concurrent workers per bot …"
+    )
 
     results = [stress_test(fn, name, iterations, concurrency) for name, fn in bots]
     memory_results = [memory_profile(fn, name) for name, fn in bots]
@@ -218,7 +249,17 @@ def main(iterations=100, concurrency=5):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Dreamcobots AI Stress Test")
-    parser.add_argument("--iterations", type=int, default=100, help="Number of iterations per bot (default: 100)")
-    parser.add_argument("--concurrency", type=int, default=5, help="Concurrent workers per bot (default: 5)")
+    parser.add_argument(
+        "--iterations",
+        type=int,
+        default=100,
+        help="Number of iterations per bot (default: 100)",
+    )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=5,
+        help="Concurrent workers per bot (default: 5)",
+    )
     args = parser.parse_args()
     sys.exit(main(iterations=args.iterations, concurrency=args.concurrency))

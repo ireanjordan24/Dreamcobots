@@ -30,7 +30,6 @@ from typing import Any, Dict, List, Optional
 from core.dreamco_orchestrator import DreamCoOrchestrator
 from event_bus.redis_bus import RedisQueueBus
 
-
 # ---------------------------------------------------------------------------
 # BotWorker
 # ---------------------------------------------------------------------------

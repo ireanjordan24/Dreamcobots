@@ -1,4 +1,5 @@
 """Item/product dataset generator for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import random
@@ -8,10 +9,26 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 CATEGORIES = [
-    "Electronics", "Clothing", "Home & Garden", "Sports", "Books",
-    "Toys", "Automotive", "Health", "Beauty", "Food & Grocery",
+    "Electronics",
+    "Clothing",
+    "Home & Garden",
+    "Sports",
+    "Books",
+    "Toys",
+    "Automotive",
+    "Health",
+    "Beauty",
+    "Food & Grocery",
 ]
-ADJECTIVES = ["Premium", "Deluxe", "Professional", "Smart", "Ultra", "Classic", "Advanced"]
+ADJECTIVES = [
+    "Premium",
+    "Deluxe",
+    "Professional",
+    "Smart",
+    "Ultra",
+    "Classic",
+    "Advanced",
+]
 NOUNS = ["Widget", "Device", "Tool", "Gadget", "System", "Kit", "Bundle", "Pack"]
 
 
@@ -31,7 +48,9 @@ class ItemDatasetGenerator:
         history = []
         price = base_price
         for i in range(num_points):
-            date = (datetime.utcnow() - timedelta(days=30 * (num_points - i))).isoformat()
+            date = (
+                datetime.utcnow() - timedelta(days=30 * (num_points - i))
+            ).isoformat()
             price = round(price * random.uniform(0.85, 1.15), 2)
             history.append({"date": date, "price": price})
         return history

@@ -9,20 +9,20 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BotRequest:
@@ -63,6 +63,7 @@ class BotRequest:
 # ---------------------------------------------------------------------------
 # Request Interface
 # ---------------------------------------------------------------------------
+
 
 class RequestInterfaceError(Exception):
     """Raised when a bot request is invalid."""

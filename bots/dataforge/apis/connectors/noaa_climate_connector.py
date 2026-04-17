@@ -1,4 +1,5 @@
 """NOAA Climate Data Online API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -17,7 +18,9 @@ class NOAAClimateConnector:
         if not self.api_key:
             logger.warning("NOAA_API_KEY not set.")
 
-    def get_data(self, datasetid: str, startdate: str, enddate: str, locationid: str) -> dict:
+    def get_data(
+        self, datasetid: str, startdate: str, enddate: str, locationid: str
+    ) -> dict:
         """Get climate data from NOAA CDO.
 
         Args:
@@ -30,10 +33,18 @@ class NOAAClimateConnector:
             API response dict or error dict.
         """
         import requests
+
         headers = {"token": self.api_key}
-        params = {"datasetid": datasetid, "startdate": startdate, "enddate": enddate, "locationid": locationid}
+        params = {
+            "datasetid": datasetid,
+            "startdate": startdate,
+            "enddate": enddate,
+            "locationid": locationid,
+        }
         try:
-            response = requests.get(f"{self.BASE_URL}/data", params=params, headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/data", params=params, headers=headers, timeout=30
+            )
             response.raise_for_status()
             logger.info("NOAA climate data fetched.")
             return {"status": "success", "data": response.json()}
@@ -48,12 +59,14 @@ class NOAAClimateConnector:
             API response dict with dataset list or error dict.
         """
         import requests
+
         headers = {"token": self.api_key}
         try:
-            response = requests.get(f"{self.BASE_URL}/datasets", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/datasets", headers=headers, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("NOAA get_datasets error: %s", e)
             return {"status": "error", "message": str(e)}
-

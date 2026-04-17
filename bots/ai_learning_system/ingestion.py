@@ -4,14 +4,15 @@ Data ingestion layer for the DreamCo Global AI Learning System.
 Supports scraping and normalizing records from arXiv, GitHub, Kaggle, and AI Labs.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_SCRAPER
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .tiers import FEATURE_SCRAPER, Tier, TierConfig, get_tier_config
 
 
 class DataSourceType(Enum):
@@ -82,103 +83,330 @@ class IngestionLimitError(Exception):
 
 _MOCK_TEMPLATES = {
     DataSourceType.ARXIV: [
-        ("Attention Is All You Need", "https://arxiv.org/abs/1706.03762",
-         ["transformer", "attention", "nlp"], "English", ContentType.RESEARCH_PAPER),
-        ("BERT: Pre-training of Deep Bidirectional Transformers", "https://arxiv.org/abs/1810.04805",
-         ["bert", "nlp", "transfer_learning"], "English", ContentType.RESEARCH_PAPER),
-        ("Deep Residual Learning for Image Recognition", "https://arxiv.org/abs/1512.03385",
-         ["resnet", "computer_vision", "supervised_learning"], "English", ContentType.RESEARCH_PAPER),
-        ("Generative Adversarial Networks", "https://arxiv.org/abs/1406.2661",
-         ["gan", "unsupervised_learning", "generative"], "English", ContentType.RESEARCH_PAPER),
-        ("Proximal Policy Optimization Algorithms", "https://arxiv.org/abs/1707.06347",
-         ["reinforcement_learning", "ppo", "policy_gradient"], "English", ContentType.RESEARCH_PAPER),
-        ("Self-Supervised Learning of Pretext-Invariant Representations", "https://arxiv.org/abs/1912.01991",
-         ["self_supervised_learning", "representation_learning"], "English", ContentType.RESEARCH_PAPER),
-        ("Federated Learning: Challenges, Methods, and Future Directions", "https://arxiv.org/abs/1908.07873",
-         ["federated_learning", "privacy", "distributed"], "English", ContentType.RESEARCH_PAPER),
-        ("Model-Agnostic Meta-Learning for Fast Adaptation", "https://arxiv.org/abs/1703.03400",
-         ["meta_learning", "few_shot", "maml"], "English", ContentType.RESEARCH_PAPER),
-        ("Semi-Supervised Learning with Deep Generative Models", "https://arxiv.org/abs/1406.5298",
-         ["semi_supervised_learning", "vae", "generative"], "English", ContentType.RESEARCH_PAPER),
-        ("An Image is Worth 16x16 Words: Transformers for Image Recognition", "https://arxiv.org/abs/2010.11929",
-         ["vit", "transformer", "computer_vision"], "English", ContentType.RESEARCH_PAPER),
+        (
+            "Attention Is All You Need",
+            "https://arxiv.org/abs/1706.03762",
+            ["transformer", "attention", "nlp"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "BERT: Pre-training of Deep Bidirectional Transformers",
+            "https://arxiv.org/abs/1810.04805",
+            ["bert", "nlp", "transfer_learning"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Deep Residual Learning for Image Recognition",
+            "https://arxiv.org/abs/1512.03385",
+            ["resnet", "computer_vision", "supervised_learning"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Generative Adversarial Networks",
+            "https://arxiv.org/abs/1406.2661",
+            ["gan", "unsupervised_learning", "generative"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Proximal Policy Optimization Algorithms",
+            "https://arxiv.org/abs/1707.06347",
+            ["reinforcement_learning", "ppo", "policy_gradient"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Self-Supervised Learning of Pretext-Invariant Representations",
+            "https://arxiv.org/abs/1912.01991",
+            ["self_supervised_learning", "representation_learning"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Federated Learning: Challenges, Methods, and Future Directions",
+            "https://arxiv.org/abs/1908.07873",
+            ["federated_learning", "privacy", "distributed"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Model-Agnostic Meta-Learning for Fast Adaptation",
+            "https://arxiv.org/abs/1703.03400",
+            ["meta_learning", "few_shot", "maml"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "Semi-Supervised Learning with Deep Generative Models",
+            "https://arxiv.org/abs/1406.5298",
+            ["semi_supervised_learning", "vae", "generative"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
+        (
+            "An Image is Worth 16x16 Words: Transformers for Image Recognition",
+            "https://arxiv.org/abs/2010.11929",
+            ["vit", "transformer", "computer_vision"],
+            "English",
+            ContentType.RESEARCH_PAPER,
+        ),
     ],
     DataSourceType.GITHUB: [
-        ("pytorch/pytorch", "https://github.com/pytorch/pytorch",
-         ["deep_learning", "framework", "supervised_learning"], "Python", ContentType.CODE_REPOSITORY),
-        ("tensorflow/tensorflow", "https://github.com/tensorflow/tensorflow",
-         ["deep_learning", "framework", "neural_network"], "Python", ContentType.CODE_REPOSITORY),
-        ("openai/gym", "https://github.com/openai/gym",
-         ["reinforcement_learning", "environment", "simulation"], "Python", ContentType.CODE_REPOSITORY),
-        ("huggingface/transformers", "https://github.com/huggingface/transformers",
-         ["transfer_learning", "nlp", "pre_trained_models"], "Python", ContentType.CODE_REPOSITORY),
-        ("scikit-learn/scikit-learn", "https://github.com/scikit-learn/scikit-learn",
-         ["supervised_learning", "unsupervised_learning", "ml_library"], "Python", ContentType.CODE_REPOSITORY),
-        ("tensorflow/federated", "https://github.com/tensorflow/federated",
-         ["federated_learning", "privacy", "distributed"], "Python", ContentType.CODE_REPOSITORY),
-        ("google-research/meta-dataset", "https://github.com/google-research/meta-dataset",
-         ["meta_learning", "few_shot", "dataset"], "Python", ContentType.CODE_REPOSITORY),
-        ("facebookresearch/faiss", "https://github.com/facebookresearch/faiss",
-         ["unsupervised_learning", "clustering", "similarity_search"], "C++", ContentType.CODE_REPOSITORY),
-        ("openai/CLIP", "https://github.com/openai/CLIP",
-         ["self_supervised_learning", "multimodal", "contrastive"], "Python", ContentType.CODE_REPOSITORY),
-        ("google/jax", "https://github.com/google/jax",
-         ["deep_learning", "autodiff", "accelerated_computing"], "Python", ContentType.CODE_REPOSITORY),
+        (
+            "pytorch/pytorch",
+            "https://github.com/pytorch/pytorch",
+            ["deep_learning", "framework", "supervised_learning"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "tensorflow/tensorflow",
+            "https://github.com/tensorflow/tensorflow",
+            ["deep_learning", "framework", "neural_network"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "openai/gym",
+            "https://github.com/openai/gym",
+            ["reinforcement_learning", "environment", "simulation"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "huggingface/transformers",
+            "https://github.com/huggingface/transformers",
+            ["transfer_learning", "nlp", "pre_trained_models"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "scikit-learn/scikit-learn",
+            "https://github.com/scikit-learn/scikit-learn",
+            ["supervised_learning", "unsupervised_learning", "ml_library"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "tensorflow/federated",
+            "https://github.com/tensorflow/federated",
+            ["federated_learning", "privacy", "distributed"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "google-research/meta-dataset",
+            "https://github.com/google-research/meta-dataset",
+            ["meta_learning", "few_shot", "dataset"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "facebookresearch/faiss",
+            "https://github.com/facebookresearch/faiss",
+            ["unsupervised_learning", "clustering", "similarity_search"],
+            "C++",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "openai/CLIP",
+            "https://github.com/openai/CLIP",
+            ["self_supervised_learning", "multimodal", "contrastive"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
+        (
+            "google/jax",
+            "https://github.com/google/jax",
+            ["deep_learning", "autodiff", "accelerated_computing"],
+            "Python",
+            ContentType.CODE_REPOSITORY,
+        ),
     ],
     DataSourceType.KAGGLE: [
-        ("ImageNet Large Scale Visual Recognition Challenge", "https://www.kaggle.com/c/imagenet-object-localization-challenge",
-         ["computer_vision", "supervised_learning", "classification"], "Python", ContentType.DATASET),
-        ("NLP with Disaster Tweets", "https://www.kaggle.com/c/nlp-getting-started",
-         ["nlp", "supervised_learning", "classification"], "Python", ContentType.DATASET),
-        ("Google Brain - Ventilator Pressure Prediction", "https://www.kaggle.com/c/ventilator-pressure-prediction",
-         ["time_series", "supervised_learning", "regression"], "Python", ContentType.DATASET),
-        ("Tabular Playground Series", "https://www.kaggle.com/c/tabular-playground-series-jan-2021",
-         ["tabular_data", "supervised_learning", "regression"], "Python", ContentType.DATASET),
-        ("CommonLit Readability Prize", "https://www.kaggle.com/c/commonlitreadabilityprize",
-         ["nlp", "semi_supervised_learning", "regression"], "Python", ContentType.DATASET),
-        ("Shopee - Price Match Guarantee", "https://www.kaggle.com/c/shopee-product-matching",
-         ["computer_vision", "nlp", "self_supervised_learning"], "Python", ContentType.DATASET),
-        ("TensorFlow - Help Protect the Great Barrier Reef", "https://www.kaggle.com/c/tensorflow-great-barrier-reef",
-         ["computer_vision", "supervised_learning", "object_detection"], "Python", ContentType.DATASET),
-        ("Optiver Realized Volatility Prediction", "https://www.kaggle.com/c/optiver-realized-volatility-prediction",
-         ["time_series", "supervised_learning", "finance"], "Python", ContentType.DATASET),
-        ("Google Universal Image Embedding", "https://www.kaggle.com/c/google-universal-image-embedding",
-         ["computer_vision", "transfer_learning", "embedding"], "Python", ContentType.DATASET),
-        ("HuBMAP - Hacking the Human Vasculature", "https://www.kaggle.com/c/hubmap-hacking-the-human-vasculature",
-         ["computer_vision", "supervised_learning", "segmentation"], "Python", ContentType.DATASET),
+        (
+            "ImageNet Large Scale Visual Recognition Challenge",
+            "https://www.kaggle.com/c/imagenet-object-localization-challenge",
+            ["computer_vision", "supervised_learning", "classification"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "NLP with Disaster Tweets",
+            "https://www.kaggle.com/c/nlp-getting-started",
+            ["nlp", "supervised_learning", "classification"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "Google Brain - Ventilator Pressure Prediction",
+            "https://www.kaggle.com/c/ventilator-pressure-prediction",
+            ["time_series", "supervised_learning", "regression"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "Tabular Playground Series",
+            "https://www.kaggle.com/c/tabular-playground-series-jan-2021",
+            ["tabular_data", "supervised_learning", "regression"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "CommonLit Readability Prize",
+            "https://www.kaggle.com/c/commonlitreadabilityprize",
+            ["nlp", "semi_supervised_learning", "regression"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "Shopee - Price Match Guarantee",
+            "https://www.kaggle.com/c/shopee-product-matching",
+            ["computer_vision", "nlp", "self_supervised_learning"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "TensorFlow - Help Protect the Great Barrier Reef",
+            "https://www.kaggle.com/c/tensorflow-great-barrier-reef",
+            ["computer_vision", "supervised_learning", "object_detection"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "Optiver Realized Volatility Prediction",
+            "https://www.kaggle.com/c/optiver-realized-volatility-prediction",
+            ["time_series", "supervised_learning", "finance"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "Google Universal Image Embedding",
+            "https://www.kaggle.com/c/google-universal-image-embedding",
+            ["computer_vision", "transfer_learning", "embedding"],
+            "Python",
+            ContentType.DATASET,
+        ),
+        (
+            "HuBMAP - Hacking the Human Vasculature",
+            "https://www.kaggle.com/c/hubmap-hacking-the-human-vasculature",
+            ["computer_vision", "supervised_learning", "segmentation"],
+            "Python",
+            ContentType.DATASET,
+        ),
     ],
     DataSourceType.AI_LAB: [
-        ("GPT-4 Technical Report", "https://openai.com/research/gpt-4",
-         ["large_language_model", "supervised_learning", "rlhf"], "English", ContentType.MODEL),
-        ("PaLM 2 Technical Report", "https://ai.google/discover/palm2",
-         ["large_language_model", "transfer_learning", "multilingual"], "English", ContentType.MODEL),
-        ("LLaMA: Open and Efficient Foundation Language Models", "https://ai.meta.com/research/publications/llama/",
-         ["large_language_model", "self_supervised_learning", "efficient"], "English", ContentType.MODEL),
-        ("Gemini: A Family of Highly Capable Multimodal Models", "https://deepmind.google/technologies/gemini/",
-         ["multimodal", "self_supervised_learning", "reasoning"], "English", ContentType.MODEL),
-        ("Claude: Constitutional AI", "https://www.anthropic.com/research/constitutional-ai",
-         ["rlhf", "reinforcement_learning", "safety"], "English", ContentType.MODEL),
-        ("Stable Diffusion: High-Resolution Image Synthesis", "https://stability.ai/research/stable-diffusion",
-         ["generative", "diffusion_model", "unsupervised_learning"], "English", ContentType.MODEL),
-        ("AlphaCode: Competitive Programming with LLMs", "https://deepmind.google/research/highlighted-research/alphacode/",
-         ["code_generation", "supervised_learning", "transformer"], "English", ContentType.MODEL),
-        ("Whisper: Robust Speech Recognition via Large-Scale Supervision", "https://openai.com/research/whisper",
-         ["speech_recognition", "supervised_learning", "transformer"], "English", ContentType.MODEL),
-        ("DALL-E 3: Improving Image Generation with Better Captions", "https://openai.com/research/dall-e-3",
-         ["generative", "text_to_image", "self_supervised_learning"], "English", ContentType.MODEL),
-        ("RT-2: Vision-Language-Action Models Transfer Web Knowledge", "https://robotics-transformer2.github.io/",
-         ["robotics", "transfer_learning", "reinforcement_learning"], "English", ContentType.MODEL),
+        (
+            "GPT-4 Technical Report",
+            "https://openai.com/research/gpt-4",
+            ["large_language_model", "supervised_learning", "rlhf"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "PaLM 2 Technical Report",
+            "https://ai.google/discover/palm2",
+            ["large_language_model", "transfer_learning", "multilingual"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "LLaMA: Open and Efficient Foundation Language Models",
+            "https://ai.meta.com/research/publications/llama/",
+            ["large_language_model", "self_supervised_learning", "efficient"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "Gemini: A Family of Highly Capable Multimodal Models",
+            "https://deepmind.google/technologies/gemini/",
+            ["multimodal", "self_supervised_learning", "reasoning"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "Claude: Constitutional AI",
+            "https://www.anthropic.com/research/constitutional-ai",
+            ["rlhf", "reinforcement_learning", "safety"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "Stable Diffusion: High-Resolution Image Synthesis",
+            "https://stability.ai/research/stable-diffusion",
+            ["generative", "diffusion_model", "unsupervised_learning"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "AlphaCode: Competitive Programming with LLMs",
+            "https://deepmind.google/research/highlighted-research/alphacode/",
+            ["code_generation", "supervised_learning", "transformer"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "Whisper: Robust Speech Recognition via Large-Scale Supervision",
+            "https://openai.com/research/whisper",
+            ["speech_recognition", "supervised_learning", "transformer"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "DALL-E 3: Improving Image Generation with Better Captions",
+            "https://openai.com/research/dall-e-3",
+            ["generative", "text_to_image", "self_supervised_learning"],
+            "English",
+            ContentType.MODEL,
+        ),
+        (
+            "RT-2: Vision-Language-Action Models Transfer Web Knowledge",
+            "https://robotics-transformer2.github.io/",
+            ["robotics", "transfer_learning", "reinforcement_learning"],
+            "English",
+            ContentType.MODEL,
+        ),
     ],
 }
 
 _LAB_NAMES = {
-    DataSourceType.ARXIV: ["DeepMind", "OpenAI", "Google Brain", "Meta AI", "Stanford AI Lab"],
+    DataSourceType.ARXIV: [
+        "DeepMind",
+        "OpenAI",
+        "Google Brain",
+        "Meta AI",
+        "Stanford AI Lab",
+    ],
     DataSourceType.GITHUB: ["Meta AI", "Google", "Hugging Face", "OpenAI", "NVIDIA"],
-    DataSourceType.KAGGLE: ["Kaggle Community", "Google Brain", "Shopee Research", "Optiver Labs", "TensorFlow Team"],
-    DataSourceType.AI_LAB: ["OpenAI", "Google DeepMind", "Meta AI", "Anthropic", "Stability AI"],
+    DataSourceType.KAGGLE: [
+        "Kaggle Community",
+        "Google Brain",
+        "Shopee Research",
+        "Optiver Labs",
+        "TensorFlow Team",
+    ],
+    DataSourceType.AI_LAB: [
+        "OpenAI",
+        "Google DeepMind",
+        "Meta AI",
+        "Anthropic",
+        "Stability AI",
+    ],
 }
 
-_COUNTRIES = ["USA", "UK", "China", "Canada", "France", "Germany", "Japan", "South Korea"]
+_COUNTRIES = [
+    "USA",
+    "UK",
+    "China",
+    "Canada",
+    "France",
+    "Germany",
+    "Japan",
+    "South Korea",
+]
 
 _NOVELTY_SCORES = {
     DataSourceType.ARXIV: (0.55, 0.95),
@@ -251,11 +479,16 @@ class DataIngestionLayer:
         new_records: List[IngestedRecord] = []
         query_lower = query.lower()
 
-        for i, (title, url, tags, language, content_type) in enumerate(templates[:count]):
+        for i, (title, url, tags, language, content_type) in enumerate(
+            templates[:count]
+        ):
             normalised_tags = [t.lower().replace(" ", "_") for t in tags]
             # Boost novelty slightly when query term appears in title/tags
             base_novelty = _make_novelty(source, i)
-            if any(query_lower in t for t in normalised_tags) or query_lower in title.lower():
+            if (
+                any(query_lower in t for t in normalised_tags)
+                or query_lower in title.lower()
+            ):
                 novelty = min(1.0, base_novelty + 0.05)
             else:
                 novelty = base_novelty

@@ -3,13 +3,15 @@ Payment gateway integration for the SaaS Selling Bot.
 Handles subscription creation, webhook processing, and revenue recording.
 Supports Stripe as the primary payment provider.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import os
 import json
+import os
 
 try:
     import stripe
+
     STRIPE_AVAILABLE = True
 except ImportError:
     STRIPE_AVAILABLE = False
@@ -112,7 +114,9 @@ def handle_webhook(payload: bytes, sig_header: str) -> dict:
 
     try:
         stripe.api_key = STRIPE_SECRET_KEY
-        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
     except ValueError:
         return {"status": "error", "message": "Invalid payload"}
     except stripe.error.SignatureVerificationError:

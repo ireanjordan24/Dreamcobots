@@ -32,8 +32,8 @@ class TaskRecord:
 class ComputeSnapshot:
     """A point-in-time snapshot of compute resource usage."""
 
-    cpu_percent: float       # 0–100
-    memory_percent: float    # 0–100
+    cpu_percent: float  # 0–100
+    memory_percent: float  # 0–100
     disk_read_mb: float
     disk_write_mb: float
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -151,7 +151,9 @@ class MetricsCollector:
     # Profitability
     # ------------------------------------------------------------------
 
-    def record_earning(self, amount: float, timestamp: Optional[datetime] = None) -> None:
+    def record_earning(
+        self, amount: float, timestamp: Optional[datetime] = None
+    ) -> None:
         """Log a client-side earnings event."""
         self._earnings_timeline.append(
             {

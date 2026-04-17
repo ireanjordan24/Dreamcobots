@@ -1,6 +1,7 @@
 """Tests for bots/smart_city_bot/ — infrastructure, government AI, and main bot."""
-import sys
+
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -10,25 +11,26 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.smart_city_bot.city_infrastructure import (
-    TrafficManagementSystem,
     EnergyManagementSystem,
     PublicSafetyMonitor,
     SmartCityInfrastructureError,
+    TrafficManagementSystem,
 )
 from bots.smart_city_bot.government_ai import (
-    TaxSystemAI,
     CensusCollector,
-    PolicyModelingBot,
     GovernmentAIError,
+    PolicyModelingBot,
+    TaxSystemAI,
 )
 from bots.smart_city_bot.smart_city_bot import SmartCityBot, SmartCityBotError
 from bots.smart_city_bot.tiers import BOT_FEATURES, get_bot_tier_info
 
-
 # ===========================================================================
 # Tiers
 # ===========================================================================
+
 
 class TestSmartCityTiers:
     def test_bot_features_has_all_tiers(self):
@@ -60,6 +62,7 @@ class TestSmartCityTiers:
 # ===========================================================================
 # TrafficManagementSystem
 # ===========================================================================
+
 
 class TestTrafficManagementSystem:
     def test_default_tier_is_free(self):
@@ -95,16 +98,36 @@ class TestTrafficManagementSystem:
 
     def test_pro_tier_allows_10_zones(self):
         tms = TrafficManagementSystem(Tier.PRO)
-        zones = ["downtown", "north", "south", "east", "west",
-                 "industrial", "residential", "port", "airport", "suburbs"]
+        zones = [
+            "downtown",
+            "north",
+            "south",
+            "east",
+            "west",
+            "industrial",
+            "residential",
+            "port",
+            "airport",
+            "suburbs",
+        ]
         for zone in zones:
             tms.monitor_congestion(zone)
         assert len(tms._monitored_zones) == 10
 
     def test_enterprise_tier_unlimited_zones(self):
         tms = TrafficManagementSystem(Tier.ENTERPRISE)
-        zones = ["downtown", "north", "south", "east", "west",
-                 "industrial", "residential", "port", "airport", "suburbs"]
+        zones = [
+            "downtown",
+            "north",
+            "south",
+            "east",
+            "west",
+            "industrial",
+            "residential",
+            "port",
+            "airport",
+            "suburbs",
+        ]
         for zone in zones:
             tms.monitor_congestion(zone)
         assert len(tms._monitored_zones) == 10
@@ -147,6 +170,7 @@ class TestTrafficManagementSystem:
 # EnergyManagementSystem
 # ===========================================================================
 
+
 class TestEnergyManagementSystem:
     def test_default_tier_is_free(self):
         ems = EnergyManagementSystem()
@@ -160,7 +184,13 @@ class TestEnergyManagementSystem:
     def test_monitor_grid_has_required_keys(self):
         ems = EnergyManagementSystem(Tier.FREE)
         result = ems.monitor_grid("commercial_center")
-        for key in ("district", "load_mw", "capacity_mw", "utilization_pct", "grid_status"):
+        for key in (
+            "district",
+            "load_mw",
+            "capacity_mw",
+            "utilization_pct",
+            "grid_status",
+        ):
             assert key in result
 
     def test_optimize_energy_returns_dict(self):
@@ -213,6 +243,7 @@ class TestEnergyManagementSystem:
 # ===========================================================================
 # PublicSafetyMonitor
 # ===========================================================================
+
 
 class TestPublicSafetyMonitor:
     def test_default_tier_is_free(self):
@@ -284,6 +315,7 @@ class TestPublicSafetyMonitor:
 # TaxSystemAI
 # ===========================================================================
 
+
 class TestTaxSystemAI:
     def test_calculate_tax_returns_dict(self):
         tax = TaxSystemAI(Tier.FREE)
@@ -323,7 +355,9 @@ class TestTaxSystemAI:
 
     def test_optimize_policy_pro(self):
         tax = TaxSystemAI(Tier.PRO)
-        result = tax.optimize_tax_policy({"population": 100000, "current_revenue_usd": 500_000_000})
+        result = tax.optimize_tax_policy(
+            {"population": 100000, "current_revenue_usd": 500_000_000}
+        )
         assert "recommended_rate_adjustment_pct" in result
 
     def test_generate_report_free_raises(self):
@@ -346,6 +380,7 @@ class TestTaxSystemAI:
 # ===========================================================================
 # CensusCollector
 # ===========================================================================
+
 
 class TestCensusCollector:
     def test_collect_census_returns_dict(self):
@@ -399,6 +434,7 @@ class TestCensusCollector:
 # PolicyModelingBot
 # ===========================================================================
 
+
 class TestPolicyModelingBot:
     def test_model_policy_returns_dict(self):
         pmb = PolicyModelingBot(Tier.FREE)
@@ -412,7 +448,9 @@ class TestPolicyModelingBot:
 
     def test_pro_policy_has_risk_level(self):
         pmb = PolicyModelingBot(Tier.PRO)
-        result = pmb.model_policy({"name": "Transit Expansion", "budget_usd": 50_000_000})
+        result = pmb.model_policy(
+            {"name": "Transit Expansion", "budget_usd": 50_000_000}
+        )
         assert "risk_level" in result
 
     def test_simulate_impact_free_raises(self):
@@ -422,13 +460,17 @@ class TestPolicyModelingBot:
 
     def test_simulate_impact_pro(self):
         pmb = PolicyModelingBot(Tier.PRO)
-        result = pmb.simulate_impact({"name": "Transit", "budget_usd": 10_000_000}, 500000)
+        result = pmb.simulate_impact(
+            {"name": "Transit", "budget_usd": 10_000_000}, 500000
+        )
         assert "roi_pct" in result
         assert result["estimated_benefit_usd"] > 0
 
     def test_enterprise_simulation_has_gdp_impact(self):
         pmb = PolicyModelingBot(Tier.ENTERPRISE)
-        result = pmb.simulate_impact({"name": "Green Deal", "budget_usd": 100_000_000}, 1_000_000)
+        result = pmb.simulate_impact(
+            {"name": "Green Deal", "budget_usd": 100_000_000}, 1_000_000
+        )
         assert "gdp_impact_pct" in result
         assert result["simulation_runs"] == 10000
 
@@ -457,6 +499,7 @@ class TestPolicyModelingBot:
 # ===========================================================================
 # SmartCityBot — main bot
 # ===========================================================================
+
 
 class TestSmartCityBotInstantiation:
     def test_default_tier_is_free(self):
@@ -551,7 +594,9 @@ class TestSmartCityBotGovernmentService:
 
     def test_policy_model_service(self):
         bot = SmartCityBot(Tier.FREE)
-        result = bot.government_service("policy_model", {"name": "Green Act", "budget_usd": 1_000_000})
+        result = bot.government_service(
+            "policy_model", {"name": "Green Act", "budget_usd": 1_000_000}
+        )
         assert "feasibility" in result
 
     def test_tax_report_requires_pro(self):
@@ -584,7 +629,13 @@ class TestSmartCityBotDashboard:
     def test_dashboard_has_required_keys(self):
         bot = SmartCityBot(Tier.FREE)
         result = bot.get_city_dashboard()
-        for key in ("bot", "tier", "features", "services_available", "upgrade_available"):
+        for key in (
+            "bot",
+            "tier",
+            "features",
+            "services_available",
+            "upgrade_available",
+        ):
             assert key in result
 
     def test_free_dashboard_has_upgrade(self):

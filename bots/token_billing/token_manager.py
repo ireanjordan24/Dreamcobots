@@ -63,14 +63,18 @@ class TokenAccount:
     last_daily_reset: date = field(default_factory=date.today)
     ledger: list = field(default_factory=list)
 
-    def reset_daily_if_needed(self, daily_allowance: int, today: Optional[date] = None) -> None:
+    def reset_daily_if_needed(
+        self, daily_allowance: int, today: Optional[date] = None
+    ) -> None:
         """Reset the daily token counter if the date has changed."""
         today = today or date.today()
         if self.last_daily_reset < today:
             self.daily_tokens_used = 0
             self.last_daily_reset = today
 
-    def available_tokens(self, daily_allowance: int, today: Optional[date] = None) -> int:
+    def available_tokens(
+        self, daily_allowance: int, today: Optional[date] = None
+    ) -> int:
         """Return total available tokens (purchased + remaining daily allowance).
 
         Parameters
@@ -127,7 +131,9 @@ class TokenManager:
     # Credits
     # ------------------------------------------------------------------
 
-    def add_tokens(self, user_id: str, amount: int, description: str = "Token purchase") -> int:
+    def add_tokens(
+        self, user_id: str, amount: int, description: str = "Token purchase"
+    ) -> int:
         """Add purchased (non-expiring) *amount* tokens to *user_id*.
 
         Parameters

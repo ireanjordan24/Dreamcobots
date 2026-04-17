@@ -9,12 +9,7 @@ Usage::
     sub = bot.create_subscription("customer@example.com")
 """
 
-from bots.saas_bot.saas_bot import (
-    SaasBot,
-    SaasBotError,
-    SaasBotTierError,
-    Subscription,
-)
+from bots.saas_bot.saas_bot import SaasBot, SaasBotError, SaasBotTierError, Subscription
 from bots.saas_bot.tiers import Tier, get_tier_config, list_tiers
 
 __all__ = [

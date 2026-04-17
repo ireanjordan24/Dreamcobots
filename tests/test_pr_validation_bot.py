@@ -1,21 +1,22 @@
 """Tests for bots/pr_validation_bot/pr_validation_bot.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-import pytest
-from unittest.mock import patch, MagicMock
-from bots.pr_validation_bot.pr_validation_bot import (
-    PRValidationBot,
-    ValidationResult,
-    RevenueCheck,
-    FileStatus,
-    CRITICAL_FILES,
-)
+from unittest.mock import MagicMock, patch
 
+import pytest
+
+from bots.pr_validation_bot.pr_validation_bot import (
+    CRITICAL_FILES,
+    FileStatus,
+    PRValidationBot,
+    RevenueCheck,
+    ValidationResult,
+)
 
 # ---------------------------------------------------------------------------
 # FileStatus and classification tests
@@ -240,7 +241,9 @@ class TestBuildReport:
             passed=True,
             critical_files_ok=True,
             revenue_checks=[
-                RevenueCheck("my_bot", has_payment=True, has_logger=True, has_offer=True)
+                RevenueCheck(
+                    "my_bot", has_payment=True, has_logger=True, has_offer=True
+                )
             ],
         )
         result.report_md = bot._build_report(result)

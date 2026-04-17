@@ -14,48 +14,50 @@ Covers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.stripe_key_rotation_bot.stripe_key_rotation_bot import (
+    _REDACTED,
+    Bot,
+    RotationTierError,
+    RotationValidationError,
+    RotationWorkflowError,
+    StripeKeyRotationBot,
+    _key_fingerprint,
+    _mask_key,
+)
 from bots.stripe_key_rotation_bot.tiers import (
+    FEATURE_AUDIT_TRAIL,
+    FEATURE_EMAIL_NOTIFICATION,
+    FEATURE_GITHUB_SECRETS_UPDATE,
+    FEATURE_KEY_VALIDATION,
+    FEATURE_MANUAL_ROTATION,
+    FEATURE_MULTI_ENV_ROTATION,
+    FEATURE_OLD_KEY_DEACTIVATION,
+    FEATURE_PAYMENT_WORKFLOW_TEST,
+    FEATURE_SCHEDULED_ROTATION,
+    FEATURE_SLACK_NOTIFICATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_MANUAL_ROTATION,
-    FEATURE_SCHEDULED_ROTATION,
-    FEATURE_GITHUB_SECRETS_UPDATE,
-    FEATURE_EMAIL_NOTIFICATION,
-    FEATURE_SLACK_NOTIFICATION,
-    FEATURE_AUDIT_TRAIL,
-    FEATURE_KEY_VALIDATION,
-    FEATURE_OLD_KEY_DEACTIVATION,
-    FEATURE_PAYMENT_WORKFLOW_TEST,
-    FEATURE_MULTI_ENV_ROTATION,
 )
-from bots.stripe_key_rotation_bot.stripe_key_rotation_bot import (
-    StripeKeyRotationBot,
-    RotationTierError,
-    RotationValidationError,
-    RotationWorkflowError,
-    Bot,
-    _mask_key,
-    _key_fingerprint,
-    _REDACTED,
-)
-
 
 # ===========================================================================
 # Helpers
 # ===========================================================================
 
-def _bot(tier: Tier = Tier.STARTER, key: str = "sk_test_abc123def456ghi789jkl0") -> StripeKeyRotationBot:
+
+def _bot(
+    tier: Tier = Tier.STARTER, key: str = "sk_test_abc123def456ghi789jkl0"
+) -> StripeKeyRotationBot:
     return StripeKeyRotationBot(
         tier=tier,
         stripe_api_key=key,
@@ -70,6 +72,7 @@ def _bot(tier: Tier = Tier.STARTER, key: str = "sk_test_abc123def456ghi789jkl0")
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -151,6 +154,7 @@ class TestTiers:
 # 2. Secure key helpers
 # ===========================================================================
 
+
 class TestSecureKeyHelpers:
     def test_mask_key_hides_most_of_key(self):
         key = "sk_test_abc123def456ghi789jkl0"
@@ -181,6 +185,7 @@ class TestSecureKeyHelpers:
 # 3. Validate current key
 # ===========================================================================
 
+
 class TestValidateCurrentKey:
     def test_valid_test_key(self):
         bot = _bot(key="sk_test_abc123def456ghi789jkl0")
@@ -210,6 +215,7 @@ class TestValidateCurrentKey:
 # ===========================================================================
 # 4. Key rotation
 # ===========================================================================
+
 
 class TestRotateKey:
     def test_rotation_succeeds(self):
@@ -268,6 +274,7 @@ class TestRotateKey:
 # 5. GitHub Secret update
 # ===========================================================================
 
+
 class TestUpdateGithubSecret:
     def test_update_succeeds_in_simulation(self):
         bot = _bot()
@@ -295,6 +302,7 @@ class TestUpdateGithubSecret:
 # ===========================================================================
 # 6. Payment workflow validation
 # ===========================================================================
+
 
 class TestValidatePaymentWorkflows:
     def test_all_workflows_pass_in_simulation(self):
@@ -341,6 +349,7 @@ class TestValidatePaymentWorkflows:
 # 7. Deactivate old key
 # ===========================================================================
 
+
 class TestDeactivateOldKey:
     def test_deactivate_after_rotation_growth_tier(self):
         bot = _bot(tier=Tier.GROWTH)
@@ -379,6 +388,7 @@ class TestDeactivateOldKey:
 # ===========================================================================
 # 8. Notifications
 # ===========================================================================
+
 
 class TestNotify:
     def test_email_notification_starter(self):
@@ -427,6 +437,7 @@ class TestNotify:
 # ===========================================================================
 # 9. Full rotation pipeline
 # ===========================================================================
+
 
 class TestRunRotation:
     def test_pipeline_succeeds_starter(self):
@@ -490,6 +501,7 @@ class TestRunRotation:
 # 10. Audit log
 # ===========================================================================
 
+
 class TestAuditLog:
     def test_audit_log_available_growth(self):
         bot = _bot(tier=Tier.GROWTH)
@@ -526,6 +538,7 @@ class TestAuditLog:
 # ===========================================================================
 # 11. Status / reporting
 # ===========================================================================
+
 
 class TestGetStatus:
     def test_status_returns_dict(self):
@@ -564,12 +577,16 @@ class TestGetStatus:
 # 12. Chat / process interface
 # ===========================================================================
 
+
 class TestChatInterface:
     def test_chat_rotate_command(self):
         bot = _bot()
         result = bot.chat("please rotate the keys")
         assert "message" in result
-        assert "rotation" in result["message"].lower() or "key" in result["message"].lower()
+        assert (
+            "rotation" in result["message"].lower()
+            or "key" in result["message"].lower()
+        )
 
     def test_chat_status_command(self):
         bot = _bot()
@@ -579,7 +596,10 @@ class TestChatInterface:
     def test_chat_validate_command(self):
         bot = _bot()
         result = bot.chat("validate the key")
-        assert "validation" in result["message"].lower() or "key" in result["message"].lower()
+        assert (
+            "validation" in result["message"].lower()
+            or "key" in result["message"].lower()
+        )
 
     def test_chat_default_response(self):
         bot = _bot()
@@ -605,6 +625,7 @@ class TestChatInterface:
 # 13. Security — keys never exposed
 # ===========================================================================
 
+
 class TestKeySecurityInvariants:
     """Ensure API keys are never returned in method outputs or exceptions."""
 
@@ -614,9 +635,9 @@ class TestKeySecurityInvariants:
         return _bot(key=self._SECRET_KEY)
 
     def _assert_key_not_in(self, value: object) -> None:
-        assert self._SECRET_KEY not in str(value), (
-            f"SECRET KEY was exposed in output: {str(value)[:200]}"
-        )
+        assert self._SECRET_KEY not in str(
+            value
+        ), f"SECRET KEY was exposed in output: {str(value)[:200]}"
 
     def test_validate_does_not_expose_key(self):
         self._assert_key_not_in(self._bot().validate_current_key())

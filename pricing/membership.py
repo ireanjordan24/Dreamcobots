@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 
 class MembershipTier(Enum):
     """Three-tier membership hierarchy."""
+
     FREE = "free"
     PREMIUM = "premium"
     ELITE = "elite"
@@ -21,6 +22,7 @@ class MembershipTier(Enum):
 
 class BillingCycle(Enum):
     """Supported billing cadences."""
+
     WEEKLY = "weekly"
     MONTHLY = "monthly"
     YEARLY = "yearly"
@@ -35,9 +37,9 @@ _BASE_MONTHLY_PRICES: Dict[MembershipTier, float] = {
 
 # Discount multipliers per billing cycle (applied to the monthly base)
 _CYCLE_MULTIPLIERS: Dict[BillingCycle, float] = {
-    BillingCycle.WEEKLY: 0.30,    # approx weekly fraction (monthly * 0.30)
+    BillingCycle.WEEKLY: 0.30,  # approx weekly fraction (monthly * 0.30)
     BillingCycle.MONTHLY: 1.00,
-    BillingCycle.YEARLY: 10.00,   # two months free on annual plan
+    BillingCycle.YEARLY: 10.00,  # two months free on annual plan
 }
 
 # Feature sets per tier
@@ -76,6 +78,7 @@ class MembershipPlan:
         tier: The membership tier.
         billing_cycle: How often the member is billed.
     """
+
     tier: MembershipTier
     billing_cycle: BillingCycle
 
@@ -110,6 +113,7 @@ class MembershipPlan:
 @dataclass
 class Subscription:
     """Active subscription record for a member."""
+
     member_id: str
     plan: MembershipPlan
     start_date: date = field(default_factory=date.today)
@@ -179,7 +183,9 @@ class MembershipManager:
         """Return the subscription for *member_id*, or None."""
         return self._subscriptions.get(member_id)
 
-    def upgrade(self, member_id: str, new_tier: MembershipTier) -> Optional[Subscription]:
+    def upgrade(
+        self, member_id: str, new_tier: MembershipTier
+    ) -> Optional[Subscription]:
         """
         Upgrade a member to *new_tier* while retaining their billing cycle.
 
@@ -217,13 +223,15 @@ class MembershipManager:
         for tier in MembershipTier:
             for cycle in BillingCycle:
                 plan = MembershipPlan(tier=tier, billing_cycle=cycle)
-                plans.append({
-                    "tier": tier.value,
-                    "billing_cycle": cycle.value,
-                    "price_usd": plan.price,
-                    "features": plan.features,
-                    "description": plan.describe(),
-                })
+                plans.append(
+                    {
+                        "tier": tier.value,
+                        "billing_cycle": cycle.value,
+                        "price_usd": plan.price,
+                        "features": plan.features,
+                        "description": plan.describe(),
+                    }
+                )
         return plans
 
     def active_subscribers(self) -> List[Subscription]:

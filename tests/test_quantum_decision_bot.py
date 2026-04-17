@@ -27,6 +27,7 @@ sys.path.insert(0, REPO_ROOT)
 # SimulationEngine
 # ===========================================================================
 
+
 class TestSimulationEngine:
     def test_returns_list(self):
         from bots.quantum_decision_bot.simulation_engine import run_simulations
@@ -57,16 +58,28 @@ class TestSimulationEngine:
     def test_risk_always_non_negative(self):
         from bots.quantum_decision_bot.simulation_engine import run_simulations
 
-        results = run_simulations({"base_profit": 100, "risk": 2, "volatility": 0.5}, runs=50)
+        results = run_simulations(
+            {"base_profit": 100, "risk": 2, "volatility": 0.5}, runs=50
+        )
         assert all(r["risk"] >= 0 for r in results)
 
     def test_summarise_outcomes_keys(self):
-        from bots.quantum_decision_bot.simulation_engine import run_simulations, summarise_outcomes
+        from bots.quantum_decision_bot.simulation_engine import (
+            run_simulations,
+            summarise_outcomes,
+        )
 
         outcomes = run_simulations({"base_profit": 1000, "risk": 5}, runs=20)
         summary = summarise_outcomes(outcomes)
-        for key in ("count", "avg_profit", "min_profit", "max_profit", "avg_risk",
-                    "profitable_runs", "profitable_pct"):
+        for key in (
+            "count",
+            "avg_profit",
+            "min_profit",
+            "max_profit",
+            "avg_risk",
+            "profitable_runs",
+            "profitable_pct",
+        ):
             assert key in summary
 
     def test_summarise_empty_outcomes(self):
@@ -79,23 +92,34 @@ class TestSimulationEngine:
     def test_summarise_profitable_pct(self):
         from bots.quantum_decision_bot.simulation_engine import summarise_outcomes
 
-        outcomes = [{"profit": 100, "risk": 2}, {"profit": -50, "risk": 8},
-                    {"profit": 200, "risk": 3}, {"profit": 50, "risk": 4}]
+        outcomes = [
+            {"profit": 100, "risk": 2},
+            {"profit": -50, "risk": 8},
+            {"profit": 200, "risk": 3},
+            {"profit": 50, "risk": 4},
+        ]
         summary = summarise_outcomes(outcomes)
         assert summary["profitable_runs"] == 3
         assert summary["profitable_pct"] == 75.0
 
     def test_high_base_profit_raises_avg_profit(self):
-        from bots.quantum_decision_bot.simulation_engine import run_simulations, summarise_outcomes
+        from bots.quantum_decision_bot.simulation_engine import (
+            run_simulations,
+            summarise_outcomes,
+        )
 
         outcomes_low = run_simulations({"base_profit": 100, "risk": 2}, runs=100)
         outcomes_high = run_simulations({"base_profit": 10_000, "risk": 2}, runs=100)
-        assert summarise_outcomes(outcomes_high)["avg_profit"] > summarise_outcomes(outcomes_low)["avg_profit"]
+        assert (
+            summarise_outcomes(outcomes_high)["avg_profit"]
+            > summarise_outcomes(outcomes_low)["avg_profit"]
+        )
 
 
 # ===========================================================================
 # ProbabilityModel
 # ===========================================================================
+
 
 class TestProbabilityModel:
     def test_score_returns_float(self):
@@ -194,6 +218,7 @@ class TestProbabilityModel:
 # DimensionMapper
 # ===========================================================================
 
+
 class TestDimensionMapper:
     def test_map_returns_dict_with_keys(self):
         from bots.quantum_decision_bot.dimension_mapper import DimensionMapper
@@ -265,8 +290,12 @@ class TestDimensionMapper:
         from bots.quantum_decision_bot.dimension_mapper import DimensionMapper
 
         mapper = DimensionMapper()
-        good = mapper.optimality_score({"time": 5.0, "capital": 0.0, "risk": 1.0, "scale": 10.0})
-        bad = mapper.optimality_score({"time": 10.0, "capital": 10.0, "risk": 10.0, "scale": 1.0})
+        good = mapper.optimality_score(
+            {"time": 5.0, "capital": 0.0, "risk": 1.0, "scale": 10.0}
+        )
+        bad = mapper.optimality_score(
+            {"time": 10.0, "capital": 10.0, "risk": 10.0, "scale": 1.0}
+        )
         assert good > bad
 
     def test_find_optimal_intersection_sorted(self):
@@ -274,8 +303,14 @@ class TestDimensionMapper:
 
         mapper = DimensionMapper()
         paths = [
-            {"profile": {"time": 9.0, "capital": 9.0, "risk": 9.0, "scale": 1.0}, "score": 100},
-            {"profile": {"time": 5.0, "capital": 2.0, "risk": 3.0, "scale": 7.0}, "score": 80},
+            {
+                "profile": {"time": 9.0, "capital": 9.0, "risk": 9.0, "scale": 1.0},
+                "score": 100,
+            },
+            {
+                "profile": {"time": 5.0, "capital": 2.0, "risk": 3.0, "scale": 7.0},
+                "score": 80,
+            },
         ]
         result = mapper.find_optimal_intersection(paths)
         # Closer to ideal should come first
@@ -285,6 +320,7 @@ class TestDimensionMapper:
 # ===========================================================================
 # QuantumEngine
 # ===========================================================================
+
 
 class TestQuantumEngine:
     def test_decide_returns_dict(self):
@@ -359,6 +395,7 @@ class TestQuantumEngine:
 # BotRouter
 # ===========================================================================
 
+
 class TestBotRouter:
     def test_route_returns_dict(self):
         from bots.quantum_decision_bot.bot_router import BotRouter
@@ -366,6 +403,7 @@ class TestBotRouter:
         router = BotRouter()
         # Override engine with low-run engine for speed
         from bots.quantum_decision_bot.quantum_engine import QuantumEngine
+
         router.engine = QuantumEngine(simulation_runs=5)
         result = router.route("real_estate_bot", {"base_profit": 40_000, "risk": 7})
         assert isinstance(result, dict)
@@ -400,10 +438,12 @@ class TestBotRouter:
         from bots.quantum_decision_bot.quantum_engine import QuantumEngine
 
         router = BotRouter(engine=QuantumEngine(simulation_runs=5))
-        results = router.route_all({
-            "real_estate_bot": {},
-            "trade_bot": {},
-        })
+        results = router.route_all(
+            {
+                "real_estate_bot": {},
+                "trade_bot": {},
+            }
+        )
         assert len(results) == 2
         bots = {r["bot"] for r in results}
         assert "real_estate_bot" in bots
@@ -443,9 +483,11 @@ class TestBotRouter:
 # MoneyEngine
 # ===========================================================================
 
+
 class TestMoneyEngine:
     def _fast_engine(self):
         from bots.quantum_decision_bot.quantum_engine import QuantumEngine
+
         return QuantumEngine(simulation_runs=5)
 
     def test_scan_returns_dict(self):
@@ -498,8 +540,12 @@ class TestMoneyEngine:
 
         engine = MoneyEngine(engine=self._fast_engine())
         custom = {
-            "id": "test_opp", "type": "service", "name": "Test Service",
-            "description": "Test", "base_profit": 999, "risk": 2.0
+            "id": "test_opp",
+            "type": "service",
+            "name": "Test Service",
+            "description": "Test",
+            "base_profit": 999,
+            "risk": 2.0,
         }
         engine.add_opportunity(custom)
         result = engine.scan(top_n=20)
@@ -519,8 +565,17 @@ class TestMoneyEngine:
         from bots.quantum_decision_bot.money_engine import MoneyEngine
 
         engine = MoneyEngine(engine=self._fast_engine())
-        for opp_type in ("service", "saas", "real_estate", "affiliate", "trading", "digital"):
-            plan = engine.execute_plan({"type": opp_type, "name": "X", "base_profit": 1000, "risk": 3})
+        for opp_type in (
+            "service",
+            "saas",
+            "real_estate",
+            "affiliate",
+            "trading",
+            "digital",
+        ):
+            plan = engine.execute_plan(
+                {"type": opp_type, "name": "X", "base_profit": 1000, "risk": 3}
+            )
             assert plan["type"] == opp_type
 
     def test_probability_of_profit_in_opportunity(self):
@@ -537,9 +592,13 @@ class TestMoneyEngine:
 # QuantumDecisionBot — Tier gating
 # ===========================================================================
 
+
 class TestQuantumDecisionBotTiers:
     def test_free_tier_decide(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         bot.quantum_engine.simulation_runs = 5
@@ -547,43 +606,66 @@ class TestQuantumDecisionBotTiers:
         assert "best_path" in result
 
     def test_free_tier_simulate(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.simulate({"base_profit": 1000, "risk": 3})
         assert "count" in result
 
     def test_free_tier_cannot_access_dimension_mapper(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier, QuantumTierError
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            QuantumTierError,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         with pytest.raises(QuantumTierError):
             bot.map_dimensions({})
 
     def test_free_tier_cannot_access_bot_router(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier, QuantumTierError
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            QuantumTierError,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         with pytest.raises(QuantumTierError):
             bot.route_bot("real_estate_bot", {})
 
     def test_free_tier_cannot_scan_opportunities(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier, QuantumTierError
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            QuantumTierError,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         with pytest.raises(QuantumTierError):
             bot.scan_opportunities()
 
     def test_pro_tier_can_access_dimension_mapper(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
-        result = bot.map_dimensions({"time_horizon": "medium", "risk_level": "moderate"})
+        result = bot.map_dimensions(
+            {"time_horizon": "medium", "risk_level": "moderate"}
+        )
         assert "dimensions" in result
 
     def test_pro_tier_can_route_bot(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -591,7 +673,10 @@ class TestQuantumDecisionBotTiers:
         assert result["bot"] == "trade_bot"
 
     def test_pro_tier_can_scan_opportunities(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -599,14 +684,21 @@ class TestQuantumDecisionBotTiers:
         assert "ranked_opportunities" in result
 
     def test_pro_tier_cannot_learn(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier, QuantumTierError
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            QuantumTierError,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         with pytest.raises(QuantumTierError):
             bot.learn("test", 1000.0, 1200.0)
 
     def test_enterprise_tier_can_learn(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.ENTERPRISE)
         bot.quantum_engine.simulation_runs = 5
@@ -614,7 +706,10 @@ class TestQuantumDecisionBotTiers:
         assert "scenario" in result
 
     def test_enterprise_tier_get_model_weights(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.ENTERPRISE)
         weights = bot.get_model_weights()
@@ -625,16 +720,24 @@ class TestQuantumDecisionBotTiers:
 # QuantumDecisionBot — Active paths
 # ===========================================================================
 
+
 class TestQuantumDecisionBotActivePaths:
     def test_free_tier_no_active_paths(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier, QuantumTierError
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            QuantumTierError,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         with pytest.raises(QuantumTierError):
             bot.get_active_paths()
 
     def test_pro_tier_active_paths_grow(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -644,7 +747,10 @@ class TestQuantumDecisionBotActivePaths:
         assert len(paths) == 2
 
     def test_active_paths_capped_at_max(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -658,34 +764,50 @@ class TestQuantumDecisionBotActivePaths:
 # QuantumDecisionBot — Dashboard
 # ===========================================================================
 
+
 class TestQuantumDecisionBotDashboard:
     def test_dashboard_returns_dict(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.dashboard()
         assert isinstance(result, dict)
 
     def test_dashboard_has_title(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         assert bot.dashboard()["title"] == "DreamCo QuantumOS"
 
     def test_dashboard_reflects_tier(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         assert bot.dashboard()["tier"] == "pro"
 
     def test_dashboard_has_model_weights(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         assert "model_weights" in bot.dashboard()
 
     def test_dashboard_paths_evaluated_increases(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         bot.quantum_engine.simulation_runs = 5
@@ -699,30 +821,43 @@ class TestQuantumDecisionBotDashboard:
 # QuantumDecisionBot — Chat interface
 # ===========================================================================
 
+
 class TestQuantumDecisionBotChat:
     def test_chat_default_response(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.chat("hello")
         assert "message" in result
 
     def test_chat_dashboard_command(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.chat("show dashboard")
         assert "data" in result
 
     def test_chat_tier_command(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         result = bot.chat("what is my tier plan")
         assert "data" in result
 
     def test_chat_opportunities_pro_tier(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -730,7 +865,10 @@ class TestQuantumDecisionBotChat:
         assert "data" in result
 
     def test_chat_opportunities_free_tier_blocked(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.chat("scan for money opportunities")
@@ -738,7 +876,10 @@ class TestQuantumDecisionBotChat:
         assert "not available" in result["message"].lower()
 
     def test_process_delegates_to_chat(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         result = bot.process({"command": "status"})
@@ -749,9 +890,13 @@ class TestQuantumDecisionBotChat:
 # QuantumDecisionBot — Tier info
 # ===========================================================================
 
+
 class TestQuantumDecisionBotTierInfo:
     def test_free_tier_info(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         info = bot.get_tier_info()
@@ -759,7 +904,10 @@ class TestQuantumDecisionBotTierInfo:
         assert info["price_usd_monthly"] == 0.0
 
     def test_pro_tier_info(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         info = bot.get_tier_info()
@@ -767,7 +915,10 @@ class TestQuantumDecisionBotTierInfo:
         assert info["price_usd_monthly"] == 49.0
 
     def test_enterprise_tier_info(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.ENTERPRISE)
         info = bot.get_tier_info()
@@ -775,7 +926,10 @@ class TestQuantumDecisionBotTierInfo:
         assert info["price_usd_monthly"] == 199.0
 
     def test_can_access_returns_bool(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.FREE)
         assert bot.can_access("simulation") is True
@@ -786,21 +940,30 @@ class TestQuantumDecisionBotTierInfo:
 # QuantumDecisionBot — route_all_bots & network_status
 # ===========================================================================
 
+
 class TestQuantumDecisionBotNetwork:
     def test_route_all_bots(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
-        results = bot.route_all_bots({
-            "real_estate_bot": {},
-            "trade_bot": {},
-            "hustle_bot": {},
-        })
+        results = bot.route_all_bots(
+            {
+                "real_estate_bot": {},
+                "trade_bot": {},
+                "hustle_bot": {},
+            }
+        )
         assert len(results) == 3
 
     def test_network_status_returns_dict(self):
-        from bots.quantum_decision_bot.quantum_decision_bot import QuantumDecisionBot, Tier
+        from bots.quantum_decision_bot.quantum_decision_bot import (
+            QuantumDecisionBot,
+            Tier,
+        )
 
         bot = QuantumDecisionBot(tier=Tier.PRO)
         bot.quantum_engine.simulation_runs = 5
@@ -812,6 +975,7 @@ class TestQuantumDecisionBotNetwork:
 # ===========================================================================
 # Module-level run()
 # ===========================================================================
+
 
 class TestModuleLevelRun:
     def test_run_returns_dict(self):
@@ -857,6 +1021,7 @@ class TestModuleLevelRun:
 # BotLibrary registration
 # ===========================================================================
 
+
 class TestBotLibraryRegistration:
     def test_quantum_bot_in_library(self):
         from bots.global_bot_network.bot_library import BotLibrary
@@ -877,7 +1042,7 @@ class TestBotLibraryRegistration:
         assert "entangled_bot_router" in entry.capabilities
 
     def test_quantum_bot_category(self):
-        from bots.global_bot_network.bot_library import BotLibrary, BotCategory
+        from bots.global_bot_network.bot_library import BotCategory, BotLibrary
 
         lib = BotLibrary()
         lib.populate_dreamco_bots()

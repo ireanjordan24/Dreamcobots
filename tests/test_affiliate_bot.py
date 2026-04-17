@@ -1,14 +1,17 @@
 """Tests for bots/affiliate_bot/tiers.py and bots/affiliate_bot/affiliate_bot.py"""
-import sys, os
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
+import os
+import sys
+
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
 sys.path.insert(0, AI_MODELS_DIR)
-sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
+sys.path.insert(0, os.path.join(AI_MODELS_DIR, "models"))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
+
 from bots.affiliate_bot.affiliate_bot import AffiliateBot, AffiliateBotTierError
 
 
@@ -33,14 +36,17 @@ class TestAffiliateBotInstantiation:
 class TestAffiliateBotTierFeatures:
     def test_free_tier_features_present(self):
         from bots.affiliate_bot.tiers import BOT_FEATURES
+
         assert len(BOT_FEATURES[Tier.FREE.value]) > 0
 
     def test_pro_tier_has_more_features_than_free(self):
         from bots.affiliate_bot.tiers import BOT_FEATURES
+
         assert len(BOT_FEATURES[Tier.PRO.value]) > len(BOT_FEATURES[Tier.FREE.value])
 
     def test_enterprise_tier_has_api_access(self):
         from bots.affiliate_bot.tiers import BOT_FEATURES
+
         assert any("API" in f for f in BOT_FEATURES[Tier.ENTERPRISE.value])
 
 
@@ -75,7 +81,18 @@ class TestRecommendProducts:
 
     def test_enterprise_unlimited_niches(self):
         bot = AffiliateBot(tier=Tier.ENTERPRISE)
-        niches = ["tech", "fitness", "home", "beauty", "finance", "travel", "food", "gaming", "education", "pets"]
+        niches = [
+            "tech",
+            "fitness",
+            "home",
+            "beauty",
+            "finance",
+            "travel",
+            "food",
+            "gaming",
+            "education",
+            "pets",
+        ]
         for niche in niches:
             result = bot.recommend_products(niche)
             assert isinstance(result, list)
@@ -101,7 +118,13 @@ class TestGenerateReport:
         bot = AffiliateBot(tier=Tier.FREE)
         bot.recommend_products("tech")
         report = bot.generate_report()
-        for key in ("tracked_niches", "total_clicks", "estimated_monthly_revenue_usd", "tier", "features"):
+        for key in (
+            "tracked_niches",
+            "total_clicks",
+            "estimated_monthly_revenue_usd",
+            "tier",
+            "features",
+        ):
             assert key in report
 
     def test_pro_report_has_detailed_breakdown(self):

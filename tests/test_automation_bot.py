@@ -2,27 +2,33 @@
 Tests for bots/automation_bot/tiers.py and bots/automation_bot/automation_bot.py
 """
 
-import sys
 import os
+import sys
 
-REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
-AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
-BOT_DIR = os.path.join(REPO_ROOT, 'bots', 'automation_bot')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
+BOT_DIR = os.path.join(REPO_ROOT, "bots", "automation_bot")
 sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.automation_bot.automation_bot import AutomationBot, AutomationBotTierError, AutomationBotRequestLimitError
 
+from bots.automation_bot.automation_bot import (
+    AutomationBot,
+    AutomationBotRequestLimitError,
+    AutomationBotTierError,
+)
 
 # -----------------------------------------------------------------------
 # Tier info tests
 # -----------------------------------------------------------------------
 
+
 class TestAutomationBotTierInfo:
     def _load_tiers(self):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_auto_tiers", os.path.join(BOT_DIR, "tiers.py")
         )
@@ -33,8 +39,15 @@ class TestAutomationBotTierInfo:
     def test_tier_info_keys(self):
         mod = self._load_tiers()
         info = mod.get_automation_tier_info(Tier.FREE)
-        for key in ("tier", "name", "price_usd_monthly", "requests_per_month",
-                    "automation_features", "task_limit", "support_level"):
+        for key in (
+            "tier",
+            "name",
+            "price_usd_monthly",
+            "requests_per_month",
+            "automation_features",
+            "task_limit",
+            "support_level",
+        ):
             assert key in info
 
     def test_free_price_zero(self):
@@ -69,6 +82,7 @@ class TestAutomationBotTierInfo:
 # AutomationBot tests
 # -----------------------------------------------------------------------
 
+
 class TestAutomationBot:
     def test_default_tier_free(self):
         bot = AutomationBot()
@@ -100,6 +114,7 @@ class TestAutomationBot:
     def test_free_tier_task_limit(self):
         bot = AutomationBot(tier=Tier.FREE)
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "_auto_t", os.path.join(BOT_DIR, "tiers.py")
         )

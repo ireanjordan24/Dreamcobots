@@ -1,16 +1,25 @@
 """
 Dreamcobots CustomerSupportBot — tier-aware customer support automation.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
 
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.customer_support_bot.tiers import CUSTOMER_SUPPORT_FEATURES, get_customer_support_tier_info
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
 import uuid
 from datetime import datetime
+
+from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.customer_support_bot.tiers import (
+    CUSTOMER_SUPPORT_FEATURES,
+    get_customer_support_tier_info,
+)
 
 
 class CustomerSupportBotTierError(Exception):
@@ -56,8 +65,29 @@ class CustomerSupportBot:
     def _analyze_sentiment(self, message: str) -> str:
         """Basic sentiment analysis using keyword matching."""
         message_lower = message.lower()
-        negative_keywords = ["angry", "frustrated", "terrible", "awful", "broken", "failed", "error", "wrong", "bad", "horrible"]
-        positive_keywords = ["great", "excellent", "happy", "satisfied", "wonderful", "amazing", "love", "perfect", "thank"]
+        negative_keywords = [
+            "angry",
+            "frustrated",
+            "terrible",
+            "awful",
+            "broken",
+            "failed",
+            "error",
+            "wrong",
+            "bad",
+            "horrible",
+        ]
+        positive_keywords = [
+            "great",
+            "excellent",
+            "happy",
+            "satisfied",
+            "wonderful",
+            "amazing",
+            "love",
+            "perfect",
+            "thank",
+        ]
         neg_count = sum(1 for kw in negative_keywords if kw in message_lower)
         pos_count = sum(1 for kw in positive_keywords if kw in message_lower)
         if neg_count > pos_count:
@@ -97,8 +127,11 @@ class CustomerSupportBot:
             response = (
                 f"Thank you for reaching out. We've received your {category} inquiry "
                 f"and have assigned it priority routing. "
-                + ("A specialist will contact you shortly due to the urgency detected." if escalated
-                   else "We will respond within 4 hours.")
+                + (
+                    "A specialist will contact you shortly due to the urgency detected."
+                    if escalated
+                    else "We will respond within 4 hours."
+                )
             )
 
         else:  # ENTERPRISE
@@ -107,8 +140,11 @@ class CustomerSupportBot:
             response = (
                 f"Your {category} request has been received and processed by our AI system. "
                 f"Sentiment: {sentiment}. "
-                + ("Escalating to your dedicated SLA team immediately." if escalated
-                   else "Your dedicated agent will respond within 1 hour per your SLA.")
+                + (
+                    "Escalating to your dedicated SLA team immediately."
+                    if escalated
+                    else "Your dedicated agent will respond within 1 hour per your SLA."
+                )
             )
 
         return {

@@ -2,6 +2,7 @@
 Configuration module for the 211 Resource and Eligibility Checker Bot.
 Loads settings from environment variables with sensible defaults.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 import os
@@ -10,7 +11,9 @@ import os
 # 211 API settings
 # Register for a free key at https://developer.211.org
 # -------------------------------------------------------------------
-API_211_BASE_URL = os.getenv("API_211_BASE_URL", "https://api.211.org/search/v1/resources")
+API_211_BASE_URL = os.getenv(
+    "API_211_BASE_URL", "https://api.211.org/search/v1/resources"
+)
 API_211_KEY = os.getenv("API_211_KEY", "")
 
 # -------------------------------------------------------------------

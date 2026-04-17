@@ -25,6 +25,7 @@ from typing import Any, Dict, Optional
 
 try:
     import stripe as _stripe  # type: ignore[import]
+
     _STRIPE_AVAILABLE = True
 except ImportError:
     _stripe = None  # type: ignore[assignment]
@@ -133,7 +134,12 @@ class StripeBillingService:
                 "status": "active",
             }
             self._revenue_log.append(
-                {"event": "subscription_created", "tier": tier, "amount": amount, "ts": time.time()}
+                {
+                    "event": "subscription_created",
+                    "tier": tier,
+                    "amount": amount,
+                    "ts": time.time(),
+                }
             )
             return {
                 "success": True,
@@ -151,7 +157,12 @@ class StripeBillingService:
                 metadata={"dreamco_tier": tier, "dreamco_user_id": user_id},
             )
             self._revenue_log.append(
-                {"event": "subscription_created", "tier": tier, "amount": amount, "ts": time.time()}
+                {
+                    "event": "subscription_created",
+                    "tier": tier,
+                    "amount": amount,
+                    "ts": time.time(),
+                }
             )
             return {
                 "success": True,
@@ -174,7 +185,11 @@ class StripeBillingService:
         if self._simulation:
             if subscription_id in self._subscriptions:
                 self._subscriptions[subscription_id]["status"] = "cancelled"
-            return {"success": True, "subscription_id": subscription_id, "status": "cancelled"}
+            return {
+                "success": True,
+                "subscription_id": subscription_id,
+                "status": "cancelled",
+            }
 
         try:
             sub = _stripe.Subscription.delete(subscription_id)
@@ -219,7 +234,12 @@ class StripeBillingService:
             sub = _stripe.Subscription.retrieve(subscription_id)
             _stripe.Subscription.modify(
                 subscription_id,
-                items=[{"id": sub["items"]["data"][0]["id"], "price": STRIPE_PRICE_IDS[new_tier]}],
+                items=[
+                    {
+                        "id": sub["items"]["data"][0]["id"],
+                        "price": STRIPE_PRICE_IDS[new_tier],
+                    }
+                ],
                 metadata={"dreamco_tier": new_tier, "dreamco_user_id": user_id},
                 proration_behavior="always_invoice",
             )
@@ -251,7 +271,9 @@ class StripeBillingService:
             return {"success": False, "error": "STRIPE_WEBHOOK_SECRET not configured"}
 
         try:
-            event = _stripe.Webhook.construct_event(payload, sig_header, _WEBHOOK_SECRET)
+            event = _stripe.Webhook.construct_event(
+                payload, sig_header, _WEBHOOK_SECRET
+            )
         except Exception as exc:
             return {"success": False, "error": f"webhook verification failed: {exc}"}
 
@@ -261,7 +283,11 @@ class StripeBillingService:
         elif event_type == "invoice.payment_succeeded":
             data = event["data"]["object"]
             self._revenue_log.append(
-                {"event": "payment_succeeded", "amount": data.get("amount_paid", 0) / 100, "ts": time.time()}
+                {
+                    "event": "payment_succeeded",
+                    "amount": data.get("amount_paid", 0) / 100,
+                    "ts": time.time(),
+                }
             )
         elif event_type == "customer.subscription.deleted":
             pass  # handle cancellation

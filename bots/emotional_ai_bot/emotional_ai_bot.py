@@ -2,12 +2,25 @@
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
+from bots.emotional_ai_bot.emotion_engine import (
+    EmotionRecognizer,
+    EmotionRecognizerError,
+    PersonalityAdapter,
+)
+from bots.emotional_ai_bot.mental_health_coach import (
+    MentalHealthCoach,
+    ProductivityCoach,
+)
 from bots.emotional_ai_bot.tiers import BOT_FEATURES, get_bot_tier_info
-from bots.emotional_ai_bot.emotion_engine import EmotionRecognizer, PersonalityAdapter, EmotionRecognizerError
-from bots.emotional_ai_bot.mental_health_coach import MentalHealthCoach, ProductivityCoach
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 

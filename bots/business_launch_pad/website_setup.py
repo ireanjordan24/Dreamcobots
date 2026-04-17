@@ -1,8 +1,8 @@
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """Website Setup module for Business Launch Pad."""
 
-import uuid
 import random
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -58,12 +58,36 @@ _INDUSTRY_TEMPLATES: dict[str, WebsiteTemplate] = {
 
 _TEMPLATE_PAGES: dict[WebsiteTemplate, list[str]] = {
     WebsiteTemplate.LANDING_PAGE: ["Home", "About", "Features", "Pricing", "Contact"],
-    WebsiteTemplate.ECOMMERCE: ["Home", "Shop", "Product", "Cart", "Checkout", "About", "Contact"],
+    WebsiteTemplate.ECOMMERCE: [
+        "Home",
+        "Shop",
+        "Product",
+        "Cart",
+        "Checkout",
+        "About",
+        "Contact",
+    ],
     WebsiteTemplate.PORTFOLIO: ["Home", "Portfolio", "About", "Services", "Contact"],
     WebsiteTemplate.BLOG: ["Home", "Blog", "About", "Archive", "Contact"],
-    WebsiteTemplate.SAAS: ["Home", "Features", "Pricing", "Docs", "Blog", "Contact", "Login"],
-    WebsiteTemplate.CORPORATE: ["Home", "About", "Services", "Team", "Case Studies", "Contact"],
+    WebsiteTemplate.SAAS: [
+        "Home",
+        "Features",
+        "Pricing",
+        "Docs",
+        "Blog",
+        "Contact",
+        "Login",
+    ],
+    WebsiteTemplate.CORPORATE: [
+        "Home",
+        "About",
+        "Services",
+        "Team",
+        "Case Studies",
+        "Contact",
+    ],
 }
+
 
 # Deterministic domain simulation: domains ending in known TLDs are "taken" if name length < 6
 def _simulate_domain_status(domain: str) -> DomainStatus:
@@ -107,9 +131,13 @@ class WebsiteSetup:
         # Remove current domain from alternatives
         alternatives = [a for a in alternatives if a != domain][:4]
 
-        return DomainResult(domain=domain, status=status, price_usd=price, alternatives=alternatives)
+        return DomainResult(
+            domain=domain, status=status, price_usd=price, alternatives=alternatives
+        )
 
-    def create_website(self, business_name: str, domain: str, template: WebsiteTemplate) -> WebsiteProject:
+    def create_website(
+        self, business_name: str, domain: str, template: WebsiteTemplate
+    ) -> WebsiteProject:
         """Create a new website project."""
         pages = list(_TEMPLATE_PAGES.get(template, ["Home", "About", "Contact"]))
         project = WebsiteProject(

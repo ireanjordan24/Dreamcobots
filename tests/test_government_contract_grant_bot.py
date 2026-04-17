@@ -1,16 +1,20 @@
 """Tests for the fully-implemented Government Contract & Grant Bot."""
 
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 def _import_bot():
-    bot_dir = os.path.join(os.path.dirname(__file__), "..", "bots", "government-contract-grant-bot")
+    bot_dir = os.path.join(
+        os.path.dirname(__file__), "..", "bots", "government-contract-grant-bot"
+    )
     sys.path.insert(0, bot_dir)
     import importlib
+
     mod = importlib.import_module("government_contract_grant_bot")
     return mod
 
@@ -49,7 +53,10 @@ class TestTierConfig:
         assert bot_module.TIER_LIMITS[bot_module.Tier.FREE]["results_per_search"] == 5
 
     def test_enterprise_tier_no_limit(self, bot_module):
-        assert bot_module.TIER_LIMITS[bot_module.Tier.ENTERPRISE]["results_per_search"] is None
+        assert (
+            bot_module.TIER_LIMITS[bot_module.Tier.ENTERPRISE]["results_per_search"]
+            is None
+        )
 
     def test_tier_prices_defined(self, bot_module):
         assert bot_module.TIER_PRICES[bot_module.Tier.FREE] == 0
@@ -260,7 +267,9 @@ class TestSummary:
 
     def test_summary_total_equals_contracts_plus_grants(self, pro_bot):
         summary = pro_bot.get_summary()
-        assert summary["total_opportunities"] == summary["contracts"] + summary["grants"]
+        assert (
+            summary["total_opportunities"] == summary["contracts"] + summary["grants"]
+        )
 
     def test_get_tier_info(self, pro_bot):
         info = pro_bot.get_tier_info()

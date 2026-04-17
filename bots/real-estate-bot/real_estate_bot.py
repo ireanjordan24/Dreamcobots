@@ -1,8 +1,10 @@
 """Real Estate Bot - Property valuation, investment analysis, and market insights."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.base_bot import BaseBot
@@ -51,14 +53,20 @@ class RealEstateBot(BaseBot):
             "disclaimer": "This is an automated estimate. Get a professional appraisal for financing or legal purposes.",
         }
 
-    def analyze_investment(self, purchase_price: float, monthly_rent: float, expenses: float) -> dict:
+    def analyze_investment(
+        self, purchase_price: float, monthly_rent: float, expenses: float
+    ) -> dict:
         """Analyze a rental property investment for ROI, cap rate, and cash flow."""
         annual_rent = monthly_rent * 12
         annual_expenses = expenses * 12
         noi = annual_rent - annual_expenses
         cap_rate = (noi / purchase_price * 100) if purchase_price > 0 else 0
         cash_flow_monthly = monthly_rent - expenses
-        cash_on_cash = (cash_flow_monthly * 12 / (purchase_price * 0.20) * 100) if purchase_price > 0 else 0
+        cash_on_cash = (
+            (cash_flow_monthly * 12 / (purchase_price * 0.20) * 100)
+            if purchase_price > 0
+            else 0
+        )
         gross_rent_multiplier = purchase_price / annual_rent if annual_rent > 0 else 0
         return {
             "purchase_price": purchase_price,
@@ -69,8 +77,16 @@ class RealEstateBot(BaseBot):
             "cap_rate_percent": round(cap_rate, 2),
             "cash_on_cash_return_percent": round(cash_on_cash, 2),
             "gross_rent_multiplier": round(gross_rent_multiplier, 2),
-            "investment_rating": "Excellent" if cap_rate >= 8 else "Good" if cap_rate >= 5 else "Fair" if cap_rate >= 3 else "Poor",
-            "break_even_months": round(purchase_price / (monthly_rent - expenses)) if cash_flow_monthly > 0 else "Negative cash flow",
+            "investment_rating": (
+                "Excellent"
+                if cap_rate >= 8
+                else "Good" if cap_rate >= 5 else "Fair" if cap_rate >= 3 else "Poor"
+            ),
+            "break_even_months": (
+                round(purchase_price / (monthly_rent - expenses))
+                if cash_flow_monthly > 0
+                else "Negative cash flow"
+            ),
             "rule_of_1_percent": f"{'✅ Meets' if monthly_rent >= purchase_price * 0.01 else '❌ Does not meet'} 1% rule (rent/price)",
         }
 
@@ -93,7 +109,9 @@ class RealEstateBot(BaseBot):
             "best_investment_strategy": "Buy-and-hold rental" if True else "Flip",
         }
 
-    def calculate_rental_income(self, monthly_rent: float, vacancy_rate: float, expenses: float) -> dict:
+    def calculate_rental_income(
+        self, monthly_rent: float, vacancy_rate: float, expenses: float
+    ) -> dict:
         """Calculate net rental income after vacancy and expenses."""
         effective_rent = monthly_rent * (1 - vacancy_rate / 100)
         net_monthly = effective_rent - expenses
@@ -106,7 +124,9 @@ class RealEstateBot(BaseBot):
             "monthly_expenses": expenses,
             "net_operating_income_monthly": round(net_monthly, 2),
             "net_operating_income_annual": round(net_annual, 2),
-            "expense_ratio_percent": round(expenses / monthly_rent * 100, 1) if monthly_rent > 0 else 0,
+            "expense_ratio_percent": (
+                round(expenses / monthly_rent * 100, 1) if monthly_rent > 0 else 0
+            ),
         }
 
     def compare_properties(self, properties: list) -> list:
@@ -117,13 +137,15 @@ class RealEstateBot(BaseBot):
             rent = prop.get("monthly_rent", 0)
             expenses = prop.get("monthly_expenses", 0)
             analysis = self.analyze_investment(price, rent, expenses)
-            scored.append({
-                "address": prop.get("address", "Unknown"),
-                "price": price,
-                "cap_rate": analysis["cap_rate_percent"],
-                "monthly_cash_flow": analysis["monthly_cash_flow"],
-                "rating": analysis["investment_rating"],
-            })
+            scored.append(
+                {
+                    "address": prop.get("address", "Unknown"),
+                    "price": price,
+                    "cap_rate": analysis["cap_rate_percent"],
+                    "monthly_cash_flow": analysis["monthly_cash_flow"],
+                    "rating": analysis["investment_rating"],
+                }
+            )
         scored.sort(key=lambda x: x["cap_rate"], reverse=True)
         for i, p in enumerate(scored):
             p["rank"] = i + 1
@@ -150,7 +172,10 @@ class RealEstateBot(BaseBot):
                 "Hospital: 2.3 miles",
                 "Major employer: Amazon warehouse (1.8 miles)",
             ],
-            "risk_factors": ["Flood zone check recommended", "Review HOA rules if applicable"],
+            "risk_factors": [
+                "Flood zone check recommended",
+                "Review HOA rules if applicable",
+            ],
             "data_sources": ["Walk Score", "GreatSchools", "FBI Crime Data (mock)"],
         }
 
@@ -169,18 +194,41 @@ class RealEstateBot(BaseBot):
         final_score = max(1, min(10, final_score))
         return {
             "deal_score": final_score,
-            "rating": "🔥 Hot Deal" if final_score >= 8 else "✅ Good" if final_score >= 6 else "⚠️ Average" if final_score >= 4 else "❌ Pass",
+            "rating": (
+                "🔥 Hot Deal"
+                if final_score >= 8
+                else (
+                    "✅ Good"
+                    if final_score >= 6
+                    else "⚠️ Average" if final_score >= 4 else "❌ Pass"
+                )
+            ),
             "cap_rate": analysis["cap_rate_percent"],
             "monthly_cash_flow": analysis["monthly_cash_flow"],
-            "recommendation": "Buy" if final_score >= 7 else "Negotiate" if final_score >= 5 else "Pass",
+            "recommendation": (
+                "Buy"
+                if final_score >= 7
+                else "Negotiate" if final_score >= 5 else "Pass"
+            ),
         }
 
-    def flip_vs_rent(self, purchase_price: float, renovation_cost: float,
-                     arv: float, monthly_rent: float) -> dict:
+    def flip_vs_rent(
+        self,
+        purchase_price: float,
+        renovation_cost: float,
+        arv: float,
+        monthly_rent: float,
+    ) -> dict:
         """Analyze whether to flip or rent a property."""
         flip_profit = arv - purchase_price - renovation_cost - (arv * 0.08)
-        flip_roi = (flip_profit / (purchase_price + renovation_cost) * 100) if (purchase_price + renovation_cost) > 0 else 0
-        rental_analysis = self.analyze_investment(purchase_price, monthly_rent, monthly_rent * 0.45)
+        flip_roi = (
+            (flip_profit / (purchase_price + renovation_cost) * 100)
+            if (purchase_price + renovation_cost) > 0
+            else 0
+        )
+        rental_analysis = self.analyze_investment(
+            purchase_price, monthly_rent, monthly_rent * 0.45
+        )
         return {
             "property_info": {
                 "purchase_price": purchase_price,
@@ -200,6 +248,8 @@ class RealEstateBot(BaseBot):
                 "timeline": "Long-term hold",
                 "risk": "Low-Medium",
             },
-            "recommendation": "Flip" if flip_roi > 20 and flip_profit > 30000 else "Rent",
+            "recommendation": (
+                "Flip" if flip_roi > 20 and flip_profit > 30000 else "Rent"
+            ),
             "reasoning": f"Flip ROI of {flip_roi:.1f}% {'exceeds' if flip_roi > 20 else 'does not exceed'} 20% threshold",
         }

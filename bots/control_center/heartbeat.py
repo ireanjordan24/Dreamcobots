@@ -8,12 +8,14 @@ Tracks whether bots are "live" or "offline" based on periodic pings.
 
 from __future__ import annotations
 
-import sys
 import os
-from datetime import datetime, timezone, timedelta
+import sys
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 # A bot is considered offline if it has not pinged within this many seconds.
@@ -25,7 +27,7 @@ class HeartbeatMonitor:
 
     def __init__(self, timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS) -> None:
         self._timeout = timeout_seconds
-        self._pings: dict[str, dict] = {}   # bot_name -> last ping metadata
+        self._pings: dict[str, dict] = {}  # bot_name -> last ping metadata
 
     # ------------------------------------------------------------------
     # Ping

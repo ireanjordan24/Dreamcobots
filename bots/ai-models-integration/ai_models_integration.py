@@ -19,25 +19,21 @@ Usage
     client.show_upgrade_path()
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
 
-from tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-)
+sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
 from models.registry import (
     MODEL_REGISTRY,
     ModelInfo,
     get_model_info,
-    list_models_for_tier,
     list_models_by_category,
+    list_models_for_tier,
 )
+from tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers
+
 from framework import GlobalAISourcesFlow
 
 

@@ -54,6 +54,7 @@ class MatchStatus(Enum):
 # Profile & Match data models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Profile:
     """Represents a participant in the matchmaking system."""
@@ -118,6 +119,7 @@ class Match:
 # Matchmaking Engine
 # ---------------------------------------------------------------------------
 
+
 class MatchmakingEngine:
     """
     Core engine that scores and surfaces compatible partnerships.
@@ -181,21 +183,19 @@ class MatchmakingEngine:
         if not requester:
             return []
 
-        candidates = [
-            p for p in self._profiles.values()
-            if p.profile_id != profile_id
-        ]
+        candidates = [p for p in self._profiles.values() if p.profile_id != profile_id]
         if collaboration_type:
             candidates = [
-                c for c in candidates
-                if collaboration_type in c.collaboration_types
+                c for c in candidates if collaboration_type in c.collaboration_types
             ]
 
         scored = []
         for candidate in candidates:
             score = self._compute_score(requester, candidate)
             if score >= min_score:
-                scored.append({"profile": candidate.to_dict(), "score": round(score, 3)})
+                scored.append(
+                    {"profile": candidate.to_dict(), "score": round(score, 3)}
+                )
 
         scored.sort(key=lambda x: x["score"], reverse=True)
         return scored[:limit]
@@ -214,7 +214,9 @@ class MatchmakingEngine:
         req_collab = set(requester.collaboration_types)
         cand_collab = set(candidate.collaboration_types)
         if req_collab and cand_collab:
-            collab_score = len(req_collab & cand_collab) / max(len(req_collab), len(cand_collab))
+            collab_score = len(req_collab & cand_collab) / max(
+                len(req_collab), len(cand_collab)
+            )
         else:
             collab_score = 0.0
 
@@ -245,9 +247,7 @@ class MatchmakingEngine:
         requester = self._profiles.get(requester_id)
         partner = self._profiles.get(partner_id)
         score = (
-            self._compute_score(requester, partner)
-            if requester and partner
-            else 0.0
+            self._compute_score(requester, partner) if requester and partner else 0.0
         )
         match = Match(
             match_id=match_id,
@@ -285,7 +285,8 @@ class MatchmakingEngine:
         matches = list(self._matches.values())
         if profile_id:
             matches = [
-                m for m in matches
+                m
+                for m in matches
                 if m.requester_id == profile_id or m.partner_id == profile_id
             ]
         return matches
@@ -388,7 +389,12 @@ class MatchmakingEngine:
                 profile_id="SEED-ROB-001",
                 name="Apex Robotics Manufacturing",
                 profile_type=ProfileType.ROBOTICS_MANUFACTURER,
-                expertise=["servo systems", "CNC fabrication", "embedded systems", "robotics ai"],
+                expertise=[
+                    "servo systems",
+                    "CNC fabrication",
+                    "embedded systems",
+                    "robotics ai",
+                ],
                 collaboration_types=[
                     CollaborationType.CONTRACT_MANUFACTURING,
                     CollaborationType.CO_DEVELOPMENT,
@@ -420,7 +426,12 @@ class MatchmakingEngine:
                 profile_id="SEED-CIRC-001",
                 name="Precision Circuit Designers",
                 profile_type=ProfileType.CIRCUIT_DESIGNER,
-                expertise=["analog circuits", "rf engineering", "mixed-signal design", "pcb layout"],
+                expertise=[
+                    "analog circuits",
+                    "rf engineering",
+                    "mixed-signal design",
+                    "pcb layout",
+                ],
                 collaboration_types=[
                     CollaborationType.CO_DEVELOPMENT,
                     CollaborationType.LICENSING,
@@ -435,7 +446,13 @@ class MatchmakingEngine:
                 profile_id="SEED-IOT-001",
                 name="SmartEdge IoT",
                 profile_type=ProfileType.IOT_SPECIALIST,
-                expertise=["iot architecture", "mqtt", "edge computing", "machine learning", "firmware"],
+                expertise=[
+                    "iot architecture",
+                    "mqtt",
+                    "edge computing",
+                    "machine learning",
+                    "firmware",
+                ],
                 collaboration_types=[
                     CollaborationType.IOT_COLLABORATION,
                     CollaborationType.CO_DEVELOPMENT,

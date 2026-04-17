@@ -21,12 +21,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from saas.stripe_billing import (
-    StripeBillingService,
-    STRIPE_PRICE_IDS,
-    TIER_PRICES_USD,
-)
-
+from saas.stripe_billing import STRIPE_PRICE_IDS, TIER_PRICES_USD, StripeBillingService
 
 # ===========================================================================
 # Fixtures
@@ -135,7 +130,9 @@ class TestSubscriptionCreation:
 
     def test_create_enterprise_subscription(self, billing):
         cust = billing.create_customer("usr_003", "c@d.com")
-        result = billing.create_subscription(cust["customer_id"], "enterprise", "usr_003")
+        result = billing.create_subscription(
+            cust["customer_id"], "enterprise", "usr_003"
+        )
         assert result["success"] is True
         assert result["tier"] == "enterprise"
         assert result["amount_usd"] == TIER_PRICES_USD["enterprise"]
@@ -156,7 +153,9 @@ class TestSubscriptionCreation:
     def test_multiple_subscriptions_tracked(self, billing):
         for i in range(3):
             cust = billing.create_customer(f"usr_multi_{i:03d}", f"user{i}@test.com")
-            billing.create_subscription(cust["customer_id"], "pro", f"usr_multi_{i:03d}")
+            billing.create_subscription(
+                cust["customer_id"], "pro", f"usr_multi_{i:03d}"
+            )
         summary = billing.revenue_summary()
         assert summary["total_subscriptions"] >= 3
 
@@ -210,7 +209,9 @@ class TestSubscriptionUpgrade:
     def test_upgrade_pro_to_enterprise(self, billing):
         cust = billing.create_customer("usr_011", "k@l.com")
         sub = billing.create_subscription(cust["customer_id"], "pro", "usr_011")
-        result = billing.upgrade_subscription(sub["subscription_id"], "enterprise", "usr_011")
+        result = billing.upgrade_subscription(
+            sub["subscription_id"], "enterprise", "usr_011"
+        )
         assert result["success"] is True
         assert result["new_tier"] == "enterprise"
 
@@ -223,7 +224,9 @@ class TestSubscriptionUpgrade:
     def test_upgrade_returns_subscription_id(self, billing):
         cust = billing.create_customer("usr_013", "m@n.com")
         sub = billing.create_subscription(cust["customer_id"], "pro", "usr_013")
-        result = billing.upgrade_subscription(sub["subscription_id"], "enterprise", "usr_013")
+        result = billing.upgrade_subscription(
+            sub["subscription_id"], "enterprise", "usr_013"
+        )
         assert result["subscription_id"] == sub["subscription_id"]
 
 
@@ -317,7 +320,9 @@ class TestPaymentFlows:
         sub = billing.create_subscription(cust["customer_id"], "free", "usr_e2e_001")
         assert sub["success"] is True
 
-        upgrade = billing.upgrade_subscription(sub["subscription_id"], "pro", "usr_e2e_001")
+        upgrade = billing.upgrade_subscription(
+            sub["subscription_id"], "pro", "usr_e2e_001"
+        )
         assert upgrade["success"] is True
         assert upgrade["new_tier"] == "pro"
 
@@ -328,7 +333,9 @@ class TestPaymentFlows:
     def test_enterprise_subscription_flow(self, billing):
         """Create customer → enterprise subscription → check revenue."""
         cust = billing.create_customer("usr_e2e_002", "enterprise@example.com")
-        sub = billing.create_subscription(cust["customer_id"], "enterprise", "usr_e2e_002")
+        sub = billing.create_subscription(
+            cust["customer_id"], "enterprise", "usr_e2e_002"
+        )
         assert sub["success"] is True
 
         summary = billing.revenue_summary()
@@ -371,5 +378,7 @@ class TestPaymentFlows:
         up1 = billing.upgrade_subscription(sub["subscription_id"], "pro", "usr_e2e_004")
         assert up1["new_tier"] == "pro"
 
-        up2 = billing.upgrade_subscription(sub["subscription_id"], "enterprise", "usr_e2e_004")
+        up2 = billing.upgrade_subscription(
+            sub["subscription_id"], "enterprise", "usr_e2e_004"
+        )
         assert up2["new_tier"] == "enterprise"

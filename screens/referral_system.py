@@ -21,6 +21,7 @@ from typing import Optional
 @dataclass
 class ReferralProgram:
     """A referral/affiliate program a user is enrolled in."""
+
     program_id: str
     program_name: str
     payout_per_referral_usd: float
@@ -33,9 +34,10 @@ class ReferralProgram:
 @dataclass
 class TeamNode:
     """A node in the referral team tree."""
+
     user_id: str
     name: str
-    level: int = 1          # 1 = direct, 2 = 2nd tier, etc.
+    level: int = 1  # 1 = direct, 2 = 2nd tier, etc.
     contribution_usd: float = 0.0
     own_referrals: int = 0
     earned_from_this_usd: float = 0.0
@@ -218,31 +220,76 @@ class ReferralSystemScreen:
             user_name="Alice Johnson",
             invite_code="ALICE2025",
         )
-        screen.add_program(ReferralProgram(
-            "wisely", "Wisely Pay Card", 25.0, 8, 200.0, "active",
-            "https://wisely.com/ref/ALICE2025",
-        ))
-        screen.add_program(ReferralProgram(
-            "cashapp", "Cash App", 15.0, 12, 180.0, "active",
-            "https://cash.app/ref/ALICE2025",
-        ))
-        screen.add_program(ReferralProgram(
-            "robinhood", "Robinhood", 20.0, 5, 100.0, "active",
-            "https://join.robinhood.com/alice2025",
-        ))
-        screen.add_program(ReferralProgram(
-            "amazon", "Amazon Affiliate", 50.0, 22, 1_100.0, "active",
-            "https://amzn.to/ALICE2025",
-        ))
+        screen.add_program(
+            ReferralProgram(
+                "wisely",
+                "Wisely Pay Card",
+                25.0,
+                8,
+                200.0,
+                "active",
+                "https://wisely.com/ref/ALICE2025",
+            )
+        )
+        screen.add_program(
+            ReferralProgram(
+                "cashapp",
+                "Cash App",
+                15.0,
+                12,
+                180.0,
+                "active",
+                "https://cash.app/ref/ALICE2025",
+            )
+        )
+        screen.add_program(
+            ReferralProgram(
+                "robinhood",
+                "Robinhood",
+                20.0,
+                5,
+                100.0,
+                "active",
+                "https://join.robinhood.com/alice2025",
+            )
+        )
+        screen.add_program(
+            ReferralProgram(
+                "amazon",
+                "Amazon Affiliate",
+                50.0,
+                22,
+                1_100.0,
+                "active",
+                "https://amzn.to/ALICE2025",
+            )
+        )
         screen.add_team_member(TeamNode("bob", "Bob Williams", 1, 2_500.0, 3, 37.50))
         screen.add_team_member(TeamNode("carol", "Carol Davis", 1, 2_000.0, 2, 30.00))
         screen.add_team_member(TeamNode("dave", "Dave Miller", 1, 1_000.0, 0, 15.00))
         screen.add_team_member(TeamNode("eve", "Eve Thompson", 2, 800.0, 1, 0.0))
-        screen.set_leaderboard([
-            {"rank": 1, "name": "Alice Johnson", "referrals": 47, "earned_usd": 1_580.0},
-            {"rank": 2, "name": "Bob Williams", "referrals": 31, "earned_usd": 930.0},
-            {"rank": 3, "name": "Carol Davis", "referrals": 28, "earned_usd": 840.0},
-            {"rank": 4, "name": "Frank Lee", "referrals": 19, "earned_usd": 570.0},
-            {"rank": 5, "name": "Grace Kim", "referrals": 14, "earned_usd": 420.0},
-        ])
+        screen.set_leaderboard(
+            [
+                {
+                    "rank": 1,
+                    "name": "Alice Johnson",
+                    "referrals": 47,
+                    "earned_usd": 1_580.0,
+                },
+                {
+                    "rank": 2,
+                    "name": "Bob Williams",
+                    "referrals": 31,
+                    "earned_usd": 930.0,
+                },
+                {
+                    "rank": 3,
+                    "name": "Carol Davis",
+                    "referrals": 28,
+                    "earned_usd": 840.0,
+                },
+                {"rank": 4, "name": "Frank Lee", "referrals": 19, "earned_usd": 570.0},
+                {"rank": 5, "name": "Grace Kim", "referrals": 14, "earned_usd": 420.0},
+            ]
+        )
         return screen

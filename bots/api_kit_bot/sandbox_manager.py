@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -144,9 +144,7 @@ class SandboxManager:
         if record is None:
             return {"error": f"Sandbox '{sandbox_id}' not found."}
         total = record["requests_count"]
-        avg_rt = (
-            record["total_response_time_ms"] / total if total > 0 else 0
-        )
+        avg_rt = record["total_response_time_ms"] / total if total > 0 else 0
         success_rate = record["success_count"] / total if total > 0 else 0.0
         error_rate = record["error_count"] / total if total > 0 else 0.0
         top_endpoints = sorted(

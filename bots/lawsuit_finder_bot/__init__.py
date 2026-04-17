@@ -2,10 +2,10 @@
 
 from .lawsuit_finder_bot import (
     LawsuitFinderBot,
-    LawsuitFinderTierError,
     LawsuitFinderRequestLimitError,
+    LawsuitFinderTierError,
 )
-from .tiers import get_lf_tier_info, LF_EXTRA_FEATURES, LF_TOOLS
+from .tiers import LF_EXTRA_FEATURES, LF_TOOLS, get_lf_tier_info
 
 __all__ = [
     "LawsuitFinderBot",

@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -198,9 +198,7 @@ class DragDropBuilder:
         has_action = ComponentType.ACTION.value in types_present
         has_output = ComponentType.OUTPUT.value in types_present
         if not has_action and not has_output:
-            issues.append(
-                "Bot should have at least one ACTION or OUTPUT component."
-            )
+            issues.append("Bot should have at least one ACTION or OUTPUT component.")
 
         return {"valid": len(issues) == 0, "issues": issues}
 
@@ -235,7 +233,5 @@ class DragDropBuilder:
 
     def _get_project(self, project_id: str) -> dict:
         if project_id not in self._projects:
-            raise DragDropBuilderError(
-                f"Project '{project_id}' not found."
-            )
+            raise DragDropBuilderError(f"Project '{project_id}' not found.")
         return self._projects[project_id]

@@ -15,10 +15,10 @@ Adheres to the DreamCo bots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
-import uuid
 import random
+import sys
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -26,38 +26,37 @@ from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from bots.wealth_system_bot.tiers import (
+    FEATURE_AML_COMPLIANCE,
+    FEATURE_ANALYTICS,
+    FEATURE_ASSET_ALLOCATION,
+    FEATURE_ASSET_BOTS,
+    FEATURE_DIVIDEND_ENGINE,
+    FEATURE_DREAMCOIN,
+    FEATURE_GLOBAL_REGISTRY,
+    FEATURE_GOVERNANCE_VOTING,
+    FEATURE_INCOME_BOTS,
+    FEATURE_KYC_COMPLIANCE,
+    FEATURE_MARKETPLACE,
+    FEATURE_MULTI_CURRENCY,
+    FEATURE_MULTI_LANGUAGE,
+    FEATURE_REFERRAL_SYSTEM,
+    FEATURE_STRIPE_BILLING,
+    FEATURE_TRADING_BOTS,
+    FEATURE_TREASURY_MANAGEMENT,
+    FEATURE_WEALTH_HUBS,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_WEALTH_HUBS,
-    FEATURE_TREASURY_MANAGEMENT,
-    FEATURE_GOVERNANCE_VOTING,
-    FEATURE_DIVIDEND_ENGINE,
-    FEATURE_ASSET_ALLOCATION,
-    FEATURE_DREAMCOIN,
-    FEATURE_KYC_COMPLIANCE,
-    FEATURE_AML_COMPLIANCE,
-    FEATURE_GLOBAL_REGISTRY,
-    FEATURE_MULTI_LANGUAGE,
-    FEATURE_MULTI_CURRENCY,
-    FEATURE_INCOME_BOTS,
-    FEATURE_ASSET_BOTS,
-    FEATURE_TRADING_BOTS,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_STRIPE_BILLING,
-    FEATURE_REFERRAL_SYSTEM,
-    FEATURE_MARKETPLACE,
 )
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class WealthSystemBotError(Exception):
     """Base exception for Wealth System Bot errors."""
@@ -75,9 +74,10 @@ class WealthSystemBotNotFoundError(WealthSystemBotError):
 # Enums
 # ---------------------------------------------------------------------------
 
+
 class AssetTier(Enum):
-    STABILITY = "stability"      # 40 % target
-    GROWTH = "growth"            # 40 % target
+    STABILITY = "stability"  # 40 % target
+    GROWTH = "growth"  # 40 % target
     HIGH_GROWTH = "high_growth"  # 20 % target
 
 
@@ -107,14 +107,14 @@ class HubStatus(Enum):
 
 
 class Language(Enum):
-    EN = "en"   # English
-    ES = "es"   # Spanish
-    FR = "fr"   # French
-    PT = "pt"   # Portuguese
-    ZH = "zh"   # Chinese
-    AR = "ar"   # Arabic
-    HI = "hi"   # Hindi
-    SW = "sw"   # Swahili
+    EN = "en"  # English
+    ES = "es"  # Spanish
+    FR = "fr"  # French
+    PT = "pt"  # Portuguese
+    ZH = "zh"  # Chinese
+    AR = "ar"  # Arabic
+    HI = "hi"  # Hindi
+    SW = "sw"  # Swahili
 
 
 class Region(Enum):
@@ -130,6 +130,7 @@ class Region(Enum):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RegionConfig:
@@ -341,6 +342,7 @@ _LANGUAGE_GREETINGS: dict[Language, str] = {
 # Main bot class
 # ---------------------------------------------------------------------------
 
+
 class WealthSystemBot:
     """
     DreamCo Wealth System Bot.
@@ -384,7 +386,9 @@ class WealthSystemBot:
         hub_members = [m for m in self._members.values() if m.hub_id == hub_id]
         total = sum(m.contribution_total for m in hub_members)
         for m in hub_members:
-            m.ownership_pct = (m.contribution_total / total * 100.0) if total > 0 else 0.0
+            m.ownership_pct = (
+                (m.contribution_total / total * 100.0) if total > 0 else 0.0
+            )
             self._hubs[hub_id].ownership_ledger[m.member_id] = m.ownership_pct
 
     # ------------------------------------------------------------------
@@ -540,7 +544,9 @@ class WealthSystemBot:
     # KYC / AML Compliance
     # ------------------------------------------------------------------
 
-    def submit_kyc(self, user_id: str, hub_id: str, documents: list) -> ComplianceRecord:
+    def submit_kyc(
+        self, user_id: str, hub_id: str, documents: list
+    ) -> ComplianceRecord:
         """Submit KYC documents for a user. Requires KYC feature."""
         self._require_feature(FEATURE_KYC_COMPLIANCE)
         self.get_hub(hub_id)
@@ -560,7 +566,9 @@ class WealthSystemBot:
         """Approve a KYC compliance record."""
         record = self._compliance_records.get(record_id)
         if record is None:
-            raise WealthSystemBotNotFoundError(f"Compliance record '{record_id}' not found.")
+            raise WealthSystemBotNotFoundError(
+                f"Compliance record '{record_id}' not found."
+            )
         record.status = ComplianceStatus.APPROVED
         return record
 
@@ -568,7 +576,9 @@ class WealthSystemBot:
         """Reject a KYC compliance record with a reason."""
         record = self._compliance_records.get(record_id)
         if record is None:
-            raise WealthSystemBotNotFoundError(f"Compliance record '{record_id}' not found.")
+            raise WealthSystemBotNotFoundError(
+                f"Compliance record '{record_id}' not found."
+            )
         record.status = ComplianceStatus.REJECTED
         record.notes = reason
         return record
@@ -644,7 +654,9 @@ class WealthSystemBot:
         proposal = self._proposals.get(proposal_id)
         if proposal is None:
             raise WealthSystemBotNotFoundError(f"Proposal '{proposal_id}' not found.")
-        proposal.status = "approved" if proposal.votes_for > proposal.votes_against else "rejected"
+        proposal.status = (
+            "approved" if proposal.votes_for > proposal.votes_against else "rejected"
+        )
         return proposal
 
     def list_proposals(self, hub_id: str) -> list:
@@ -968,6 +980,7 @@ class WealthSystemBot:
 # ---------------------------------------------------------------------------
 # Module-level run() helper
 # ---------------------------------------------------------------------------
+
 
 def run(tier: Tier = Tier.FREE) -> None:  # pragma: no cover
     """Quick demo of the Wealth System Bot."""

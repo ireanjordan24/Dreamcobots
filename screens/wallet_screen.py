@@ -32,6 +32,7 @@ class TransactionType(Enum):
 @dataclass
 class Transaction:
     """A single wallet transaction record."""
+
     tx_id: str
     tx_type: TransactionType
     amount_usd: float = 0.0
@@ -97,19 +98,22 @@ class WalletScreen:
 
     def total_deposited(self) -> float:
         return sum(
-            t.amount_usd for t in self._transactions
+            t.amount_usd
+            for t in self._transactions
             if t.tx_type == TransactionType.DEPOSIT
         )
 
     def total_withdrawn(self) -> float:
         return sum(
-            t.amount_usd for t in self._transactions
+            t.amount_usd
+            for t in self._transactions
             if t.tx_type == TransactionType.WITHDRAWAL
         )
 
     def total_dividends(self) -> float:
         return sum(
-            t.amount_usd for t in self._transactions
+            t.amount_usd
+            for t in self._transactions
             if t.tx_type == TransactionType.DIVIDEND
         )
 
@@ -144,7 +148,9 @@ class WalletScreen:
         if not self._transactions:
             lines.append("  No transactions yet.")
         else:
-            for tx in sorted(self._transactions, key=lambda t: t.timestamp, reverse=True)[:20]:
+            for tx in sorted(
+                self._transactions, key=lambda t: t.timestamp, reverse=True
+            )[:20]:
                 lines.append(
                     f"  {tx.timestamp_str():<18} {tx.tx_type.value:<20} "
                     f"{tx.amount_str():>16}  {(tx.hub_name or tx.description)[:25]:<25}"
@@ -173,7 +179,9 @@ class WalletScreen:
                     "hub_name": t.hub_name,
                     "timestamp": t.timestamp_str(),
                 }
-                for t in sorted(self._transactions, key=lambda x: x.timestamp, reverse=True)
+                for t in sorted(
+                    self._transactions, key=lambda x: x.timestamp, reverse=True
+                )
             ],
         }
 
@@ -181,6 +189,7 @@ class WalletScreen:
     def demo(cls) -> "WalletScreen":
         """Return a pre-populated demo instance."""
         from datetime import timedelta
+
         screen = cls(
             user_id="alice",
             user_name="Alice Johnson",
@@ -189,29 +198,49 @@ class WalletScreen:
             dreamcoin_staked=200.0,
         )
         base = datetime(2025, 3, 15, 10, 0, tzinfo=timezone.utc)
-        screen.add_transaction(Transaction(
-            "tx-001", TransactionType.DEPOSIT,
-            amount_usd=1_000.0, hub_name="Family Wealth Circle",
-            timestamp=base,
-        ))
-        screen.add_transaction(Transaction(
-            "tx-002", TransactionType.DIVIDEND,
-            amount_usd=320.50, hub_name="Family Wealth Circle",
-            timestamp=base + timedelta(days=7),
-        ))
-        screen.add_transaction(Transaction(
-            "tx-003", TransactionType.DEPOSIT,
-            amount_usd=500.0, hub_name="Tech Entrepreneurs Pool",
-            timestamp=base + timedelta(days=10),
-        ))
-        screen.add_transaction(Transaction(
-            "tx-004", TransactionType.DREAMCOIN_EARNED,
-            dreamcoin_amount=150.0, description="Referral Bot reward",
-            timestamp=base + timedelta(days=12),
-        ))
-        screen.add_transaction(Transaction(
-            "tx-005", TransactionType.WITHDRAWAL,
-            amount_usd=200.0, description="Personal withdrawal",
-            timestamp=base + timedelta(days=15),
-        ))
+        screen.add_transaction(
+            Transaction(
+                "tx-001",
+                TransactionType.DEPOSIT,
+                amount_usd=1_000.0,
+                hub_name="Family Wealth Circle",
+                timestamp=base,
+            )
+        )
+        screen.add_transaction(
+            Transaction(
+                "tx-002",
+                TransactionType.DIVIDEND,
+                amount_usd=320.50,
+                hub_name="Family Wealth Circle",
+                timestamp=base + timedelta(days=7),
+            )
+        )
+        screen.add_transaction(
+            Transaction(
+                "tx-003",
+                TransactionType.DEPOSIT,
+                amount_usd=500.0,
+                hub_name="Tech Entrepreneurs Pool",
+                timestamp=base + timedelta(days=10),
+            )
+        )
+        screen.add_transaction(
+            Transaction(
+                "tx-004",
+                TransactionType.DREAMCOIN_EARNED,
+                dreamcoin_amount=150.0,
+                description="Referral Bot reward",
+                timestamp=base + timedelta(days=12),
+            )
+        )
+        screen.add_transaction(
+            Transaction(
+                "tx-005",
+                TransactionType.WITHDRAWAL,
+                amount_usd=200.0,
+                description="Personal withdrawal",
+                timestamp=base + timedelta(days=15),
+            )
+        )
         return screen

@@ -16,132 +16,132 @@ Coverage areas:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-# ── Tier imports ───────────────────────────────────────────────────────────
-from bots.global_bot_network.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-    FEATURE_UBP_MESSAGING,
-    FEATURE_REALTIME_DASHBOARD,
-    FEATURE_EARNINGS_TRACKER,
-    FEATURE_KILL_SWITCH,
-    FEATURE_RATE_LIMITING,
-    FEATURE_PERMISSIONS,
-    FEATURE_ADVANCED_VERIFICATION,
-    FEATURE_TRUSTED_BOT_STATUS,
-    FEATURE_MARKETPLACE,
-    FEATURE_MARKETPLACE_SELL,
-    FEATURE_SLACK_INTEGRATION,
-    FEATURE_DISCORD_INTEGRATION,
-    FEATURE_OPENAI_INTEGRATION,
-    FEATURE_WHITE_LABEL,
-)
-
-# ── UBP imports ────────────────────────────────────────────────────────────
-from bots.global_bot_network.universal_bot_protocol import (
-    UBPMessage,
-    MessageType,
-    Permission,
-    UBPValidationError,
-    UBPPermissionError,
-    BROADCAST_TARGET,
-    create_message,
-    create_ping,
-    create_pong,
-    create_error,
-    create_broadcast,
-    validate_message,
-)
-
-# ── Messaging Network imports ──────────────────────────────────────────────
-from bots.global_bot_network.messaging_network import (
-    MessagingNetwork,
-    RateLimitExceeded,
-    BotNotConnected,
-    RateLimiter,
-    DeliveryReceipt,
-)
-
 # ── API Gateway imports ────────────────────────────────────────────────────
 from bots.global_bot_network.api_gateway import (
     APIGateway,
-    IntegrationType,
-    Integration,
     GatewayRequest,
     GatewayResponse,
-    IntegrationNotFound,
+    Integration,
     IntegrationDisabled,
-)
-
-# ── Verification System imports ────────────────────────────────────────────
-from bots.global_bot_network.verification_system import (
-    VerificationSystem,
-    VerificationRecord,
-    VerificationLevel,
-    VerificationMethod,
-    VerificationError,
-    BotNotRegistered,
-    InsufficientVerificationMethod,
+    IntegrationNotFound,
+    IntegrationType,
 )
 
 # ── Bot Library imports ────────────────────────────────────────────────────
 from bots.global_bot_network.bot_library import (
-    BotLibrary,
-    BotEntry,
-    BotCategory,
-    BotStatus,
     BotAlreadyRegistered,
+    BotCategory,
+    BotEntry,
+    BotLibrary,
     BotNotFound,
+    BotStatus,
 )
 
-# ── Owner Dashboard imports ────────────────────────────────────────────────
-from bots.global_bot_network.owner_dashboard import (
-    OwnerDashboard,
-    BotControl,
-    ActivityLogEntry,
-    ChatMessage,
-    EarningsRecord,
-    BotNotOwned,
-    BotAlreadyKilled,
+# ── Main GBN imports ───────────────────────────────────────────────────────
+from bots.global_bot_network.global_bot_network import (
+    GBNBotLimitError,
+    GBNError,
+    GBNTierError,
+    GlobalBotNetwork,
 )
 
 # ── Marketplace imports ────────────────────────────────────────────────────
 from bots.global_bot_network.marketplace import (
     BotMarketplace,
+    InsufficientFunds,
+    ListingNotFound,
+    ListingStatus,
+    ListingType,
+    ListingUnavailable,
+    MarketplaceError,
     MarketplaceListing,
     Purchase,
-    UserWallet,
-    ListingType,
-    ListingStatus,
     SubscriptionInterval,
-    MarketplaceError,
-    ListingNotFound,
-    InsufficientFunds,
-    ListingUnavailable,
+    UserWallet,
 )
 
-# ── Main GBN imports ───────────────────────────────────────────────────────
-from bots.global_bot_network.global_bot_network import (
-    GlobalBotNetwork,
-    GBNError,
-    GBNTierError,
-    GBNBotLimitError,
+# ── Messaging Network imports ──────────────────────────────────────────────
+from bots.global_bot_network.messaging_network import (
+    BotNotConnected,
+    DeliveryReceipt,
+    MessagingNetwork,
+    RateLimiter,
+    RateLimitExceeded,
 )
 
+# ── Owner Dashboard imports ────────────────────────────────────────────────
+from bots.global_bot_network.owner_dashboard import (
+    ActivityLogEntry,
+    BotAlreadyKilled,
+    BotControl,
+    BotNotOwned,
+    ChatMessage,
+    EarningsRecord,
+    OwnerDashboard,
+)
+
+# ── Tier imports ───────────────────────────────────────────────────────────
+from bots.global_bot_network.tiers import (
+    FEATURE_ADVANCED_VERIFICATION,
+    FEATURE_DISCORD_INTEGRATION,
+    FEATURE_EARNINGS_TRACKER,
+    FEATURE_KILL_SWITCH,
+    FEATURE_MARKETPLACE,
+    FEATURE_MARKETPLACE_SELL,
+    FEATURE_OPENAI_INTEGRATION,
+    FEATURE_PERMISSIONS,
+    FEATURE_RATE_LIMITING,
+    FEATURE_REALTIME_DASHBOARD,
+    FEATURE_SLACK_INTEGRATION,
+    FEATURE_TRUSTED_BOT_STATUS,
+    FEATURE_UBP_MESSAGING,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+    list_tiers,
+)
+
+# ── UBP imports ────────────────────────────────────────────────────────────
+from bots.global_bot_network.universal_bot_protocol import (
+    BROADCAST_TARGET,
+    MessageType,
+    Permission,
+    UBPMessage,
+    UBPPermissionError,
+    UBPValidationError,
+    create_broadcast,
+    create_error,
+    create_message,
+    create_ping,
+    create_pong,
+    validate_message,
+)
+
+# ── Verification System imports ────────────────────────────────────────────
+from bots.global_bot_network.verification_system import (
+    BotNotRegistered,
+    InsufficientVerificationMethod,
+    VerificationError,
+    VerificationLevel,
+    VerificationMethod,
+    VerificationRecord,
+    VerificationSystem,
+)
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -208,6 +208,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Universal Bot Protocol (UBP)
 # ===========================================================================
+
 
 class TestUBPMessage:
     def test_create_message_defaults(self):
@@ -291,10 +292,14 @@ class TestUBPValidation:
 
     def test_validate_invalid_permission(self):
         with pytest.raises(UBPValidationError):
-            validate_message({
-                "from": "a", "to": "b", "type": "message",
-                "permissions": ["superpower"]
-            })
+            validate_message(
+                {
+                    "from": "a",
+                    "to": "b",
+                    "type": "message",
+                    "permissions": ["superpower"],
+                }
+            )
 
     def test_validate_non_dict_raises(self):
         with pytest.raises(UBPValidationError):
@@ -312,6 +317,7 @@ class TestUBPValidation:
 # ===========================================================================
 # 3. Messaging Network
 # ===========================================================================
+
 
 class TestMessagingNetwork:
     def setup_method(self):
@@ -368,7 +374,10 @@ class TestMessagingNetwork:
 
     def test_ping_auto_pong(self):
         pongs = []
-        self.net.connect("bot_a", callback=lambda m: pongs.append(m) if m.type == MessageType.PONG else None)
+        self.net.connect(
+            "bot_a",
+            callback=lambda m: pongs.append(m) if m.type == MessageType.PONG else None,
+        )
         self.net.connect("bot_b")
         ping = create_ping("bot_a", "bot_b")
         self.net.send(ping)
@@ -459,7 +468,9 @@ class TestPermissionEnforcement:
         net.connect("a")
         net.connect("b")
         msg = create_message(
-            "a", "b", "do task",
+            "a",
+            "b",
+            "do task",
             msg_type=MessageType.TASK,
             permissions=["read"],  # no execute
         )
@@ -471,7 +482,9 @@ class TestPermissionEnforcement:
         net.connect("a")
         net.connect("b")
         msg = create_message(
-            "a", "b", "do task",
+            "a",
+            "b",
+            "do task",
             msg_type=MessageType.TASK,
             permissions=["read", "execute"],
         )
@@ -482,7 +495,9 @@ class TestPermissionEnforcement:
         net = MessagingNetwork(enforce_permissions=False)
         net.connect("a")
         net.connect("b")
-        msg = create_message("a", "b", "task", msg_type=MessageType.TASK, permissions=["read"])
+        msg = create_message(
+            "a", "b", "task", msg_type=MessageType.TASK, permissions=["read"]
+        )
         receipt = net.send(msg)
         assert "b" in receipt.delivered_to
 
@@ -490,6 +505,7 @@ class TestPermissionEnforcement:
 # ===========================================================================
 # 4. API Gateway
 # ===========================================================================
+
 
 class TestAPIGateway:
     def setup_method(self):
@@ -506,12 +522,16 @@ class TestAPIGateway:
         assert "Notion" in names
 
     def test_slack_send_message(self):
-        resp = self.gw.route("Slack", "send_message", {"channel": "#general", "text": "Hi"})
+        resp = self.gw.route(
+            "Slack", "send_message", {"channel": "#general", "text": "Hi"}
+        )
         assert resp.success
         assert resp.result["ok"] is True
 
     def test_discord_send_message(self):
-        resp = self.gw.route("Discord", "send_message", {"channel_id": "123", "content": "Hello"})
+        resp = self.gw.route(
+            "Discord", "send_message", {"channel_id": "123", "content": "Hello"}
+        )
         assert resp.success
 
     def test_openai_chat_completion(self):
@@ -520,7 +540,9 @@ class TestAPIGateway:
         assert "choices" in resp.result
 
     def test_trello_create_card(self):
-        resp = self.gw.route("Trello", "create_card", {"name": "Task 1", "list_id": "list_001"})
+        resp = self.gw.route(
+            "Trello", "create_card", {"name": "Task 1", "list_id": "list_001"}
+        )
         assert resp.success
         assert resp.result["name"] == "Task 1"
 
@@ -570,6 +592,7 @@ class TestAPIGateway:
 
     def test_custom_adapter(self):
         called = []
+
         def my_adapter(action, payload):
             called.append(action)
             return {"custom": True}
@@ -591,6 +614,7 @@ class TestAPIGateway:
 # ===========================================================================
 # 5. Verification System
 # ===========================================================================
+
 
 class TestVerificationSystem:
     def setup_method(self):
@@ -628,9 +652,13 @@ class TestVerificationSystem:
     def test_verify_trusted_requires_wallet(self):
         self.vs.register_bot("bot_001", owner_id="user_1")
         self.vs.verify("bot_001", VerificationMethod.EMAIL, VerificationLevel.BASIC)
-        self.vs.verify("bot_001", VerificationMethod.OWNER_CONFIRM, VerificationLevel.VERIFIED)
+        self.vs.verify(
+            "bot_001", VerificationMethod.OWNER_CONFIRM, VerificationLevel.VERIFIED
+        )
         with pytest.raises(InsufficientVerificationMethod):
-            self.vs.verify("bot_001", VerificationMethod.EMAIL, VerificationLevel.TRUSTED)
+            self.vs.verify(
+                "bot_001", VerificationMethod.EMAIL, VerificationLevel.TRUSTED
+            )
 
     def test_admin_grant_bypasses_requirements(self):
         self.vs.register_bot("bot_001", owner_id="user_1")
@@ -644,7 +672,9 @@ class TestVerificationSystem:
 
     def test_admin_grant_shortcut(self):
         self.vs.register_bot("bot_001", owner_id="user_1")
-        rec = self.vs.admin_grant("bot_001", VerificationLevel.TRUSTED, notes="Granted by admin")
+        rec = self.vs.admin_grant(
+            "bot_001", VerificationLevel.TRUSTED, notes="Granted by admin"
+        )
         assert rec.level == VerificationLevel.TRUSTED
 
     def test_revoke_resets_to_none(self):
@@ -700,13 +730,16 @@ class TestVerificationSystem:
     def test_level_does_not_downgrade(self):
         self.vs.register_bot("bot_001", owner_id="user_1")
         self.vs.admin_grant("bot_001", VerificationLevel.TRUSTED)
-        rec = self.vs.verify("bot_001", VerificationMethod.EMAIL, VerificationLevel.BASIC, admin=True)
+        rec = self.vs.verify(
+            "bot_001", VerificationMethod.EMAIL, VerificationLevel.BASIC, admin=True
+        )
         assert rec.level == VerificationLevel.TRUSTED  # unchanged
 
 
 # ===========================================================================
 # 6. Bot Library
 # ===========================================================================
+
 
 class TestBotLibrary:
     def setup_method(self):
@@ -797,7 +830,10 @@ class TestBotLibrary:
     def test_search_by_name(self):
         self.lib.populate_dreamco_bots()
         results = self.lib.search("crypto")
-        assert any("crypto" in r["bot_id"] or "crypto" in r["display_name"].lower() for r in results)
+        assert any(
+            "crypto" in r["bot_id"] or "crypto" in r["display_name"].lower()
+            for r in results
+        )
 
     def test_search_by_capability(self):
         self.lib.populate_dreamco_bots()
@@ -828,7 +864,10 @@ class TestBotLibrary:
     def test_financial_literacy_bot_in_library(self):
         self.lib.populate_dreamco_bots()
         entry = self.lib.get_bot("financial_literacy_bot")
-        assert "credit" in entry.capabilities or "investment" in " ".join(entry.capabilities).lower()
+        assert (
+            "credit" in entry.capabilities
+            or "investment" in " ".join(entry.capabilities).lower()
+        )
 
     def test_fiverr_bot_in_library(self):
         self.lib.populate_dreamco_bots()
@@ -844,6 +883,7 @@ class TestBotLibrary:
 # ===========================================================================
 # 7. Owner Dashboard
 # ===========================================================================
+
 
 class TestOwnerDashboard:
     def setup_method(self):
@@ -921,7 +961,9 @@ class TestOwnerDashboard:
 
     def test_record_earning(self):
         self.dash.add_bot("bot_a")
-        rec = self.dash.record_earning("bot_a", 25.50, "gig", description="Freelance job")
+        rec = self.dash.record_earning(
+            "bot_a", 25.50, "gig", description="Freelance job"
+        )
         assert rec.amount_usd == 25.50
         assert rec.source == "gig"
 
@@ -964,6 +1006,7 @@ class TestOwnerDashboard:
 # ===========================================================================
 # 8. Marketplace
 # ===========================================================================
+
 
 class TestBotMarketplace:
     def setup_method(self):
@@ -1008,13 +1051,17 @@ class TestBotMarketplace:
         assert all(l["price_usd"] <= 10.0 for l in cheap)
 
     def test_search_listings(self):
-        self.mkt.create_listing("s1", "Finance Bot Pro", "finance automation", ListingType.BOT, 29.0)
+        self.mkt.create_listing(
+            "s1", "Finance Bot Pro", "finance automation", ListingType.BOT, 29.0
+        )
         results = self.mkt.list_active(query="finance")
         assert len(results) == 1
 
     def test_update_listing(self):
         listing = self.mkt.create_listing("s1", "Bot", "desc", ListingType.BOT, 10.0)
-        updated = self.mkt.update_listing(listing.listing_id, title="New Title", price_usd=15.0)
+        updated = self.mkt.update_listing(
+            listing.listing_id, title="New Title", price_usd=15.0
+        )
         assert updated.title == "New Title"
         assert updated.price_usd == 15.0
 
@@ -1032,54 +1079,70 @@ class TestBotMarketplace:
             self.mkt.deposit("buyer_1", -10.0)
 
     def test_buy_listing(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 20.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 20.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         purchase = self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         assert purchase.buyer_id == "buyer_1"
         assert purchase.amount_usd == 20.0
 
     def test_buy_deducts_buyer_balance(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 20.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 20.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         assert self.mkt.get_balance("buyer_1") == 80.0
 
     def test_buy_credits_seller_minus_commission(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 20.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 20.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         expected = 20.0 * (1 - BotMarketplace.COMMISSION_RATE)
         assert abs(self.mkt.get_seller_earnings("seller_1") - expected) < 0.001
 
     def test_buy_insufficient_funds_raises(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 50.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 50.0
+        )
         self.mkt.deposit("buyer_1", 10.0)
         with pytest.raises(InsufficientFunds):
             self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
 
     def test_buy_unavailable_listing_raises(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 10.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 10.0
+        )
         self.mkt.remove_listing(listing.listing_id)
         self.mkt.deposit("buyer_1", 100.0)
         with pytest.raises(ListingUnavailable):
             self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
 
     def test_get_purchase_history(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 10.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 10.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         history = self.mkt.get_purchase_history("buyer_1")
         assert len(history) == 1
 
     def test_get_sales_history(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 10.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 10.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         sales = self.mkt.get_sales_history("seller_1")
         assert len(sales) == 1
 
     def test_marketplace_stats(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 10.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 10.0
+        )
         self.mkt.deposit("buyer_1", 100.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         stats = self.mkt.get_stats()
@@ -1087,7 +1150,9 @@ class TestBotMarketplace:
         assert stats["total_revenue_usd"] == 10.0
 
     def test_total_sales_counter_increments(self):
-        listing = self.mkt.create_listing("seller_1", "Bot", "desc", ListingType.BOT, 10.0)
+        listing = self.mkt.create_listing(
+            "seller_1", "Bot", "desc", ListingType.BOT, 10.0
+        )
         self.mkt.deposit("buyer_1", 200.0)
         self.mkt.buy(listing.listing_id, buyer_id="buyer_1")
         self.mkt.deposit("buyer_2", 200.0)
@@ -1096,14 +1161,19 @@ class TestBotMarketplace:
 
     def test_subscription_listing(self):
         listing = self.mkt.create_listing(
-            "seller_1", "Premium Bot", "desc",
-            ListingType.SUBSCRIPTION, 9.99,
+            "seller_1",
+            "Premium Bot",
+            "desc",
+            ListingType.SUBSCRIPTION,
+            9.99,
             subscription_interval=SubscriptionInterval.MONTHLY,
         )
         assert listing.subscription_interval == SubscriptionInterval.MONTHLY
 
     def test_listing_to_dict(self):
-        listing = self.mkt.create_listing("s1", "Bot", "desc", ListingType.BOT, 10.0, tags=["ai"])
+        listing = self.mkt.create_listing(
+            "s1", "Bot", "desc", ListingType.BOT, 10.0, tags=["ai"]
+        )
         d = listing.to_dict()
         assert "listing_id" in d
         assert "ai" in d["tags"]
@@ -1112,6 +1182,7 @@ class TestBotMarketplace:
 # ===========================================================================
 # 9. GlobalBotNetwork — main class
 # ===========================================================================
+
 
 class TestGlobalBotNetwork:
     def setup_method(self):
@@ -1159,7 +1230,9 @@ class TestGlobalBotNetwork:
     def test_broadcast(self):
         received = []
         self.gbn.connect_bot("bot_a")
-        self.gbn.messaging_network.connect("bot_b", callback=lambda m: received.append(m))
+        self.gbn.messaging_network.connect(
+            "bot_b", callback=lambda m: received.append(m)
+        )
         self.gbn.connect_bot("bot_c")
         self.gbn.broadcast("bot_a", "Broadcast!")
         assert len(received) >= 1
@@ -1175,7 +1248,9 @@ class TestGlobalBotNetwork:
         assert resp.success
 
     def test_call_integration_openai(self):
-        resp = self.gbn.call_integration("OpenAI", "chat_completion", {"user_message": "Hello"})
+        resp = self.gbn.call_integration(
+            "OpenAI", "chat_completion", {"user_message": "Hello"}
+        )
         assert resp.success
 
     def test_verify_bot(self):
@@ -1276,6 +1351,7 @@ class TestGlobalBotNetwork:
 # ===========================================================================
 # 10. Chat / process interface
 # ===========================================================================
+
 
 class TestGBNChat:
     def setup_method(self):

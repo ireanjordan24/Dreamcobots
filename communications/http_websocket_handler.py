@@ -38,7 +38,14 @@ class HTTPCommunicationHandler:
                 self.end_headers()
                 payload = json.dumps({"status": "received", "body": body})
                 self.wfile.write(payload.encode())
-                log.append({"method": "POST", "path": self.path, "body": body, "time": time.time()})
+                log.append(
+                    {
+                        "method": "POST",
+                        "path": self.path,
+                        "body": body,
+                        "time": time.time(),
+                    }
+                )
 
             def log_message(self, fmt, *args):  # suppress default console output
                 pass

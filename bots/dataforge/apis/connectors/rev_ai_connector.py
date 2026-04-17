@@ -1,4 +1,5 @@
 """Rev.ai speech transcription connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -27,9 +28,18 @@ class RevAIConnector:
             API response dict with job ID or error dict.
         """
         import requests
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         try:
-            response = requests.post(f"{self.BASE_URL}/jobs", json={"media_url": media_url}, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/jobs",
+                json={"media_url": media_url},
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Rev.ai transcription job submitted.")
             return {"status": "success", "data": response.json()}
@@ -47,12 +57,14 @@ class RevAIConnector:
             API response dict with transcript or error dict.
         """
         import requests
+
         headers = {"Authorization": f"Bearer {self.api_key}"}
         try:
-            response = requests.get(f"{self.BASE_URL}/jobs/{job_id}/transcript", headers=headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/jobs/{job_id}/transcript", headers=headers, timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Rev.ai get_transcript error: %s", e)
             return {"status": "error", "message": str(e)}
-

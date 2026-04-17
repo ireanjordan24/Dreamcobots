@@ -1,4 +1,5 @@
 """Replicate API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -28,14 +29,22 @@ class ReplicateConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Authorization": f"Token {self.api_key}", "Content-Type": "application/json"}
+
+        headers = {
+            "Authorization": f"Token {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"version": model_version, "input": inputs}
         try:
-            response = requests.post(f"{self.BASE_URL}/predictions", json=payload, headers=headers, timeout=30)
+            response = requests.post(
+                f"{self.BASE_URL}/predictions",
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("Replicate prediction created for model %s.", model_version)
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("Replicate error: %s", e)
             return {"status": "error", "message": str(e)}
-

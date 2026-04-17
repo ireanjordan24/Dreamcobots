@@ -29,7 +29,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # Minimum lead value (USD/month) to qualify for performance-based pricing
 PERFORMANCE_PRICING_THRESHOLD_USD: float = 3000.0
 
@@ -37,6 +36,7 @@ PERFORMANCE_PRICING_THRESHOLD_USD: float = 3000.0
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
+
 
 class ServiceType(Enum):
     AD_CAMPAIGN = "ad_campaign"
@@ -60,6 +60,7 @@ class PricingModel(Enum):
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ServiceOffer:
@@ -100,6 +101,7 @@ class ServiceOffer:
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class OfferGeneratorError(Exception):
     """Base exception for OfferGeneratorEngine errors."""
@@ -286,6 +288,7 @@ _SERVICE_METADATA: dict[ServiceType, dict] = {
 # OfferGeneratorEngine
 # ---------------------------------------------------------------------------
 
+
 class OfferGeneratorEngine:
     """Generates tailored service offers for business leads.
 
@@ -309,7 +312,8 @@ class OfferGeneratorEngine:
         can_custom_bundle: bool = False,
     ) -> None:
         self.available_service_types: list[ServiceType] = (
-            available_service_types if available_service_types is not None
+            available_service_types
+            if available_service_types is not None
             else _FREE_SERVICE_TYPES
         )
         self.can_dynamic_pricing = can_dynamic_pricing
@@ -344,7 +348,10 @@ class OfferGeneratorEngine:
         ServiceOffer
             The generated offer.
         """
-        if service_type is not None and service_type not in self.available_service_types:
+        if (
+            service_type is not None
+            and service_type not in self.available_service_types
+        ):
             raise OfferGeneratorTierError(
                 f"Service type '{service_type.value}' requires PRO tier or above."
             )
@@ -361,7 +368,10 @@ class OfferGeneratorEngine:
             monthly = round((lo + hi) / 2, 2)
 
         pricing_model = PricingModel.MONTHLY_RETAINER
-        if self.can_performance_pricing and estimated_lead_value >= PERFORMANCE_PRICING_THRESHOLD_USD:
+        if (
+            self.can_performance_pricing
+            and estimated_lead_value >= PERFORMANCE_PRICING_THRESHOLD_USD
+        ):
             pricing_model = PricingModel.PERFORMANCE_BASED
 
         offer = ServiceOffer(
@@ -405,9 +415,7 @@ class OfferGeneratorEngine:
             One ServiceOffer per service type in the bundle.
         """
         if not self.can_custom_bundle:
-            raise OfferGeneratorTierError(
-                "Custom bundles require ENTERPRISE tier."
-            )
+            raise OfferGeneratorTierError("Custom bundles require ENTERPRISE tier.")
         offers = []
         for stype in service_types:
             offer = self.build_offer(business_name, stype, estimated_lead_value)

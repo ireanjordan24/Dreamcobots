@@ -7,8 +7,8 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -33,11 +33,13 @@ def find_deals(leads: list[dict]) -> list[dict]:
     deals = []
 
     for lead in leads:
-        deals.append({
-            "property": "Off-market deal",
-            "profit": 20000,
-            "lead": lead.get("name", "Unknown"),
-        })
+        deals.append(
+            {
+                "property": "Off-market deal",
+                "profit": 20000,
+                "lead": lead.get("name", "Unknown"),
+            }
+        )
 
     return deals
 

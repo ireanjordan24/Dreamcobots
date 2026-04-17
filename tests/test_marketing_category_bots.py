@@ -1,41 +1,45 @@
 """Tests for all 30 Marketing bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from Marketing_bots.ab_testing_bot import ABTestingBot
+from Marketing_bots.ad_campaign_bot import AdCampaignBot
+from Marketing_bots.affiliate_marketer_bot import AffiliateMarketerBot
+from Marketing_bots.analytics_reporter_bot import AnalyticsReporterBot
+from Marketing_bots.brand_story_bot import BrandStoryBot
+from Marketing_bots.chatbot_builder_bot import ChatbotBuilderBot
+from Marketing_bots.competitor_spy_bot import CompetitorSpyBot
+from Marketing_bots.conversion_optimizer_bot import ConversionOptimizerBot
+from Marketing_bots.customer_review_bot import CustomerReviewBot
+from Marketing_bots.event_promoter_bot import EventPromoterBot
 from Marketing_bots.feature_1 import SocialMediaBot
 from Marketing_bots.feature_2 import EmailMarketingBot
 from Marketing_bots.feature_3 import ContentCreationBot
-from Marketing_bots.seo_optimizer_bot import SEOOptimizerBot
-from Marketing_bots.ad_campaign_bot import AdCampaignBot
-from Marketing_bots.influencer_finder_bot import InfluencerFinderBot
+from Marketing_bots.google_ads_bot import GoogleAdsBot
 from Marketing_bots.hashtag_analyzer_bot import HashtagAnalyzerBot
-from Marketing_bots.competitor_spy_bot import CompetitorSpyBot
+from Marketing_bots.influencer_finder_bot import InfluencerFinderBot
 from Marketing_bots.landing_page_bot import LandingPageBot
 from Marketing_bots.lead_magnet_bot import LeadMagnetBot
-from Marketing_bots.sales_funnel_bot import SalesFunnelBot
-from Marketing_bots.chatbot_builder_bot import ChatbotBuilderBot
-from Marketing_bots.video_marketing_bot import VideoMarketingBot
-from Marketing_bots.podcast_promoter_bot import PodcastPromoterBot
-from Marketing_bots.affiliate_marketer_bot import AffiliateMarketerBot
-from Marketing_bots.press_release_bot import PressReleaseBot
-from Marketing_bots.brand_story_bot import BrandStoryBot
-from Marketing_bots.viral_content_bot import ViralContentBot
-from Marketing_bots.customer_review_bot import CustomerReviewBot
-from Marketing_bots.newsletter_bot import NewsletterBot
-from Marketing_bots.webinar_bot import WebinarBot
-from Marketing_bots.retargeting_bot import RetargetingBot
-from Marketing_bots.google_ads_bot import GoogleAdsBot
-from Marketing_bots.social_proof_bot import SocialProofBot
-from Marketing_bots.ab_testing_bot import ABTestingBot
-from Marketing_bots.conversion_optimizer_bot import ConversionOptimizerBot
-from Marketing_bots.event_promoter_bot import EventPromoterBot
-from Marketing_bots.referral_marketing_bot import ReferralMarketingBot
 from Marketing_bots.loyalty_program_bot import LoyaltyProgramBot
-from Marketing_bots.analytics_reporter_bot import AnalyticsReporterBot
+from Marketing_bots.newsletter_bot import NewsletterBot
+from Marketing_bots.podcast_promoter_bot import PodcastPromoterBot
+from Marketing_bots.press_release_bot import PressReleaseBot
+from Marketing_bots.referral_marketing_bot import ReferralMarketingBot
+from Marketing_bots.retargeting_bot import RetargetingBot
+from Marketing_bots.sales_funnel_bot import SalesFunnelBot
+from Marketing_bots.seo_optimizer_bot import SEOOptimizerBot
+from Marketing_bots.social_proof_bot import SocialProofBot
+from Marketing_bots.video_marketing_bot import VideoMarketingBot
+from Marketing_bots.viral_content_bot import ViralContentBot
+from Marketing_bots.webinar_bot import WebinarBot
 
 ALL_BOTS = [
     ("SocialMediaBot", SocialMediaBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

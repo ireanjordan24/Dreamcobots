@@ -8,32 +8,34 @@ See framework/global_ai_sources_flow.py for the full pipeline specification.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from typing import Optional
 
-from bots.ai_brain.tiers import Tier, TierConfig, get_tier_config, get_upgrade_path
+from bots.ai_brain.decision_engine import DecisionEngine
+from bots.ai_brain.metrics_tracker import MetricsTracker
+from bots.ai_brain.state_manager import StateManager
 from bots.ai_brain.tiers import (
+    FEATURE_AUTO_SCALE,
     FEATURE_DECISION_ENGINE,
+    FEATURE_FULL_AUTONOMY,
     FEATURE_PERSISTENT_MEMORY,
     FEATURE_REAL_METRICS,
-    FEATURE_AUTO_SCALE,
     FEATURE_RECOVERY_BOT,
-    FEATURE_FULL_AUTONOMY,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
 )
-from bots.ai_brain.decision_engine import DecisionEngine
-from bots.ai_brain.state_manager import StateManager
-from bots.ai_brain.metrics_tracker import MetricsTracker
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class AIBrainError(Exception):
     """Base exception for AI Brain errors."""
@@ -46,6 +48,7 @@ class AIBrainTierError(AIBrainError):
 # ---------------------------------------------------------------------------
 # AI Brain
 # ---------------------------------------------------------------------------
+
 
 class AIBrain:
     """

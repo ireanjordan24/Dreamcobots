@@ -6,18 +6,20 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from enum import Enum
 from typing import Optional
-from framework import GlobalAISourcesFlow
 
+from framework import GlobalAISourcesFlow
 
 # ---------------------------------------------------------------------------
 # Tier definitions
 # ---------------------------------------------------------------------------
+
 
 class Tier(Enum):
     FREE = "free"
@@ -28,7 +30,11 @@ class Tier(Enum):
 TIER_LIMITS = {
     Tier.FREE: {"results_per_search": 5, "saved_searches": 2, "alert_keywords": 3},
     Tier.PRO: {"results_per_search": 50, "saved_searches": 20, "alert_keywords": 30},
-    Tier.ENTERPRISE: {"results_per_search": None, "saved_searches": None, "alert_keywords": None},
+    Tier.ENTERPRISE: {
+        "results_per_search": None,
+        "saved_searches": None,
+        "alert_keywords": None,
+    },
 }
 
 TIER_PRICES = {
@@ -40,14 +46,28 @@ TIER_PRICES = {
 BOT_FEATURES = {
     Tier.FREE: ["basic_contract_search", "federal_grants_preview"],
     Tier.PRO: [
-        "full_contract_search", "grant_search", "state_contracts",
-        "deadline_alerts", "bid_analysis", "naics_filter", "saved_searches",
+        "full_contract_search",
+        "grant_search",
+        "state_contracts",
+        "deadline_alerts",
+        "bid_analysis",
+        "naics_filter",
+        "saved_searches",
     ],
     Tier.ENTERPRISE: [
-        "full_contract_search", "grant_search", "state_contracts",
-        "deadline_alerts", "bid_analysis", "naics_filter", "saved_searches",
-        "ai_proposal_assistant", "competitor_analysis", "subcontract_finder",
-        "compliance_checker", "performance_analytics", "api_access",
+        "full_contract_search",
+        "grant_search",
+        "state_contracts",
+        "deadline_alerts",
+        "bid_analysis",
+        "naics_filter",
+        "saved_searches",
+        "ai_proposal_assistant",
+        "competitor_analysis",
+        "subcontract_finder",
+        "compliance_checker",
+        "performance_analytics",
+        "api_access",
     ],
 }
 
@@ -458,6 +478,7 @@ MOCK_CONTRACTS = [
 # Main bot class
 # ---------------------------------------------------------------------------
 
+
 class GovernmentContractGrantBot:
     """Tier-aware bot that discovers, filters, and analyzes government
     contracts and grants from federal and state sources.
@@ -527,7 +548,11 @@ class GovernmentContractGrantBot:
         results = []
         kw = keyword.lower()
         for opp in MOCK_CONTRACTS:
-            if kw and kw not in opp["title"].lower() and kw not in opp["description"].lower():
+            if (
+                kw
+                and kw not in opp["title"].lower()
+                and kw not in opp["description"].lower()
+            ):
                 continue
             if naics and not opp["naics"].startswith(naics):
                 continue
@@ -551,7 +576,9 @@ class GovernmentContractGrantBot:
     def search_contracts(self, keyword: str = "", **kwargs) -> dict:
         """Search federal contracts only."""
         query = kwargs.pop("query", keyword)
-        results = self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
+        results = self.search_opportunities(
+            keyword=query, opportunity_type="contract", **kwargs
+        )
         return {"contracts": results, "count": len(results), "keyword": query}
 
     def search_grants(self, keyword: str = "", **kwargs) -> list[dict]:
@@ -560,11 +587,14 @@ class GovernmentContractGrantBot:
             raise GovernmentContractGrantBotTierError(
                 "Full grant search requires PRO or ENTERPRISE tier."
             )
-        return self.search_opportunities(keyword=keyword, opportunity_type="grant", **kwargs)
+        return self.search_opportunities(
+            keyword=keyword, opportunity_type="grant", **kwargs
+        )
 
     def get_upcoming_deadlines(self, days: int = 30) -> list[dict]:
         """Return opportunities with deadlines within *days* calendar days."""
         import datetime
+
         today = datetime.date.today()
         cutoff = today + datetime.timedelta(days=days)
         results = []
@@ -604,8 +634,14 @@ class GovernmentContractGrantBot:
             "analysis": {
                 "win_probability_pct": win_prob,
                 "roi_score": roi_score,
-                "competition_level": "high" if opp["value"] > 5_000_000 else "medium" if opp["value"] > 1_000_000 else "low",
-                "recommended_action": "bid" if win_prob >= 40 else "monitor" if win_prob >= 20 else "skip",
+                "competition_level": (
+                    "high"
+                    if opp["value"] > 5_000_000
+                    else "medium" if opp["value"] > 1_000_000 else "low"
+                ),
+                "recommended_action": (
+                    "bid" if win_prob >= 40 else "monitor" if win_prob >= 20 else "skip"
+                ),
                 "key_requirements": self._extract_requirements(opp),
                 "similar_past_wins": [],
             },
@@ -653,7 +689,11 @@ class GovernmentContractGrantBot:
             reqs.append("Cybersecurity clearance / CMMC compliance")
         if "cloud" in desc or "aws" in desc or "azure" in desc:
             reqs.append("Cloud platform expertise (AWS/Azure/GCP)")
-        if "software" in desc or "development" in desc or "it" in opp.get("category", ""):
+        if (
+            "software" in desc
+            or "development" in desc
+            or "it" in opp.get("category", "")
+        ):
             reqs.append("Software development / IT capabilities")
         if "consulting" in desc or "management" in desc:
             reqs.append("Management consulting credentials")
@@ -727,7 +767,10 @@ class GovernmentContractGrantBot:
     def run(self) -> dict:
         """Execute the full GLOBAL AI SOURCES FLOW pipeline for this bot."""
         result = self.flow.run_pipeline(
-            raw_data={"domain": "government_contracts_and_grants", "records": len(MOCK_CONTRACTS)},
+            raw_data={
+                "domain": "government_contracts_and_grants",
+                "records": len(MOCK_CONTRACTS),
+            },
             learning_method="supervised",
         )
         return result
@@ -739,7 +782,9 @@ class GovernmentContractGrantBot:
     def process_contracts(self) -> None:
         """Process available federal contracts."""
         contracts = self.search_contracts()
-        count = contracts.get("count", 0) if isinstance(contracts, dict) else len(contracts)
+        count = (
+            contracts.get("count", 0) if isinstance(contracts, dict) else len(contracts)
+        )
         print(f"Processing {count} contracts...")
 
     def process_grants(self) -> None:
@@ -760,7 +805,7 @@ class GovernmentContractGrantBot:
             "eligible": True,
             "organization": organization,
             "recommended_grants": recommended,
-            "tier": self.tier.value if hasattr(self.tier, 'value') else str(self.tier),
+            "tier": self.tier.value if hasattr(self.tier, "value") else str(self.tier),
         }
 
 
@@ -774,10 +819,12 @@ def run() -> dict:
 
 
 # If this module is run directly, start the bot
-if __name__ == '__main__':
+if __name__ == "__main__":
     bot = GovernmentContractGrantBot(tier=Tier.PRO)
     summary = bot.get_summary()
-    print(f"Government Contract & Grant Bot — {summary['total_opportunities']} opportunities")
+    print(
+        f"Government Contract & Grant Bot — {summary['total_opportunities']} opportunities"
+    )
     print(f"  Contracts: {summary['contracts']}  |  Grants: {summary['grants']}")
     print(f"  Total value: ${summary['total_value_usd']:,.0f}")
     tech = bot.search_contracts(keyword="technology")

@@ -23,12 +23,13 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
-from framework import GlobalAISourcesFlow  # noqa: F401
 
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ==========================================================================
 # Divisions
 # ==========================================================================
+
 
 class Divisions:
     """Organise empire bots and operations into named divisions."""
@@ -36,7 +37,9 @@ class Divisions:
     def __init__(self) -> None:
         self._divisions: dict[str, dict] = {}
 
-    def create_division(self, name: str, purpose: str, bot_names: Optional[list] = None) -> dict:
+    def create_division(
+        self, name: str, purpose: str, bot_names: Optional[list] = None
+    ) -> dict:
         self._divisions[name] = {
             "name": name,
             "purpose": purpose,
@@ -67,6 +70,7 @@ class Divisions:
 # AI Models Hub
 # ==========================================================================
 
+
 class ModelStatus(Enum):
     AVAILABLE = "available"
     DEPRECATED = "deprecated"
@@ -82,7 +86,9 @@ class AIModel:
     version: str
     status: ModelStatus = ModelStatus.AVAILABLE
     active: bool = False
-    registered_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    registered_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class AIModelsHub:
@@ -99,7 +105,9 @@ class AIModelsHub:
         task: str,
         version: str = "1.0",
     ) -> dict:
-        model = AIModel(model_id=model_id, name=name, provider=provider, task=task, version=version)
+        model = AIModel(
+            model_id=model_id, name=name, provider=provider, task=task, version=version
+        )
         self._models[model_id] = model
         return _model_to_dict(model)
 
@@ -145,6 +153,7 @@ def _model_to_dict(m: AIModel) -> dict:
 # AI Ecosystem
 # ==========================================================================
 
+
 class AIEcosystem:
     """Visualise the web of AI agents and their relationships."""
 
@@ -153,8 +162,12 @@ class AIEcosystem:
         self._edges: list = []
 
     def add_agent(self, agent_id: str, name: str, agent_type: str) -> dict:
-        node = {"agent_id": agent_id, "name": name, "type": agent_type,
-                "added_at": datetime.now(timezone.utc).isoformat()}
+        node = {
+            "agent_id": agent_id,
+            "name": name,
+            "type": agent_type,
+            "added_at": datetime.now(timezone.utc).isoformat(),
+        }
         self._nodes[agent_id] = node
         return node
 
@@ -176,6 +189,7 @@ class AIEcosystem:
 # Crypto Tracker
 # ==========================================================================
 
+
 @dataclass
 class CryptoAsset:
     symbol: str
@@ -190,7 +204,9 @@ class CryptoAsset:
 
     @property
     def pnl_usd(self) -> float:
-        return round(self.amount * (self.current_price_usd - self.purchase_price_usd), 2)
+        return round(
+            self.amount * (self.current_price_usd - self.purchase_price_usd), 2
+        )
 
 
 class CryptoTracker:
@@ -200,10 +216,16 @@ class CryptoTracker:
         self._assets: dict[str, CryptoAsset] = {}
         self._signals: list = []
 
-    def add_asset(self, symbol: str, name: str, amount: float, purchase_price_usd: float) -> dict:
-        asset = CryptoAsset(symbol=symbol, name=name, amount=amount,
-                            purchase_price_usd=purchase_price_usd,
-                            current_price_usd=purchase_price_usd)
+    def add_asset(
+        self, symbol: str, name: str, amount: float, purchase_price_usd: float
+    ) -> dict:
+        asset = CryptoAsset(
+            symbol=symbol,
+            name=name,
+            amount=amount,
+            purchase_price_usd=purchase_price_usd,
+            current_price_usd=purchase_price_usd,
+        )
         self._assets[symbol] = asset
         return {"symbol": symbol, "name": name, "amount": amount}
 
@@ -212,12 +234,20 @@ class CryptoTracker:
             raise KeyError(f"Asset '{symbol}' not found.")
         self._assets[symbol].current_price_usd = current_price_usd
         asset = self._assets[symbol]
-        return {"symbol": symbol, "current_price_usd": current_price_usd,
-                "pnl_usd": asset.pnl_usd, "value_usd": asset.value_usd}
+        return {
+            "symbol": symbol,
+            "current_price_usd": current_price_usd,
+            "pnl_usd": asset.pnl_usd,
+            "value_usd": asset.value_usd,
+        }
 
     def record_signal(self, symbol: str, signal: str, confidence_pct: float) -> dict:
-        entry = {"symbol": symbol, "signal": signal, "confidence_pct": confidence_pct,
-                 "timestamp": datetime.now(timezone.utc).isoformat()}
+        entry = {
+            "symbol": symbol,
+            "signal": signal,
+            "confidence_pct": confidence_pct,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
         self._signals.append(entry)
         return entry
 
@@ -226,10 +256,15 @@ class CryptoTracker:
         total_pnl = sum(a.pnl_usd for a in self._assets.values())
         return {
             "assets": [
-                {"symbol": a.symbol, "name": a.name, "amount": a.amount,
-                 "purchase_price_usd": a.purchase_price_usd,
-                 "current_price_usd": a.current_price_usd,
-                 "value_usd": a.value_usd, "pnl_usd": a.pnl_usd}
+                {
+                    "symbol": a.symbol,
+                    "name": a.name,
+                    "amount": a.amount,
+                    "purchase_price_usd": a.purchase_price_usd,
+                    "current_price_usd": a.current_price_usd,
+                    "value_usd": a.value_usd,
+                    "pnl_usd": a.pnl_usd,
+                }
                 for a in self._assets.values()
             ],
             "total_portfolio_value_usd": round(total_value, 2),
@@ -242,6 +277,7 @@ class CryptoTracker:
 # ==========================================================================
 # Payments Hub
 # ==========================================================================
+
 
 class PaymentStatus(Enum):
     PENDING = "pending"
@@ -258,7 +294,9 @@ class Payment:
     amount_usd: float
     currency: str = "USD"
     status: PaymentStatus = PaymentStatus.PENDING
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 class PaymentsHub:
@@ -268,7 +306,9 @@ class PaymentsHub:
         self._payments: list[Payment] = []
         self._counter: int = 0
 
-    def create_payment(self, from_party: str, to_party: str, amount_usd: float, currency: str = "USD") -> dict:
+    def create_payment(
+        self, from_party: str, to_party: str, amount_usd: float, currency: str = "USD"
+    ) -> dict:
         self._counter += 1
         payment = Payment(
             payment_id=f"pay_{self._counter:06d}",
@@ -295,8 +335,12 @@ class PaymentsHub:
         return {
             "total_payments": len(self._payments),
             "completed": len(completed),
-            "failed": sum(1 for p in self._payments if p.status == PaymentStatus.FAILED),
-            "pending": sum(1 for p in self._payments if p.status == PaymentStatus.PENDING),
+            "failed": sum(
+                1 for p in self._payments if p.status == PaymentStatus.FAILED
+            ),
+            "pending": sum(
+                1 for p in self._payments if p.status == PaymentStatus.PENDING
+            ),
             "total_volume_usd": round(sum(p.amount_usd for p in completed), 2),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -327,28 +371,53 @@ def _payment_to_dict(p: Payment) -> dict:
 # Biz Launch
 # ==========================================================================
 
+
 class BizLaunch:
     """Guided launcher for new side businesses powered by DreamCo bots."""
 
     LAUNCH_TEMPLATES = {
         "saas": {
             "name": "SaaS Product",
-            "steps": ["Validate idea", "Build MVP", "Set up payments", "Launch marketing bot", "Acquire first 10 customers"],
+            "steps": [
+                "Validate idea",
+                "Build MVP",
+                "Set up payments",
+                "Launch marketing bot",
+                "Acquire first 10 customers",
+            ],
             "estimated_revenue_month_1_usd": 500.0,
         },
         "ecommerce": {
             "name": "E-Commerce Store",
-            "steps": ["Pick niche", "Source products", "Set up store", "Automate fulfillment", "Run ads bot"],
+            "steps": [
+                "Pick niche",
+                "Source products",
+                "Set up store",
+                "Automate fulfillment",
+                "Run ads bot",
+            ],
             "estimated_revenue_month_1_usd": 800.0,
         },
         "ai_service": {
             "name": "AI Service Agency",
-            "steps": ["Define service offer", "Build sample bot", "Create portfolio", "Find first client", "Automate delivery"],
+            "steps": [
+                "Define service offer",
+                "Build sample bot",
+                "Create portfolio",
+                "Find first client",
+                "Automate delivery",
+            ],
             "estimated_revenue_month_1_usd": 1500.0,
         },
         "content": {
             "name": "Content Empire",
-            "steps": ["Choose platform", "Content strategy", "Build AI writer bot", "Monetise via ads/sponsorships", "Scale"],
+            "steps": [
+                "Choose platform",
+                "Content strategy",
+                "Build AI writer bot",
+                "Monetise via ads/sponsorships",
+                "Scale",
+            ],
             "estimated_revenue_month_1_usd": 300.0,
         },
     }
@@ -359,7 +428,9 @@ class BizLaunch:
     def launch_business(self, business_type: str, name: str) -> dict:
         template = self.LAUNCH_TEMPLATES.get(business_type)
         if not template:
-            raise ValueError(f"Unknown business type '{business_type}'. Options: {list(self.LAUNCH_TEMPLATES)}")
+            raise ValueError(
+                f"Unknown business type '{business_type}'. Options: {list(self.LAUNCH_TEMPLATES)}"
+            )
         launch = {
             "business_name": name,
             "type": business_type,
@@ -374,7 +445,11 @@ class BizLaunch:
 
     def get_templates(self) -> list:
         return [
-            {"type": k, "name": v["name"], "estimated_revenue_month_1_usd": v["estimated_revenue_month_1_usd"]}
+            {
+                "type": k,
+                "name": v["name"],
+                "estimated_revenue_month_1_usd": v["estimated_revenue_month_1_usd"],
+            }
             for k, v in self.LAUNCH_TEMPLATES.items()
         ]
 
@@ -385,6 +460,7 @@ class BizLaunch:
 # ==========================================================================
 # Code Lab
 # ==========================================================================
+
 
 class CodeLab:
     """Sandbox for creating and testing automation scripts and bot prototypes."""
@@ -431,6 +507,7 @@ class CodeLab:
 # Loans & Deals
 # ==========================================================================
 
+
 class LoansDeals:
     """Centralise financing tools and deal tracking."""
 
@@ -438,11 +515,20 @@ class LoansDeals:
         self._loans: list = []
         self._deals: list = []
 
-    def add_loan(self, name: str, principal_usd: float, interest_rate_pct: float, term_months: int) -> dict:
+    def add_loan(
+        self,
+        name: str,
+        principal_usd: float,
+        interest_rate_pct: float,
+        term_months: int,
+    ) -> dict:
         monthly_rate = interest_rate_pct / 100 / 12
         if monthly_rate > 0:
             monthly_payment = round(
-                principal_usd * monthly_rate / (1 - (1 + monthly_rate) ** (-term_months)), 2
+                principal_usd
+                * monthly_rate
+                / (1 - (1 + monthly_rate) ** (-term_months)),
+                2,
             )
         else:
             monthly_payment = round(principal_usd / term_months, 2)
@@ -458,7 +544,9 @@ class LoansDeals:
         self._loans.append(loan)
         return loan
 
-    def add_deal(self, name: str, value_usd: float, partner: str, notes: str = "") -> dict:
+    def add_deal(
+        self, name: str, value_usd: float, partner: str, notes: str = ""
+    ) -> dict:
         deal = {
             "name": name,
             "value_usd": value_usd,
@@ -486,6 +574,7 @@ class LoansDeals:
 # Debug Intel
 # ==========================================================================
 
+
 class DebugLevel(Enum):
     INFO = "info"
     WARNING = "warning"
@@ -499,7 +588,9 @@ class DebugIntel:
     def __init__(self) -> None:
         self._logs: list = []
 
-    def log(self, bot_name: str, message: str, level: DebugLevel = DebugLevel.INFO) -> dict:
+    def log(
+        self, bot_name: str, message: str, level: DebugLevel = DebugLevel.INFO
+    ) -> dict:
         entry = {
             "bot_name": bot_name,
             "message": message,
@@ -534,6 +625,7 @@ class DebugIntel:
 # Pricing Engine
 # ==========================================================================
 
+
 class PricingEngine:
     """Set, test, and optimise pricing for bots and services."""
 
@@ -541,9 +633,16 @@ class PricingEngine:
         self._prices: dict[str, dict] = {}
         self._ab_tests: list = []
 
-    def set_price(self, product_id: str, name: str, price_usd: float, tier: str = "standard") -> dict:
-        entry = {"product_id": product_id, "name": name, "price_usd": round(price_usd, 2),
-                 "tier": tier, "updated_at": datetime.now(timezone.utc).isoformat()}
+    def set_price(
+        self, product_id: str, name: str, price_usd: float, tier: str = "standard"
+    ) -> dict:
+        entry = {
+            "product_id": product_id,
+            "name": name,
+            "price_usd": round(price_usd, 2),
+            "tier": tier,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
         self._prices[product_id] = entry
         return entry
 
@@ -565,14 +664,20 @@ class PricingEngine:
 # Connections
 # ==========================================================================
 
+
 class Connections:
     """Registry for API keys, third-party integrations, and bot-to-bot links."""
 
     def __init__(self) -> None:
         self._integrations: dict[str, dict] = {}
 
-    def add_integration(self, integration_id: str, name: str, endpoint: str,
-                        integration_type: str = "api") -> dict:
+    def add_integration(
+        self,
+        integration_id: str,
+        name: str,
+        endpoint: str,
+        integration_type: str = "api",
+    ) -> dict:
         entry = {
             "integration_id": integration_id,
             "name": name,
@@ -601,6 +706,7 @@ class Connections:
 # Time Capsule
 # ==========================================================================
 
+
 class TimeCapsule:
     """Archive of bot data, logs, and historical snapshots."""
 
@@ -620,12 +726,16 @@ class TimeCapsule:
         return [e for e in self._archive if e["label"] == label]
 
     def list_archives(self) -> list:
-        return [{"label": e["label"], "archived_at": e["archived_at"]} for e in self._archive]
+        return [
+            {"label": e["label"], "archived_at": e["archived_at"]}
+            for e in self._archive
+        ]
 
 
 # ==========================================================================
 # Autonomy Control
 # ==========================================================================
+
 
 class AutonomyMode(Enum):
     MANUAL = "manual"

@@ -10,6 +10,14 @@ class TierConfig:
 
 TIERS = {
     "free": TierConfig("Free", 0.0, ["compound lookup", "basic property screening"]),
-    "pro": TierConfig("Pro", 199.0, ["ADMET prediction", "target docking score", "lead optimization hints"]),
-    "enterprise": TierConfig("Enterprise", 999.0, ["all features", "multi-target screening", "patent check", "API access"]),
+    "pro": TierConfig(
+        "Pro",
+        199.0,
+        ["ADMET prediction", "target docking score", "lead optimization hints"],
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        ["all features", "multi-target screening", "patent check", "API access"],
+    ),
 }

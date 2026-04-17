@@ -16,10 +16,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Income stream types
 # ---------------------------------------------------------------------------
+
 
 class IncomeStreamType(Enum):
     SUBSCRIPTION = "subscription"
@@ -59,6 +59,7 @@ PAYMENT_METHODS: list[str] = [
 # ---------------------------------------------------------------------------
 # Income stream
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class IncomeStream:
@@ -128,6 +129,7 @@ class IncomeStream:
 # Compound interest calculator
 # ---------------------------------------------------------------------------
 
+
 def compound_interest(
     principal: float,
     rate: float,
@@ -173,6 +175,7 @@ def compound_interest(
 # ---------------------------------------------------------------------------
 # Sales & Monetization Engine
 # ---------------------------------------------------------------------------
+
 
 class SalesMonetizationError(Exception):
     """Raised when a sales/monetization operation fails."""
@@ -320,7 +323,9 @@ class SalesMonetizationEngine:
     def monthly_recurring_revenue(self) -> float:
         """Sum MRR across all recurring streams."""
         return round(
-            sum(s.monthly_revenue_usd for s in self._streams.values() if s.is_recurring),
+            sum(
+                s.monthly_revenue_usd for s in self._streams.values() if s.is_recurring
+            ),
             2,
         )
 
@@ -342,9 +347,7 @@ class SalesMonetizationEngine:
     # Money goal projection
     # ------------------------------------------------------------------
 
-    def project_goal(
-        self, daily_users: int, price_per_user: float
-    ) -> dict:
+    def project_goal(self, daily_users: int, price_per_user: float) -> dict:
         """
         Project revenue math the way Big Bro teaches it.
 

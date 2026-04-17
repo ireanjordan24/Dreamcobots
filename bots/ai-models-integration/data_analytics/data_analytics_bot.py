@@ -56,8 +56,9 @@ class DataAnalyticsModelsBot:
     # ------------------------------------------------------------------
     # Google Vertex AI AutoML
     # ------------------------------------------------------------------
-    def run_google_vertex_automl(self, dataset_uri, target_column, task_type="classification",
-                                  budget_hours=1):
+    def run_google_vertex_automl(
+        self, dataset_uri, target_column, task_type="classification", budget_hours=1
+    ):
         """
         Train an AutoML model using Google Vertex AI.
 
@@ -92,8 +93,13 @@ class DataAnalyticsModelsBot:
     # ------------------------------------------------------------------
     # AWS SageMaker
     # ------------------------------------------------------------------
-    def run_aws_sagemaker(self, s3_data_uri, algorithm="xgboost", instance_type="ml.m5.xlarge",
-                           job_name="dreamcobots-training"):
+    def run_aws_sagemaker(
+        self,
+        s3_data_uri,
+        algorithm="xgboost",
+        instance_type="ml.m5.xlarge",
+        job_name="dreamcobots-training",
+    ):
         """
         Launch a training job on AWS SageMaker.
 
@@ -129,8 +135,13 @@ class DataAnalyticsModelsBot:
     # ------------------------------------------------------------------
     # Microsoft Azure Machine Learning
     # ------------------------------------------------------------------
-    def run_azure_ml(self, experiment_name, script_path, compute_target="cpu-cluster",
-                      framework="sklearn"):
+    def run_azure_ml(
+        self,
+        experiment_name,
+        script_path,
+        compute_target="cpu-cluster",
+        framework="sklearn",
+    ):
         """
         Submit an experiment run to Azure Machine Learning.
 
@@ -166,8 +177,13 @@ class DataAnalyticsModelsBot:
     # ------------------------------------------------------------------
     # Databricks
     # ------------------------------------------------------------------
-    def run_databricks(self, notebook_path, cluster_id=None, parameters=None,
-                        job_name="dreamcobots-analytics"):
+    def run_databricks(
+        self,
+        notebook_path,
+        cluster_id=None,
+        parameters=None,
+        job_name="dreamcobots-analytics",
+    ):
         """
         Run a Databricks notebook or job for collaborative data analytics.
 
@@ -203,8 +219,9 @@ class DataAnalyticsModelsBot:
     # ------------------------------------------------------------------
     # IBM Watson Studio
     # ------------------------------------------------------------------
-    def run_ibm_watson_studio(self, project_id, asset_id, runtime="default_py3.9",
-                               task="auto-ai"):
+    def run_ibm_watson_studio(
+        self, project_id, asset_id, runtime="default_py3.9", task="auto-ai"
+    ):
         """
         Run a Watson Studio experiment or AutoAI pipeline.
 
@@ -245,29 +262,27 @@ class DataAnalyticsModelsBot:
             dataset_uri="gs://my-bucket/sales_data.csv",
             target_column="churn",
             task_type="classification",
-            budget_hours=2
+            budget_hours=2,
         )
         self.run_aws_sagemaker(
             s3_data_uri="s3://my-bucket/train/",
             algorithm="xgboost",
             instance_type="ml.m5.xlarge",
-            job_name="dreamcobots-churn-model"
+            job_name="dreamcobots-churn-model",
         )
         self.run_azure_ml(
             experiment_name="dreamcobots-forecast",
             script_path="train.py",
             compute_target="cpu-cluster",
-            framework="sklearn"
+            framework="sklearn",
         )
         self.run_databricks(
             notebook_path="/Shared/dreamcobots/revenue_analysis",
             parameters={"start_date": "2024-01-01", "end_date": "2024-12-31"},
-            job_name="dreamcobots-annual-revenue"
+            job_name="dreamcobots-annual-revenue",
         )
         self.run_ibm_watson_studio(
-            project_id="abc-123",
-            asset_id="dataset-456",
-            task="auto-ai"
+            project_id="abc-123", asset_id="dataset-456", task="auto-ai"
         )
 
 

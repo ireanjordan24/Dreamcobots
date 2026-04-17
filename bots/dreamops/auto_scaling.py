@@ -9,19 +9,21 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
-
-from framework import GlobalAISourcesFlow  # noqa: F401
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
+
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 
 class ScalingAction(Enum):
@@ -33,7 +35,7 @@ class ScalingAction(Enum):
 @dataclass
 class LoadMetrics:
     task_id: str
-    current_load: float   # 0.0 - 1.0
+    current_load: float  # 0.0 - 1.0
     peak_load: float
     avg_load: float
     timestamp: datetime = field(default_factory=datetime.utcnow)
@@ -93,7 +95,9 @@ class ScalingEngine:
         self._record_event(task_id, ScalingAction.SCALE_UP, factor)
         return allocation
 
-    def trigger_scale_down(self, task_id: str, factor: float = 0.7) -> ResourceAllocation:
+    def trigger_scale_down(
+        self, task_id: str, factor: float = 0.7
+    ) -> ResourceAllocation:
         """Scale down resources for a task."""
         current = self._allocations.get(task_id)
         units = (current.allocated_units * factor) if current else factor
@@ -126,13 +130,15 @@ class ScalingEngine:
         }
 
     def _record_event(self, task_id: str, action: ScalingAction, factor: float) -> None:
-        self._scaling_events.append({
-            "event_id": str(uuid.uuid4()),
-            "task_id": task_id,
-            "action": action.value,
-            "factor": factor,
-            "timestamp": datetime.utcnow().isoformat(),
-        })
+        self._scaling_events.append(
+            {
+                "event_id": str(uuid.uuid4()),
+                "task_id": task_id,
+                "action": action.value,
+                "factor": factor,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        )
 
     def get_scaling_history(self) -> List[dict]:
         """Return all recorded scaling events."""

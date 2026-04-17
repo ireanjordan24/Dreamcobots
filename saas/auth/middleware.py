@@ -14,7 +14,6 @@ from typing import Dict, Optional, Tuple
 from saas.auth.auth import AuthService, User
 from saas.auth.user_model import SubscriptionTier, TierFeatures, get_tier_features
 
-
 # ---------------------------------------------------------------------------
 # Middleware helpers
 # ---------------------------------------------------------------------------
@@ -71,9 +70,7 @@ class AuthMiddleware:
             return None, "account is disabled"
         return user, None
 
-    def require_tier(
-        self, user: User, minimum_tier: SubscriptionTier
-    ) -> Optional[str]:
+    def require_tier(self, user: User, minimum_tier: SubscriptionTier) -> Optional[str]:
         """
         Return an error string if *user* does not have *minimum_tier* or higher.
 

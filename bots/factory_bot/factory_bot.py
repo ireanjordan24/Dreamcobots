@@ -1,21 +1,24 @@
 """Factory Bot — tier-aware manufacturing workflow optimizer and green manufacturing assistant."""
-import sys
+
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
-from bots.factory_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: F401
-from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.factory_bot.workflow_optimizer import (
-    ProductionLineOptimizer,
-    PredictiveMaintenanceEngine,
-    MACHINE_DATABASE,
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
 )
+from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
+
 from bots.factory_bot.green_manufacturing import (
     EnergyEfficiencyMonitor,
     GreenInitiativeManager,
 )
+from bots.factory_bot.tiers import BOT_FEATURES, get_bot_tier_info  # noqa: F401
+from bots.factory_bot.workflow_optimizer import (
+    MACHINE_DATABASE,
+    PredictiveMaintenanceEngine,
+    ProductionLineOptimizer,
+)
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="FactoryBot")
 
@@ -115,7 +118,12 @@ class FactoryBot:
             "tier": self.tier.value,
             "features": BOT_FEATURES[self.tier.value],
             "machine_count": len(MACHINE_DATABASE),
-            "modules": ["WorkflowOptimizer", "PredictiveMaintenance", "EnergyMonitor", "GreenInitiatives"],
+            "modules": [
+                "WorkflowOptimizer",
+                "PredictiveMaintenance",
+                "EnergyMonitor",
+                "GreenInitiatives",
+            ],
         }
 
         if self.tier in (Tier.PRO, Tier.ENTERPRISE):

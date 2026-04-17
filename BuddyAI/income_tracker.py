@@ -30,7 +30,13 @@ class IncomeRecord:
     """Immutable snapshot of income data for one source at one point in time."""
 
     __slots__ = (
-        "source", "date", "revenue", "traffic", "engagement", "currency", "raw"
+        "source",
+        "date",
+        "revenue",
+        "traffic",
+        "engagement",
+        "currency",
+        "raw",
     )
 
     def __init__(

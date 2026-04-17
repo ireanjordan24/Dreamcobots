@@ -57,8 +57,8 @@ class BaseBot(ABC):
         self.monetization = MonetizationManager(bot_id=self.bot_id)
 
         # Emotional state (simple valence/arousal model)
-        self._emotion_valence: float = 0.0   # [-1 negative … +1 positive]
-        self._emotion_arousal: float = 0.5   # [0 calm … 1 excited]
+        self._emotion_valence: float = 0.0  # [-1 negative … +1 positive]
+        self._emotion_arousal: float = 0.5  # [0 calm … 1 excited]
 
         # One-time initialisation hooks
         self._setup_datasets()
@@ -118,7 +118,7 @@ class BaseBot(ABC):
 
     def _update_emotion(self, sentiment_score: float) -> None:
         """Smoothly shift emotional state toward the user's sentiment."""
-        alpha = 0.3   # EMA smoothing factor
+        alpha = 0.3  # EMA smoothing factor
         self._emotion_valence = round(
             (1 - alpha) * self._emotion_valence + alpha * sentiment_score, 3
         )
@@ -185,23 +185,31 @@ class BaseBot(ABC):
         Override to add pricing plans at initialisation time.
         Called once from ``__init__``.
         """
-        self.monetization.add_plan(PricingPlan(
-            plan_id="free",
-            name="Free",
-            model=PricingModel.FREEMIUM,
-            price_usd=9.99,
-            description="10 free interactions, then $9.99/month.",
-            features=["Basic Q&A", "Job/task guidance"],
-            free_tier_limit=10,
-        ))
-        self.monetization.add_plan(PricingPlan(
-            plan_id="pro",
-            name="Pro",
-            model=PricingModel.SUBSCRIPTION,
-            price_usd=29.99,
-            description="Unlimited interactions + dataset access.",
-            features=["Unlimited interactions", "Dataset downloads", "Priority support"],
-        ))
+        self.monetization.add_plan(
+            PricingPlan(
+                plan_id="free",
+                name="Free",
+                model=PricingModel.FREEMIUM,
+                price_usd=9.99,
+                description="10 free interactions, then $9.99/month.",
+                features=["Basic Q&A", "Job/task guidance"],
+                free_tier_limit=10,
+            )
+        )
+        self.monetization.add_plan(
+            PricingPlan(
+                plan_id="pro",
+                name="Pro",
+                model=PricingModel.SUBSCRIPTION,
+                price_usd=29.99,
+                description="Unlimited interactions + dataset access.",
+                features=[
+                    "Unlimited interactions",
+                    "Dataset downloads",
+                    "Priority support",
+                ],
+            )
+        )
 
     # ------------------------------------------------------------------
     # Shared response utilities available to subclasses
@@ -211,9 +219,9 @@ class BaseBot(ABC):
         """Return an emotion-aware conversational opener."""
         label = self.current_emotion()["label"]
         prefixes = {
-            "happy":     "Great to hear from you! ",
+            "happy": "Great to hear from you! ",
             "concerned": "I sense some frustration – let me help. ",
-            "neutral":   "",
+            "neutral": "",
         }
         return prefixes.get(label, "")
 

@@ -23,16 +23,17 @@ class SubscriptionTier(str, Enum):
 # Feature flags per tier
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TierFeatures:
     tier: SubscriptionTier
-    max_bots: int              # bots uploadable
-    max_runs_per_day: int      # bot runs per day
+    max_bots: int  # bots uploadable
+    max_runs_per_day: int  # bot runs per day
     can_use_redis_queue: bool  # queue-based execution
-    can_use_workers: bool      # multi-worker scaling
+    can_use_workers: bool  # multi-worker scaling
     can_use_webhooks: bool
     can_export_data: bool
-    support_level: str         # "community" | "email" | "dedicated"
+    support_level: str  # "community" | "email" | "dedicated"
     price_usd_monthly: float
 
 

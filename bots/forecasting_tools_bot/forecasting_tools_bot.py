@@ -1,10 +1,15 @@
 """Forecasting Tools Bot — tier-aware revenue forecasting, seasonality, and scenario planning."""
-import sys, os
-import math
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+import math
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from tiers import Tier, get_tier_config
+
 from bots.forecasting_tools_bot.tiers import BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
@@ -39,7 +44,15 @@ class ForecastingToolsBot:
 
         confidence_interval = None
         if self.tier != Tier.FREE and forecast:
-            std_dev = (sum((r - avg_growth_rate) ** 2 for r in growth_rates) / len(growth_rates)) ** 0.5 if growth_rates else 0.0
+            std_dev = (
+                (
+                    sum((r - avg_growth_rate) ** 2 for r in growth_rates)
+                    / len(growth_rates)
+                )
+                ** 0.5
+                if growth_rates
+                else 0.0
+            )
             margin = historical_data[-1] * std_dev * 1.96
             confidence_interval = {
                 "lower": [round(v - margin, 2) for v in forecast],
@@ -85,22 +98,31 @@ class ForecastingToolsBot:
 
     def detect_seasonality(self, data_points: list) -> dict:
         if self.tier == Tier.FREE:
-            raise PermissionError("Seasonality detection requires PRO or ENTERPRISE tier")
+            raise PermissionError(
+                "Seasonality detection requires PRO or ENTERPRISE tier"
+            )
         if len(data_points) < 4:
-            raise ValueError("At least 4 data points are required for seasonality detection")
+            raise ValueError(
+                "At least 4 data points are required for seasonality detection"
+            )
 
         # Split into quarters (groups of equal size where possible)
         n = len(data_points)
         quarter_size = max(1, n // 4)
-        quarters = [data_points[i * quarter_size: (i + 1) * quarter_size] for i in range(4)]
+        quarters = [
+            data_points[i * quarter_size : (i + 1) * quarter_size] for i in range(4)
+        ]
         # Include any remainder in the last quarter
-        remainder = data_points[4 * quarter_size:]
+        remainder = data_points[4 * quarter_size :]
         if remainder:
             quarters[3] = quarters[3] + remainder
 
         quarter_avgs = [sum(q) / len(q) if q else 0 for q in quarters]
         overall_avg = sum(data_points) / len(data_points) if data_points else 1
-        seasonal_indices = [round(avg / overall_avg, 4) if overall_avg != 0 else 1.0 for avg in quarter_avgs]
+        seasonal_indices = [
+            round(avg / overall_avg, 4) if overall_avg != 0 else 1.0
+            for avg in quarter_avgs
+        ]
 
         max_idx = max(seasonal_indices)
         min_idx = min(seasonal_indices)

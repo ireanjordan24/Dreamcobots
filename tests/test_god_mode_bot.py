@@ -14,8 +14,8 @@ Covers:
   10. Bot Library registration
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -23,41 +23,41 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 # ---------------------------------------------------------------------------
+# Bot imports
+# ---------------------------------------------------------------------------
+from bots.god_mode_bot.god_mode_bot import (
+    AutoClientHunter,
+    AutoCloser,
+    GodModeBot,
+    PaymentAutoCollector,
+    SelfImprovingAI,
+    ViralEngine,
+)
+
+# ---------------------------------------------------------------------------
 # Tier imports
 # ---------------------------------------------------------------------------
 from bots.god_mode_bot.tiers import (
+    FEATURE_API_ACCESS,
+    FEATURE_AUTO_CLOSER,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_LEAD_HUNTING,
+    FEATURE_PAYMENT_COLLECTION,
+    FEATURE_SELF_IMPROVING_AI,
+    FEATURE_VIRAL_ENGINE,
+    FEATURE_WHITE_LABEL,
+    TIER_CATALOGUE,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    TIER_CATALOGUE,
-    FEATURE_LEAD_HUNTING,
-    FEATURE_AUTO_CLOSER,
-    FEATURE_PAYMENT_COLLECTION,
-    FEATURE_VIRAL_ENGINE,
-    FEATURE_SELF_IMPROVING_AI,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
 )
-
-# ---------------------------------------------------------------------------
-# Bot imports
-# ---------------------------------------------------------------------------
-from bots.god_mode_bot.god_mode_bot import (
-    GodModeBot,
-    AutoClientHunter,
-    AutoCloser,
-    PaymentAutoCollector,
-    ViralEngine,
-    SelfImprovingAI,
-)
-
 
 # ===========================================================================
 # 1. Tier tests
 # ===========================================================================
+
 
 class TestTierEnum:
     def test_tier_values(self):
@@ -160,6 +160,7 @@ class TestTierHelpers:
 # 2. AutoClientHunter tests
 # ===========================================================================
 
+
 class TestAutoClientHunter:
     def setup_method(self):
         self.hunter = AutoClientHunter()
@@ -207,6 +208,7 @@ class TestAutoClientHunter:
 # ===========================================================================
 # 3. AutoCloser tests
 # ===========================================================================
+
 
 class TestAutoCloser:
     def setup_method(self):
@@ -267,6 +269,7 @@ class TestAutoCloser:
 # 4. PaymentAutoCollector tests
 # ===========================================================================
 
+
 class TestPaymentAutoCollector:
     def setup_method(self):
         self.collector = PaymentAutoCollector()
@@ -309,6 +312,7 @@ class TestPaymentAutoCollector:
 # ===========================================================================
 # 5. ViralEngine tests
 # ===========================================================================
+
 
 class TestViralEngine:
     def setup_method(self):
@@ -358,6 +362,7 @@ class TestViralEngine:
 # 6. SelfImprovingAI tests
 # ===========================================================================
 
+
 class TestSelfImprovingAI:
     def setup_method(self):
         self.ai = SelfImprovingAI()
@@ -399,6 +404,7 @@ class TestSelfImprovingAI:
 # 7. GodModeBot orchestrator tests
 # ===========================================================================
 
+
 class TestGodModeBotInit:
     def test_default_tier_is_free(self):
         bot = GodModeBot()
@@ -430,7 +436,15 @@ class TestGodModeBotRunAllEngines:
     def test_report_has_required_keys(self):
         bot = GodModeBot(tier=Tier.PRO)
         report = bot.run_all_engines()
-        for key in ["bot", "tier", "niche", "leads_hunted", "deals_won", "total_revenue", "timestamp"]:
+        for key in [
+            "bot",
+            "tier",
+            "niche",
+            "leads_hunted",
+            "deals_won",
+            "total_revenue",
+            "timestamp",
+        ]:
             assert key in report, f"Missing key: {key}"
 
     def test_bot_name_correct(self):
@@ -485,7 +499,15 @@ class TestGodModeBotGetSummary:
     def test_summary_has_required_keys(self):
         bot = GodModeBot(tier=Tier.PRO)
         summary = bot.get_summary()
-        for key in ["bot", "tier", "status", "total_revenue", "total_leads", "deals_won", "mrr"]:
+        for key in [
+            "bot",
+            "tier",
+            "status",
+            "total_revenue",
+            "total_leads",
+            "deals_won",
+            "mrr",
+        ]:
             assert key in summary, f"Missing summary key: {key}"
 
     def test_summary_status_active(self):
@@ -519,6 +541,7 @@ class TestGodModeBotGetSummary:
 # ===========================================================================
 # 8. Tier gating tests
 # ===========================================================================
+
 
 class TestTierGating:
     def test_free_leads_capped_at_5(self):
@@ -579,6 +602,7 @@ class TestTierGating:
 # 9. Error handling & edge cases
 # ===========================================================================
 
+
 class TestEdgeCases:
     def test_hunt_leads_zero_count(self):
         bot = GodModeBot(tier=Tier.PRO)
@@ -623,9 +647,11 @@ class TestEdgeCases:
 # 10. Bot Library registration
 # ===========================================================================
 
+
 class TestBotLibraryRegistration:
     def test_god_mode_bot_in_library(self):
         from bots.global_bot_network.bot_library import BotLibrary, BotNotFound
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         try:
@@ -636,6 +662,7 @@ class TestBotLibraryRegistration:
 
     def test_god_mode_bot_entry_fields(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("god_mode_bot")
@@ -645,9 +672,16 @@ class TestBotLibraryRegistration:
 
     def test_god_mode_bot_capabilities(self):
         from bots.global_bot_network.bot_library import BotLibrary
+
         lib = BotLibrary()
         lib.populate_dreamco_bots()
         entry = lib.get_bot("god_mode_bot")
-        expected = ["lead_hunting", "auto_closing", "payment_collection", "viral_engine", "god_mode"]
+        expected = [
+            "lead_hunting",
+            "auto_closing",
+            "payment_collection",
+            "viral_engine",
+            "god_mode",
+        ]
         for cap in expected:
             assert cap in entry.capabilities, f"Missing capability: {cap}"

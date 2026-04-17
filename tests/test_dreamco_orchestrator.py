@@ -12,8 +12,8 @@ Covers:
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -24,15 +24,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from core.dreamco_orchestrator import (
+    MAINTAIN_THRESHOLD,
+    SCALE_THRESHOLD,
+    AutoScaler,
     DreamCoOrchestrator,
     RevenueValidator,
-    AutoScaler,
-    SCALE_THRESHOLD,
-    MAINTAIN_THRESHOLD,
 )
-from core.optimizer import Optimizer, HIGH_REVENUE_THRESHOLD, LOW_CONVERSION_THRESHOLD
+from core.optimizer import HIGH_REVENUE_THRESHOLD, LOW_CONVERSION_THRESHOLD, Optimizer
 from core.scheduler import Scheduler
-
 
 # ===========================================================================
 # RevenueValidator
@@ -174,7 +173,9 @@ class TestDreamCoOrchestratorRunBot:
 
     def test_run_bot_success(self):
         path = "mock_dreamco_success"
-        self._register_mock_module(path, {"revenue": 300, "leads_generated": 5, "conversion_rate": 0.2})
+        self._register_mock_module(
+            path, {"revenue": 300, "leads_generated": 5, "conversion_rate": 0.2}
+        )
         result = self.orch.run_bot(path, "success_bot")
         assert "output" in result
         assert result["output"]["revenue"] == 300
@@ -196,7 +197,9 @@ class TestDreamCoOrchestratorRunBot:
 
     def test_run_bot_scale_true_when_high_revenue(self):
         path = "mock_dreamco_high"
-        self._register_mock_module(path, {"revenue": 5000, "leads_generated": 2, "conversion_rate": 0.1})
+        self._register_mock_module(
+            path, {"revenue": 5000, "leads_generated": 2, "conversion_rate": 0.1}
+        )
         result = self.orch.run_bot(path, "high_bot")
         assert result["validation"]["scale"] is True
 
@@ -214,12 +217,20 @@ class TestDreamCoOrchestratorSummary:
         return [
             {
                 "bot": "bot_a",
-                "output": {"revenue": 500, "leads_generated": 3, "conversion_rate": 0.2},
+                "output": {
+                    "revenue": 500,
+                    "leads_generated": 3,
+                    "conversion_rate": 0.2,
+                },
                 "validation": {"scale": False, "status": "maintain"},
             },
             {
                 "bot": "bot_b",
-                "output": {"revenue": 1500, "leads_generated": 2, "conversion_rate": 0.1},
+                "output": {
+                    "revenue": 1500,
+                    "leads_generated": 2,
+                    "conversion_rate": 0.1,
+                },
                 "validation": {"scale": True, "status": "scale"},
             },
             {
@@ -268,23 +279,35 @@ class TestOptimizer:
         self.opt = Optimizer()
 
     def test_scale_aggressively_high_revenue(self):
-        rec = self.opt.improve({"revenue": HIGH_REVENUE_THRESHOLD + 1, "conversion_rate": 0.3, "leads_generated": 5})
+        rec = self.opt.improve(
+            {
+                "revenue": HIGH_REVENUE_THRESHOLD + 1,
+                "conversion_rate": 0.3,
+                "leads_generated": 5,
+            }
+        )
         assert rec == "Scale aggressively"
 
     def test_change_strategy_low_conversion(self):
-        rec = self.opt.improve({
-            "revenue": 200,
-            "conversion_rate": LOW_CONVERSION_THRESHOLD - 0.01,
-            "leads_generated": 5,
-        })
+        rec = self.opt.improve(
+            {
+                "revenue": 200,
+                "conversion_rate": LOW_CONVERSION_THRESHOLD - 0.01,
+                "leads_generated": 5,
+            }
+        )
         assert rec == "Change strategy"
 
     def test_expand_reach_few_leads(self):
-        rec = self.opt.improve({"revenue": 100, "conversion_rate": 0.2, "leads_generated": 1})
+        rec = self.opt.improve(
+            {"revenue": 100, "conversion_rate": 0.2, "leads_generated": 1}
+        )
         assert rec == "Expand reach"
 
     def test_maintain_middle_ground(self):
-        rec = self.opt.improve({"revenue": 300, "conversion_rate": 0.15, "leads_generated": 5})
+        rec = self.opt.improve(
+            {"revenue": 300, "conversion_rate": 0.15, "leads_generated": 5}
+        )
         assert rec == "Maintain"
 
     def test_expand_reach_when_no_leads(self):
@@ -294,14 +317,37 @@ class TestOptimizer:
 
     def test_analyse_all_returns_list(self):
         results = [
-            {"bot": "bot_a", "output": {"revenue": 200, "conversion_rate": 0.1, "leads_generated": 5}},
-            {"bot": "bot_b", "output": {"revenue": 2000, "conversion_rate": 0.3, "leads_generated": 10}},
+            {
+                "bot": "bot_a",
+                "output": {
+                    "revenue": 200,
+                    "conversion_rate": 0.1,
+                    "leads_generated": 5,
+                },
+            },
+            {
+                "bot": "bot_b",
+                "output": {
+                    "revenue": 2000,
+                    "conversion_rate": 0.3,
+                    "leads_generated": 10,
+                },
+            },
         ]
         enriched = self.opt.analyse_all(results)
         assert len(enriched) == 2
 
     def test_analyse_all_includes_recommendation(self):
-        results = [{"bot": "test", "output": {"revenue": 500, "conversion_rate": 0.1, "leads_generated": 5}}]
+        results = [
+            {
+                "bot": "test",
+                "output": {
+                    "revenue": 500,
+                    "conversion_rate": 0.1,
+                    "leads_generated": 5,
+                },
+            }
+        ]
         enriched = self.opt.analyse_all(results)
         assert "recommendation" in enriched[0]
 
@@ -355,7 +401,9 @@ class TestScheduler:
         assert sched.cycles_run == 1
 
     def test_run_cycle_returns_summary(self):
-        sched = Scheduler(interval_seconds=0, orchestrator=_MockOrchestrator(revenue=750))
+        sched = Scheduler(
+            interval_seconds=0, orchestrator=_MockOrchestrator(revenue=750)
+        )
         result = sched.run_cycle()
         assert result["total_revenue"] == 750
 

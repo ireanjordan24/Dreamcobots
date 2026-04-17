@@ -22,6 +22,7 @@ from typing import Optional
 @dataclass
 class ProposalDetail:
     """Full detail for a governance proposal."""
+
     proposal_id: str
     title: str
     description: str
@@ -91,8 +92,7 @@ class GovernancePanelScreen:
             "║          DREAMCO — GOVERNANCE PANEL                  ║",
             "╚══════════════════════════════════════════════════════╝",
             f"  Hub: {self.hub_name}",
-            f"  Open Proposals: {len(open_props)}  |  "
-            f"Closed: {len(closed_props)}",
+            f"  Open Proposals: {len(open_props)}  |  " f"Closed: {len(closed_props)}",
             "",
             "  ── ACTIVE PROPOSALS ──────────────────────────────────",
         ]
@@ -162,29 +162,67 @@ class GovernancePanelScreen:
     def demo(cls) -> "GovernancePanelScreen":
         """Return a pre-populated demo instance."""
         from datetime import timedelta
-        screen = cls(hub_id="hub-001", hub_name="Family Wealth Circle", current_user_id="alice")
+
+        screen = cls(
+            hub_id="hub-001", hub_name="Family Wealth Circle", current_user_id="alice"
+        )
         base = datetime(2025, 3, 1, tzinfo=timezone.utc)
-        screen.add_proposal(ProposalDetail(
-            "prop-1", "Allocate 10% to Bitcoin", "Move 10% of growth allocation into BTC.",
-            "investment", "Alice Johnson", 3, 1, 4, "open", created_at=base,
-        ))
-        screen.add_proposal(ProposalDetail(
-            "prop-2", "Monthly dividend payout schedule",
-            "Change from quarterly to monthly dividend distributions.",
-            "payout", "Bob Williams", 4, 0, 4, "open", created_at=base + timedelta(days=3),
-        ))
-        screen.add_proposal(ProposalDetail(
-            "prop-3", "Increase reinvestment rate to 30%",
-            "Raise the auto-reinvestment rate from 20% to 30%.",
-            "risk_level", "Carol Davis", 2, 2, 4, "rejected",
-            created_at=base - timedelta(days=15),
-            closed_at=base - timedelta(days=7),
-        ))
-        screen.add_proposal(ProposalDetail(
-            "prop-4", "Add Real Estate Bot to hub",
-            "Activate the Real Estate Bot for automated deal finding.",
-            "other", "Alice Johnson", 4, 0, 4, "passed",
-            created_at=base - timedelta(days=30),
-            closed_at=base - timedelta(days=22),
-        ))
+        screen.add_proposal(
+            ProposalDetail(
+                "prop-1",
+                "Allocate 10% to Bitcoin",
+                "Move 10% of growth allocation into BTC.",
+                "investment",
+                "Alice Johnson",
+                3,
+                1,
+                4,
+                "open",
+                created_at=base,
+            )
+        )
+        screen.add_proposal(
+            ProposalDetail(
+                "prop-2",
+                "Monthly dividend payout schedule",
+                "Change from quarterly to monthly dividend distributions.",
+                "payout",
+                "Bob Williams",
+                4,
+                0,
+                4,
+                "open",
+                created_at=base + timedelta(days=3),
+            )
+        )
+        screen.add_proposal(
+            ProposalDetail(
+                "prop-3",
+                "Increase reinvestment rate to 30%",
+                "Raise the auto-reinvestment rate from 20% to 30%.",
+                "risk_level",
+                "Carol Davis",
+                2,
+                2,
+                4,
+                "rejected",
+                created_at=base - timedelta(days=15),
+                closed_at=base - timedelta(days=7),
+            )
+        )
+        screen.add_proposal(
+            ProposalDetail(
+                "prop-4",
+                "Add Real Estate Bot to hub",
+                "Activate the Real Estate Bot for automated deal finding.",
+                "other",
+                "Alice Johnson",
+                4,
+                0,
+                4,
+                "passed",
+                created_at=base - timedelta(days=30),
+                closed_at=base - timedelta(days=22),
+            )
+        )
         return screen

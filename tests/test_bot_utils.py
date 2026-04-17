@@ -12,20 +12,20 @@ import pytest
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
-from bots.utils.logger import get_logger, BotLogger, _JsonFormatter  # noqa: E402
-from bots.utils.error_handler import (  # noqa: E402
-    BotError,
+from bots.utils.error_handler import (
+    APIError,
+    BotError,  # noqa: E402
     TierError,
     ValidationError,
-    APIError,
     retry,
     safe_run,
 )
-
+from bots.utils.logger import BotLogger, _JsonFormatter, get_logger  # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logger tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestGetLogger:
     def test_returns_bot_logger_instance(self):
@@ -39,11 +39,13 @@ class TestGetLogger:
     def test_level_default_info(self):
         log = get_logger("level_bot")
         import logging
+
         assert log._logger.level == logging.INFO
 
     def test_level_override(self):
         log = get_logger("debug_bot", level="DEBUG")
         import logging
+
         assert log._logger.level == logging.DEBUG
 
     def test_get_logger_same_bot_reuses_underlying_logger(self):
@@ -97,6 +99,7 @@ class TestBotLoggerOutput:
 # BotError tests
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestBotError:
     def test_basic_instantiation(self):
         err = BotError("something went wrong", bot_name="test_bot")
@@ -134,6 +137,7 @@ class TestBotError:
 # ─────────────────────────────────────────────────────────────────────────────
 # retry decorator tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestRetry:
     def test_succeeds_on_first_attempt(self):
@@ -210,6 +214,7 @@ class TestRetry:
 # ─────────────────────────────────────────────────────────────────────────────
 # safe_run decorator tests
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestSafeRun:
     def test_returns_result_on_success(self):

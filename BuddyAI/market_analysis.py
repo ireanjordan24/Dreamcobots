@@ -134,12 +134,10 @@ class TrendSignal:
     category: str
     growth_pct: float
     search_volume: int
-    competition: str          # low / medium / high
+    competition: str  # low / medium / high
     monetization_paths: list[str] = field(default_factory=list)
     opportunity_score: float = 0.0
-    date_scanned: str = field(
-        default_factory=lambda: datetime.date.today().isoformat()
-    )
+    date_scanned: str = field(default_factory=lambda: datetime.date.today().isoformat())
 
     def to_dict(self) -> dict:
         return {
@@ -205,7 +203,9 @@ class TrendScanner:
         for item in sampled:
             item = dict(item)
             item["growth_pct"] = item["growth_pct"] * random.uniform(0.9, 1.1)
-            item["search_volume"] = int(item["search_volume"] * random.uniform(0.85, 1.15))
+            item["search_volume"] = int(
+                item["search_volume"] * random.uniform(0.85, 1.15)
+            )
         return sampled
 
     def _score(self, raw: dict) -> TrendSignal:
@@ -253,15 +253,14 @@ class MarketAnalysis:
 
         top_n = signals[:5]
         recommended_niches = list({s.category for s in signals[:8]})
-        emerging = [
-            s.topic for s in signals if s.growth_pct > 80
-        ][:5]
+        emerging = [s.topic for s in signals if s.growth_pct > 80][:5]
 
         summary = (
             f"Scanned {len(signals)} trending topics. "
             f"Top opportunity: '{top_n[0].topic}' (score {top_n[0].opportunity_score}/10). "
             f"Fastest growing category: {top_n[0].category}."
-            if top_n else "No signals detected."
+            if top_n
+            else "No signals detected."
         )
 
         report = MarketReport(
@@ -298,16 +297,18 @@ class MarketAnalysis:
         """Return the top-*k* income stream suggestions from the report."""
         suggestions = []
         for trend in report.top_trends[:top_k]:
-            suggestions.append({
-                "topic": trend.topic,
-                "category": trend.category,
-                "opportunity_score": trend.opportunity_score,
-                "monetization_paths": trend.monetization_paths,
-                "rationale": (
-                    f"{trend.growth_pct:.0f}% growth rate with "
-                    f"{trend.competition} competition and "
-                    f"{trend.search_volume:,} monthly searches."
-                ),
-            })
+            suggestions.append(
+                {
+                    "topic": trend.topic,
+                    "category": trend.category,
+                    "opportunity_score": trend.opportunity_score,
+                    "monetization_paths": trend.monetization_paths,
+                    "rationale": (
+                        f"{trend.growth_pct:.0f}% growth rate with "
+                        f"{trend.competition} competition and "
+                        f"{trend.search_volume:,} monthly searches."
+                    ),
+                }
+            )
         self.bus.publish("market.new_streams_suggested", suggestions)
         return suggestions

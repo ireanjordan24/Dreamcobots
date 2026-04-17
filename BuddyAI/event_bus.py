@@ -6,7 +6,7 @@ the DreamCo ecosystem.
 """
 
 import threading
-from typing import Callable, Any
+from typing import Any, Callable
 
 
 class EventBus:

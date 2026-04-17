@@ -22,11 +22,13 @@ class RevenueEngine:
     def record_transaction(self, amount: float, description: str = "") -> None:
         """Record a revenue transaction."""
         self.total_revenue += amount
-        self.transactions.append({
-            "amount": amount,
-            "description": description,
-            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        })
+        self.transactions.append(
+            {
+                "amount": amount,
+                "description": description,
+                "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            }
+        )
 
     def get_summary(self) -> dict:
         return {

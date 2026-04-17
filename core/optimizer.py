@@ -6,10 +6,9 @@ Analyses bot output and recommends strategic adjustments.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Thresholds (module-level defaults for backwards compatibility)
@@ -24,6 +23,7 @@ MIN_LEADS_THRESHOLD: int = 3
 # OptimizationResult
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class OptimizationResult:
     bot_name: str
@@ -32,7 +32,9 @@ class OptimizationResult:
     conversion_rate: float
     leads_generated: int = 0
     priority_score: float = 0.0
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -49,6 +51,7 @@ class OptimizationResult:
 # ---------------------------------------------------------------------------
 # Optimizer
 # ---------------------------------------------------------------------------
+
 
 class Optimizer:
     """
@@ -119,7 +122,9 @@ class Optimizer:
 
     def get_top_performers(self, n: int = 5) -> List[Dict[str, Any]]:
         """Return the top N bots by priority score from history."""
-        sorted_history = sorted(self._history, key=lambda r: r.priority_score, reverse=True)
+        sorted_history = sorted(
+            self._history, key=lambda r: r.priority_score, reverse=True
+        )
         return [r.to_dict() for r in sorted_history[:n]]
 
     def analyse_all(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -129,5 +134,7 @@ class Optimizer:
             bot_name = result.get("bot", "unknown")
             output = result.get("output") or {}
             recommendation = self.improve(output) if output else "Insufficient data"
-            enriched.append({"bot": bot_name, "recommendation": recommendation, "output": output})
+            enriched.append(
+                {"bot": bot_name, "recommendation": recommendation, "output": output}
+            )
         return enriched

@@ -22,25 +22,20 @@ _DEFAULTS: dict = {
     "blog_analytics_api_key": "",
     "affiliate_api_key": "",
     "saas_api_key": "",
-
     # ── Content generation ─────────────────────────────────────────────────
     "openai_api_key": "",
     "content_output_dir": "output/content",
-
     # ── Market analysis ────────────────────────────────────────────────────
     "trends_api_key": "",
     "market_scan_interval_hours": 24,
     "top_trends_limit": 10,
-
     # ── ML optimizer ──────────────────────────────────────────────────────
     "ml_model_dir": "output/models",
     "training_data_dir": "output/training_data",
     "optimization_iterations": 100,
-
     # ── Dashboard ─────────────────────────────────────────────────────────
     "dashboard_output_dir": "output/dashboard",
-    "report_format": "text",          # "text" | "json"
-
+    "report_format": "text",  # "text" | "json"
     # ── General ────────────────────────────────────────────────────────────
     "log_level": "INFO",
     "buddy_bot_name": "BuddyBot",
@@ -76,8 +71,12 @@ def load_config(config_path: str | None = None) -> dict:
 
 def ensure_output_dirs(cfg: dict) -> None:
     """Create output directories referenced in *cfg* if they don't exist."""
-    for dir_key in ("content_output_dir", "ml_model_dir",
-                    "training_data_dir", "dashboard_output_dir"):
+    for dir_key in (
+        "content_output_dir",
+        "ml_model_dir",
+        "training_data_dir",
+        "dashboard_output_dir",
+    ):
         path = cfg.get(dir_key, "")
         if path:
             Path(path).mkdir(parents=True, exist_ok=True)

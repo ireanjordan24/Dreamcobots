@@ -16,22 +16,17 @@ Usage
 
 from typing import List, Optional
 
-from .tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    list_tiers,
-)
-from .ingestion import DataIngestionLayer, DataSourceType, IngestedRecord
-from .classifier import LearningMethodClassifier, ClassifiedMethod
-from .sandbox import SandboxTestingLayer, SandboxTestResult
-from .analytics import PerformanceAnalyticsLayer, MethodRanking
-from .hybrid_engine import HybridEvolutionEngine, HybridStrategy
-from .deployment import DeploymentOrchestrator, BotApplication, Deployment
-from .governance import GovernanceLayer
-from .scheduler import AutomationScheduler, ScheduleFrequency
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .analytics import MethodRanking, PerformanceAnalyticsLayer
+from .classifier import ClassifiedMethod, LearningMethodClassifier
+from .deployment import BotApplication, Deployment, DeploymentOrchestrator
+from .governance import GovernanceLayer
+from .hybrid_engine import HybridEvolutionEngine, HybridStrategy
+from .ingestion import DataIngestionLayer, DataSourceType, IngestedRecord
+from .sandbox import SandboxTestingLayer, SandboxTestResult
+from .scheduler import AutomationScheduler, ScheduleFrequency
+from .tiers import Tier, TierConfig, get_tier_config, get_upgrade_path, list_tiers
 
 
 class AILearningSystemTierError(Exception):

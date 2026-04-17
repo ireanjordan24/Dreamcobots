@@ -18,8 +18,8 @@ Covers:
   14. Tier restrictions
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
@@ -27,59 +27,59 @@ sys.path.insert(0, REPO_ROOT)
 import pytest
 
 from bots.wealth_system_bot.tiers import (
+    FEATURE_AML_COMPLIANCE,
+    FEATURE_ANALYTICS,
+    FEATURE_ASSET_ALLOCATION,
+    FEATURE_ASSET_BOTS,
+    FEATURE_DIVIDEND_ENGINE,
+    FEATURE_DREAMCOIN,
+    FEATURE_GLOBAL_REGISTRY,
+    FEATURE_GOVERNANCE_VOTING,
+    FEATURE_INCOME_BOTS,
+    FEATURE_KYC_COMPLIANCE,
+    FEATURE_MARKETPLACE,
+    FEATURE_MULTI_CURRENCY,
+    FEATURE_MULTI_LANGUAGE,
+    FEATURE_REFERRAL_SYSTEM,
+    FEATURE_STRIPE_BILLING,
+    FEATURE_TRADING_BOTS,
+    FEATURE_TREASURY_MANAGEMENT,
+    FEATURE_WEALTH_HUBS,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_WEALTH_HUBS,
-    FEATURE_TREASURY_MANAGEMENT,
-    FEATURE_GOVERNANCE_VOTING,
-    FEATURE_DIVIDEND_ENGINE,
-    FEATURE_ASSET_ALLOCATION,
-    FEATURE_DREAMCOIN,
-    FEATURE_KYC_COMPLIANCE,
-    FEATURE_AML_COMPLIANCE,
-    FEATURE_GLOBAL_REGISTRY,
-    FEATURE_MULTI_LANGUAGE,
-    FEATURE_MULTI_CURRENCY,
-    FEATURE_INCOME_BOTS,
-    FEATURE_ASSET_BOTS,
-    FEATURE_TRADING_BOTS,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_STRIPE_BILLING,
-    FEATURE_REFERRAL_SYSTEM,
-    FEATURE_MARKETPLACE,
 )
 from bots.wealth_system_bot.wealth_system_bot import (
-    WealthSystemBot,
-    WealthSystemBotError,
-    WealthSystemBotTierError,
-    WealthSystemBotNotFoundError,
+    LANGUAGE_LABELS,
+    REGION_CONFIG_CATALOGUE,
+    AssetAllocation,
     AssetTier,
-    PayoutSchedule,
+    BotTask,
     BotType,
+    ComplianceRecord,
     ComplianceStatus,
+    DividendRecord,
+    GovernanceProposal,
     HubStatus,
     Language,
-    Region,
-    WealthHub,
     Member,
-    GovernanceProposal,
-    DividendRecord,
-    AssetAllocation,
-    ComplianceRecord,
-    BotTask,
+    PayoutSchedule,
+    Region,
     RegionConfig,
-    REGION_CONFIG_CATALOGUE,
-    LANGUAGE_LABELS,
+    WealthHub,
+    WealthSystemBot,
+    WealthSystemBotError,
+    WealthSystemBotNotFoundError,
+    WealthSystemBotTierError,
 )
-
 
 # ===========================================================================
 # Helpers
 # ===========================================================================
+
 
 def _make_bot(tier: Tier = Tier.FREE) -> WealthSystemBot:
     return WealthSystemBot(tier=tier)
@@ -101,6 +101,7 @@ def _make_hub(bot: WealthSystemBot, owner_id: str = "owner_1", name: str = "Test
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -179,12 +180,24 @@ class TestTiers:
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
         for feat in [
-            FEATURE_WEALTH_HUBS, FEATURE_TREASURY_MANAGEMENT, FEATURE_GOVERNANCE_VOTING,
-            FEATURE_DIVIDEND_ENGINE, FEATURE_ASSET_ALLOCATION, FEATURE_DREAMCOIN,
-            FEATURE_KYC_COMPLIANCE, FEATURE_AML_COMPLIANCE, FEATURE_GLOBAL_REGISTRY,
-            FEATURE_MULTI_LANGUAGE, FEATURE_MULTI_CURRENCY, FEATURE_INCOME_BOTS,
-            FEATURE_ASSET_BOTS, FEATURE_TRADING_BOTS, FEATURE_ANALYTICS,
-            FEATURE_WHITE_LABEL, FEATURE_STRIPE_BILLING, FEATURE_REFERRAL_SYSTEM,
+            FEATURE_WEALTH_HUBS,
+            FEATURE_TREASURY_MANAGEMENT,
+            FEATURE_GOVERNANCE_VOTING,
+            FEATURE_DIVIDEND_ENGINE,
+            FEATURE_ASSET_ALLOCATION,
+            FEATURE_DREAMCOIN,
+            FEATURE_KYC_COMPLIANCE,
+            FEATURE_AML_COMPLIANCE,
+            FEATURE_GLOBAL_REGISTRY,
+            FEATURE_MULTI_LANGUAGE,
+            FEATURE_MULTI_CURRENCY,
+            FEATURE_INCOME_BOTS,
+            FEATURE_ASSET_BOTS,
+            FEATURE_TRADING_BOTS,
+            FEATURE_ANALYTICS,
+            FEATURE_WHITE_LABEL,
+            FEATURE_STRIPE_BILLING,
+            FEATURE_REFERRAL_SYSTEM,
             FEATURE_MARKETPLACE,
         ]:
             assert cfg.has_feature(feat), f"Enterprise missing: {feat}"
@@ -212,6 +225,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Global Registry
 # ===========================================================================
+
 
 class TestGlobalRegistry:
     def setup_method(self):
@@ -248,9 +262,14 @@ class TestGlobalRegistry:
 
     def test_register_hub_language(self):
         hub = self.bot.register_hub(
-            owner_id="u1", name="French Hub", city="Paris",
-            state="IDF", country="France", region=Region.EUROPE,
-            language=Language.FR, currency="EUR",
+            owner_id="u1",
+            name="French Hub",
+            city="Paris",
+            state="IDF",
+            country="France",
+            region=Region.EUROPE,
+            language=Language.FR,
+            currency="EUR",
         )
         assert hub.language == Language.FR
         assert hub.currency == "EUR"
@@ -290,12 +309,20 @@ class TestGlobalRegistry:
     def test_list_hubs_filter_by_region_multi(self):
         bot = _make_bot(Tier.PRO)
         bot.register_hub(
-            owner_id="u1", name="NA Hub", city="NYC",
-            state="NY", country="USA", region=Region.NORTH_AMERICA,
+            owner_id="u1",
+            name="NA Hub",
+            city="NYC",
+            state="NY",
+            country="USA",
+            region=Region.NORTH_AMERICA,
         )
         bot.register_hub(
-            owner_id="u2", name="EU Hub", city="Berlin",
-            state="BE", country="Germany", region=Region.EUROPE,
+            owner_id="u2",
+            name="EU Hub",
+            city="Berlin",
+            state="BE",
+            country="Germany",
+            region=Region.EUROPE,
         )
         assert len(bot.list_hubs(region=Region.NORTH_AMERICA)) == 1
         assert len(bot.list_hubs(region=Region.EUROPE)) == 1
@@ -350,6 +377,7 @@ class TestGlobalRegistry:
 # ===========================================================================
 # 3. Localization
 # ===========================================================================
+
 
 class TestLocalization:
     def setup_method(self):
@@ -407,6 +435,7 @@ class TestLocalization:
 # ===========================================================================
 # 4. Member Management
 # ===========================================================================
+
 
 class TestMemberManagement:
     def setup_method(self):
@@ -479,7 +508,8 @@ class TestMemberManagement:
         self.bot.contribute(m2.member_id, 2000.0)
         self.bot.contribute(m3.member_id, 3000.0)
         total = sum(
-            self.bot.get_member(mid).ownership_pct for mid in [m1.member_id, m2.member_id, m3.member_id]
+            self.bot.get_member(mid).ownership_pct
+            for mid in [m1.member_id, m2.member_id, m3.member_id]
         )
         assert total == pytest.approx(100.0)
 
@@ -508,6 +538,7 @@ class TestMemberManagement:
 # ===========================================================================
 # 5. KYC / AML Compliance
 # ===========================================================================
+
 
 class TestKYCAMLCompliance:
     def setup_method(self):
@@ -591,8 +622,12 @@ class TestKYCAMLCompliance:
         bot = _make_bot(Tier.PRO)
         # Africa threshold is $3,000
         hub = bot.register_hub(
-            owner_id="o1", name="Africa Hub", city="Lagos",
-            state="Lagos", country="Nigeria", region=Region.AFRICA,
+            owner_id="o1",
+            name="Africa Hub",
+            city="Lagos",
+            state="Lagos",
+            country="Nigeria",
+            region=Region.AFRICA,
         )
         record = bot.submit_aml_check("u1", hub.hub_id, 4000.0)
         assert record.status == ComplianceStatus.PENDING
@@ -601,6 +636,7 @@ class TestKYCAMLCompliance:
 # ===========================================================================
 # 6. Governance
 # ===========================================================================
+
 
 class TestGovernance:
     def setup_method(self):
@@ -684,6 +720,7 @@ class TestGovernance:
 # 7. Asset Allocation
 # ===========================================================================
 
+
 class TestAssetAllocation:
     def setup_method(self):
         self.bot = _make_bot(Tier.PRO)
@@ -746,6 +783,7 @@ class TestAssetAllocation:
 # ===========================================================================
 # 8. Dividend Engine
 # ===========================================================================
+
 
 class TestDividendEngine:
     def setup_method(self):
@@ -824,6 +862,7 @@ class TestDividendEngine:
 # 9. DreamCoin
 # ===========================================================================
 
+
 class TestDreamCoin:
     def setup_method(self):
         self.bot = _make_bot(Tier.PRO)
@@ -861,6 +900,7 @@ class TestDreamCoin:
 # ===========================================================================
 # 10. Bot Tasks
 # ===========================================================================
+
 
 class TestBotTasks:
     def setup_method(self):
@@ -950,6 +990,7 @@ class TestBotTasks:
 # 11. Referral System
 # ===========================================================================
 
+
 class TestReferralSystem:
     def setup_method(self):
         self.bot = _make_bot(Tier.PRO)
@@ -986,6 +1027,7 @@ class TestReferralSystem:
 # ===========================================================================
 # 12. Analytics
 # ===========================================================================
+
 
 class TestAnalytics:
     def setup_method(self):
@@ -1051,6 +1093,7 @@ class TestAnalytics:
 # 13. Chat and process interface
 # ===========================================================================
 
+
 class TestChatAndProcess:
     def setup_method(self):
         self.bot = _make_bot(Tier.FREE)
@@ -1089,25 +1132,29 @@ class TestChatAndProcess:
         assert self.bot.tier.value in result
 
     def test_process_register_hub(self):
-        result = self.bot.process({
-            "action": "register_hub",
-            "owner_id": "u1",
-            "name": "Process Hub",
-            "city": "Miami",
-            "state": "FL",
-            "country": "USA",
-            "region": "north_america",
-            "language": "en",
-            "currency": "USD",
-        })
+        result = self.bot.process(
+            {
+                "action": "register_hub",
+                "owner_id": "u1",
+                "name": "Process Hub",
+                "city": "Miami",
+                "state": "FL",
+                "country": "USA",
+                "region": "north_america",
+                "language": "en",
+                "currency": "USD",
+            }
+        )
         assert result["success"] is True
         assert isinstance(result["data"], WealthHub)
 
     def test_process_get_hub(self):
-        result = self.bot.process({
-            "action": "get_hub",
-            "hub_id": self.hub.hub_id,
-        })
+        result = self.bot.process(
+            {
+                "action": "get_hub",
+                "hub_id": self.hub.hub_id,
+            }
+        )
         assert result["success"] is True
 
     def test_process_get_hub_not_found(self):
@@ -1120,20 +1167,24 @@ class TestChatAndProcess:
         assert isinstance(result["data"], list)
 
     def test_process_add_member(self):
-        result = self.bot.process({
-            "action": "add_member",
-            "hub_id": self.hub.hub_id,
-            "user_id": "user_proc",
-        })
+        result = self.bot.process(
+            {
+                "action": "add_member",
+                "hub_id": self.hub.hub_id,
+                "user_id": "user_proc",
+            }
+        )
         assert result["success"] is True
 
     def test_process_contribute(self):
         m = self.bot.add_member(self.hub.hub_id, "user_c")
-        result = self.bot.process({
-            "action": "contribute",
-            "member_id": m.member_id,
-            "amount_usd": 500.0,
-        })
+        result = self.bot.process(
+            {
+                "action": "contribute",
+                "member_id": m.member_id,
+                "amount_usd": 500.0,
+            }
+        )
         assert result["success"] is True
 
     def test_process_chat(self):
@@ -1152,6 +1203,7 @@ class TestChatAndProcess:
 # ===========================================================================
 # 14. Tier restrictions
 # ===========================================================================
+
 
 class TestTierRestrictions:
     def test_free_governance_blocked(self):

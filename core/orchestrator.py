@@ -33,11 +33,11 @@ _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
+from core.bot_lab import BotLab
+from core.bot_registry import clear_registry, get_registered_bots, register_bot
 from event_bus.redis_bus import RedisEventBus
 from python_bots.base_bot import BaseBot
 from python_bots.real_estate.bot import RealEstateBot
-from core.bot_lab import BotLab
-from core.bot_registry import register_bot, get_registered_bots, clear_registry
 
 # ---------------------------------------------------------------------------
 # Money pipeline handler
@@ -174,6 +174,7 @@ class Orchestrator:
         # Try to include Feature1Bot from the existing Real_Estate_bots folder
         try:
             from Real_Estate_bots.feature_1 import Feature1Bot  # type: ignore[import]
+
             core_bots.append(Feature1Bot("feature_1"))
         except Exception:  # pylint: disable=broad-except
             pass
@@ -222,16 +223,26 @@ class Orchestrator:
             passed = self.lab.test_bot(bot, test_bus)
 
             if passed:
-                register_bot({"name": bot.name, "type": type(bot).__name__, "status": "approved"})
+                register_bot(
+                    {"name": bot.name, "type": type(bot).__name__, "status": "approved"}
+                )
                 bot.run(self.bus)
             else:
-                register_bot({"name": bot.name, "type": type(bot).__name__, "status": "failed_test"})
+                register_bot(
+                    {
+                        "name": bot.name,
+                        "type": type(bot).__name__,
+                        "status": "failed_test",
+                    }
+                )
 
         summary = get_registered_bots()
         approved = [b for b in summary if b["status"] == "approved"]
         failed = [b for b in summary if b["status"] != "approved"]
 
-        print(f"\n✅ DreamCo OS run complete — {len(approved)} approved, {len(failed)} failed")
+        print(
+            f"\n✅ DreamCo OS run complete — {len(approved)} approved, {len(failed)} failed"
+        )
 
 
 # ---------------------------------------------------------------------------

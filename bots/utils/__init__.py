@@ -5,8 +5,8 @@ Provides structured logging, centralized error handling, and
 performance metrics helpers for all bots.
 """
 
-from .logger import get_logger, BotLogger
 from .error_handler import BotError, retry, safe_run
+from .logger import BotLogger, get_logger
 
 __all__ = [
     "get_logger",

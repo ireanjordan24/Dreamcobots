@@ -1,17 +1,23 @@
 """Nanotech-assisted disease detection and precision medicine engine."""
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+
+import os
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 from tiers import Tier, get_tier_config, get_upgrade_path
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _flow = GlobalAISourcesFlow(bot_name="PrecisionMedicine")
 
 # Simulated disease-marker reference database
 DISEASE_MARKERS = {
-    "cancer":        {"CEA": (0, 3.0), "CA-125": (0, 35), "PSA": (0, 4.0)},
-    "diabetes":      {"HbA1c": (0, 5.7), "fasting_glucose": (70, 100)},
+    "cancer": {"CEA": (0, 3.0), "CA-125": (0, 35), "PSA": (0, 4.0)},
+    "diabetes": {"HbA1c": (0, 5.7), "fasting_glucose": (70, 100)},
     "cardiovascular": {"troponin": (0, 0.04), "BNP": (0, 100), "CRP": (0, 1.0)},
-    "infection":     {"WBC": (4500, 11000), "CRP": (0, 1.0), "procalcitonin": (0, 0.5)},
+    "infection": {"WBC": (4500, 11000), "CRP": (0, 1.0), "procalcitonin": (0, 0.5)},
 }
 
 # DNA variant risk scores (simulated)
@@ -20,15 +26,15 @@ GENOMIC_RISKS = {
     "BRCA2": {"cancer": 0.65, "description": "Elevated breast cancer risk"},
     "APOE4": {"alzheimers": 0.60, "description": "Elevated Alzheimer's risk"},
     "MTHFR": {"cardiovascular": 0.35, "description": "Elevated cardiovascular risk"},
-    "TP53":  {"cancer": 0.80, "description": "Elevated multi-cancer risk"},
+    "TP53": {"cancer": 0.80, "description": "Elevated multi-cancer risk"},
 }
 
 # Simulated drug–gene interactions (efficacy 0–1)
 DRUG_EFFICACY_TABLE = {
-    "metformin":   {"default": 0.78, "MTHFR": 0.55},
-    "warfarin":    {"default": 0.70, "CYP2C9": 0.40},
-    "tamoxifen":   {"default": 0.68, "CYP2D6_poor": 0.30},
-    "aspirin":     {"default": 0.75, "default_cardio": 0.85},
+    "metformin": {"default": 0.78, "MTHFR": 0.55},
+    "warfarin": {"default": 0.70, "CYP2C9": 0.40},
+    "tamoxifen": {"default": 0.68, "CYP2D6_poor": 0.30},
+    "aspirin": {"default": 0.75, "default_cardio": 0.85},
     "atorvastatin": {"default": 0.80, "SLCO1B1": 0.50},
 }
 
@@ -44,6 +50,7 @@ class PrecisionMedicineError(Exception):
 # ---------------------------------------------------------------------------
 # NanotechDiseaseDetector
 # ---------------------------------------------------------------------------
+
 
 class NanotechDiseaseDetector:
     """Nanotech-assisted disease biomarker detection.
@@ -88,12 +95,14 @@ class NanotechDiseaseDetector:
                 if measured is None:
                     continue
                 abnormal = measured < low or measured > high
-                disease_flags.append({
-                    "marker": marker,
-                    "measured": measured,
-                    "reference_range": (low, high),
-                    "abnormal": abnormal,
-                })
+                disease_flags.append(
+                    {
+                        "marker": marker,
+                        "measured": measured,
+                        "reference_range": (low, high),
+                        "abnormal": abnormal,
+                    }
+                )
                 if abnormal:
                     flagged_diseases.append(disease)
             if disease_flags:
@@ -107,7 +116,8 @@ class NanotechDiseaseDetector:
             "findings": findings,
             "flagged_diseases": list(set(flagged_diseases)),
             "recommendation": (
-                "Consult a specialist for flagged conditions" if flagged_diseases
+                "Consult a specialist for flagged conditions"
+                if flagged_diseases
                 else "No significant abnormalities detected"
             ),
         }
@@ -134,7 +144,11 @@ class NanotechDiseaseDetector:
             if variant in GENOMIC_RISKS:
                 risk_profile[variant] = GENOMIC_RISKS[variant]
 
-        high_risk = {v: r for v, r in risk_profile.items() if max(r[k] for k in r if isinstance(r[k], float)) > 0.5}
+        high_risk = {
+            v: r
+            for v, r in risk_profile.items()
+            if max(r[k] for k in r if isinstance(r[k], float)) > 0.5
+        }
 
         return {
             "patient_id": patient_id,
@@ -143,7 +157,9 @@ class NanotechDiseaseDetector:
             "variants_identified": variants,
             "risk_profile": risk_profile,
             "high_risk_variants": list(high_risk.keys()),
-            "overall_genomic_risk": "high" if high_risk else "moderate" if risk_profile else "low",
+            "overall_genomic_risk": (
+                "high" if high_risk else "moderate" if risk_profile else "low"
+            ),
             "nanotech_sequencing": True,
             "accuracy_pct": 99.7,
         }
@@ -161,13 +177,15 @@ class NanotechDiseaseDetector:
         conditions = patient_data.get("conditions", [])
 
         treatments = {
-            "cancer":        ["oncology_referral", "imaging_workup", "biopsy"],
-            "diabetes":      ["metformin", "lifestyle_modification", "glucose_monitoring"],
+            "cancer": ["oncology_referral", "imaging_workup", "biopsy"],
+            "diabetes": ["metformin", "lifestyle_modification", "glucose_monitoring"],
             "cardiovascular": ["aspirin", "atorvastatin", "cardiac_rehabilitation"],
-            "infection":     ["antibiotic_therapy", "hydration", "rest"],
+            "infection": ["antibiotic_therapy", "hydration", "rest"],
         }
 
-        base = treatments.get(diagnosis.lower(), ["specialist_referral", "further_testing"])
+        base = treatments.get(
+            diagnosis.lower(), ["specialist_referral", "further_testing"]
+        )
 
         result = {
             "patient_id": patient_id,
@@ -193,6 +211,7 @@ class NanotechDiseaseDetector:
 # ---------------------------------------------------------------------------
 # PrecisionMedicineEngine
 # ---------------------------------------------------------------------------
+
 
 class PrecisionMedicineEngine:
     """Engine for building patient profiles, calculating drug efficacy,
@@ -233,7 +252,11 @@ class PrecisionMedicineEngine:
 
         patient_id = patient_data.get("patient_id", "unknown")
         limit = self._PATIENT_LIMIT[self.tier]
-        if limit is not None and len(self._profiles) >= limit and patient_id not in self._profiles:
+        if (
+            limit is not None
+            and len(self._profiles) >= limit
+            and patient_id not in self._profiles
+        ):
             raise PrecisionMedicineError(
                 f"{self.tier.value.upper()} tier allows only {limit} patient profile(s). "
                 "Upgrade to ENTERPRISE for unlimited profiles."
@@ -247,8 +270,15 @@ class PrecisionMedicineEngine:
             "conditions": patient_data.get("conditions", []),
             "current_medications": patient_data.get("medications", []),
             "allergies": patient_data.get("allergies", []),
-            "bmi": round(patient_data.get("weight_kg", 70) / ((patient_data.get("height_cm", 170) / 100) ** 2), 1)
-                   if patient_data.get("height_cm") else None,
+            "bmi": (
+                round(
+                    patient_data.get("weight_kg", 70)
+                    / ((patient_data.get("height_cm", 170) / 100) ** 2),
+                    1,
+                )
+                if patient_data.get("height_cm")
+                else None
+            ),
             "tier": self.tier.value,
         }
 
@@ -273,7 +303,9 @@ class PrecisionMedicineEngine:
             "base_efficacy": base_efficacy,
             "adjusted_efficacy": base_efficacy,
             "tier": self.tier.value,
-            "recommendation": "suitable" if base_efficacy >= 0.65 else "consider_alternative",
+            "recommendation": (
+                "suitable" if base_efficacy >= 0.65 else "consider_alternative"
+            ),
         }
 
         if self.tier == Tier.ENTERPRISE:
@@ -284,12 +316,16 @@ class PrecisionMedicineEngine:
             for variant in variants:
                 if variant in drug_table:
                     adjusted = drug_table[variant]
-                    variant_adjustments.append({"variant": variant, "adjusted_efficacy": adjusted})
+                    variant_adjustments.append(
+                        {"variant": variant, "adjusted_efficacy": adjusted}
+                    )
 
             result["adjusted_efficacy"] = adjusted
             result["genomic_adjustments"] = variant_adjustments
             result["pharmacogenomics_applied"] = True
-            result["recommendation"] = "suitable" if adjusted >= 0.65 else "consider_alternative"
+            result["recommendation"] = (
+                "suitable" if adjusted >= 0.65 else "consider_alternative"
+            )
 
         return result
 
@@ -302,12 +338,12 @@ class PrecisionMedicineEngine:
         variants = profile.get("genomic_variants", [])
 
         plans = {
-            "cancer":        {
+            "cancer": {
                 "primary": ["targeted_immunotherapy", "surgical_resection"],
                 "supportive": ["anti-emetics", "nutritional_support"],
                 "monitoring": ["monthly_imaging", "tumour_markers"],
             },
-            "diabetes":      {
+            "diabetes": {
                 "primary": ["metformin_500mg_bid", "sglt2_inhibitor"],
                 "supportive": ["dietary_counselling", "exercise_program"],
                 "monitoring": ["quarterly_HbA1c", "daily_glucose"],
@@ -317,18 +353,21 @@ class PrecisionMedicineEngine:
                 "supportive": ["cardiac_rehab", "stress_reduction"],
                 "monitoring": ["monthly_lipid_panel", "echocardiogram"],
             },
-            "infection":     {
+            "infection": {
                 "primary": ["broad_spectrum_antibiotic"],
                 "supportive": ["iv_fluids", "analgesics"],
                 "monitoring": ["daily_cbc", "culture_results"],
             },
         }
 
-        plan = plans.get(condition.lower(), {
-            "primary": ["specialist_referral"],
-            "supportive": ["general_supportive_care"],
-            "monitoring": ["regular_follow_up"],
-        })
+        plan = plans.get(
+            condition.lower(),
+            {
+                "primary": ["specialist_referral"],
+                "supportive": ["general_supportive_care"],
+                "monitoring": ["regular_follow_up"],
+            },
+        )
 
         return {
             "patient_id": patient_id,

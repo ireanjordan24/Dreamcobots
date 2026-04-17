@@ -31,12 +31,10 @@ import React from 'react';
 // ---------------------------------------------------------------------------
 
 /** Base URL for the DreamCo payment / checkout system. */
-const PAYMENT_BASE_URL =
-  process.env.REACT_APP_DREAMCO_PAYMENT_URL || 'https://pay.dreamco.ai';
+const PAYMENT_BASE_URL = process.env.REACT_APP_DREAMCO_PAYMENT_URL || 'https://pay.dreamco.ai';
 
 /** Base URL for bot demo pages. */
-const DEMO_BASE_URL =
-  process.env.REACT_APP_DREAMCO_DEMO_URL || 'https://demo.dreamco.ai';
+const DEMO_BASE_URL = process.env.REACT_APP_DREAMCO_DEMO_URL || 'https://demo.dreamco.ai';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -47,8 +45,7 @@ function primaryCtaLabel(pricingType) {
   if (!pricingType) return 'Get Started';
   const lower = pricingType.toLowerCase();
   if (lower.includes('enterprise')) return 'Contact Sales';
-  if (lower.includes('saas') || lower.includes('subscription'))
-    return 'Subscribe';
+  if (lower.includes('saas') || lower.includes('subscription')) return 'Subscribe';
   if (lower.includes('per-')) return 'Purchase';
   if (lower.includes('success fee')) return 'Subscribe';
   return 'Get Started';
@@ -86,9 +83,7 @@ function demoUrl(bot) {
 export default function MonetizationLinks({ bot }) {
   if (!bot) return null;
 
-  const isEnterprise =
-    bot.pricingType &&
-    bot.pricingType.toLowerCase().includes('enterprise');
+  const isEnterprise = bot.pricingType && bot.pricingType.toLowerCase().includes('enterprise');
 
   const primaryLabel = primaryCtaLabel(bot.pricingType);
   const primaryHref = checkoutUrl(bot);

@@ -43,135 +43,130 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from bots.buddy_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    FEATURE_CONVERSATIONAL_AI,
-    FEATURE_EMOTION_DETECTION,
-    FEATURE_BASIC_MEMORY,
-    FEATURE_MULTILINGUAL,
-    FEATURE_HUMOR_ENGINE,
-    FEATURE_EMPATHY_ENGINE,
-    FEATURE_VOICE_SYNTHESIS,
-    FEATURE_AVATAR_2D,
-    FEATURE_AVATAR_3D,
-    FEATURE_MICRO_EXPRESSIONS,
-    FEATURE_AR_VR_PRESENCE,
-    FEATURE_ADVANCED_MEMORY,
-    FEATURE_MILESTONE_TRACKER,
-    FEATURE_CONFLICT_RESOLUTION,
-    FEATURE_MOOD_SYNC,
-    FEATURE_PERSONALITY_MODES,
-    FEATURE_CREATIVITY_ENGINE,
-    FEATURE_GAMIFIED_PRODUCTIVITY,
-    FEATURE_VOICE_CLONING,
-    FEATURE_GAN_IMAGE_MIMICRY,
-    FEATURE_HOLOGRAPHIC_PROJECTION,
-    FEATURE_REAL_TIME_TRANSLATION,
-    FEATURE_WELLNESS_TRACKER,
-    FEATURE_SOCIAL_MEDIA_MANAGER,
-    FEATURE_WHITE_LABEL,
-    FEATURE_API_ACCESS,
-    FEATURE_DEDICATED_SUPPORT,
-    FEATURE_LEAD_FINDER,
-    FEATURE_OFFER_GENERATOR,
-    FEATURE_CONVERSION_ENGINE,
-    FEATURE_FULFILLMENT_ENGINE,
-    FEATURE_RETENTION_ENGINE,
+from bots.buddy_bot.avatar_engine import (
+    AvatarEngine,
+    AvatarEngineError,
+    AvatarEnvironment,
+    AvatarType,
+    MicroExpression,
 )
 from bots.buddy_bot.conversation_engine import (
+    SUPPORTED_LANGUAGES,
+    CommunicationContext,
     ConversationEngine,
     ConversationTone,
-    CommunicationContext,
-    SUPPORTED_LANGUAGES,
 )
-from bots.buddy_bot.emotion_engine import (
-    EmotionEngine,
-    EmotionLabel,
-    EmotionSource,
+from bots.buddy_bot.conversion_engine import (
+    ConversionEngine,
+    ConversionEngineError,
+    ConversionEngineTierError,
+    ConversionRecord,
+    ConversionStage,
+    OutreachChannel,
+    Proposal,
 )
+from bots.buddy_bot.creativity_engine import (
+    ArtMedium,
+    CreativityEngine,
+    CreativityEngineError,
+    SongMood,
+    StoryGenre,
+)
+from bots.buddy_bot.emotion_engine import EmotionEngine, EmotionLabel, EmotionSource
+from bots.buddy_bot.fulfillment_engine import (
+    Deliverable,
+    DeliverableStatus,
+    DeliverableType,
+    FulfillmentEngine,
+    FulfillmentEngineError,
+    FulfillmentEngineTierError,
+)
+from bots.buddy_bot.lead_finder_engine import (
+    BusinessLead,
+    BusinessVertical,
+    LeadContactType,
+    LeadFinderEngine,
+    LeadFinderError,
+    LeadFinderTierError,
+)
+from bots.buddy_bot.lead_finder_engine import LeadStatus as LeadFinderStatus
 from bots.buddy_bot.memory_system import (
     MemorySystem,
     MemorySystemError,
     MilestoneCategory,
     UserProfile,
 )
-from bots.buddy_bot.avatar_engine import (
-    AvatarEngine,
-    AvatarType,
-    AvatarEnvironment,
-    MicroExpression,
-    AvatarEngineError,
-)
-from bots.buddy_bot.voice_engine import (
-    VoiceEngine,
-    VoiceTone,
-    AccentStyle,
-    VoiceEngineError,
-)
-from bots.buddy_bot.creativity_engine import (
-    CreativityEngine,
-    StoryGenre,
-    SongMood,
-    ArtMedium,
-    CreativityEngineError,
+from bots.buddy_bot.offer_generator_engine import (
+    OfferGeneratorEngine,
+    OfferGeneratorError,
+    OfferGeneratorTierError,
+    PricingModel,
+    ServiceOffer,
+    ServiceType,
 )
 from bots.buddy_bot.personality_engine import (
     PersonalityEngine,
     PersonaMode,
     PersonaTone,
 )
-from bots.buddy_bot.lead_finder_engine import (
-    LeadFinderEngine,
-    BusinessLead,
-    BusinessVertical,
-    LeadStatus as LeadFinderStatus,
-    LeadContactType,
-    LeadFinderError,
-    LeadFinderTierError,
-)
-from bots.buddy_bot.offer_generator_engine import (
-    OfferGeneratorEngine,
-    ServiceOffer,
-    ServiceType,
-    PricingModel,
-    OfferGeneratorError,
-    OfferGeneratorTierError,
-)
-from bots.buddy_bot.conversion_engine import (
-    ConversionEngine,
-    Proposal,
-    ConversionRecord,
-    OutreachChannel,
-    ConversionStage,
-    ConversionEngineError,
-    ConversionEngineTierError,
-)
-from bots.buddy_bot.fulfillment_engine import (
-    FulfillmentEngine,
-    Deliverable,
-    DeliverableType,
-    DeliverableStatus,
-    FulfillmentEngineError,
-    FulfillmentEngineTierError,
-)
 from bots.buddy_bot.retention_engine import (
-    RetentionEngine,
     ClientHealthRecord,
     HealthStatus,
-    UpsellStage,
-    UpsellOffer,
+    RetentionEngine,
     RetentionEngineError,
     RetentionEngineTierError,
+    UpsellOffer,
+    UpsellStage,
 )
-
+from bots.buddy_bot.tiers import (
+    FEATURE_ADVANCED_MEMORY,
+    FEATURE_API_ACCESS,
+    FEATURE_AR_VR_PRESENCE,
+    FEATURE_AVATAR_2D,
+    FEATURE_AVATAR_3D,
+    FEATURE_BASIC_MEMORY,
+    FEATURE_CONFLICT_RESOLUTION,
+    FEATURE_CONVERSATIONAL_AI,
+    FEATURE_CONVERSION_ENGINE,
+    FEATURE_CREATIVITY_ENGINE,
+    FEATURE_DEDICATED_SUPPORT,
+    FEATURE_EMOTION_DETECTION,
+    FEATURE_EMPATHY_ENGINE,
+    FEATURE_FULFILLMENT_ENGINE,
+    FEATURE_GAMIFIED_PRODUCTIVITY,
+    FEATURE_GAN_IMAGE_MIMICRY,
+    FEATURE_HOLOGRAPHIC_PROJECTION,
+    FEATURE_HUMOR_ENGINE,
+    FEATURE_LEAD_FINDER,
+    FEATURE_MICRO_EXPRESSIONS,
+    FEATURE_MILESTONE_TRACKER,
+    FEATURE_MOOD_SYNC,
+    FEATURE_MULTILINGUAL,
+    FEATURE_OFFER_GENERATOR,
+    FEATURE_PERSONALITY_MODES,
+    FEATURE_REAL_TIME_TRANSLATION,
+    FEATURE_RETENTION_ENGINE,
+    FEATURE_SOCIAL_MEDIA_MANAGER,
+    FEATURE_VOICE_CLONING,
+    FEATURE_VOICE_SYNTHESIS,
+    FEATURE_WELLNESS_TRACKER,
+    FEATURE_WHITE_LABEL,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+)
+from bots.buddy_bot.voice_engine import (
+    AccentStyle,
+    VoiceEngine,
+    VoiceEngineError,
+    VoiceTone,
+)
 from framework import GlobalAISourcesFlow
 
 
@@ -237,14 +232,22 @@ class BuddyBot:
         _is_pro_plus = tier in (Tier.PRO, Tier.ENTERPRISE)
         _is_enterprise = tier == Tier.ENTERPRISE
         self.lead_finder = LeadFinderEngine(
-            max_leads_per_scan=(None if _is_enterprise else (100 if _is_pro_plus else 5)),
+            max_leads_per_scan=(
+                None if _is_enterprise else (100 if _is_pro_plus else 5)
+            ),
             can_filter_vertical=_is_pro_plus,
             can_enrich=_is_pro_plus,
             can_ai_score=_is_enterprise,
         )
-        from bots.buddy_bot.offer_generator_engine import _ALL_SERVICE_TYPES, _FREE_SERVICE_TYPES
+        from bots.buddy_bot.offer_generator_engine import (
+            _ALL_SERVICE_TYPES,
+            _FREE_SERVICE_TYPES,
+        )
+
         self.offer_generator = OfferGeneratorEngine(
-            available_service_types=(_ALL_SERVICE_TYPES if _is_pro_plus else _FREE_SERVICE_TYPES),
+            available_service_types=(
+                _ALL_SERVICE_TYPES if _is_pro_plus else _FREE_SERVICE_TYPES
+            ),
             can_dynamic_pricing=_is_pro_plus,
             can_performance_pricing=_is_enterprise,
             can_custom_bundle=_is_enterprise,
@@ -254,7 +257,9 @@ class BuddyBot:
             can_sms=_is_enterprise,
             can_ai_closing=_is_enterprise,
             can_booking=_is_enterprise,
-            max_outreach_per_day=(None if _is_enterprise else (50 if _is_pro_plus else 0)),
+            max_outreach_per_day=(
+                None if _is_enterprise else (50 if _is_pro_plus else 0)
+            ),
             require_human_approval=(not _is_enterprise),
         )
         self.fulfillment = FulfillmentEngine(
@@ -355,7 +360,10 @@ class BuddyBot:
                 EmotionLabel.EXCITEMENT: ConversationTone.EXCITED,
                 EmotionLabel.GRATITUDE: ConversationTone.HAPPY,
             }
-            if resolved_tone == ConversationTone.NEUTRAL and detected_emotion in emotion_tone_map:
+            if (
+                resolved_tone == ConversationTone.NEUTRAL
+                and detected_emotion in emotion_tone_map
+            ):
                 resolved_tone = emotion_tone_map[detected_emotion]
 
         # 3. Generate conversational response
@@ -522,7 +530,9 @@ class BuddyBot:
         except MemorySystemError as exc:
             return str(exc)
 
-    def record_episode(self, title: str, summary: str, emotion: str = "neutral") -> dict:
+    def record_episode(
+        self, title: str, summary: str, emotion: str = "neutral"
+    ) -> dict:
         """Record a significant life episode in Buddy's memory."""
         self._require_feature(FEATURE_ADVANCED_MEMORY)
         episode = self.memory.record_episode(
@@ -536,10 +546,30 @@ class BuddyBot:
     def _extract_interests(self, text: str) -> None:
         """Heuristically extract topics of interest from user text."""
         interest_keywords = {
-            "music", "coding", "programming", "art", "travel", "food", "fitness",
-            "sports", "reading", "writing", "film", "gaming", "fashion", "business",
-            "investing", "meditation", "yoga", "cooking", "photography", "science",
-            "history", "philosophy", "nature", "technology",
+            "music",
+            "coding",
+            "programming",
+            "art",
+            "travel",
+            "food",
+            "fitness",
+            "sports",
+            "reading",
+            "writing",
+            "film",
+            "gaming",
+            "fashion",
+            "business",
+            "investing",
+            "meditation",
+            "yoga",
+            "cooking",
+            "photography",
+            "science",
+            "history",
+            "philosophy",
+            "nature",
+            "technology",
         }
         for word in text.lower().split():
             clean = word.strip(".,!?;:\"'")
@@ -709,7 +739,6 @@ class BuddyBot:
         ctx = self.conversation.detect_context(text)
         return {"detected_context": ctx.value}
 
-
     def start_story(
         self,
         genre: str = "inspirational",
@@ -789,7 +818,9 @@ class BuddyBot:
     # Personality
     # ------------------------------------------------------------------
 
-    def set_persona(self, persona: str, blend_with: str = None, blend_ratio: float = 1.0) -> dict:
+    def set_persona(
+        self, persona: str, blend_with: str = None, blend_ratio: float = 1.0
+    ) -> dict:
         """Switch Buddy's active persona mode (PRO+)."""
         self._require_feature(FEATURE_PERSONALITY_MODES)
         persona_enum = PersonaMode(persona)
@@ -989,7 +1020,9 @@ class BuddyBot:
     # Autonomous SaaS — Fulfillment
     # ------------------------------------------------------------------
 
-    def deliver_ad_copy(self, client_name: str, industry: str = "local business") -> "Deliverable":
+    def deliver_ad_copy(
+        self, client_name: str, industry: str = "local business"
+    ) -> "Deliverable":
         """Generate ad copy for a client (PRO+)."""
         self._require_feature(FEATURE_FULFILLMENT_ENGINE)
         return self.fulfillment.generate_ad_copy(client_name, industry)
@@ -1002,7 +1035,9 @@ class BuddyBot:
     ) -> "Deliverable":
         """Generate a full ad campaign structure (PRO+)."""
         self._require_feature(FEATURE_FULFILLMENT_ENGINE)
-        return self.fulfillment.generate_ad_campaign(client_name, budget_usd, duration_days)
+        return self.fulfillment.generate_ad_campaign(
+            client_name, budget_usd, duration_days
+        )
 
     def deliver_landing_page(
         self, client_name: str, headline: str, offer_summary: str
@@ -1016,7 +1051,9 @@ class BuddyBot:
     ) -> "Deliverable":
         """Generate an email drip sequence (PRO+)."""
         self._require_feature(FEATURE_FULFILLMENT_ENGINE)
-        return self.fulfillment.generate_email_sequence(client_name, sequence_length, goal)
+        return self.fulfillment.generate_email_sequence(
+            client_name, sequence_length, goal
+        )
 
     # ------------------------------------------------------------------
     # Autonomous SaaS — Retention

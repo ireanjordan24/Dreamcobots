@@ -10,5 +10,14 @@ class TierConfig:
 
 TIERS = {
     "pro": TierConfig("Pro", 99.0, ["multi-chain staking", "validator selection AI"]),
-    "enterprise": TierConfig("Enterprise", 299.0, ["multi-chain staking", "validator selection AI", "auto-compound rewards", "slashing risk monitoring"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        299.0,
+        [
+            "multi-chain staking",
+            "validator selection AI",
+            "auto-compound rewards",
+            "slashing risk monitoring",
+        ],
+    ),
 }

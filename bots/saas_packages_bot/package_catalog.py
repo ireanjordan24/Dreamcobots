@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -87,7 +87,12 @@ _CATALOG: list = [
         monthly_price_usd=149.0,
         setup_fee_usd=499.0,
         users_included=20,
-        features=["multi-vendor", "commission-splits", "fraud-detection", "bulk-import"],
+        features=[
+            "multi-vendor",
+            "commission-splits",
+            "fraud-detection",
+            "bulk-import",
+        ],
     ),
     SaaSPackage(
         package_id="crm-001",
@@ -98,7 +103,12 @@ _CATALOG: list = [
         monthly_price_usd=59.0,
         setup_fee_usd=149.0,
         users_included=10,
-        features=["lead-scoring", "email-sequences", "deal-forecasting", "integrations"],
+        features=[
+            "lead-scoring",
+            "email-sequences",
+            "deal-forecasting",
+            "integrations",
+        ],
     ),
     SaaSPackage(
         package_id="crm-002",
@@ -109,7 +119,12 @@ _CATALOG: list = [
         monthly_price_usd=199.0,
         setup_fee_usd=999.0,
         users_included=50,
-        features=["territory-management", "AI-forecasting", "360-customer-view", "custom-fields"],
+        features=[
+            "territory-management",
+            "AI-forecasting",
+            "360-customer-view",
+            "custom-fields",
+        ],
     ),
     SaaSPackage(
         package_id="hr-001",
@@ -127,11 +142,22 @@ _CATALOG: list = [
         name="TalentBridge Workforce",
         industry=Industry.HR_AUTOMATION,
         description="Workforce planning and talent analytics platform for scaling teams.",
-        modules=["workforce-planning", "talent-analytics", "succession", "learning", "benefits"],
+        modules=[
+            "workforce-planning",
+            "talent-analytics",
+            "succession",
+            "learning",
+            "benefits",
+        ],
         monthly_price_usd=129.0,
         setup_fee_usd=499.0,
         users_included=100,
-        features=["succession-planning", "skills-gap-analysis", "LMS-integration", "benefits-admin"],
+        features=[
+            "succession-planning",
+            "skills-gap-analysis",
+            "LMS-integration",
+            "benefits-admin",
+        ],
     ),
     SaaSPackage(
         package_id="fin-001",
@@ -142,18 +168,34 @@ _CATALOG: list = [
         monthly_price_usd=69.0,
         setup_fee_usd=199.0,
         users_included=5,
-        features=["multi-currency", "tax-automation", "bank-feeds", "financial-dashboards"],
+        features=[
+            "multi-currency",
+            "tax-automation",
+            "bank-feeds",
+            "financial-dashboards",
+        ],
     ),
     SaaSPackage(
         package_id="fin-002",
         name="TreasuryMax Enterprise",
         industry=Industry.FINANCE,
         description="Enterprise treasury management with cash flow, FX, and risk analytics.",
-        modules=["cash-management", "fx-hedging", "risk-analytics", "payments", "compliance"],
+        modules=[
+            "cash-management",
+            "fx-hedging",
+            "risk-analytics",
+            "payments",
+            "compliance",
+        ],
         monthly_price_usd=499.0,
         setup_fee_usd=2999.0,
         users_included=20,
-        features=["FX-hedging", "cash-forecasting", "risk-dashboards", "SWIFT-integration"],
+        features=[
+            "FX-hedging",
+            "cash-forecasting",
+            "risk-dashboards",
+            "SWIFT-integration",
+        ],
     ),
     SaaSPackage(
         package_id="health-001",
@@ -164,7 +206,12 @@ _CATALOG: list = [
         monthly_price_usd=199.0,
         setup_fee_usd=999.0,
         users_included=10,
-        features=["HIPAA-compliant", "telemedicine", "e-prescriptions", "insurance-billing"],
+        features=[
+            "HIPAA-compliant",
+            "telemedicine",
+            "e-prescriptions",
+            "insurance-billing",
+        ],
     ),
     SaaSPackage(
         package_id="edu-001",
@@ -182,18 +229,35 @@ _CATALOG: list = [
         name="LexTrack Legal",
         industry=Industry.LEGAL,
         description="Matter management, billing, and document management for law firms.",
-        modules=["matter-management", "billing", "documents", "time-tracking", "client-portal"],
+        modules=[
+            "matter-management",
+            "billing",
+            "documents",
+            "time-tracking",
+            "client-portal",
+        ],
         monthly_price_usd=149.0,
         setup_fee_usd=499.0,
         users_included=10,
-        features=["matter-tracking", "trust-accounting", "e-discovery", "conflict-checks"],
+        features=[
+            "matter-tracking",
+            "trust-accounting",
+            "e-discovery",
+            "conflict-checks",
+        ],
     ),
     SaaSPackage(
         package_id="mkt-001",
         name="CampaignDrive Marketing",
         industry=Industry.MARKETING,
         description="Multi-channel marketing automation with email, SMS, and social campaigns.",
-        modules=["email-campaigns", "sms", "social-scheduler", "landing-pages", "analytics"],
+        modules=[
+            "email-campaigns",
+            "sms",
+            "social-scheduler",
+            "landing-pages",
+            "analytics",
+        ],
         monthly_price_usd=79.0,
         setup_fee_usd=199.0,
         users_included=5,
@@ -204,11 +268,22 @@ _CATALOG: list = [
         name="FreightFlow Logistics",
         industry=Industry.LOGISTICS,
         description="End-to-end logistics management with shipment tracking and fleet management.",
-        modules=["shipment-tracking", "fleet-management", "warehouse", "routing", "reports"],
+        modules=[
+            "shipment-tracking",
+            "fleet-management",
+            "warehouse",
+            "routing",
+            "reports",
+        ],
         monthly_price_usd=129.0,
         setup_fee_usd=499.0,
         users_included=15,
-        features=["real-time-tracking", "route-optimization", "warehouse-management", "carrier-integration"],
+        features=[
+            "real-time-tracking",
+            "route-optimization",
+            "warehouse-management",
+            "carrier-integration",
+        ],
     ),
     SaaSPackage(
         package_id="re-001",
@@ -226,11 +301,22 @@ _CATALOG: list = [
         name="AssetPlex Property Management",
         industry=Industry.REAL_ESTATE,
         description="Property management platform for landlords with tenant portal and maintenance.",
-        modules=["tenant-portal", "maintenance", "rent-collection", "accounting", "leases"],
+        modules=[
+            "tenant-portal",
+            "maintenance",
+            "rent-collection",
+            "accounting",
+            "leases",
+        ],
         monthly_price_usd=79.0,
         setup_fee_usd=199.0,
         users_included=5,
-        features=["online-rent-collection", "maintenance-requests", "lease-management", "financial-reports"],
+        features=[
+            "online-rent-collection",
+            "maintenance-requests",
+            "lease-management",
+            "financial-reports",
+        ],
     ),
 ]
 
@@ -263,7 +349,8 @@ class PackageCatalog:
         """Full-text search across name, description, and features."""
         q = query.lower()
         return [
-            p for p in self._packages.values()
+            p
+            for p in self._packages.values()
             if q in p.name.lower()
             or q in p.description.lower()
             or any(q in f.lower() for f in p.features)

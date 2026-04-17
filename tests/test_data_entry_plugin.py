@@ -1,8 +1,9 @@
 """Tests for data_entry plugin."""
 
 import pytest
-from BuddyAI.task_engine import TaskEngine
+
 from BuddyAI.plugins import data_entry
+from BuddyAI.task_engine import TaskEngine
 
 
 @pytest.fixture(autouse=True)

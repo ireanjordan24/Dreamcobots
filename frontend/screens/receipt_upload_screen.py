@@ -58,7 +58,11 @@ class ReceiptUploadScreen:
                 },
                 "ocr_result": {
                     "store": self.store or "Detecting...",
-                    "purchase_amount": f"${self.purchase_amount:.2f}" if self.purchase_amount else "Detecting...",
+                    "purchase_amount": (
+                        f"${self.purchase_amount:.2f}"
+                        if self.purchase_amount
+                        else "Detecting..."
+                    ),
                 },
                 "cashback_stack": {
                     "apps": self.SUPPORTED_APPS,
@@ -94,11 +98,36 @@ class ReceiptUploadScreen:
             store="walmart",
             purchase_amount=87.43,
             cashback_results=[
-                {"app": "coinout", "cashback_amount": 4.37, "cashback_pct": 5.0, "status": "pending"},
-                {"app": "ibotta", "cashback_amount": 6.99, "cashback_pct": 8.0, "status": "pending"},
-                {"app": "fetch_rewards", "cashback_amount": 2.62, "cashback_pct": 3.0, "status": "pending"},
-                {"app": "checkout51", "cashback_amount": 5.25, "cashback_pct": 6.0, "status": "pending"},
-                {"app": "rakuten", "cashback_amount": 8.74, "cashback_pct": 10.0, "status": "pending"},
+                {
+                    "app": "coinout",
+                    "cashback_amount": 4.37,
+                    "cashback_pct": 5.0,
+                    "status": "pending",
+                },
+                {
+                    "app": "ibotta",
+                    "cashback_amount": 6.99,
+                    "cashback_pct": 8.0,
+                    "status": "pending",
+                },
+                {
+                    "app": "fetch_rewards",
+                    "cashback_amount": 2.62,
+                    "cashback_pct": 3.0,
+                    "status": "pending",
+                },
+                {
+                    "app": "checkout51",
+                    "cashback_amount": 5.25,
+                    "cashback_pct": 6.0,
+                    "status": "pending",
+                },
+                {
+                    "app": "rakuten",
+                    "cashback_amount": 8.74,
+                    "cashback_pct": 10.0,
+                    "status": "pending",
+                },
             ],
             total_cashback=27.97,
             scan_status="complete",

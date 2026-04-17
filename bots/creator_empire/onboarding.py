@@ -4,6 +4,7 @@ Talent Identity & Onboarding module for the CreatorEmpire bot.
 Guides creators through profile setup tailored to their specific role
 (streamer, rapper, athlete, etc.) and generates a personalised action plan.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -11,7 +12,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .tiers import CREATOR_ROLES, Tier, CREATOR_FEATURES_BY_TIER, FEATURE_ROLE_ONBOARDING
+from .tiers import (
+    CREATOR_FEATURES_BY_TIER,
+    CREATOR_ROLES,
+    FEATURE_ROLE_ONBOARDING,
+    Tier,
+)
 
 
 class OnboardingError(Exception):
@@ -257,7 +263,9 @@ class OnboardingEngine:
         allowed = {"bio", "goals", "platforms", "metadata"}
         for key, value in kwargs.items():
             if key not in allowed:
-                raise OnboardingError(f"Field '{key}' cannot be updated via this method.")
+                raise OnboardingError(
+                    f"Field '{key}' cannot be updated via this method."
+                )
             setattr(profile, key, value)
         return profile
 
@@ -281,25 +289,55 @@ class OnboardingEngine:
     @staticmethod
     def _default_goals(role: str) -> list[str]:
         defaults = {
-            "streamer": ["grow subscriber base", "reach affiliate/partner status",
-                         "generate streaming revenue"],
-            "rapper": ["release debut EP", "grow SoundCloud/Spotify following",
-                       "land first paid performance"],
-            "athlete": ["secure sponsorship deal", "build social media presence",
-                        "document journey to pro"],
-            "artist": ["build commission client base", "launch Patreon",
-                       "exhibit in an online gallery"],
-            "content_creator": ["reach 1k subscribers", "enable monetisation",
-                                 "build brand partnerships"],
-            "podcaster": ["publish 10 episodes", "reach 500 listeners per episode",
-                          "land a sponsorship"],
-            "comedian": ["perform at 5 open mics", "grow TikTok following",
-                         "book first paid comedy show"],
-            "fitness_coach": ["onboard 10 online clients", "launch digital product",
-                               "build email list of 1k"],
-            "gamer": ["reach Twitch Affiliate", "grow Discord server to 100 members",
-                      "win a tournament"],
-            "dancer": ["reach 10k TikTok followers", "launch online class",
-                       "book first commercial gig"],
+            "streamer": [
+                "grow subscriber base",
+                "reach affiliate/partner status",
+                "generate streaming revenue",
+            ],
+            "rapper": [
+                "release debut EP",
+                "grow SoundCloud/Spotify following",
+                "land first paid performance",
+            ],
+            "athlete": [
+                "secure sponsorship deal",
+                "build social media presence",
+                "document journey to pro",
+            ],
+            "artist": [
+                "build commission client base",
+                "launch Patreon",
+                "exhibit in an online gallery",
+            ],
+            "content_creator": [
+                "reach 1k subscribers",
+                "enable monetisation",
+                "build brand partnerships",
+            ],
+            "podcaster": [
+                "publish 10 episodes",
+                "reach 500 listeners per episode",
+                "land a sponsorship",
+            ],
+            "comedian": [
+                "perform at 5 open mics",
+                "grow TikTok following",
+                "book first paid comedy show",
+            ],
+            "fitness_coach": [
+                "onboard 10 online clients",
+                "launch digital product",
+                "build email list of 1k",
+            ],
+            "gamer": [
+                "reach Twitch Affiliate",
+                "grow Discord server to 100 members",
+                "win a tournament",
+            ],
+            "dancer": [
+                "reach 10k TikTok followers",
+                "launch online class",
+                "book first commercial gig",
+            ],
         }
         return defaults.get(role, ["build audience", "monetise content"])

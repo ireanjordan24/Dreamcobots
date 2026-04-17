@@ -1,4 +1,5 @@
 """PII anonymizer for DataForge AI datasets."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import re
@@ -6,13 +7,25 @@ import re
 logger = logging.getLogger(__name__)
 
 PII_PATTERNS = {
-    "email": (re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"), "[EMAIL_REDACTED]"),
-    "phone": (re.compile(r"\b(\+?1[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})\b"), "[PHONE_REDACTED]"),
+    "email": (
+        re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"),
+        "[EMAIL_REDACTED]",
+    ),
+    "phone": (
+        re.compile(r"\b(\+?1[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})\b"),
+        "[PHONE_REDACTED]",
+    ),
     "ssn": (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "[SSN_REDACTED]"),
     "credit_card": (re.compile(r"\b(?:\d{4}[-\s]?){3}\d{4}\b"), "[CC_REDACTED]"),
-    "name_pattern": (re.compile(r"\b(Mr\.|Mrs\.|Ms\.|Dr\.)\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b"), "[NAME_REDACTED]"),
+    "name_pattern": (
+        re.compile(r"\b(Mr\.|Mrs\.|Ms\.|Dr\.)\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b"),
+        "[NAME_REDACTED]",
+    ),
     "zip_code": (re.compile(r"\b\d{5}(?:-\d{4})?\b"), "[ZIP_REDACTED]"),
-    "ip_address": (re.compile(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"), "[IP_REDACTED]"),
+    "ip_address": (
+        re.compile(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"),
+        "[IP_REDACTED]",
+    ),
 }
 
 

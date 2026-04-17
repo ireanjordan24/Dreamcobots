@@ -23,11 +23,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pytest
 
+from core.bot_base import SCALING_MULTIPLIERS, AutonomyLevel, BotBase, ScalingLevel
+
 # ---------------------------------------------------------------------------
 # 1. Core – Bot Base (autonomy & scaling)
 # ---------------------------------------------------------------------------
-
-from core.bot_base import AutonomyLevel, BotBase, ScalingLevel, SCALING_MULTIPLIERS
 
 
 class TestBotBase:
@@ -143,20 +143,26 @@ class TestCommunicationBot:
         deal = self.bot.initiate_deal("Vendor A", {"price": 5000, "units": 10})
         assert deal["status"] == "initiated"
         assert self.bot.close_deal(deal["deal_id"])
-        closed = next(d for d in self.bot.get_deals() if d["deal_id"] == deal["deal_id"])
+        closed = next(
+            d for d in self.bot.get_deals() if d["deal_id"] == deal["deal_id"]
+        )
         assert closed["status"] == "closed"
 
     def test_close_nonexistent_deal(self):
         assert not self.bot.close_deal(str(uuid.uuid4()))
 
     def test_bluetooth_transfer(self):
-        transfer = self.bot.initiate_bluetooth_transfer("device-XYZ", "song.mp3", 5_000_000)
+        transfer = self.bot.initiate_bluetooth_transfer(
+            "device-XYZ", "song.mp3", 5_000_000
+        )
         assert transfer.status == "in_progress"
         assert self.bot.complete_bluetooth_transfer(transfer.transfer_id)
         assert self.bot.get_bluetooth_transfers()[0].status == "complete"
 
     def test_verification_notification(self):
-        notif = self.bot.create_verification_notification("KYC pending", "https://app.dreamcobots.com/verify/123")
+        notif = self.bot.create_verification_notification(
+            "KYC pending", "https://app.dreamcobots.com/verify/123"
+        )
         assert not notif.resolved
         pending = self.bot.get_pending_notifications()
         assert len(pending) == 1
@@ -164,14 +170,16 @@ class TestCommunicationBot:
         assert len(self.bot.get_pending_notifications()) == 0
 
     def test_execute_task_send_message(self):
-        result = self.bot.execute_task({
-            "type": "send_message",
-            "channel": "text",
-            "sender": "bot",
-            "recipient": "user-1",
-            "content": "Hello!",
-            "validated": True,
-        })
+        result = self.bot.execute_task(
+            {
+                "type": "send_message",
+                "channel": "text",
+                "sender": "bot",
+                "recipient": "user-1",
+                "content": "Hello!",
+                "validated": True,
+            }
+        )
         assert result["status"] == "ok"
         assert "message_id" in result
 
@@ -225,7 +233,9 @@ class TestSandbox:
         assert "perf_test" in output
 
     def test_stress_test(self):
-        metrics = self.tester.run_stress_test(self.bot, {"type": "generic"}, duration_seconds=0.1)
+        metrics = self.tester.run_stress_test(
+            self.bot, {"type": "generic"}, duration_seconds=0.1
+        )
         assert metrics.total_iterations > 0
         assert metrics.throughput_ops_per_second > 0
 
@@ -241,7 +251,12 @@ class TestSandbox:
 # 4. Pricing & Membership
 # ---------------------------------------------------------------------------
 
-from pricing.membership import BillingCycle, MembershipManager, MembershipPlan, MembershipTier
+from pricing.membership import (
+    BillingCycle,
+    MembershipManager,
+    MembershipPlan,
+    MembershipTier,
+)
 
 
 class TestMembership:
@@ -249,7 +264,9 @@ class TestMembership:
         self.manager = MembershipManager()
 
     def test_subscribe(self):
-        sub = self.manager.subscribe("user-1", MembershipTier.PREMIUM, BillingCycle.MONTHLY)
+        sub = self.manager.subscribe(
+            "user-1", MembershipTier.PREMIUM, BillingCycle.MONTHLY
+        )
         assert sub.plan.tier == MembershipTier.PREMIUM
         assert sub.plan.billing_cycle == BillingCycle.MONTHLY
         assert sub.active
@@ -268,11 +285,15 @@ class TestMembership:
     def test_has_feature_free(self):
         self.manager.subscribe("user-4", MembershipTier.FREE, BillingCycle.MONTHLY)
         assert self.manager.has_feature("user-4", "Basic bot services")
-        assert not self.manager.has_feature("user-4", "Unlimited access to all bots and tools")
+        assert not self.manager.has_feature(
+            "user-4", "Unlimited access to all bots and tools"
+        )
 
     def test_has_feature_elite(self):
         self.manager.subscribe("user-5", MembershipTier.ELITE, BillingCycle.YEARLY)
-        assert self.manager.has_feature("user-5", "Unlimited access to all bots and tools")
+        assert self.manager.has_feature(
+            "user-5", "Unlimited access to all bots and tools"
+        )
 
     def test_plan_prices(self):
         free = MembershipPlan(MembershipTier.FREE, BillingCycle.MONTHLY)
@@ -376,8 +397,12 @@ class TestMediaRecognition:
         audio = b"fake audio data for testing purposes" * 100
         fp = MediaRecognition.compute_fingerprint(audio)
         track = MediaTrack(
-            title="Test Song", artist="Test Artist", album="Test Album",
-            genre="Pop", duration_seconds=180.0, fingerprint=fp,
+            title="Test Song",
+            artist="Test Artist",
+            album="Test Album",
+            genre="Pop",
+            duration_seconds=180.0,
+            fingerprint=fp,
             download_url="https://cdn.dreamcobots.com/test.mp3",
         )
         self.mr.register_track(track)
@@ -473,7 +498,9 @@ class TestTextProcessor:
         assert results[1].translated_text == "au revoir"
 
     def test_synthesize_speech(self):
-        seg = self.tp.synthesize_speech("Hello Dreamcobots", voice="en-US", speed=1.0, pitch=1.0)
+        seg = self.tp.synthesize_speech(
+            "Hello Dreamcobots", voice="en-US", speed=1.0, pitch=1.0
+        )
         assert seg.text == "Hello Dreamcobots"
         assert len(self.tp.get_speech_queue()) == 1
 
@@ -493,7 +520,9 @@ class TestTextProcessor:
         assert TextProcessor.word_count("one two three") == 3
 
     def test_extract_keywords(self):
-        kw = TextProcessor.extract_keywords("Dreamcobots builds amazing intelligent bots for automation")
+        kw = TextProcessor.extract_keywords(
+            "Dreamcobots builds amazing intelligent bots for automation"
+        )
         assert "dreamcobots" in kw
         assert "amazing" in kw
         # Short words excluded
@@ -536,7 +565,9 @@ class TestHealthcareAI:
         assert result.urgency == "low"
 
     def test_schedule_appointment(self):
-        appt = self.bot.schedule_appointment("p-001", date(2026, 4, 1), "Dr. Jones", "Follow-up")
+        appt = self.bot.schedule_appointment(
+            "p-001", date(2026, 4, 1), "Dr. Jones", "Follow-up"
+        )
         assert appt["status"] == "scheduled"
         assert len(self.bot.get_appointments("p-001")) == 1
 
@@ -558,7 +589,18 @@ class TestRealEstateAI:
     def setup_method(self):
         self.bot = RealEstateAI(autonomy=AutonomyLevel.MANUAL)
         self.bot.start()
-        self.prop = Property("prop-1", "123 Main St", "Austin", "TX", "78701", "sale", 400000, 3, 2.0, 1800)
+        self.prop = Property(
+            "prop-1",
+            "123 Main St",
+            "Austin",
+            "TX",
+            "78701",
+            "sale",
+            400000,
+            3,
+            2.0,
+            1800,
+        )
         self.bot.add_property(self.prop)
 
     def test_add_and_get_property(self):
@@ -583,7 +625,9 @@ class TestRealEstateAI:
         assert value > 0
 
     def test_add_and_qualify_lead(self):
-        lead = Lead("lead-1", "Bob", "bob@test.com", "555-0000", "buy", 500000, ["Austin"])
+        lead = Lead(
+            "lead-1", "Bob", "bob@test.com", "555-0000", "buy", 500000, ["Austin"]
+        )
         self.bot.add_lead(lead)
         assert self.bot.qualify_lead("lead-1")
         assert self.bot.get_lead("lead-1").status == "qualified"
@@ -606,8 +650,13 @@ class TestConstructionAI:
         self.bot = ConstructionAI(autonomy=AutonomyLevel.MANUAL)
         self.bot.start()
         self.project = ConstructionProject(
-            "proj-1", "Office Tower", "Acme Corp", "Dallas, TX",
-            date(2026, 1, 1), date(2026, 12, 31), 2_000_000.0
+            "proj-1",
+            "Office Tower",
+            "Acme Corp",
+            "Dallas, TX",
+            date(2026, 1, 1),
+            date(2026, 12, 31),
+            2_000_000.0,
         )
         self.bot.create_project(self.project)
 
@@ -636,8 +685,12 @@ class TestConstructionAI:
         assert costs["total_cost"] == costs["raw_cost"] + costs["overhead"]
 
     def test_safety_check(self):
-        self.bot.record_safety_check("proj-1", "PPE", True, "All workers wearing hard hats")
-        self.bot.record_safety_check("proj-1", "scaffolding", False, "Scaffolding tag expired")
+        self.bot.record_safety_check(
+            "proj-1", "PPE", True, "All workers wearing hard hats"
+        )
+        self.bot.record_safety_check(
+            "proj-1", "scaffolding", False, "Scaffolding tag expired"
+        )
         summary = self.bot.get_safety_summary("proj-1")
         assert summary["passed"] == 1
         assert summary["failed"] == 1

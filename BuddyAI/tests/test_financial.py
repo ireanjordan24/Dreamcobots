@@ -2,6 +2,12 @@
 
 import pytest
 
+from BuddyAI.financial.cards import CardProcessor
+from BuddyAI.financial.earnings import (
+    BUDDY_SHARE_RATIO,
+    CLIENT_SHARE_RATIO,
+    EarningsDistributor,
+)
 from BuddyAI.financial.models import (
     Account,
     Card,
@@ -12,13 +18,11 @@ from BuddyAI.financial.models import (
     TransactionType,
 )
 from BuddyAI.financial.transactions import TransactionProcessor
-from BuddyAI.financial.earnings import EarningsDistributor, BUDDY_SHARE_RATIO, CLIENT_SHARE_RATIO
-from BuddyAI.financial.cards import CardProcessor
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_account(owner_id: str, name: str, balance: float = 0.0) -> Account:
     acc = Account(owner_id=owner_id, owner_name=name, balance=balance)
@@ -28,6 +32,7 @@ def make_account(owner_id: str, name: str, balance: float = 0.0) -> Account:
 # ---------------------------------------------------------------------------
 # Account model tests
 # ---------------------------------------------------------------------------
+
 
 class TestAccount:
     def test_deposit_increases_balance(self):
@@ -67,6 +72,7 @@ class TestAccount:
 # TransactionProcessor tests
 # ---------------------------------------------------------------------------
 
+
 class TestTransactionProcessor:
     def setup_method(self):
         self.processor = TransactionProcessor()
@@ -103,7 +109,9 @@ class TestTransactionProcessor:
             self.processor.transfer("unknown", self.bob.account_id, 10.0)
 
     def test_process_payment_records_correct_type(self):
-        txn = self.processor.process_payment(self.alice.account_id, self.bob.account_id, 75.0)
+        txn = self.processor.process_payment(
+            self.alice.account_id, self.bob.account_id, 75.0
+        )
         assert txn.transaction_type == TransactionType.PAYMENT
         assert txn.status == TransactionStatus.COMPLETED
 
@@ -141,6 +149,7 @@ class TestTransactionProcessor:
 # ---------------------------------------------------------------------------
 # EarningsDistributor tests
 # ---------------------------------------------------------------------------
+
 
 class TestEarningsDistributor:
     def setup_method(self):
@@ -203,6 +212,7 @@ class TestEarningsDistributor:
 # ---------------------------------------------------------------------------
 # CardProcessor tests
 # ---------------------------------------------------------------------------
+
 
 class TestCardProcessor:
     def setup_method(self):

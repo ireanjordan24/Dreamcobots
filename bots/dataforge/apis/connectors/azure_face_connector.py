@@ -1,4 +1,5 @@
 """Azure Face API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,12 +27,18 @@ class AzureFaceConnector:
             API response dict or error dict.
         """
         import requests
-        headers = {"Ocp-Apim-Subscription-Key": self.api_key, "Content-Type": "application/json"}
+
+        headers = {
+            "Ocp-Apim-Subscription-Key": self.api_key,
+            "Content-Type": "application/json",
+        }
         payload = {"url": image_url}
         try:
             response = requests.post(
                 f"{self.endpoint}/face/v1.0/detect?returnFaceAttributes=age,gender,emotion",
-                json=payload, headers=headers, timeout=30
+                json=payload,
+                headers=headers,
+                timeout=30,
             )
             response.raise_for_status()
             logger.info("Azure Face detection completed.")
@@ -39,4 +46,3 @@ class AzureFaceConnector:
         except requests.RequestException as e:
             logger.error("Azure Face detect error: %s", e)
             return {"status": "error", "message": str(e)}
-

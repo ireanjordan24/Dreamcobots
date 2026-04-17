@@ -1,15 +1,29 @@
 """Compliance packages with real requirements for all supported industries."""
-import sys
+
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from core.compliance import CompliancePackage
 
 PRICING_TIERS = {
-    "Starter": {"price": "$499", "description": "Essential compliance tools for solo operators"},
-    "Professional": {"price": "$1,499", "description": "Full compliance suite for small teams"},
-    "Enterprise": {"price": "$4,999", "description": "Complete enterprise compliance platform"},
-    "Master": {"price": "$9,999", "description": "White-label compliance solution for agencies"},
+    "Starter": {
+        "price": "$499",
+        "description": "Essential compliance tools for solo operators",
+    },
+    "Professional": {
+        "price": "$1,499",
+        "description": "Full compliance suite for small teams",
+    },
+    "Enterprise": {
+        "price": "$4,999",
+        "description": "Complete enterprise compliance platform",
+    },
+    "Master": {
+        "price": "$9,999",
+        "description": "White-label compliance solution for agencies",
+    },
 }
 
 
@@ -43,7 +57,11 @@ def get_all_packages():
                 "Enable audit logging on all PHI systems",
                 "Test incident response plan annually",
             ],
-            certifications=["HIPAA Compliance Certificate", "HITECH Attestation", "SOC 2 Type II (recommended)"],
+            certifications=[
+                "HIPAA Compliance Certificate",
+                "HITECH Attestation",
+                "SOC 2 Type II (recommended)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -73,7 +91,11 @@ def get_all_packages():
                 "Document fee arrangements in writing",
                 "Regular ethics compliance training",
             ],
-            certifications=["State Bar Good Standing", "ABA Compliance Attestation", "Malpractice Insurance Certificate"],
+            certifications=[
+                "State Bar Good Standing",
+                "ABA Compliance Attestation",
+                "Malpractice Insurance Certificate",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -103,7 +125,11 @@ def get_all_packages():
                 "PCI DSS SAQ completion",
                 "Annual compliance audit",
             ],
-            certifications=["SEC Registration (if applicable)", "PCI DSS Certificate", "CAMS Certification (AML)"],
+            certifications=[
+                "SEC Registration (if applicable)",
+                "PCI DSS Certificate",
+                "CAMS Certification (AML)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -133,7 +159,11 @@ def get_all_packages():
                 "Implement data loss prevention (DLP)",
                 "Vendor security assessment program",
             ],
-            certifications=["SOC 2 Type II", "ISO 27001", "CISA/CISSP (staff certifications)"],
+            certifications=[
+                "SOC 2 Type II",
+                "ISO 27001",
+                "CISA/CISSP (staff certifications)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -163,7 +193,11 @@ def get_all_packages():
                 "State-specific licensing compliance",
                 "Annual compliance review",
             ],
-            certifications=["State Education License", "Accreditation (regional/national)", "FERPA Compliance Attestation"],
+            certifications=[
+                "State Education License",
+                "Accreditation (regional/national)",
+                "FERPA Compliance Attestation",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -193,7 +227,11 @@ def get_all_packages():
                 "Cremation authorization procedures",
                 "Transport and disposition record keeping",
             ],
-            certifications=["State Funeral Director License", "NFDA Member (recommended)", "Green Burial Council (optional)"],
+            certifications=[
+                "State Funeral Director License",
+                "NFDA Member (recommended)",
+                "Green Burial Council (optional)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -223,7 +261,11 @@ def get_all_packages():
                 "State-required leave law compliance",
                 "Annual HR policy review",
             ],
-            certifications=["SHRM-CP or SHRM-SCP (staff)", "PHR/SPHR Certification", "OSHA 30-Hour Training"],
+            certifications=[
+                "SHRM-CP or SHRM-SCP (staff)",
+                "PHR/SPHR Certification",
+                "OSHA 30-Hour Training",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -253,7 +295,11 @@ def get_all_packages():
                 "Platform-specific ad policy review",
                 "Annual marketing compliance audit",
             ],
-            certifications=["DMA (Direct Marketing Association) Member", "IAB Privacy Certification", "Google Ads Certification"],
+            certifications=[
+                "DMA (Direct Marketing Association) Member",
+                "IAB Privacy Certification",
+                "Google Ads Certification",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -283,7 +329,11 @@ def get_all_packages():
                 "Continuing education requirements met",
                 "Transaction record retention (3-5 years by state)",
             ],
-            certifications=["State Real Estate License", "NAR Membership", "CRS/ABR/SRES Designations (optional)"],
+            certifications=[
+                "State Real Estate License",
+                "NAR Membership",
+                "CRS/ABR/SRES Designations (optional)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -313,7 +363,11 @@ def get_all_packages():
                 "Secure checkout (SSL/TLS)",
                 "Annual compliance review",
             ],
-            certifications=["PCI DSS Compliance Certificate", "ADA Compliance Audit Report", "BBB Accreditation (recommended)"],
+            certifications=[
+                "PCI DSS Compliance Certificate",
+                "ADA Compliance Audit Report",
+                "BBB Accreditation (recommended)",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
         CompliancePackage(
@@ -343,7 +397,11 @@ def get_all_packages():
                 "Set up accounting and bookkeeping",
                 "Annual registered agent maintenance",
             ],
-            certifications=["Certificate of Incorporation/Organization", "EIN Letter from IRS", "Business License"],
+            certifications=[
+                "Certificate of Incorporation/Organization",
+                "EIN Letter from IRS",
+                "Business License",
+            ],
             pricing_tiers=PRICING_TIERS,
         ),
     ]

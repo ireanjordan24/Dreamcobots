@@ -9,6 +9,19 @@ class TierConfig:
 
 
 TIERS = {
-    "enterprise": TierConfig("Enterprise", 999.0, ["triangular arbitrage detection", "cross-rate discrepancy scanning"]),
-    "elite": TierConfig("Elite", 1500.0, ["triangular arbitrage detection", "cross-rate discrepancy scanning", "latency-optimized execution", "multi-venue routing"]),
+    "enterprise": TierConfig(
+        "Enterprise",
+        999.0,
+        ["triangular arbitrage detection", "cross-rate discrepancy scanning"],
+    ),
+    "elite": TierConfig(
+        "Elite",
+        1500.0,
+        [
+            "triangular arbitrage detection",
+            "cross-rate discrepancy scanning",
+            "latency-optimized execution",
+            "multi-venue routing",
+        ],
+    ),
 }

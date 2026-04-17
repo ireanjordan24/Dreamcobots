@@ -1,24 +1,36 @@
 """Tests for api/app.py"""
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from api.app import DreamCoSaaSApp, authenticate, _get_tier, VALID_API_KEYS, TIER_DAILY_LIMITS
-from core.dreamco_orchestrator import DreamCoOrchestrator
 
+from api.app import (
+    TIER_DAILY_LIMITS,
+    VALID_API_KEYS,
+    DreamCoSaaSApp,
+    _get_tier,
+    authenticate,
+)
+from core.dreamco_orchestrator import DreamCoOrchestrator
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_app():
     orch = DreamCoOrchestrator()
     orch.run_all_bots = lambda: [
-        {"bot_name": "stub", "output": {"revenue": 100}, "validation": {"scale": False}, "error": None}
+        {
+            "bot_name": "stub",
+            "output": {"revenue": 100},
+            "validation": {"scale": False},
+            "error": None,
+        }
     ]
     return DreamCoSaaSApp(orchestrator=orch)
 
@@ -26,6 +38,7 @@ def _make_app():
 # ---------------------------------------------------------------------------
 # Authentication
 # ---------------------------------------------------------------------------
+
 
 class TestAuthenticate:
     def test_valid_demo_key(self):
@@ -41,6 +54,7 @@ class TestAuthenticate:
 # ---------------------------------------------------------------------------
 # Tier resolution
 # ---------------------------------------------------------------------------
+
 
 class TestGetTier:
     def test_pro_prefix(self):
@@ -59,6 +73,7 @@ class TestGetTier:
 # ---------------------------------------------------------------------------
 # handle_run_bots
 # ---------------------------------------------------------------------------
+
 
 class TestHandleRunBots:
     def test_unauthorized_returns_401(self):
@@ -91,6 +106,7 @@ class TestHandleRunBots:
 # handle_run_single
 # ---------------------------------------------------------------------------
 
+
 class TestHandleRunSingle:
     def test_unauthorized_returns_401(self):
         app = _make_app()
@@ -99,7 +115,9 @@ class TestHandleRunSingle:
 
     def test_authorized_returns_result(self):
         app = _make_app()
-        body, status = app.handle_run_single("dreamco_demo_key", "nonexistent.module", "test_bot")
+        body, status = app.handle_run_single(
+            "dreamco_demo_key", "nonexistent.module", "test_bot"
+        )
         assert status == 200
         assert "result" in body
 
@@ -107,6 +125,7 @@ class TestHandleRunSingle:
 # ---------------------------------------------------------------------------
 # handle_summary
 # ---------------------------------------------------------------------------
+
 
 class TestHandleSummary:
     def test_free_tier_blocked(self):
@@ -123,6 +142,7 @@ class TestHandleSummary:
 # ---------------------------------------------------------------------------
 # handle_health
 # ---------------------------------------------------------------------------
+
 
 class TestHandleHealth:
     def test_health_returns_200(self):

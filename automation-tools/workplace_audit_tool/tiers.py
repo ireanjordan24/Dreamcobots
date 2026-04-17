@@ -10,6 +10,10 @@ class TierConfig:
 
 TIERS = {
     "free": TierConfig("Free", 0.0, ["basic audit", "5S scoring"]),
-    "pro": TierConfig("Pro", 29.0, ["basic audit", "5S scoring", "detailed reports", "trend analysis"]),
-    "enterprise": TierConfig("Enterprise", 99.0, ["all features", "multi-location", "custom templates"]),
+    "pro": TierConfig(
+        "Pro", 29.0, ["basic audit", "5S scoring", "detailed reports", "trend analysis"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise", 99.0, ["all features", "multi-location", "custom templates"]
+    ),
 }

@@ -10,17 +10,24 @@ Usage
     course = bot.create_course("Intro to Python", ["Variables", "Loops", "Functions"])
     print(course)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
+import sys
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
+
+import importlib.util as _ilu
 
 from tiers import Tier, get_tier_config, get_upgrade_path
 
-import importlib.util as _ilu
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-_spec = _ilu.spec_from_file_location("_education_tiers", os.path.join(_THIS_DIR, "tiers.py"))
+_spec = _ilu.spec_from_file_location(
+    "_education_tiers", os.path.join(_THIS_DIR, "tiers.py")
+)
 _education_tiers = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_education_tiers)
 EDUCATION_FEATURES = _education_tiers.EDUCATION_FEATURES
@@ -89,7 +96,10 @@ class EducationBot:
             "status": "active",
         }
         self._courses[course_id] = course
-        self._progress[course_id] = {"completed_lessons": 0, "total_lessons": len(content)}
+        self._progress[course_id] = {
+            "completed_lessons": 0,
+            "total_lessons": len(content),
+        }
         return {
             "course": course,
             "tier": self.tier.value,
@@ -160,7 +170,9 @@ class EducationBot:
             "question_id": question_id,
             "submitted_answer": answer,
             "correct": correct,
-            "feedback": "Correct!" if correct else "Incorrect. The correct answer is Option A.",
+            "feedback": (
+                "Correct!" if correct else "Incorrect. The correct answer is Option A."
+            ),
             "tier": self.tier.value,
             "requests_used": self._request_count,
             "requests_remaining": self._requests_remaining(),
@@ -211,9 +223,7 @@ class EducationBot:
             else f"{info['requests_per_month']:,}"
         )
         course_limit = (
-            "Unlimited"
-            if info["course_limit"] is None
-            else str(info["course_limit"])
+            "Unlimited" if info["course_limit"] is None else str(info["course_limit"])
         )
         lines = [
             f"=== {info['name']} Education Bot Tier ===",
@@ -238,7 +248,9 @@ class EducationBot:
             print(msg)
             return msg
         current_feats = set(EDUCATION_FEATURES[self.tier.value])
-        new_feats = [f for f in EDUCATION_FEATURES[next_cfg.tier.value] if f not in current_feats]
+        new_feats = [
+            f for f in EDUCATION_FEATURES[next_cfg.tier.value] if f not in current_feats
+        ]
         lines = [
             f"=== Upgrade: {self.config.name} → {next_cfg.name} ===",
             f"New price: ${next_cfg.price_usd_monthly:.2f}/month",

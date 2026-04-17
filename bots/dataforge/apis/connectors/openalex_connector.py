@@ -1,4 +1,5 @@
 """OpenAlex scholarly works API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -26,6 +27,7 @@ class OpenAlexConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"search": query, "per-page": per_page, "mailto": self.mailto}
         try:
             response = requests.get(f"{self.BASE_URL}/works", params=params, timeout=30)
@@ -46,11 +48,13 @@ class OpenAlexConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/authors/{author_id}?mailto={self.mailto}", timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/authors/{author_id}?mailto={self.mailto}", timeout=30
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("OpenAlex get_author error: %s", e)
             return {"status": "error", "message": str(e)}
-

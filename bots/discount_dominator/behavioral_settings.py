@@ -4,6 +4,7 @@ Behavioral Settings module for the Discount Dominator (settings 581–600).
 Provides the :class:`BehavioralSettings` facade used by all bots to drive
 customer-centric, data-driven behavioural automation.
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -13,9 +14,9 @@ from typing import Any, Dict, List, Optional
 from .settings import (
     DISCOUNT_DOMINATOR_SETTINGS,
     GROUP_BEHAVIORAL,
-    get_setting,
-    get_group_settings,
     as_dict,
+    get_group_settings,
+    get_setting,
 )
 
 
@@ -100,33 +101,29 @@ class BehavioralSettings:
 
     def get_enabled_features(self) -> List[str]:
         """Return names of behavioral settings that are currently ``True``."""
-        return [
-            s.name
-            for s in get_group_settings(GROUP_BEHAVIORAL)
-            if s.value is True
-        ]
+        return [s.name for s in get_group_settings(GROUP_BEHAVIORAL) if s.value is True]
 
     def configure_for_real_estate(self) -> None:
         """Apply behavioral presets for the real estate optimisation system."""
-        DISCOUNT_DOMINATOR_SETTINGS[581].value = "rfm"    # segmentation_model
-        DISCOUNT_DOMINATOR_SETTINGS[592].value = True     # real_estate_buyer_scoring
-        DISCOUNT_DOMINATOR_SETTINGS[588].value = True     # next_best_action
-        DISCOUNT_DOMINATOR_SETTINGS[595].value = True     # dynamic_content_personalisation
+        DISCOUNT_DOMINATOR_SETTINGS[581].value = "rfm"  # segmentation_model
+        DISCOUNT_DOMINATOR_SETTINGS[592].value = True  # real_estate_buyer_scoring
+        DISCOUNT_DOMINATOR_SETTINGS[588].value = True  # next_best_action
+        DISCOUNT_DOMINATOR_SETTINGS[595].value = True  # dynamic_content_personalisation
 
     def configure_for_car_flipping(self) -> None:
         """Apply behavioral presets for the car-flipping bot."""
-        DISCOUNT_DOMINATOR_SETTINGS[593].value = True     # car_buyer_intent_model
-        DISCOUNT_DOMINATOR_SETTINGS[582].value = True     # purchase_tracking
-        DISCOUNT_DOMINATOR_SETTINGS[586].value = True     # win_back_campaign
-        DISCOUNT_DOMINATOR_SETTINGS[597].value = True     # social_proof_injection
+        DISCOUNT_DOMINATOR_SETTINGS[593].value = True  # car_buyer_intent_model
+        DISCOUNT_DOMINATOR_SETTINGS[582].value = True  # purchase_tracking
+        DISCOUNT_DOMINATOR_SETTINGS[586].value = True  # win_back_campaign
+        DISCOUNT_DOMINATOR_SETTINGS[597].value = True  # social_proof_injection
 
     def configure_for_retail_intelligence(self) -> None:
         """Apply behavioral presets for the retail intelligence network."""
-        DISCOUNT_DOMINATOR_SETTINGS[581].value = "kmeans" # segmentation_model
-        DISCOUNT_DOMINATOR_SETTINGS[594].value = True     # retail_persona_modelling
-        DISCOUNT_DOMINATOR_SETTINGS[598].value = True     # urgency_scarcity_engine
-        DISCOUNT_DOMINATOR_SETTINGS[584].value = True     # abandoned_cart_recovery
-        DISCOUNT_DOMINATOR_SETTINGS[587].value = True     # churn_prediction
+        DISCOUNT_DOMINATOR_SETTINGS[581].value = "kmeans"  # segmentation_model
+        DISCOUNT_DOMINATOR_SETTINGS[594].value = True  # retail_persona_modelling
+        DISCOUNT_DOMINATOR_SETTINGS[598].value = True  # urgency_scarcity_engine
+        DISCOUNT_DOMINATOR_SETTINGS[584].value = True  # abandoned_cart_recovery
+        DISCOUNT_DOMINATOR_SETTINGS[587].value = True  # churn_prediction
 
     def score_customer(self, customer_data: Dict[str, Any]) -> Dict[str, Any]:
         """Return a simple intent score for a customer based on behavioural data.

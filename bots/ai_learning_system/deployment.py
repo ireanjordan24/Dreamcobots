@@ -5,15 +5,16 @@ Simulates Kubernetes rolling updates and rollbacks for deploying hybrid
 AI strategies to DreamCo bot applications.
 """
 
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import List, Optional
 import datetime
 import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional
 
-from .tiers import Tier, TierConfig, get_tier_config, FEATURE_DEPLOYMENT
-from .hybrid_engine import HybridStrategy
 from framework import GlobalAISourcesFlow  # noqa: F401
+
+from .hybrid_engine import HybridStrategy
+from .tiers import FEATURE_DEPLOYMENT, Tier, TierConfig, get_tier_config
 
 
 class DeploymentStatus(Enum):
@@ -200,14 +201,16 @@ class DeploymentOrchestrator:
         deployment.status = DeploymentStatus.DEPLOYED
         deployment.version = _make_version(new_strategy.generation)
         deployment.deployed_at = now
-        deployment.metrics.update({
-            "fitness_score": new_strategy.fitness_score,
-            "accuracy": new_strategy.accuracy,
-            "convergence_rate": new_strategy.convergence_rate,
-            "resource_consumption": new_strategy.resource_consumption,
-            "generation": new_strategy.generation,
-            "last_rolling_update": now.isoformat(),
-        })
+        deployment.metrics.update(
+            {
+                "fitness_score": new_strategy.fitness_score,
+                "accuracy": new_strategy.accuracy,
+                "convergence_rate": new_strategy.convergence_rate,
+                "resource_consumption": new_strategy.resource_consumption,
+                "generation": new_strategy.generation,
+                "last_rolling_update": now.isoformat(),
+            }
+        )
         return deployment
 
     def rollback(self, deployment_id: str) -> Deployment:
@@ -233,7 +236,11 @@ class DeploymentOrchestrator:
         self._check_tier()
         deployment = self._get(deployment_id)
         deployment.status = DeploymentStatus.ROLLED_BACK
-        rolled_back_at = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat()
+        rolled_back_at = (
+            datetime.datetime.now(datetime.timezone.utc)
+            .replace(tzinfo=None)
+            .isoformat()
+        )
         deployment.metrics["rolled_back_at"] = rolled_back_at
         return deployment
 
@@ -265,7 +272,5 @@ class DeploymentOrchestrator:
 
     def _get(self, deployment_id: str) -> Deployment:
         if deployment_id not in self._deployments:
-            raise DeploymentNotFoundError(
-                f"Deployment '{deployment_id}' not found."
-            )
+            raise DeploymentNotFoundError(f"Deployment '{deployment_id}' not found.")
         return self._deployments[deployment_id]

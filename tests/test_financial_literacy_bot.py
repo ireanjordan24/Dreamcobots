@@ -15,53 +15,53 @@ Covers:
   11. run() helper (skipped — pragma: no cover)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
+from bots.financial_literacy_bot.financial_literacy_bot import (
+    CREDIT_TIPS,
+    EDUCATION_CATALOGUE,
+    OPM_STRATEGIES,
+    PRODUCT_CATALOGUE,
+    CreditScoreRange,
+    EducationLevel,
+    FinancialLiteracyBot,
+    FinancialLiteracyBotError,
+    FinancialLiteracyBotNotFoundError,
+    FinancialLiteracyBotTierError,
+    InvestmentType,
+    ReminderType,
+)
 from bots.financial_literacy_bot.tiers import (
+    FEATURE_ANALYTICS,
+    FEATURE_AUTOMATED_REMINDERS,
+    FEATURE_BANK_INTEGRATION,
+    FEATURE_COMMUNITY_POST,
+    FEATURE_COMMUNITY_READ,
+    FEATURE_CREDIT_ALERTS,
+    FEATURE_CREDIT_TIPS,
+    FEATURE_EDUCATION_PATHS,
+    FEATURE_INVESTMENT_CALCULATOR,
+    FEATURE_OPM_STRATEGIES,
+    FEATURE_PRODUCT_MATCHING,
+    FEATURE_STRIPE_BILLING,
+    FEATURE_WHITE_LABEL,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
     list_tiers,
-    FEATURE_CREDIT_TIPS,
-    FEATURE_CREDIT_ALERTS,
-    FEATURE_OPM_STRATEGIES,
-    FEATURE_INVESTMENT_CALCULATOR,
-    FEATURE_BANK_INTEGRATION,
-    FEATURE_AUTOMATED_REMINDERS,
-    FEATURE_EDUCATION_PATHS,
-    FEATURE_COMMUNITY_READ,
-    FEATURE_COMMUNITY_POST,
-    FEATURE_ANALYTICS,
-    FEATURE_WHITE_LABEL,
-    FEATURE_STRIPE_BILLING,
-    FEATURE_PRODUCT_MATCHING,
 )
-from bots.financial_literacy_bot.financial_literacy_bot import (
-    FinancialLiteracyBot,
-    FinancialLiteracyBotError,
-    FinancialLiteracyBotTierError,
-    FinancialLiteracyBotNotFoundError,
-    InvestmentType,
-    CreditScoreRange,
-    EducationLevel,
-    ReminderType,
-    EDUCATION_CATALOGUE,
-    PRODUCT_CATALOGUE,
-    OPM_STRATEGIES,
-    CREDIT_TIPS,
-)
-
 
 # ===========================================================================
 # 1. Tiers
 # ===========================================================================
+
 
 class TestTiers:
     def test_three_tiers_exist(self):
@@ -103,11 +103,18 @@ class TestTiers:
     def test_enterprise_has_all_features(self):
         cfg = get_tier_config(Tier.ENTERPRISE)
         for feat in [
-            FEATURE_CREDIT_TIPS, FEATURE_CREDIT_ALERTS, FEATURE_OPM_STRATEGIES,
-            FEATURE_INVESTMENT_CALCULATOR, FEATURE_BANK_INTEGRATION,
-            FEATURE_AUTOMATED_REMINDERS, FEATURE_EDUCATION_PATHS,
-            FEATURE_COMMUNITY_READ, FEATURE_COMMUNITY_POST,
-            FEATURE_ANALYTICS, FEATURE_WHITE_LABEL, FEATURE_STRIPE_BILLING,
+            FEATURE_CREDIT_TIPS,
+            FEATURE_CREDIT_ALERTS,
+            FEATURE_OPM_STRATEGIES,
+            FEATURE_INVESTMENT_CALCULATOR,
+            FEATURE_BANK_INTEGRATION,
+            FEATURE_AUTOMATED_REMINDERS,
+            FEATURE_EDUCATION_PATHS,
+            FEATURE_COMMUNITY_READ,
+            FEATURE_COMMUNITY_POST,
+            FEATURE_ANALYTICS,
+            FEATURE_WHITE_LABEL,
+            FEATURE_STRIPE_BILLING,
             FEATURE_PRODUCT_MATCHING,
         ]:
             assert cfg.has_feature(feat), f"Missing: {feat}"
@@ -135,6 +142,7 @@ class TestTiers:
 # ===========================================================================
 # 2. Credit Building Assistance
 # ===========================================================================
+
 
 class TestCreditTips:
     def setup_method(self):
@@ -198,14 +206,18 @@ class TestCreditProfileAnalysis:
 
     def test_analyze_low_utilization_advice(self):
         result = self.bot.analyze_credit_profile(760, 20000, 500)
-        assert any("excellent" in a.lower() or "below" in a.lower() for a in result["advice"])
+        assert any(
+            "excellent" in a.lower() or "below" in a.lower() for a in result["advice"]
+        )
 
     def test_analyze_missed_payments_advice(self):
         result = self.bot.analyze_credit_profile(650, 10000, 2000, missed_payments=2)
         assert any("missed" in a.lower() for a in result["advice"])
 
     def test_analyze_short_history_advice(self):
-        result = self.bot.analyze_credit_profile(700, 10000, 1000, oldest_account_years=0.5)
+        result = self.bot.analyze_credit_profile(
+            700, 10000, 1000, oldest_account_years=0.5
+        )
         assert any("history" in a.lower() for a in result["advice"])
 
     def test_analyze_invalid_score_low(self):
@@ -282,6 +294,7 @@ class TestCreditAlerts:
 # 3. OPM Strategies
 # ===========================================================================
 
+
 class TestOPMStrategies:
     def setup_method(self):
         self.bot = FinancialLiteracyBot(tier=Tier.PRO)
@@ -323,6 +336,7 @@ class TestOPMStrategies:
 # 4. Investment Calculators
 # ===========================================================================
 
+
 class TestInvestmentCalculator:
     def setup_method(self):
         self.bot = FinancialLiteracyBot(tier=Tier.PRO)
@@ -342,9 +356,13 @@ class TestInvestmentCalculator:
         assert result["roi_pct"] > 0
 
     def test_calculate_roi_with_credit_cost(self):
-        result = self.bot.calculate_roi(InvestmentType.REAL_ESTATE, 10000, 8.0, 5, credit_rate_pct=3.0)
+        result = self.bot.calculate_roi(
+            InvestmentType.REAL_ESTATE, 10000, 8.0, 5, credit_rate_pct=3.0
+        )
         # Net profit should be lower than with 0% credit rate
-        result_no_cost = self.bot.calculate_roi(InvestmentType.REAL_ESTATE, 10000, 8.0, 5, credit_rate_pct=0.0)
+        result_no_cost = self.bot.calculate_roi(
+            InvestmentType.REAL_ESTATE, 10000, 8.0, 5, credit_rate_pct=0.0
+        )
         assert result["net_profit"] < result_no_cost["net_profit"]
 
     def test_calculate_roi_compound_growth(self):
@@ -388,6 +406,7 @@ class TestInvestmentCalculator:
 # ===========================================================================
 # 5. Bank / Credit Bureau Integration
 # ===========================================================================
+
 
 class TestBankIntegration:
     def setup_method(self):
@@ -457,21 +476,28 @@ class TestBankIntegration:
 # 6. Automated Reminders
 # ===========================================================================
 
+
 class TestAutomatedReminders:
     def setup_method(self):
         self.bot = FinancialLiteracyBot(tier=Tier.PRO)
 
     def test_create_reminder_returns_dict(self):
-        rem = self.bot.create_reminder(ReminderType.PAYMENT_DUE, "Pay your credit card bill!")
+        rem = self.bot.create_reminder(
+            ReminderType.PAYMENT_DUE, "Pay your credit card bill!"
+        )
         assert isinstance(rem, dict)
         assert "reminder_id" in rem
 
     def test_create_reminder_not_sent(self):
-        rem = self.bot.create_reminder(ReminderType.UTILIZATION_CHECK, "Check utilization!")
+        rem = self.bot.create_reminder(
+            ReminderType.UTILIZATION_CHECK, "Check utilization!"
+        )
         assert rem["sent"] is False
 
     def test_create_reminder_with_due_date(self):
-        rem = self.bot.create_reminder(ReminderType.PAYMENT_DUE, "Bill due", due_date="2026-04-01")
+        rem = self.bot.create_reminder(
+            ReminderType.PAYMENT_DUE, "Bill due", due_date="2026-04-01"
+        )
         assert rem["due_date"] == "2026-04-01"
 
     def test_send_reminders_marks_sent(self):
@@ -520,6 +546,7 @@ class TestAutomatedReminders:
 # 7. Education Module
 # ===========================================================================
 
+
 class TestEducationModule:
     def setup_method(self):
         self.free_bot = FinancialLiteracyBot(tier=Tier.FREE)
@@ -539,7 +566,9 @@ class TestEducationModule:
         assert len(modules) == len(EDUCATION_CATALOGUE)
 
     def test_filter_by_level(self):
-        modules = self.enterprise_bot.get_education_modules(level=EducationLevel.BEGINNER)
+        modules = self.enterprise_bot.get_education_modules(
+            level=EducationLevel.BEGINNER
+        )
         for m in modules:
             assert m["level"] == "beginner"
 
@@ -550,8 +579,15 @@ class TestEducationModule:
 
     def test_modules_have_required_fields(self):
         for m in self.pro_bot.get_education_modules():
-            for key in ("module_id", "title", "level", "topic", "content_summary",
-                        "estimated_minutes", "tags"):
+            for key in (
+                "module_id",
+                "title",
+                "level",
+                "topic",
+                "content_summary",
+                "estimated_minutes",
+                "tags",
+            ):
                 assert key in m
 
     def test_complete_module_returns_progress(self):
@@ -601,6 +637,7 @@ class TestEducationModule:
 # 8. Community Platform
 # ===========================================================================
 
+
 class TestCommunityPlatform:
     def setup_method(self):
         self.free_bot = FinancialLiteracyBot(tier=Tier.FREE)
@@ -640,7 +677,9 @@ class TestCommunityPlatform:
 
     def test_get_posts_filter_by_tag(self):
         self._seed_post()
-        self.enterprise_bot.create_community_post("OPM Story", "I used HELOC...", tags=["opm"])
+        self.enterprise_bot.create_community_post(
+            "OPM Story", "I used HELOC...", tags=["opm"]
+        )
         tagged = self.enterprise_bot.get_community_posts(tag="credit")
         assert len(tagged) == 1
 
@@ -694,6 +733,7 @@ class TestCommunityPlatform:
 # 9. Analytics
 # ===========================================================================
 
+
 class TestAnalytics:
     def setup_method(self):
         self.bot = FinancialLiteracyBot(tier=Tier.ENTERPRISE)
@@ -704,8 +744,14 @@ class TestAnalytics:
 
     def test_analytics_has_required_fields(self):
         result = self.bot.get_analytics()
-        for key in ("total_calculations", "total_reminders", "completed_modules",
-                    "community_posts", "credit_profiles", "tier"):
+        for key in (
+            "total_calculations",
+            "total_reminders",
+            "completed_modules",
+            "community_posts",
+            "credit_profiles",
+            "tier",
+        ):
             assert key in result
 
     def test_analytics_initial_zeros(self):
@@ -742,6 +788,7 @@ class TestAnalytics:
 # 10. Chat Interface
 # ===========================================================================
 
+
 class TestChatInterface:
     def setup_method(self):
         self.bot = FinancialLiteracyBot(tier=Tier.PRO)
@@ -758,7 +805,9 @@ class TestChatInterface:
     def test_chat_opm_free_tier_blocked_message(self):
         bot = FinancialLiteracyBot(tier=Tier.FREE)
         result = bot.chat("OPM leverage investing")
-        assert "pro" in result["message"].lower() or "upgrade" in result["message"].lower()
+        assert (
+            "pro" in result["message"].lower() or "upgrade" in result["message"].lower()
+        )
 
     def test_chat_calculator(self):
         result = self.bot.chat("calculate my ROI")
@@ -786,6 +835,7 @@ class TestChatInterface:
 # 11. get_summary
 # ===========================================================================
 
+
 class TestGetSummary:
     def test_summary_returns_dict(self):
         bot = FinancialLiteracyBot(tier=Tier.FREE)
@@ -812,33 +862,49 @@ class TestGetSummary:
 # 12. CreditProfile data class
 # ===========================================================================
 
+
 class TestCreditProfileModel:
     def test_utilization_rate_calculation(self):
         from bots.financial_literacy_bot.financial_literacy_bot import CreditProfile
+
         profile = CreditProfile(
-            profile_id="p1", user_id="u1",
-            credit_score=700, total_credit_limit=10000,
-            total_balance=3000, on_time_payments=24,
-            missed_payments=0, oldest_account_years=5.0,
+            profile_id="p1",
+            user_id="u1",
+            credit_score=700,
+            total_credit_limit=10000,
+            total_balance=3000,
+            on_time_payments=24,
+            missed_payments=0,
+            oldest_account_years=5.0,
         )
         assert abs(profile.utilization_rate - 0.30) < 0.001
 
     def test_utilization_rate_zero_limit(self):
         from bots.financial_literacy_bot.financial_literacy_bot import CreditProfile
+
         profile = CreditProfile(
-            profile_id="p2", user_id="u1",
-            credit_score=500, total_credit_limit=0,
-            total_balance=0, on_time_payments=0,
-            missed_payments=0, oldest_account_years=0.0,
+            profile_id="p2",
+            user_id="u1",
+            credit_score=500,
+            total_credit_limit=0,
+            total_balance=0,
+            on_time_payments=0,
+            missed_payments=0,
+            oldest_account_years=0.0,
         )
         assert profile.utilization_rate == 0.0
 
     def test_score_range_exceptional(self):
         from bots.financial_literacy_bot.financial_literacy_bot import CreditProfile
+
         profile = CreditProfile(
-            profile_id="p3", user_id="u1",
-            credit_score=820, total_credit_limit=50000,
-            total_balance=1000, on_time_payments=100,
-            missed_payments=0, oldest_account_years=10.0,
+            profile_id="p3",
+            user_id="u1",
+            credit_score=820,
+            total_credit_limit=50000,
+            total_balance=1000,
+            on_time_payments=100,
+            missed_payments=0,
+            oldest_account_years=10.0,
         )
         assert profile.score_range == CreditScoreRange.EXCEPTIONAL

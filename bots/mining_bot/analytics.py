@@ -12,6 +12,7 @@ Analytics depth is gated by tier:
   - PRO:        advanced (revenue + energy + ROI)
   - ENTERPRISE: full (all metrics + trend analysis)
 """
+
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
@@ -140,9 +141,7 @@ class ProfitabilityAnalytics:
         total_cost = self.total_electricity_cost_usd() + self.hardware_cost_usd
         if total_cost == 0:
             return float("inf") if self.total_revenue_usd() > 0 else 0.0
-        return round(
-            (self.total_revenue_usd() - total_cost) / total_cost * 100, 4
-        )
+        return round((self.total_revenue_usd() - total_cost) / total_cost * 100, 4)
 
     def best_performing_coin(self) -> Optional[str]:
         self._require_depth("advanced")

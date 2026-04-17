@@ -15,31 +15,30 @@ interface so bots can be tested without external dependencies.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import threading
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from typing import Callable, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
-
 from bots.global_bot_network.universal_bot_protocol import (
-    UBPMessage,
+    BROADCAST_TARGET,
     MessageType,
     Permission,
     UBPError,
+    UBPMessage,
     UBPPermissionError,
-    BROADCAST_TARGET,
-    create_pong,
     create_error,
+    create_pong,
 )
-
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class MessagingNetworkError(Exception):
     """Base exception for the Messaging Network."""
@@ -56,6 +55,7 @@ class BotNotConnected(MessagingNetworkError):
 # ---------------------------------------------------------------------------
 # Rate limiter
 # ---------------------------------------------------------------------------
+
 
 class RateLimiter:
     """
@@ -114,6 +114,7 @@ class RateLimiter:
 # Delivery receipt
 # ---------------------------------------------------------------------------
 
+
 class DeliveryReceipt:
     """Tracks whether a message was delivered and acknowledged."""
 
@@ -149,6 +150,7 @@ class DeliveryReceipt:
 # ---------------------------------------------------------------------------
 # Messaging Network
 # ---------------------------------------------------------------------------
+
 
 class MessagingNetwork:
     """
@@ -189,7 +191,9 @@ class MessagingNetwork:
     # Connection management
     # ------------------------------------------------------------------
 
-    def connect(self, bot_id: str, callback: Optional[Callable[[UBPMessage], None]] = None) -> None:
+    def connect(
+        self, bot_id: str, callback: Optional[Callable[[UBPMessage], None]] = None
+    ) -> None:
         """
         Register a bot on the network.
 
@@ -265,9 +269,7 @@ class MessagingNetwork:
         target = message.to_bot
         if target not in self._connected:
             receipt.mark_failed(target)
-            raise BotNotConnected(
-                f"Bot '{target}' is not connected to the network."
-            )
+            raise BotNotConnected(f"Bot '{target}' is not connected to the network.")
         self._invoke_callback(target, message, receipt)
 
         # Auto-pong for ping messages
@@ -316,7 +318,8 @@ class MessagingNetwork:
         if bot_id is None:
             return list(self._message_log)
         return [
-            m for m in self._message_log
+            m
+            for m in self._message_log
             if m.get("from") == bot_id or m.get("to") in (bot_id, BROADCAST_TARGET)
         ]
 
@@ -354,6 +357,7 @@ class MessagingNetwork:
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _check_permissions(message: UBPMessage) -> None:
     """

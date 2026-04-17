@@ -25,10 +25,9 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from core.base_bot import RESULT_STATUS_SUCCESS, RESULT_STATUS_FAILED
-from core.dreamco_orchestrator import RevenueValidator, AutoScaler
+from core.base_bot import RESULT_STATUS_FAILED, RESULT_STATUS_SUCCESS
+from core.dreamco_orchestrator import AutoScaler, RevenueValidator
 from core.workflow import WorkflowEngine, WorkflowResult
-
 
 # ---------------------------------------------------------------------------
 # CycleReport
@@ -123,8 +122,12 @@ class MoneyLoopEngine:
             for step in workflow_result.steps:
                 step_result = step.get("result") or {}
                 if step_result:
-                    cycle_revenue += float(step_result.get("data", {}).get("revenue", 0))
-                    cycle_leads += int(step_result.get("data", {}).get("leads_generated", 0))
+                    cycle_revenue += float(
+                        step_result.get("data", {}).get("revenue", 0)
+                    )
+                    cycle_leads += int(
+                        step_result.get("data", {}).get("leads_generated", 0)
+                    )
 
             validation = self._validator.validate(
                 {"revenue": cycle_revenue, "leads_generated": cycle_leads}

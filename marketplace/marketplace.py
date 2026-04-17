@@ -22,6 +22,7 @@ from framework import GlobalAISourcesFlow  # noqa: F401
 @dataclass
 class BotListing:
     """A bot available for hire or purchase in the marketplace."""
+
     listing_id: str
     bot_name: str
     industry: str
@@ -29,8 +30,8 @@ class BotListing:
     price_usd_monthly: float
     owner: str
     description: str
-    is_human_worker: bool = False   # True if listing is for a human contractor
-    is_robot: bool = False          # True if physical robot hardware
+    is_human_worker: bool = False  # True if listing is for a human contractor
+    is_robot: bool = False  # True if physical robot hardware
     tags: list[str] = field(default_factory=list)
 
 
@@ -65,7 +66,8 @@ class Marketplace:
         """Full-text search across bot names, industries, and job titles."""
         q = query.lower()
         return [
-            l for l in self._listings.values()
+            l
+            for l in self._listings.values()
             if q in l.bot_name.lower()
             or q in l.industry.lower()
             or q in l.job_title.lower()
@@ -108,12 +110,14 @@ BotMarketplace = Marketplace
 # Extended BotListing and BotMarketplace for test compatibility
 # ---------------------------------------------------------------------------
 import uuid as _uuid
-from dataclasses import dataclass as _dataclass, field as _field
+from dataclasses import dataclass as _dataclass
+from dataclasses import field as _field
 
 
 @_dataclass
 class BotListing:
     """A bot listing in the marketplace (extended version)."""
+
     name: str
     description: str
     category: str
@@ -128,6 +132,7 @@ class BotListing:
 @_dataclass
 class BotPurchase:
     """Record of a bot purchase."""
+
     purchase_id: str
     buyer_id: str
     listing_id: str
@@ -160,8 +165,11 @@ class BotMarketplace:
 
     def search(self, query: str):
         q = query.lower()
-        return [l for l in self._listings.values()
-                if l.available and (q in l.name.lower() or q in l.description.lower())]
+        return [
+            l
+            for l in self._listings.values()
+            if l.available and (q in l.name.lower() or q in l.description.lower())
+        ]
 
     def purchase(self, buyer_id: str, listing_id: str) -> BotPurchase:
         listing = self._listings.get(listing_id)

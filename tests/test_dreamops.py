@@ -16,8 +16,8 @@ Covers all DreamOps modules:
   12. DreamOpsBot main class (integration)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -26,48 +26,38 @@ sys.path.insert(0, REPO_ROOT)
 
 import pytest
 from tiers import Tier
-from bots.dreamops.tiers import (
-    BOT_FEATURES,
-    WORKFLOW_LIMITS,
-    BOT_LIMITS,
-    get_bot_tier_info,
-)
+
+from bots.dreamops import DreamOpsBot as DreamOpsBotExport
 from bots.dreamops.anomaly_detection import (
+    AnomalyAlert,
     AnomalyDetector,
     WorkflowMetrics,
-    AnomalyAlert,
-)
-from bots.dreamops.auto_scaling import (
-    ScalingEngine,
-    LoadMetrics,
-    ScalingAction,
-)
-from bots.dreamops.ops_commander import OpsCommander
-from bots.dreamops.bottleneck_detector import (
-    BottleneckDetector,
-    WorkflowStage,
 )
 from bots.dreamops.auto_failover import AutoFailover
-from bots.dreamops.cost_reduction import CostReductionEngine, CostData
-from bots.dreamops.throughput_maximizer import (
-    ThroughputMaximizer,
-    FlowStage,
-)
-from bots.dreamops.resilience_scorer import ResilienceScorer, ResilienceMetrics
-from bots.dreamops.task_delegation import TaskDelegationAI, Task
+from bots.dreamops.auto_scaling import LoadMetrics, ScalingAction, ScalingEngine
+from bots.dreamops.bottleneck_detector import BottleneckDetector, WorkflowStage
+from bots.dreamops.cost_reduction import CostData, CostReductionEngine
 from bots.dreamops.dashboard import (
     render_anomaly_summary,
-    render_scaling_status,
-    render_ops_status,
     render_bottleneck_map,
-    render_failover_status,
     render_cost_summary,
-    render_throughput_report,
+    render_failover_status,
     render_full_dashboard,
+    render_ops_status,
+    render_scaling_status,
+    render_throughput_report,
 )
 from bots.dreamops.dreamops_bot import DreamOpsBot, DreamOpsTierError
-from bots.dreamops import DreamOpsBot as DreamOpsBotExport
-
+from bots.dreamops.ops_commander import OpsCommander
+from bots.dreamops.resilience_scorer import ResilienceMetrics, ResilienceScorer
+from bots.dreamops.task_delegation import Task, TaskDelegationAI
+from bots.dreamops.throughput_maximizer import FlowStage, ThroughputMaximizer
+from bots.dreamops.tiers import (
+    BOT_FEATURES,
+    BOT_LIMITS,
+    WORKFLOW_LIMITS,
+    get_bot_tier_info,
+)
 
 # ===========================================================================
 # 1. Tiers
@@ -77,6 +67,7 @@ from bots.dreamops import DreamOpsBot as DreamOpsBotExport
 class TestTiers:
     def test_three_tiers_exist(self):
         from tiers import list_tiers
+
         assert len(list_tiers()) == 3
 
     def test_free_tier_features_exist(self):
@@ -138,8 +129,13 @@ class TestAnomalyDetection:
     def setup_method(self):
         self.detector = AnomalyDetector()
 
-    def _make_metrics(self, workflow_id="wf-001", execution_time=1.0,
-                      error_rate=0.01, throughput=100.0):
+    def _make_metrics(
+        self,
+        workflow_id="wf-001",
+        execution_time=1.0,
+        error_rate=0.01,
+        throughput=100.0,
+    ):
         return WorkflowMetrics(
             workflow_id=workflow_id,
             execution_time=execution_time,
@@ -165,7 +161,11 @@ class TestAnomalyDetection:
         metrics = self._make_metrics(execution_time=1.0, error_rate=0.01)
         self.detector.analyze_workflow("wf-001", metrics)
         alerts = self.detector.get_alerts()
-        critical = [a for a in alerts if hasattr(a, "severity") and str(a.severity.value).upper() == "CRITICAL"]
+        critical = [
+            a
+            for a in alerts
+            if hasattr(a, "severity") and str(a.severity.value).upper() == "CRITICAL"
+        ]
         assert len(critical) == 0
 
     def test_high_error_rate_generates_alert(self):
@@ -247,7 +247,9 @@ class TestAutoScaling:
         loads = [90.0, 70.0, 50.0, 30.0, 10.0]
         last_action = ScalingAction.MAINTAIN
         for l in loads:
-            last_action = engine.analyze_demand("task-low", LoadMetrics("task-low", l / 100, l / 100, l / 100))
+            last_action = engine.analyze_demand(
+                "task-low", LoadMetrics("task-low", l / 100, l / 100, l / 100)
+            )
         assert last_action == ScalingAction.SCALE_DOWN
 
     def test_trigger_scale_up_returns_result(self):
@@ -512,8 +514,12 @@ class TestThroughputMaximizer:
 
     def _make_stages(self):
         return [
-            FlowStage(f"fs-{i}", capacity=100.0 - i * 10,
-                      current_load=60.0, cycle_time=float(i + 1))
+            FlowStage(
+                f"fs-{i}",
+                capacity=100.0 - i * 10,
+                current_load=60.0,
+                cycle_time=float(i + 1),
+            )
             for i in range(5)
         ]
 
@@ -555,7 +561,9 @@ class TestThroughputMaximizer:
     def test_constrained_flow_has_constraints(self):
         stages = [
             FlowStage("s1", capacity=100.0, current_load=10.0, cycle_time=1.0),
-            FlowStage("s2", capacity=20.0, current_load=19.5, cycle_time=5.0),  # bottleneck
+            FlowStage(
+                "s2", capacity=20.0, current_load=19.5, cycle_time=5.0
+            ),  # bottleneck
         ]
         self.maximizer.analyze_flow("constrained", stages)
         constraints = self.maximizer.identify_constraints("constrained")
@@ -639,6 +647,7 @@ class TestTaskDelegationAI:
 
     def _make_task(self):
         from datetime import datetime, timedelta
+
         return Task(
             task_id="t-001",
             required_skills={"python"},

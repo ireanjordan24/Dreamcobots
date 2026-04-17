@@ -8,8 +8,6 @@ GLOBAL AI SOURCES FLOW
 
 from __future__ import annotations
 
-# GLOBAL AI SOURCES FLOW
-
 import hashlib
 import hmac
 import json
@@ -17,6 +15,8 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
+
+# GLOBAL AI SOURCES FLOW
 
 
 @dataclass
@@ -77,13 +77,15 @@ class WebhookManager:
             if event_name not in webhook.events and "*" not in webhook.events:
                 continue
             signature = self._sign_payload(payload, webhook.secret)
-            results.append({
-                "webhook": webhook.name,
-                "url": webhook.url,
-                "status": "dispatched",
-                "signature": signature,
-                "event_id": event.event_id,
-            })
+            results.append(
+                {
+                    "webhook": webhook.name,
+                    "url": webhook.url,
+                    "status": "dispatched",
+                    "signature": signature,
+                    "event_id": event.event_id,
+                }
+            )
         return results
 
     def _sign_payload(self, payload: dict, secret: str) -> str:

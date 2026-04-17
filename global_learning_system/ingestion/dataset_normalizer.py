@@ -43,7 +43,9 @@ class DatasetNormalizer:
     # Public interface
     # ------------------------------------------------------------------
 
-    def normalize(self, raw_records: List[Dict[str, Any]], source: str) -> List[NormalizedRecord]:
+    def normalize(
+        self, raw_records: List[Dict[str, Any]], source: str
+    ) -> List[NormalizedRecord]:
         """
         Normalise a list of raw record dictionaries.
 
@@ -65,7 +67,9 @@ class DatasetNormalizer:
                 normalised.append(processed)
         return normalised
 
-    def normalize_schema(self, records: List[NormalizedRecord], schema: Dict[str, type]) -> List[NormalizedRecord]:
+    def normalize_schema(
+        self, records: List[NormalizedRecord], schema: Dict[str, type]
+    ) -> List[NormalizedRecord]:
         """
         Coerce record features to the types specified in *schema*.
 

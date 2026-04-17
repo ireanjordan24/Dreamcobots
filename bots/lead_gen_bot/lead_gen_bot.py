@@ -15,7 +15,7 @@ import os
 import random
 import sys
 from datetime import datetime, timezone
-from typing import List, Dict
+from typing import Dict, List
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -85,13 +85,15 @@ class Bot:
         leads: List[Dict] = []
         for i in range(count):
             industry = random.choice(INDUSTRIES)
-            leads.append({
-                "business": f"{industry.title()} Business #{i + 1}",
-                "industry": industry,
-                "phone": f"555-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
-                "email": f"contact{random.randint(1, 9999)}@{industry.replace(' ', '')}.example.com",
-                "generated_at": datetime.now(timezone.utc).isoformat(),
-            })
+            leads.append(
+                {
+                    "business": f"{industry.title()} Business #{i + 1}",
+                    "industry": industry,
+                    "phone": f"555-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
+                    "email": f"contact{random.randint(1, 9999)}@{industry.replace(' ', '')}.example.com",
+                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
         return leads
 
     def save_leads(self, leads: List[Dict]) -> None:

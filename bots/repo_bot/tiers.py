@@ -1,12 +1,15 @@
 """
 Tier definitions for the RepoActivityTracker bot.
 """
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+)
 
 from tiers import Tier  # noqa: E402
 

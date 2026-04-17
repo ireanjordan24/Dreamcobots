@@ -8,47 +8,123 @@ the underlying implementation for a transformer-based model without changing
 the public API.
 """
 
-import re
 import math
+import re
 from collections import Counter
 from typing import Dict, List, Optional, Tuple
-
 
 # ---------------------------------------------------------------------------
 # Sentiment lexicons (compact, extensible)
 # ---------------------------------------------------------------------------
 _POSITIVE_WORDS = {
-    "good", "great", "excellent", "amazing", "wonderful", "fantastic",
-    "happy", "love", "like", "best", "awesome", "perfect", "brilliant",
-    "positive", "helpful", "outstanding", "superb", "impressive", "glad",
-    "excited", "pleased", "enjoy", "nice", "well", "better", "thanks",
-    "thank", "appreciate", "splendid", "cheerful", "joyful",
+    "good",
+    "great",
+    "excellent",
+    "amazing",
+    "wonderful",
+    "fantastic",
+    "happy",
+    "love",
+    "like",
+    "best",
+    "awesome",
+    "perfect",
+    "brilliant",
+    "positive",
+    "helpful",
+    "outstanding",
+    "superb",
+    "impressive",
+    "glad",
+    "excited",
+    "pleased",
+    "enjoy",
+    "nice",
+    "well",
+    "better",
+    "thanks",
+    "thank",
+    "appreciate",
+    "splendid",
+    "cheerful",
+    "joyful",
 }
 
 _NEGATIVE_WORDS = {
-    "bad", "terrible", "awful", "horrible", "hate", "dislike", "worst",
-    "poor", "boring", "negative", "useless", "frustrating", "difficult",
-    "problem", "issue", "fail", "failed", "error", "wrong", "sad",
-    "angry", "disappointed", "confused", "unhappy", "annoyed", "upset",
-    "slow", "broken", "worse", "never", "not", "no",
+    "bad",
+    "terrible",
+    "awful",
+    "horrible",
+    "hate",
+    "dislike",
+    "worst",
+    "poor",
+    "boring",
+    "negative",
+    "useless",
+    "frustrating",
+    "difficult",
+    "problem",
+    "issue",
+    "fail",
+    "failed",
+    "error",
+    "wrong",
+    "sad",
+    "angry",
+    "disappointed",
+    "confused",
+    "unhappy",
+    "annoyed",
+    "upset",
+    "slow",
+    "broken",
+    "worse",
+    "never",
+    "not",
+    "no",
 }
 
 # ---------------------------------------------------------------------------
 # Intent patterns  {intent_name: [keyword_list]}
 # ---------------------------------------------------------------------------
 _INTENT_PATTERNS: Dict[str, List[str]] = {
-    "job_search":       ["job", "career", "position", "hire", "employment", "work", "vacancy"],
-    "resume_help":      ["resume", "cv", "curriculum", "portfolio", "bio"],
-    "interview_prep":   ["interview", "prepare", "question", "practice", "mock"],
-    "dataset_purchase": ["buy", "purchase", "dataset", "data", "acquire", "get", "download"],
-    "dataset_sell":     ["sell", "upload", "distribute", "publish", "monetize"],
-    "pricing_inquiry":  ["price", "cost", "fee", "payment", "charge", "rate", "plan"],
-    "help":             ["help", "support", "assist", "guide", "how", "what", "explain"],
-    "greeting":         ["hello", "hi", "hey", "greetings", "howdy", "good morning", "good afternoon"],
-    "farewell":         ["bye", "goodbye", "see you", "later", "exit", "quit"],
-    "feedback":         ["feedback", "review", "rating", "opinion", "suggest", "improve"],
-    "schedule":         ["schedule", "meeting", "appointment", "calendar", "book", "plan"],
-    "invoice":          ["invoice", "bill", "receipt", "payment", "charge", "statement"],
+    "job_search": [
+        "job",
+        "career",
+        "position",
+        "hire",
+        "employment",
+        "work",
+        "vacancy",
+    ],
+    "resume_help": ["resume", "cv", "curriculum", "portfolio", "bio"],
+    "interview_prep": ["interview", "prepare", "question", "practice", "mock"],
+    "dataset_purchase": [
+        "buy",
+        "purchase",
+        "dataset",
+        "data",
+        "acquire",
+        "get",
+        "download",
+    ],
+    "dataset_sell": ["sell", "upload", "distribute", "publish", "monetize"],
+    "pricing_inquiry": ["price", "cost", "fee", "payment", "charge", "rate", "plan"],
+    "help": ["help", "support", "assist", "guide", "how", "what", "explain"],
+    "greeting": [
+        "hello",
+        "hi",
+        "hey",
+        "greetings",
+        "howdy",
+        "good morning",
+        "good afternoon",
+    ],
+    "farewell": ["bye", "goodbye", "see you", "later", "exit", "quit"],
+    "feedback": ["feedback", "review", "rating", "opinion", "suggest", "improve"],
+    "schedule": ["schedule", "meeting", "appointment", "calendar", "book", "plan"],
+    "invoice": ["invoice", "bill", "receipt", "payment", "charge", "statement"],
 }
 
 
@@ -122,7 +198,7 @@ class NLPEngine:
         pos = sum(1 for t in tokens if t in _POSITIVE_WORDS)
         neg = sum(1 for t in tokens if t in _NEGATIVE_WORDS)
         total = max(pos + neg, 1)
-        score = (pos - neg) / total          # range [-1, 1]
+        score = (pos - neg) / total  # range [-1, 1]
         if score > 0.1:
             label = "positive"
         elif score < -0.1:
@@ -137,7 +213,8 @@ class NLPEngine:
         scores: Dict[str, int] = {}
         for intent, keywords in _INTENT_PATTERNS.items():
             hit = sum(
-                1 for kw in keywords
+                1
+                for kw in keywords
                 if kw in token_set
                 or re.search(r"\b" + re.escape(kw) + r"\b", raw) is not None
             )
@@ -150,7 +227,12 @@ class NLPEngine:
     @staticmethod
     def _extract_entities(text: str) -> Dict[str, List[str]]:
         """Simple rule-based named-entity extraction."""
-        entities: Dict[str, List[str]] = {"emails": [], "urls": [], "numbers": [], "capitalized": []}
+        entities: Dict[str, List[str]] = {
+            "emails": [],
+            "urls": [],
+            "numbers": [],
+            "capitalized": [],
+        }
         entities["emails"] = re.findall(r"[\w.+-]+@[\w-]+\.\w+", text)
         entities["urls"] = re.findall(r"https?://\S+", text)
         entities["numbers"] = re.findall(r"\b\d+(?:\.\d+)?\b", text)

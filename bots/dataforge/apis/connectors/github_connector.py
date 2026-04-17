@@ -1,4 +1,5 @@
 """GitHub REST API connector for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import logging
 import os
@@ -29,9 +30,15 @@ class GitHubConnector:
             API response dict or error dict.
         """
         import requests
+
         params = {"q": query, "per_page": per_page}
         try:
-            response = requests.get(f"{self.BASE_URL}/search/repositories", params=params, headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/search/repositories",
+                params=params,
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             logger.info("GitHub repository search completed for: %s", query)
             return {"status": "success", "data": response.json()}
@@ -50,11 +57,15 @@ class GitHubConnector:
             API response dict or error dict.
         """
         import requests
+
         try:
-            response = requests.get(f"{self.BASE_URL}/repos/{owner}/{repo}", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.BASE_URL}/repos/{owner}/{repo}",
+                headers=self.headers,
+                timeout=30,
+            )
             response.raise_for_status()
             return {"status": "success", "data": response.json()}
         except requests.RequestException as e:
             logger.error("GitHub get_repo error: %s", e)
             return {"status": "error", "message": str(e)}
-

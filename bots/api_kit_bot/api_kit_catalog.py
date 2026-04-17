@@ -9,8 +9,8 @@ Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -18,7 +18,6 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from framework import GlobalAISourcesFlow  # noqa: F401
-
 
 # ---------------------------------------------------------------------------
 # Categories
@@ -39,6 +38,7 @@ LOGISTICS = "logistics"
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class EndpointSpec:
@@ -94,14 +94,16 @@ _KITS: list = [
         category=HEALTHCARE_DIAGNOSTICS,
         description="Symptom checker and triage assistant powered by clinical NLP.",
         endpoints=[
-            EndpointSpec("POST", "/diagnose", "Submit symptoms and receive triage output."),
+            EndpointSpec(
+                "POST", "/diagnose", "Submit symptoms and receive triage output."
+            ),
             EndpointSpec("GET", "/conditions/{id}", "Retrieve condition details."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/meddiagnosis/diagnose",\n'
             '    json={"symptoms": ["fever", "cough"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=79.0,
         setup_fee_usd=0.0,
@@ -118,10 +120,10 @@ _KITS: list = [
             EndpointSpec("GET", "/schedule", "Retrieve optimised daily schedule."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/taskflow/tasks",\n'
             '    json={"tasks": ["write report", "team standup"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=19.0,
         setup_fee_usd=0.0,
@@ -138,10 +140,10 @@ _KITS: list = [
             EndpointSpec("POST", "/story/continue", "Continue an existing story."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/storygen/story/generate",\n'
             '    json={"prompt": "A dragon discovers coffee"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=29.0,
         setup_fee_usd=0.0,
@@ -154,14 +156,18 @@ _KITS: list = [
         category=FINANCE,
         description="AI-powered investment portfolio analysis and rebalancing.",
         endpoints=[
-            EndpointSpec("POST", "/portfolio/analyse", "Analyse portfolio risk/return."),
-            EndpointSpec("POST", "/portfolio/rebalance", "Suggest rebalancing actions."),
+            EndpointSpec(
+                "POST", "/portfolio/analyse", "Analyse portfolio risk/return."
+            ),
+            EndpointSpec(
+                "POST", "/portfolio/rebalance", "Suggest rebalancing actions."
+            ),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/portfolioadvisor/portfolio/analyse",\n'
             '    json={"holdings": [{"ticker": "AAPL", "weight": 0.4}]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=99.0,
         setup_fee_usd=49.0,
@@ -174,14 +180,16 @@ _KITS: list = [
         category=E_COMMERCE,
         description="Personalised product recommendation and upsell engine.",
         endpoints=[
-            EndpointSpec("POST", "/recommend", "Get personalised product recommendations."),
+            EndpointSpec(
+                "POST", "/recommend", "Get personalised product recommendations."
+            ),
             EndpointSpec("POST", "/upsell", "Suggest upsell/cross-sell products."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/shopassist/recommend",\n'
             '    json={"user_id": "u123", "cart": ["SKU-001"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=49.0,
         setup_fee_usd=0.0,
@@ -195,13 +203,15 @@ _KITS: list = [
         description="Automated resume parsing, scoring, and candidate ranking.",
         endpoints=[
             EndpointSpec("POST", "/resume/parse", "Parse and extract resume data."),
-            EndpointSpec("POST", "/resume/score", "Score resume against a job description."),
+            EndpointSpec(
+                "POST", "/resume/score", "Score resume against a job description."
+            ),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/resumescreener/resume/score",\n'
             '    json={"resume_text": "...", "job_description": "..."})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=59.0,
         setup_fee_usd=0.0,
@@ -214,14 +224,16 @@ _KITS: list = [
         category=EDUCATION,
         description="Adaptive learning tutor with quiz generation and progress tracking.",
         endpoints=[
-            EndpointSpec("POST", "/tutor/explain", "Explain a concept at desired level."),
+            EndpointSpec(
+                "POST", "/tutor/explain", "Explain a concept at desired level."
+            ),
             EndpointSpec("POST", "/tutor/quiz", "Generate quiz questions on a topic."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/tutorbot/tutor/explain",\n'
             '    json={"topic": "photosynthesis", "level": "middle_school"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=29.0,
         setup_fee_usd=0.0,
@@ -238,10 +250,10 @@ _KITS: list = [
             EndpointSpec("POST", "/copy/email", "Draft marketing email sequences."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/copywriter/copy/ad",\n'
             '    json={"product": "running shoes", "tone": "energetic"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=39.0,
         setup_fee_usd=0.0,
@@ -258,10 +270,10 @@ _KITS: list = [
             EndpointSpec("POST", "/contract/summarise", "Summarise key clauses."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/contractreview/contract/analyse",\n'
             '    json={"contract_text": "..."})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=129.0,
         setup_fee_usd=99.0,
@@ -278,10 +290,10 @@ _KITS: list = [
             EndpointSpec("GET", "/route/eta/{route_id}", "Get ETA for a route."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/routeoptimizer/route/optimise",\n'
             '    json={"stops": ["NYC", "Boston", "Philadelphia"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=69.0,
         setup_fee_usd=0.0,
@@ -298,10 +310,10 @@ _KITS: list = [
             EndpointSpec("GET", "/fraud/rules", "List active fraud detection rules."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/fraudshield/fraud/score",\n'
             '    json={"amount": 999.99, "merchant": "AcmeCorp", "user_id": "u42"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=149.0,
         setup_fee_usd=99.0,
@@ -318,10 +330,10 @@ _KITS: list = [
             EndpointSpec("POST", "/sentiment/batch", "Batch sentiment analysis."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/sentimentradar/sentiment/analyse",\n'
             '    json={"text": "This product changed my life!"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=25.0,
         setup_fee_usd=0.0,
@@ -334,14 +346,16 @@ _KITS: list = [
         category=HR,
         description="Automated employee onboarding workflow and checklist manager.",
         endpoints=[
-            EndpointSpec("POST", "/onboarding/start", "Initiate onboarding for a new hire."),
+            EndpointSpec(
+                "POST", "/onboarding/start", "Initiate onboarding for a new hire."
+            ),
             EndpointSpec("GET", "/onboarding/{id}/status", "Get onboarding progress."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/onboardingbot/onboarding/start",\n'
             '    json={"employee_id": "e001", "role": "engineer"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=45.0,
         setup_fee_usd=0.0,
@@ -354,14 +368,16 @@ _KITS: list = [
         category=HEALTHCARE_DIAGNOSTICS,
         description="Medication interaction checker for clinical decision support.",
         endpoints=[
-            EndpointSpec("POST", "/drugs/interactions", "Check interactions between drugs."),
+            EndpointSpec(
+                "POST", "/drugs/interactions", "Check interactions between drugs."
+            ),
             EndpointSpec("GET", "/drugs/{id}", "Get drug information."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/druginteraction/drugs/interactions",\n'
             '    json={"drugs": ["aspirin", "warfarin"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=89.0,
         setup_fee_usd=49.0,
@@ -378,10 +394,10 @@ _KITS: list = [
             EndpointSpec("POST", "/code/explain", "Explain what a code snippet does."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/codereview/code/review",\n'
             '    json={"code": "def foo(): pass", "language": "python"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=35.0,
         setup_fee_usd=0.0,
@@ -395,13 +411,15 @@ _KITS: list = [
         description="Demand forecasting and inventory optimisation for retail.",
         endpoints=[
             EndpointSpec("POST", "/inventory/forecast", "Forecast demand for SKUs."),
-            EndpointSpec("POST", "/inventory/reorder", "Generate reorder recommendations."),
+            EndpointSpec(
+                "POST", "/inventory/reorder", "Generate reorder recommendations."
+            ),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/inventorypredict/inventory/forecast",\n'
             '    json={"sku": "SKU-999", "horizon_days": 30})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=55.0,
         setup_fee_usd=0.0,
@@ -414,14 +432,16 @@ _KITS: list = [
         category=EDUCATION,
         description="Personalised learning path generator for professional upskilling.",
         endpoints=[
-            EndpointSpec("POST", "/path/generate", "Generate a personalised learning path."),
+            EndpointSpec(
+                "POST", "/path/generate", "Generate a personalised learning path."
+            ),
             EndpointSpec("GET", "/path/{id}/progress", "Track learning path progress."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/edupath/path/generate",\n'
             '    json={"goal": "machine learning engineer", "current_skills": ["python"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=39.0,
         setup_fee_usd=0.0,
@@ -438,10 +458,10 @@ _KITS: list = [
             EndpointSpec("GET", "/price/competitors/{sku}", "Get competitor prices."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/priceoptimizer/price/optimise",\n'
             '    json={"sku": "SKU-007", "cost": 12.50, "market_data": {}})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=65.0,
         setup_fee_usd=0.0,
@@ -454,14 +474,16 @@ _KITS: list = [
         category=LEGAL,
         description="Regulatory compliance scanning for GDPR, HIPAA, and SOC2.",
         endpoints=[
-            EndpointSpec("POST", "/compliance/scan", "Scan documents for compliance issues."),
+            EndpointSpec(
+                "POST", "/compliance/scan", "Scan documents for compliance issues."
+            ),
             EndpointSpec("GET", "/compliance/frameworks", "List supported frameworks."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/compliancechecker/compliance/scan",\n'
             '    json={"document": "...", "framework": "GDPR"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=159.0,
         setup_fee_usd=149.0,
@@ -475,13 +497,15 @@ _KITS: list = [
         description="Real-time AI game master for tabletop RPG and interactive fiction.",
         endpoints=[
             EndpointSpec("POST", "/game/action", "Process a player action."),
-            EndpointSpec("POST", "/game/world/describe", "Describe a game world location."),
+            EndpointSpec(
+                "POST", "/game/world/describe", "Describe a game world location."
+            ),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/gamenarrator/game/action",\n'
             '    json={"session_id": "s1", "action": "open the treasure chest"})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=34.0,
         setup_fee_usd=0.0,
@@ -494,14 +518,16 @@ _KITS: list = [
         category=FINANCE,
         description="Alternative credit scoring using non-traditional data signals.",
         endpoints=[
-            EndpointSpec("POST", "/credit/score", "Generate an alternative credit score."),
+            EndpointSpec(
+                "POST", "/credit/score", "Generate an alternative credit score."
+            ),
             EndpointSpec("GET", "/credit/factors/{id}", "Explain score factors."),
         ],
         sample_code=(
-            'import requests\n'
+            "import requests\n"
             'r = requests.post("https://api.dreamco.ai/creditscore/credit/score",\n'
             '    json={"applicant_id": "a001", "data_sources": ["bank", "utility"]})\n'
-            'print(r.json())'
+            "print(r.json())"
         ),
         monthly_price_usd=119.0,
         setup_fee_usd=99.0,
@@ -516,6 +542,7 @@ _KIT_INDEX: dict = {kit.kit_id: kit for kit in _KITS}
 # ---------------------------------------------------------------------------
 # Catalog class
 # ---------------------------------------------------------------------------
+
 
 class APIKitCatalog:
     """Browse, search, and retrieve pre-made AI-as-a-Service bot kits."""
@@ -534,7 +561,8 @@ class APIKitCatalog:
         """Full-text search across name, description, and category."""
         q = query.lower()
         return [
-            k for k in _KITS
+            k
+            for k in _KITS
             if q in k.name.lower()
             or q in k.description.lower()
             or q in k.category.lower()

@@ -9,32 +9,33 @@ Validates:
   5. Static analysis checker (tools/check_bot_framework.py)
 """
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
+
 from framework import (
-    GlobalAISourcesFlow,
-    DataIngestionLayer,
-    LearningMethodClassifier,
-    SandboxTestLab,
-    PerformanceAnalytics,
-    HybridEvolutionEngine,
-    DeploymentEngine,
-    ProfitMarketIntelligence,
-    GovernanceSecurityLayer,
-    FrameworkViolationError,
     FRAMEWORK_VERSION,
     REQUIRED_STAGES,
+    DataIngestionLayer,
+    DeploymentEngine,
+    FrameworkViolationError,
+    GlobalAISourcesFlow,
+    GovernanceSecurityLayer,
+    HybridEvolutionEngine,
+    LearningMethodClassifier,
+    PerformanceAnalytics,
+    ProfitMarketIntelligence,
+    SandboxTestLab,
 )
-
 
 # ===========================================================================
 # Framework constants
 # ===========================================================================
+
 
 class TestFrameworkConstants:
     def test_framework_version_is_string(self):
@@ -67,6 +68,7 @@ class TestFrameworkConstants:
 # ===========================================================================
 # Stage 1 — DataIngestionLayer
 # ===========================================================================
+
 
 class TestDataIngestionLayer:
     def test_default_stage_id(self):
@@ -109,6 +111,7 @@ class TestDataIngestionLayer:
 # ===========================================================================
 # Stage 2 — LearningMethodClassifier
 # ===========================================================================
+
 
 class TestLearningMethodClassifier:
     def test_default_stage_id(self):
@@ -156,6 +159,7 @@ class TestLearningMethodClassifier:
 # Stage 3 — SandboxTestLab
 # ===========================================================================
 
+
 class TestSandboxTestLab:
     def test_default_stage_id(self):
         assert SandboxTestLab().stage_id == "sandbox_test"
@@ -185,6 +189,7 @@ class TestSandboxTestLab:
 # ===========================================================================
 # Stage 4 — PerformanceAnalytics
 # ===========================================================================
+
 
 class TestPerformanceAnalytics:
     def test_default_stage_id(self):
@@ -218,6 +223,7 @@ class TestPerformanceAnalytics:
 # Stage 5 — HybridEvolutionEngine
 # ===========================================================================
 
+
 class TestHybridEvolutionEngine:
     def test_default_stage_id(self):
         assert HybridEvolutionEngine().stage_id == "hybrid_evolution"
@@ -244,6 +250,7 @@ class TestHybridEvolutionEngine:
 # Stage 6 — DeploymentEngine
 # ===========================================================================
 
+
 class TestDeploymentEngine:
     def test_default_stage_id(self):
         assert DeploymentEngine().stage_id == "deployment"
@@ -267,6 +274,7 @@ class TestDeploymentEngine:
 # ===========================================================================
 # Stage 7 — ProfitMarketIntelligence
 # ===========================================================================
+
 
 class TestProfitMarketIntelligence:
     def test_default_stage_id(self):
@@ -301,6 +309,7 @@ class TestProfitMarketIntelligence:
 # ===========================================================================
 # Stage 8 — GovernanceSecurityLayer
 # ===========================================================================
+
 
 class TestGovernanceSecurityLayer:
     def test_default_stage_id(self):
@@ -357,6 +366,7 @@ class TestGovernanceSecurityLayer:
 # ===========================================================================
 # GlobalAISourcesFlow orchestrator
 # ===========================================================================
+
 
 class TestGlobalAISourcesFlowInit:
     def test_instantiation_with_bot_name(self):
@@ -472,11 +482,15 @@ class TestGlobalAISourcesFlowRunPipeline:
 # Bot integration checks — existing bots must use the framework
 # ===========================================================================
 
+
 class TestGovernmentContractGrantBotFramework:
     def setup_method(self):
-        self._inserted_path = os.path.join(REPO_ROOT, "bots", "government-contract-grant-bot")
+        self._inserted_path = os.path.join(
+            REPO_ROOT, "bots", "government-contract-grant-bot"
+        )
         sys.path.insert(0, self._inserted_path)
         from government_contract_grant_bot import GovernmentContractGrantBot
+
         self.BotClass = GovernmentContractGrantBot
 
     def teardown_method(self):
@@ -508,6 +522,7 @@ class TestAIModelsIntegrationFramework:
         for p in self._inserted_paths:
             sys.path.insert(0, p)
         from ai_models_integration import AIModelsIntegration
+
         self.BotClass = AIModelsIntegration
 
     def teardown_method(self):
@@ -535,6 +550,7 @@ class TestAIChatbotFramework:
         for p in self._inserted_paths:
             sys.path.insert(0, p)
         from bots.ai_chatbot.chatbot import Chatbot
+
         self.BotClass = Chatbot
 
     def teardown_method(self):
@@ -559,6 +575,7 @@ class TestAIChatbotFramework:
 # Static analysis checker
 # ===========================================================================
 
+
 class TestCheckBotFrameworkTool:
     """Validate the tools/check_bot_framework.py static analysis script."""
 
@@ -567,6 +584,7 @@ class TestCheckBotFrameworkTool:
         checker_path = os.path.join(REPO_ROOT, "tools")
         sys.path.insert(0, checker_path)
         from check_bot_framework import main
+
         args = extra_args or []
         return main(["--path", REPO_ROOT] + args)
 
@@ -580,47 +598,58 @@ class TestCheckBotFrameworkTool:
 
     def test_checker_scan_function_compliant_files(self):
         from pathlib import Path
+
         from check_bot_framework import scan_directory
+
         root = Path(REPO_ROOT)
         compliant, violations = scan_directory(root)
-        assert violations == [], (
-            f"Non-compliant bot files found: {violations}"
-        )
+        assert violations == [], f"Non-compliant bot files found: {violations}"
 
     def test_checker_is_bot_file_excludes_init(self):
         from pathlib import Path
+
         from check_bot_framework import is_bot_file
+
         assert not is_bot_file(Path("__init__.py"))
 
     def test_checker_is_bot_file_excludes_tiers(self):
         from pathlib import Path
+
         from check_bot_framework import is_bot_file
+
         assert not is_bot_file(Path("tiers.py"))
 
     def test_checker_is_bot_file_excludes_test_files(self):
         from pathlib import Path
+
         from check_bot_framework import is_bot_file
+
         assert not is_bot_file(Path("test_something.py"))
 
     def test_checker_is_bot_file_accepts_bot_py(self):
         from pathlib import Path
+
         from check_bot_framework import is_bot_file
+
         assert is_bot_file(Path("my_bot.py"))
 
     def test_file_is_compliant_with_marker(self, tmp_path):
         from check_bot_framework import file_is_compliant
+
         f = tmp_path / "bot.py"
         f.write_text("from framework import GlobalAISourcesFlow\n")
         assert file_is_compliant(f) is True
 
     def test_file_is_compliant_without_marker(self, tmp_path):
         from check_bot_framework import file_is_compliant
+
         f = tmp_path / "bot.py"
         f.write_text("print('hello world')\n")
         assert file_is_compliant(f) is False
 
     def test_file_is_compliant_with_comment_marker(self, tmp_path):
         from check_bot_framework import file_is_compliant
+
         f = tmp_path / "bot.py"
         f.write_text("# GLOBAL AI SOURCES FLOW\nprint('hi')\n")
         assert file_is_compliant(f) is True

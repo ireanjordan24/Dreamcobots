@@ -16,10 +16,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Catalog item categories
 # ---------------------------------------------------------------------------
+
 
 class CatalogCategory(Enum):
     BOTS = "bots"
@@ -38,6 +38,7 @@ class CatalogCategory(Enum):
 # Franchise status
 # ---------------------------------------------------------------------------
 
+
 class FranchiseStatus(Enum):
     PENDING = "pending"
     ACTIVE = "active"
@@ -48,6 +49,7 @@ class FranchiseStatus(Enum):
 # ---------------------------------------------------------------------------
 # Catalog item
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CatalogItem:
@@ -112,6 +114,7 @@ class CatalogItem:
 # Franchise
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Franchise:
     """
@@ -172,9 +175,11 @@ class Franchise:
 # Catalog order
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class CatalogOrder:
     """A customer order placed through the catalog."""
+
     order_id: str
     customer_id: str
     item_id: str
@@ -200,6 +205,7 @@ class CatalogOrder:
 # ---------------------------------------------------------------------------
 # Catalog & Franchise Engine
 # ---------------------------------------------------------------------------
+
 
 class CatalogFranchiseError(Exception):
     """Raised when a catalog or franchise operation fails."""

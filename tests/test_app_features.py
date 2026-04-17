@@ -1,22 +1,26 @@
 """Tests for App_bots/feature_1.py, feature_2.py, feature_3.py"""
+
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
 
-from App_bots.feature_1 import UserOnboardingBot, EXAMPLES as AB1_EXAMPLES
-from App_bots.feature_2 import UserSupportBot, EXAMPLES as AB2_EXAMPLES
-from App_bots.feature_3 import FeatureUpdateBot, EXAMPLES as AB3_EXAMPLES
-
+from App_bots.feature_1 import EXAMPLES as AB1_EXAMPLES
+from App_bots.feature_1 import UserOnboardingBot
+from App_bots.feature_2 import EXAMPLES as AB2_EXAMPLES
+from App_bots.feature_2 import UserSupportBot
+from App_bots.feature_3 import EXAMPLES as AB3_EXAMPLES
+from App_bots.feature_3 import FeatureUpdateBot
 
 # ===========================================================================
 # Feature 1: UserOnboardingBot
 # ===========================================================================
+
 
 class TestUserOnboardingBotInstantiation:
     def test_default_tier_is_free(self):
@@ -119,6 +123,7 @@ class TestUserOnboardingBotMethods:
 # ===========================================================================
 # Feature 2: UserSupportBot
 # ===========================================================================
+
 
 class TestUserSupportBotInstantiation:
     def test_default_tier_is_free(self):
@@ -228,6 +233,7 @@ class TestUserSupportBotMethods:
 # ===========================================================================
 # Feature 3: FeatureUpdateBot
 # ===========================================================================
+
 
 class TestFeatureUpdateBotInstantiation:
     def test_default_tier_is_free(self):

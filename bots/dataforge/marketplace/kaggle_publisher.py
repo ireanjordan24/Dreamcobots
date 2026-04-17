@@ -1,4 +1,5 @@
 """Kaggle dataset publisher for DataForge AI."""
+
 # Adheres to the GLOBAL AI SOURCES FLOW framework — see framework/global_ai_sources_flow.py
 import json
 import logging
@@ -33,6 +34,7 @@ class KagglePublisher:
             return {"status": "error", "message": "Kaggle credentials not configured."}
         try:
             import kaggle
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 data_path = os.path.join(tmpdir, "data.json")
                 with open(data_path, "w") as f:
@@ -64,6 +66,7 @@ class KagglePublisher:
         """
         try:
             import kaggle
+
             info = kaggle.api.dataset_list(search=dataset_id)
             return {"status": "success", "info": str(info)}
         except Exception as e:

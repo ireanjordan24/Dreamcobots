@@ -24,45 +24,48 @@ Usage
 
 from __future__ import annotations
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-# GLOBAL AI SOURCES FLOW
-from framework import GlobalAISourcesFlow  # noqa: F401
-
-from bots.quantum_decision_bot.tiers import (
-    Tier,
-    TierConfig,
-    get_tier_config,
-    get_upgrade_path,
-    FEATURE_SIMULATION,
-    FEATURE_QUANTUM_DECISION,
-    FEATURE_PROBABILITY_MODEL,
-    FEATURE_DIMENSION_MAPPER,
-    FEATURE_BOT_ROUTER,
-    FEATURE_MONEY_ENGINE,
-    FEATURE_HYPER_SIMULATION,
-    FEATURE_SELF_IMPROVING_AI,
-    FEATURE_GOD_MODE,
-    FEATURE_AUTONOMOUS_EXECUTION,
-    FEATURE_MULTI_PATH_TRACKER,
-)
-from bots.quantum_decision_bot.probability_model import ProbabilityModel
-from bots.quantum_decision_bot.simulation_engine import run_simulations, summarise_outcomes
-from bots.quantum_decision_bot.quantum_engine import QuantumEngine
-from bots.quantum_decision_bot.dimension_mapper import DimensionMapper
-from bots.quantum_decision_bot.bot_router import BotRouter
-from bots.quantum_decision_bot.money_engine import MoneyEngine
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from bots.quantum_decision_bot.bot_router import BotRouter
+from bots.quantum_decision_bot.dimension_mapper import DimensionMapper
+from bots.quantum_decision_bot.money_engine import MoneyEngine
+from bots.quantum_decision_bot.probability_model import ProbabilityModel
+from bots.quantum_decision_bot.quantum_engine import QuantumEngine
+from bots.quantum_decision_bot.simulation_engine import (
+    run_simulations,
+    summarise_outcomes,
+)
+from bots.quantum_decision_bot.tiers import (
+    FEATURE_AUTONOMOUS_EXECUTION,
+    FEATURE_BOT_ROUTER,
+    FEATURE_DIMENSION_MAPPER,
+    FEATURE_GOD_MODE,
+    FEATURE_HYPER_SIMULATION,
+    FEATURE_MONEY_ENGINE,
+    FEATURE_MULTI_PATH_TRACKER,
+    FEATURE_PROBABILITY_MODEL,
+    FEATURE_QUANTUM_DECISION,
+    FEATURE_SELF_IMPROVING_AI,
+    FEATURE_SIMULATION,
+    Tier,
+    TierConfig,
+    get_tier_config,
+    get_upgrade_path,
+)
+
+# GLOBAL AI SOURCES FLOW
+from framework import GlobalAISourcesFlow  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class QuantumDecisionBotError(Exception):
     """Base exception for QuantumDecisionBot errors."""
@@ -75,6 +78,7 @@ class QuantumTierError(QuantumDecisionBotError):
 # ---------------------------------------------------------------------------
 # QuantumDecisionBot
 # ---------------------------------------------------------------------------
+
 
 class QuantumDecisionBot:
     """
@@ -120,7 +124,9 @@ class QuantumDecisionBot:
     def _require(self, feature: str) -> None:
         if not self._config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            msg = f"Feature '{feature}' is not available on the {self._config.name} tier."
+            msg = (
+                f"Feature '{feature}' is not available on the {self._config.name} tier."
+            )
             if upgrade:
                 msg += f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
             raise QuantumTierError(msg)
@@ -275,7 +281,9 @@ class QuantumDecisionBot:
         Available on: ENTERPRISE.
         """
         self._require(FEATURE_SELF_IMPROVING_AI)
-        return self.probability_model.learn(scenario_name, predicted_score, actual_profit)
+        return self.probability_model.learn(
+            scenario_name, predicted_score, actual_profit
+        )
 
     def get_model_weights(self) -> dict:
         """
@@ -311,9 +319,7 @@ class QuantumDecisionBot:
         """
         self._require(FEATURE_QUANTUM_DECISION)
         history = self.quantum_engine.get_path_history()
-        best_ever = (
-            max(history, key=lambda p: p["score"]) if history else None
-        )
+        best_ever = max(history, key=lambda p: p["score"]) if history else None
         return {
             "title": "DreamCo QuantumOS",
             "operator": self.operator_name,
@@ -395,6 +401,7 @@ class QuantumDecisionBot:
 # ---------------------------------------------------------------------------
 # Module-level run() — DreamCo OS orchestrator interface
 # ---------------------------------------------------------------------------
+
 
 def run() -> Dict[str, Any]:
     """

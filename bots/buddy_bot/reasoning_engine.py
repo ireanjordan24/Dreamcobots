@@ -28,29 +28,31 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-
 # ---------------------------------------------------------------------------
 # Query intent taxonomy
 # ---------------------------------------------------------------------------
 
+
 class QueryIntent(Enum):
-    FACTUAL       = "factual"        # "What is …?" / "How does …?"
-    ANALYTICAL    = "analytical"     # "Why did …?" / "Compare …"
-    CREATIVE      = "creative"       # "Write me …" / "Generate …"
-    EMOTIONAL     = "emotional"      # Feelings, venting, support
+    FACTUAL = "factual"  # "What is …?" / "How does …?"
+    ANALYTICAL = "analytical"  # "Why did …?" / "Compare …"
+    CREATIVE = "creative"  # "Write me …" / "Generate …"
+    EMOTIONAL = "emotional"  # Feelings, venting, support
     INSTRUCTIONAL = "instructional"  # "Help me …" / "Show me how …"
-    CONVERSATIONAL = "conversational" # Small talk, greetings
-    ETHICAL       = "ethical"        # Moral dilemmas, advice
-    UNKNOWN       = "unknown"
+    CONVERSATIONAL = "conversational"  # Small talk, greetings
+    ETHICAL = "ethical"  # Moral dilemmas, advice
+    UNKNOWN = "unknown"
 
 
 # ---------------------------------------------------------------------------
 # Reasoning step
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ReasoningStep:
     """A single step in a chain-of-thought reasoning trace."""
+
     step_number: int
     description: str
     conclusion: str
@@ -66,6 +68,7 @@ class ReasoningStep:
 # ---------------------------------------------------------------------------
 # Reasoning result
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ReasoningResult:
@@ -89,6 +92,7 @@ class ReasoningResult:
     confidence : float
         Model confidence in the response (0.0–1.0).
     """
+
     original_query: str
     intent: QueryIntent
     reasoning_steps: list[ReasoningStep] = field(default_factory=list)
@@ -127,7 +131,7 @@ _FACTUAL_RESPONSE_TEMPLATES: list[str] = [
         "The core idea here is that {insight}."
     ),
     (
-        "Let me break this down clearly. Regarding \"{query_echo}\": "
+        'Let me break this down clearly. Regarding "{query_echo}": '
         "{insight} — understanding this deeply can shift how you approach it."
     ),
     (
@@ -139,11 +143,11 @@ _FACTUAL_RESPONSE_TEMPLATES: list[str] = [
 _ANALYTICAL_RESPONSE_TEMPLATES: list[str] = [
     (
         "Thinking through this analytically — there are several dimensions to consider. "
-        "{framework} Applied to your question about \"{query_echo}\": {insight}."
+        '{framework} Applied to your question about "{query_echo}": {insight}.'
     ),
     (
         "Let me reason through this step by step. "
-        "When we look at \"{query_echo}\" through a {framework_name} lens: {insight}."
+        'When we look at "{query_echo}" through a {framework_name} lens: {insight}.'
     ),
 ]
 
@@ -174,12 +178,12 @@ _EMOTIONAL_SUPPORT_TEMPLATES: list[str] = [
 
 _INSTRUCTIONAL_RESPONSE_TEMPLATES: list[str] = [
     (
-        "Let me walk you through this clearly. To help with \"{query_echo}\", "
+        'Let me walk you through this clearly. To help with "{query_echo}", '
         "the most effective starting point is: {insight}. "
         "From there, we can build step by step."
     ),
     (
-        "Great — I can help with that. The key principle for \"{query_echo}\" is "
+        'Great — I can help with that. The key principle for "{query_echo}" is '
         "{insight}. Shall I lay out a detailed plan?"
     ),
 ]
@@ -195,6 +199,7 @@ _CREATIVE_PROMPTS: list[str] = [
 # ---------------------------------------------------------------------------
 # ReasoningEngine
 # ---------------------------------------------------------------------------
+
 
 class ReasoningEngine:
     """
@@ -266,7 +271,9 @@ class ReasoningEngine:
             steps = self._chain_of_thought(query, intent, context)
 
         # Step 4: Generate enriched response
-        response = self._generate_enriched_response(query, intent, comprehension, context)
+        response = self._generate_enriched_response(
+            query, intent, comprehension, context
+        )
 
         result = ReasoningResult(
             original_query=query,
@@ -279,12 +286,16 @@ class ReasoningEngine:
         )
 
         # Update internal history
-        self._conversation_history.append({
-            "user_input": query,
-            "response": response,
-        })
+        self._conversation_history.append(
+            {
+                "user_input": query,
+                "response": response,
+            }
+        )
         if len(self._conversation_history) > self.context_window:
-            self._conversation_history = self._conversation_history[-self.context_window:]
+            self._conversation_history = self._conversation_history[
+                -self.context_window :
+            ]
 
         return result
 
@@ -368,52 +379,112 @@ class ReasoningEngine:
 
         # Check ethical first — before emotional to avoid "hurts" / "wrong" misclassification
         ethical_signals = (
-            "should i", "is it right", "moral", "ethical", "wrong to",
-            "okay to", "fair", "justice",
+            "should i",
+            "is it right",
+            "moral",
+            "ethical",
+            "wrong to",
+            "okay to",
+            "fair",
+            "justice",
         )
         if any(s in lower for s in ethical_signals):
             return QueryIntent.ETHICAL
 
         emotional_signals = (
-            "feel", "feeling", "sad", "happy", "angry", "anxious", "anxiety",
-            "scared", "lonely", "hurt", "upset", "stressed", "overwhelmed",
-            "depressed", "excited", "love", "hate", "miss", "proud",
+            "feel",
+            "feeling",
+            "sad",
+            "happy",
+            "angry",
+            "anxious",
+            "anxiety",
+            "scared",
+            "lonely",
+            "hurt",
+            "upset",
+            "stressed",
+            "overwhelmed",
+            "depressed",
+            "excited",
+            "love",
+            "hate",
+            "miss",
+            "proud",
         )
         if any(s in lower for s in emotional_signals):
             return QueryIntent.EMOTIONAL
 
         instructional_signals = (
-            "help me", "how do i", "how to", "show me", "can you", "teach me",
-            "guide me", "walk me through", "assist",
+            "help me",
+            "how do i",
+            "how to",
+            "show me",
+            "can you",
+            "teach me",
+            "guide me",
+            "walk me through",
+            "assist",
         )
         if any(s in lower for s in instructional_signals):
             return QueryIntent.INSTRUCTIONAL
 
         analytical_signals = (
-            "why", "compare", "difference between", "pros and cons",
-            "analyse", "analyze", "explain", "what causes", "how does",
-            "impact of", "effect of", "trade-off",
+            "why",
+            "compare",
+            "difference between",
+            "pros and cons",
+            "analyse",
+            "analyze",
+            "explain",
+            "what causes",
+            "how does",
+            "impact of",
+            "effect of",
+            "trade-off",
         )
         if any(s in lower for s in analytical_signals):
             return QueryIntent.ANALYTICAL
 
         factual_signals = (
-            "what is", "what are", "who is", "when did", "where is",
-            "define", "tell me about", "describe",
+            "what is",
+            "what are",
+            "who is",
+            "when did",
+            "where is",
+            "define",
+            "tell me about",
+            "describe",
         )
         if any(s in lower for s in factual_signals):
             return QueryIntent.FACTUAL
 
         creative_signals = (
-            "write", "create", "generate", "make", "compose", "design",
-            "come up with", "brainstorm", "imagine", "story",
+            "write",
+            "create",
+            "generate",
+            "make",
+            "compose",
+            "design",
+            "come up with",
+            "brainstorm",
+            "imagine",
+            "story",
         )
         if any(s in lower for s in creative_signals):
             return QueryIntent.CREATIVE
 
         conversational_signals = (
-            "hello", "hi", "hey", "how are you", "what's up", "good morning",
-            "good night", "bye", "thanks", "thank you",
+            "hello",
+            "hi",
+            "hey",
+            "how are you",
+            "what's up",
+            "good morning",
+            "good night",
+            "bye",
+            "thanks",
+            "thank you",
         )
         if any(s in lower for s in conversational_signals):
             return QueryIntent.CONVERSATIONAL
@@ -423,16 +494,39 @@ class ReasoningEngine:
     def _extract_entities(self, text: str) -> list[str]:
         """Heuristic entity extraction (capitalised words, quoted phrases)."""
         quoted = re.findall(r'"([^"]+)"', text)
-        capitalised = re.findall(r'\b[A-Z][a-z]{2,}\b', text)
+        capitalised = re.findall(r"\b[A-Z][a-z]{2,}\b", text)
         return list(dict.fromkeys(quoted + capitalised))[:5]
 
     def _detect_sentiment(self, text: str) -> str:
         """Simple keyword-based sentiment classifier."""
         lower = text.lower()
-        positive = ("great", "love", "amazing", "happy", "excited", "wonderful",
-                    "fantastic", "good", "best", "brilliant", "joy")
-        negative = ("sad", "angry", "hate", "terrible", "awful", "bad", "worst",
-                    "horrible", "upset", "hurt", "pain", "fear")
+        positive = (
+            "great",
+            "love",
+            "amazing",
+            "happy",
+            "excited",
+            "wonderful",
+            "fantastic",
+            "good",
+            "best",
+            "brilliant",
+            "joy",
+        )
+        negative = (
+            "sad",
+            "angry",
+            "hate",
+            "terrible",
+            "awful",
+            "bad",
+            "worst",
+            "horrible",
+            "upset",
+            "hurt",
+            "pain",
+            "fear",
+        )
         pos = sum(1 for w in positive if w in lower)
         neg = sum(1 for w in negative if w in lower)
         if pos > neg:
@@ -444,14 +538,14 @@ class ReasoningEngine:
     def _infer_implicit_need(self, text: str, intent: QueryIntent) -> str:
         """Map intent to the most likely underlying user need."""
         need_map: dict[QueryIntent, str] = {
-            QueryIntent.FACTUAL:        "understanding and clarity",
-            QueryIntent.ANALYTICAL:     "structured insight and perspective",
-            QueryIntent.CREATIVE:       "inspiration and a creative spark",
-            QueryIntent.EMOTIONAL:      "validation, empathy, and connection",
-            QueryIntent.INSTRUCTIONAL:  "actionable guidance and next steps",
+            QueryIntent.FACTUAL: "understanding and clarity",
+            QueryIntent.ANALYTICAL: "structured insight and perspective",
+            QueryIntent.CREATIVE: "inspiration and a creative spark",
+            QueryIntent.EMOTIONAL: "validation, empathy, and connection",
+            QueryIntent.INSTRUCTIONAL: "actionable guidance and next steps",
             QueryIntent.CONVERSATIONAL: "connection and a friendly presence",
-            QueryIntent.ETHICAL:        "moral clarity and trusted guidance",
-            QueryIntent.UNKNOWN:        "a thoughtful, helpful response",
+            QueryIntent.ETHICAL: "moral clarity and trusted guidance",
+            QueryIntent.UNKNOWN: "a thoughtful, helpful response",
         }
         return need_map.get(intent, "a thoughtful, helpful response")
 
@@ -484,7 +578,7 @@ class ReasoningEngine:
         if not history:
             return "This is the beginning of our conversation — no prior context."
 
-        recent = history[-self.context_window:]
+        recent = history[-self.context_window :]
         topics: list[str] = []
         for turn in recent:
             user_msg = turn.get("user_input", "")
@@ -504,10 +598,7 @@ class ReasoningEngine:
             if unique_topics
             else "No specific entities identified in recent turns."
         )
-        turns_summary = (
-            f"We've had {len(recent)} recent exchange(s). "
-            f"{topic_str}"
-        )
+        turns_summary = f"We've had {len(recent)} recent exchange(s). " f"{topic_str}"
         return turns_summary
 
     def _chain_of_thought(
@@ -520,51 +611,61 @@ class ReasoningEngine:
         steps: list[ReasoningStep] = []
 
         # Step 1 — Parse intent
-        steps.append(ReasoningStep(
-            step_number=1,
-            description="Parse the query intent",
-            conclusion=f"The query is classified as '{intent.value}'.",
-        ))
+        steps.append(
+            ReasoningStep(
+                step_number=1,
+                description="Parse the query intent",
+                conclusion=f"The query is classified as '{intent.value}'.",
+            )
+        )
 
         # Step 2 — Acknowledge context
-        steps.append(ReasoningStep(
-            step_number=2,
-            description="Synthesise relevant conversation context",
-            conclusion=context,
-        ))
+        steps.append(
+            ReasoningStep(
+                step_number=2,
+                description="Synthesise relevant conversation context",
+                conclusion=context,
+            )
+        )
 
         # Step 3 — Identify the implicit need
         implicit_need = self._infer_implicit_need(query, intent)
-        steps.append(ReasoningStep(
-            step_number=3,
-            description="Identify what the user really needs",
-            conclusion=f"The user's core need appears to be: {implicit_need}.",
-        ))
+        steps.append(
+            ReasoningStep(
+                step_number=3,
+                description="Identify what the user really needs",
+                conclusion=f"The user's core need appears to be: {implicit_need}.",
+            )
+        )
 
         # Step 4 — Select a response strategy
         strategy_map: dict[QueryIntent, str] = {
-            QueryIntent.FACTUAL:        "Provide clear, grounded, accurate information.",
-            QueryIntent.ANALYTICAL:     "Offer structured multi-perspective analysis.",
-            QueryIntent.CREATIVE:       "Generate an imaginative, original idea or piece.",
-            QueryIntent.EMOTIONAL:      "Lead with empathy; validate, then support.",
-            QueryIntent.INSTRUCTIONAL:  "Break down actionable steps clearly.",
+            QueryIntent.FACTUAL: "Provide clear, grounded, accurate information.",
+            QueryIntent.ANALYTICAL: "Offer structured multi-perspective analysis.",
+            QueryIntent.CREATIVE: "Generate an imaginative, original idea or piece.",
+            QueryIntent.EMOTIONAL: "Lead with empathy; validate, then support.",
+            QueryIntent.INSTRUCTIONAL: "Break down actionable steps clearly.",
             QueryIntent.CONVERSATIONAL: "Respond warmly and naturally.",
-            QueryIntent.ETHICAL:        "Offer balanced moral reasoning.",
-            QueryIntent.UNKNOWN:        "Default to a thoughtful, open-ended response.",
+            QueryIntent.ETHICAL: "Offer balanced moral reasoning.",
+            QueryIntent.UNKNOWN: "Default to a thoughtful, open-ended response.",
         }
         strategy = strategy_map.get(intent, "Default to a thoughtful response.")
-        steps.append(ReasoningStep(
-            step_number=4,
-            description="Select response strategy",
-            conclusion=strategy,
-        ))
+        steps.append(
+            ReasoningStep(
+                step_number=4,
+                description="Select response strategy",
+                conclusion=strategy,
+            )
+        )
 
         # Step 5 — Formulate answer
-        steps.append(ReasoningStep(
-            step_number=5,
-            description="Formulate the enriched response",
-            conclusion="Applying Claude-Mithos narrative intelligence to craft a response.",
-        ))
+        steps.append(
+            ReasoningStep(
+                step_number=5,
+                description="Formulate the enriched response",
+                conclusion="Applying Claude-Mithos narrative intelligence to craft a response.",
+            )
+        )
 
         return steps
 
@@ -597,7 +698,7 @@ class ReasoningEngine:
         if intent == QueryIntent.CREATIVE:
             prompt = random.choice(_CREATIVE_PROMPTS)
             return (
-                f"{prompt} For \"{query_echo}\" — what if you started with "
+                f'{prompt} For "{query_echo}" — what if you started with '
                 f"the idea that {insight}? That could open an entirely unexpected direction."
             )
 
@@ -644,13 +745,13 @@ class ReasoningEngine:
     def _estimate_confidence(self, intent: QueryIntent) -> float:
         """Return a confidence score for the given intent class."""
         confidence_map: dict[QueryIntent, float] = {
-            QueryIntent.FACTUAL:        0.91,
-            QueryIntent.ANALYTICAL:     0.88,
-            QueryIntent.CREATIVE:       0.94,
-            QueryIntent.EMOTIONAL:      0.95,
-            QueryIntent.INSTRUCTIONAL:  0.92,
+            QueryIntent.FACTUAL: 0.91,
+            QueryIntent.ANALYTICAL: 0.88,
+            QueryIntent.CREATIVE: 0.94,
+            QueryIntent.EMOTIONAL: 0.95,
+            QueryIntent.INSTRUCTIONAL: 0.92,
             QueryIntent.CONVERSATIONAL: 0.98,
-            QueryIntent.ETHICAL:        0.85,
-            QueryIntent.UNKNOWN:        0.75,
+            QueryIntent.ETHICAL: 0.85,
+            QueryIntent.UNKNOWN: 0.75,
         }
         return confidence_map.get(intent, 0.80)

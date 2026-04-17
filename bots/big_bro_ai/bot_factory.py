@@ -24,22 +24,23 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
-
 # ---------------------------------------------------------------------------
 # Bot status
 # ---------------------------------------------------------------------------
 
+
 class BotStatus(Enum):
-    BLUEPRINT = "blueprint"    # Design phase
+    BLUEPRINT = "blueprint"  # Design phase
     IN_PROGRESS = "in_progress"  # Being built
-    READY = "ready"            # Deployed and operational
-    PAUSED = "paused"          # Temporarily halted
-    RETIRED = "retired"        # No longer active
+    READY = "ready"  # Deployed and operational
+    PAUSED = "paused"  # Temporarily halted
+    RETIRED = "retired"  # No longer active
 
 
 # ---------------------------------------------------------------------------
 # Bot categories
 # ---------------------------------------------------------------------------
+
 
 class BotCategory(Enum):
     MENTOR = "mentor"
@@ -56,6 +57,7 @@ class BotCategory(Enum):
 # ---------------------------------------------------------------------------
 # Prospectus (bot specification)
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BotProspectus:
@@ -103,6 +105,7 @@ class BotProspectus:
 # ---------------------------------------------------------------------------
 # Manufactured bot record
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ManufacturedBot:
@@ -229,6 +232,7 @@ class ManufacturedBot:
 # ---------------------------------------------------------------------------
 # Bot Factory
 # ---------------------------------------------------------------------------
+
 
 class BotFactoryError(Exception):
     """Raised when a Bot Factory operation fails."""
@@ -377,9 +381,7 @@ class BotFactory:
         """Return a summary of all bots created by this factory."""
         bots = list(self._bots.values())
         total_revenue = sum(b.revenue_earned_usd for b in bots)
-        avg_readiness = (
-            sum(b.readiness_score for b in bots) / len(bots) if bots else 0
-        )
+        avg_readiness = sum(b.readiness_score for b in bots) / len(bots) if bots else 0
         by_status: dict[str, int] = {}
         for b in bots:
             by_status[b.status.value] = by_status.get(b.status.value, 0) + 1

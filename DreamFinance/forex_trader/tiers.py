@@ -9,6 +9,17 @@ class TierConfig:
 
 
 TIERS = {
-    "pro": TierConfig("Pro", 199.0, ["currency pair correlation", "technical signal engine"]),
-    "enterprise": TierConfig("Enterprise", 499.0, ["currency pair correlation", "technical signal engine", "economic calendar integration", "multi-broker execution"]),
+    "pro": TierConfig(
+        "Pro", 199.0, ["currency pair correlation", "technical signal engine"]
+    ),
+    "enterprise": TierConfig(
+        "Enterprise",
+        499.0,
+        [
+            "currency pair correlation",
+            "technical signal engine",
+            "economic calendar integration",
+            "multi-broker execution",
+        ],
+    ),
 }

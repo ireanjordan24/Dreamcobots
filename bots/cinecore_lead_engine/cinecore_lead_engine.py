@@ -17,9 +17,9 @@ Tier-aware:
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -28,25 +28,25 @@ from typing import Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.cinecore_lead_engine.tiers import (
+    FEATURE_AD_PACKAGE,
+    FEATURE_ANALYTICS,
+    FEATURE_BULK_GENERATION,
+    FEATURE_BUSINESS_SCAN,
+    FEATURE_CRM_EXPORT,
+    FEATURE_LEAD_SCORING,
+    FEATURE_NICHE_FILTER,
+    FEATURE_OUTREACH_DRAFT,
+    FEATURE_SCRIPT_GENERATION,
     Tier,
     TierConfig,
     get_tier_config,
     get_upgrade_path,
-    FEATURE_BUSINESS_SCAN,
-    FEATURE_SCRIPT_GENERATION,
-    FEATURE_LEAD_SCORING,
-    FEATURE_OUTREACH_DRAFT,
-    FEATURE_CRM_EXPORT,
-    FEATURE_BULK_GENERATION,
-    FEATURE_ANALYTICS,
-    FEATURE_NICHE_FILTER,
-    FEATURE_AD_PACKAGE,
 )
-
 
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
+
 
 class BusinessNiche(Enum):
     RESTAURANT = "restaurant"
@@ -75,6 +75,7 @@ class LeadStatus(Enum):
 @dataclass
 class BusinessLead:
     """Represents a single business lead for CineCore outreach."""
+
     lead_id: str
     name: str
     niche: BusinessNiche
@@ -82,19 +83,22 @@ class BusinessLead:
     website: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    marketing_score: float = 50.0      # 0-100; lower = weaker marketing
-    opportunity_score: float = 50.0    # 0-100; higher = better opportunity
+    marketing_score: float = 50.0  # 0-100; lower = weaker marketing
+    opportunity_score: float = 50.0  # 0-100; higher = better opportunity
     status: LeadStatus = LeadStatus.RAW
     generated_script: Optional[str] = None
     outreach_draft: Optional[str] = None
     ad_package: Optional[dict] = None
     tags: list = field(default_factory=list)
-    found_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    found_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
+
 
 class CineCoreLeadEngineError(Exception):
     """Base exception for CineCore Lead Engine errors."""
@@ -124,13 +128,22 @@ _SAMPLE_BUSINESSES = [
 ]
 
 _SAMPLE_LOCATIONS = [
-    "New York, NY", "Los Angeles, CA", "Chicago, IL",
-    "Houston, TX", "Phoenix, AZ", "Miami, FL",
-    "Dallas, TX", "Atlanta, GA", "Seattle, WA", "Denver, CO",
+    "New York, NY",
+    "Los Angeles, CA",
+    "Chicago, IL",
+    "Houston, TX",
+    "Phoenix, AZ",
+    "Miami, FL",
+    "Dallas, TX",
+    "Atlanta, GA",
+    "Seattle, WA",
+    "Denver, CO",
 ]
 
 
-def _simulate_business_scan(count: int, niche_filter: Optional[BusinessNiche] = None) -> list[dict]:
+def _simulate_business_scan(
+    count: int, niche_filter: Optional[BusinessNiche] = None
+) -> list[dict]:
     """Simulate scanning public business directories for leads."""
     pool = _SAMPLE_BUSINESSES
     if niche_filter:
@@ -142,20 +155,23 @@ def _simulate_business_scan(count: int, niche_filter: Optional[BusinessNiche] = 
     for i in range(count):
         name, niche = random.choice(pool)
         suffix = random.randint(1, 999)
-        results.append({
-            "name": f"{name} #{suffix}",
-            "niche": niche,
-            "location": random.choice(_SAMPLE_LOCATIONS),
-            "website": f"https://www.{name.lower().replace(' ', '')}{suffix}.com",
-            "phone": f"+1-{random.randint(200,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
-            "marketing_score": round(random.uniform(10.0, 60.0), 1),
-        })
+        results.append(
+            {
+                "name": f"{name} #{suffix}",
+                "niche": niche,
+                "location": random.choice(_SAMPLE_LOCATIONS),
+                "website": f"https://www.{name.lower().replace(' ', '')}{suffix}.com",
+                "phone": f"+1-{random.randint(200,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}",
+                "marketing_score": round(random.uniform(10.0, 60.0), 1),
+            }
+        )
     return results
 
 
 # ---------------------------------------------------------------------------
 # Main bot class
 # ---------------------------------------------------------------------------
+
 
 class CineCoreLeadEngine:
     """
@@ -184,7 +200,11 @@ class CineCoreLeadEngine:
     def _require(self, feature: str) -> None:
         if not self._config.has_feature(feature):
             upgrade = get_upgrade_path(self.tier)
-            hint = f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)." if upgrade else ""
+            hint = (
+                f" Upgrade to {upgrade.name} (${upgrade.price_usd_monthly}/mo)."
+                if upgrade
+                else ""
+            )
             raise CineCoreLeadEngineTierError(
                 f"Feature '{feature}' is not available on the {self._config.name} tier.{hint}"
             )
@@ -262,7 +282,9 @@ class CineCoreLeadEngine:
                 BusinessNiche.DENTAL: 12,
                 BusinessNiche.ROOFING: 10,
             }.get(lead.niche, 5)
-            lead.opportunity_score = min(100.0, round(base + niche_bonus + random.uniform(-5, 5), 1))
+            lead.opportunity_score = min(
+                100.0, round(base + niche_bonus + random.uniform(-5, 5), 1)
+            )
             lead.status = LeadStatus.SCORED
             scored += 1
         return {"scored": scored}
@@ -276,7 +298,11 @@ class CineCoreLeadEngine:
         self._require(FEATURE_SCRIPT_GENERATION)
 
         candidates = sorted(
-            [l for l in self._leads.values() if l.status in (LeadStatus.RAW, LeadStatus.SCORED)],
+            [
+                l
+                for l in self._leads.values()
+                if l.status in (LeadStatus.RAW, LeadStatus.SCORED)
+            ],
             key=lambda l: l.opportunity_score,
             reverse=True,
         )[:top_n]
@@ -350,7 +376,12 @@ class CineCoreLeadEngine:
             lead.ad_package = {
                 "script": lead.generated_script,
                 "scenes": ["Problem hook", "Solution reveal", "Social proof", "CTA"],
-                "platforms": ["TikTok", "Instagram Reels", "YouTube Shorts", "Facebook Ads"],
+                "platforms": [
+                    "TikTok",
+                    "Instagram Reels",
+                    "YouTube Shorts",
+                    "Facebook Ads",
+                ],
                 "voiceover_style": "energetic",
                 "suggested_visuals": [
                     f"{lead.niche.value.replace('_', ' ')} interior shots",
@@ -386,7 +417,9 @@ class CineCoreLeadEngine:
             lead.outreach_draft = self._build_outreach(lead)
             lead.status = LeadStatus.OUTREACH_READY
             self._leads[lead_id] = lead
-            results.append({"lead_id": lead_id, "name": biz_name, "script": lead.generated_script})
+            results.append(
+                {"lead_id": lead_id, "name": biz_name, "script": lead.generated_script}
+            )
         return {
             "bulk_generated": len(results),
             "results": results,
@@ -401,7 +434,8 @@ class CineCoreLeadEngine:
         """Export outreach-ready leads to a CRM system (PRO+)."""
         self._require(FEATURE_CRM_EXPORT)
         exportable = [
-            l for l in self._leads.values()
+            l
+            for l in self._leads.values()
             if l.status in (LeadStatus.SCRIPT_READY, LeadStatus.OUTREACH_READY)
         ]
         for lead in exportable:
@@ -434,7 +468,9 @@ class CineCoreLeadEngine:
 
     def get_top_leads(self, n: int = 10) -> list:
         """Return top N leads by opportunity score."""
-        ranked = sorted(self._leads.values(), key=lambda l: l.opportunity_score, reverse=True)
+        ranked = sorted(
+            self._leads.values(), key=lambda l: l.opportunity_score, reverse=True
+        )
         return [_lead_to_dict(l) for l in ranked[:n]]
 
     def get_summary(self) -> dict:
@@ -450,7 +486,9 @@ class CineCoreLeadEngine:
             "total_leads": len(leads),
             "by_status": by_status,
             "by_niche": by_niche,
-            "avg_opportunity_score": round(sum(scores) / len(scores), 1) if scores else None,
+            "avg_opportunity_score": (
+                round(sum(scores) / len(scores), 1) if scores else None
+            ),
             "total_crm_exports": sum(e["leads_exported"] for e in self._crm_exports),
             "tier": self.tier.value,
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -476,20 +514,38 @@ class CineCoreLeadEngine:
         msg = message.lower()
         if "scan" in msg or "find" in msg or "get leads" in msg:
             result = self.scan_businesses(count=10)
-            return {"message": f"Scanned and found {result['new_leads']} new business leads.", "data": result}
+            return {
+                "message": f"Scanned and found {result['new_leads']} new business leads.",
+                "data": result,
+            }
         if "score" in msg:
             result = self.score_leads()
-            return {"message": f"Scored {result['scored']} leads by opportunity.", "data": result}
+            return {
+                "message": f"Scored {result['scored']} leads by opportunity.",
+                "data": result,
+            }
         if "script" in msg or "commercial" in msg or "ad" in msg:
             result = self.generate_scripts()
-            return {"message": f"Generated {result['scripts_generated']} ad scripts.", "data": result}
+            return {
+                "message": f"Generated {result['scripts_generated']} ad scripts.",
+                "data": result,
+            }
         if "outreach" in msg or "pitch" in msg or "message" in msg:
             result = self.generate_outreach()
-            return {"message": f"Created {result['outreach_drafts_generated']} outreach drafts.", "data": result}
+            return {
+                "message": f"Created {result['outreach_drafts_generated']} outreach drafts.",
+                "data": result,
+            }
         if "summary" in msg or "stats" in msg or "status" in msg:
-            return {"message": "CineCore Lead Engine summary retrieved.", "data": self.get_summary()}
+            return {
+                "message": "CineCore Lead Engine summary retrieved.",
+                "data": self.get_summary(),
+            }
         if "top" in msg or "best" in msg:
-            return {"message": "Top leads by opportunity score.", "data": self.get_top_leads()}
+            return {
+                "message": "Top leads by opportunity score.",
+                "data": self.get_top_leads(),
+            }
         return {
             "message": (
                 "CineCore Lead Engine online. "
@@ -507,6 +563,7 @@ class CineCoreLeadEngine:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _lead_to_dict(lead: BusinessLead) -> dict:
     return {
@@ -531,9 +588,11 @@ def _lead_to_dict(lead: BusinessLead) -> dict:
 # Standalone entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     """Standalone entry point for the CineCore Lead Engine bot."""
     import json
+
     print("=== CineCore Lead Engine Bot ===")
     print("DreamCo CineCore™ — Original Lead Engine\n")
 

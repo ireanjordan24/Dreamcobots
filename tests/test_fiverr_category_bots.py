@@ -1,41 +1,45 @@
 """Tests for all 30 Fiverr bots."""
+
 from __future__ import annotations
-import sys, os
+
 import importlib
+import os
+import sys
+
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from Fiverr_bots.buyer_persona_bot import BuyerPersonaBot
+from Fiverr_bots.client_finder_bot import ClientFinderBot
+from Fiverr_bots.client_retention_bot import ClientRetentionBot
+from Fiverr_bots.competitor_spy_bot import CompetitorSpyBot
+from Fiverr_bots.cross_sell_bot import CrossSellBot
+from Fiverr_bots.deadline_tracker_bot import DeadlineTrackerBot
+from Fiverr_bots.dispute_resolver_bot import DisputeResolverBot
+from Fiverr_bots.earnings_tracker_bot import EarningsTrackerBot
 from Fiverr_bots.feature_1 import GigListingBot
 from Fiverr_bots.feature_2 import OrderManagementBot
 from Fiverr_bots.feature_3 import ReviewCollectorBot
-from Fiverr_bots.pricing_optimizer_bot import PricingOptimizerBot
-from Fiverr_bots.inbox_automation_bot import InboxAutomationBot
-from Fiverr_bots.gig_ranking_bot import GigRankingBot
-from Fiverr_bots.client_finder_bot import ClientFinderBot
-from Fiverr_bots.portfolio_builder_bot import PortfolioBuilderBot
-from Fiverr_bots.upsell_bot import UpsellBot
-from Fiverr_bots.deadline_tracker_bot import DeadlineTrackerBot
-from Fiverr_bots.revision_manager_bot import RevisionManagerBot
-from Fiverr_bots.dispute_resolver_bot import DisputeResolverBot
-from Fiverr_bots.earnings_tracker_bot import EarningsTrackerBot
-from Fiverr_bots.niche_analyzer_bot import NicheAnalyzerBot
-from Fiverr_bots.competitor_spy_bot import CompetitorSpyBot
-from Fiverr_bots.proposal_writer_bot import ProposalWriterBot
-from Fiverr_bots.client_retention_bot import ClientRetentionBot
-from Fiverr_bots.package_optimizer_bot import PackageOptimizerBot
-from Fiverr_bots.response_time_bot import ResponseTimeBot
-from Fiverr_bots.skill_tagger_bot import SkillTaggerBot
-from Fiverr_bots.gig_description_optimizer_bot import GigDescriptionOptimizerBot
-from Fiverr_bots.order_completion_bot import OrderCompletionBot
-from Fiverr_bots.milestone_tracker_bot import MilestoneTrackerBot
-from Fiverr_bots.buyer_persona_bot import BuyerPersonaBot
-from Fiverr_bots.seasonal_pricing_bot import SeasonalPricingBot
-from Fiverr_bots.gig_image_optimizer_bot import GigImageOptimizerBot
-from Fiverr_bots.service_expansion_bot import ServiceExpansionBot
-from Fiverr_bots.cross_sell_bot import CrossSellBot
 from Fiverr_bots.feedback_analyzer_bot import FeedbackAnalyzerBot
+from Fiverr_bots.gig_description_optimizer_bot import GigDescriptionOptimizerBot
+from Fiverr_bots.gig_image_optimizer_bot import GigImageOptimizerBot
+from Fiverr_bots.gig_ranking_bot import GigRankingBot
+from Fiverr_bots.inbox_automation_bot import InboxAutomationBot
 from Fiverr_bots.level_up_bot import LevelUpBot
+from Fiverr_bots.milestone_tracker_bot import MilestoneTrackerBot
+from Fiverr_bots.niche_analyzer_bot import NicheAnalyzerBot
+from Fiverr_bots.order_completion_bot import OrderCompletionBot
+from Fiverr_bots.package_optimizer_bot import PackageOptimizerBot
+from Fiverr_bots.portfolio_builder_bot import PortfolioBuilderBot
+from Fiverr_bots.pricing_optimizer_bot import PricingOptimizerBot
+from Fiverr_bots.proposal_writer_bot import ProposalWriterBot
+from Fiverr_bots.response_time_bot import ResponseTimeBot
+from Fiverr_bots.revision_manager_bot import RevisionManagerBot
+from Fiverr_bots.seasonal_pricing_bot import SeasonalPricingBot
+from Fiverr_bots.service_expansion_bot import ServiceExpansionBot
+from Fiverr_bots.skill_tagger_bot import SkillTaggerBot
+from Fiverr_bots.upsell_bot import UpsellBot
 
 ALL_BOTS = [
     ("GigListingBot", GigListingBot),
@@ -114,7 +118,10 @@ class TestTierPricing:
     @pytest.mark.parametrize("name,BotClass", ALL_BOTS)
     def test_enterprise_price_gte_pro(self, name, BotClass):
         T = _get_tier(BotClass)
-        assert BotClass(tier=T.ENTERPRISE).monthly_price() >= BotClass(tier=T.PRO).monthly_price()
+        assert (
+            BotClass(tier=T.ENTERPRISE).monthly_price()
+            >= BotClass(tier=T.PRO).monthly_price()
+        )
 
 
 class TestListItems:
@@ -139,7 +146,9 @@ class TestTierEnforcement:
     def test_analyze_requires_pro(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.FREE)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.analyze()
 
@@ -147,7 +156,9 @@ class TestTierEnforcement:
     def test_export_requires_enterprise(self, name, BotClass):
         T = _get_tier(BotClass)
         bot = BotClass(tier=T.PRO)
-        TierError = getattr(sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception)
+        TierError = getattr(
+            sys.modules[BotClass.__module__], BotClass.__name__ + "TierError", Exception
+        )
         with pytest.raises((TierError, Exception)):
             bot.export_report()
 

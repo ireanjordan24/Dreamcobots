@@ -1,7 +1,8 @@
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 from dataclasses import dataclass, field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
 
 @dataclass
 class DivisionRevenue:
@@ -12,17 +13,26 @@ class DivisionRevenue:
     month: str
     year: int
 
+
 class RevenueTracker:
     def __init__(self):
         self._records: list = []
 
-    def record_revenue(self, division_id, division_name, revenue_usd, expenses_usd, month, year) -> DivisionRevenue:
-        rec = DivisionRevenue(division_id, division_name, revenue_usd, expenses_usd, month, year)
+    def record_revenue(
+        self, division_id, division_name, revenue_usd, expenses_usd, month, year
+    ) -> DivisionRevenue:
+        rec = DivisionRevenue(
+            division_id, division_name, revenue_usd, expenses_usd, month, year
+        )
         self._records.append(rec)
         return rec
 
     def get_total_revenue(self, year: int = None) -> float:
-        records = self._records if year is None else [r for r in self._records if r.year == year]
+        records = (
+            self._records
+            if year is None
+            else [r for r in self._records if r.year == year]
+        )
         return sum(r.revenue_usd for r in records)
 
     def get_division_revenue(self, division_id: str) -> list:
