@@ -32,6 +32,29 @@ function writeBots(bots) {
 }
 
 // ---------------------------------------------------------------------------
+// GET /api/get-bots — list all bots with structured response
+// ---------------------------------------------------------------------------
+app.get('/api/get-bots', (_req, res) => {
+  if (!fs.existsSync(BOTS_FILE)) {
+    return res.status(503).json({ success: false, error: 'bots.json not found — service unavailable' });
+  }
+
+  let bots;
+  try {
+    bots = JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
+  } catch (err) {
+    return res.status(500).json({ success: false, error: `Failed to parse bots.json: ${err.message}` });
+  }
+
+  return res.json({
+    success: true,
+    bots,
+    count: bots.length,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Heartbeat endpoint
 // Bots POST here to signal they are online and operational.
 // ---------------------------------------------------------------------------
@@ -145,11 +168,14 @@ app.get('/api/status', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Start server
+// Start server (skipped in test environment)
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Control Tower API running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Control Tower API running on port ${PORT}`);
+  });
+}
 
-export default app;
+export { app };
+
