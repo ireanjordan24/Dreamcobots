@@ -1,6 +1,6 @@
 {
   "name": "Dreamcobots Devcontainer",
-  "dockerFile": "../Dockerfile",
+  "dockerfile": "../Dockerfile",
   "context": "..",
   "customizations": {
     "vscode": {

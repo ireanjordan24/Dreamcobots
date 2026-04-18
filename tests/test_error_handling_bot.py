@@ -30,17 +30,17 @@ from bots.error_handling_bot.error_handling_bot import (
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def bot():
+def bot(tmp_path):
     """Fresh ErrorHandlingBot with learning mode enabled."""
-    b = ErrorHandlingBot(learning_mode=True, log_dir="/tmp/test-error-bot")
+    b = ErrorHandlingBot(learning_mode=True, log_dir=str(tmp_path / "error-bot"))
     b.start()
     return b
 
 
 @pytest.fixture
-def bot_no_learning():
+def bot_no_learning(tmp_path):
     """Fresh ErrorHandlingBot with learning mode disabled."""
-    b = ErrorHandlingBot(learning_mode=False, log_dir="/tmp/test-error-bot")
+    b = ErrorHandlingBot(learning_mode=False, log_dir=str(tmp_path / "error-bot"))
     b.start()
     return b
 

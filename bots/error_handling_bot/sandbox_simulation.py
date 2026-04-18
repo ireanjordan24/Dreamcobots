@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import sys
 import os
+import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -35,7 +36,10 @@ def run_simulation(learning_mode: bool = True) -> int:
     print(f"  Learning Mode: {'ON  (tutorials included)' if learning_mode else 'OFF'}")
     print("=" * 60 + "\n")
 
-    bot = ErrorHandlingBot(learning_mode=learning_mode, log_dir="/tmp/error-bot-demo")
+    bot = ErrorHandlingBot(
+        learning_mode=learning_mode,
+        log_dir=os.path.join(tempfile.gettempdir(), "error-bot-demo"),
+    )
     records = bot.simulate_bot_run()
 
     print(f"✅  Simulation complete — {len(records)} error(s) captured.\n")
