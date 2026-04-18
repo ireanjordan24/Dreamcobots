@@ -1,20 +1,13 @@
-# Development Container Configuration
-
-This is a configuration for setting up GitHub Codespaces.
-
-```json
 {
   "name": "Dreamcobots Devcontainer",
-  "dockerFile": "Dockerfile",
-  "context": ".",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
     "editor.formatOnSave": true
   },
-  "extensions": [
-    "ms-python.python",
-    "ms-vscode.cpptools"
-  ],
+  "extensions": ["ms-python.python", "ms-vscode.cpptools"],
   "postCreateCommand": "pip install -r requirements.txt"
 }
-```

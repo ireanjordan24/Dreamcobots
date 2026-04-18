@@ -17,10 +17,10 @@
  */
 export async function getStripeRevenue(secretKey, limit = 100) {
   if (!secretKey) {
-    return { total: 0, entries: [], error: "Stripe secret key not configured." };
+    return { total: 0, entries: [], error: 'Stripe secret key not configured.' };
   }
   try {
-    const Stripe = (await import("stripe")).default;
+    const Stripe = (await import('stripe')).default;
     const stripe = new Stripe(secretKey);
     const paymentIntents = await stripe.paymentIntents.list({ limit });
     const entries = paymentIntents.data.map((p) => ({
@@ -29,10 +29,10 @@ export async function getStripeRevenue(secretKey, limit = 100) {
       currency: p.currency,
       status: p.status,
       created: new Date(p.created * 1000).toISOString(),
-      description: p.description || "",
+      description: p.description || '',
     }));
     const total = entries
-      .filter((e) => e.status === "succeeded")
+      .filter((e) => e.status === 'succeeded')
       .reduce((sum, e) => sum + e.amount_usd, 0);
     return { total: Math.round(total * 100) / 100, entries };
   } catch (err) {
@@ -51,25 +51,20 @@ export async function getStripeRevenue(secretKey, limit = 100) {
  * @param {"sandbox"|"live"} [mode="sandbox"]
  * @returns {Promise<{ total: number, entries: object[], error?: string }>}
  */
-export async function getPayPalRevenue(clientId, clientSecret, mode = "sandbox") {
+export async function getPayPalRevenue(clientId, clientSecret, mode = 'sandbox') {
   if (!clientId || !clientSecret) {
-    return { total: 0, entries: [], error: "PayPal credentials not configured." };
+    return { total: 0, entries: [], error: 'PayPal credentials not configured.' };
   }
-  const baseUrl =
-    mode === "live"
-      ? "https://api-m.paypal.com"
-      : "https://api-m.sandbox.paypal.com";
+  const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
   try {
     // Get access token
     const tokenResp = await fetch(`${baseUrl}/v1/oauth2/token`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Authorization:
-          "Basic " +
-          Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: "grant_type=client_credentials",
+      body: 'grant_type=client_credentials',
     });
     const tokenData = await tokenResp.json();
     const accessToken = tokenData.access_token;
@@ -91,9 +86,7 @@ export async function getPayPalRevenue(clientId, clientSecret, mode = "sandbox")
       status: t.transaction_info?.transaction_status,
       created: t.transaction_info?.transaction_initiation_date,
     }));
-    const total = entries
-      .filter((e) => e.status === "S")
-      .reduce((sum, e) => sum + e.amount_usd, 0);
+    const total = entries.filter((e) => e.status === 'S').reduce((sum, e) => sum + e.amount_usd, 0);
     return { total: Math.round(total * 100) / 100, entries };
   } catch (err) {
     return { total: 0, entries: [], error: err.message };
@@ -114,7 +107,7 @@ export async function getRevenueSummary() {
     getPayPalRevenue(
       process.env.PAYPAL_CLIENT_ID,
       process.env.PAYPAL_CLIENT_SECRET,
-      process.env.PAYPAL_MODE || "sandbox"
+      process.env.PAYPAL_MODE || 'sandbox'
     ),
   ]);
 
