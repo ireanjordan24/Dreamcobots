@@ -2,7 +2,8 @@ name: Daily Health Monitor
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight UTC
+    - cron: '0 0 * * *'   # Runs every day at midnight UTC
+  workflow_dispatch:        # Allow manual triggering
 
 jobs:
   health_monitor:
@@ -10,25 +11,55 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Test Coverage
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
         run: |
-          # Add the command to check test coverage
-          echo "Checking test coverage..."
-          # Example command (replace with your actual command)
-          npm run test -- --coverage
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run bot framework compliance check
+        run: python tools/check_bot_framework.py
+
+      - name: Run Python test suite (health check)
+        run: |
+          echo "🏥 Running daily health check..."
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
+        env:
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRICE_PRO: ${{ secrets.STRIPE_PRICE_PRO }}
+          STRIPE_PRICE_ENTERPRISE: ${{ secrets.STRIPE_PRICE_ENTERPRISE }}
 
       - name: Branch Activity
         run: |
-          # Command to gather branch activity
-          echo "Gathering branch activity..."
+          echo "📊 Gathering branch activity..."
           git fetch --all
-          git log --oneline --since='1 day ago' | wc -l
+          COMMITS=$(git log --oneline --since='1 day ago' | wc -l)
+          echo "Commits in the last 24 hours: $COMMITS"
 
-      - name: Formatting Check
+      - name: Run Error Handling Bot sandbox simulation
         run: |
-          # Command to check code formatting
-          echo "Checking for formatting errors..."
-          # Example command (replace with your actual command)
-          npx eslint . --fix --quiet
+          echo "🤖 Running Error Handling Bot self-check..."
+          python bots/error_handling_bot/sandbox_simulation.py --no-learning
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Report health status
+        if: always()
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "  DreamCo Daily Health Monitor"
+          echo "  Date: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          echo "  Repo: ${{ github.repository }}"
+          echo "=========================================="

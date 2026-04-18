@@ -1,20 +1,27 @@
-# Development Container Configuration
-
-This is a configuration for setting up GitHub Codespaces.
-
-```json
 {
   "name": "Dreamcobots Devcontainer",
-  "dockerFile": "Dockerfile",
-  "context": ".",
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "editor.formatOnSave": true
+  "dockerFile": "../Dockerfile",
+  "context": "..",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.cpptools",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions"
+      ]
+    }
   },
-  "extensions": [
-    "ms-python.python",
-    "ms-vscode.cpptools"
-  ],
-  "postCreateCommand": "pip install -r requirements.txt"
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "remoteUser": "root",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
 }
-```
