@@ -271,21 +271,33 @@ class SandboxBuilderBot(BotBase):
     # Per-bot test pipeline
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _instantiate_bot(bot_class: Type[BotBase], bot_name: str) -> Optional[BotBase]:
+        """
+        Instantiate *bot_class* using :func:`inspect.signature` to determine
+        whether the constructor accepts a positional ``name`` argument.
+
+        Returns the bot instance, or ``None`` if instantiation fails.
+        """
+        try:
+            sig = inspect.signature(bot_class.__init__)
+            params = list(sig.parameters.keys())
+            # params[0] is always 'self'; check for a second positional param
+            has_name_param = len(params) > 1 and params[1] not in ("*args", "**kwargs")
+            if has_name_param:
+                return bot_class(bot_name)
+            return bot_class()
+        except Exception as exc:
+            logger.warning("Cannot instantiate %s: %s", bot_name, exc)
+            return None
+
     def _test_bot_class(self, bot_class: Type[BotBase]):
         """Instantiate, test, and rate one bot class.  Returns None on error."""
         bot_name = bot_class.__name__
         logger.info("Testing bot: %s", bot_name)
 
-        try:
-            bot = bot_class(bot_name)  # type: ignore[call-arg]
-        except TypeError:
-            try:
-                bot = bot_class()  # type: ignore[call-arg]
-            except Exception as exc:
-                logger.warning("Cannot instantiate %s: %s", bot_name, exc)
-                return None
-        except Exception as exc:
-            logger.warning("Cannot instantiate %s: %s", bot_name, exc)
+        bot = self._instantiate_bot(bot_class, bot_name)
+        if bot is None:
             return None
 
         try:

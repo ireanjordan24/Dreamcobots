@@ -84,6 +84,20 @@ class SandboxReportGenerator:
     # Rendering
     # ------------------------------------------------------------------
 
+    # ------------------------------------------------------------------
+    # Internal formatting helpers
+    # ------------------------------------------------------------------
+
+    _BOX_WIDTH = 68  # inner width (between the two ║ characters)
+
+    @classmethod
+    def _row(cls, content: str) -> str:
+        """Return a single box row padded to ``_BOX_WIDTH`` inner columns."""
+        padded = f"  {content}"
+        return f"║{padded:<{cls._BOX_WIDTH}}║"
+
+    # ------------------------------------------------------------------
+
     def render_text(self) -> str:
         """
         Return a multi-line ASCII report string.
@@ -91,37 +105,42 @@ class SandboxReportGenerator:
         Suitable for printing to a terminal or appending to CI logs.
         """
         self._generated_at = datetime.now(timezone.utc)
+        w = self._BOX_WIDTH
+        top = "╔" + "═" * w + "╗"
+        mid = "╠" + "═" * w + "╣"
+        bot = "╚" + "═" * w + "╝"
+
         lines = [
-            "╔══════════════════════════════════════════════════════════════════╗",
-            f"║  {self.report_title:<64}║",
-            f"║  Generated : {self._generated_at.strftime('%Y-%m-%d %H:%M:%S UTC'):<52}║",
-            f"║  Test duration : {self.test_duration_hours:.1f} hours{'':<46}║",
-            f"║  Bots evaluated : {len(self._ratings):<47}║",
-            "╠══════════════════════════════════════════════════════════════════╣",
+            top,
+            self._row(self.report_title),
+            self._row(f"Generated : {self._generated_at.strftime('%Y-%m-%d %H:%M:%S UTC')}"),
+            self._row(f"Test duration : {self.test_duration_hours:.1f} hours"),
+            self._row(f"Bots evaluated : {len(self._ratings)}"),
+            mid,
         ]
 
         if not self._ratings:
-            lines += [
-                "║  No bot ratings available.                                       ║",
-                "╚══════════════════════════════════════════════════════════════════╝",
-            ]
+            lines += [self._row("No bot ratings available."), bot]
             return "\n".join(lines)
 
         for rating in sorted(self._ratings, key=lambda r: r.star_rating, reverse=True):
             stars_str = "★" * int(rating.star_rating) + "☆" * (5 - int(rating.star_rating))
-            lines += [
-                f"║  Bot       : {rating.bot_name:<53}║",
-                f"║  Rating    : {stars_str}  {rating.label:<45}║",
-                f"║  Score     : {rating.weighted_score:>6.2f} / 100{'':<46}║",
-                f"║  Tasks     : {rating.total_tasks} total, "
+            tasks_line = (
+                f"Tasks     : {rating.total_tasks} total, "
                 f"{rating.successful_tasks} passed, "
-                f"{rating.failed_tasks} failed{'':<27}║",
-                f"║  Success % : {rating.success_rate * 100:>6.2f}%{'':<52}║",
-                f"║  Error   % : {rating.error_rate * 100:>6.2f}%{'':<52}║",
-                "╠══════════════════════════════════════════════════════════════════╣",
+                f"{rating.failed_tasks} failed"
+            )
+            lines += [
+                self._row(f"Bot       : {rating.bot_name}"),
+                self._row(f"Rating    : {stars_str}  {rating.label}"),
+                self._row(f"Score     : {rating.weighted_score:>6.2f} / 100"),
+                self._row(tasks_line),
+                self._row(f"Success % : {rating.success_rate * 100:>6.2f}%"),
+                self._row(f"Error   % : {rating.error_rate * 100:>6.2f}%"),
+                mid,
             ]
 
-        lines[-1] = "╚══════════════════════════════════════════════════════════════════╝"
+        lines[-1] = bot
         return "\n".join(lines)
 
     def render_json(self) -> str:
