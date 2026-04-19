@@ -7,12 +7,8 @@ name: DreamCo Auto-Fix CI Bot
 on:
   workflow_run:
     workflows:
-      - "CI/CD Workflow"
-      - "Auto Recovery CI Mechanism"
-      - "CI"
-      - "Bot CI"
-      - "Python Tests"
-      - "Language-Specific Lint & Format"
+      - "DreamCo CI"
+      - "Lint Check"
     types:
       - completed
 

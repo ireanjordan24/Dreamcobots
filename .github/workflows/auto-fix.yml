@@ -1,56 +1,107 @@
-# Auto-fix Workflow
+# Auto Fix — Auto-lint, auto-format, and retry on failed DreamCo CI jobs.
+# Replaces: auto-debug-tests.yml, auto-recovery.yml
+#
+# Triggered automatically when DreamCo CI completes with a failure.
+# Applies Black, ESLint, Prettier, and google-java-format, then commits and
+# pushes the fixes so the next CI run can succeed.
 
 name: Auto Fix
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["DreamCo CI"]
+    types:
+      - completed
 
 jobs:
-  auto-fix:
+  fix:
+    name: Auto-Lint, Auto-Format & Retry
+    # Only run on failures originating from the same repository (not fork PRs)
+    # to prevent untrusted code from executing in a privileged context.
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      contents: write
 
-      - name: Setup Node.js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      # ── Python auto-format ────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python auto-format (Black)
+        run: |
+          pip install black flake8
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            black --quiet python_bots/
+            echo "Black formatting applied to python_bots/"
+          else
+            echo "No Python files in python_bots/ — skipping."
+          fi
+
+      # ── JavaScript auto-fix ───────────────────────────────────────────────
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Node dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Check code style (ESLint)
-        run: npm run lint
-        continue-on-error: true
+      - name: JS/TS auto-fix (ESLint + Prettier)
+        run: |
+          npm run lint -- --fix --ext .js,.ts,.jsx,.tsx 2>&1 || true
+          npx prettier --write \
+            --ignore-path .prettierignore \
+            "**/*.{js,ts,jsx,tsx}" 2>&1 || true
+          echo "ESLint + Prettier auto-fix applied."
 
-      - name: Check formatting (Prettier)
-        run: npm run format
-        continue-on-error: true
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # ── Java auto-format ──────────────────────────────────────────────────
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          python-version: '3.11'
+          distribution: 'temurin'
+          java-version: '21'
 
-      - name: Install Python dependencies
+      - name: Java auto-format (google-java-format)
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          GJF_VERSION="1.22.0"
+          mkdir -p ~/.cache/gjf
+          JAR=~/.cache/gjf/google-java-format-${GJF_VERSION}-all-deps.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/google/google-java-format/releases/download/v${GJF_VERSION}/google-java-format-${GJF_VERSION}-all-deps.jar" \
+              -o "$JAR"
+          fi
+          JAVA_FILES=$(find java_bots -name "*.java" 2>/dev/null || true)
+          if [ -n "$JAVA_FILES" ]; then
+            # shellcheck disable=SC2086
+            java -jar "$JAR" --replace $JAVA_FILES
+            echo "google-java-format applied to java_bots/"
+          else
+            echo "No Java files in java_bots/ — skipping."
+          fi
 
-      - name: Run bot framework compliance check
-        run: python tools/check_bot_framework.py
-        continue-on-error: true
-
-      - name: Run Python tests
+      # ── Commit and push auto-fixes ────────────────────────────────────────
+      - name: Commit and push auto-fixes
         run: |
-          python -m pytest tests/ \
-            --ignore=tests/test_backend.py \
-            --ignore=tests/test_web_dashboard.py \
-            -q --tb=short
-        continue-on-error: true
+          git config --global user.name "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git commit -m "🤖 Auto-fix: lint and format applied"
+            git push || echo "⚠️  Push failed — check GH_TOKEN permissions, branch protection rules, and resolve any conflicts"
+          fi

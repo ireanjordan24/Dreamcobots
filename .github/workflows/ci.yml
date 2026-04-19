@@ -1,24 +1,26 @@
-# CI Configuration for Python Testing
+# DreamCo CI — Unified pipeline for Python, JavaScript, and Java bots.
+# Replaces: ci.yml (old), ci-cd.yml, bot-ci.yml, test_bots.yml
 
-name: CI
+name: DreamCo CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, develop]
   pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  # ── Python: dependency management, bot framework compliance, pytest ────────
+  test-python:
+    name: Python Tests & Bot Compliance
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -34,11 +36,8 @@ jobs:
       - name: Check bot framework compliance
         run: python tools/check_bot_framework.py
 
-      - name: Run tests with pytest
+      - name: Run Python tests
         env:
-          # Stripe credentials — set these as GitHub Actions secrets.
-          # When absent the Stripe modules run in simulation mode and
-          # all tests still pass.
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
@@ -49,3 +48,53 @@ jobs:
             --ignore=tests/test_backend.py \
             --ignore=tests/test_web_dashboard.py \
             -q --tb=short
+
+  # ── JavaScript: install deps, run Jest tests ──────────────────────────────
+  test-js:
+    name: JavaScript Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run tests
+        run: npm test
+
+  # ── Java bots: validate structure and smoke-test ──────────────────────────
+  test-java-bots:
+    name: Java Bot Structure Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Verify Java bot structure
+        run: |
+          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
+            echo "Java bots found:"
+            find java_bots -name "*.java"
+            echo "Java bot structure check passed."
+          else
+            echo "No Java bots found in java_bots/ — skipping."
+          fi
