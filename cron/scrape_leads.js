@@ -43,12 +43,14 @@ function scrapeLinkedIn(keywords) {
   const count = 3 + Math.floor(Math.random() * 5);
   const leads = [];
   for (let i = 0; i < count; i++) {
-    leads.push(_makeLead({
-      name: `LI Contact ${i + 1} (${kws[0] || 'general'})`,
-      source: 'linkedin',
-      category: 'business',
-      score: 55 + Math.floor(Math.random() * 40),
-    }));
+    leads.push(
+      _makeLead({
+        name: `LI Contact ${i + 1} (${kws[0] || 'general'})`,
+        source: 'linkedin',
+        category: 'business',
+        score: 55 + Math.floor(Math.random() * 40),
+      })
+    );
   }
   return leads;
 }
@@ -62,12 +64,14 @@ function scrapeIndeed(jobTitle) {
   const count = 2 + Math.floor(Math.random() * 4);
   const leads = [];
   for (let i = 0; i < count; i++) {
-    leads.push(_makeLead({
-      name: `Indeed Lead ${i + 1} (${jobTitle})`,
-      source: 'indeed',
-      category: 'marketing',
-      score: 40 + Math.floor(Math.random() * 35),
-    }));
+    leads.push(
+      _makeLead({
+        name: `Indeed Lead ${i + 1} (${jobTitle})`,
+        source: 'indeed',
+        category: 'marketing',
+        score: 40 + Math.floor(Math.random() * 35),
+      })
+    );
   }
   return leads;
 }
@@ -81,12 +85,14 @@ function scrapeGoogle(query) {
   const count = 4 + Math.floor(Math.random() * 6);
   const leads = [];
   for (let i = 0; i < count; i++) {
-    leads.push(_makeLead({
-      name: `Google Lead ${i + 1}`,
-      source: 'google',
-      category: query.includes('estate') ? 'real_estate' : 'general',
-      score: 35 + Math.floor(Math.random() * 50),
-    }));
+    leads.push(
+      _makeLead({
+        name: `Google Lead ${i + 1}`,
+        source: 'google',
+        category: query.includes('estate') ? 'real_estate' : 'general',
+        score: 35 + Math.floor(Math.random() * 50),
+      })
+    );
   }
   return leads;
 }
@@ -100,13 +106,15 @@ function scrapeZillow(zipCode) {
   const count = 3 + Math.floor(Math.random() * 5);
   const leads = [];
   for (let i = 0; i < count; i++) {
-    leads.push(_makeLead({
-      name: `Zillow Seller ${i + 1} (${zipCode})`,
-      source: 'zillow',
-      category: 'real_estate',
-      score: 60 + Math.floor(Math.random() * 35),
-      phone: `${zipCode.slice(0, 3)}-${Math.floor(1000 + Math.random() * 9000)}`,
-    }));
+    leads.push(
+      _makeLead({
+        name: `Zillow Seller ${i + 1} (${zipCode})`,
+        source: 'zillow',
+        category: 'real_estate',
+        score: 60 + Math.floor(Math.random() * 35),
+        phone: `${zipCode.slice(0, 3)}-${Math.floor(1000 + Math.random() * 9000)}`,
+      })
+    );
   }
   return leads;
 }
@@ -132,7 +140,9 @@ async function runFullScrape(config) {
   // Deduplicate by email
   const seen = new Set();
   const unique = all.filter((lead) => {
-    if (seen.has(lead.email)) { return false; }
+    if (seen.has(lead.email)) {
+      return false;
+    }
     seen.add(lead.email);
     return true;
   });

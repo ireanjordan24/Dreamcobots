@@ -51,9 +51,7 @@ function parsePriceNumber(priceStr) {
 /** Return the set of categories for a given division name. */
 function categoriesForDivision(division) {
   return [
-    ...new Set(
-      ALL_BOTS.filter((b) => b.division === division).map((b) => b.category)
-    ),
+    ...new Set(ALL_BOTS.filter((b) => b.division === division).map((b) => b.category)),
   ].sort();
 }
 
@@ -87,23 +85,18 @@ export default function DivisionExplorer() {
   }, [selectedDivision]);
 
   // Reset category when division changes to avoid showing empty results.
-  const handleDivisionChange = useCallback(
-    (division) => {
-      setSelectedDivision(division);
-      setSelectedCategory('All');
-    },
-    []
-  );
+  const handleDivisionChange = useCallback((division) => {
+    setSelectedDivision(division);
+    setSelectedCategory('All');
+  }, []);
 
   // ── Filtered bots ─────────────────────────────────────────────────────────
   const filteredBots = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return ALL_BOTS.filter((bot) => {
-      if (selectedDivision !== 'All' && bot.division !== selectedDivision)
-        return false;
+      if (selectedDivision !== 'All' && bot.division !== selectedDivision) return false;
       if (selectedTier !== 'All' && bot.tier !== selectedTier) return false;
-      if (selectedCategory !== 'All' && bot.category !== selectedCategory)
-        return false;
+      if (selectedCategory !== 'All' && bot.category !== selectedCategory) return false;
       if (parsePriceNumber(bot.price) > maxPrice) return false;
       if (
         query &&
@@ -182,8 +175,7 @@ export default function DivisionExplorer() {
 
           {/* Results count */}
           <p className="results-count">
-            {filteredBots.length}{' '}
-            {filteredBots.length === 1 ? 'bot' : 'bots'} found
+            {filteredBots.length} {filteredBots.length === 1 ? 'bot' : 'bots'} found
             {selectedDivision !== 'All' ? ` in ${selectedDivision}` : ''}
           </p>
 

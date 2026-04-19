@@ -21,7 +21,17 @@ const WORKFLOW_FILES = [
   'crypto.json',
 ];
 
-const REQUIRED_TOP_LEVEL = ['id', 'name', 'description', 'trigger', 'steps', 'monetization', 'automation', 'created_at', 'version'];
+const REQUIRED_TOP_LEVEL = [
+  'id',
+  'name',
+  'description',
+  'trigger',
+  'steps',
+  'monetization',
+  'automation',
+  'created_at',
+  'version',
+];
 const REQUIRED_STEP = ['id', 'name', 'action', 'params', 'on_success', 'on_failure'];
 const REQUIRED_MONETIZATION = ['model', 'revenue_per_cycle', 'payment_processor'];
 const REQUIRED_TRIGGER = ['type'];

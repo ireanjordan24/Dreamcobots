@@ -12,7 +12,7 @@
  *   const status = await getRepoStatus("ireanjordan24", "Dreamcobots", token);
  */
 
-import { Octokit } from "@octokit/rest";
+import { Octokit } from '@octokit/rest';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -31,7 +31,7 @@ async function getOpenPRs(octokit, owner, repo) {
     const { data } = await octokit.pulls.list({
       owner,
       repo,
-      state: "open",
+      state: 'open',
       per_page: 20,
     });
     return data.map((pr) => ({
@@ -61,7 +61,7 @@ async function getOpenIssues(octokit, owner, repo) {
     const { data } = await octokit.issues.listForRepo({
       owner,
       repo,
-      state: "open",
+      state: 'open',
       per_page: 20,
     });
     // GitHub returns PRs in the issues list — filter them out.
@@ -89,7 +89,7 @@ async function getOpenIssues(octokit, owner, repo) {
  * @param {string} branch
  * @returns {Promise<object|null>}
  */
-async function getLatestCommit(octokit, owner, repo, branch = "main") {
+async function getLatestCommit(octokit, owner, repo, branch = 'main') {
   try {
     const { data } = await octokit.repos.listCommits({
       owner,
@@ -97,11 +97,13 @@ async function getLatestCommit(octokit, owner, repo, branch = "main") {
       sha: branch,
       per_page: 1,
     });
-    if (!data.length) return null;
+    if (!data.length) {
+      return null;
+    }
     const c = data[0];
     return {
       sha: c.sha?.slice(0, 7),
-      message: c.commit?.message?.split("\n")[0],
+      message: c.commit?.message?.split('\n')[0],
       author: c.commit?.author?.name,
       date: c.commit?.author?.date,
       url: c.html_url,
@@ -163,9 +165,7 @@ export async function getRepoStatus(owner, repo, token) {
   ]);
 
   const latestWorkflow = workflowRuns[0] ?? null;
-  const hasConflicts = openPRs.some((pr) =>
-    pr.title?.toLowerCase().includes("conflict")
-  );
+  const hasConflicts = openPRs.some((pr) => pr.title?.toLowerCase().includes('conflict'));
 
   return {
     owner,
@@ -177,7 +177,7 @@ export async function getRepoStatus(owner, repo, token) {
     summary: {
       openPRCount: openPRs.length,
       openIssueCount: openIssues.length,
-      lastWorkflowStatus: latestWorkflow?.conclusion ?? "unknown",
+      lastWorkflowStatus: latestWorkflow?.conclusion ?? 'unknown',
       hasConflicts,
     },
     timestamp: new Date().toISOString(),
@@ -197,7 +197,15 @@ export async function getRepoStatus(owner, repo, token) {
  * @param {string} [options.body=""]     - PR description.
  * @returns {Promise<object>}
  */
-export async function createPullRequest({ owner, repo, token, title, head, base = "main", body = "" }) {
+export async function createPullRequest({
+  owner,
+  repo,
+  token,
+  title,
+  head,
+  base = 'main',
+  body = '',
+}) {
   const octokit = new Octokit({ auth: token });
   const { data } = await octokit.pulls.create({
     owner,

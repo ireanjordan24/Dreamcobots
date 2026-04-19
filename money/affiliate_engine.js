@@ -63,7 +63,9 @@ const links = new Map();
 const events = [];
 
 // Pre-load default programs
-DEFAULT_PROGRAMS.forEach((p) => programs.set(p.name, { ...p, earnings: 0, clicks: 0, conversions: 0 }));
+DEFAULT_PROGRAMS.forEach((p) =>
+  programs.set(p.name, { ...p, earnings: 0, clicks: 0, conversions: 0 })
+);
 
 /**
  * Register a new affiliate program.

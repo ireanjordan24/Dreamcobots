@@ -1,0 +1,221 @@
+name: Repository Health Monitor
+
+# Runs on every push and pull request (and daily on a schedule).
+# All lint/format steps use continue-on-error so the debug steps
+# always execute regardless of test outcomes.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * *' # daily at 06:00 UTC
+
+jobs:
+  repo-health:
+    name: Repo Health & Dependency Debug
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Tool setup ──────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 3. Install dependencies ────────────────────────────────────────────
+      - name: Install Node dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ── 4. Lint (continue even on failure) ─────────────────────────────────
+      - name: ESLint check
+        id: eslint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Prettier check
+        id: prettier
+        continue-on-error: true
+        run: npm run format
+
+      # ── 5. Python dependency checker (permanent — always runs) ─────────────
+      - name: Python dependency checker
+        continue-on-error: true
+        run: |
+          python - <<'EOF'
+          import os
+          import importlib.util
+
+          print("=" * 60)
+          print("PYTHON DEPENDENCY CHECKER")
+          print("=" * 60)
+
+          missing = []
+          checked = set()
+
+          for root, dirs, files in os.walk("."):
+              # Skip hidden dirs, node_modules, virtualenvs, dist
+              dirs[:] = [
+                  d for d in dirs
+                  if not d.startswith(".")
+                  and d not in ("node_modules", "__pycache__", "dist", "coverage", ".venv", "venv")
+              ]
+              for filename in files:
+                  if not filename.endswith(".py"):
+                      continue
+                  filepath = os.path.join(root, filename)
+                  try:
+                      with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                          for lineno, line in enumerate(f, 1):
+                              stripped = line.strip()
+                              if stripped.startswith("import ") or stripped.startswith("from "):
+                                  parts = stripped.split()
+                                  if len(parts) >= 2:
+                                      module = parts[1].split(".")[0]
+                                      key = (filename, module)
+                                      if key not in checked:
+                                          checked.add(key)
+                                          spec = importlib.util.find_spec(module)
+                                          if spec is None:
+                                              missing.append({
+                                                  "file": filepath,
+                                                  "line": lineno,
+                                                  "module": module,
+                                              })
+                  except Exception as e:
+                      print(f"  [WARN] Could not read {filepath}: {e}")
+
+          if missing:
+              print(f"\n⚠️  Found {len(missing)} missing module(s):\n")
+              current_file = None
+              for entry in missing:
+                  if entry["file"] != current_file:
+                      current_file = entry["file"]
+                      print(f"  📄 {current_file}")
+                  print(f"      line {entry['line']:>4}: {entry['module']}")
+              print()
+              print("Tip: add missing packages to requirements.txt and re-run")
+              print("     pip install -r requirements.txt")
+          else:
+              print("\n✅ All imported Python modules are available.")
+
+          print("=" * 60)
+          EOF
+
+      # ── 6. Missing-files audit (always runs) ───────────────────────────────
+      - name: Missing files & structure audit
+        continue-on-error: true
+        run: |
+          python - <<'EOF'
+          import os
+          import json
+
+          print("=" * 60)
+          print("MISSING FILES & STRUCTURE AUDIT")
+          print("=" * 60)
+
+          # Files that are commonly expected in a healthy repo
+          EXPECTED_FILES = [
+              "README.md",
+              "requirements.txt",
+              "package.json",
+              ".eslintrc.js",
+              ".prettierrc",
+              ".prettierignore",
+              ".gitignore",
+              "Dockerfile",
+          ]
+
+          missing_expected = []
+          for f in EXPECTED_FILES:
+              if not os.path.exists(f):
+                  missing_expected.append(f)
+
+          if missing_expected:
+              print(f"\n⚠️  Missing expected root files:")
+              for f in missing_expected:
+                  print(f"  ❌ {f}")
+          else:
+              print("\n✅ All expected root files are present.")
+
+          # Scan workflow files and report referenced paths that don't exist
+          workflow_dir = ".github/workflows"
+          missing_refs = []
+          if os.path.isdir(workflow_dir):
+              import re
+              path_pattern = re.compile(r"(?:run:|uses:)\s+(\S+\.(?:py|js|sh|json|yml))")
+              for wf_file in os.listdir(workflow_dir):
+                  if not wf_file.endswith((".yml", ".yaml")):
+                      continue
+                  wf_path = os.path.join(workflow_dir, wf_file)
+                  with open(wf_path, "r", encoding="utf-8", errors="ignore") as f:
+                      content = f.read()
+                  # Find python/node script references (simple heuristic)
+                  for match in re.finditer(r'(?:python3?|node)\s+([\w./\-]+\.(?:py|js))', content):
+                      script = match.group(1)
+                      if not os.path.exists(script):
+                          missing_refs.append((wf_file, script))
+
+          if missing_refs:
+              print(f"\n⚠️  Workflow references to non-existent scripts:")
+              for wf, script in missing_refs:
+                  print(f"  ❌ [{wf}] references missing: {script}")
+              print()
+              print("Tip: create these files or update the workflow paths.")
+          else:
+              print("✅ All workflow-referenced scripts appear to exist.")
+
+          # Repository file inventory summary
+          file_counts = {}
+          for root, dirs, files in os.walk("."):
+              dirs[:] = [d for d in dirs if not d.startswith(".") and d != "node_modules"]
+              for filename in files:
+                  ext = os.path.splitext(filename)[1].lower() or "(no ext)"
+                  file_counts[ext] = file_counts.get(ext, 0) + 1
+
+          print("\n📊 File inventory by extension:")
+          for ext, count in sorted(file_counts.items(), key=lambda x: -x[1])[:20]:
+              print(f"  {ext:15s}  {count:>5} files")
+
+          print("=" * 60)
+          EOF
+
+      # ── 7. Lint & Prettier result summary ──────────────────────────────────
+      - name: Lint & Prettier result summary
+        if: always()
+        run: |
+          echo "===================================="
+          echo "LINT & PRETTIER RESULT SUMMARY"
+          echo "===================================="
+          ESLINT_STATUS="${{ steps.eslint.outcome }}"
+          PRETTIER_STATUS="${{ steps.prettier.outcome }}"
+          echo "  ESLint  : $ESLINT_STATUS"
+          echo "  Prettier: $PRETTIER_STATUS"
+          if [ "$ESLINT_STATUS" = "failure" ] || [ "$PRETTIER_STATUS" = "failure" ]; then
+            echo ""
+            echo "⚠️  One or more code-style checks failed."
+            echo "   To fix locally:"
+            echo "     npm run lint:fix      # ESLint auto-fix"
+            echo "     npm run format:fix    # Prettier auto-fix"
+          else
+            echo ""
+            echo "✅ All code-style checks passed."
+          fi
+          echo "===================================="

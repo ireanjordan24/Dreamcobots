@@ -13,9 +13,21 @@
 /** Subscription plan definitions. */
 const PLANS = {
   starter: { name: 'Starter', price_usd: 29, features: ['basic_access', 'email_support'] },
-  professional: { name: 'Professional', price_usd: 99, features: ['full_access', 'priority_support', 'analytics'] },
-  business: { name: 'Business', price_usd: 299, features: ['full_access', 'dedicated_support', 'analytics', 'api_access', 'white_label'] },
-  enterprise: { name: 'Enterprise', price_usd: 999, features: ['everything', 'sla', 'custom_integrations', 'dedicated_csm'] },
+  professional: {
+    name: 'Professional',
+    price_usd: 99,
+    features: ['full_access', 'priority_support', 'analytics'],
+  },
+  business: {
+    name: 'Business',
+    price_usd: 299,
+    features: ['full_access', 'dedicated_support', 'analytics', 'api_access', 'white_label'],
+  },
+  enterprise: {
+    name: 'Enterprise',
+    price_usd: 999,
+    features: ['everything', 'sla', 'custom_integrations', 'dedicated_csm'],
+  },
 };
 
 const TAX_RATE = 0.085; // 8.5%

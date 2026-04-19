@@ -8,27 +8,27 @@
  *   node index.js
  */
 
-require("dotenv").config();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 /**
  * Create a Stripe Checkout session for a one-time payment.
  */
 async function createCheckoutSession({
   amountCents,
-  currency = "usd",
+  currency = 'usd',
   customerEmail,
   successUrl,
   cancelUrl,
-  mode = "payment",
+  mode = 'payment',
 }) {
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: ['card'],
     line_items: [
       {
         price_data: {
           currency: currency.toLowerCase(),
-          product_data: { name: "Dreamcobots Service" },
+          product_data: { name: 'Dreamcobots Service' },
           unit_amount: amountCents,
         },
         quantity: 1,
@@ -45,7 +45,7 @@ async function createCheckoutSession({
 /**
  * Create a shareable Stripe Payment Link.
  */
-async function createPaymentLink({ amountCents, currency = "usd", productName }) {
+async function createPaymentLink({ amountCents, currency = 'usd', productName }) {
   const price = await stripe.prices.create({
     unit_amount: amountCents,
     currency: currency.toLowerCase(),
@@ -73,7 +73,9 @@ async function createSubscription({ customerId, priceId }) {
  */
 async function createRefund({ paymentIntentId, amountCents }) {
   const params = { payment_intent: paymentIntentId };
-  if (amountCents) params.amount = amountCents;
+  if (amountCents) {
+    params.amount = amountCents;
+  }
   const refund = await stripe.refunds.create(params);
   return { id: refund.id, status: refund.status };
 }
@@ -86,6 +88,6 @@ module.exports = {
 };
 
 if (require.main === module) {
-  const mode = process.env.STRIPE_SECRET_KEY ? "live" : "simulation";
+  const mode = process.env.STRIPE_SECRET_KEY ? 'live' : 'simulation';
   console.log(`Dreamcobots Stripe Node.js client initialised in ${mode} mode.`);
 }

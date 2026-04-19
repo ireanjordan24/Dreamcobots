@@ -168,7 +168,10 @@ function generateInvoice(orderId) {
     status: order.status,
     paymentMethod: order.paymentMethod,
     issuedAt: new Date().toISOString(),
-    dueAt: order.status === 'paid' ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueAt:
+      order.status === 'paid'
+        ? null
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     paidAt: order.paidAt,
   };
 }
