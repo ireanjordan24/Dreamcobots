@@ -393,7 +393,7 @@
       <textarea id="errorLog" rows="5" placeholder="Paste your stack trace, error message, or log output here…"></textarea>
     </div>
     <div class="actions">
-      <button class="btn btn-danger" id="btnDebug">🔎 Analyse Error</button>
+      <button class="btn btn-danger" id="btnDebug">🔎 Analyze Error</button>
     </div>
   </div>
 
@@ -545,7 +545,7 @@
         <div class="outreach-box">
           <div class="outreach-label">Outreach Message</div>
           <div>${escHtml(msg)}</div>
-          <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(escHtml(msg))})">📋 Copy</button>
+          <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(msg)})">📋 Copy</button>
         </div>` : ''}
       </div>`;
   }
