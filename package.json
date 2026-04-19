@@ -7,8 +7,8 @@
     "start": "node index.js",
     "build": "mkdir -p dist && cp -r public/* dist/",
     "test": "jest --passWithNoTests",
-    "lint": "eslint . --ext .js --max-warnings=0",
-    "lint:fix": "eslint . --ext .js --fix",
+    "lint": "eslint . --ext .js,.ts,.jsx,.tsx --max-warnings=0",
+    "lint:fix": "eslint . --ext .js,.ts,.jsx,.tsx --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "apply-fix": "node apply-fix.js",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
     "jest": "^29.0.0",
     "prettier": "^3.3.3"
   },

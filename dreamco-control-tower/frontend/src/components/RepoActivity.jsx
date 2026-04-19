@@ -23,7 +23,9 @@ export default function RepoActivity() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-slate-400">Loading activity…</p>;
+  if (loading) {
+    return <p className="text-slate-400">Loading activity…</p>;
+  }
 
   return (
     <div>
