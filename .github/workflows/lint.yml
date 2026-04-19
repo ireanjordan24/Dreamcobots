@@ -1,0 +1,201 @@
+# Lint Check — Non-blocking lint and format checks for Python, JavaScript, and Java.
+# Replaces: language-specific-lint.yml, pr-validation.yml, repo-validation.yml
+#
+# All checks use `|| true` so a formatting issue never blocks a merge.
+
+name: Lint Check
+
+on:
+  pull_request:
+
+jobs:
+  # ── Detect which language categories have changed files ──────────────────
+  detect-languages:
+    name: Detect Changed Languages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      has_python: ${{ steps.detect.outputs.has_python }}
+      has_java: ${{ steps.detect.outputs.has_java }}
+      has_js: ${{ steps.detect.outputs.has_js }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file types in changeset
+        id: detect
+        shell: bash
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD" 2>/dev/null || git diff --name-only HEAD~1 HEAD)
+
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '\.py$'; then
+            echo "has_python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_python=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if echo "$CHANGED" | grep -qE '\.java$'; then
+            echo "has_java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_java=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if echo "$CHANGED" | grep -qE '\.(js|ts|jsx|tsx)$'; then
+            echo "has_js=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_js=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Python: Flake8 + Black (non-blocking) ────────────────────────────────
+  lint-python:
+    name: Python Lint (Flake8 + Black)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_python == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install lint tools
+        run: pip install flake8 black
+
+      - name: Flake8 lint
+        run: |
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            flake8 python_bots/ --max-line-length=120 --ignore=W503 --statistics || true
+          else
+            echo "No Python files in python_bots/ — skipping Flake8."
+          fi
+
+      - name: Black format check
+        run: |
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            black --check --diff python_bots/ || true
+          else
+            echo "No Python files in python_bots/ — skipping Black."
+          fi
+
+  # ── JavaScript: ESLint + Prettier (non-blocking) ─────────────────────────
+  lint-js:
+    name: JS/TS Lint (ESLint + Prettier)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_js == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: ESLint
+        run: npm run lint -- --ext .js,.ts,.jsx,.tsx || true
+
+      - name: Prettier check
+        run: |
+          npx prettier --check \
+            --ignore-path .prettierignore \
+            "**/*.{js,ts,jsx,tsx}" || true
+
+  # ── Java: Checkstyle + google-java-format (non-blocking) ─────────────────
+  lint-java:
+    name: Java Lint (Checkstyle + google-java-format)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_java == 'true'
+
+    env:
+      CHECKSTYLE_VERSION: '10.21.0'
+      GJF_VERSION: '1.22.0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Checkstyle JAR
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/checkstyle
+          key: checkstyle-${{ env.CHECKSTYLE_VERSION }}
+
+      - name: Download Checkstyle JAR
+        run: |
+          mkdir -p ~/.cache/checkstyle
+          JAR=~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${{ env.CHECKSTYLE_VERSION }}/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar" \
+              -o "$JAR"
+          fi
+
+      - name: Cache google-java-format JAR
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/gjf
+          key: gjf-${{ env.GJF_VERSION }}
+
+      - name: Download google-java-format JAR
+        run: |
+          mkdir -p ~/.cache/gjf
+          JAR=~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/google/google-java-format/releases/download/v${{ env.GJF_VERSION }}/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar" \
+              -o "$JAR"
+          fi
+
+      - name: Checkstyle lint
+        run: |
+          JAVA_FILES=$(find java_bots -name "*.java" 2>/dev/null || true)
+          if [ -n "$JAVA_FILES" ] && [ -f checkstyle.xml ]; then
+            # shellcheck disable=SC2086
+            java -jar ~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar \
+              -c checkstyle.xml $JAVA_FILES || true
+          else
+            echo "No Java files or checkstyle.xml not found — skipping Checkstyle."
+          fi
+
+      - name: google-java-format check
+        run: |
+          JAVA_FILES=$(find java_bots -name "*.java" 2>/dev/null || true)
+          if [ -n "$JAVA_FILES" ]; then
+            # shellcheck disable=SC2086
+            java -jar ~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar \
+              --dry-run --set-exit-if-changed $JAVA_FILES || true
+          else
+            echo "No Java files in java_bots/ — skipping google-java-format."
+          fi
