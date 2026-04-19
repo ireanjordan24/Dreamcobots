@@ -26,7 +26,9 @@ module.exports = {
     {
       files: [
         'src/**/*.js',
+        'src/**/*.jsx',
         'src/**/*.ts',
+        'src/**/*.tsx',
         'dreamco-control-tower/**/*.js',
         'dreamco-control-tower/**/*.jsx',
         'dreamco-control-tower/**/*.ts',
@@ -35,12 +37,17 @@ module.exports = {
       env: {
         browser: true,
       },
+      plugins: ['react'],
       parserOptions: {
         ecmaVersion: 2021,
         sourceType: 'module',
         ecmaFeatures: {
           jsx: true,
         },
+      },
+      rules: {
+        'react/jsx-uses-react': 'error',
+        'react/jsx-uses-vars': 'error',
       },
     },
     // Browser-side scripts that use DOM globals (document, window, prompt, etc.)
