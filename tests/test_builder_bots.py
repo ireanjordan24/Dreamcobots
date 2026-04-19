@@ -121,7 +121,8 @@ class TestOrchestrationBuilderBot:
         )
         ideas_path = str(tmp_path / "ideas.txt")
         bot.log_bot_ideas(ideas_path)
-        content = open(ideas_path).read()
+        with open(ideas_path, encoding="utf-8") as fh:
+            content = fh.read()
         assert bot.name in content
 
 

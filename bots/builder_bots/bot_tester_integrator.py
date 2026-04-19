@@ -121,7 +121,7 @@ class BotTesterIntegrator:
                 result=result if passed else None,
                 error=None if passed else f"Invalid run() return: {result!r}",
             )
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001  # probed bots may raise any exception type
             elapsed = round((time.monotonic() - start) * 1000, 2)
             tr = TestResult(
                 test_id=test_id,

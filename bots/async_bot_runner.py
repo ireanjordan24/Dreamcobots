@@ -125,7 +125,7 @@ class AsyncBotRunner:
                         result = await loop.run_in_executor(None, fn)
                     elapsed = round((time.monotonic() - start) * 1000, 2)
                     return {"bot": name, "status": "success", "result": result, "elapsed_ms": elapsed}
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:  # noqa: BLE001  # bot callables may raise any exception
                     elapsed = round((time.monotonic() - start) * 1000, 2)
                     return {"bot": name, "status": "failed", "error": str(exc), "elapsed_ms": elapsed}
 

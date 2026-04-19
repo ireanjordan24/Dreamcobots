@@ -199,7 +199,7 @@ class OrchestrationBuilderBot:
                         loop = asyncio.get_event_loop()
                         t.result = await loop.run_in_executor(None, lambda: t.handler(**t.payload))
                     t.status = "completed"
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:  # noqa: BLE001  # third-party handlers may raise anything
                     t.status = "failed"
                     t.error = str(exc)
                 finally:
