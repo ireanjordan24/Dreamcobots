@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamCo Lite</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #6c3bff;
+      --brand-light: #8a5cff;
+      --brand-dim: #ede8ff;
+      --accent: #22d3ae;
+      --danger: #ef4444;
+      --bg: #f6f5ff;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(108, 59, 255, 0.08);
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    .header {
+      background: var(--brand);
+      color: #fff;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { font-size: 1.5rem; }
+    .brand-name { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .header-tagline { font-size: 0.85rem; opacity: 0.8; }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    .main { max-width: 960px; margin: 32px auto; padding: 0 16px 64px; }
+
+    /* ── Card ────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .emoji { font-size: 1.25rem; }
+
+    /* ── Form ────────────────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .field input, .field textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #fafafa;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .field input:focus, .field textarea:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: #fff;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .btn {
+      padding: 11px 22px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-secondary { background: var(--accent); color: #fff; }
+    .btn-outline {
+      background: transparent;
+      color: var(--brand);
+      border: 2px solid var(--brand);
+    }
+    .btn-danger { background: var(--danger); color: #fff; }
+
+    /* ── Tabs ────────────────────────────────────────────────────────────── */
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .tab-btn {
+      padding: 9px 18px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.15s;
+    }
+    .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Output ──────────────────────────────────────────────────────────── */
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .output-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .output-actions { display: flex; gap: 8px; }
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      font-size: 0.95rem;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── Lead card ────────────────────────────────────────────────────────── */
+    .lead-list { display: flex; flex-direction: column; gap: 14px; }
+    .lead-card {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fafafa;
+      position: relative;
+    }
+    .lead-card-top { display: flex; align-items: flex-start; gap: 12px; }
+    .lead-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--brand-dim);
+      color: var(--brand);
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .lead-info { flex: 1; min-width: 0; }
+    .lead-name { font-weight: 700; font-size: 0.97rem; }
+    .lead-business { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+    .lead-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .meta-item { display: flex; align-items: center; gap: 4px; }
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #fef9c3;
+      color: #92400e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .outreach-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--brand-dim);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #3b1e9e;
+      border-left: 3px solid var(--brand);
+    }
+    .outreach-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .copy-btn {
+      margin-top: 8px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { opacity: 0.85; }
+
+    /* ── Debug output ─────────────────────────────────────────────────────── */
+    .debug-explanation {
+      background: #fef2f2;
+      border-left: 4px solid var(--danger);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #7f1d1d;
+      margin-bottom: 16px;
+    }
+    .debug-fixes-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .fix-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #f0fdf4;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #14532d;
+    }
+    .fix-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    /* ── Loading spinner ──────────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ────────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Status indicator ─────────────────────────────────────────────────── */
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="brand">
+    <span class="brand-icon">🤖</span>
+    <span class="brand-name">DreamCo <strong>Lite</strong></span>
+    <span class="brand-badge">MVP</span>
+  </div>
+  <span class="header-tagline">Leads · Outreach · Debugging</span>
+</header>
+
+<main class="main">
+
+  <!-- ── Money Bot card ──────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">💰</span> Money Bot — Lead Generation &amp; Outreach</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="niche">Niche</label>
+        <input id="niche" type="text" placeholder="e.g. real estate agents" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="location">Location</label>
+        <input id="location" type="text" placeholder="e.g. Wisconsin" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnFindLeads">🔍 Find Leads</button>
+      <button class="btn btn-secondary" id="btnGenMessages">✉️ Generate Messages</button>
+      <button class="btn btn-outline" id="btnRunAutomation">⚡ Run Automation</button>
+    </div>
+  </div>
+
+  <!-- ── Debug Bot card ──────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">🔧</span> Debug Bot — Error Explainer &amp; Fix Suggester</div>
+    <div class="field">
+      <label for="errorLog">Paste Error / Log</label>
+      <textarea id="errorLog" rows="5" placeholder="Paste your stack trace, error message, or log output here…"></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn btn-danger" id="btnDebug">🔎 Analyse Error</button>
+    </div>
+  </div>
+
+  <!-- ── Output panel ─────────────────────────────────────────────────── -->
+  <div class="card" id="outputCard">
+    <div class="output-header">
+      <div class="output-title" id="outputTitle">📋 Output</div>
+      <div class="output-actions">
+        <button class="btn btn-outline" id="btnCopyAll" style="display:none;padding:7px 14px;font-size:0.82rem;">📋 Copy All</button>
+        <button class="btn btn-outline" id="btnExportJSON" style="display:none;padding:7px 14px;font-size:0.82rem;">⬇ Export JSON</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabsRow" style="display:none;">
+      <button class="tab-btn active" data-tab="leadsTab">Leads</button>
+      <button class="tab-btn" data-tab="messagesTab">Messages</button>
+      <button class="tab-btn" data-tab="debugTab">Debug</button>
+    </div>
+
+    <div id="leadsTab" class="tab-panel active">
+      <div class="empty-state" id="emptyLeads">
+        <div class="empty-icon">🔍</div>
+        <div>Run Money Bot to see leads here.</div>
+      </div>
+      <div class="lead-list" id="leadList" style="display:none;"></div>
+    </div>
+
+    <div id="messagesTab" class="tab-panel">
+      <div class="empty-state" id="emptyMessages">
+        <div class="empty-icon">✉️</div>
+        <div>Generate messages to see outreach copy here.</div>
+      </div>
+      <div class="lead-list" id="messageList" style="display:none;"></div>
+    </div>
+
+    <div id="debugTab" class="tab-panel">
+      <div class="empty-state" id="emptyDebug">
+        <div class="empty-icon">🔧</div>
+        <div>Analyse an error to see the explanation here.</div>
+      </div>
+      <div id="debugOutput" style="display:none;"></div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  'use strict';
+
+  /* ── State ─────────────────────────────────────────────────────────── */
+  const state = {
+    leads: [],
+    results: [],   // leads + messages from automation / generate
+    niche: '',
+    debug: null,
+  };
+
+  /* ── DOM refs ─────────────────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+  const nicheEl = $('niche');
+  const locationEl = $('location');
+  const errorLogEl = $('errorLog');
+
+  const btnFindLeads = $('btnFindLeads');
+  const btnGenMessages = $('btnGenMessages');
+  const btnRunAutomation = $('btnRunAutomation');
+  const btnDebug = $('btnDebug');
+  const btnCopyAll = $('btnCopyAll');
+  const btnExportJSON = $('btnExportJSON');
+
+  const tabsRow = $('tabsRow');
+  const outputTitle = $('outputTitle');
+
+  /* ── Toast ─────────────────────────────────────────────────────────── */
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── Tab management ─────────────────────────────────────────────────── */
+  function activateTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
+  }
+
+  tabsRow.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (btn) activateTab(btn.dataset.tab);
+  });
+
+  /* ── API helpers ─────────────────────────────────────────────────────── */
+  async function apiFetch(path, body) {
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  }
+
+  /* ── Button loading state ─────────────────────────────────────────── */
+  function setLoading(btn, loading, originalHtml) {
+    btn.disabled = loading;
+    if (loading) {
+      btn.dataset.original = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner"></span> Working…';
+    } else {
+      btn.innerHTML = btn.dataset.original || originalHtml;
+    }
+  }
+
+  /* ── Render helpers ──────────────────────────────────────────────────── */
+  function initials(name) {
+    return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderLeadCard(lead, withMessage) {
+    const msg = lead.outreach_message;
+    return `
+      <div class="lead-card">
+        <div class="lead-card-top">
+          <div class="lead-avatar">${escHtml(initials(lead.name))}</div>
+          <div class="lead-info">
+            <div class="lead-name">${escHtml(lead.name || '—')}</div>
+            <div class="lead-business">${escHtml(lead.business || '—')}</div>
+          </div>
+          ${lead.rating ? `<span class="rating-badge">⭐ ${escHtml(String(lead.rating))}</span>` : ''}
+        </div>
+        <div class="lead-meta">
+          ${lead.phone && lead.phone !== 'N/A' ? `<span class="meta-item">📞 ${escHtml(lead.phone)}</span>` : ''}
+          ${lead.email && lead.email !== 'N/A' ? `<span class="meta-item">✉️ ${escHtml(lead.email)}</span>` : ''}
+          ${lead.location ? `<span class="meta-item">📍 ${escHtml(lead.location)}</span>` : ''}
+        </div>
+        ${withMessage && msg ? `
+        <div class="outreach-box">
+          <div class="outreach-label">Outreach Message</div>
+          <div>${escHtml(msg)}</div>
+          <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(escHtml(msg))})">📋 Copy</button>
+        </div>` : ''}
+      </div>`;
+  }
+
+  function renderLeadsPanel(leads) {
+    const el = $('leadList');
+    const empty = $('emptyLeads');
+    if (!leads.length) { el.style.display = 'none'; empty.style.display = ''; return; }
+    el.innerHTML = leads.map(l => renderLeadCard(l, false)).join('');
+    el.style.display = 'flex';
+    empty.style.display = 'none';
+  }
+
+  function renderMessagesPanel(results) {
+    const el = $('messageList');
+    const empty = $('emptyMessages');
+    if (!results.length) { el.style.display = 'none'; empty.style.display = ''; return; }
+    el.innerHTML = results.map(l => renderLeadCard(l, true)).join('');
+    el.style.display = 'flex';
+    empty.style.display = 'none';
+  }
+
+  function renderDebugPanel(result) {
+    const el = $('debugOutput');
+    const empty = $('emptyDebug');
+    if (!result) { el.style.display = 'none'; empty.style.display = ''; return; }
+    const fixes = (result.fixes || [])
+      .map((f, i) => `<div class="fix-item"><span class="fix-num">${i + 1}</span><span>${escHtml(f)}</span></div>`)
+      .join('');
+    el.innerHTML = `
+      <div class="debug-explanation">${escHtml(result.explanation || '')}</div>
+      <div class="debug-fixes-title">Suggested Fixes</div>
+      ${fixes}
+      <div class="source-badge">🤖 Analysis source: ${escHtml(result.source || 'unknown')}</div>`;
+    el.style.display = 'block';
+    empty.style.display = 'none';
+  }
+
+  /* ── Copy helpers ─────────────────────────────────────────────────────── */
+  window.copyText = function(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    });
+  };
+
+  btnCopyAll.addEventListener('click', () => {
+    if (state.results.length) {
+      const text = state.results.map(r =>
+        `${r.name} — ${r.business}\n${r.outreach_message || ''}`
+      ).join('\n\n---\n\n');
+      navigator.clipboard.writeText(text).then(() => showToast('All messages copied!'));
+    }
+  });
+
+  btnExportJSON.addEventListener('click', () => {
+    const data = state.results.length ? state.results : state.leads;
+    if (!data.length) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dreamco-leads.json';
+    a.click();
+  });
+
+  /* ── Show output panel ─────────────────────────────────────────────── */
+  function showOutput(title, activeTab, withCopyAll) {
+    tabsRow.style.display = 'flex';
+    outputTitle.textContent = title;
+    btnCopyAll.style.display = withCopyAll ? '' : 'none';
+    btnExportJSON.style.display = '';
+    activateTab(activeTab);
+  }
+
+  /* ── Button handlers ─────────────────────────────────────────────────── */
+
+  // Find Leads
+  btnFindLeads.addEventListener('click', async () => {
+    const niche = nicheEl.value.trim();
+    const location = locationEl.value.trim();
+    if (!niche || !location) { showToast('Please enter both niche and location.'); return; }
+    setLoading(btnFindLeads, true);
+    try {
+      const data = await apiFetch('/api/leads', { niche, location });
+      state.leads = data.leads || [];
+      state.niche = niche;
+      renderLeadsPanel(state.leads);
+      showOutput(`📋 Leads (${state.leads.length})`, 'leadsTab', false);
+      showToast(`Found ${state.leads.length} leads!`);
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      setLoading(btnFindLeads, false);
+    }
+  });
+
+  // Generate Messages (requires leads already fetched)
+  btnGenMessages.addEventListener('click', async () => {
+    const niche = nicheEl.value.trim() || state.niche;
+    const leads = state.leads;
+    if (!leads.length) { showToast('Find leads first, then generate messages.'); return; }
+    if (!niche) { showToast('Please enter a niche.'); return; }
+    setLoading(btnGenMessages, true);
+    try {
+      const data = await apiFetch('/api/messages', { leads, niche });
+      state.results = data.results || [];
+      renderMessagesPanel(state.results);
+      showOutput(`✉️ Outreach Messages (${state.results.length})`, 'messagesTab', true);
+      showToast(`Generated ${state.results.length} messages!`);
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      setLoading(btnGenMessages, false);
+    }
+  });
+
+  // Run Automation (find leads + generate messages in one shot)
+  btnRunAutomation.addEventListener('click', async () => {
+    const niche = nicheEl.value.trim();
+    const location = locationEl.value.trim();
+    if (!niche || !location) { showToast('Please enter both niche and location.'); return; }
+    setLoading(btnRunAutomation, true);
+    try {
+      const data = await apiFetch('/api/run-automation', { niche, location });
+      state.results = data.results || [];
+      state.leads = state.results;
+      state.niche = niche;
+      renderLeadsPanel(state.leads);
+      renderMessagesPanel(state.results);
+      showOutput(`⚡ Automation Results (${state.results.length})`, 'messagesTab', true);
+      showToast(`Automation complete — ${state.results.length} leads with messages!`);
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      setLoading(btnRunAutomation, false);
+    }
+  });
+
+  // Debug Bot
+  btnDebug.addEventListener('click', async () => {
+    const log = errorLogEl.value.trim();
+    if (!log) { showToast('Paste an error log first.'); return; }
+    setLoading(btnDebug, true);
+    try {
+      const data = await apiFetch('/api/debug', { log });
+      state.debug = data;
+      renderDebugPanel(data);
+      showOutput('🔧 Debug Analysis', 'debugTab', false);
+      showToast('Analysis complete!');
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    } finally {
+      setLoading(btnDebug, false);
+    }
+  });
+</script>
+</body>
+</html>
