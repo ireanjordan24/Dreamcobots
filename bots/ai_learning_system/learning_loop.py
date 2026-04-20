@@ -318,9 +318,10 @@ class LearningLoop:
         return {"bot_name": bot_name, "score": score, "status": status}
 
     def get_underperformers(self):
-        """Return underperforming bots as dict {name: score}."""
-        return {name: score for name, score in self.performance_log.items()
-                if score < self.underperform_threshold}
+        """Return underperforming bots as a list of names."""
+        result = [name for name, score in self.performance_log.items()
+                  if score is not None and score < self.underperform_threshold]
+        return result
 
     def get_performance_log(self):
         """Return a copy of the performance log (dict)."""
@@ -330,9 +331,23 @@ class LearningLoop:
         """Optimize underperforming bots. Returns list of created bot names."""
         print("Optimizing bots...")
         created = []
-        underperformers = self.get_underperformers()
+
+        # Revenue-based bot creation only when running standalone (no control_center)
+        if self.control_center is None and self.generator is not None:
+            revenue = self.track_revenue()
+            if revenue < 500.0:
+                self.generator.create_bot("lead_booster_bot")
+                created.append("lead_booster_bot")
+                self._refactor_log.append({"type": "revenue_boost", "bot": "lead_booster_bot"})
+            else:
+                self.generator.create_bot("sales_scaler_bot")
+                created.append("sales_scaler_bot")
+                self._refactor_log.append({"type": "scale", "bot": "sales_scaler_bot"})
+
+        # Optimize underperforming bots from performance_log
+        underperformers = {name: score for name, score in self.performance_log.items()
+                           if score is not None and score < self.underperform_threshold}
         if self.control_center is not None and not underperformers:
-            # Use cc.bots if performance_log is from new-API style
             bots = getattr(self.control_center, "bots", {}) or {}
             for name in bots:
                 score = self.performance_log.get(name, DEFAULT_SCORE_MAX)
@@ -353,6 +368,16 @@ class LearningLoop:
     def track_revenue(self) -> float:
         if self.control_center is not None and hasattr(self.control_center, "get_total_revenue"):
             return float(self.control_center.get_total_revenue())
+        # Read from leads file (count × $10 per lead)
+        import json as _json
+        leads_path = os.path.join(os.getcwd(), "data", "leads.json")
+        if os.path.exists(leads_path):
+            count = 0
+            with open(leads_path, encoding="utf-8") as fh:
+                for line in fh:
+                    if line.strip():
+                        count += 1
+            return float(count * 10)
         return float(sum(r.total_revenue_usd for r in self._performance.values()))
 
     def count_leads(self) -> int:

@@ -80,7 +80,7 @@ class RedisEventBus(BaseEventBus):
         data : Any
             JSON-serialisable payload.
         """
-        super().publish(event_type, data)
+        self._publish_local(event_type, data)
         if self._redis is not None:
             try:
                 payload = json.dumps({"event_type": event_type, "data": data})
@@ -88,9 +88,18 @@ class RedisEventBus(BaseEventBus):
             except Exception:
                 pass
 
+    def subscribe(self, event_type: str, handler: Callable) -> None:
+        """Register handler, preventing duplicates."""
+        self._subscribe_local(event_type, handler)
+
     @property
     def redis_available(self) -> bool:
         """Return True if Redis is connected."""
+        return self._redis is not None
+
+    @property
+    def redis_connected(self) -> bool:
+        """Alias for redis_available — True if Redis is connected."""
         return self._redis is not None
 
 

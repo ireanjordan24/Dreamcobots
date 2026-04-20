@@ -52,7 +52,7 @@ class Bot:
     for production use.
     """
 
-    def __init__(self, leads_file: str = _DEFAULT_LEADS_FILE) -> None:
+    def __init__(self, leads_file: str = _DEFAULT_LEADS_FILE, db_dsn: str = None) -> None:
         self.name = "Lead Generator Bot"
         self.leads_file = leads_file
         self._total_generated: int = 0
@@ -112,3 +112,6 @@ class Bot:
             "leads_file": self.leads_file,
             "status": "active",
         }
+
+# Alias for backward compatibility
+LeadGenBot = Bot

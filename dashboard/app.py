@@ -109,9 +109,107 @@ except ImportError:  # pragma: no cover
     FLASK_AVAILABLE = False
 
 
-def create_app() -> Any:
-    """Return the Flask application instance (or None)."""
-    return app
+def create_app(leads_path: str | None = None) -> Any:
+    """Return a Flask application instance configured with the given leads_path.
+
+    Parameters
+    ----------
+    leads_path : str | None
+        Optional path to a JSONL leads file.  When provided, the dashboard
+        reads leads from that file instead of the global orchestrator.
+    """
+    if not FLASK_AVAILABLE:
+        return None
+
+    from flask import Flask, jsonify, make_response  # noqa: PLC0415
+
+    app_instance = Flask(__name__)
+    _leads_path = leads_path
+
+    def _count_leads() -> int:
+        if _leads_path and os.path.exists(_leads_path):
+            with open(_leads_path, encoding="utf-8") as fh:
+                return sum(1 for line in fh if line.strip())
+        return 0
+
+    def _load_leads() -> list:
+        import json as _json
+        if _leads_path and os.path.exists(_leads_path):
+            leads = []
+            with open(_leads_path, encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if line:
+                        try:
+                            leads.append(_json.loads(line))
+                        except Exception:
+                            leads.append({"raw": line})
+            return leads
+        return []
+
+    @app_instance.route("/health")
+    def _health() -> Any:
+        return jsonify({"status": "ok", "service": "dreamco-dashboard"})
+
+    @app_instance.route("/api/leads")
+    def _api_leads() -> Any:
+        leads = _load_leads()
+        return jsonify({"leads": leads, "est_revenue": len(leads) * 10.0})
+
+    @app_instance.route("/api/data")
+    def _api_data() -> Any:
+        results = _orch.run_all_bots()
+        summary = _orch.summary(results)
+        return jsonify({"results": results, "summary": summary})
+
+    @app_instance.route("/")
+    def _dashboard() -> Any:
+        lead_count = _count_leads()
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="30">
+  <title>DreamCo Empire Dashboard</title>
+  <style>
+    body{{font-family:Arial,sans-serif;margin:2rem;background:#0d0d0d;color:#e0e0e0}}
+    h1{{color:#00ff88}}
+    .card{{background:#1a1a2e;padding:1rem 2rem;border-radius:8px;display:inline-block;margin:0.5rem}}
+    .card h2{{margin:0;font-size:2rem;color:#00ff88}}
+    .card p{{margin:.2rem 0 0;color:#aaa}}
+    .go-live{{margin:2rem 0;padding:1rem;background:#1a2e1a;border-radius:8px}}
+    .bot-catalog{{margin:2rem 0}}
+    .workflow-monitor{{margin:2rem 0}}
+    .quantum-section{{margin:2rem 0}}
+  </style>
+</head>
+<body>
+  <h1>🤖 DreamCo Empire Dashboard</h1>
+  <div class="card"><h2>Leads: {lead_count}</h2><p>Total Leads</p></div>
+  <div class="card"><h2>${lead_count * 10:.2f}</h2><p>Est. Revenue</p></div>
+  <div class="go-live">
+    <h2>🚀 Go Live</h2>
+    <p>Deploy bots, activate revenue streams, and scale your empire.</p>
+  </div>
+  <div class="bot-catalog">
+    <h2>🤖 Bot Catalog</h2>
+    <p>Browse and deploy bots from the DreamCo marketplace.</p>
+  </div>
+  <div class="workflow-monitor">
+    <h2>⚙️ Workflow Monitor</h2>
+    <p>Track active workflows and automation pipelines.</p>
+  </div>
+  <div class="quantum-section">
+    <h2>⚛️ Quantum AI Engine</h2>
+    <p>Next-generation AI decision making and optimization.</p>
+  </div>
+</body>
+</html>"""
+        resp = make_response(html)
+        resp.headers["Content-Type"] = "text/html"
+        return resp
+
+    return app_instance
 
 
 class DashboardApp:

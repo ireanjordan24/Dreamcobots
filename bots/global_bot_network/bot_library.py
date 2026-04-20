@@ -841,4 +841,62 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "god_mode",
         ],
     ),
+    BotEntry(
+        bot_id="cinecore_lead_engine",
+        display_name="CineCore Lead Engine",
+        description=(
+            "Cinema-grade B2B lead generation engine. Scans business directories, "
+            "generates personalized pitch scripts, and exports leads to CRM systems."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
+        class_name="CineCoreLeadEngine",
+        capabilities=[
+            "business_scan",
+            "script_generation",
+            "crm_export",
+            "lead_scoring",
+            "multi_source_scraping",
+        ],
+    ),
+    BotEntry(
+        bot_id="public_lead_engine",
+        display_name="Public Lead Engine",
+        description=(
+            "Public data lead generation engine. Searches Google Places, Yelp, and "
+            "other public directories to find businesses with weak online marketing "
+            "and scores them as high-value prospects."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.public_lead_engine.public_lead_engine",
+        class_name="PublicLeadEngine",
+        capabilities=[
+            "google_places_search",
+            "yelp_search",
+            "rating_filter",
+            "weak_marketing_filter",
+            "lead_export",
+        ],
+    ),
+    BotEntry(
+        bot_id="god_mode_bot",
+        display_name="God Mode Bot",
+        description=(
+            "Full-spectrum autonomous revenue bot. Simultaneously hunts leads, closes "
+            "deals, collects payments, launches viral campaigns, and self-optimizes "
+            "across all income streams in real time."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.god_mode_bot.god_mode_bot",
+        class_name="GodModeBot",
+        capabilities=[
+            "lead_hunting",
+            "auto_closing",
+            "payment_collection",
+            "viral_engine",
+            "god_mode",
+            "self_optimization",
+            "cross_stream_revenue",
+        ],
+    ),
 ]
