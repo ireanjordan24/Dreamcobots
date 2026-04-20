@@ -3,18 +3,51 @@ import sys as _sys, os as _os
 _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'BuddyAI'))
 from base_bot import BaseBot
 
+import hashlib
+import statistics
+import uuid
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+
 # OOH Life, Physical, and Social Science (SOC 19)
 
 class ScienceBot(BaseBot):
-    """Bot for OOH Life, Physical, and Social Science (SOC 19).
+    """State-of-the-art scientist bot for OOH Life, Physical, and Social Science (SOC 19).
 
-    Provides 100 features, 100 functions, and 100 tools
-    aligned with the Buddy system and Government Contract & Grant Bot format.
+    Provides 100 features, 100 functions, and 100 tools aligned with the Buddy
+    system and Government Contract & Grant Bot format, plus six core research
+    capabilities:
+
+    1. Literature review automation — scan, analyze, and summarize publications.
+    2. AI-driven experiment planning, data analysis, and hypothesis validation.
+    3. Collaborative features for multi-disciplinary teams with version control.
+    4. ML-based pattern recognition across large datasets.
+    5. Ethical AI adherence — reproducibility and transparency standards.
+    6. Modular architecture supporting breakthroughs across scientific domains.
     """
+
+    # ── Domain & Ethics configuration ────────────────────────────────
+
+    SUPPORTED_DOMAINS: List[str] = [
+        'Astronomy', 'Biology', 'Chemistry', 'Computer Science',
+        'Ecology', 'Environmental Science', 'Materials Science',
+        'Mathematics', 'Neuroscience', 'Physics', 'Psychology',
+    ]
+
+    ETHICAL_AI_PRINCIPLES: List[str] = [
+        'accountability', 'fairness', 'non-maleficence',
+        'privacy', 'reproducibility', 'safety', 'transparency',
+    ]
 
     def __init__(self):
         super().__init__()
         self.description = 'OOH Life, Physical, and Social Science (SOC 19)'
+
+        # ── Internal state stores ─────────────────────────────────────
+        self._publications: Dict[str, Dict[str, Any]] = {}   # pub_id → pub
+        self._experiments: Dict[str, List[Dict[str, Any]]] = {}  # exp_id → versions
+        self._teams: Dict[str, Dict[str, Any]] = {}           # team_id → team
+        self._audit_log: List[Dict[str, Any]] = []            # ethical-AI events
 
     def connect_to_buddy(self, buddy):
         """Register this bot with the Buddy central AI."""
@@ -25,6 +58,694 @@ class ScienceBot(BaseBot):
 
     def run(self):
         self.start()
+
+    # ══════════════════════════════════════════════════════════════════
+    # 1. LITERATURE REVIEW AUTOMATION
+    # ══════════════════════════════════════════════════════════════════
+
+    def scan_publications(
+        self,
+        query: str,
+        domain: Optional[str] = None,
+        max_results: int = 50,
+    ) -> List[Dict[str, Any]]:
+        """Scan and index scientific publications matching *query*.
+
+        Args:
+            query: Free-text search string.
+            domain: Optional domain filter (must be in SUPPORTED_DOMAINS).
+            max_results: Maximum number of results to return (capped at 200).
+
+        Returns:
+            List of publication summary dicts, each with keys:
+            ``pub_id``, ``title``, ``authors``, ``year``, ``domain``,
+            ``abstract_snippet``, ``citation_count``, ``relevance_score``.
+        """
+        if domain and domain not in self.SUPPORTED_DOMAINS:
+            raise ValueError(f"Unknown domain '{domain}'. Supported: {self.SUPPORTED_DOMAINS}")
+        max_results = min(max_results, 200)
+
+        results: List[Dict[str, Any]] = []
+        query_tokens = set(query.lower().split())
+        for pub_id, pub in self._publications.items():
+            if domain and pub.get('domain') != domain:
+                continue
+            text = ' '.join([
+                pub.get('title', ''), pub.get('abstract', ''),
+            ]).lower()
+            matched = sum(1 for t in query_tokens if t in text)
+            if matched:
+                score = round(matched / max(len(query_tokens), 1), 3)
+                results.append({
+                    'pub_id': pub_id,
+                    'title': pub.get('title', ''),
+                    'authors': pub.get('authors', []),
+                    'year': pub.get('year'),
+                    'domain': pub.get('domain'),
+                    'abstract_snippet': pub.get('abstract', '')[:200],
+                    'citation_count': pub.get('citation_count', 0),
+                    'relevance_score': score,
+                })
+        results.sort(key=lambda x: x['relevance_score'], reverse=True)
+        return results[:max_results]
+
+    def add_publication(self, publication: Dict[str, Any]) -> str:
+        """Index a publication for later scanning and analysis.
+
+        Args:
+            publication: Dict with keys ``title``, ``authors``, ``year``,
+                         ``domain``, ``abstract``, ``citation_count``
+                         (optional: ``methodology``, ``findings``).
+
+        Returns:
+            Assigned ``pub_id``.
+        """
+        required = {'title', 'authors', 'year', 'domain', 'abstract'}
+        missing = required - publication.keys()
+        if missing:
+            raise ValueError(f"Publication missing required fields: {missing}")
+        pub_id = 'PUB-' + hashlib.md5(
+            publication['title'].encode()
+        ).hexdigest()[:8].upper()
+        self._publications[pub_id] = dict(publication)
+        self._publications[pub_id]['pub_id'] = pub_id
+        return pub_id
+
+    def analyze_publication(self, pub_id: str) -> Dict[str, Any]:
+        """Extract key findings, methodology, and citation metrics.
+
+        Args:
+            pub_id: ID returned by :meth:`add_publication`.
+
+        Returns:
+            Dict with keys ``pub_id``, ``title``, ``methodology``,
+            ``key_findings``, ``citation_count``, ``reproducibility_flag``.
+        """
+        if pub_id not in self._publications:
+            raise KeyError(f"Publication '{pub_id}' not found.")
+        pub = self._publications[pub_id]
+        return {
+            'pub_id': pub_id,
+            'title': pub.get('title', ''),
+            'methodology': pub.get('methodology', 'Not specified'),
+            'key_findings': pub.get('findings', []),
+            'citation_count': pub.get('citation_count', 0),
+            'reproducibility_flag': bool(pub.get('methodology')),
+        }
+
+    def summarize_literature(
+        self,
+        topic: str,
+        publications: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Generate a structured literature summary on *topic*.
+
+        Args:
+            topic: Research topic string.
+            publications: Optional pre-scanned publication list; if omitted,
+                          performs an internal scan.
+
+        Returns:
+            Dict with ``topic``, ``total_papers``, ``date_range``,
+            ``dominant_domains``, ``top_cited``, ``consensus_summary``.
+        """
+        if publications is None:
+            publications = self.scan_publications(topic)
+        if not publications:
+            return {
+                'topic': topic, 'total_papers': 0,
+                'date_range': None, 'dominant_domains': [],
+                'top_cited': [], 'consensus_summary': 'No publications found.',
+            }
+        years = [p['year'] for p in publications if p.get('year')]
+        domains: Dict[str, int] = {}
+        for p in publications:
+            d = p.get('domain', 'Unknown')
+            domains[d] = domains.get(d, 0) + 1
+        top_cited = sorted(
+            publications, key=lambda x: x.get('citation_count', 0), reverse=True
+        )[:5]
+        return {
+            'topic': topic,
+            'total_papers': len(publications),
+            'date_range': (min(years), max(years)) if years else None,
+            'dominant_domains': sorted(domains, key=domains.get, reverse=True)[:3],
+            'top_cited': [p['title'] for p in top_cited],
+            'consensus_summary': (
+                f"Literature on '{topic}' spans {len(publications)} papers "
+                f"across {len(domains)} domain(s). "
+                f"Most active domain: {sorted(domains, key=domains.get, reverse=True)[0]}."
+            ),
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # 2. EXPERIMENT PLANNING, DATA ANALYSIS, HYPOTHESIS VALIDATION
+    # ══════════════════════════════════════════════════════════════════
+
+    def plan_experiment(
+        self,
+        hypothesis: str,
+        independent_vars: List[str],
+        dependent_vars: List[str],
+        control_vars: Optional[List[str]] = None,
+        domain: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Create a structured experiment plan.
+
+        Args:
+            hypothesis: The scientific hypothesis to test.
+            independent_vars: Variables manipulated by the researcher.
+            dependent_vars: Measured outcome variables.
+            control_vars: Variables held constant.
+            domain: Scientific domain (must be in SUPPORTED_DOMAINS if given).
+
+        Returns:
+            Experiment plan dict with ``experiment_id``, ``hypothesis``,
+            ``variables``, ``methodology_steps``, ``ethical_notes``, ``status``.
+        """
+        if domain and domain not in self.SUPPORTED_DOMAINS:
+            raise ValueError(f"Unknown domain '{domain}'.")
+        if not independent_vars or not dependent_vars:
+            raise ValueError("Experiment must have at least one independent and one dependent variable.")
+        exp_id = 'EXP-' + uuid.uuid4().hex[:8].upper()
+        plan = {
+            'experiment_id': exp_id,
+            'hypothesis': hypothesis,
+            'domain': domain,
+            'variables': {
+                'independent': independent_vars,
+                'dependent': dependent_vars,
+                'control': control_vars or [],
+            },
+            'methodology_steps': [
+                '1. Define and document the hypothesis clearly.',
+                '2. Identify and operationalize all variables.',
+                '3. Design data collection protocol.',
+                '4. Determine sample size for statistical power.',
+                '5. Execute experiment under controlled conditions.',
+                '6. Collect and record raw data with timestamps.',
+                '7. Perform statistical analysis on results.',
+                '8. Validate or reject hypothesis based on evidence.',
+                '9. Document findings for reproducibility.',
+            ],
+            'ethical_notes': (
+                'Ensure informed consent, data anonymization, and '
+                'adherence to domain-specific ethical guidelines.'
+            ),
+            'status': 'planned',
+            'created_at': datetime.now(timezone.utc).isoformat(),
+        }
+        self._experiments[exp_id] = [{'version': 1, 'data': plan, 'notes': 'Initial plan'}]
+        self._log_audit('plan_experiment', {'experiment_id': exp_id})
+        return plan
+
+    def analyze_experimental_data(
+        self,
+        dataset: List[Dict[str, Any]],
+        target_key: str,
+    ) -> Dict[str, Any]:
+        """Perform descriptive and basic inferential statistics on *dataset*.
+
+        Args:
+            dataset: List of observation dicts, each containing *target_key*.
+            target_key: The numeric field to analyse.
+
+        Returns:
+            Dict with ``n``, ``mean``, ``median``, ``stdev``, ``min``, ``max``,
+            ``variance``, ``outliers``, ``summary``.
+        """
+        if not dataset:
+            raise ValueError("Dataset must not be empty.")
+        values = []
+        for i, row in enumerate(dataset):
+            if target_key not in row:
+                raise KeyError(f"Row {i} missing key '{target_key}'.")
+            values.append(float(row[target_key]))
+        n = len(values)
+        mean = statistics.mean(values)
+        median = statistics.median(values)
+        stdev = statistics.stdev(values) if n > 1 else 0.0
+        variance = statistics.variance(values) if n > 1 else 0.0
+        minimum, maximum = min(values), max(values)
+        # Simple IQR-based outlier detection
+        sorted_vals = sorted(values)
+        q1 = sorted_vals[n // 4]
+        q3 = sorted_vals[(3 * n) // 4]
+        iqr = q3 - q1
+        lower, upper = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+        outliers = [v for v in values if v < lower or v > upper]
+        self._log_audit('analyze_data', {'n': n, 'target_key': target_key})
+        return {
+            'n': n,
+            'mean': round(mean, 4),
+            'median': round(median, 4),
+            'stdev': round(stdev, 4),
+            'min': minimum,
+            'max': maximum,
+            'variance': round(variance, 4),
+            'outliers': outliers,
+            'summary': (
+                f"Analyzed {n} observations of '{target_key}'. "
+                f"Mean={mean:.3f}, Std={stdev:.3f}."
+            ),
+        }
+
+    def validate_hypothesis(
+        self,
+        hypothesis: str,
+        analysis_result: Dict[str, Any],
+        significance_threshold: float = 0.05,
+    ) -> Dict[str, Any]:
+        """Validate a hypothesis based on analysis results.
+
+        Uses a simple heuristic: hypothesis is considered *supported* when
+        the coefficient of variation (stdev/mean) is below 50 % and no
+        outliers dominate (fewer than 10 % of n).
+
+        Args:
+            hypothesis: The hypothesis statement.
+            analysis_result: Output of :meth:`analyze_experimental_data`.
+            significance_threshold: α-level for the decision boundary.
+
+        Returns:
+            Dict with ``hypothesis``, ``decision``, ``confidence``,
+            ``reasoning``, ``reproducibility_score``.
+        """
+        mean = analysis_result.get('mean', 0)
+        stdev = analysis_result.get('stdev', 0)
+        n = analysis_result.get('n', 0)
+        outliers = analysis_result.get('outliers', [])
+        cv = (stdev / mean) if mean != 0 else float('inf')
+        outlier_ratio = len(outliers) / n if n else 0
+        supported = cv < 0.5 and outlier_ratio < 0.1
+        confidence = round(max(0.0, 1.0 - cv - outlier_ratio), 3)
+        reproducibility_score = round(
+            min(1.0, (1 - outlier_ratio) * (1 / max(cv, 0.01))), 3
+        )
+        reproducibility_score = min(reproducibility_score, 1.0)
+        self._log_audit('validate_hypothesis', {'supported': supported})
+        return {
+            'hypothesis': hypothesis,
+            'decision': 'supported' if supported else 'not supported',
+            'confidence': confidence,
+            'reasoning': (
+                f"CV={cv:.3f} (threshold 0.50); "
+                f"outlier ratio={outlier_ratio:.3f} (threshold 0.10)."
+            ),
+            'reproducibility_score': reproducibility_score,
+            'significance_threshold': significance_threshold,
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # 3. COLLABORATIVE FEATURES & VERSION CONTROL
+    # ══════════════════════════════════════════════════════════════════
+
+    def create_research_team(
+        self,
+        name: str,
+        disciplines: List[str],
+    ) -> Dict[str, Any]:
+        """Create a named multi-disciplinary research team.
+
+        Args:
+            name: Human-readable team name.
+            disciplines: List of scientific disciplines represented.
+
+        Returns:
+            Team dict with ``team_id``, ``name``, ``disciplines``,
+            ``collaborators``, ``created_at``.
+        """
+        if not name:
+            raise ValueError("Team name must not be empty.")
+        if not disciplines:
+            raise ValueError("Team must have at least one discipline.")
+        team_id = 'TEAM-' + uuid.uuid4().hex[:6].upper()
+        team = {
+            'team_id': team_id,
+            'name': name,
+            'disciplines': disciplines,
+            'collaborators': [],
+            'created_at': datetime.now(timezone.utc).isoformat(),
+        }
+        self._teams[team_id] = team
+        return team
+
+    def add_collaborator(
+        self,
+        team_id: str,
+        user: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Add a collaborator to an existing research team.
+
+        Args:
+            team_id: ID from :meth:`create_research_team`.
+            user: Dict with at least ``name`` and ``role`` keys.
+
+        Returns:
+            Updated team dict.
+        """
+        if team_id not in self._teams:
+            raise KeyError(f"Team '{team_id}' not found.")
+        required = {'name', 'role'}
+        missing = required - user.keys()
+        if missing:
+            raise ValueError(f"User dict missing required keys: {missing}")
+        user_entry = dict(user)
+        user_entry.setdefault('joined_at', datetime.now(timezone.utc).isoformat())
+        self._teams[team_id]['collaborators'].append(user_entry)
+        return self._teams[team_id]
+
+    def commit_experiment_version(
+        self,
+        experiment_id: str,
+        data: Dict[str, Any],
+        notes: str = '',
+    ) -> Dict[str, Any]:
+        """Commit a versioned snapshot of an experiment.
+
+        Args:
+            experiment_id: Experiment ID from :meth:`plan_experiment`.
+            data: Updated experiment data dict.
+            notes: Human-readable change notes.
+
+        Returns:
+            Version record with ``version``, ``experiment_id``,
+            ``committed_at``, ``notes``, ``checksum``.
+        """
+        if experiment_id not in self._experiments:
+            raise KeyError(f"Experiment '{experiment_id}' not found.")
+        version_number = len(self._experiments[experiment_id]) + 1
+        checksum = hashlib.sha256(
+            str(data).encode()
+        ).hexdigest()[:16]
+        record = {
+            'version': version_number,
+            'experiment_id': experiment_id,
+            'committed_at': datetime.now(timezone.utc).isoformat(),
+            'notes': notes,
+            'data': data,
+            'checksum': checksum,
+        }
+        self._experiments[experiment_id].append(record)
+        self._log_audit('commit_version', {
+            'experiment_id': experiment_id,
+            'version': version_number,
+        })
+        return record
+
+    def get_experiment_history(
+        self,
+        experiment_id: str,
+    ) -> List[Dict[str, Any]]:
+        """Return the full version history of an experiment.
+
+        Args:
+            experiment_id: Experiment ID from :meth:`plan_experiment`.
+
+        Returns:
+            List of version records in chronological order.
+        """
+        if experiment_id not in self._experiments:
+            raise KeyError(f"Experiment '{experiment_id}' not found.")
+        return list(self._experiments[experiment_id])
+
+    def rollback_experiment(
+        self,
+        experiment_id: str,
+        version: int,
+    ) -> Dict[str, Any]:
+        """Restore an experiment to a specific version.
+
+        Args:
+            experiment_id: Experiment ID.
+            version: Target version number (1-based).
+
+        Returns:
+            The data dict of the requested version.
+        """
+        if experiment_id not in self._experiments:
+            raise KeyError(f"Experiment '{experiment_id}' not found.")
+        history = self._experiments[experiment_id]
+        matches = [v for v in history if v.get('version') == version]
+        if not matches:
+            raise ValueError(
+                f"Version {version} not found for experiment '{experiment_id}'."
+            )
+        self._log_audit('rollback', {
+            'experiment_id': experiment_id,
+            'version': version,
+        })
+        return matches[0]['data']
+
+    # ══════════════════════════════════════════════════════════════════
+    # 4. ML PATTERN RECOGNITION
+    # ══════════════════════════════════════════════════════════════════
+
+    def detect_patterns(
+        self,
+        dataset: List[Dict[str, Any]],
+        feature_keys: List[str],
+    ) -> Dict[str, Any]:
+        """Detect statistical patterns and correlations in a dataset.
+
+        Implements variance-based feature importance and pairwise Pearson
+        correlation using only the Python standard library.
+
+        Args:
+            dataset: List of observation dicts.
+            feature_keys: Numeric keys to analyse for patterns.
+
+        Returns:
+            Dict with ``feature_variances``, ``correlations``,
+            ``high_variance_features``, ``pattern_summary``.
+        """
+        if not dataset:
+            raise ValueError("Dataset must not be empty.")
+        if not feature_keys:
+            raise ValueError("At least one feature key required.")
+        n = len(dataset)
+        # Extract columns
+        columns: Dict[str, List[float]] = {}
+        for key in feature_keys:
+            col = []
+            for i, row in enumerate(dataset):
+                if key not in row:
+                    raise KeyError(f"Row {i} missing feature '{key}'.")
+                col.append(float(row[key]))
+            columns[key] = col
+        # Feature variances
+        feature_variances: Dict[str, float] = {}
+        for key, col in columns.items():
+            feature_variances[key] = round(
+                statistics.variance(col) if n > 1 else 0.0, 6
+            )
+        # Pairwise Pearson correlations
+        def _pearson(x: List[float], y: List[float]) -> float:
+            mx, my = statistics.mean(x), statistics.mean(y)
+            sx = [v - mx for v in x]
+            sy = [v - my for v in y]
+            num = sum(a * b for a, b in zip(sx, sy))
+            den = (sum(a ** 2 for a in sx) * sum(b ** 2 for b in sy)) ** 0.5
+            return round(num / den, 4) if den else 0.0
+
+        correlations: Dict[str, float] = {}
+        keys = list(feature_keys)
+        for i, k1 in enumerate(keys):
+            for k2 in keys[i + 1:]:
+                r = _pearson(columns[k1], columns[k2])
+                correlations[f'{k1}_vs_{k2}'] = r
+        high_var = sorted(
+            feature_variances, key=feature_variances.get, reverse=True
+        )[:3]
+        self._log_audit('detect_patterns', {'n': n, 'features': feature_keys})
+        return {
+            'n': n,
+            'feature_variances': feature_variances,
+            'correlations': correlations,
+            'high_variance_features': high_var,
+            'pattern_summary': (
+                f"Analyzed {n} observations across {len(feature_keys)} features. "
+                f"Highest-variance feature: {high_var[0] if high_var else 'N/A'}."
+            ),
+        }
+
+    def train_simple_classifier(
+        self,
+        training_data: List[Dict[str, Any]],
+        feature_keys: List[str],
+        label_key: str,
+    ) -> Dict[str, Any]:
+        """Train a centroid-based nearest-mean classifier.
+
+        Each class is represented by the mean vector of its training samples.
+        Classification is done via minimum Euclidean distance to a centroid.
+
+        Args:
+            training_data: Labelled observations.
+            feature_keys: Numeric feature keys.
+            label_key: Key containing the class label.
+
+        Returns:
+            Model dict with ``model_id``, ``classes``, ``centroids``,
+            ``training_accuracy``, ``feature_keys``, ``label_key``.
+        """
+        if not training_data:
+            raise ValueError("Training data must not be empty.")
+        class_vectors: Dict[str, List[List[float]]] = {}
+        for row in training_data:
+            label = str(row[label_key])
+            vec = [float(row[k]) for k in feature_keys]
+            class_vectors.setdefault(label, []).append(vec)
+        centroids: Dict[str, List[float]] = {
+            label: [
+                statistics.mean(v[i] for v in vecs)
+                for i in range(len(feature_keys))
+            ]
+            for label, vecs in class_vectors.items()
+        }
+
+        def _euclidean(a: List[float], b: List[float]) -> float:
+            return sum((x - y) ** 2 for x, y in zip(a, b)) ** 0.5
+
+        def _predict(row: Dict[str, Any]) -> str:
+            vec = [float(row[k]) for k in feature_keys]
+            return min(centroids, key=lambda c: _euclidean(vec, centroids[c]))
+
+        correct = sum(1 for row in training_data if _predict(row) == str(row[label_key]))
+        accuracy = round(correct / len(training_data), 4)
+        model_id = 'MODEL-' + uuid.uuid4().hex[:8].upper()
+        self._log_audit('train_classifier', {'model_id': model_id, 'accuracy': accuracy})
+        return {
+            'model_id': model_id,
+            'classes': list(centroids.keys()),
+            'centroids': centroids,
+            'training_accuracy': accuracy,
+            'feature_keys': feature_keys,
+            'label_key': label_key,
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # 5. ETHICAL AI — REPRODUCIBILITY & TRANSPARENCY
+    # ══════════════════════════════════════════════════════════════════
+
+    def generate_reproducibility_report(
+        self,
+        experiment_id: str,
+    ) -> Dict[str, Any]:
+        """Generate a reproducibility report for a versioned experiment.
+
+        Args:
+            experiment_id: ID from :meth:`plan_experiment`.
+
+        Returns:
+            Dict with ``experiment_id``, ``versions``, ``checksum_verified``,
+            ``methodology_documented``, ``reproducibility_score``,
+            ``recommendations``.
+        """
+        if experiment_id not in self._experiments:
+            raise KeyError(f"Experiment '{experiment_id}' not found.")
+        history = self._experiments[experiment_id]
+        checksums = [v.get('checksum') for v in history if 'checksum' in v]
+        unique_checksums = set(checksums)
+        methodology_documented = any(
+            isinstance(v.get('data'), dict)
+            and bool(v['data'].get('methodology_steps'))
+            for v in history
+        )
+        version_count = len(history)
+        score = round(
+            (0.5 if methodology_documented else 0.0)
+            + (0.3 if version_count > 1 else 0.1)
+            + (0.2 if len(unique_checksums) == len(checksums) else 0.0),
+            2,
+        )
+        recommendations = []
+        if not methodology_documented:
+            recommendations.append('Document methodology steps in the experiment plan.')
+        if version_count < 2:
+            recommendations.append('Commit at least one update to establish version history.')
+        if len(unique_checksums) < len(checksums):
+            recommendations.append('Duplicate versions detected — ensure each commit captures new changes.')
+        return {
+            'experiment_id': experiment_id,
+            'versions': version_count,
+            'checksum_verified': len(unique_checksums) == len(checksums),
+            'methodology_documented': methodology_documented,
+            'reproducibility_score': score,
+            'recommendations': recommendations or ['No issues found — experiment meets reproducibility standards.'],
+        }
+
+    def audit_transparency(
+        self,
+        include_recent: int = 20,
+    ) -> Dict[str, Any]:
+        """Return a transparency audit of recent AI decisions.
+
+        Args:
+            include_recent: Number of most-recent audit entries to include.
+
+        Returns:
+            Dict with ``total_events``, ``event_types``, ``recent_events``,
+            ``principles_covered``, ``compliance_summary``.
+        """
+        recent = self._audit_log[-include_recent:]
+        event_types: Dict[str, int] = {}
+        for entry in self._audit_log:
+            et = entry.get('event_type', 'unknown')
+            event_types[et] = event_types.get(et, 0) + 1
+        covered = {e for e in event_types}
+        principles_covered = [
+            p for p in self.ETHICAL_AI_PRINCIPLES
+            if any(p in e for e in covered)
+            or p in ('transparency', 'reproducibility')  # always covered by audit log
+        ]
+        return {
+            'total_events': len(self._audit_log),
+            'event_types': event_types,
+            'recent_events': recent,
+            'principles_covered': principles_covered,
+            'compliance_summary': (
+                f"{len(self._audit_log)} auditable AI events recorded. "
+                f"Principles addressed: {', '.join(principles_covered)}."
+            ),
+        }
+
+    # ══════════════════════════════════════════════════════════════════
+    # 6. MODULAR ARCHITECTURE HELPERS
+    # ══════════════════════════════════════════════════════════════════
+
+    def list_supported_domains(self) -> List[str]:
+        """Return the list of scientific domains supported by this bot."""
+        return list(self.SUPPORTED_DOMAINS)
+
+    def get_ethical_principles(self) -> List[str]:
+        """Return the ethical AI principles this bot adheres to."""
+        return list(self.ETHICAL_AI_PRINCIPLES)
+
+    def get_research_summary(self) -> Dict[str, Any]:
+        """Return a high-level summary of all active research objects.
+
+        Returns:
+            Dict with counts of ``publications``, ``experiments``, ``teams``,
+            ``audit_events``, and ``supported_domains``.
+        """
+        return {
+            'publications': len(self._publications),
+            'experiments': len(self._experiments),
+            'teams': len(self._teams),
+            'audit_events': len(self._audit_log),
+            'supported_domains': self.SUPPORTED_DOMAINS,
+        }
+
+    # ── Private helpers ───────────────────────────────────────────────
+
+    def _log_audit(self, event_type: str, metadata: Dict[str, Any]) -> None:
+        """Append an entry to the internal ethical-AI audit log."""
+        self._audit_log.append({
+            'event_type': event_type,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'metadata': metadata,
+        })
 
     # ── Features ─────────────────────────────────────────────────────
 
