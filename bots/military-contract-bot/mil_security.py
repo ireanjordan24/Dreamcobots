@@ -2,7 +2,9 @@
 Security module for the Military Contract Bot.
 
 Provides:
-- AES-256-GCM encryption / decryption helpers
+- PBKDF2+SHA-256 derived key with XOR-stream encryption / decryption helpers
+  (portable, no external dependencies; swap for AES-256-GCM via ``cryptography``
+  package when stricter FIPS compliance is required in production)
 - User-level role-based authorization (RBAC)
 - Audit trail logging
 - Data integrity verification (HMAC-SHA256)

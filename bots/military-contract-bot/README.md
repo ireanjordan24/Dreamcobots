@@ -46,7 +46,8 @@ for r in results:
 
 ## Security
 
-- **AES-256 encryption** for sensitive data at rest and in transit
+- **PBKDF2+SHA-256 key derivation with XOR-stream encryption** for sensitive data at rest
+  and in transit (swap in the `cryptography` package for FIPS-validated AES-256-GCM in production)
 - **Role-Based Access Control (RBAC)** — five levels: VIEWER → ANALYST → CONTRACTOR → OFFICER → ADMIN
 - **Tamper-evident audit trail** using HMAC-SHA256-protected entries
 - **ITAR / EAR export control screening** on all contract descriptions
@@ -66,10 +67,10 @@ for r in results:
 bots/military-contract-bot/
 ├── bot.py                    # Entry point
 ├── military_contract_bot.py  # Core bot class (MilitaryContractBot)
-├── security.py               # AES-256, RBAC, audit trail
-├── compliance.py             # CMMC, FAR/DFARS, MIL-SPEC, ITAR/EAR
-├── analytics.py              # Performance metrics & monitoring
-├── api.py                    # REST-style API handlers
+├── mil_security.py           # PBKDF2+XOR encryption, RBAC, audit trail
+├── mil_compliance.py         # CMMC, FAR/DFARS, MIL-SPEC, ITAR/EAR
+├── mil_analytics.py          # Performance metrics & monitoring
+├── mil_api.py                # REST-style API handlers
 ├── config.json               # Deployment configuration
 └── README.md
 ```
