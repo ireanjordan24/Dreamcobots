@@ -359,8 +359,8 @@ class VibeCoder:
         return (
             f'// {name}\n'
             f'export function init{name}(){type_ann} {{\n'
-            f'  var el = document.querySelector(".{name.lower()}");\n'
-            f'  if (!el) return;\n'
+            f'  var sectionElement = document.querySelector(".{name.lower()}");\n'
+            f'  if (!sectionElement) return;\n'
             f'  // TODO: implement {name} behaviour\n'
             f'}}\n'
         )

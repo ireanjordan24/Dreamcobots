@@ -113,7 +113,7 @@ _WIDGET_DESCRIPTIONS: dict = {
     WidgetType.ACCORDION: (
         "Collapsible FAQ/content accordion with smooth animation."
     ),
-    WidgetType.TABS: "Tabbed content panel for organising multiple content areas.",
+    WidgetType.TABS: "Tabbed content panel for organizing multiple content areas.",
     WidgetType.MODAL: (
         "Lightbox/modal overlay triggered by button, scroll, or delay."
     ),
