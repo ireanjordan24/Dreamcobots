@@ -60,7 +60,9 @@ export default function Analytics() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-slate-400">Loading analytics…</p>;
+  if (loading) {
+    return <p className="text-slate-400">Loading analytics…</p>;
+  }
 
   const activeCount = systemStatus?.bots?.active ?? 0;
   const totalCount = systemStatus?.bots?.total ?? bots.length;
