@@ -94,18 +94,27 @@ export default function DivisionExplorer() {
   const filteredBots = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return ALL_BOTS.filter((bot) => {
-      if (selectedDivision !== 'All' && bot.division !== selectedDivision) return false;
-      if (selectedTier !== 'All' && bot.tier !== selectedTier) return false;
-      if (selectedCategory !== 'All' && bot.category !== selectedCategory) return false;
-      if (parsePriceNumber(bot.price) > maxPrice) return false;
+      if (selectedDivision !== 'All' && bot.division !== selectedDivision) {
+        return false;
+      }
+      if (selectedTier !== 'All' && bot.tier !== selectedTier) {
+        return false;
+      }
+      if (selectedCategory !== 'All' && bot.category !== selectedCategory) {
+        return false;
+      }
+      if (parsePriceNumber(bot.price) > maxPrice) {
+        return false;
+      }
       if (
         query &&
         !bot.botName.toLowerCase().includes(query) &&
         !bot.description.toLowerCase().includes(query) &&
         !bot.category.toLowerCase().includes(query) &&
         !bot.features.some((f) => f.toLowerCase().includes(query))
-      )
+      ) {
         return false;
+      }
       return true;
     });
   }, [selectedDivision, selectedTier, selectedCategory, maxPrice, searchQuery]);

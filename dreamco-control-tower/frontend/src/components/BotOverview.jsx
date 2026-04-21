@@ -15,11 +15,17 @@ const STATUS_DOT = {
 };
 
 function formatHeartbeat(ts) {
-  if (!ts) return 'Never';
+  if (!ts) {
+    return 'Never';
+  }
   const diff = Date.now() - new Date(ts).getTime();
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) {
+    return 'Just now';
+  }
+  if (mins < 60) {
+    return `${mins}m ago`;
+  }
   return `${Math.floor(mins / 60)}h ago`;
 }
 
@@ -41,8 +47,12 @@ export default function BotOverview() {
       });
   }, []);
 
-  if (loading) return <p className="text-slate-400">Loading bots…</p>;
-  if (error) return <p className="text-dreamco-red">Error: {error}</p>;
+  if (loading) {
+    return <p className="text-slate-400">Loading bots…</p>;
+  }
+  if (error) {
+    return <p className="text-dreamco-red">Error: {error}</p>;
+  }
 
   return (
     <div>
