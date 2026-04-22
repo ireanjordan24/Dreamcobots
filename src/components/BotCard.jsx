@@ -34,7 +34,7 @@ const TIER_CLASS = {
 export default function BotCard({ bot }) {
   const [featuresExpanded, setFeaturesExpanded] = useState(false);
 
-  if (!bot) return null;
+  if (!bot) {return null;}
 
   const {
     botName,

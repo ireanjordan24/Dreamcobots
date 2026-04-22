@@ -112,3 +112,7 @@ class Bot:
             "leads_file": self.leads_file,
             "status": "active",
         }
+
+
+# Alias for external imports expecting the standard naming convention
+LeadGenBot = Bot

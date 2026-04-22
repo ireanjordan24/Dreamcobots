@@ -203,6 +203,18 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """String subclass exposing .value for tier-enum compatibility.
+
+    Allows ``bot.tier == "FREE"`` (string comparison) and
+    ``bot.tier.value == "free"`` (enum-style access) to both work.
+    """
+
+    @property
+    def value(self):
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
@@ -216,7 +228,8 @@ _orig_propertyviewingscheduler_bot_init = PropertyViewingSchedulerBot.__init__
 def _propertyviewingscheduler_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_propertyviewingscheduler_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    # Use _TierStr so both `bot.tier == "FREE"` and `bot.tier.value == "free"` work
+    self.tier = _TierStr(tier_val.upper())
 
 
 PropertyViewingSchedulerBot.__init__ = _propertyviewingscheduler_bot_new_init

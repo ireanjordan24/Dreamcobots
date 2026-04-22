@@ -49,6 +49,21 @@ class BuddyBot:
         self.billing: Optional["BillingSystem"] = billing
         self.default_token_cost: int = default_token_cost
         self._consumption: dict[str, dict] = {}
+        self._running: bool = False
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def start(self) -> None:
+        """Start the BuddyBot orchestrator."""
+        self._running = True
+        self.event_bus.publish("buddy_started", {})
+
+    def stop(self) -> None:
+        """Stop the BuddyBot orchestrator."""
+        self._running = False
+        self.event_bus.publish("buddy_stopped", {})
 
     # ------------------------------------------------------------------
     # Bot registry

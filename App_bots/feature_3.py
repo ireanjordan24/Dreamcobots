@@ -193,6 +193,18 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """String subclass exposing .value for tier-enum compatibility.
+
+    Allows ``bot.tier == "FREE"`` (string comparison) and
+    ``bot.tier.value == "free"`` (enum-style access) to both work.
+    """
+
+    @property
+    def value(self):
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
@@ -207,7 +219,8 @@ def _featureupdate_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
         tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
     _orig_featureupdate_bot_init(self, tier.value.upper())
-    self.tier = tier
+    # Use _TierStr so both `bot.tier == "FREE"` and `bot.tier.value == "free"` work
+    self.tier = _TierStr(tier.value.upper())
 
 
 FeatureUpdateBot.__init__ = _featureupdate_bot_new_init
