@@ -122,6 +122,27 @@ app.get('/api/bots', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/get-bots — list bots with enriched metadata envelope
+// ---------------------------------------------------------------------------
+app.get('/api/get-bots', (_req, res) => {
+  if (!fs.existsSync(BOTS_FILE)) {
+    return res.status(503).json({ success: false, error: 'bots.json not found' });
+  }
+  let bots;
+  try {
+    bots = JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+  return res.json({
+    success: true,
+    bots,
+    count: bots.length,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/status — overall system health summary
 // ---------------------------------------------------------------------------
 app.get('/api/status', (_req, res) => {
@@ -145,11 +166,14 @@ app.get('/api/status', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Start server
+// Start server (only when not in test mode)
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Control Tower API running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Control Tower API running on port ${PORT}`);
+  });
+}
 
+export { app };
 export default app;

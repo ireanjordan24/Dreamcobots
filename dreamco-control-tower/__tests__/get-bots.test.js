@@ -43,9 +43,9 @@ beforeAll(async () => {
   // Backup the original bots.json content
   originalBotsContent = fs.readFileSync(BOTS_FILE, 'utf8');
 
-  // Import app after setting NODE_ENV
+  // Import app — server uses ESM
   const module = await import('../backend/server.js');
-  app = module.app;
+  app = module.default;
 });
 
 afterAll(() => {
