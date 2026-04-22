@@ -379,7 +379,8 @@ def _detect_uncoded_bots() -> dict:
             for fname in py_files:
                 fpath = os.path.join(dirpath, fname)
                 try:
-                    content = open(fpath, encoding="utf-8", errors="replace").read()
+                    with open(fpath, encoding="utf-8", errors="replace") as _f:
+                        content = _f.read()
                 except OSError:
                     continue
                 if _re.search(r"def run\(", content):
@@ -1564,16 +1565,16 @@ def create_app(
         live_badge = '<span style="color:#22cc44;font-weight:700">● LIVE</span>' if is_live else '<span style="color:#888">○ Idle</span>'
 
         failure_rows = "".join(
-            f"<tr><td style='white-space:nowrap'>{e['timestamp'][:19].replace('T',' ')}</td>"
-            f"<td style='color:#ff6b6b'>{e['failure_type']}</td>"
-            f"<td>{e['message']}</td></tr>"
+            f"<tr><td style='white-space:nowrap'>{e.get('timestamp', '')[:19].replace('T', ' ') if e.get('timestamp') else '—'}</td>"
+            f"<td style='color:#ff6b6b'>{e.get('failure_type', '—')}</td>"
+            f"<td>{e.get('message', '—')}</td></tr>"
             for e in reversed(failures)
         ) or "<tr><td colspan='3' style='color:#22cc44'>✅ No failures</td></tr>"
 
         history_rows = "".join(
-            f"<tr><td style='white-space:nowrap'>{h.get('timestamp','')[:19].replace('T',' ')}</td>"
-            f"<td>{h.get('status','—')}</td>"
-            f"<td>{h.get('notes','')}</td></tr>"
+            f"<tr><td style='white-space:nowrap'>{h.get('timestamp', '')[:19].replace('T', ' ') if h.get('timestamp') else '—'}</td>"
+            f"<td>{h.get('status', '—')}</td>"
+            f"<td>{h.get('notes', '')}</td></tr>"
             for h in reversed(history)
         ) or "<tr><td colspan='3' style='color:#555'>No runs recorded</td></tr>"
 
