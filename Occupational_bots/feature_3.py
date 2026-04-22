@@ -229,6 +229,18 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """String subclass exposing .value for tier-enum compatibility.
+
+    Allows ``bot.tier == "FREE"`` (string comparison) and
+    ``bot.tier.value == "free"`` (enum-style access) to both work.
+    """
+
+    @property
+    def value(self):
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
@@ -242,7 +254,8 @@ _orig_interviewprep_bot_init = InterviewPrepBot.__init__
 def _interviewprep_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_interviewprep_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    # Use _TierStr so both `bot.tier == "FREE"` and `bot.tier.value == "free"` work
+    self.tier = _TierStr(tier_val.upper())
 
 
 InterviewPrepBot.__init__ = _interviewprep_bot_new_init
@@ -320,7 +333,7 @@ _INTERVIEW_QUESTIONS = [
 def _interviewprepbot_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_interviewprep_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = _TierStr(tier_val.upper())
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_ip.uuid4())
     self.name = "Interview Prep Bot"

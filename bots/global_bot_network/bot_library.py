@@ -841,4 +841,57 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "god_mode",
         ],
     ),
+    BotEntry(
+        bot_id="public_lead_engine",
+        display_name="Public Lead Engine",
+        description=(
+            "DreamCo public lead-generation engine. Scans businesses from Google "
+            "Places, Yelp, and other public sources, scores them for marketing "
+            "opportunity, generates ad scripts, and builds outreach drafts for "
+            "qualified leads."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.public_lead_engine.public_lead_engine",
+        class_name="PublicLeadEngine",
+        capabilities=[
+            "google_places_search",
+            "yelp_search",
+            "rating_filter",
+            "weak_marketing_filter",
+            "ad_score",
+            "script_generation",
+            "outreach_draft",
+            "crm_export",
+            "multi_api",
+            "ai_opportunity_score",
+            "bulk_search",
+            "analytics",
+        ],
+    ),
+    BotEntry(
+        bot_id="cinecore_lead_engine",
+        display_name="CineCore Lead Engine",
+        description=(
+            "The original DreamCo CineCore™ lead engine. Scans businesses from "
+            "multiple sources, scores commercial opportunity, generates ad scripts, "
+            "builds outreach drafts, and exports qualified leads to CRM systems."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
+        class_name="CineCoreLeadEngine",
+        capabilities=[
+            "business_scan",
+            "google_places_search",
+            "yelp_search",
+            "rating_filter",
+            "weak_marketing_filter",
+            "ad_score",
+            "script_generation",
+            "outreach_draft",
+            "crm_export",
+            "bulk_search",
+            "analytics",
+            "white_label",
+        ],
+    ),
 ]

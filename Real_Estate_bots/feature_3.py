@@ -204,11 +204,27 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """String subclass exposing .value for tier-enum compatibility.
+
+    Allows ``bot.tier == "FREE"`` (string comparison) and
+    ``bot.tier.value == "free"`` (enum-style access) to both work.
+    """
+
+    @property
+    def value(self):
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
-class MarketAnalysisBotTierError(Exception):
-    """Raised when a feature is not available on the current tier."""
+class MarketAnalysisBotTierError(PermissionError):
+    """Raised when a feature is not available on the current tier.
+
+    Inherits from PermissionError so callers using ``pytest.raises(PermissionError)``
+    also catch this exception.
+    """
 
 
 _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
@@ -217,7 +233,8 @@ _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
 def _marketanalysis_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_marketanalysis_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    # Use _TierStr so both `bot.tier == "FREE"` and `bot.tier.value == "free"` work
+    self.tier = _TierStr(tier_val.upper())
 
 
 MarketAnalysisBot.__init__ = _marketanalysis_bot_new_init
@@ -225,7 +242,7 @@ MarketAnalysisBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
 
 
 def _marketanalysis_bot_monthly_price(self):
-    return _TIER_MONTHLY_PRICE[self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()]
+    return _TIER_MONTHLY_PRICE[self.tier.value]
 
 
 def _marketanalysis_bot_get_tier_info(self):
@@ -261,7 +278,13 @@ def _marketanalysis_bot_analyze(self):
 def _marketanalysis_bot_export_report(self, city=None):
     self._enforce_tier("enterprise")
     t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    return {"bot": "MarketAnalysisBot", "tier": t, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {
+        "report_type": "Investment Market Report",
+        "bot": "MarketAnalysisBot",
+        "tier": t,
+        "total_items": len(EXAMPLES),
+        "items": EXAMPLES,
+    }
 
 
 MarketAnalysisBot.monthly_price = _marketanalysis_bot_monthly_price

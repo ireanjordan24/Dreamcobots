@@ -18,9 +18,12 @@ Buddy Bot rules
 
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING, Optional
 
 from BuddyAI.event_bus import EventBus
+from BuddyAI.task_engine import TaskEngine
+from BuddyAI.library_manager import LibraryManager
 
 if TYPE_CHECKING:
     from bots.token_billing.billing_system import BillingSystem
@@ -49,6 +52,107 @@ class BuddyBot:
         self.billing: Optional["BillingSystem"] = billing
         self.default_token_cost: int = default_token_cost
         self._consumption: dict[str, dict] = {}
+        self._running: bool = False
+        self._library_manager: LibraryManager = LibraryManager()
+
+        # Task engine: dispatch text commands to registered capability handlers
+        self.task_engine: TaskEngine = TaskEngine()
+        self._register_default_capabilities()
+
+    # ------------------------------------------------------------------
+    # Default capability registration
+    # ------------------------------------------------------------------
+
+    def _register_default_capabilities(self) -> None:
+        """Register built-in capabilities from all default plugins."""
+        from BuddyAI.plugins import productivity, api_integrator, data_entry
+
+        productivity.register(self.task_engine)
+        api_integrator.register(self.task_engine)
+        data_entry.register(self.task_engine)
+
+        # install_library capability (backed by LibraryManager)
+        def _handle_install_library(params: dict) -> dict:
+            package = params.get("package", "")
+            return self._install_capability_handler(package)
+
+        self.task_engine.register_capability("install_library", _handle_install_library)
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def start(self) -> None:
+        """Start the BuddyBot orchestrator."""
+        self._running = True
+        self.event_bus.publish("buddy_started", {})
+
+    def stop(self) -> None:
+        """Stop the BuddyBot orchestrator."""
+        self._running = False
+        self.event_bus.publish("buddy_stopped", {})
+
+    # ------------------------------------------------------------------
+    # Chat interface
+    # ------------------------------------------------------------------
+
+    def chat(self, text: str, user_id: str = "anonymous") -> dict:
+        """Process a text command and return a response dict.
+
+        Publishes a ``buddy.input.text`` event with ``{"text": text}`` and
+        then dispatches to the task engine.  Always returns a dict with at
+        least ``{"success": bool, "message": str}``.
+        """
+        self.event_bus.publish("buddy.input.text", {"text": text})
+        result = self.task_engine.process_text(text)
+        if result is None:
+            result = {"success": False, "message": "Unknown command.  Type 'help' to see available commands."}
+        if not isinstance(result, dict):
+            result = {"success": True, "message": str(result)}
+        result.setdefault("success", True)
+        result.setdefault("message", "")
+        return result
+
+    def benchmark_task(self, text: str, iterations: int = 5) -> dict:
+        """Run *text* through the task engine *iterations* times and report timing.
+
+        Returns a dict with ``{"success": bool, "benchmark": {...}}``.
+        """
+        timings = []
+        last_result: dict = {}
+        for _ in range(iterations):
+            t0 = time.monotonic()
+            last_result = self.chat(text)
+            timings.append(time.monotonic() - t0)
+        avg = sum(timings) / len(timings) if timings else 0.0
+        return {
+            "success": True,
+            "message": last_result.get("message", ""),
+            "benchmark": {
+                "iterations": iterations,
+                "avg_ms": round(avg * 1000, 3),
+                "min_ms": round(min(timings) * 1000, 3),
+                "max_ms": round(max(timings) * 1000, 3),
+            },
+        }
+
+    def install_capability(self, package: str) -> dict:
+        """Attempt to install *package* at runtime using the LibraryManager.
+
+        Blocked packages (os, sys, subprocess, …) always return
+        ``{"success": False}``.
+        """
+        return self._install_capability_handler(package)
+
+    def _install_capability_handler(self, package: str) -> dict:
+        """Shared logic for the install_capability method and task-engine handler."""
+        if package in self._library_manager._BLOCKED_PACKAGES:
+            return {"success": False, "message": f"Package '{package}' is not allowed to be installed at runtime."}
+        try:
+            self._library_manager.install_library(package)
+            return {"success": True, "message": f"Package '{package}' installed successfully."}
+        except Exception as exc:  # pragma: no cover
+            return {"success": False, "message": str(exc)}
 
     # ------------------------------------------------------------------
     # Bot registry

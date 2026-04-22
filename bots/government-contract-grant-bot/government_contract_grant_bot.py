@@ -548,11 +548,10 @@ class GovernmentContractGrantBot:
             results = results[:limit]
         return results
 
-    def search_contracts(self, keyword: str = "", **kwargs) -> dict:
-        """Search federal contracts only."""
+    def search_contracts(self, keyword: str = "", **kwargs) -> list:
+        """Search federal contracts only. Returns a list of contract records."""
         query = kwargs.pop("query", keyword)
-        results = self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
-        return {"contracts": results, "count": len(results), "keyword": query}
+        return self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
 
     def search_grants(self, keyword: str = "", **kwargs) -> list[dict]:
         """Search grants only.  Requires PRO or ENTERPRISE tier."""
@@ -730,6 +729,7 @@ class GovernmentContractGrantBot:
             raw_data={"domain": "government_contracts_and_grants", "records": len(MOCK_CONTRACTS)},
             learning_method="supervised",
         )
+        print(f"GovernmentContractGrantBot pipeline complete: {result.get('pipeline_complete', False)}")
         return result
 
     def start(self) -> None:
