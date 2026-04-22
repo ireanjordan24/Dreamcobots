@@ -2,7 +2,6 @@
   "name": "dreamco-control-tower",
   "version": "1.0.0",
   "description": "DreamCo Control Tower — centralized bot management hub integrated with GitHub",
-  "type": "module",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",

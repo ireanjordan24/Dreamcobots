@@ -1,94 +1,57 @@
 {
   "version": "1.0.0",
-  "platform": "Make.com/Zapier",
+  "platform": "DreamCo",
+  "global_settings": {
+    "max_concurrent_workflows": 25,
+    "default_retry_attempts": 3,
+    "notify_on_failure": true,
+    "log_level": "info"
+  },
   "workflows": [
     {
-      "id": "wf-001",
-      "name": "Hourly Deal Scanner",
-      "trigger": "schedule:hourly",
-      "action": "dealBot.run",
-      "description": "Scans all deal sources hourly for new profitable opportunities",
-      "enabled": true
-    },
-    {
-      "id": "wf-002",
-      "name": "Penny Scanner",
+      "id": "fiverr",
+      "name": "Fiverr Gig Automation",
+      "file": "workflows/fiverr.json",
+      "action": "fiverr_bot.run",
       "trigger": "schedule:every_6_hours",
-      "action": "pennyBot.run",
-      "description": "Scans stores for penny/clearance deals every 6 hours",
-      "enabled": true
+      "enabled": true,
+      "priority": 1
     },
     {
-      "id": "wf-003",
-      "name": "Cashback Tracker",
-      "trigger": "webhook:receipt_upload",
-      "action": "receiptBot.run",
-      "description": "Processes receipt uploads and matches cashback opportunities",
-      "enabled": true
-    },
-    {
-      "id": "wf-004",
-      "name": "Flip Finder",
-      "trigger": "schedule:every_4_hours",
-      "action": "flipBot.run",
-      "description": "Scans Facebook Marketplace and local listings for flip opportunities",
-      "enabled": true
-    },
-    {
-      "id": "wf-005",
-      "name": "Coupon Stacker",
+      "id": "real_estate",
+      "name": "Real Estate Deal Pipeline",
+      "file": "workflows/real_estate.json",
+      "action": "real_estate_bot.run",
       "trigger": "schedule:daily",
-      "action": "couponBot.run",
-      "description": "Aggregates and stacks coupons from all sources daily",
-      "enabled": true
+      "enabled": true,
+      "priority": 2
     },
     {
-      "id": "wf-006",
-      "name": "Profit Calculator",
-      "trigger": "webhook:new_deal",
-      "action": "profitEngine.calculateDeal",
-      "description": "Auto-calculates profit for every new deal found",
-      "enabled": true
-    },
-    {
-      "id": "wf-007",
-      "name": "Deal Ranker",
-      "trigger": "schedule:every_2_hours",
-      "action": "rankingAI.rank",
-      "description": "Re-ranks all active deals by AI score every 2 hours",
-      "enabled": true
-    },
-    {
-      "id": "wf-008",
-      "name": "Alert Sender",
-      "trigger": "webhook:high_profit_deal",
-      "action": "alertEngine.filterAlerts",
-      "description": "Sends push notifications for HIGH urgency deals",
-      "enabled": true
-    },
-    {
-      "id": "wf-009",
-      "name": "Revenue Monitor",
-      "trigger": "schedule:daily",
-      "action": "revenueEngine.track",
-      "description": "Tracks daily/weekly/monthly revenue across all bots",
-      "enabled": true
-    },
-    {
-      "id": "wf-010",
-      "name": "Legal Payout Tracker",
+      "id": "grants",
+      "name": "Government Grants Automation",
+      "file": "workflows/grants.json",
+      "action": "grants_bot.run",
       "trigger": "schedule:weekly",
-      "action": "legalMoneyBot.scan",
-      "description": "Scans PACER/FTC for new settlement/payout opportunities weekly",
-      "enabled": true
+      "enabled": true,
+      "priority": 3
     },
     {
-      "id": "wf-011",
-      "name": "Grant Scanner",
+      "id": "legal_money",
+      "name": "Legal Claims Automation",
+      "file": "workflows/legal_money.json",
+      "action": "legal_bot.run",
       "trigger": "schedule:weekly",
-      "action": "grantBot.scan",
-      "description": "Scans government and private grant databases weekly",
-      "enabled": true
+      "enabled": true,
+      "priority": 4
+    },
+    {
+      "id": "crypto",
+      "name": "Crypto Trading Automation",
+      "file": "workflows/crypto.json",
+      "action": "crypto_bot.run",
+      "trigger": "schedule:every_15_minutes",
+      "enabled": true,
+      "priority": 5
     }
   ]
 }
