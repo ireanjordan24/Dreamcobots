@@ -1,0 +1,33 @@
+name: Interactive Terminal
+
+on:
+  workflow_dispatch: # Trigger only when manually run
+    inputs:
+      debug_session:
+        description: "Start a debug terminal session?"
+
+jobs:
+  debug:
+    name: Debug Runner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Up tmate
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmate
+
+      - name: Start tmate Session
+        run: |
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
+          echo "Use this SSH connection to interact with the runner:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "Or open the Web terminal here:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+
+      - name: Keep Runner Running
+        run: sleep infinity
