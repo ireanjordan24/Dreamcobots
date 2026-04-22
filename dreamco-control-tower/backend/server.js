@@ -1,19 +1,20 @@
+'use strict';
+
 /**
  * DreamCo Control Tower — Express.js API Server
  *
  * Endpoints:
  *   POST /api/bot-heartbeat        — update bot status via heartbeat
  *   POST /api/github-webhook       — receive GitHub repository events
- *   GET  /api/bots                 — list all registered bots and their status
+ *   GET  /api/get-bots             — list all registered bots and their status
+ *   GET  /api/bots                 — list all registered bots (alias)
  *   GET  /api/status               — overall system health
  */
 
-import express from 'express';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BOTS_FILE = path.join(__dirname, '../config/bots.json');
 
 const app = express();
@@ -42,7 +43,13 @@ app.post('/api/bot-heartbeat', (req, res) => {
     return res.status(400).json({ error: 'botName is required' });
   }
 
-  const bots = readBots();
+  let bots;
+  try {
+    bots = readBots();
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+
   const bot = bots.find((b) => b.name === botName);
 
   if (!bot) {
@@ -114,6 +121,32 @@ app.post('/api/github-webhook', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/get-bots — list all bots with current status (structured response)
+// ---------------------------------------------------------------------------
+app.get('/api/get-bots', (_req, res) => {
+  let raw;
+  try {
+    raw = fs.readFileSync(BOTS_FILE, 'utf8');
+  } catch (err) {
+    return res.status(503).json({ success: false, error: `Unable to read bots file: ${err.message}` });
+  }
+
+  let bots;
+  try {
+    bots = JSON.parse(raw);
+  } catch (err) {
+    return res.status(500).json({ success: false, error: `Malformed bots file: ${err.message}` });
+  }
+
+  return res.json({
+    success: true,
+    count: bots.length,
+    bots,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/bots — list all bots with current status
 // ---------------------------------------------------------------------------
 app.get('/api/bots', (_req, res) => {
@@ -145,11 +178,13 @@ app.get('/api/status', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Start server
+// Start server (only when run directly, not when required by tests)
 // ---------------------------------------------------------------------------
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Control Tower API running on port ${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Control Tower API running on port ${PORT}`);
+  });
+}
 
-export default app;
+module.exports = app;

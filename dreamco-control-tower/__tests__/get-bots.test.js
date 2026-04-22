@@ -1,10 +1,8 @@
-import request from 'supertest';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+'use strict';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const request = require('supertest');
+const fs = require('fs');
+const path = require('path');
 
 // Set test environment before importing server
 process.env.NODE_ENV = 'test';
@@ -43,9 +41,8 @@ beforeAll(async () => {
   // Backup the original bots.json content
   originalBotsContent = fs.readFileSync(BOTS_FILE, 'utf8');
 
-  // Import app after setting NODE_ENV
-  const module = await import('../backend/server.js');
-  app = module.app;
+  // Require app after setting NODE_ENV
+  app = require('../backend/server.js');
 });
 
 afterAll(() => {
