@@ -257,7 +257,10 @@ _orig_usersupport_bot_init = UserSupportBot.__init__
 
 def _usersupport_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+        tier_str = str(tier).lower()
+        if tier_str not in ("free", "pro", "enterprise"):
+            raise ValueError(f"Invalid tier: {tier!r}. Must be one of: free, pro, enterprise")
+        tier = Tier(tier_str)
     _orig_usersupport_bot_init(self, tier.value.upper())
     # Use _TierStr so both `bot.tier == "FREE"` and `bot.tier.value == "free"` work
     self.tier = _TierStr(tier.value.upper())

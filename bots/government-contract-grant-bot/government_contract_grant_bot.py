@@ -548,11 +548,10 @@ class GovernmentContractGrantBot:
             results = results[:limit]
         return results
 
-    def search_contracts(self, keyword: str = "", **kwargs) -> dict:
-        """Search federal contracts only."""
+    def search_contracts(self, keyword: str = "", **kwargs) -> list:
+        """Search federal contracts only. Returns a list of contract records."""
         query = kwargs.pop("query", keyword)
-        results = self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
-        return {"contracts": results, "count": len(results), "keyword": query}
+        return self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
 
     def search_grants(self, keyword: str = "", **kwargs) -> list[dict]:
         """Search grants only.  Requires PRO or ENTERPRISE tier."""

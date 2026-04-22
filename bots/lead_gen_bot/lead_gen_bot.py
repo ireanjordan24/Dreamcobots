@@ -42,6 +42,19 @@ INDUSTRIES = [
 ]
 
 
+class _SimpleRevenueEngine:
+    """Minimal stub revenue engine used when no real revenue_engine is passed."""
+
+    def __init__(self) -> None:
+        self._total: float = 0.0
+
+    def add(self, amount: float) -> None:
+        self._total += amount
+
+    def total(self) -> float:
+        return self._total
+
+
 class Bot:
     """
     Lead Generation Bot.
@@ -52,10 +65,12 @@ class Bot:
     for production use.
     """
 
-    def __init__(self, leads_file: str = _DEFAULT_LEADS_FILE) -> None:
+    def __init__(self, leads_file: str = _DEFAULT_LEADS_FILE, **kwargs) -> None:
         self.name = "Lead Generator Bot"
         self.leads_file = leads_file
         self._total_generated: int = 0
+        self._scraped_leads: List[Dict] = []
+        self.revenue_engine = _SimpleRevenueEngine()
         os.makedirs(os.path.dirname(os.path.abspath(self.leads_file)), exist_ok=True)
 
     # ------------------------------------------------------------------
@@ -112,6 +127,65 @@ class Bot:
             "leads_file": self.leads_file,
             "status": "active",
         }
+
+    def scrape_html(self, html: str) -> List[Dict]:
+        """Extract leads (name + email) from an HTML snippet.
+
+        Parses ``href="mailto:..."`` links and bare email addresses using
+        a simple regex.  Returns a list of dicts with the fields required by
+        the ``LeadResponse`` schema (name, email, phone, company, url).
+        """
+        import re
+        email_re = re.compile(
+            r"(?:mailto:)?([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})"
+        )
+        found = []
+        for match in email_re.finditer(html or ""):
+            email = match.group(1)
+            name = email.split("@")[0].replace(".", " ").replace("_", " ").title()
+            found.append({
+                "name": name,
+                "email": email,
+                "phone": "",
+                "company": email.split("@")[1] if "@" in email else "",
+                "url": "",
+                "type": "scraped",
+            })
+        return found
+
+    def add_html_source(self, html: str) -> None:
+        """Store an HTML snippet for later scraping.
+
+        Scraped leads are accessible via :meth:`get_leads` after calling
+        :meth:`run` or :meth:`scrape_html`.
+        """
+        leads = self.scrape_html(html)
+        self._scraped_leads.extend(leads)
+
+    def add_lead(self, lead: Dict) -> None:
+        """Append a lead dict to the internal scraped leads list."""
+        self._scraped_leads.append(lead)
+
+    def get_leads(self) -> List[Dict]:
+        """Return all scraped/added leads."""
+        return list(self._scraped_leads)
+
+    def get_outreach_emails(self) -> List[str]:
+        """Return a mock list of outreach emails (one per scraped lead)."""
+        return [lead["email"] for lead in self._scraped_leads if lead.get("email")]
+
+    def export_csv(self) -> str:
+        """Export scraped leads to a CSV string."""
+        import csv
+        import io
+        if not self._scraped_leads:
+            return "name,email,type\n"
+        output = io.StringIO()
+        fields = list(self._scraped_leads[0].keys())
+        writer = csv.DictWriter(output, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(self._scraped_leads)
+        return output.getvalue()
 
 
 # Alias for external imports expecting the standard naming convention

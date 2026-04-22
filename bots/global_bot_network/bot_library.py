@@ -880,6 +880,7 @@ _DREAMCO_BOTS: list[BotEntry] = [
         module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
         class_name="CineCoreLeadEngine",
         capabilities=[
+            "business_scan",
             "google_places_search",
             "yelp_search",
             "rating_filter",
