@@ -17,6 +17,7 @@ on:
       - "DreamCo/bots/marketing/**"
       - "DreamCo/orchestrator/**"
       - "tests/test_god_mode_bot.py"
+  workflow_dispatch:
 
 jobs:
   python-god-mode-tests:
