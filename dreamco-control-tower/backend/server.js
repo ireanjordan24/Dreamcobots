@@ -144,7 +144,7 @@ app.post('/api/github-webhook', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// GET /api/bots — alias for get-bots
+// GET /api/bots — alias for get-bots (same response structure)
 // ---------------------------------------------------------------------------
 app.get('/api/bots', (_req, res) => {
   let bots;
@@ -156,7 +156,12 @@ app.get('/api/bots', (_req, res) => {
     }
     return res.status(500).json({ success: false, error: `Failed to read bots.json: ${err.message}` });
   }
-  return res.json(bots);
+  return res.json({
+    success: true,
+    bots,
+    count: bots.length,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -18,6 +18,8 @@ Responsibilities
 """
 
 import json
+import math
+import base64
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -363,7 +365,6 @@ class GitHubAnalyzerBot:
             return None
 
         # GitHub returns file content as base64 when using the contents API.
-        import base64
         content = data.get("content", "")
         encoding = data.get("encoding", "base64")
         if encoding == "base64":
@@ -419,7 +420,6 @@ class GitHubAnalyzerBot:
         has_topics = min(len(repo.get("topics", [])), 5)
 
         # Logarithmic star score (0–60 points)
-        import math
         star_score = min(math.log1p(stars) / math.log1p(10000) * 60, 60)
         # Fork score (0–20 points)
         fork_score = min(math.log1p(forks) / math.log1p(1000) * 20, 20)
