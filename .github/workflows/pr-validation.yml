@@ -2,11 +2,13 @@
 #
 # Runs on every pull request to validate:
 #   1. JavaScript code style (ESLint + Prettier) — JS/TS files only
-#   2. Node.js tests (Jest)
-#   3. Python bot checks (flake8 + Black) + pytest + framework compliance
+#   2. Python bot checks (flake8 + Black) + pytest + framework compliance
+#   3. Bot-level test validation via bot_test_validator.py
 #   4. Java bot checks (Checkstyle + google-java-format)
 #   5. Deployment simulation (smoke test)
 #   6. Posts a summary comment with actionable feedback
+#
+# Note: Jest is not used. All testing is Python/pytest-based.
 
 name: PR Validation
 
@@ -134,36 +136,7 @@ jobs:
           path: /tmp/prettier-output.txt
           retention-days: 7
 
-  # ── 3. Node.js Tests (Jest) ────────────────────────────────────────────────
-  test-node:
-    name: Node.js Tests (Jest)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Run Jest tests
-        shell: bash
-        run: npm test -- --ci --reporters=default 2>&1 | tee /tmp/jest-output.txt; exit ${PIPESTATUS[0]}
-
-      - name: Upload Jest results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jest-results
-          path: /tmp/jest-output.txt
-          retention-days: 7
-
-  # ── 4. Python Bot Lint + Format (Flake8 + Black) ─────────────────────────
+  # ── 3. Python Bot Lint + Format (Flake8 + Black) ─────────────────────────
   lint-python:
     name: Python Lint & Format (Flake8 + Black)
     runs-on: ubuntu-latest
@@ -211,7 +184,7 @@ jobs:
           path: /tmp/flake8-output.txt
           retention-days: 7
 
-  # ── 5. Python Bot Framework Compliance + Tests ────────────────────────────
+  # ── 4. Python Bot Framework Compliance + Tests ────────────────────────────
   test-python:
     name: Python Tests & Bot Framework Compliance
     runs-on: ubuntu-latest
@@ -245,12 +218,30 @@ jobs:
             2>&1 | tee /tmp/pytest-output.txt
           exit ${PIPESTATUS[0]}
 
+      - name: Run Bot Test Validator (per-bot reporting)
+        if: always()
+        shell: bash
+        run: |
+          python tools/bot_test_validator.py \
+            --tests-dir tests/ \
+            --max-retries 1 \
+            --report /tmp/bot-validator-report.md \
+            2>&1 | tee /tmp/bot-validator-output.txt || true
+
       - name: Upload pytest results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pytest-results-${{ matrix.python-version }}
           path: /tmp/pytest-output.txt
+          retention-days: 7
+
+      - name: Upload bot validator report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-validator-report-${{ matrix.python-version }}
+          path: /tmp/bot-validator-report.md
           retention-days: 7
 
   # ── 6. Java Bot Lint + Format (Checkstyle + google-java-format) ───────────
@@ -338,11 +329,11 @@ jobs:
           path: /tmp/checkstyle-output.txt
           retention-days: 7
 
-  # ── 7. Deployment Simulation ───────────────────────────────────────────────
+  # ── 5. Deployment Simulation ───────────────────────────────────────────────
   deploy-simulation:
     name: Deployment Simulation
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, lint-python, test-python, lint-java]
+    needs: [lint-js, format-check, lint-python, test-python, lint-java]
     if: |
       always() &&
       !contains(needs.*.result, 'failure') &&
@@ -371,11 +362,11 @@ jobs:
           node deploy.js --dry-run 2>/dev/null || echo "Deployment script ran (dry-run mode)"
           echo "✅ Deployment simulation complete — no production systems affected."
 
-  # ── 8. PR Feedback Summary ─────────────────────────────────────────────────
+  # ── 6. PR Feedback Summary ─────────────────────────────────────────────────
   feedback:
     name: Post PR Feedback
     runs-on: ubuntu-latest
-    needs: [lint-js, format-check, test-node, lint-python, test-python, lint-java, deploy-simulation]
+    needs: [lint-js, format-check, lint-python, test-python, lint-java, deploy-simulation]
     if: always()
     steps:
       - name: Download ESLint results
@@ -392,13 +383,6 @@ jobs:
           path: /tmp/artifacts/prettier
         continue-on-error: true
 
-      - name: Download Jest results
-        uses: actions/download-artifact@v4
-        with:
-          name: jest-results
-          path: /tmp/artifacts/jest
-        continue-on-error: true
-
       - name: Build and post feedback comment
         uses: actions/github-script@v7
         with:
@@ -406,7 +390,6 @@ jobs:
           script: |
             const eslintResult      = '${{ needs.lint-js.result }}';
             const prettierResult    = '${{ needs.format-check.result }}';
-            const jestResult        = '${{ needs.test-node.result }}';
             const pythonLintResult  = '${{ needs.lint-python.result }}';
             const pytestResult      = '${{ needs.test-python.result }}';
             const javaLintResult    = '${{ needs.lint-java.result }}';
@@ -419,12 +402,11 @@ jobs:
             const lines = [
               '## 🤖 DreamCobots PR Validation Report',
               '',
-              '### JavaScript / TypeScript Checks',
+              '### JavaScript / TypeScript Style Checks',
               `| Check | Status |`,
               `|-------|--------|`,
               `| ESLint (JS/TS Linting)        | ${icon(eslintResult)} ${eslintResult} |`,
               `| Prettier (JS/TS Formatting)   | ${icon(prettierResult)} ${prettierResult} |`,
-              `| Jest (Node.js Tests)          | ${icon(jestResult)} ${jestResult} |`,
               '',
               '### Python Bot Checks',
               `| Check | Status |`,
@@ -444,7 +426,7 @@ jobs:
               '',
             ];
 
-            const checkResults = [eslintResult, prettierResult, jestResult, pythonLintResult, pytestResult, javaLintResult];
+            const checkResults = [eslintResult, prettierResult, pythonLintResult, pytestResult, javaLintResult];
             const relevantResults = checkResults.filter(r => r !== 'skipped');
             const allPassed = relevantResults.every(r => r === 'success');
 
@@ -459,15 +441,13 @@ jobs:
               if (prettierResult === 'failure') {
                 lines.push('**Prettier:** Run `npm run format:fix` locally to auto-format JS/TS files.');
               }
-              if (jestResult === 'failure') {
-                lines.push('**Jest:** Run `npm test` locally and fix failing tests.');
-              }
               if (pythonLintResult === 'failure') {
                 lines.push('**Python Lint:** Run `flake8 python_bots/ --max-line-length=120` and `black python_bots/` locally.');
               }
               if (pytestResult === 'failure') {
                 lines.push('**pytest:** Run `python -m pytest tests/ -q --tb=short` and fix failing Python tests.');
                 lines.push('Also verify: `python tools/check_bot_framework.py` passes.');
+                lines.push('For per-bot details run: `python tools/bot_test_validator.py`');
               }
               if (javaLintResult === 'failure') {
                 lines.push('**Java Lint:** Fix Checkstyle and google-java-format issues in `java_bots/`.');
