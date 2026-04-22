@@ -218,10 +218,13 @@ jobs:
             2>&1 | tee /tmp/pytest-output.txt
           exit ${PIPESTATUS[0]}
 
-      - name: Run Bot Test Validator (per-bot reporting)
+      - name: Run Bot Test Validator (per-bot reporting, informational)
         if: always()
         shell: bash
         run: |
+          # The bot_test_validator provides per-bot detail reporting.
+          # The preceding pytest step is the actual deployment gate.
+          # Use || true so this step never masks the pytest result.
           python tools/bot_test_validator.py \
             --tests-dir tests/ \
             --max-retries 1 \

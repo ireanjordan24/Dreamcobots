@@ -54,7 +54,7 @@ _FAILURE_PATTERNS = [
         re.compile(r"AttributeError", re.IGNORECASE),
         "attribute_error",
         "Missing attribute or method on a class/object.",
-        "Check the class definition and ensure all required attributes are initialised.",
+        "Check the class definition and ensure all required attributes are initialized.",
         False,
     ),
     (
@@ -239,7 +239,7 @@ class GuardianDebugger:
 
         Expected schema per workflow entry::
 
-            { "file": str, "priority": int, "global_settings": dict }
+            { "id": str, "name": str, "trigger": str, "action": str }
 
         Returns a dict with keys: path, valid, issues, fix_applied.
         """

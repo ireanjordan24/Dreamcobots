@@ -41,6 +41,7 @@ from typing import List, Optional
 
 DEFAULT_MAX_RETRIES = 2
 DEFAULT_REPORT_FILE = "logs/guardian_monitor_report.md"
+VALIDATOR_TIMEOUT_SECONDS = 600  # 10 minutes for full test suite run
 
 
 def _utcnow() -> str:
@@ -189,7 +190,7 @@ class GuardianMonitor:
             ],
             capture_output=True,
             text=True,
-            timeout=600,
+            timeout=VALIDATOR_TIMEOUT_SECONDS,
         )
         return result.returncode, result.stdout + result.stderr
 

@@ -250,7 +250,14 @@ class BotTestValidator:
     def run_test_file(self, test_file: Path) -> TestResult:
         """Run pytest on a single test file with retry on failure."""
         retries = 0
-        last_result: Optional[TestResult] = None
+        last_result: TestResult = TestResult(
+            test_file=str(test_file),
+            passed=False,
+            exit_code=-1,
+            stdout="",
+            stderr="Not yet run",
+            duration=0.0,
+        )
 
         while retries <= self.max_retries:
             if retries > 0:
@@ -302,7 +309,7 @@ class BotTestValidator:
                 break
             retries += 1
 
-        return last_result  # type: ignore[return-value]
+        return last_result
 
     def run_all(self) -> ValidationReport:
         """Discover and run all bot tests, returning a ValidationReport."""
