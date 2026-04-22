@@ -398,21 +398,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BOTS_CONFIG = path.join(__dirname, '..', 'config', 'bots.json');
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function loadBots() {
-  return JSON.parse(readFileSync(BOTS_CONFIG, 'utf8'));
-}
-
-function exec(cmd, opts = {}) {
-  return execSync(cmd, { stdio: 'pipe', encoding: 'utf8', ...opts });
-}
-
 /**
  * Pull latest and auto-resolve conflicts using the "theirs" merge strategy.
  *

@@ -232,7 +232,7 @@ class WorkflowEngine:
         context: Dict[str, Any],
     ) -> List[dict]:
         """Execute a list of steps concurrently and collect results."""
-        step_results: List[dict] = [{}] * len(steps)
+        step_results: List[dict] = [{} for _ in steps]
         with ThreadPoolExecutor(max_workers=min(self.max_workers, len(steps))) as pool:
             future_to_index = {
                 pool.submit(self._execute_step_with_retry, step, dict(context)): idx
