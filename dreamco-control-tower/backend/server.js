@@ -5,6 +5,7 @@
  *   POST /api/bot-heartbeat        — update bot status via heartbeat
  *   POST /api/github-webhook       — receive GitHub repository events
  *   GET  /api/bots                 — list all registered bots and their status
+ *   GET  /api/get-bots             — list bots with metadata envelope
  *   GET  /api/status               — overall system health
  */
 
@@ -18,6 +19,36 @@ const BOTS_FILE = path.join(__dirname, '../config/bots.json');
 
 const app = express();
 app.use(express.json());
+
+// ---------------------------------------------------------------------------
+// Simple in-process rate limiter (sliding window)
+// Protects file-system endpoints from excessive reads.
+// ---------------------------------------------------------------------------
+
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 60; // max requests per window per IP
+
+const _rateLimitStore = new Map();
+
+function rateLimiter(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+  const entry = _rateLimitStore.get(ip) ?? { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+
+  if (now > entry.resetAt) {
+    entry.count = 0;
+    entry.resetAt = now + RATE_LIMIT_WINDOW_MS;
+  }
+
+  entry.count += 1;
+  _rateLimitStore.set(ip, entry);
+
+  if (entry.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({ error: 'Too many requests — please slow down.' });
+  }
+
+  return next();
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -116,15 +147,36 @@ app.post('/api/github-webhook', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/bots — list all bots with current status
 // ---------------------------------------------------------------------------
-app.get('/api/bots', (_req, res) => {
+app.get('/api/bots', rateLimiter, (_req, res) => {
   const bots = readBots();
   return res.json(bots);
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/get-bots — list bots with enriched metadata envelope
+// ---------------------------------------------------------------------------
+app.get('/api/get-bots', rateLimiter, (_req, res) => {
+  if (!fs.existsSync(BOTS_FILE)) {
+    return res.status(503).json({ success: false, error: 'bots.json not found' });
+  }
+  let bots;
+  try {
+    bots = JSON.parse(fs.readFileSync(BOTS_FILE, 'utf8'));
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+  return res.json({
+    success: true,
+    bots,
+    count: bots.length,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/status — overall system health summary
 // ---------------------------------------------------------------------------
-app.get('/api/status', (_req, res) => {
+app.get('/api/status', rateLimiter, (_req, res) => {
   const bots = readBots();
   const total = bots.length;
   const active = bots.filter((b) => b.status === 'active').length;
@@ -145,11 +197,14 @@ app.get('/api/status', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Start server
+// Start server (only when not in test mode)
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Control Tower API running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Control Tower API running on port ${PORT}`);
+  });
+}
 
+export { app };
 export default app;
