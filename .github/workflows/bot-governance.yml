@@ -1,0 +1,342 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DreamCo Bot Governance & Control Tower
+#
+# Provides centralized runtime governance for all bots with configurable:
+#   - Execution duration limits
+#   - Aggressiveness levels (passive / balanced / aggressive / max)
+#   - Automatic retry policies
+#   - Failure and conflict detection
+#   - Uncoded / stub bot monitoring
+#
+# Triggered on demand via workflow_dispatch with interactive input fields,
+# or automatically on every push to main and on a daily schedule.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: Bot Governance & Control Tower
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:
+    inputs:
+      aggressiveness:
+        description: >
+          Bot aggressiveness level — controls how eagerly bots retry
+          failures and consume resources.
+        required: true
+        default: balanced
+        type: choice
+        options:
+          - passive
+          - balanced
+          - aggressive
+          - max
+      max_execution_seconds:
+        description: Maximum total execution time per bot run (seconds, 30–3600)
+        required: true
+        default: '300'
+        type: string
+      retry_policy:
+        description: >
+          Retry policy on failure.
+          none = no retries; once = 1 retry; twice = 2 retries; auto = system decides.
+        required: true
+        default: auto
+        type: choice
+        options:
+          - none
+          - once
+          - twice
+          - auto
+      target_bot:
+        description: >
+          (Optional) Name of a specific bot to govern.
+          Leave blank to apply governance to ALL bots.
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  AGGRESSIVENESS:          ${{ github.event.inputs.aggressiveness       || 'balanced' }}
+  MAX_EXECUTION_SECONDS:   ${{ github.event.inputs.max_execution_seconds || '300' }}
+  RETRY_POLICY:            ${{ github.event.inputs.retry_policy          || 'auto' }}
+  TARGET_BOT:              ${{ github.event.inputs.target_bot            || '' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 1 — Validate governance parameters
+  # ────────────────────────────────────────────────────────────────────────
+  validate-governance-params:
+    name: Validate Governance Parameters
+    runs-on: ubuntu-latest
+    outputs:
+      aggressiveness:        ${{ steps.params.outputs.aggressiveness }}
+      max_execution_seconds: ${{ steps.params.outputs.max_execution_seconds }}
+      retry_policy:          ${{ steps.params.outputs.retry_policy }}
+    steps:
+      - name: Validate and normalise inputs
+        id: params
+        run: |
+          set -euo pipefail
+
+          AGGR="${AGGRESSIVENESS}"
+          VALID_AGGR="passive balanced aggressive max"
+          if ! echo "$VALID_AGGR" | grep -wq "$AGGR"; then
+            echo "::warning::Unknown aggressiveness '${AGGR}'; defaulting to 'balanced'"
+            AGGR="balanced"
+          fi
+
+          MAX_EXEC="${MAX_EXECUTION_SECONDS}"
+          if ! [[ "$MAX_EXEC" =~ ^[0-9]+$ ]] || [ "$MAX_EXEC" -lt 30 ] || [ "$MAX_EXEC" -gt 3600 ]; then
+            echo "::warning::max_execution_seconds '${MAX_EXEC}' out of range [30, 3600]; defaulting to 300"
+            MAX_EXEC="300"
+          fi
+
+          RETRY="${RETRY_POLICY}"
+          VALID_RETRY="none once twice auto"
+          if ! echo "$VALID_RETRY" | grep -wq "$RETRY"; then
+            echo "::warning::Unknown retry_policy '${RETRY}'; defaulting to 'auto'"
+            RETRY="auto"
+          fi
+
+          echo "aggressiveness=${AGGR}"          >> "$GITHUB_OUTPUT"
+          echo "max_execution_seconds=${MAX_EXEC}" >> "$GITHUB_OUTPUT"
+          echo "retry_policy=${RETRY}"            >> "$GITHUB_OUTPUT"
+
+          echo "### ⚙️ Governance Parameters" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |"         >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |"                  >> "$GITHUB_STEP_SUMMARY"
+          echo "| Aggressiveness | \`${AGGR}\` |"     >> "$GITHUB_STEP_SUMMARY"
+          echo "| Max Execution (s) | \`${MAX_EXEC}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Retry Policy | \`${RETRY}\` |"       >> "$GITHUB_STEP_SUMMARY"
+          echo "| Target Bot | \`${TARGET_BOT:-ALL}\` |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 2 — Detect uncoded / stub bots
+  # ────────────────────────────────────────────────────────────────────────
+  detect-uncoded-bots:
+    name: Detect Uncoded / Stub Bots
+    runs-on: ubuntu-latest
+    needs: validate-governance-params
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Detect stub and uncoded bots
+        id: detect
+        run: |
+          python - <<'PYEOF'
+          import os, json, re, sys
+
+          bots_root = "bots"
+          stub_patterns = [
+              r"^\s*pass\s*$",
+              r"raise\s+NotImplementedError",
+              r"#\s*TODO",
+              r"#\s*FIXME",
+              r"#\s*STUB",
+              r"#\s*PLACEHOLDER",
+          ]
+          stub_re = re.compile("|".join(stub_patterns), re.IGNORECASE)
+
+          uncoded = []
+          stubbed = []
+
+          for dirpath, dirnames, filenames in os.walk(bots_root):
+              # Skip hidden dirs and __pycache__
+              dirnames[:] = [d for d in dirnames if not d.startswith(('.', '__'))]
+              py_files = [f for f in filenames if f.endswith('.py')]
+              if not py_files:
+                  continue
+              has_run = False
+              stub_hits = []
+              for fname in py_files:
+                  fpath = os.path.join(dirpath, fname)
+                  try:
+                      content = open(fpath, encoding='utf-8', errors='replace').read()
+                  except OSError:
+                      continue
+                  if re.search(r'def run\(', content):
+                      has_run = True
+                  for lineno, line in enumerate(content.splitlines(), 1):
+                      if stub_re.search(line):
+                          stub_hits.append(f"{fpath}:{lineno}")
+              if not has_run:
+                  uncoded.append(dirpath)
+              if stub_hits:
+                  stubbed.append({"path": dirpath, "hints": stub_hits[:5]})
+
+          report = {"uncoded_bots": uncoded, "stubbed_bots": stubbed}
+          print(json.dumps(report, indent=2))
+
+          summary_lines = [
+              "### 🔍 Uncoded / Stub Bot Report",
+              f"- **Uncoded bots** (no `run()` method): {len(uncoded)}",
+              f"- **Stub / TODO bots**: {len(stubbed)}",
+          ]
+          if uncoded:
+              summary_lines.append("\n#### Uncoded bots")
+              for b in uncoded[:20]:
+                  summary_lines.append(f"- `{b}`")
+          if stubbed:
+              summary_lines.append("\n#### Stub / TODO bots")
+              for s in stubbed[:20]:
+                  summary_lines.append(f"- `{s['path']}`")
+                  for h in s["hints"][:3]:
+                      summary_lines.append(f"  - {h}")
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("\n".join(summary_lines) + "\n")
+
+          if uncoded or stubbed:
+              print(f"::notice::Found {len(uncoded)} uncoded bots and {len(stubbed)} stub bots.")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 3 — Run Python tests with governance constraints
+  # ────────────────────────────────────────────────────────────────────────
+  run-tests:
+    name: Run Python Tests (Governed)
+    runs-on: ubuntu-latest
+    needs: validate-governance-params
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Apply governance — set retry count
+        id: retries
+        run: |
+          case "${{ needs.validate-governance-params.outputs.retry_policy }}" in
+            none)  echo "max_retries=0" >> "$GITHUB_OUTPUT" ;;
+            once)  echo "max_retries=1" >> "$GITHUB_OUTPUT" ;;
+            twice) echo "max_retries=2" >> "$GITHUB_OUTPUT" ;;
+            auto)
+              case "${{ needs.validate-governance-params.outputs.aggressiveness }}" in
+                passive)    echo "max_retries=0" >> "$GITHUB_OUTPUT" ;;
+                balanced)   echo "max_retries=1" >> "$GITHUB_OUTPUT" ;;
+                aggressive) echo "max_retries=2" >> "$GITHUB_OUTPUT" ;;
+                max)        echo "max_retries=3" >> "$GITHUB_OUTPUT" ;;
+              esac ;;
+          esac
+
+      - name: Run governed Python test suite
+        env:
+          BOT_AGGRESSIVENESS:       ${{ needs.validate-governance-params.outputs.aggressiveness }}
+          BOT_MAX_EXECUTION_SECONDS: ${{ needs.validate-governance-params.outputs.max_execution_seconds }}
+          BOT_RETRY_POLICY:         ${{ needs.validate-governance-params.outputs.retry_policy }}
+        run: |
+          MAX_EXEC="${{ needs.validate-governance-params.outputs.max_execution_seconds }}"
+          timeout "${MAX_EXEC}" python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            -q --tb=short \
+            || STATUS=$?
+          echo "### 🧪 Test Results" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${STATUS:-0}" -eq 0 ]; then
+            echo "✅ All tests passed." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${STATUS:-0}" -eq 124 ]; then
+            echo "⏱️ Tests timed out after ${MAX_EXEC}s." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          else
+            echo "❌ Tests failed (exit code ${STATUS})." >> "$GITHUB_STEP_SUMMARY"
+            exit "${STATUS}"
+          fi
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 4 — Failure and conflict reporting
+  # ────────────────────────────────────────────────────────────────────────
+  failure-conflict-report:
+    name: Failure & Conflict Report
+    runs-on: ubuntu-latest
+    needs: [validate-governance-params, run-tests]
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Scan for merge-conflict markers
+        run: |
+          python - <<'PYEOF'
+          import os, sys
+
+          conflict_markers = ["<<<<<<<", "=======", ">>>>>>>"]
+          conflicts = []
+
+          for dirpath, dirnames, filenames in os.walk("."):
+              dirnames[:] = [
+                  d for d in dirnames
+                  if d not in (".git", "node_modules", "__pycache__", ".github")
+                  and not d.startswith(".")
+              ]
+              for fname in filenames:
+                  if not fname.endswith(('.py', '.js', '.ts', '.yml', '.yaml', '.json', '.md')):
+                      continue
+                  fpath = os.path.join(dirpath, fname)
+                  try:
+                      lines = open(fpath, encoding='utf-8', errors='replace').readlines()
+                  except OSError:
+                      continue
+                  for lineno, line in enumerate(lines, 1):
+                      if any(m in line for m in conflict_markers):
+                          conflicts.append(f"{fpath}:{lineno}: {line.rstrip()}")
+
+          summary_lines = ["### ⚔️ Merge Conflict Scan"]
+          if conflicts:
+              summary_lines.append(f"❌ Found **{len(conflicts)}** unresolved conflict marker(s):")
+              for c in conflicts[:30]:
+                  summary_lines.append(f"- `{c}`")
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+                  fh.write("\n".join(summary_lines) + "\n")
+              for c in conflicts[:10]:
+                  print(f"::error::{c}")
+              sys.exit(1)
+          else:
+              summary_lines.append("✅ No unresolved merge conflict markers found.")
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+                  fh.write("\n".join(summary_lines) + "\n")
+          PYEOF
+
+      - name: Annotate test failures (if previous job failed)
+        if: needs.run-tests.result == 'failure'
+        run: |
+          echo "::error title=Test Suite Failed::One or more Python tests failed during the governed test run."
+          echo "### ❌ Test Failures Detected" >> "$GITHUB_STEP_SUMMARY"
+          echo "Re-run the **Run Python Tests (Governed)** job or increase the retry policy." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Summarise governance run
+        if: always()
+        run: |
+          echo "### 🏁 Governance Run Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |"   >> "$GITHUB_STEP_SUMMARY"
+          echo "| Triggered by | \`${{ github.event_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Aggressiveness | \`${{ needs.validate-governance-params.outputs.aggressiveness }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Max Execution (s) | \`${{ needs.validate-governance-params.outputs.max_execution_seconds }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Retry Policy | \`${{ needs.validate-governance-params.outputs.retry_policy }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Test Result | ${{ needs.run-tests.result }} |" >> "$GITHUB_STEP_SUMMARY"

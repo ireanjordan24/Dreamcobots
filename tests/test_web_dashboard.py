@@ -37,6 +37,13 @@ from ui.web_dashboard import (
     _fetch_github_workflows,
     _fetch_github_artifacts,
     _check_quantum_bot_status,
+    _get_governance,
+    _update_governance,
+    _get_bot_config,
+    _set_bot_config,
+    _append_failure,
+    _get_failures,
+    _detect_uncoded_bots,
 )
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
@@ -837,3 +844,440 @@ class TestFetchGitHubHelpers:
         with patch.dict(os.environ, env, clear=True):
             headers = _github_headers()
         assert "Authorization" not in headers
+
+
+# ===========================================================================
+# 15. Governance API (/api/governance, /api/governance/settings)
+# ===========================================================================
+
+class TestGovernanceApi:
+    def test_get_governance_returns_200(self, client):
+        resp = client.get("/api/governance")
+        assert resp.status_code == 200
+
+    def test_get_governance_has_required_fields(self, client):
+        data = json.loads(client.get("/api/governance").data)
+        assert "aggressiveness" in data
+        assert "max_execution_seconds" in data
+        assert "retry_policy" in data
+
+    def test_get_governance_defaults(self, client):
+        data = json.loads(client.get("/api/governance").data)
+        assert data["aggressiveness"] in ("passive", "balanced", "aggressive", "max")
+        assert isinstance(data["max_execution_seconds"], int)
+        assert data["retry_policy"] in ("none", "once", "twice", "auto")
+
+    def test_post_governance_settings_returns_200(self, client):
+        resp = client.post(
+            "/api/governance/settings",
+            data=json.dumps({"aggressiveness": "aggressive"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 200
+
+    def test_post_governance_settings_updates_aggressiveness(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"aggressiveness": "max"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["aggressiveness"] == "max"
+
+    def test_post_governance_settings_updates_max_exec(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"max_execution_seconds": 600}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["max_execution_seconds"] == 600
+
+    def test_post_governance_settings_clamps_max_exec_low(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"max_execution_seconds": 5}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["max_execution_seconds"] >= 30
+
+    def test_post_governance_settings_clamps_max_exec_high(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"max_execution_seconds": 99999}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["max_execution_seconds"] <= 3600
+
+    def test_post_governance_settings_updates_retry_policy(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"retry_policy": "twice"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["retry_policy"] == "twice"
+
+    def test_post_governance_no_fields_returns_400(self, client):
+        resp = client.post(
+            "/api/governance/settings",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 400
+
+    def test_post_governance_invalid_aggressiveness_ignored(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"aggressiveness": "balanced"}),
+            content_type="application/json",
+        )
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"aggressiveness": "turbo_invalid"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["aggressiveness"] == "balanced"
+
+    def test_governance_has_updated_at_after_update(self, client):
+        client.post(
+            "/api/governance/settings",
+            data=json.dumps({"retry_policy": "once"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/governance").data)
+        assert data["updated_at"] is not None
+
+
+# ===========================================================================
+# 16. Per-bot configuration (/api/bots/<name>/configure, /api/bots/<name>/config)
+# ===========================================================================
+
+class TestBotConfigureApi:
+    def test_configure_returns_200(self, client):
+        resp = client.post(
+            "/api/bots/test_bot/configure",
+            data=json.dumps({"aggressiveness": "aggressive"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 200
+
+    def test_configure_response_has_bot_name(self, client):
+        resp = client.post(
+            "/api/bots/my_bot/configure",
+            data=json.dumps({"aggressiveness": "max"}),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert data["bot_name"] == "my_bot"
+
+    def test_configure_aggressiveness_stored(self, client):
+        client.post(
+            "/api/bots/cfg_bot/configure",
+            data=json.dumps({"aggressiveness": "passive"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/cfg_bot/config").data)
+        assert data["aggressiveness"] == "passive"
+
+    def test_configure_max_exec_stored(self, client):
+        client.post(
+            "/api/bots/exec_bot/configure",
+            data=json.dumps({"max_execution_seconds": 120}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/exec_bot/config").data)
+        assert data["max_execution_seconds"] == 120
+
+    def test_configure_retry_policy_stored(self, client):
+        client.post(
+            "/api/bots/retry_bot/configure",
+            data=json.dumps({"retry_policy": "twice"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/retry_bot/config").data)
+        assert data["retry_policy"] == "twice"
+
+    def test_configure_marks_custom_true(self, client):
+        client.post(
+            "/api/bots/custom_bot/configure",
+            data=json.dumps({"aggressiveness": "max"}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/custom_bot/config").data)
+        assert data["custom"] is True
+
+    def test_config_get_unconfigured_bot_returns_defaults(self, client):
+        data = json.loads(client.get("/api/bots/unknown_bot_xyz/config").data)
+        assert data["custom"] is False
+        assert "aggressiveness" in data
+
+    def test_config_get_returns_200(self, client):
+        resp = client.get("/api/bots/any_bot/config")
+        assert resp.status_code == 200
+
+    def test_configure_clamps_max_exec(self, client):
+        client.post(
+            "/api/bots/clamp_bot/configure",
+            data=json.dumps({"max_execution_seconds": 0}),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/bots/clamp_bot/config").data)
+        assert data["max_execution_seconds"] >= 30
+
+
+# ===========================================================================
+# 17. Uncoded bot monitor (/api/bots/uncoded)
+# ===========================================================================
+
+class TestUncodedBotsApi:
+    def test_endpoint_returns_200(self, client):
+        resp = client.get("/api/bots/uncoded")
+        assert resp.status_code == 200
+
+    def test_response_has_uncoded_count(self, client):
+        data = json.loads(client.get("/api/bots/uncoded").data)
+        assert "uncoded_count" in data
+
+    def test_response_has_stubbed_count(self, client):
+        data = json.loads(client.get("/api/bots/uncoded").data)
+        assert "stubbed_count" in data
+
+    def test_uncoded_list_is_list(self, client):
+        data = json.loads(client.get("/api/bots/uncoded").data)
+        assert isinstance(data["uncoded"], list)
+
+    def test_stubbed_list_is_list(self, client):
+        data = json.loads(client.get("/api/bots/uncoded").data)
+        assert isinstance(data["stubbed"], list)
+
+    def test_has_scanned_at(self, client):
+        data = json.loads(client.get("/api/bots/uncoded").data)
+        assert "scanned_at" in data
+
+    def test_detect_uncoded_bots_returns_dict(self):
+        from ui.web_dashboard import _detect_uncoded_bots
+        result = _detect_uncoded_bots()
+        assert isinstance(result, dict)
+        assert "uncoded_count" in result
+        assert "stubbed_count" in result
+
+    def test_detect_uncoded_bots_never_raises(self):
+        from ui.web_dashboard import _detect_uncoded_bots
+        try:
+            result = _detect_uncoded_bots()
+            assert isinstance(result, dict)
+        except Exception as exc:
+            pytest.fail(f"_detect_uncoded_bots raised unexpectedly: {exc}")
+
+
+# ===========================================================================
+# 18. Failure and conflict log (/api/failures, /api/failures/report)
+# ===========================================================================
+
+class TestFailuresApi:
+    def test_get_failures_returns_200(self, client):
+        resp = client.get("/api/failures")
+        assert resp.status_code == 200
+
+    def test_get_failures_has_failures_key(self, client):
+        data = json.loads(client.get("/api/failures").data)
+        assert "failures" in data
+
+    def test_get_failures_has_total_key(self, client):
+        data = json.loads(client.get("/api/failures").data)
+        assert "total" in data
+
+    def test_failures_list_is_list(self, client):
+        data = json.loads(client.get("/api/failures").data)
+        assert isinstance(data["failures"], list)
+
+    def test_report_failure_returns_201(self, client):
+        resp = client.post(
+            "/api/failures/report",
+            data=json.dumps({
+                "bot_name": "crash_bot",
+                "failure_type": "failure",
+                "message": "Test failure",
+            }),
+            content_type="application/json",
+        )
+        assert resp.status_code == 201
+
+    def test_reported_failure_appears_in_log(self, client):
+        client.post(
+            "/api/failures/report",
+            data=json.dumps({
+                "bot_name": "tracked_fail_bot",
+                "failure_type": "failure",
+                "message": "Something broke",
+            }),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/failures").data)
+        bot_names = [f["bot_name"] for f in data["failures"]]
+        assert "tracked_fail_bot" in bot_names
+
+    def test_report_failure_missing_fields_returns_400(self, client):
+        resp = client.post(
+            "/api/failures/report",
+            data=json.dumps({"bot_name": "x"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 400
+
+    def test_report_failure_response_has_timestamp(self, client):
+        resp = client.post(
+            "/api/failures/report",
+            data=json.dumps({
+                "bot_name": "time_bot",
+                "failure_type": "conflict",
+                "message": "Merge conflict detected",
+            }),
+            content_type="application/json",
+        )
+        data = json.loads(resp.data)
+        assert "timestamp" in data
+
+    def test_get_failures_filtered_by_bot_name(self, client):
+        client.post(
+            "/api/failures/report",
+            data=json.dumps({
+                "bot_name": "filter_bot",
+                "failure_type": "warning",
+                "message": "Slow execution",
+            }),
+            content_type="application/json",
+        )
+        data = json.loads(client.get("/api/failures?bot_name=filter_bot").data)
+        assert all(f["bot_name"] == "filter_bot" for f in data["failures"])
+
+    def test_get_failures_limit_param(self, client):
+        for i in range(5):
+            client.post(
+                "/api/failures/report",
+                data=json.dumps({
+                    "bot_name": f"limit_bot_{i}",
+                    "failure_type": "failure",
+                    "message": f"Failure {i}",
+                }),
+                content_type="application/json",
+            )
+        data = json.loads(client.get("/api/failures?limit=2").data)
+        assert len(data["failures"]) <= 2
+
+    def test_append_failure_helper_returns_entry(self):
+        from ui.web_dashboard import _append_failure
+        entry = _append_failure("helper_bot", "failure", "test msg")
+        assert entry["bot_name"] == "helper_bot"
+        assert entry["failure_type"] == "failure"
+        assert "timestamp" in entry
+
+    def test_get_failures_helper_returns_list(self):
+        from ui.web_dashboard import _get_failures
+        result = _get_failures()
+        assert isinstance(result, list)
+
+
+# ===========================================================================
+# 19. Per-bot dashboard HTML page (/bots/<name>)
+# ===========================================================================
+
+class TestBotDashboardPage:
+    def test_bot_page_returns_200(self, client):
+        resp = client.get("/bots/multi_source_lead_scraper")
+        assert resp.status_code == 200
+
+    def test_bot_page_content_type_html(self, client):
+        resp = client.get("/bots/real_estate_bot")
+        assert "text/html" in resp.content_type
+
+    def test_bot_page_contains_bot_name(self, client):
+        resp = client.get("/bots/multi_source_lead_scraper")
+        assert b"multi_source_lead_scraper" in resp.data or b"Lead Generator" in resp.data
+
+    def test_bot_page_contains_runtime_parameters(self, client):
+        resp = client.get("/bots/crypto_bot")
+        assert b"Runtime Parameters" in resp.data or b"Aggressiveness" in resp.data
+
+    def test_bot_page_contains_back_link(self, client):
+        resp = client.get("/bots/fiverr_bot")
+        assert b"Back to Dashboard" in resp.data or b"href=\"/\"" in resp.data
+
+    def test_bot_page_for_unknown_bot_returns_200(self, client):
+        resp = client.get("/bots/completely_unknown_bot_xyz")
+        assert resp.status_code == 200
+
+    def test_bot_page_contains_failures_section(self, client):
+        resp = client.get("/bots/affiliate_bot")
+        assert b"Failures" in resp.data or b"failure" in resp.data.lower()
+
+    def test_bot_page_contains_run_history_section(self, client):
+        resp = client.get("/bots/ai_chatbot")
+        assert b"Run History" in resp.data or b"history" in resp.data.lower()
+
+    def test_catalog_has_dashboard_link_section(self, client):
+        resp = client.get("/")
+        assert b"Bot Dashboard" in resp.data or b"bot-dash-link" in resp.data
+
+    def test_dashboard_html_contains_governance_section(self, client):
+        resp = client.get("/")
+        assert b"Governance" in resp.data or b"governance" in resp.data.lower()
+
+    def test_dashboard_html_contains_uncoded_monitor(self, client):
+        resp = client.get("/")
+        assert b"Uncoded" in resp.data or b"uncoded" in resp.data.lower()
+
+    def test_dashboard_html_contains_failure_section(self, client):
+        resp = client.get("/")
+        assert b"Failures" in resp.data or b"failure" in resp.data.lower()
+
+
+# ===========================================================================
+# 20. Governance helper function unit tests
+# ===========================================================================
+
+class TestGovernanceHelpers:
+    def test_get_governance_returns_dict(self):
+        from ui.web_dashboard import _get_governance
+        result = _get_governance()
+        assert isinstance(result, dict)
+
+    def test_update_governance_aggressiveness(self):
+        from ui.web_dashboard import _get_governance, _update_governance
+        _update_governance(aggressiveness="passive")
+        assert _get_governance()["aggressiveness"] == "passive"
+        _update_governance(aggressiveness="balanced")  # restore default
+
+    def test_update_governance_max_exec(self):
+        from ui.web_dashboard import _get_governance, _update_governance
+        _update_governance(max_execution_seconds=120)
+        assert _get_governance()["max_execution_seconds"] == 120
+        _update_governance(max_execution_seconds=300)  # restore
+
+    def test_update_governance_invalid_aggressiveness_ignored(self):
+        from ui.web_dashboard import _get_governance, _update_governance
+        _update_governance(aggressiveness="balanced")
+        _update_governance(aggressiveness="invalid_value")
+        assert _get_governance()["aggressiveness"] == "balanced"
+
+    def test_get_bot_config_returns_dict(self):
+        from ui.web_dashboard import _get_bot_config
+        result = _get_bot_config("any_bot")
+        assert isinstance(result, dict)
+        assert "aggressiveness" in result
+
+    def test_set_bot_config_persists(self):
+        from ui.web_dashboard import _get_bot_config, _set_bot_config
+        _set_bot_config("my_test_bot", aggressiveness="max")
+        cfg = _get_bot_config("my_test_bot")
+        assert cfg["aggressiveness"] == "max"
+
+    def test_set_bot_config_marks_custom(self):
+        from ui.web_dashboard import _get_bot_config, _set_bot_config
+        _set_bot_config("custom_check_bot", retry_policy="once")
+        assert _get_bot_config("custom_check_bot")["custom"] is True
+

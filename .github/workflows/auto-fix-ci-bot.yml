@@ -15,6 +15,7 @@ on:
       - "Language-Specific Lint & Format"
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   auto-fix:

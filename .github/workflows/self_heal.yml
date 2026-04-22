@@ -5,6 +5,7 @@ on:
     workflows: ["DreamCo Master System"]
     types:
       - completed
+  workflow_dispatch:
 
 permissions:
   contents: read

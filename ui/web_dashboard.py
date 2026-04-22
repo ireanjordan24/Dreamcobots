@@ -8,6 +8,10 @@ Provides a real-time web UI to:
   - Launch high-revenue bots live via Go Live buttons.
   - Display live GitHub Actions workflow runs and artifacts (read-only).
   - Show Quantum Bot system health.
+  - Control bot governance (aggressiveness, execution duration, retry policy).
+  - View per-bot dashboard pages with runtime parameters.
+  - Detect and report uncoded / stub bots.
+  - Track and display failures and merge conflicts.
 
 Usage
 -----
@@ -18,20 +22,28 @@ Usage
 
 Endpoints
 ---------
-  GET  /                          — Dashboard HTML landing page
-  GET  /api/status                — System-wide status JSON
-  GET  /api/bots                  — Registered bot list with KPI scores
-  POST /api/bots/register         — Register a new bot { "name": "...", "tier": "..." }
-  POST /api/bots/<name>/go_live   — Deploy / activate a bot instance
-  GET  /api/bots/catalog          — Full bot catalog with Go Live status
-  GET  /api/revenue               — Revenue summary JSON
-  GET  /api/leaderboard           — Bot leaderboard (top by composite KPI)
-  GET  /api/underperformers       — Bots with composite score < threshold
-  POST /api/record_run            — Record a bot run with KPIs
-  GET  /api/history/<bot_name>    — Run history for a specific bot
-  GET  /api/github/workflows      — Live GitHub Actions workflow runs (read-only)
-  GET  /api/github/artifacts      — GitHub Actions artifact list (read-only)
-  GET  /api/quantum/status        — Quantum Bot system health check
+  GET  /                              — Dashboard HTML landing page
+  GET  /bots/<name>                   — Per-bot HTML dashboard page
+  GET  /api/status                    — System-wide status JSON
+  GET  /api/bots                      — Registered bot list with KPI scores
+  POST /api/bots/register             — Register a new bot { "name": "...", "tier": "..." }
+  POST /api/bots/<name>/go_live       — Deploy / activate a bot instance
+  POST /api/bots/<name>/configure     — Configure bot runtime parameters
+  GET  /api/bots/<name>/config        — Retrieve bot runtime parameters
+  GET  /api/bots/catalog              — Full bot catalog with Go Live status
+  GET  /api/bots/uncoded              — Uncoded / stub bots report
+  GET  /api/revenue                   — Revenue summary JSON
+  GET  /api/leaderboard               — Bot leaderboard (top by composite KPI)
+  GET  /api/underperformers           — Bots with composite score < threshold
+  POST /api/record_run                — Record a bot run with KPIs
+  GET  /api/history/<bot_name>        — Run history for a specific bot
+  GET  /api/governance                — Current global governance settings
+  POST /api/governance/settings       — Update global governance settings
+  GET  /api/failures                  — Recent failure and conflict log
+  POST /api/failures/report           — Append an entry to the failure log
+  GET  /api/github/workflows          — Live GitHub Actions workflow runs (read-only)
+  GET  /api/github/artifacts          — GitHub Actions artifact list (read-only)
+  GET  /api/quantum/status            — Quantum Bot system health check
 """
 
 from __future__ import annotations
@@ -53,6 +65,9 @@ except ImportError:  # pragma: no cover
     _requests = None  # type: ignore[assignment]
     _REQUESTS_AVAILABLE = False
 
+import re as _re
+import threading as _threading
+
 from bots.ai_learning_system.database import BotPerformanceDB
 from bots.control_center.control_center import ControlCenter
 
@@ -71,6 +86,44 @@ _GITHUB_PER_PAGE_MAX = 100
 # Cached QuantumAIBot check result (reset on each process start)
 _quantum_cache: dict = {}
 _QUANTUM_CACHE_TTL_S = 60
+
+
+# ---------------------------------------------------------------------------
+# Global governance state (process-local, in-memory)
+# ---------------------------------------------------------------------------
+
+_GOVERNANCE_LOCK = _threading.Lock()
+_GOVERNANCE_SETTINGS: dict = {
+    "aggressiveness": "balanced",
+    "max_execution_seconds": 300,
+    "retry_policy": "auto",
+    "updated_at": None,
+}
+
+# Valid values for governance fields
+_VALID_AGGRESSIVENESS = {"passive", "balanced", "aggressive", "max"}
+_VALID_RETRY_POLICY = {"none", "once", "twice", "auto"}
+
+# ---------------------------------------------------------------------------
+# Per-bot runtime configuration (process-local, in-memory)
+# ---------------------------------------------------------------------------
+
+_BOT_CONFIG_LOCK = _threading.Lock()
+_BOT_CONFIGS: dict[str, dict] = {}
+
+# ---------------------------------------------------------------------------
+# Failure / conflict log (process-local, capped)
+# ---------------------------------------------------------------------------
+
+_FAILURE_LOG_LOCK = _threading.Lock()
+_FAILURE_LOG: list[dict] = []
+_FAILURE_LOG_MAX = 200
+
+# Stub / TODO detection patterns
+_STUB_PATTERN = _re.compile(
+    r"raise\s+NotImplementedError|#\s*TODO|#\s*FIXME|#\s*STUB|#\s*PLACEHOLDER",
+    _re.IGNORECASE,
+)
 
 
 def _github_headers() -> dict:
@@ -216,6 +269,139 @@ def _check_quantum_bot_status() -> dict:
     _quantum_cache = {**result, "_cached_at": now}
     result["checked_at"] = datetime.now(timezone.utc).isoformat()
     return result
+
+
+def _get_governance() -> dict:
+    """Return a copy of the current global governance settings."""
+    with _GOVERNANCE_LOCK:
+        return dict(_GOVERNANCE_SETTINGS)
+
+
+def _update_governance(aggressiveness: str | None = None,
+                       max_execution_seconds: int | None = None,
+                       retry_policy: str | None = None) -> dict:
+    """Update global governance settings and return the new state.
+
+    Ignores invalid values and keeps the previous setting instead.
+    """
+    with _GOVERNANCE_LOCK:
+        if aggressiveness is not None and aggressiveness in _VALID_AGGRESSIVENESS:
+            _GOVERNANCE_SETTINGS["aggressiveness"] = aggressiveness
+        if max_execution_seconds is not None:
+            clamped = max(30, min(3600, int(max_execution_seconds)))
+            _GOVERNANCE_SETTINGS["max_execution_seconds"] = clamped
+        if retry_policy is not None and retry_policy in _VALID_RETRY_POLICY:
+            _GOVERNANCE_SETTINGS["retry_policy"] = retry_policy
+        _GOVERNANCE_SETTINGS["updated_at"] = datetime.now(timezone.utc).isoformat()
+        return dict(_GOVERNANCE_SETTINGS)
+
+
+def _get_bot_config(bot_name: str) -> dict:
+    """Return the runtime config for *bot_name*, falling back to governance defaults."""
+    gov = _get_governance()
+    with _BOT_CONFIG_LOCK:
+        cfg = dict(_BOT_CONFIGS.get(bot_name, {}))
+    return {
+        "bot_name": bot_name,
+        "aggressiveness": cfg.get("aggressiveness", gov["aggressiveness"]),
+        "max_execution_seconds": cfg.get("max_execution_seconds", gov["max_execution_seconds"]),
+        "retry_policy": cfg.get("retry_policy", gov["retry_policy"]),
+        "custom": bool(cfg),
+        "updated_at": cfg.get("updated_at"),
+    }
+
+
+def _set_bot_config(bot_name: str, **kwargs: object) -> dict:
+    """Persist per-bot runtime config overrides. Returns the merged config."""
+    with _BOT_CONFIG_LOCK:
+        existing = dict(_BOT_CONFIGS.get(bot_name, {}))
+        if "aggressiveness" in kwargs and kwargs["aggressiveness"] in _VALID_AGGRESSIVENESS:
+            existing["aggressiveness"] = kwargs["aggressiveness"]
+        if "max_execution_seconds" in kwargs:
+            try:
+                clamped = max(30, min(3600, int(kwargs["max_execution_seconds"])))  # type: ignore[arg-type]
+                existing["max_execution_seconds"] = clamped
+            except (TypeError, ValueError):
+                pass
+        if "retry_policy" in kwargs and kwargs["retry_policy"] in _VALID_RETRY_POLICY:
+            existing["retry_policy"] = kwargs["retry_policy"]
+        existing["updated_at"] = datetime.now(timezone.utc).isoformat()
+        _BOT_CONFIGS[bot_name] = existing
+    return _get_bot_config(bot_name)
+
+
+def _append_failure(bot_name: str, failure_type: str, message: str, details: dict | None = None) -> dict:
+    """Append a failure entry to the in-memory log (capped at _FAILURE_LOG_MAX)."""
+    entry: dict = {
+        "bot_name": bot_name,
+        "failure_type": failure_type,
+        "message": message,
+        "details": details or {},
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    with _FAILURE_LOG_LOCK:
+        _FAILURE_LOG.append(entry)
+        while len(_FAILURE_LOG) > _FAILURE_LOG_MAX:
+            _FAILURE_LOG.pop(0)
+    return entry
+
+
+def _get_failures(bot_name: str | None = None, limit: int = 50) -> list[dict]:
+    """Return recent failures, optionally filtered by *bot_name*."""
+    with _FAILURE_LOG_LOCK:
+        log = list(_FAILURE_LOG)
+    if bot_name:
+        log = [e for e in log if e["bot_name"] == bot_name]
+    return log[-limit:]
+
+
+def _detect_uncoded_bots() -> dict:
+    """Scan the *bots/* directory for uncoded and stub bots.
+
+    An *uncoded* bot directory has Python files but none define a ``run()``
+    method.  A *stub* bot directory has files containing TODO / FIXME /
+    NotImplementedError markers.
+
+    Returns a dict with ``uncoded`` and ``stubbed`` lists.  Never raises.
+    """
+    bots_root = os.path.join(os.path.dirname(__file__), "..", "bots")
+    uncoded: list[str] = []
+    stubbed: list[dict] = []
+
+    try:
+        for dirpath, dirnames, filenames in os.walk(bots_root):
+            dirnames[:] = [d for d in dirnames if not d.startswith((".", "__"))]
+            py_files = [f for f in filenames if f.endswith(".py")]
+            if not py_files:
+                continue
+            has_run = False
+            stub_hints: list[str] = []
+            for fname in py_files:
+                fpath = os.path.join(dirpath, fname)
+                try:
+                    content = open(fpath, encoding="utf-8", errors="replace").read()
+                except OSError:
+                    continue
+                if _re.search(r"def run\(", content):
+                    has_run = True
+                for lineno, line in enumerate(content.splitlines(), 1):
+                    if _STUB_PATTERN.search(line):
+                        stub_hints.append(f"{os.path.relpath(fpath, bots_root)}:{lineno}")
+            rel = os.path.relpath(dirpath, bots_root)
+            if not has_run:
+                uncoded.append(rel)
+            if stub_hints:
+                stubbed.append({"path": rel, "hints": stub_hints[:5]})
+    except Exception:  # noqa: BLE001
+        pass
+
+    return {
+        "uncoded_count": len(uncoded),
+        "stubbed_count": len(stubbed),
+        "uncoded": uncoded,
+        "stubbed": stubbed,
+        "scanned_at": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -449,6 +635,58 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+
+    /* Governance panel */
+    .governance-panel {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 0 24px 24px;
+    }
+    .governance-panel h2 {
+      font-size: 0.85rem; color: #888; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 14px;
+    }
+    .gov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .gov-field label {
+      display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px;
+    }
+    .gov-field input[type="range"] { width: 100%; accent-color: #00d4aa; }
+    .gov-field select, .gov-field input[type="number"] {
+      width: 100%; background: #0d0d0d; border: 1px solid #2a2a4a;
+      color: #e0e0e0; border-radius: 4px; padding: 5px 8px;
+      font-size: 0.82rem;
+    }
+    .gov-field .range-label {
+      font-size: 0.72rem; color: #00d4aa; margin-top: 2px;
+    }
+    .gov-save-btn {
+      margin-top: 14px;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #7b2ff7, #00d4aa);
+      border: none; border-radius: 6px; color: #fff;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.5px; transition: opacity 0.15s;
+    }
+    .gov-save-btn:hover { opacity: 0.88; }
+    #gov-status { font-size: 0.75rem; color: #00d4aa; margin-left: 10px; }
+
+    /* Failure log */
+    .failure-row-failure { color: #ff6b6b; }
+    .failure-row-conflict { color: #ff9900; }
+    .failure-row-warning  { color: #ffdd57; }
+
+    /* Per-bot dashboard link */
+    .bot-dash-link {
+      font-size: 0.72rem; color: #0090ff; text-decoration: none;
+      margin-top: 2px; display: inline-block;
+    }
+    .bot-dash-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -549,6 +787,75 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
         </thead>
         <tbody id="artifact-body">
           <tr><td colspan="5" style="color:#555">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── BOT GOVERNANCE CONTROL ── -->
+  <p class="section-header">🎛️ Bot Governance — Global Runtime Controls</p>
+  <div class="governance-panel" id="governance-panel">
+    <h2>Runtime Governance Settings</h2>
+    <div class="gov-grid">
+      <div class="gov-field">
+        <label for="gov-aggressiveness">Aggressiveness Level</label>
+        <select id="gov-aggressiveness">
+          <option value="passive">Passive — minimal retries, conservative resources</option>
+          <option value="balanced" selected>Balanced — 1 retry, standard resources</option>
+          <option value="aggressive">Aggressive — 2 retries, elevated resources</option>
+          <option value="max">Max — 3 retries, maximum resources</option>
+        </select>
+      </div>
+      <div class="gov-field">
+        <label for="gov-max-exec">Max Execution Duration (seconds): <span id="gov-exec-label">300</span></label>
+        <input type="range" id="gov-max-exec" min="30" max="3600" step="30" value="300"
+          oninput="document.getElementById('gov-exec-label').textContent=this.value">
+        <div class="range-label">30 s — 3600 s</div>
+      </div>
+      <div class="gov-field">
+        <label for="gov-retry-policy">Retry Policy</label>
+        <select id="gov-retry-policy">
+          <option value="none">None — no retries on failure</option>
+          <option value="once">Once — 1 retry</option>
+          <option value="twice">Twice — 2 retries</option>
+          <option value="auto" selected>Auto — determined by aggressiveness level</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="gov-save-btn" onclick="saveGovernance()">💾 Save Governance Settings</button>
+      <span id="gov-status"></span>
+    </div>
+  </div>
+
+  <!-- ── UNCODED BOT MONITOR ── -->
+  <p class="section-header">🔍 Uncoded Bot Monitor</p>
+  <div style="padding: 0 24px 24px;">
+    <div class="card">
+      <h2 style="margin-bottom:12px;">Uncoded / Stub Bot Report</h2>
+      <div id="uncoded-summary" style="font-size:0.82rem;color:#aaa;margin-bottom:10px">Loading…</div>
+      <table>
+        <thead>
+          <tr><th>Bot Path</th><th>Status</th><th>Stub Hints</th></tr>
+        </thead>
+        <tbody id="uncoded-body">
+          <tr><td colspan="3" style="color:#555">Scanning…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── FAILURE & CONFLICT LOG ── -->
+  <p class="section-header">🚨 Failures &amp; Conflicts — Detailed Report</p>
+  <div style="padding: 0 24px 24px;">
+    <div class="card">
+      <h2 style="margin-bottom:12px;">Recent Failures &amp; Conflicts</h2>
+      <table>
+        <thead>
+          <tr><th>Time</th><th>Bot</th><th>Type</th><th>Message</th></tr>
+        </thead>
+        <tbody id="failure-body">
+          <tr><td colspan="4" style="color:#555">No failures recorded.</td></tr>
         </tbody>
       </table>
     </div>
@@ -688,11 +995,104 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
               ${isLive ? "disabled" : ""}
             >${isLive ? '✅ Live' : '🚀 Go Live'}</button>
             ${isLive ? '<span class="live-indicator"></span>' : ''}
+            <a class="bot-dash-link" href="/bots/${encodeURIComponent(bot.name)}">📊 Bot Dashboard →</a>
           `;
           grid.appendChild(card);
         });
       } catch (e) {
         console.error('Catalog load error:', e);
+      }
+    }
+
+    async function loadGovernance() {
+      try {
+        const g = await fetch('/api/governance').then(r => r.json());
+        const aggSel = document.getElementById('gov-aggressiveness');
+        const maxExec = document.getElementById('gov-max-exec');
+        const execLabel = document.getElementById('gov-exec-label');
+        const retrySel = document.getElementById('gov-retry-policy');
+        if (aggSel) aggSel.value = g.aggressiveness || 'balanced';
+        if (maxExec) {
+          maxExec.value = g.max_execution_seconds || 300;
+          if (execLabel) execLabel.textContent = maxExec.value;
+        }
+        if (retrySel) retrySel.value = g.retry_policy || 'auto';
+      } catch (e) {
+        console.error('Governance load error:', e);
+      }
+    }
+
+    async function saveGovernance() {
+      const statusEl = document.getElementById('gov-status');
+      statusEl.textContent = '⏳ Saving…';
+      try {
+        const payload = {
+          aggressiveness: document.getElementById('gov-aggressiveness').value,
+          max_execution_seconds: parseInt(document.getElementById('gov-max-exec').value, 10),
+          retry_policy: document.getElementById('gov-retry-policy').value,
+        };
+        const res = await fetch('/api/governance/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          statusEl.textContent = '✅ Saved!';
+          setTimeout(() => { statusEl.textContent = ''; }, 3000);
+        } else {
+          statusEl.textContent = '⚠ Error saving';
+        }
+      } catch (e) {
+        statusEl.textContent = '⚠ Network error';
+      }
+    }
+
+    async function loadUncoded() {
+      try {
+        const data = await fetch('/api/bots/uncoded').then(r => r.json());
+        const summary = document.getElementById('uncoded-summary');
+        const tbody = document.getElementById('uncoded-body');
+        summary.textContent =
+          `Uncoded bots: ${data.uncoded_count} | Stub/TODO bots: ${data.stubbed_count}`;
+        const rows = [];
+        (data.uncoded || []).forEach(p => {
+          rows.push(`<tr><td><code>${p}</code></td><td><span style="color:#ff9900">⚠ No run()</span></td><td>—</td></tr>`);
+        });
+        (data.stubbed || []).forEach(s => {
+          const hints = (s.hints || []).map(h => `<code style="font-size:0.7rem">${h}</code>`).join('<br>');
+          rows.push(`<tr><td><code>${s.path}</code></td><td><span style="color:#ffdd57">🔧 Stub</span></td><td>${hints}</td></tr>`);
+        });
+        tbody.innerHTML = rows.length
+          ? rows.join('')
+          : '<tr><td colspan="3" style="color:#22cc44">✅ No uncoded bots found.</td></tr>';
+      } catch (e) {
+        console.error('Uncoded load error:', e);
+      }
+    }
+
+    async function loadFailures() {
+      try {
+        const data = await fetch('/api/failures').then(r => r.json());
+        const tbody = document.getElementById('failure-body');
+        const failures = data.failures || [];
+        if (failures.length) {
+          const typeColor = t => {
+            if (t === 'failure') return 'failure-row-failure';
+            if (t === 'conflict') return 'failure-row-conflict';
+            return 'failure-row-warning';
+          };
+          tbody.innerHTML = failures.slice().reverse().map(f => `
+            <tr class="${typeColor(f.failure_type)}">
+              <td style="white-space:nowrap">${f.timestamp ? new Date(f.timestamp).toLocaleString() : '—'}</td>
+              <td>${f.bot_name || '—'}</td>
+              <td><strong>${f.failure_type || '—'}</strong></td>
+              <td>${f.message || '—'}</td>
+            </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4" style="color:#22cc44">✅ No failures recorded.</td></tr>';
+        }
+      } catch (e) {
+        console.error('Failures load error:', e);
       }
     }
 
@@ -750,7 +1150,10 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
     loadAll();
     loadWorkflows();
     loadQuantum();
-    setInterval(() => { loadAll(); loadWorkflows(); loadQuantum(); }, 15000);
+    loadGovernance();
+    loadUncoded();
+    loadFailures();
+    setInterval(() => { loadAll(); loadWorkflows(); loadQuantum(); loadFailures(); }, 15000);
   </script>
 </body>
 </html>
@@ -1000,7 +1403,348 @@ def create_app(
         """Return Quantum Bot health status (read-only instantiation check)."""
         return jsonify(_check_quantum_bot_status())
 
+    # ---------------------------------------------------------------
+    # Global governance settings
+    # ---------------------------------------------------------------
+
+    @app.route("/api/governance")
+    def api_governance_get() -> Response:
+        """Return the current global governance settings."""
+        return jsonify(_get_governance())
+
+    @app.route("/api/governance/settings", methods=["POST"])
+    def api_governance_set() -> Response:
+        """Update global governance settings.
+
+        Request JSON (all fields optional)
+        ------------------------------------
+        aggressiveness : str
+            One of ``passive``, ``balanced``, ``aggressive``, ``max``.
+        max_execution_seconds : int
+            Clamped to [30, 3600].
+        retry_policy : str
+            One of ``none``, ``once``, ``twice``, ``auto``.
+
+        Returns
+        -------
+        200
+            Updated governance state.
+        400
+            If no recognisable fields are provided.
+        """
+        data = request.get_json(silent=True) or {}
+        if not any(k in data for k in ("aggressiveness", "max_execution_seconds", "retry_policy")):
+            return jsonify({"error": "No valid governance fields provided."}), 400
+        updated = _update_governance(
+            aggressiveness=data.get("aggressiveness"),
+            max_execution_seconds=data.get("max_execution_seconds"),
+            retry_policy=data.get("retry_policy"),
+        )
+        return jsonify(updated)
+
+    # ---------------------------------------------------------------
+    # Per-bot runtime configuration
+    # ---------------------------------------------------------------
+
+    @app.route("/api/bots/<bot_name>/configure", methods=["POST"])
+    def api_bot_configure(bot_name: str) -> Response:
+        """Configure runtime parameters for a specific bot.
+
+        Request JSON (all fields optional)
+        ------------------------------------
+        aggressiveness : str
+        max_execution_seconds : int
+        retry_policy : str
+
+        Returns
+        -------
+        200  Updated bot config.
+        400  If bot_name is blank.
+        """
+        bot_name = bot_name.strip()
+        if not bot_name:
+            return jsonify({"error": "bot_name is required."}), 400
+        data = request.get_json(silent=True) or {}
+        cfg = _set_bot_config(
+            bot_name,
+            aggressiveness=data.get("aggressiveness"),
+            max_execution_seconds=data.get("max_execution_seconds"),
+            retry_policy=data.get("retry_policy"),
+        )
+        return jsonify(cfg)
+
+    @app.route("/api/bots/<bot_name>/config")
+    def api_bot_config_get(bot_name: str) -> Response:
+        """Return the current runtime config for a specific bot."""
+        return jsonify(_get_bot_config(bot_name.strip()))
+
+    # ---------------------------------------------------------------
+    # Uncoded / stub bot monitor
+    # ---------------------------------------------------------------
+
+    @app.route("/api/bots/uncoded")
+    def api_bots_uncoded() -> Response:
+        """Return uncoded and stub bot report."""
+        return jsonify(_detect_uncoded_bots())
+
+    # ---------------------------------------------------------------
+    # Failure and conflict log
+    # ---------------------------------------------------------------
+
+    @app.route("/api/failures")
+    def api_failures_get() -> Response:
+        """Return recent failure and conflict entries.
+
+        Query parameters
+        ----------------
+        bot_name : str   (optional) filter by bot name
+        limit    : int   (optional, default 50)
+        """
+        bot_name = request.args.get("bot_name", "").strip() or None
+        limit = max(1, min(200, request.args.get("limit", 50, type=int)))
+        failures = _get_failures(bot_name=bot_name, limit=limit)
+        return jsonify({"failures": failures, "total": len(failures)})
+
+    @app.route("/api/failures/report", methods=["POST"])
+    def api_failures_report() -> Response:
+        """Append a failure entry to the log.
+
+        Request JSON
+        ------------
+        bot_name     : str  (required)
+        failure_type : str  (required) — e.g. ``failure``, ``conflict``, ``warning``
+        message      : str  (required)
+        details      : dict (optional)
+
+        Returns
+        -------
+        201  The appended entry.
+        400  Missing required fields.
+        """
+        data = request.get_json(silent=True) or {}
+        bot_name = data.get("bot_name", "").strip()
+        failure_type = data.get("failure_type", "").strip()
+        message = data.get("message", "").strip()
+        if not bot_name or not failure_type or not message:
+            return jsonify({"error": "bot_name, failure_type, and message are required."}), 400
+        entry = _append_failure(
+            bot_name=bot_name,
+            failure_type=failure_type,
+            message=message,
+            details=data.get("details"),
+        )
+        return jsonify(entry), 201
+
+    # ---------------------------------------------------------------
+    # Per-bot HTML dashboard page
+    # ---------------------------------------------------------------
+
+    @app.route("/bots/<bot_name>")
+    def bot_dashboard_page(bot_name: str) -> Response:
+        """Render an HTML dashboard page for a specific bot."""
+        bot_name = bot_name.strip()
+        catalog_entry = next(
+            (b for b in _BOT_CATALOG if b["name"] == bot_name),
+            None,
+        )
+        cfg = _get_bot_config(bot_name)
+        gov = _get_governance()
+        failures = _get_failures(bot_name=bot_name, limit=20)
+        history = perf_db.get_run_history(bot_name, limit=10)
+        scores = {s["bot_name"]: s for s in perf_db.get_all_scores()}
+        score = scores.get(bot_name, {})
+
+        display_name = (catalog_entry or {}).get("display_name", bot_name)
+        emoji = (catalog_entry or {}).get("emoji", "🤖")
+        description = (catalog_entry or {}).get("description", "No description available.")
+        revenue_model = (catalog_entry or {}).get("revenue_model", "—")
+        category = (catalog_entry or {}).get("category", "—")
+
+        is_live = bot_name in cc.get_status().get("bots", {})
+        live_badge = '<span style="color:#22cc44;font-weight:700">● LIVE</span>' if is_live else '<span style="color:#888">○ Idle</span>'
+
+        failure_rows = "".join(
+            f"<tr><td style='white-space:nowrap'>{e['timestamp'][:19].replace('T',' ')}</td>"
+            f"<td style='color:#ff6b6b'>{e['failure_type']}</td>"
+            f"<td>{e['message']}</td></tr>"
+            for e in reversed(failures)
+        ) or "<tr><td colspan='3' style='color:#22cc44'>✅ No failures</td></tr>"
+
+        history_rows = "".join(
+            f"<tr><td style='white-space:nowrap'>{h.get('timestamp','')[:19].replace('T',' ')}</td>"
+            f"<td>{h.get('status','—')}</td>"
+            f"<td>{h.get('notes','')}</td></tr>"
+            for h in reversed(history)
+        ) or "<tr><td colspan='3' style='color:#555'>No runs recorded</td></tr>"
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{display_name} — Bot Dashboard</title>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{ font-family: 'Segoe UI', sans-serif; background: #0d0d0d; color: #e0e0e0; }}
+    header {{ background: linear-gradient(90deg,#1a1a2e,#16213e); padding: 18px 32px;
+              border-bottom: 2px solid #00d4aa; display:flex; align-items:center; gap:14px; }}
+    header h1 {{ font-size: 1.4rem; color: #00d4aa; }}
+    .back {{ font-size: 0.8rem; color: #aaa; text-decoration: none; }}
+    .back:hover {{ color: #00d4aa; }}
+    .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; padding:24px; }}
+    .card {{ background:#1a1a2e; border:1px solid #2a2a4a; border-radius:10px; padding:18px; }}
+    .card h2 {{ font-size:0.8rem; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }}
+    .value {{ font-size:1.6rem; font-weight:700; color:#00d4aa; }}
+    .sub {{ font-size:0.72rem; color:#666; margin-top:4px; }}
+    table {{ width:100%; border-collapse:collapse; margin-top:6px; }}
+    th {{ text-align:left; font-size:0.73rem; color:#888; border-bottom:1px solid #2a2a4a; padding:5px 4px; }}
+    td {{ font-size:0.78rem; padding:5px 4px; border-bottom:1px solid #1a1a2e; }}
+    .gov-field {{ margin-bottom:12px; }}
+    .gov-field label {{ display:block; font-size:0.75rem; color:#aaa; margin-bottom:4px; }}
+    .gov-field select, .gov-field input[type="number"] {{
+      width:100%; background:#0d0d0d; border:1px solid #2a2a4a;
+      color:#e0e0e0; border-radius:4px; padding:5px 8px; font-size:0.82rem;
+    }}
+    .gov-field input[type="range"] {{ width:100%; accent-color:#00d4aa; }}
+    .save-btn {{
+      padding:8px 18px; background:linear-gradient(135deg,#00d4aa,#0090ff);
+      border:none; border-radius:6px; color:#fff; font-size:0.82rem;
+      font-weight:700; cursor:pointer;
+    }}
+    #save-status {{ font-size:0.75rem; color:#00d4aa; margin-left:10px; }}
+    .section {{ padding: 0 24px 24px; }}
+    footer {{ text-align:center; color:#444; padding:20px; font-size:0.75rem; }}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <a class="back" href="/">← Back to Dashboard</a>
+      <h1>{emoji} {display_name} — Bot Dashboard</h1>
+      <span style="font-size:0.8rem;color:#aaa">{category} &middot; {live_badge}</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Description</h2>
+      <div style="font-size:0.82rem;color:#aaa;line-height:1.5">{description}</div>
+    </div>
+    <div class="card">
+      <h2>Revenue Model</h2>
+      <div class="value" style="font-size:1.1rem">{revenue_model}</div>
+    </div>
+    <div class="card">
+      <h2>Composite KPI</h2>
+      <div class="value">{score.get('composite_score', '—')}</div>
+      <div class="sub">0–100 scale</div>
+    </div>
+    <div class="card">
+      <h2>Total Runs</h2>
+      <div class="value">{score.get('total_runs', 0)}</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <h2 style="margin-bottom:14px">⚙️ Runtime Parameters</h2>
+      <div class="gov-field">
+        <label>Aggressiveness Level</label>
+        <select id="bot-aggressiveness">
+          <option value="passive" {"selected" if cfg["aggressiveness"] == "passive" else ""}>Passive</option>
+          <option value="balanced" {"selected" if cfg["aggressiveness"] == "balanced" else ""}>Balanced</option>
+          <option value="aggressive" {"selected" if cfg["aggressiveness"] == "aggressive" else ""}>Aggressive</option>
+          <option value="max" {"selected" if cfg["aggressiveness"] == "max" else ""}>Max</option>
+        </select>
+      </div>
+      <div class="gov-field">
+        <label>Max Execution Duration (seconds): <span id="exec-label">{cfg["max_execution_seconds"]}</span></label>
+        <input type="range" id="bot-max-exec" min="30" max="3600" step="30" value="{cfg["max_execution_seconds"]}"
+          oninput="document.getElementById('exec-label').textContent=this.value">
+      </div>
+      <div class="gov-field">
+        <label>Retry Policy</label>
+        <select id="bot-retry-policy">
+          <option value="none" {"selected" if cfg["retry_policy"] == "none" else ""}>None</option>
+          <option value="once" {"selected" if cfg["retry_policy"] == "once" else ""}>Once</option>
+          <option value="twice" {"selected" if cfg["retry_policy"] == "twice" else ""}>Twice</option>
+          <option value="auto" {"selected" if cfg["retry_policy"] == "auto" else ""}>Auto</option>
+        </select>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;">
+        <button class="save-btn" onclick="saveBotConfig()">💾 Save Parameters</button>
+        <span id="save-status"></span>
+      </div>
+      {"<div style='margin-top:8px;font-size:0.72rem;color:#555'>Using global defaults (not customised)</div>" if not cfg["custom"] else "<div style='margin-top:8px;font-size:0.72rem;color:#00d4aa'>✓ Custom parameters active</div>"}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <h2 style="margin-bottom:10px">🚨 Recent Failures</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Type</th><th>Message</th></tr></thead>
+        <tbody>{failure_rows}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <h2 style="margin-bottom:10px">📜 Run History</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>{history_rows}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>DreamCo Empire OS — {display_name} Bot Dashboard</footer>
+
+  <script>
+    async function saveBotConfig() {{
+      const statusEl = document.getElementById('save-status');
+      statusEl.textContent = '⏳ Saving…';
+      try {{
+        const payload = {{
+          aggressiveness: document.getElementById('bot-aggressiveness').value,
+          max_execution_seconds: parseInt(document.getElementById('bot-max-exec').value, 10),
+          retry_policy: document.getElementById('bot-retry-policy').value,
+        }};
+        const res = await fetch('/api/bots/{bot_name}/configure', {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify(payload),
+        }});
+        if (res.ok) {{
+          statusEl.textContent = '✅ Saved!';
+          setTimeout(() => {{ statusEl.textContent = ''; }}, 3000);
+        }} else {{
+          statusEl.textContent = '⚠ Error';
+        }}
+      }} catch (e) {{
+        statusEl.textContent = '⚠ Network error';
+      }}
+    }}
+  </script>
+</body>
+</html>"""
+        return Response(html, mimetype="text/html")
+
     return app
 
 
-__all__ = ["create_app", "_BOT_CATALOG", "_fetch_github_workflows", "_fetch_github_artifacts", "_check_quantum_bot_status"]
+__all__ = [
+    "create_app",
+    "_BOT_CATALOG",
+    "_fetch_github_workflows",
+    "_fetch_github_artifacts",
+    "_check_quantum_bot_status",
+    "_get_governance",
+    "_update_governance",
+    "_get_bot_config",
+    "_set_bot_config",
+    "_append_failure",
+    "_get_failures",
+    "_detect_uncoded_bots",
+]
