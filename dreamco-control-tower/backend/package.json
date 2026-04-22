@@ -1,7 +1,6 @@
 {
   "name": "dreamco-control-tower-backend",
   "version": "1.0.0",
-  "type": "module",
   "description": "DreamCo Control Tower — Express backend for bot and repo management",
   "main": "server.js",
   "scripts": {
