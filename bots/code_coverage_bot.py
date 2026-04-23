@@ -16,6 +16,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -43,6 +44,11 @@ def run_coverage(threshold: int = _DEFAULT_THRESHOLD) -> dict:
     for path in _IGNORED_TESTS:
         ignore_args += ["--ignore", path]
 
+    # Use a temporary file for the JSON report to support concurrent runs
+    # and cross-platform compatibility.
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+        cov_report_path = tmp.name
+
     cmd = [
         sys.executable,
         "-m",
@@ -50,7 +56,7 @@ def run_coverage(threshold: int = _DEFAULT_THRESHOLD) -> dict:
         "tests/",
         "--cov=.",
         "--cov-report=term-missing",
-        "--cov-report=json:/tmp/coverage.json",
+        f"--cov-report=json:{cov_report_path}",
         "-q",
         "--tb=no",
         "--disable-warnings",
@@ -63,7 +69,7 @@ def run_coverage(threshold: int = _DEFAULT_THRESHOLD) -> dict:
     modules_below: list[dict] = []
 
     try:
-        with open("/tmp/coverage.json") as fh:
+        with open(cov_report_path) as fh:
             cov_data = json.load(fh)
         totals = cov_data.get("totals", {})
         overall_pct = totals.get("percent_covered", 0.0)
@@ -73,6 +79,11 @@ def run_coverage(threshold: int = _DEFAULT_THRESHOLD) -> dict:
                 modules_below.append({"module": module, "coverage_pct": round(pct, 1)})
     except (OSError, json.JSONDecodeError, KeyError):
         pass
+    finally:
+        try:
+            os.unlink(cov_report_path)
+        except OSError:
+            pass
 
     passed = result.returncode == 0
     return {

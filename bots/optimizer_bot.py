@@ -26,6 +26,7 @@ except ImportError:
 
 _COMPLEXITY_THRESHOLD = 10
 _MI_WARNING_THRESHOLD = 20
+_EXCLUDED_DIRS = frozenset({"node_modules", "__pycache__", "venv", ".venv"})
 
 
 def analyze_file(path: str) -> dict:
@@ -82,7 +83,7 @@ def analyze_path(target: str) -> list[dict]:
         for root, _, files in os.walk(target):
             # Skip hidden / venv / cache directories
             parts = root.replace("\\", "/").split("/")
-            if any(p.startswith(".") or p in ("node_modules", "__pycache__", "venv", ".venv") for p in parts):
+            if any(p.startswith(".") or p in _EXCLUDED_DIRS for p in parts):
                 continue
             for fname in files:
                 if fname.endswith(".py"):

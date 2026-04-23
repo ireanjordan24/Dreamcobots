@@ -24,6 +24,10 @@ RANKED_FILE = os.path.join(_ROOT, "knowledge", "ranked_insights.json")
 CONFIG_FILE = os.path.join(_ROOT, "knowledge", "adaptive_config.json")
 
 _DEFAULTS: dict = {
+    # Starting thresholds used when a saved config doesn't yet exist.
+    # When the knowledge base is empty these are immediately lowered to 1
+    # (most permissive) by the adapt() function so the system doesn't
+    # reject every input while it is still learning.
     "min_confidence": 2,
     "validator_penalty_high": 15,
     "validator_penalty_medium": 10,

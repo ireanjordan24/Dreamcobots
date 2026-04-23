@@ -24,6 +24,9 @@ IGNORED_TESTS = [
     "tests/test_web_dashboard.py",
 ]
 
+_MAX_OUTPUT_LENGTH = 4000
+_MAX_ERROR_LENGTH = 2000
+
 
 def run_tests(
     test_dir: str = "tests",
@@ -80,8 +83,8 @@ def run_tests(
         return {
             "success": result.returncode == 0,
             "returncode": result.returncode,
-            "output": result.stdout[-4000:],
-            "errors": result.stderr[-2000:],
+            "output": result.stdout[-_MAX_OUTPUT_LENGTH:],
+            "errors": result.stderr[-_MAX_ERROR_LENGTH:],
             "passed": passed,
             "failed": failed,
         }

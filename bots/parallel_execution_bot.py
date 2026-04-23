@@ -65,13 +65,15 @@ def run_parallel(
     start = time.time()
     results: list[dict] = []
     passed = failed = timed_out = 0
+    # Total wall-clock budget: allow each bot its full timeout, running in parallel
+    total_timeout = timeout + 10  # generous buffer on top of per-future timeout
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_map = {
             executor.submit(_load_and_run, name, context): name
             for name in bot_names
         }
-        for future in as_completed(future_map, timeout=timeout * len(bot_names)):
+        for future in as_completed(future_map, timeout=total_timeout):
             name = future_map[future]
             try:
                 output = future.result(timeout=timeout)

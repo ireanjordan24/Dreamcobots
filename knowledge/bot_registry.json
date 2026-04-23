@@ -5,7 +5,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "auto_repair_bot",
@@ -13,7 +13,7 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "bot_registry",
@@ -21,7 +21,7 @@
     "category": "custom",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "bot_validator",
@@ -29,7 +29,7 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "buddy_bot",
@@ -37,7 +37,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "code_coverage_bot",
@@ -45,7 +45,7 @@
     "category": "analytics",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "context_pruner_bot",
@@ -53,7 +53,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "debug_bot",
@@ -61,7 +61,7 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "deployment_review_bot",
@@ -69,7 +69,7 @@
     "category": "analytics",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "feedback_loop_bot",
@@ -77,7 +77,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "insight_ranker",
@@ -85,7 +85,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "knowledge_sync_bot",
@@ -93,7 +93,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "optimizer_bot",
@@ -101,7 +101,7 @@
     "category": "analytics",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "parallel_execution_bot",
@@ -109,7 +109,7 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "performance_monitor_bot",
@@ -117,7 +117,7 @@
     "category": "analytics",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "pr_intelligence_bot",
@@ -125,15 +125,15 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "pr_learning_bot",
     "file": "bots/pr_learning_bot.py",
     "category": "custom",
     "has_run_fn": true,
-    "has_docs": false,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "proactive_task_planner",
@@ -141,7 +141,7 @@
     "category": "intelligence",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "security_auditor_bot",
@@ -149,7 +149,7 @@
     "category": "analytics",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "skill_generation_bot",
@@ -157,7 +157,7 @@
     "category": "factory",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "task_execution_controller",
@@ -165,7 +165,7 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   },
   {
     "name": "testing_bot",
@@ -173,6 +173,6 @@
     "category": "core",
     "has_run_fn": true,
     "has_docs": true,
-    "registered_at": "2026-04-23T04:00:13Z"
+    "registered_at": "2026-04-23T04:03:15Z"
   }
 ]
