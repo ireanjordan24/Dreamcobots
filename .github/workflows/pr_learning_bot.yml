@@ -1,0 +1,13 @@
+name: PR Learning Bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run PR Learning Bot
+        run: python your_script.py
