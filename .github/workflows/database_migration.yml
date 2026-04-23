@@ -1,0 +1,15 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run migrations
+        run: |
+          # Insert your migration command here
+          echo "Running database migrations..."
