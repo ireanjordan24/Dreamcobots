@@ -39,6 +39,7 @@ from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
 from bots.professional_music_editing_bot.tiers import (
     BOT_FEATURES,
     get_bot_tier_info,
+    MONTHLY_LIMITS,
     DAILY_LIMITS,
     TRACK_LIMITS,
     FEATURE_BASIC_EDITING,
@@ -88,7 +89,7 @@ class ProfessionalMusicEditingBot:
 
     def _check_monthly_limit(self) -> None:
         """Raise ProfessionalMusicEditingBotError if the monthly project limit is exceeded."""
-        limit = DAILY_LIMITS[self.tier.value]
+        limit = MONTHLY_LIMITS[self.tier.value]
         if limit is not None and self._monthly_count >= limit:
             upgrade = get_upgrade_path(self.tier)
             upgrade_msg = (
@@ -116,6 +117,8 @@ class ProfessionalMusicEditingBot:
 
     def load_project(self, project_id: str | None = None) -> dict:
         """Load an existing project or create a new one.
+
+        When creating a new project, defaults are: sample_rate=44100 Hz, bit_depth=24-bit.
 
         Parameters
         ----------
@@ -390,7 +393,7 @@ class ProfessionalMusicEditingBot:
 
     def get_studio_dashboard(self) -> dict:
         """Return studio dashboard with monthly usage stats and tier information."""
-        limit = DAILY_LIMITS[self.tier.value]
+        limit = MONTHLY_LIMITS[self.tier.value]
         track_limit = TRACK_LIMITS[self.tier.value]
         upgrade = get_upgrade_path(self.tier)
         return {

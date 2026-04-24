@@ -50,12 +50,15 @@ BOT_FEATURES = {
     Tier.ENTERPRISE.value: ENTERPRISE_FEATURES,
 }
 
-# Monthly limits (tracked as DAILY_LIMITS for framework consistency)
-DAILY_LIMITS = {
+# Monthly consultation limits
+MONTHLY_LIMITS = {
     Tier.FREE.value: 3,
     Tier.PRO.value: 30,
     Tier.ENTERPRISE.value: None,  # unlimited
 }
+
+# Alias for backwards compatibility
+DAILY_LIMITS = MONTHLY_LIMITS
 
 
 def get_bot_tier_info(tier: Tier) -> dict:
@@ -66,7 +69,7 @@ def get_bot_tier_info(tier: Tier) -> dict:
         "name": config.name,
         "price_usd_monthly": config.price_usd_monthly,
         "features": BOT_FEATURES[tier.value],
-        "monthly_limit": DAILY_LIMITS[tier.value],
+        "monthly_limit": MONTHLY_LIMITS[tier.value],
         "support_level": config.support_level,
         "commercial_rights": FEATURE_COMMERCIAL_RIGHTS in BOT_FEATURES[tier.value],
     }

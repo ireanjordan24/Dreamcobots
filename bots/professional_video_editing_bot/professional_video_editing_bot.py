@@ -39,6 +39,7 @@ from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
 from bots.professional_video_editing_bot.tiers import (
     BOT_FEATURES,
     get_bot_tier_info,
+    MONTHLY_LIMITS,
     DAILY_LIMITS,
     CLIP_LIMITS,
     FEATURE_BASIC_EDITING,
@@ -88,7 +89,7 @@ class ProfessionalVideoEditingBot:
 
     def _check_monthly_limit(self) -> None:
         """Raise ProfessionalVideoEditingBotError if the monthly project limit is exceeded."""
-        limit = DAILY_LIMITS[self.tier.value]
+        limit = MONTHLY_LIMITS[self.tier.value]
         if limit is not None and self._monthly_count >= limit:
             upgrade = get_upgrade_path(self.tier)
             upgrade_msg = (
@@ -116,6 +117,8 @@ class ProfessionalVideoEditingBot:
 
     def load_project(self, project_id: str | None = None) -> dict:
         """Load an existing video project or create a new one.
+
+        When creating a new project, defaults are: resolution=1920x1080, fps=30.
 
         Parameters
         ----------
@@ -376,7 +379,7 @@ class ProfessionalVideoEditingBot:
 
     def get_studio_dashboard(self) -> dict:
         """Return studio dashboard with monthly usage stats and tier information."""
-        limit = DAILY_LIMITS[self.tier.value]
+        limit = MONTHLY_LIMITS[self.tier.value]
         clip_limit = CLIP_LIMITS[self.tier.value]
         upgrade = get_upgrade_path(self.tier)
         return {

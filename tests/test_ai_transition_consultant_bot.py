@@ -24,6 +24,7 @@ from bots.ai_transition_consultant_bot.tiers import (
     get_upgrade_path,
     list_tiers,
     BOT_FEATURES,
+    MONTHLY_LIMITS,
     DAILY_LIMITS,
     get_bot_tier_info,
     FEATURE_BASIC_ASSESSMENT,
@@ -82,13 +83,13 @@ class TestTiers:
         assert FEATURE_COMMERCIAL_RIGHTS in BOT_FEATURES[Tier.ENTERPRISE.value]
 
     def test_monthly_limit_free(self):
-        assert DAILY_LIMITS[Tier.FREE.value] == 3
+        assert MONTHLY_LIMITS[Tier.FREE.value] == 3
 
     def test_monthly_limit_pro(self):
-        assert DAILY_LIMITS[Tier.PRO.value] == 30
+        assert MONTHLY_LIMITS[Tier.PRO.value] == 30
 
     def test_monthly_limit_enterprise_unlimited(self):
-        assert DAILY_LIMITS[Tier.ENTERPRISE.value] is None
+        assert MONTHLY_LIMITS[Tier.ENTERPRISE.value] is None
 
     def test_tier_info_returns_dict(self):
         info = get_bot_tier_info(Tier.PRO)
