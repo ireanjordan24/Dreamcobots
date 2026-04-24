@@ -1,0 +1,8 @@
+{
+  "min_confidence": 1,
+  "validator_penalty_high": 15,
+  "validator_penalty_medium": 10,
+  "debug_min_confidence": 1,
+  "buddy_min_confidence": 3,
+  "last_updated": "2026-04-23T03:55:49Z"
+}

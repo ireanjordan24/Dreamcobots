@@ -12,7 +12,14 @@ class PullRequestLearningBot:
         # Logic for generating a response to pull requests
         pass
 
+
+def run(context: dict | None = None) -> dict:
+    """Entry point for the Task Execution Controller."""
+    return {"status": "ok", "message": "PullRequestLearningBot initialized"}
+
+
 # Example usage:
 if __name__ == '__main__':
     bot = PullRequestLearningBot()
+    pr_data = {}
     bot.learn_from_pr(pr_data)

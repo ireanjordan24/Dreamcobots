@@ -1,0 +1,172 @@
+name: DreamCo Bots — Staged Pipeline
+
+# ─────────────────────────────────────────────────────────────
+# Triggers
+# ─────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: "Run a specific layer (core|intelligence|analytics|all)"
+        required: false
+        default: "all"
+
+concurrency:
+  group: bots-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+# ─────────────────────────────────────────────────────────────
+# LAYER 1 — Core Quality
+# Validates structure, runs tests, scans for security issues.
+# Nothing proceeds if this layer fails.
+# ─────────────────────────────────────────────────────────────
+jobs:
+  core-quality:
+    name: "Layer 1 · Core Quality"
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      contains(fromJSON('["all","core"]'), github.event.inputs.layer)
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies (single source of truth)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Deployment Review (pre-flight check)
+        run: python bots/deployment_review_bot.py
+
+      - name: Validate Bot Code Quality
+        run: |
+          python bots/bot_validator.py bots/debug_bot.py
+          python bots/bot_validator.py bots/testing_bot.py
+          python bots/bot_validator.py bots/bot_validator.py
+
+      - name: Security Audit
+        run: python bots/security_auditor_bot.py bots/
+        continue-on-error: true
+
+      - name: Run Tests
+        run: python bots/testing_bot.py
+
+      - name: Code Coverage Check
+        run: python bots/code_coverage_bot.py --threshold 50
+        continue-on-error: true
+
+# ─────────────────────────────────────────────────────────────
+# LAYER 2 — Intelligence
+# Ranks insights, distributes best practices, adapts thresholds.
+# Runs only after Layer 1 passes.
+# ─────────────────────────────────────────────────────────────
+  intelligence:
+    name: "Layer 2 · Intelligence"
+    needs: core-quality
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      contains(fromJSON('["all","intelligence"]'), github.event.inputs.layer)
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rank Insights
+        run: python bots/insight_ranker.py
+
+      - name: Buddy Bot — Distribute Recommendations
+        run: python bots/buddy_bot.py
+
+      - name: Adaptive Learning — Update Thresholds
+        run: python bots/adaptive_learning_bot.py
+
+      - name: PR Intelligence Analysis
+        run: python bots/pr_intelligence_bot.py
+
+      - name: Feedback Loop — Inject Learnings
+        run: python bots/feedback_loop_bot.py
+
+      - name: Knowledge Sync
+        run: python bots/knowledge_sync_bot.py
+
+      - name: Context Pruner — Keep Knowledge Lean
+        run: python bots/context_pruner_bot.py
+
+# ─────────────────────────────────────────────────────────────
+# LAYER 3 — Advanced Analytics
+# Optimizes code, monitors performance, plans future tasks.
+# Runs only after Layer 2 passes.
+# ─────────────────────────────────────────────────────────────
+  advanced-analytics:
+    name: "Layer 3 · Advanced Analytics"
+    needs: intelligence
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'workflow_dispatch' ||
+      contains(fromJSON('["all","analytics"]'), github.event.inputs.layer)
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Optimizer Bot — Code Analysis
+        run: python bots/optimizer_bot.py bots/
+        continue-on-error: true
+
+      - name: Performance Monitor — Health Check
+        run: python bots/performance_monitor_bot.py
+        continue-on-error: true
+
+      - name: Proactive Task Planner — Generate Sprint Plan
+        run: python bots/proactive_task_planner.py
+
+      - name: Auto Repair Bot — Apply Safe Fixes
+        run: python bots/auto_repair_bot.py
+
+      - name: Bot Registry — Update Catalog
+        run: python bots/bot_registry.py
+
+      - name: Task Execution Controller — Full Pipeline Validation
+        run: python bots/task_execution_controller.py
+        continue-on-error: true

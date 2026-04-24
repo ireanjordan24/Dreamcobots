@@ -1,0 +1,178 @@
+[
+  {
+    "name": "adaptive_learning_bot",
+    "file": "bots/adaptive_learning_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "auto_repair_bot",
+    "file": "bots/auto_repair_bot.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "bot_registry",
+    "file": "bots/bot_registry.py",
+    "category": "custom",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "bot_validator",
+    "file": "bots/bot_validator.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "buddy_bot",
+    "file": "bots/buddy_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "code_coverage_bot",
+    "file": "bots/code_coverage_bot.py",
+    "category": "analytics",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "context_pruner_bot",
+    "file": "bots/context_pruner_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "debug_bot",
+    "file": "bots/debug_bot.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "deployment_review_bot",
+    "file": "bots/deployment_review_bot.py",
+    "category": "analytics",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "feedback_loop_bot",
+    "file": "bots/feedback_loop_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "insight_ranker",
+    "file": "bots/insight_ranker.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "knowledge_sync_bot",
+    "file": "bots/knowledge_sync_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "optimizer_bot",
+    "file": "bots/optimizer_bot.py",
+    "category": "analytics",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "parallel_execution_bot",
+    "file": "bots/parallel_execution_bot.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "performance_monitor_bot",
+    "file": "bots/performance_monitor_bot.py",
+    "category": "analytics",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "pr_intelligence_bot",
+    "file": "bots/pr_intelligence_bot.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "pr_learning_bot",
+    "file": "bots/pr_learning_bot.py",
+    "category": "custom",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "proactive_task_planner",
+    "file": "bots/proactive_task_planner.py",
+    "category": "intelligence",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "security_auditor_bot",
+    "file": "bots/security_auditor_bot.py",
+    "category": "analytics",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "skill_generation_bot",
+    "file": "bots/skill_generation_bot.py",
+    "category": "factory",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "task_execution_controller",
+    "file": "bots/task_execution_controller.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  },
+  {
+    "name": "testing_bot",
+    "file": "bots/testing_bot.py",
+    "category": "core",
+    "has_run_fn": true,
+    "has_docs": true,
+    "registered_at": "2026-04-23T04:03:15Z"
+  }
+]
