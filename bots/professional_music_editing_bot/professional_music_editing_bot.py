@@ -374,7 +374,7 @@ class ProfessionalMusicEditingBot:
         )
         uid = uuid.uuid4().hex[:12]
         project = self._projects.get(project_id, {})
-        track_count = len(project.get("tracks", [1]))
+        track_count = max(1, len(project.get("tracks", [])))
         size_mb = round(track_count * random.uniform(3.5, 8.0), 1)
         return {
             "project_id": project_id,
