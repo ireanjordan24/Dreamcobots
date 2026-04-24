@@ -327,7 +327,7 @@ class ProfessionalVideoEditingBot:
         }
 
     def export_project(
-        self, project_id: str, format: str = "MP4", nle_compatible: str | None = None
+        self, project_id: str, export_format: str = "MP4", nle_compatible: str | None = None
     ) -> dict:
         """Export the video project to a media file.
 
@@ -337,7 +337,7 @@ class ProfessionalVideoEditingBot:
         ----------
         project_id : str
             Project to export.
-        format : str
+        export_format : str
             Output format: MP4, MOV, MXF.
         nle_compatible : str | None
             NLE software name for project export (e.g. 'Premiere Pro'). ENTERPRISE only.
@@ -350,7 +350,7 @@ class ProfessionalVideoEditingBot:
         else:
             self._check_feature(FEATURE_MP4_1080P_EXPORT)
         result = self.flow.run_pipeline(
-            raw_data={"task": "export_project", "project_id": project_id, "format": format, "nle": nle_compatible},
+            raw_data={"task": "export_project", "project_id": project_id, "format": export_format, "nle": nle_compatible},
             learning_method="supervised",
         )
         uid = uuid.uuid4().hex[:12]
@@ -361,11 +361,11 @@ class ProfessionalVideoEditingBot:
         size_gb = round(duration * bitrate_mbps / 8 / 1024, 2)
         return {
             "project_id": project_id,
-            "format": format.upper(),
+            "export_format": export_format.upper(),
             "resolution": resolution,
             "fps": 30,
             "duration_sec": round(duration, 1),
-            "file_url": f"https://cdn.dreamcobots.ai/exports/{uid}.{format.lower()}",
+            "file_url": f"https://cdn.dreamcobots.ai/exports/{uid}.{export_format.lower()}",
             "file_size_gb": size_gb,
             "nle_compatible": nle_compatible,
             "color_space": "Rec. 709" if not is_4k else "Rec. 2020",

@@ -346,7 +346,7 @@ class ProfessionalMusicEditingBot:
         }
 
     def export_project(
-        self, project_id: str, format: str = "WAV", daw_compatible: str | None = None
+        self, project_id: str, export_format: str = "WAV", daw_compatible: str | None = None
     ) -> dict:
         """Export the project to an audio file.
 
@@ -356,12 +356,12 @@ class ProfessionalMusicEditingBot:
         ----------
         project_id : str
             Project to export.
-        format : str
+        export_format : str
             Output format: MP3, WAV, AIFF.
         daw_compatible : str | None
             DAW name for stem export (e.g. 'Logic Pro', 'Ableton Live'). ENTERPRISE only.
         """
-        format_upper = format.upper()
+        format_upper = export_format.upper()
         if format_upper in ("WAV", "AIFF"):
             self._check_feature(FEATURE_WAV_AIFF_EXPORT)
         else:
@@ -378,7 +378,7 @@ class ProfessionalMusicEditingBot:
         size_mb = round(track_count * random.uniform(3.5, 8.0), 1)
         return {
             "project_id": project_id,
-            "format": format_upper,
+            "export_format": format_upper,
             "file_url": f"https://cdn.dreamcobots.ai/exports/{uid}.{format_upper.lower()}",
             "file_size_mb": size_mb,
             "daw_compatible": daw_compatible,
