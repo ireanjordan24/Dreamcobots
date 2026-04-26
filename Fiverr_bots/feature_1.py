@@ -193,6 +193,14 @@ GigListingBot = FiverrServiceListingBot
 
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
+
+
+class _TierStr(str):
+    """String subclass with a .value property (lowercase) for Tier-enum API compatibility."""
+    @property
+    def value(self):
+        return self.lower()
+
 # ---------------------------------------------------------------------------
 import random as _random_tier
 from enum import Enum as _TierEnum
@@ -217,7 +225,7 @@ _orig_fiverrservicelisting_bot_init = FiverrServiceListingBot.__init__
 def _fiverrservicelisting_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_fiverrservicelisting_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = _TierStr(tier_val.upper())
 
 
 FiverrServiceListingBot.__init__ = _fiverrservicelisting_bot_new_init

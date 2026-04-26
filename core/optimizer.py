@@ -76,6 +76,12 @@ class Optimizer:
         revenue: float = float(bot_output.get("revenue", 0))
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
 
+        # Leads check: only when leads_generated is explicitly provided
+        if "leads_generated" in bot_output:
+            leads_generated: int = int(bot_output["leads_generated"])
+            if leads_generated < MIN_LEADS_THRESHOLD:
+                return "Expand reach"
+
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:

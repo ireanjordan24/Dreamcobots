@@ -193,6 +193,14 @@ if __name__ == "__main__":
 
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
+
+
+class _TierStr(str):
+    """String subclass with a .value property (lowercase) for Tier-enum API compatibility."""
+    @property
+    def value(self):
+        return self.lower()
+
 # ---------------------------------------------------------------------------
 import random as _random_tier
 from enum import Enum as _TierEnum
@@ -217,7 +225,7 @@ _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
 def _marketanalysis_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_marketanalysis_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = _TierStr(tier_val.upper())
 
 
 MarketAnalysisBot.__init__ = _marketanalysis_bot_new_init
@@ -259,9 +267,23 @@ def _marketanalysis_bot_analyze(self):
 
 
 def _marketanalysis_bot_export_report(self, city=None):
-    self._enforce_tier("enterprise")
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    return {"bot": "MarketAnalysisBot", "tier": t, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    # Delegate to the original export_report which raises PermissionError for non-enterprise
+    # and returns the full Investment Market Report for enterprise tier.
+    if not self._config["export"]:
+        raise PermissionError(
+            "Report export requires ENTERPRISE tier. Upgrade at dreamcobots.com/pricing"
+        )
+    target_city = city or "Austin"
+    overview = self.get_market_overview(target_city)
+    return {
+        "report_type": "Investment Market Report",
+        "generated_by": "DreamCo MarketAnalysisBot",
+        "tier": self.tier.lower() if isinstance(self.tier, str) else self.tier.value,
+        "market": overview,
+        "comparable_markets": self.compare_markets(
+            target_city, "Austin" if target_city != "Austin" else "Nashville"
+        ),
+    }
 
 
 MarketAnalysisBot.monthly_price = _marketanalysis_bot_monthly_price

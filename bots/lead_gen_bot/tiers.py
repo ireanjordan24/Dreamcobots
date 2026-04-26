@@ -174,6 +174,7 @@ BOT_FEATURES = {
 def get_bot_tier_info(tier: Tier) -> dict:
     config = get_tier_config(tier)
     return {
+        "name": config.name,
         "tier": tier.value,
         "price_usd_monthly": config.price_usd_monthly,
         "max_leads_per_day": config.max_leads_per_day,

@@ -23,6 +23,7 @@ class HustleBot(BaseBot):
         self._goals = []
         self._milestones = []
         self._tasks_completed = []
+        self.session_revenue: float = 0.0
 
     def run(self):
         """Run the hustle bot main workflow."""

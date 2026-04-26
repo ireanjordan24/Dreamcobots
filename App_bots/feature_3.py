@@ -182,6 +182,19 @@ NotificationBot = FeatureUpdateBot
 
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
+
+
+class _TierStr(str):
+    """String subclass with a .value property (lowercase) for Tier-enum API compatibility."""
+    @property
+    def value(self):
+        return self.lower()
+
+
+
+def _raise_invalid_tier(tier):
+    raise ValueError(f"Invalid tier: {tier!r}. Valid values: free, pro, enterprise")
+
 # ---------------------------------------------------------------------------
 import random as _random_tier
 from enum import Enum as _TierEnum
@@ -205,9 +218,9 @@ _orig_featureupdate_bot_init = FeatureUpdateBot.__init__
 
 def _featureupdate_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else _raise_invalid_tier(tier)
     _orig_featureupdate_bot_init(self, tier.value.upper())
-    self.tier = tier
+    self.tier = _TierStr(tier.value.upper())
 
 
 FeatureUpdateBot.__init__ = _featureupdate_bot_new_init
@@ -215,38 +228,38 @@ FeatureUpdateBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
 
 
 def _featureupdate_bot_monthly_price(self):
-    return _TIER_MONTHLY_PRICE[self.tier.value]
+    return _TIER_MONTHLY_PRICE[self.tier.lower()]
 
 
 def _featureupdate_bot_get_tier_info(self):
     return {
-        "tier": self.tier.value,
+        "tier": self.tier.lower(),
         "monthly_price_usd": self.monthly_price(),
-        "result_limit": self.RESULT_LIMITS[self.tier.value],
+        "result_limit": self.RESULT_LIMITS[self.tier.lower()],
     }
 
 
 def _featureupdate_bot_enforce_tier(self, required_value):
     order = ["free", "pro", "enterprise"]
-    if order.index(self.tier.value) < order.index(required_value):
+    if order.index(self.tier.lower()) < order.index(required_value):
         raise FeatureUpdateBotTierError(
-            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+            f"{required_value.upper()} tier required. Current: {self.tier.lower()}"
         )
 
 
 def _featureupdate_bot_list_items(self, limit=None):
-    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.lower()]
     return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
 
 
 def _featureupdate_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FeatureUpdateBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {"bot": "FeatureUpdateBot", "tier": self.tier.lower(), "count": len(EXAMPLES)}
 
 
 def _featureupdate_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FeatureUpdateBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {"bot": "FeatureUpdateBot", "tier": self.tier.lower(), "total_items": len(EXAMPLES), "items": EXAMPLES}
 
 
 FeatureUpdateBot.monthly_price = _featureupdate_bot_monthly_price
