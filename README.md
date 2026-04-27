@@ -1,5 +1,7 @@
 # DreamCobots Repository
 
+> **Repository:** DreamCo-Technologies/Dreamcobots &nbsp;|&nbsp; **ID:** 1006128644
+
 Welcome to **DreamCobots** — a versatile, user-friendly platform for automation and income generation. This repository contains a growing collection of collaborative bots (cobots) designed to automate tasks, generate income, and empower users across multiple industries.
 
 > **Contributors:** All bots must follow the **GLOBAL AI SOURCES FLOW** mandatory architecture.
@@ -28,7 +30,7 @@ Welcome to **DreamCobots** — a versatile, user-friendly platform for automatio
 
 ```bash
 # Clone the repo
-git clone https://github.com/ireanjordan24/Dreamcobots.git
+git clone https://github.com/DreamCo-Technologies/Dreamcobots.git
 cd Dreamcobots
 
 # Install deps for a specific bot
@@ -73,7 +75,7 @@ python tools/check_bot_framework.py
 ## Installation Instructions
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/ireanjordan24/Dreamcobots.git
+   git clone https://github.com/DreamCo-Technologies/Dreamcobots.git
    ```
 2. Navigate to the directory:
    ```bash
