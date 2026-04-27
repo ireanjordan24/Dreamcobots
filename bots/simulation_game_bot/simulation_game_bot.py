@@ -372,7 +372,7 @@ class SimulationGameBot:
             effect["cash"] = effect.get("cash", 0) - cost
 
         # Trading floor special logic
-        if session.scenario_id in self._scenarios and "trading" in scenario.title.lower():
+        if session.scenario_id in self._scenarios and session.scenario_id == "trading_floor":
             effect = self._trading_effect(action, session.state)
 
         # Apply effects
@@ -486,20 +486,19 @@ class SimulationGameBot:
     def _is_game_over(self, session: GameSession) -> bool:
         """Return True if the game state represents a terminal failure."""
         state = session.state
-        scenario = self._scenarios[session.scenario_id]
-        title = scenario.title.lower()
+        sid = session.scenario_id
 
-        if "ecosystem" in title:
+        if sid == "ecosystem_sim":
             return (
                 state.get("wolves", 1) <= 0
                 or state.get("rabbits", 1) <= 0
                 or state.get("grass", 1) <= 0
             )
-        if "budget" in title:
+        if sid == "budget_hero":
             return state.get("cash", 1) <= 0 and state.get("savings", 1) <= 0
-        if "trading" in title:
+        if sid == "trading_floor":
             return state.get("cash", 1) <= 0 and state.get("portfolio_value", 0) <= 0
-        if "startup" in title:
+        if sid == "startup_simulator":
             return state.get("cash", 0) < 0
         return False
 

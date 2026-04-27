@@ -258,7 +258,11 @@ class VibeCodingBot:
     name = "Vibe Coding Bot"
     category = "coding_platform"
 
-    SUPPORTED_LANGUAGES = list(_SUPPORTED_LANGUAGES.keys()) + [
+    # Languages with native in-sandbox execution (full support):
+    _EXECUTION_READY_LANGUAGES = list(_SUPPORTED_LANGUAGES.keys())
+
+    # Full language catalogue (others fall back to simulation mode):
+    SUPPORTED_LANGUAGES = _EXECUTION_READY_LANGUAGES + [
         "java", "go", "rust", "c++", "c#", "kotlin", "swift", "typescript",
         "r", "scala", "elixir", "dart", "php", "perl",
     ]

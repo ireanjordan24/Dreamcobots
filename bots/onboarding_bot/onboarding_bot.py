@@ -458,16 +458,16 @@ class OnboardingBot:
 
     def _current_step(self, session: OnboardingSession) -> Optional[OnboardingStep]:
         """Return the next unanswered wizard step, or None if all done."""
-        answered = set(session.profile.metadata.get("_answered_steps", []))
+        answered: set = set(session.profile.metadata.get("_answered_steps", []))
         for i, step in enumerate(_WIZARD_STEPS):
-            if str(i) not in answered:
+            if i not in answered:
                 return step
         return None
 
     def _advance_step(self, session: OnboardingSession) -> None:
-        answered: List[str] = session.profile.metadata.setdefault("_answered_steps", [])
+        answered: List[int] = session.profile.metadata.setdefault("_answered_steps", [])
         next_idx = len(answered)
-        answered.append(str(next_idx))
+        answered.append(next_idx)
         # Update current_stage to match
         if next_idx < len(_WIZARD_STEPS):
             session.current_stage = _WIZARD_STEPS[min(next_idx, len(_WIZARD_STEPS) - 1)].stage

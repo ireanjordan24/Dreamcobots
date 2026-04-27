@@ -94,7 +94,8 @@ class TestCustomScenario:
     def test_generate_from_prompt_startup(self):
         sc = self.bot.generate_scenario_from_prompt("I want a startup business challenge")
         assert sc is not None
-        assert "startup" in sc.title.lower() or "Buddy" in sc.title
+        # Title will contain "Buddy-Generated:" prefix with the prompt
+        assert "Buddy-Generated" in sc.title
 
     def test_generate_from_prompt_ecosystem(self):
         sc = self.bot.generate_scenario_from_prompt("an ecosystem with nature and animals")
