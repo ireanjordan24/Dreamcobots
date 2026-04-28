@@ -230,7 +230,7 @@ class Tier(_TierEnum):
 
     def __eq__(self, other):
         if isinstance(other, str):
-            return self.value.upper() == other.upper() or self.name == other.upper()
+            return self.name == other.upper()
         return super().__eq__(other)
 
     def __hash__(self):

@@ -205,7 +205,7 @@ class Tier(_TierEnum):
 
     def __eq__(self, other):
         if isinstance(other, str):
-            return self.value.upper() == other.upper() or self.name == other.upper()
+            return self.name == other.upper()
         return super().__eq__(other)
 
     def __hash__(self):
@@ -263,10 +263,12 @@ def _marketanalysis_bot_analyze(self):
 
 
 def _marketanalysis_bot_export_report(self, city=None):
-    if self.tier.value != "enterprise":
+    try:
+        self._enforce_tier("enterprise")
+    except MarketAnalysisBotTierError as exc:
         raise PermissionError(
             "Report export requires ENTERPRISE tier. Upgrade at dreamcobots.com/pricing"
-        )
+        ) from exc
     target_city = city if city else EXAMPLES[0].get("city", "")
     overview = self.get_market_overview(target_city) if target_city else {}
     return {
