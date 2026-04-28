@@ -250,6 +250,14 @@ class Tier(_TierEnum):
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper() or self.name == other.upper()
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
@@ -264,7 +272,7 @@ _orig_propertylistingaggregator_bot_init = PropertyListingAggregatorBot.__init__
 def _propertylistingaggregator_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_propertylistingaggregator_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
 
 
 PropertyListingAggregatorBot.__init__ = _propertylistingaggregator_bot_new_init

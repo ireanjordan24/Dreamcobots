@@ -203,6 +203,14 @@ class Tier(_TierEnum):
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value.upper() == other.upper() or self.name == other.upper()
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
@@ -217,7 +225,7 @@ _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
 def _marketanalysis_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_marketanalysis_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = Tier(tier_val)
 
 
 MarketAnalysisBot.__init__ = _marketanalysis_bot_new_init
@@ -225,43 +233,51 @@ MarketAnalysisBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
 
 
 def _marketanalysis_bot_monthly_price(self):
-    return _TIER_MONTHLY_PRICE[self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()]
+    return _TIER_MONTHLY_PRICE[self.tier.value]
 
 
 def _marketanalysis_bot_get_tier_info(self):
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
     return {
-        "tier": t,
+        "tier": self.tier.value,
         "monthly_price_usd": self.monthly_price(),
-        "result_limit": self.RESULT_LIMITS[t],
+        "result_limit": self.RESULT_LIMITS[self.tier.value],
     }
 
 
 def _marketanalysis_bot_enforce_tier(self, required_value):
     order = ["free", "pro", "enterprise"]
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    if order.index(t) < order.index(required_value):
+    if order.index(self.tier.value) < order.index(required_value):
         raise MarketAnalysisBotTierError(
-            f"{required_value.upper()} tier required. Current: {t}"
+            f"{required_value.upper()} tier required. Current: {self.tier.value}"
         )
 
 
 def _marketanalysis_bot_list_items(self, limit=None):
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    cap = limit if limit else self.RESULT_LIMITS[t]
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
     return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
 
 
 def _marketanalysis_bot_analyze(self):
     self._enforce_tier("pro")
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    return {"bot": "MarketAnalysisBot", "tier": t, "count": len(EXAMPLES)}
+    return {"bot": "MarketAnalysisBot", "tier": self.tier.value, "count": len(EXAMPLES)}
 
 
 def _marketanalysis_bot_export_report(self, city=None):
-    self._enforce_tier("enterprise")
-    t = self.tier.value if hasattr(self.tier, 'value') else self.tier.lower()
-    return {"bot": "MarketAnalysisBot", "tier": t, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    if self.tier.value != "enterprise":
+        raise PermissionError(
+            "Report export requires ENTERPRISE tier. Upgrade at dreamcobots.com/pricing"
+        )
+    target_city = city if city else EXAMPLES[0].get("city", "")
+    overview = self.get_market_overview(target_city) if target_city else {}
+    return {
+        "report_type": "Investment Market Report",
+        "generated_by": "DreamCo MarketAnalysisBot",
+        "bot": "MarketAnalysisBot",
+        "tier": self.tier.value,
+        "total_items": len(EXAMPLES),
+        "market": overview,
+        "items": EXAMPLES,
+    }
 
 
 MarketAnalysisBot.monthly_price = _marketanalysis_bot_monthly_price

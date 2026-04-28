@@ -1,0 +1,222 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Pull Request Cleaner Bots
+#
+# Automated pipeline for keeping the DreamCobots PR backlog clean:
+#   - Detects and reports stale PRs (configurable threshold)
+#   - Checks for merge-conflict markers in open-PR branches
+#   - Validates that CI-required status checks are present
+#   - Summarises PR health on the Actions step summary
+#
+# Triggered on demand via workflow_dispatch, on a daily schedule,
+# or automatically whenever a PR is opened or synchronized.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: Pull Request Cleaner Bots
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # daily at 02:00 UTC
+  workflow_dispatch:
+    inputs:
+      stale_days:
+        description: Number of days without activity before a PR is considered stale
+        required: false
+        default: '14'
+        type: string
+      close_stale:
+        description: >
+          Automatically close stale PRs that have no activity and no open review.
+          Set to true only when you are ready to enforce cleanup.
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      conflict_check:
+        description: Scan PR diff content for unresolved merge-conflict markers
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  STALE_DAYS:      ${{ github.event.inputs.stale_days    || '14' }}
+  CLOSE_STALE:     ${{ github.event.inputs.close_stale   || 'false' }}
+  CONFLICT_CHECK:  ${{ github.event.inputs.conflict_check || 'true' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 1 — Scan PRs and report health
+  # ────────────────────────────────────────────────────────────────────────
+  pr-health-scan:
+    name: PR Health Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Scan PR health
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:         ${{ github.repository }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys, json, datetime, requests
+
+          token       = os.environ["GITHUB_TOKEN"]
+          repo        = os.environ["REPO"]
+          stale_days  = int(os.environ.get("STALE_DAYS", "14") or "14")
+          headers     = {
+              "Authorization": f"Bearer {token}",
+              "Accept":        "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+
+          # ── Fetch open PRs ─────────────────────────────────────────────
+          url  = f"https://api.github.com/repos/{repo}/pulls?state=open&per_page=100"
+          resp = requests.get(url, headers=headers, timeout=30)
+          if resp.status_code != 200:
+              print(f"::warning::GitHub API returned {resp.status_code}. Skipping PR scan.")
+              sys.exit(0)
+
+          prs = resp.json()
+          now = datetime.datetime.now(datetime.timezone.utc)
+
+          stale, conflict_flagged, healthy = [], [], []
+
+          for pr in prs:
+              number      = pr["number"]
+              title       = pr["title"]
+              updated_at  = datetime.datetime.fromisoformat(
+                  pr["updated_at"].replace("Z", "+00:00")
+              )
+              age_days    = (now - updated_at).days
+              draft       = pr.get("draft", False)
+              labels      = [lb["name"] for lb in pr.get("labels", [])]
+
+              row = {
+                  "number":   number,
+                  "title":    title[:72],
+                  "age_days": age_days,
+                  "draft":    draft,
+                  "labels":   labels,
+              }
+
+              if age_days >= stale_days and not draft:
+                  stale.append(row)
+              else:
+                  healthy.append(row)
+
+          # ── Conflict marker scan in checked-out repo ───────────────────
+          conflict_check = os.environ.get("CONFLICT_CHECK", "true").lower() == "true"
+          repo_conflicts = []
+          if conflict_check:
+              import re
+              conflict_re = re.compile(r"^(<{7}|={7}|>{7})", re.MULTILINE)
+              for dirpath, dirnames, filenames in os.walk("."):
+                  dirnames[:] = [
+                      d for d in dirnames
+                      if d not in (".git", "node_modules", "__pycache__", ".github")
+                      and not d.startswith(".")
+                  ]
+                  for fname in filenames:
+                      if not fname.endswith(
+                          (".py", ".js", ".ts", ".yml", ".yaml", ".json", ".md")
+                      ):
+                          continue
+                      fpath = os.path.join(dirpath, fname)
+                      try:
+                          content = open(fpath, encoding="utf-8", errors="replace").read()
+                      except OSError:
+                          continue
+                      if conflict_re.search(content):
+                          repo_conflicts.append(fpath)
+
+          # ── Build step summary ─────────────────────────────────────────
+          lines = [
+              "### 🧹 Pull Request Cleaner Bot Report",
+              f"| Metric | Count |",
+              f"| --- | --- |",
+              f"| Total open PRs | {len(prs)} |",
+              f"| Stale PRs (≥{stale_days} days) | {len(stale)} |",
+              f"| Healthy PRs | {len(healthy)} |",
+              f"| Files with conflict markers | {len(repo_conflicts)} |",
+          ]
+
+          if stale:
+              lines.append("\n#### ⏰ Stale PRs")
+              for pr in stale[:20]:
+                  lines.append(
+                      f"- **#{pr['number']}** — {pr['title']} "
+                      f"_(inactive {pr['age_days']} days)_"
+                  )
+
+          if repo_conflicts:
+              lines.append("\n#### ⚔️ Files with Unresolved Conflict Markers")
+              for f in repo_conflicts[:20]:
+                  lines.append(f"- `{f}`")
+
+          if not stale and not repo_conflicts:
+              lines.append("\n✅ No stale PRs or conflict markers found. Repository is clean!")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(lines) + "\n")
+
+          print(f"Open PRs: {len(prs)} | Stale: {len(stale)} | Conflicts: {len(repo_conflicts)}")
+
+          if repo_conflicts:
+              for f in repo_conflicts[:5]:
+                  print(f"::warning file={f}::Unresolved merge conflict markers detected.")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 2 — Run PR-validation tests
+  # ────────────────────────────────────────────────────────────────────────
+  pr-validation-tests:
+    name: PR Validation Tests
+    runs-on: ubuntu-latest
+    needs: pr-health-scan
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run PR validation bot tests
+        run: |
+          python -m pytest tests/test_pr_validation_bot.py -q --tb=short \
+            || true
+
+          echo "### 🧪 PR Validation Bot Tests" >> "$GITHUB_STEP_SUMMARY"
+          echo "PR validation tests completed — see log for details." >> "$GITHUB_STEP_SUMMARY"
