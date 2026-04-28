@@ -10,3 +10,6 @@ node_modules/
 
 # Runtime upload artifacts
 uploads/
+
+# Elite Scraper knowledge store (managed by CI workflow)
+data/elite_scraper/
