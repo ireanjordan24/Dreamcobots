@@ -224,7 +224,7 @@ _orig_socialmediaposting_bot_init = SocialMediaPostingBot.__init__
 def _socialmediaposting_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_socialmediaposting_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
 
 
 SocialMediaPostingBot.__init__ = _socialmediaposting_bot_new_init
@@ -283,7 +283,7 @@ import uuid as _uuid_mkt1
 def _socialmediabot_new_init_full(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_socialmediaposting_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_mkt1.uuid4())
     self.name = "Social Media Bot"

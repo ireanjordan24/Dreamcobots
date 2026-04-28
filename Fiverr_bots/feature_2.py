@@ -223,7 +223,7 @@ _orig_fiverrordermanager_bot_init = FiverrOrderManagerBot.__init__
 def _fiverrordermanager_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_fiverrordermanager_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
 
 
 FiverrOrderManagerBot.__init__ = _fiverrordermanager_bot_new_init
