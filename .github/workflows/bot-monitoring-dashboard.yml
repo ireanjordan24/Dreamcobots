@@ -558,6 +558,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run control center health check
+        env:
+          TOTAL_BOTS:  ${{ needs.bot-inventory.outputs.total_bots }}
+          ERROR_COUNT: ${{ needs.bot-inventory.outputs.error_count }}
+          STUB_COUNT:  ${{ needs.bot-inventory.outputs.stub_count }}
         run: |
           python - <<'PYEOF'
           import sys, os
@@ -588,12 +592,15 @@ jobs:
           except Exception as exc:
               print(f"::warning::Controller health check failed: {exc}")
 
+          total = os.environ.get("TOTAL_BOTS", "N/A")
+          errors = os.environ.get("ERROR_COUNT", "N/A")
+          stubs  = os.environ.get("STUB_COUNT", "N/A")
           summary_lines = [
               "### 🎛️ Control Center Health",
               "All core control-center components checked.",
-              f"- **Total discovered bots**: ${{ needs.bot-inventory.outputs.total_bots }}",
-              f"- **Error bots**: ${{ needs.bot-inventory.outputs.error_count }}",
-              f"- **Stub bots**: ${{ needs.bot-inventory.outputs.stub_count }}",
+              f"- **Total discovered bots**: {total}",
+              f"- **Error bots**: {errors}",
+              f"- **Stub bots**: {stubs}",
           ]
           with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
               fh.write("\n".join(summary_lines) + "\n")

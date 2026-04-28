@@ -194,10 +194,10 @@ def _status_icon(status: str) -> str:
 def render_text_dashboard(bots: list[dict], workflow_dups: dict) -> None:
     """Print a human-readable dashboard to stdout."""
     total = len(bots)
-    ok    = sum(1 for b in bots if b["status"] == "ok")
-    stub  = sum(1 for b in bots if b["status"] in ("stub", "partial"))
-    err   = sum(1 for b in bots if b["status"] == "error")
-    ts    = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ok = sum(1 for b in bots if b["status"] == "ok")
+    stub = sum(1 for b in bots if b["status"] in ("stub", "partial"))
+    err = sum(1 for b in bots if b["status"] == "error")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     print("=" * 65)
     print("  🤖  Dreamcobots Bot Dashboard")
@@ -216,9 +216,9 @@ def render_text_dashboard(bots: list[dict], workflow_dups: dict) -> None:
 
     print("  Category breakdown:")
     for cat, cat_bots in sorted(categories.items()):
-        c_ok   = sum(1 for b in cat_bots if b["status"] == "ok")
+        c_ok = sum(1 for b in cat_bots if b["status"] == "ok")
         c_stub = sum(1 for b in cat_bots if b["status"] in ("stub", "partial"))
-        c_err  = sum(1 for b in cat_bots if b["status"] == "error")
+        c_err = sum(1 for b in cat_bots if b["status"] == "error")
         print(f"    {cat:<35} {len(cat_bots):>3} total  {c_ok} ok  {c_stub} stub  {c_err} err")
 
     print("-" * 65)
