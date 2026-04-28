@@ -1,0 +1,151 @@
+name: Bot Library Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to perform"
+        required: true
+        type: choice
+        options:
+          - list_all_bots
+          - register_library
+          - update_mastery
+          - show_summary
+          - purge_low_relevance
+          - show_leaderboard
+      bot_name:
+        description: "Target bot name (required for per-bot actions)"
+        required: false
+        default: ""
+      library_name:
+        description: "Library name (required for register_library / update_mastery)"
+        required: false
+        default: ""
+      mastery_score:
+        description: "Mastery score 0-100 (required for update_mastery)"
+        required: false
+        default: "50"
+      category:
+        description: "Library category (optional, used for register_library)"
+        required: false
+        default: "general"
+      relevance_threshold:
+        description: "Relevance threshold for purge_low_relevance (default 40)"
+        required: false
+        default: "40"
+
+jobs:
+  manage-bot-library:
+    runs-on: ubuntu-latest
+    name: "Bot Library: ${{ github.event.inputs.action }}"
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run bot library action
+        env:
+          ACTION:             ${{ github.event.inputs.action }}
+          BOT_NAME:           ${{ github.event.inputs.bot_name }}
+          LIBRARY_NAME:       ${{ github.event.inputs.library_name }}
+          MASTERY_SCORE:      ${{ github.event.inputs.mastery_score }}
+          CATEGORY:           ${{ github.event.inputs.category }}
+          RELEVANCE_THRESHOLD: ${{ github.event.inputs.relevance_threshold }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys
+          sys.path.insert(0, ".")
+          from bots.bot_library_manager import BotLibraryManager
+
+          DB_PATH = "data/bot_libraries.db"
+          import pathlib
+          pathlib.Path("data").mkdir(exist_ok=True)
+
+          mgr = BotLibraryManager(db_path=DB_PATH)
+          action = os.environ["ACTION"]
+          bot_name = os.environ.get("BOT_NAME", "").strip()
+          library_name = os.environ.get("LIBRARY_NAME", "").strip()
+
+          if action == "list_all_bots":
+              bots = mgr.list_all_bots()
+              print(f"Registered bots ({len(bots)}):")
+              for b in bots:
+                  s = mgr.get_library_summary(b)
+                  print(f"  {b}: {s['total_libraries']} libs, avg mastery {s['avg_mastery']:.1f}")
+
+          elif action == "register_library":
+              if not bot_name or not library_name:
+                  print("ERROR: bot_name and library_name are required")
+                  sys.exit(1)
+              rec = mgr.register_library(bot_name, library_name,
+                                         category=os.environ.get("CATEGORY", "general"))
+              print(f"Registered: {rec}")
+
+          elif action == "update_mastery":
+              if not bot_name or not library_name:
+                  print("ERROR: bot_name and library_name are required")
+                  sys.exit(1)
+              score = float(os.environ.get("MASTERY_SCORE", "50"))
+              rec = mgr.update_mastery(bot_name, library_name, score)
+              print(f"Updated: {rec}")
+
+          elif action == "show_summary":
+              if not bot_name:
+                  # Show all bots
+                  bots = mgr.list_all_bots()
+                  for b in bots:
+                      print(mgr.get_library_summary(b))
+              else:
+                  print(mgr.get_library_summary(bot_name))
+              learning_stats = mgr.get_learning_stats(bot_name) if bot_name else {}
+              if learning_stats:
+                  print("Learning stats:", learning_stats)
+
+          elif action == "purge_low_relevance":
+              if not bot_name:
+                  print("ERROR: bot_name required for purge")
+                  sys.exit(1)
+              threshold = float(os.environ.get("RELEVANCE_THRESHOLD", "40"))
+              purged = mgr.purge_low_relevance(bot_name, threshold=threshold)
+              print(f"Purged {purged} low-relevance entries for {bot_name}")
+
+          elif action == "show_leaderboard":
+              bots = mgr.list_all_bots()
+              ranked = sorted(
+                  [mgr.get_library_summary(b) for b in bots],
+                  key=lambda x: x["avg_mastery"],
+                  reverse=True,
+              )
+              print("=== Bot Library Leaderboard ===")
+              for i, row in enumerate(ranked, 1):
+                  print(f"  #{i} {row['bot_name']}: "
+                        f"mastered={row['mastered']} proficient={row['proficient']} "
+                        f"avg_mastery={row['avg_mastery']:.1f}")
+
+          else:
+              print(f"Unknown action: {action}")
+              sys.exit(1)
+
+          mgr.close()
+          PYEOF
+
+      - name: Upload bot library database artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-library-db
+          path: data/bot_libraries.db
+          if-no-files-found: ignore

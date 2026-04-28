@@ -22,23 +22,24 @@ class TestImprove:
         )
 
     def test_change_strategy_low_conversion(self):
-        result = self.opt.improve({"revenue": 10, "conversion_rate": 0.01})
+        result = self.opt.improve({"revenue": 10, "conversion_rate": 0.01, "leads_generated": 5})
         assert result == "Change strategy"
 
     def test_scale_aggressively_high_revenue(self):
-        result = self.opt.improve({"revenue": 1_500, "conversion_rate": 0.3})
+        result = self.opt.improve({"revenue": 1_500, "conversion_rate": 0.3, "leads_generated": 5})
         assert result == "Scale aggressively"
 
     def test_maintain_middle_case(self):
-        result = self.opt.improve({"revenue": 200, "conversion_rate": 0.2})
+        result = self.opt.improve({"revenue": 200, "conversion_rate": 0.2, "leads_generated": 5})
         assert result == "Maintain"
 
     def test_missing_keys_treated_as_zero(self):
+        # No leads_generated means 0 leads < MIN_LEADS_THRESHOLD → Expand reach
         result = self.opt.improve({})
-        assert result == "Change strategy"
+        assert result == "Expand reach"
 
     def test_zero_conversion_is_change_strategy(self):
-        result = self.opt.improve({"revenue": 500, "conversion_rate": 0.0})
+        result = self.opt.improve({"revenue": 500, "conversion_rate": 0.0, "leads_generated": 5})
         assert result == "Change strategy"
 
 

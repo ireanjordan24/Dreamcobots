@@ -1,0 +1,160 @@
+name: Elite Scraper — Continuous Training
+
+# Runs all Elite Scraper bots continuously on a schedule until 2026-06-22.
+# After that date the scheduled trigger is automatically inactive (GitHub
+# does not execute cron jobs whose repository branch has no new pushes, and
+# the workflow can be disabled manually post-launch).
+#
+# Manual trigger is always available via workflow_dispatch for ad-hoc runs.
+
+on:
+  schedule:
+    # Every 6 hours — keeps training active 24/7 while staying well within
+    # the GitHub Actions free-tier usage limits.
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      bot_filter:
+        description: "Run scrapers only for this bot (leave empty for all)"
+        required: false
+        default: ""
+      query_override:
+        description: "Override the search query (leave empty for defaults)"
+        required: false
+        default: ""
+
+jobs:
+  elite-scraper-training:
+    runs-on: ubuntu-latest
+    name: "Elite Scraper Training Run"
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare data directory
+        run: mkdir -p data
+
+      - name: Run Elite Scraper training for all bots
+        env:
+          BOT_FILTER:       ${{ github.event.inputs.bot_filter }}
+          QUERY_OVERRIDE:   ${{ github.event.inputs.query_override }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys, json, datetime
+          sys.path.insert(0, ".")
+
+          from bots.bot_library_manager import BotLibraryManager
+          from bots.elite_scraper.base import EliteScraperBase
+
+          # ----------------------------------------------------------------
+          # Stop if past the launch date (safety guard for scheduled runs)
+          # ----------------------------------------------------------------
+          LAUNCH_DATE = datetime.date(2026, 6, 22)
+          today = datetime.date.today()
+          if os.environ.get("GITHUB_EVENT_NAME") == "schedule" and today > LAUNCH_DATE:
+              print(f"Launch date {LAUNCH_DATE} has passed. Skipping scheduled run.")
+              sys.exit(0)
+
+          DB_PATH = "data/bot_libraries.db"
+          mgr = BotLibraryManager(db_path=DB_PATH, retention_threshold=40.0)
+
+          # ----------------------------------------------------------------
+          # Bot scraper registry — each bot has a tailored set of keywords
+          # and a default query aligned to its domain.
+          # ----------------------------------------------------------------
+          BOT_SCRAPER_CONFIG = {
+              "lead_gen_bot":        {"keywords": ["lead generation", "scraping", "contacts", "b2b", "crm"], "query": "lead generation automation workflow"},
+              "ai_learning_system":  {"keywords": ["machine learning", "training", "neural network", "ai", "model"], "query": "AI learning system automation"},
+              "fiverr_bot":          {"keywords": ["fiverr", "freelance", "gig", "seo", "content"], "query": "fiverr automation workflow"},
+              "real_estate_bot":     {"keywords": ["real estate", "mls", "zillow", "property", "listing"], "query": "real estate data scraping"},
+              "sales_bot":           {"keywords": ["sales", "pipeline", "crm", "outreach", "conversion"], "query": "sales automation github workflow"},
+              "crypto_bot":          {"keywords": ["crypto", "trading", "blockchain", "defi", "token"], "query": "crypto trading bot automation"},
+              "social_media_bot":    {"keywords": ["social media", "twitter", "instagram", "engagement", "growth"], "query": "social media automation workflow"},
+              "affiliate_bot":       {"keywords": ["affiliate", "commission", "referral", "marketing", "revenue"], "query": "affiliate marketing automation"},
+              "saas_bot":            {"keywords": ["saas", "subscription", "api", "monetization", "pricing"], "query": "saas revenue automation workflow"},
+              "bot_generator_bot":   {"keywords": ["code generation", "template", "scaffold", "bot", "automation"], "query": "bot code generation framework"},
+          }
+
+          bot_filter = os.environ.get("BOT_FILTER", "").strip()
+          query_override = os.environ.get("QUERY_OVERRIDE", "").strip()
+
+          results_summary = []
+
+          for bot_name, cfg in BOT_SCRAPER_CONFIG.items():
+              if bot_filter and bot_name != bot_filter:
+                  continue
+
+              query = query_override or cfg["query"]
+
+              # Create a specialized scraper for this bot
+              class _BotScraper(EliteScraperBase):
+                  pass
+              _BotScraper.bot_name = bot_name
+              _BotScraper.scraper_type = "github_simulated"
+              _BotScraper.keywords = cfg["keywords"]
+              _BotScraper.min_relevance = 40.0
+
+              # Override _fetch_raw to produce simulated training items
+              # (In production, replace this with real GitHub API / web calls)
+              def _make_fetch(kws, q):
+                  def _fetch_raw(self, query):
+                      return [
+                          {"content": f"{q}: best practices for {kw} in production systems", "source_url": f"https://github.com/search?q={kw.replace(' ', '+')}"}
+                          for kw in kws
+                      ]
+                  return _fetch_raw
+
+              _BotScraper._fetch_raw = _make_fetch(cfg["keywords"], query)
+
+              scraper = _BotScraper(db_manager=mgr)
+
+              # Register the libraries this bot uses
+              for kw in cfg["keywords"][:3]:
+                  mgr.register_library(bot_name, kw, category="domain_knowledge")
+
+              result = scraper.run(query)
+              results_summary.append(result)
+              print(f"[{bot_name}] query='{query}' "
+                    f"found={result['items_found']} kept={result['items_retained']} "
+                    f"discarded={result['items_discarded']} "
+                    f"({result['duration_ms']}ms)")
+
+          print(f"\n=== Training Complete [{today}] ===")
+          print(f"Bots trained: {len(results_summary)}")
+          print(f"Total items retained: {sum(r['items_retained'] for r in results_summary)}")
+          print(f"Total items discarded: {sum(r['items_discarded'] for r in results_summary)}")
+
+          # Write a JSON summary for the artifact
+          import pathlib
+          summary_path = pathlib.Path("data/scraper_run_summary.json")
+          summary_path.write_text(json.dumps({
+              "run_date": str(today),
+              "bots_trained": len(results_summary),
+              "results": results_summary,
+          }, indent=2))
+
+          mgr.close()
+          PYEOF
+
+      - name: Upload scraper training artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elite-scraper-training-${{ github.run_number }}
+          path: |
+            data/bot_libraries.db
+            data/scraper_run_summary.json
+          if-no-files-found: ignore
