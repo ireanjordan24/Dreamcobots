@@ -39,6 +39,8 @@ jobs:
   manage-bot-library:
     runs-on: ubuntu-latest
     name: "Bot Library: ${{ github.event.inputs.action }}"
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository

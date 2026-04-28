@@ -25,17 +25,10 @@ on:
 
 jobs:
   elite-scraper-training:
-    # Only run scheduled jobs on or before 2026-06-22.
-    # workflow_dispatch runs are always allowed (no date guard).
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'schedule' &&
-       '2026-06-22' >= format('{0}', github.event.schedule))
     runs-on: ubuntu-latest
     name: "Elite Scraper Training Run"
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
