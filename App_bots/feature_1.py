@@ -241,7 +241,10 @@ _orig_useronboarding_bot_init = UserOnboardingBot.__init__
 
 def _useronboarding_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+        tier_str = str(tier).lower()
+        if tier_str not in ("free", "pro", "enterprise"):
+            raise ValueError(f"Invalid tier '{tier}'. Choose from ['FREE', 'PRO', 'ENTERPRISE']")
+        tier = Tier(tier_str)
     _orig_useronboarding_bot_init(self, tier.value.upper())
     self.tier = tier
 

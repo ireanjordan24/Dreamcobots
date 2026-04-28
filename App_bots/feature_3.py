@@ -213,7 +213,10 @@ _orig_featureupdate_bot_init = FeatureUpdateBot.__init__
 
 def _featureupdate_bot_new_init(self, tier=Tier.FREE):
     if not isinstance(tier, Tier):
-        tier = Tier(str(tier).lower()) if str(tier).lower() in ("free", "pro", "enterprise") else Tier.FREE
+        tier_str = str(tier).lower()
+        if tier_str not in ("free", "pro", "enterprise"):
+            raise ValueError(f"Invalid tier '{tier}'. Choose from ['FREE', 'PRO', 'ENTERPRISE']")
+        tier = Tier(tier_str)
     _orig_featureupdate_bot_init(self, tier.value.upper())
     self.tier = tier
 

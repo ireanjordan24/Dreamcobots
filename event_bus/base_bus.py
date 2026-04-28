@@ -7,17 +7,16 @@ implementations without change.
 
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Any, Callable, Dict, List
 
 
 class BaseEventBus(ABC):
     """
-    In-memory event bus (concrete base).
+    Abstract base event bus.
 
-    Suitable for unit tests and environments where Redis is unavailable.
-    Handlers are called synchronously on publish.
+    Concrete subclasses must implement ``publish`` and ``subscribe``.
     """
 
     def __init__(self) -> None:
@@ -25,19 +24,18 @@ class BaseEventBus(ABC):
         self._event_log: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
-    # Pub/Sub API
+    # Pub/Sub API (abstract)
     # ------------------------------------------------------------------
 
+    @abstractmethod
     def publish(self, event_type: str, data: Any = None) -> None:
         """Publish *data* to every subscriber registered for *event_type*."""
-        entry = {"event_type": event_type, "data": data}
-        self._event_log.append(entry)
-        for handler in list(self._subscribers.get(event_type, [])):
-            handler(data)
+        ...
 
+    @abstractmethod
     def subscribe(self, event_type: str, handler: Callable) -> None:
         """Register *handler* to be called when *event_type* is published."""
-        self._subscribers[event_type].append(handler)
+        ...
 
     def unsubscribe(self, event_type: str, handler: Callable) -> None:
         """Remove *handler* from *event_type* subscriptions."""

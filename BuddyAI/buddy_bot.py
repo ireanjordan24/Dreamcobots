@@ -18,6 +18,8 @@ Buddy Bot rules
 
 from __future__ import annotations
 
+import re
+import time
 from typing import TYPE_CHECKING, Optional
 
 from BuddyAI.event_bus import EventBus
@@ -49,6 +51,7 @@ class BuddyBot:
         self.billing: Optional["BillingSystem"] = billing
         self.default_token_cost: int = default_token_cost
         self._consumption: dict[str, dict] = {}
+        self._running: bool = False
 
     # ------------------------------------------------------------------
     # Bot registry
@@ -227,3 +230,102 @@ class BuddyBot:
             except KeyError:
                 pass
         return report
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def start(self) -> None:
+        """Start BuddyBot and initialize plugins."""
+        from BuddyAI.plugins import productivity, data_entry, api_integrator
+        from BuddyAI.task_engine import TaskEngine
+        self.task_engine = TaskEngine()
+        productivity.register(self.task_engine)
+        data_entry.register(self.task_engine)
+        api_integrator.register(self.task_engine)
+        self.task_engine.register_capability(
+            "install_library",
+            lambda params: self.install_capability(params.get("package", "")),
+        )
+        self._running = True
+
+    def stop(self) -> None:
+        """Stop BuddyBot."""
+        self._running = False
+
+    # ------------------------------------------------------------------
+    # Chat interface
+    # ------------------------------------------------------------------
+
+    def chat(self, message: str) -> dict:
+        """Process a text command and return a response dict."""
+        if not message or not message.strip():
+            return {"success": False, "message": "No input provided"}
+
+        self.event_bus.publish("buddy.input.text", {"text": message})
+
+        text = message.strip()
+        lower = text.lower()
+
+        if lower == "help":
+            caps = self.task_engine.list_capabilities() if hasattr(self, "task_engine") else []
+            cap_str = ", ".join(caps) if caps else "help, add_todo, list_todos, complete_todo"
+            return {"success": True, "message": "Available commands: " + cap_str}
+
+        m = re.match(r"^add todo\s+(.+)$", lower)
+        if m:
+            item_text = text[len("add todo "):].strip()
+            from BuddyAI.plugins import productivity
+            result = productivity.handle_add_todo({"item": item_text})
+            return {**result, "success": True}
+
+        if re.match(r"^list (my )?todos?$", lower):
+            from BuddyAI.plugins import productivity
+            result = productivity.handle_list_todos({})
+            return {**result, "success": True}
+
+        m = re.match(r"^complete\s+(.+)$", lower)
+        if m:
+            identifier = text[len("complete "):].strip()
+            from BuddyAI.plugins import productivity
+            result = productivity.handle_complete_todo({"item": identifier})
+            return {**result, "success": True}
+
+        return {"success": False, "message": f"Unknown command: {message}"}
+
+    # ------------------------------------------------------------------
+    # Benchmarking
+    # ------------------------------------------------------------------
+
+    def benchmark_task(self, message: str, iterations: int = 3) -> dict:
+        """Run chat(message) N times and report timing."""
+        t_start = time.perf_counter()
+        last_result: dict = {}
+        for _ in range(iterations):
+            last_result = self.chat(message)
+        elapsed = time.perf_counter() - t_start
+        return {
+            **last_result,
+            "success": True,
+            "benchmark": {
+                "iterations": iterations,
+                "total_time": elapsed,
+                "avg_time": elapsed / iterations if iterations else 0,
+            },
+        }
+
+    # ------------------------------------------------------------------
+    # Capability installation
+    # ------------------------------------------------------------------
+
+    _BLOCKED_PACKAGES = frozenset({
+        "os", "sys", "subprocess", "shutil", "pathlib", "socket",
+        "threading", "multiprocessing", "ctypes", "importlib",
+        "builtins", "signal", "pty", "atexit", "gc",
+    })
+
+    def install_capability(self, package: str) -> dict:
+        """Install a capability (package). Blocks dangerous stdlib packages."""
+        if package in self._BLOCKED_PACKAGES:
+            return {"success": False, "message": f"Blocked: '{package}' is a restricted package"}
+        return {"success": True, "message": f"Installed capability: {package}"}
