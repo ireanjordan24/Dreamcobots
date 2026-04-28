@@ -1,0 +1,47 @@
+# Dreamcobots Workflows
+
+## Button Workflows
+
+### Run Bot
+- Trigger: Push Event
+- Actions: Run the specified bot.
+
+### Test Bot
+- Trigger: Pull Request
+- Actions: Execute tests across the bots.
+
+### Deploy Bot
+- Trigger: Release
+- Actions: Deploy specified bot versions.
+
+### Secure Bot
+- Trigger: Schedule
+- Actions: Run security checks on bot implementations.
+
+### Scale Bot
+- Basic, Moderate, Aggressive
+- Actions: Adjust scalability settings based on selected level.
+
+## Global Workflows
+
+### Run All Bots
+- Trigger: Manual
+- Actions: Execute all bots in the repository.
+
+### Debug Workflows
+- Trigger: Manual
+- Actions: Identify and fix errors in workflows.
+
+### Handle Bot Scaling
+- Trigger: Manual
+- Actions: Manage scaling via superbot and subbot teams.
+
+## Training and Task Workflows for Buddy
+
+### Automate Coding
+- Trigger: On Code Commit
+- Actions: Suggest improvements and automate debugging.
+
+### Manage Repository Tasks
+- Trigger: Scheduled
+- Actions: Organize tasks at repository and Codespaces level.
