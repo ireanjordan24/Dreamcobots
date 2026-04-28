@@ -7,13 +7,14 @@ implementations without change.
 
 from __future__ import annotations
 
+from abc import ABC
 from collections import defaultdict
 from typing import Any, Callable, Dict, List
 
 
-class BaseEventBus:
+class BaseEventBus(ABC):
     """
-    In-memory event bus.
+    In-memory event bus (concrete base).
 
     Suitable for unit tests and environments where Redis is unavailable.
     Handlers are called synchronously on publish.
@@ -28,32 +29,14 @@ class BaseEventBus:
     # ------------------------------------------------------------------
 
     def publish(self, event_type: str, data: Any = None) -> None:
-        """
-        Publish *data* to every subscriber registered for *event_type*.
-
-        Parameters
-        ----------
-        event_type : str
-            The event channel name (e.g. ``"deal_found"``).
-        data : Any
-            Payload forwarded to each subscriber.
-        """
+        """Publish *data* to every subscriber registered for *event_type*."""
         entry = {"event_type": event_type, "data": data}
         self._event_log.append(entry)
         for handler in list(self._subscribers.get(event_type, [])):
             handler(data)
 
     def subscribe(self, event_type: str, handler: Callable) -> None:
-        """
-        Register *handler* to be called when *event_type* is published.
-
-        Parameters
-        ----------
-        event_type : str
-            The channel to subscribe to.
-        handler : callable
-            Function to invoke with the event data.
-        """
+        """Register *handler* to be called when *event_type* is published."""
         self._subscribers[event_type].append(handler)
 
     def unsubscribe(self, event_type: str, handler: Callable) -> None:
@@ -67,8 +50,10 @@ class BaseEventBus:
     # Introspection helpers
     # ------------------------------------------------------------------
 
-    def get_events(self) -> List[Dict[str, Any]]:
-        """Return a copy of all published events in order."""
+    def get_events(self, event_type: str = None) -> List:
+        """Return published events, optionally filtered by event_type."""
+        if event_type is not None:
+            return [e["data"] for e in self._event_log if e["event_type"] == event_type]
         return list(self._event_log)
 
     def clear(self) -> None:

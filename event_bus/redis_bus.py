@@ -80,13 +80,30 @@ class RedisEventBus(BaseEventBus):
         data : Any
             JSON-serialisable payload.
         """
-        super().publish(event_type, data)
+        entry = {"event_type": event_type, "data": data}
+        self._event_log.append(entry)
+        for handler in list(self._subscribers.get(event_type, [])):
+            handler(data)
         if self._redis is not None:
             try:
-                payload = json.dumps({"event_type": event_type, "data": data})
-                self._redis.publish(event_type, payload)
+                self._redis.publish(event_type, json.dumps(data))
             except Exception:
                 pass
+
+    def subscribe(self, event_type: str, handler: Callable) -> None:
+        """Register handler, deduplicating against already-registered handlers."""
+        existing = self._subscribers.get(event_type, [])
+        if handler not in existing:
+            self._subscribers[event_type] = list(existing) + [handler]
+
+    def get_events(self, event_type: str = None):
+        """Return published events, optionally filtered by event_type."""
+        return super().get_events(event_type)
+
+    @property
+    def redis_connected(self) -> bool:
+        """Return True if Redis is connected."""
+        return self._redis is not None
 
     @property
     def redis_available(self) -> bool:
