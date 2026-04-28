@@ -73,7 +73,7 @@ class MarketplaceDeployer:
     - Standard documented-symbol tools: $2.99 / month
     - Free tools: $0.00 (open-source libraries)
 
-    Enterprise ENTERPRISE tier users can deploy; PRO can list; FREE can browse.
+    ENTERPRISE tier users can deploy; PRO can list; FREE can browse.
     """
 
     _PRICE_HIDDEN = 9.99

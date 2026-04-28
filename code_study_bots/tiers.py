@@ -4,7 +4,7 @@ Tier definitions for the Code Study Bots / Tool Library Builder ecosystem.
 Tiers
 -----
 FREE       — Discover up to 5 languages, generate tools from documented APIs only.
-PRO        — All languages, hidden-capability discovery, versioning, 1 000 tools/month.
+PRO        — All languages, hidden-capability discovery, versioning, 1,000 tools/month.
 ENTERPRISE — Unlimited, marketplace deployment, white-label exports, priority updates.
 """
 
