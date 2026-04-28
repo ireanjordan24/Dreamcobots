@@ -123,3 +123,75 @@ CREATE TABLE IF NOT EXISTS bot_schedules (
 CREATE INDEX IF NOT EXISTS idx_bot_schedules_bot_name ON bot_schedules (bot_name);
 CREATE INDEX IF NOT EXISTS idx_bot_schedules_enabled ON bot_schedules (enabled);
 CREATE INDEX IF NOT EXISTS idx_bot_schedules_next_run ON bot_schedules (next_run);
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- bot_libraries
+-- Each bot can register one or more named libraries it uses / has mastered.
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS bot_libraries (
+    id              SERIAL PRIMARY KEY,
+    bot_name        VARCHAR(100) NOT NULL,
+    library_name    VARCHAR(255) NOT NULL,
+    version         VARCHAR(50),
+    category        VARCHAR(100) NOT NULL DEFAULT 'general',
+    mastery_score   NUMERIC(5, 2) NOT NULL DEFAULT 0.0
+                        CHECK (mastery_score >= 0 AND mastery_score <= 100),
+    status          VARCHAR(20) NOT NULL DEFAULT 'learning'
+                        CHECK (status IN ('learning', 'proficient', 'mastered', 'deprecated')),
+    notes           TEXT,
+    registered_at   TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (bot_name, library_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_bot_libraries_bot_name   ON bot_libraries (bot_name);
+CREATE INDEX IF NOT EXISTS idx_bot_libraries_status     ON bot_libraries (status);
+CREATE INDEX IF NOT EXISTS idx_bot_libraries_category   ON bot_libraries (category);
+CREATE INDEX IF NOT EXISTS idx_bot_libraries_mastery    ON bot_libraries (mastery_score);
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- bot_learning_data
+-- Per-bot key/value learning store — scraped facts, strategies, client leads,
+-- and any other structured knowledge each bot accumulates.
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS bot_learning_data (
+    id              SERIAL PRIMARY KEY,
+    bot_name        VARCHAR(100) NOT NULL,
+    data_type       VARCHAR(100) NOT NULL DEFAULT 'generic',
+    source          VARCHAR(255) NOT NULL DEFAULT 'manual',
+    content         TEXT NOT NULL,
+    relevance_score NUMERIC(5, 2) NOT NULL DEFAULT 50.0
+                        CHECK (relevance_score >= 0 AND relevance_score <= 100),
+    retained        BOOLEAN NOT NULL DEFAULT TRUE,
+    tags            TEXT,
+    scraped_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_bot_learning_data_bot_name       ON bot_learning_data (bot_name);
+CREATE INDEX IF NOT EXISTS idx_bot_learning_data_data_type      ON bot_learning_data (data_type);
+CREATE INDEX IF NOT EXISTS idx_bot_learning_data_retained       ON bot_learning_data (retained);
+CREATE INDEX IF NOT EXISTS idx_bot_learning_data_relevance      ON bot_learning_data (relevance_score);
+CREATE INDEX IF NOT EXISTS idx_bot_learning_data_scraped_at     ON bot_learning_data (scraped_at);
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- scraper_runs
+-- Records each Elite Scraper invocation so the system can track what was
+-- gathered, what was kept vs discarded, and the overall knowledge gain.
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS scraper_runs (
+    id              SERIAL PRIMARY KEY,
+    bot_name        VARCHAR(100) NOT NULL,
+    scraper_type    VARCHAR(100) NOT NULL DEFAULT 'github',
+    query           TEXT NOT NULL,
+    items_found     INTEGER NOT NULL DEFAULT 0,
+    items_retained  INTEGER NOT NULL DEFAULT 0,
+    items_discarded INTEGER NOT NULL DEFAULT 0,
+    status          VARCHAR(20) NOT NULL DEFAULT 'success'
+                        CHECK (status IN ('success', 'partial', 'failed')),
+    duration_ms     INTEGER NOT NULL DEFAULT 0,
+    ran_at          TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_scraper_runs_bot_name    ON scraper_runs (bot_name);
+CREATE INDEX IF NOT EXISTS idx_scraper_runs_status      ON scraper_runs (status);
+CREATE INDEX IF NOT EXISTS idx_scraper_runs_ran_at      ON scraper_runs (ran_at);
