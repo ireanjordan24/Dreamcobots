@@ -147,7 +147,8 @@ jobs:
                           continue
                       fpath = os.path.join(dirpath, fname)
                       try:
-                          content = open(fpath, encoding="utf-8", errors="replace").read()
+                          with open(fpath, encoding="utf-8", errors="replace") as fh:
+                              content = fh.read()
                       except OSError:
                           continue
                       if conflict_re.search(content):

@@ -116,14 +116,17 @@ jobs:
               py_files    = [f for f in filenames if f.endswith(".py")]
               if not py_files:
                   continue
-              has_run    = any(
-                  re.search(r"def run\(", open(os.path.join(dirpath, f), encoding="utf-8", errors="replace").read())
-                  for f in py_files
-              )
+              has_run = False
+              for f in py_files:
+                  with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
+                      if re.search(r"def run\(", fh.read()):
+                          has_run = True
+                          break
               if not has_run:
                   uncoded.append(dirpath)
               for f in py_files:
-                  content = open(os.path.join(dirpath, f), encoding="utf-8", errors="replace").read()
+                  with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
+                      content = fh.read()
                   if stub_re.search(content):
                       stubbed.append(dirpath)
                       break
