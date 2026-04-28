@@ -1,0 +1,165 @@
+name: Tool Library Builder CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "code_study_bots/**"
+      - "ToolLibrary/**"
+      - "tests/test_tool_library_builder.py"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "code_study_bots/**"
+      - "ToolLibrary/**"
+      - "tests/test_tool_library_builder.py"
+  schedule:
+    # Run every Sunday at 03:00 UTC for periodic library updates
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Version bump type (patch / minor / major)"
+        required: false
+        default: "patch"
+      language:
+        description: "Language to process (leave blank for all)"
+        required: false
+        default: ""
+      deploy_marketplace:
+        description: "Deploy to marketplace (true / false)"
+        required: false
+        default: "false"
+
+jobs:
+  # -----------------------------------------------------------------------
+  # 1. Unit tests for the code_study_bots package
+  # -----------------------------------------------------------------------
+  test:
+    name: Run Tool Library Builder Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+
+      - name: Run Tool Library Builder tests
+        run: |
+          python -m pytest tests/test_tool_library_builder.py -v --tb=short
+
+      - name: Smoke-test imports
+        run: |
+          python -c "
+          from code_study_bots import ToolLibraryBuilderBot
+          from code_study_bots.tiers import Tier
+          bot = ToolLibraryBuilderBot(tier=Tier.FREE)
+          status = bot.get_status()
+          assert 'tier' in status
+          print('[OK] code_study_bots package imports and instantiates correctly')
+          "
+
+  # -----------------------------------------------------------------------
+  # 2. Periodic tool library update (scheduled + manual)
+  # -----------------------------------------------------------------------
+  update-tool-library:
+    name: Periodic Tool Library Update
+    runs-on: ubuntu-latest
+    needs: test
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run periodic update (PRO-tier simulation)
+        run: |
+          python - <<'EOF'
+          import sys
+          sys.path.insert(0, '.')
+          from code_study_bots import ToolLibraryBuilderBot
+          from code_study_bots.tiers import Tier
+
+          bot = ToolLibraryBuilderBot(tier=Tier.PRO)
+          result = bot.run_periodic_update()
+          print(f"[UPDATE] Libraries processed : {result['libraries_processed']}")
+          print(f"[UPDATE] Tools generated     : {result['tools_generated']}")
+          print(f"[UPDATE] Versions bumped      : {result['versions_bumped']}")
+          EOF
+
+      - name: Version bump
+        run: |
+          python - <<'EOF'
+          import sys
+          sys.path.insert(0, '.')
+          from code_study_bots import ToolLibraryBuilderBot
+          from code_study_bots.tiers import Tier
+          import os
+
+          bump_type = os.environ.get('BUMP_TYPE', 'patch')
+          language  = os.environ.get('LANGUAGE', '') or None
+
+          bot = ToolLibraryBuilderBot(tier=Tier.PRO)
+          # Seed some tools so the version bump has something to work on
+          bot.build_tools_for_language('python')
+          result = bot.update_tool_versions(language=language, bump_type=bump_type)
+          print(f"[VERSION] Bump type     : {result['bump_type']}")
+          print(f"[VERSION] Tools updated : {result['tools_updated']}")
+          EOF
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump_type || 'patch' }}
+          LANGUAGE: ${{ github.event.inputs.language || '' }}
+
+  # -----------------------------------------------------------------------
+  # 3. Lint the code_study_bots package
+  # -----------------------------------------------------------------------
+  lint:
+    name: Lint code_study_bots
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Lint code_study_bots/
+        run: |
+          flake8 code_study_bots/ \
+            --max-line-length=120 \
+            --ignore=E501,W503,E302,E402,F401 \
+            --statistics \
+            --exit-zero
