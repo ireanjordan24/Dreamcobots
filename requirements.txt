@@ -12,4 +12,4 @@ fastapi>=0.100.0
 httpx>=0.24.0
 flask>=2.0.0
 flask-cors>=4.0.0
-stripe>=7.0.0
+stripe>=15.1.0
