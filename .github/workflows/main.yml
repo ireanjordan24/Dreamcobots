@@ -1,4 +1,4 @@
-name: DreamCo CI
+name: DreamCo Node Build
 
 on:
   push:

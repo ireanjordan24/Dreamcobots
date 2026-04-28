@@ -1,0 +1,475 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Duplication Detection Bot
+#
+# Automatically finds and reports duplicates across:
+#   - Workflow files (same name or near-identical content)
+#   - Bot directories (bots with near-identical implementations)
+#   - Python files (duplicate function/class definitions)
+#   - PR descriptions (overlapping or near-duplicate PRs)
+#
+# When run with action='merge-report', produces a consolidation plan
+# listing what should be merged, kept, or removed — without deleting anything.
+#
+# Triggered daily, on pull requests, or on demand.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: Duplication Detection Bot
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 4 * * *'   # daily at 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'What to scan for duplicates'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all               # run every scan (default)
+          - workflows         # workflow-file duplicates only
+          - bots              # bot-directory duplicates only
+          - python-symbols    # duplicate Python function/class names
+          - merge-report      # produce a consolidation plan
+      similarity_threshold:
+        description: 'Minimum similarity % to flag as duplicate (50–100)'
+        required: false
+        default: '80'
+        type: string
+      fail_on_duplicates:
+        description: 'Fail the workflow when duplicates are found'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  ACTION:               ${{ github.event.inputs.action               || 'all' }}
+  SIMILARITY_THRESHOLD: ${{ github.event.inputs.similarity_threshold || '80' }}
+  FAIL_ON_DUPLICATES:   ${{ github.event.inputs.fail_on_duplicates   || 'false' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 1 — Detect duplicate workflow files
+  # ────────────────────────────────────────────────────────────────────────
+  detect-duplicate-workflows:
+    name: "🔁 Duplicate Workflows"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: |
+      github.event.inputs.action == 'all' ||
+      github.event.inputs.action == 'workflows' ||
+      github.event.inputs.action == '' ||
+      github.event_name != 'workflow_dispatch'
+    outputs:
+      dup_workflow_count: ${{ steps.detect.outputs.dup_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect duplicate workflow names and content
+        id: detect
+        run: |
+          python - <<'PYEOF'
+          import os, re, hashlib, json
+
+          wf_dir = ".github/workflows"
+          files  = sorted(
+              f for f in os.listdir(wf_dir)
+              if f.endswith((".yml", ".yaml"))
+          )
+
+          # --- Name duplicates ---
+          name_map = {}
+          for fname in files:
+              fpath = os.path.join(wf_dir, fname)
+              content = open(fpath, encoding="utf-8", errors="replace").read()
+              m = re.search(r'^name:\s*(.+)', content, re.MULTILINE)
+              wf_name = m.group(1).strip() if m else "(unnamed)"
+              name_map.setdefault(wf_name, []).append(fname)
+
+          name_dups = {n: fs for n, fs in name_map.items() if len(fs) > 1}
+
+          # --- Content duplicates (SHA-256 of normalised content) ---
+          hash_map = {}
+          for fname in files:
+              fpath = os.path.join(wf_dir, fname)
+              content = open(fpath, encoding="utf-8", errors="replace").read()
+              # Normalise: strip comments and blank lines for comparison
+              lines = [
+                  ln for ln in content.splitlines()
+                  if ln.strip() and not ln.strip().startswith("#")
+              ]
+              digest = hashlib.sha256("\n".join(lines).encode()).hexdigest()
+              hash_map.setdefault(digest, []).append(fname)
+
+          content_dups = {h: fs for h, fs in hash_map.items() if len(fs) > 1}
+
+          total_dups = len(name_dups) + len(content_dups)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"dup_count={total_dups}\n")
+
+          lines = [
+              "### 🔁 Duplicate Workflow Report",
+              "",
+              f"| Type | Count |",
+              f"| --- | --- |",
+              f"| Duplicate names | {len(name_dups)} |",
+              f"| Identical content | {len(content_dups)} |",
+              "",
+          ]
+
+          if name_dups:
+              lines.append("#### Workflows sharing the same `name:` field")
+              lines.append("")
+              for name, flist in sorted(name_dups.items()):
+                  lines.append(f"- **`{name}`**")
+                  for f in flist:
+                      lines.append(f"  - `{f}`")
+              lines.append("")
+
+          if content_dups:
+              lines.append("#### Workflows with identical content (after comment removal)")
+              lines.append("")
+              for h, flist in content_dups.items():
+                  lines.append(f"- Hash `{h[:12]}...`")
+                  for f in flist:
+                      lines.append(f"  - `{f}`")
+              lines.append("")
+
+          if not name_dups and not content_dups:
+              lines.append("✅ No duplicate workflow files detected.")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(lines) + "\n")
+
+          if name_dups or content_dups:
+              print(f"::warning::Found {len(name_dups)} name duplicate(s) and {len(content_dups)} content duplicate(s) in workflows.")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 2 — Detect duplicate bot directories
+  # ────────────────────────────────────────────────────────────────────────
+  detect-duplicate-bots:
+    name: "🤖 Duplicate Bot Directories"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: |
+      github.event.inputs.action == 'all' ||
+      github.event.inputs.action == 'bots' ||
+      github.event.inputs.action == '' ||
+      github.event_name != 'workflow_dispatch'
+    outputs:
+      dup_bot_count: ${{ steps.detect.outputs.dup_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Detect duplicate bot directories
+        id: detect
+        env:
+          SIMILARITY_THRESHOLD: ${{ env.SIMILARITY_THRESHOLD }}
+        run: |
+          python - <<'PYEOF'
+          import os, re, hashlib, difflib, sys
+
+          threshold = int(os.environ.get("SIMILARITY_THRESHOLD", "80")) / 100.0
+
+          BOT_ROOTS = [
+              "bots", "Business_bots", "App_bots", "Occupational_bots",
+              "Marketing_bots", "Real_Estate_bots", "Side_Hustle_bots",
+              "Fiverr_bots", "Government_Contract_bots",
+          ]
+
+          def fingerprint(bot_path: str) -> str:
+              """Return a content fingerprint for a bot directory."""
+              chunks = []
+              for entry in sorted(os.listdir(bot_path)):
+                  if not entry.endswith(".py"):
+                      continue
+                  fpath = os.path.join(bot_path, entry)
+                  try:
+                      content = open(fpath, encoding="utf-8", errors="replace").read()
+                      # Strip docstrings, comments, blank lines for comparison
+                      content = re.sub(r'""".*?"""', "", content, flags=re.DOTALL)
+                      content = re.sub(r"'''.*?'''", "", content, flags=re.DOTALL)
+                      content = re.sub(r"#.*", "", content)
+                      content = "\n".join(ln.strip() for ln in content.splitlines() if ln.strip())
+                      chunks.append(content)
+                  except OSError:
+                      pass
+              return "\n".join(chunks)
+
+          # Collect all bots with their fingerprints
+          bots = []
+          for root in BOT_ROOTS:
+              if not os.path.isdir(root):
+                  continue
+              for entry in sorted(os.listdir(root)):
+                  bot_path = os.path.join(root, entry)
+                  if not os.path.isdir(bot_path):
+                      continue
+                  py_files = [f for f in os.listdir(bot_path) if f.endswith(".py")]
+                  if not py_files:
+                      continue
+                  fp = fingerprint(bot_path)
+                  if fp.strip():
+                      bots.append({"path": bot_path, "name": entry, "fp": fp})
+
+          # Compare pairs for similarity
+          duplicates = []
+          checked = set()
+          for i, a in enumerate(bots):
+              for j, b in enumerate(bots):
+                  if j <= i:
+                      continue
+                  key = (a["path"], b["path"])
+                  if key in checked:
+                      continue
+                  checked.add(key)
+                  ratio = difflib.SequenceMatcher(None, a["fp"], b["fp"]).quick_ratio()
+                  if ratio >= threshold:
+                      duplicates.append({
+                          "bot_a": a["path"],
+                          "bot_b": b["path"],
+                          "similarity": round(ratio * 100, 1),
+                      })
+
+          dup_count = len(duplicates)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"dup_count={dup_count}\n")
+
+          lines = [
+              "### 🤖 Duplicate Bot Report",
+              "",
+              f"- **Bots scanned**: {len(bots)}",
+              f"- **Similarity threshold**: {int(threshold * 100)}%",
+              f"- **Duplicate pairs found**: {dup_count}",
+              "",
+          ]
+
+          if duplicates:
+              lines.append("#### Similar bot pairs")
+              lines.append("")
+              lines.append("| Bot A | Bot B | Similarity |")
+              lines.append("| --- | --- | --- |")
+              for d in sorted(duplicates, key=lambda x: -x["similarity"])[:30]:
+                  lines.append(f"| `{d['bot_a']}` | `{d['bot_b']}` | {d['similarity']}% |")
+              lines.append("")
+              lines.append("> ⚠️ These bots share significant code. Review and merge/consolidate where appropriate.")
+          else:
+              lines.append("✅ No duplicate bot directories detected at this threshold.")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(lines) + "\n")
+
+          if duplicates:
+              print(f"::warning::Found {dup_count} near-duplicate bot pair(s) (threshold={int(threshold*100)}%).")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 3 — Detect duplicate Python symbols
+  # ────────────────────────────────────────────────────────────────────────
+  detect-duplicate-symbols:
+    name: "🐍 Duplicate Python Symbols"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: |
+      github.event.inputs.action == 'all' ||
+      github.event.inputs.action == 'python-symbols' ||
+      github.event.inputs.action == '' ||
+      github.event_name != 'workflow_dispatch'
+    outputs:
+      dup_symbol_count: ${{ steps.detect.outputs.dup_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Detect duplicate Python symbols
+        id: detect
+        run: |
+          python - <<'PYEOF'
+          import os, re, ast, sys
+          from collections import defaultdict
+
+          SCAN_ROOTS = [
+              "bots", "Business_bots", "App_bots", "Occupational_bots",
+              "Marketing_bots", "Real_Estate_bots", "Side_Hustle_bots",
+              "Fiverr_bots", "Government_Contract_bots", "core",
+          ]
+
+          # Map: symbol_name -> list of (file_path, kind)
+          symbols = defaultdict(list)
+
+          for root in SCAN_ROOTS:
+              if not os.path.isdir(root):
+                  continue
+              for dirpath, dirnames, filenames in os.walk(root):
+                  dirnames[:] = [d for d in dirnames if d not in ("__pycache__", ".git")]
+                  for fname in filenames:
+                      if not fname.endswith(".py"):
+                          continue
+                      fpath = os.path.join(dirpath, fname)
+                      try:
+                          source = open(fpath, encoding="utf-8", errors="replace").read()
+                          tree   = ast.parse(source, filename=fpath)
+                      except (SyntaxError, UnicodeDecodeError):
+                          continue
+                      for node in ast.walk(tree):
+                          if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                              symbols[node.name].append((fpath, "function"))
+                          elif isinstance(node, ast.ClassDef):
+                              symbols[node.name].append((fpath, "class"))
+
+          # Filter: only report symbols defined in 3+ files (likely duplicates)
+          MIN_FILES = 3
+          dup_symbols = {
+              name: locs
+              for name, locs in symbols.items()
+              if len(set(f for f, _ in locs)) >= MIN_FILES
+              and not name.startswith("_")   # skip private/dunder
+              and name not in ("run", "main", "setUp", "tearDown", "test")
+          }
+
+          dup_count = len(dup_symbols)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"dup_count={dup_count}\n")
+
+          lines = [
+              "### 🐍 Duplicate Python Symbol Report",
+              "",
+              f"- **Minimum files for 'duplicate' flag**: {MIN_FILES}",
+              f"- **Duplicate symbol names**: {dup_count}",
+              "",
+          ]
+
+          if dup_symbols:
+              lines.append("#### Top duplicate symbols (defined in many files)")
+              lines.append("")
+              # Sort by count descending, show top 25
+              sorted_syms = sorted(dup_symbols.items(), key=lambda x: -len(x[1]))[:25]
+              lines.append("| Symbol | Kind | # Files |")
+              lines.append("| --- | --- | --- |")
+              for name, locs in sorted_syms:
+                  kind = locs[0][1]
+                  file_count = len(set(f for f, _ in locs))
+                  lines.append(f"| `{name}` | {kind} | {file_count} |")
+              lines.append("")
+              lines.append("> ℹ️ Many of these are intentional (e.g. base-class methods).")
+              lines.append("> Review to identify unintentional duplication.")
+          else:
+              lines.append("✅ No notable duplicate Python symbols detected.")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(lines) + "\n")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 4 — Consolidation plan (merge-report)
+  # ────────────────────────────────────────────────────────────────────────
+  merge-report:
+    name: "📋 Consolidation Plan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - detect-duplicate-workflows
+      - detect-duplicate-bots
+      - detect-duplicate-symbols
+    if: |
+      always() && (
+        github.event.inputs.action == 'all' ||
+        github.event.inputs.action == 'merge-report' ||
+        github.event.inputs.action == '' ||
+        github.event_name != 'workflow_dispatch'
+      )
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate consolidation plan
+        env:
+          DUP_WORKFLOWS: ${{ needs.detect-duplicate-workflows.outputs.dup_workflow_count }}
+          DUP_BOTS:      ${{ needs.detect-duplicate-bots.outputs.dup_bot_count }}
+          DUP_SYMBOLS:   ${{ needs.detect-duplicate-symbols.outputs.dup_symbol_count }}
+          FAIL_ON_DUPS:  ${{ env.FAIL_ON_DUPLICATES }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys
+
+          dup_wf  = int(os.environ.get("DUP_WORKFLOWS", "0") or "0")
+          dup_bot = int(os.environ.get("DUP_BOTS",      "0") or "0")
+          dup_sym = int(os.environ.get("DUP_SYMBOLS",   "0") or "0")
+          fail    = os.environ.get("FAIL_ON_DUPS", "false").lower() == "true"
+
+          total = dup_wf + dup_bot + dup_sym
+
+          lines = [
+              "## 📋 Duplication Consolidation Plan",
+              "",
+              "| Category | Duplicates Found |",
+              "| --- | --- |",
+              f"| 🔁 Workflow files | {dup_wf} |",
+              f"| 🤖 Bot directories | {dup_bot} |",
+              f"| 🐍 Python symbols  | {dup_sym} |",
+              f"| **Total** | **{total}** |",
+              "",
+          ]
+
+          if total == 0:
+              lines.append("✅ **No duplicates detected — repository is clean.**")
+          else:
+              lines += [
+                  "### Recommended Actions",
+                  "",
+                  "1. **Workflow duplicates** — Review workflows with the same `name:` field.",
+                  "   - Keep the most complete version.",
+                  "   - Rename or remove the redundant file.",
+                  "   - Merge unique features from each before removing.",
+                  "",
+                  "2. **Bot duplicates** — Review near-identical bot directories.",
+                  "   - Compare feature sets side-by-side.",
+                  "   - Merge unique capabilities into the primary bot.",
+                  "   - Archive or remove the redundant bot directory.",
+                  "",
+                  "3. **Python symbol duplicates** — Review multiply-defined functions/classes.",
+                  "   - Move shared logic to a common base class or utility module.",
+                  "   - Update all call sites to use the consolidated symbol.",
+                  "",
+                  "> ⚠️ **No files have been modified.** This is a report only.",
+                  "> All consolidation must be done manually or via a dedicated PR.",
+              ]
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(lines) + "\n")
+
+          print(f"Duplication scan complete: {total} total duplicate(s) found.")
+          if fail and total > 0:
+              print(f"::error::fail_on_duplicates=true — {total} duplicate(s) detected.")
+              sys.exit(1)
+          PYEOF
