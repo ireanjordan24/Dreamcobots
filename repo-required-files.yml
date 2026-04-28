@@ -1,0 +1,50 @@
+# repo-required-files.yml
+#
+# List of files and directories that MUST exist in the repository for the
+# build and test suite to pass.  Keep this file sorted alphabetically within
+# each section.
+#
+# Run the validator locally with:
+#   python scripts/validate_repo_files.py
+#
+# The validator is also wired into the main CI workflow (dreamco-main.yml) as
+# an early "Validate required files" step so missing-file failures are
+# immediately actionable.
+
+required_files:
+  # ── Core Python modules ────────────────────────────────────────────────
+  - core/__init__.py
+  - core/dreamco_orchestrator.py
+  - core/optimizer.py
+  - core/scheduler.py
+  - core/bot_registry.py
+
+  # ── Framework ──────────────────────────────────────────────────────────
+  - framework/global_ai_sources_flow.py
+
+  # ── DreamCo JS bots & orchestrator ────────────────────────────────────
+  - DreamCo/bots/realEstateBot.js
+  - DreamCo/bots/contractBot.js
+  - DreamCo/bots/jobBot.js
+  - DreamCo/orchestrator/index.js
+
+  # ── Python bots ────────────────────────────────────────────────────────
+  - bots/government-contract-grant-bot/government_contract_grant_bot.py
+  - bots/211-resource-eligibility-bot/bot.py
+  - bots/selenium-job-application-bot/bot.py
+  - bots/ai-side-hustle-bots/bot.py
+
+  # ── Project configuration ──────────────────────────────────────────────
+  - requirements.txt
+  - package.json
+
+  # ── Registry / coding bots ────────────────────────────────────────────
+  - coding-bots.json
+
+required_dirs:
+  - bots
+  - core
+  - framework
+  - DreamCo
+  - scripts
+  - tests

@@ -1,0 +1,53 @@
+{
+  "_comment": "Single source of truth for coding systems/bots. Run `python scripts/render_coding_bots.py` to update README.md.",
+  "coding_bots": [
+    {
+      "name": "GitHub Copilot",
+      "url": "https://github.com/features/copilot",
+      "description": "AI pair programmer that suggests code and entire functions in real time.",
+      "tags": ["ai", "code-completion", "github"]
+    },
+    {
+      "name": "OpenAI Codex",
+      "url": "https://openai.com/blog/openai-codex",
+      "description": "AI system that translates natural language to code across dozens of languages.",
+      "tags": ["ai", "code-generation", "openai"]
+    },
+    {
+      "name": "Lovable",
+      "url": "https://lovable.dev",
+      "description": "AI-powered full-stack app builder — describe your app and Lovable builds it.",
+      "tags": ["ai", "app-builder", "fullstack"]
+    },
+    {
+      "name": "Replit",
+      "url": "https://replit.com",
+      "description": "Online IDE with built-in AI (Ghostwriter) for code completion and generation.",
+      "tags": ["ai", "ide", "cloud", "code-completion"]
+    },
+    {
+      "name": "Claude Code",
+      "url": "https://www.anthropic.com/claude",
+      "description": "Anthropic's Claude used for code generation, review, and refactoring.",
+      "tags": ["ai", "code-generation", "anthropic"]
+    },
+    {
+      "name": "ChatGPT",
+      "url": "https://chatgpt.com",
+      "description": "OpenAI's conversational AI capable of writing, explaining, and debugging code.",
+      "tags": ["ai", "code-generation", "openai"]
+    },
+    {
+      "name": "Cursor",
+      "url": "https://cursor.sh",
+      "description": "AI-first code editor built on VS Code with deep codebase understanding.",
+      "tags": ["ai", "editor", "code-completion"]
+    },
+    {
+      "name": "Windsurf",
+      "url": "https://codeium.com/windsurf",
+      "description": "Agentic IDE by Codeium with multi-file editing and autonomous task execution.",
+      "tags": ["ai", "editor", "agentic"]
+    }
+  ]
+}

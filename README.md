@@ -183,6 +183,54 @@ See full documentation in:
 3. Make sure necessary APIs and configurations are set before running.
 
 ---
+## 🤖 Supported Coding Systems / AI Bots
+
+The table below is auto-generated from [`coding-bots.json`](coding-bots.json).
+To add a new coding system:
+1. Edit `coding-bots.json` — append an entry to the `coding_bots` array.
+2. Run `python scripts/render_coding_bots.py` to regenerate this section.
+3. Commit both `coding-bots.json` and `README.md`.
+
+<!-- CODING-BOTS:START -->
+| System | Description | Tags |
+|--------|-------------|------|
+| [GitHub Copilot](https://github.com/features/copilot) | AI pair programmer that suggests code and entire functions in real time. | `ai`, `code-completion`, `github` |
+| [OpenAI Codex](https://openai.com/blog/openai-codex) | AI system that translates natural language to code across dozens of languages. | `ai`, `code-generation`, `openai` |
+| [Lovable](https://lovable.dev) | AI-powered full-stack app builder — describe your app and Lovable builds it. | `ai`, `app-builder`, `fullstack` |
+| [Replit](https://replit.com) | Online IDE with built-in AI (Ghostwriter) for code completion and generation. | `ai`, `ide`, `cloud`, `code-completion` |
+| [Claude Code](https://www.anthropic.com/claude) | Anthropic's Claude used for code generation, review, and refactoring. | `ai`, `code-generation`, `anthropic` |
+| [ChatGPT](https://chatgpt.com) | OpenAI's conversational AI capable of writing, explaining, and debugging code. | `ai`, `code-generation`, `openai` |
+| [Cursor](https://cursor.sh) | AI-first code editor built on VS Code with deep codebase understanding. | `ai`, `editor`, `code-completion` |
+| [Windsurf](https://codeium.com/windsurf) | Agentic IDE by Codeium with multi-file editing and autonomous task execution. | `ai`, `editor`, `agentic` |
+<!-- CODING-BOTS:END -->
+
+---
+## 🔧 Repo Validation & Build Tools
+
+### Validate required files
+
+Prevent missing-file CI failures by running the validator locally before pushing:
+
+```bash
+python scripts/validate_repo_files.py
+```
+
+The validator reads [`repo-required-files.yml`](repo-required-files.yml) and prints any missing paths with a clear action message.  It is also wired into the `DreamCo Main — Run & Validate` CI workflow as an early step.
+
+### Detect missing files in CI logs (BuildFixBot)
+
+```bash
+# Parse a saved CI log file
+python bots/build_fix_bot/build_fix_bot.py --log path/to/ci.log
+
+# Pipe directly from stdout
+cat ci.log | python bots/build_fix_bot/build_fix_bot.py
+
+# JSON output (for scripting)
+python bots/build_fix_bot/build_fix_bot.py --log ci.log --json
+```
+
+---
 ## GitHub Pages Instructions
 1. Navigate to **Settings > Pages**.
 2. Select the `deployment-setup` branch and root directory as the publishing source.

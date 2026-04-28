@@ -37,3 +37,31 @@ def get_registered_bots() -> List[Dict[str, Any]]:
 def clear_registry() -> None:
     """Clear all entries from the registry (useful for testing)."""
     REGISTERED_BOTS.clear()
+
+
+# ---------------------------------------------------------------------------
+# BotRegistry class (object-oriented facade over the module-level registry)
+# ---------------------------------------------------------------------------
+
+class BotRegistry:
+    """
+    Object-oriented wrapper around the module-level bot registry.
+
+    Example
+    -------
+    >>> registry = BotRegistry()
+    >>> registry.register({"name": "my_bot", "status": "active"})
+    >>> bots = registry.list_bots()
+    """
+
+    def register(self, bot_info: Dict[str, Any]) -> None:
+        """Add *bot_info* to the global registry."""
+        register_bot(bot_info)
+
+    def list_bots(self) -> List[Dict[str, Any]]:
+        """Return all registered bots."""
+        return get_registered_bots()
+
+    def clear(self) -> None:
+        """Clear all entries (useful for testing)."""
+        clear_registry()
