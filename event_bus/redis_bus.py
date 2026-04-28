@@ -92,9 +92,10 @@ class RedisEventBus(BaseEventBus):
 
     def subscribe(self, event_type: str, handler: Callable) -> None:
         """Register handler, deduplicating against already-registered handlers."""
-        existing = self._subscribers.get(event_type, [])
-        if handler not in existing:
-            self._subscribers[event_type] = list(existing) + [handler]
+        if event_type not in self._subscribers:
+            self._subscribers[event_type] = []
+        if handler not in self._subscribers[event_type]:
+            self._subscribers[event_type].append(handler)
 
     def get_events(self, event_type: str = None):
         """Return published events, optionally filtered by event_type."""

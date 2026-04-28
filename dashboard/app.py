@@ -113,6 +113,7 @@ def create_app(leads_path: str = None) -> Any:
     """Create and return a Flask application instance."""
     try:
         from flask import Flask, jsonify, make_response  # type: ignore[import]
+        import json as _json
     except ImportError:
         return None
 
@@ -128,7 +129,6 @@ def create_app(leads_path: str = None) -> Any:
                     line = line.strip()
                     if line:
                         try:
-                            import json as _json
                             leads.append(_json.loads(line))
                         except Exception:
                             pass

@@ -34,6 +34,8 @@ DEFAULT_KPIS: Dict[str, float] = {
 DEFAULT_UNDERPERFORM_THRESHOLD: int = 30
 DEFAULT_SCORE_MIN: float = 0.0
 DEFAULT_SCORE_MAX: float = 100.0
+REVENUE_PER_LEAD: float = 10.0
+REVENUE_THRESHOLD_FOR_SCALER_BOT: float = 500.0
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +351,7 @@ class LearningLoop:
             if revenue == 0.0:
                 self.generator.create_bot("lead_booster_bot")
                 created.append("lead_booster_bot")
-            elif revenue > 500.0:
+            elif revenue > REVENUE_THRESHOLD_FOR_SCALER_BOT:
                 self.generator.create_bot("sales_scaler_bot")
                 created.append("sales_scaler_bot")
         underperformers = {name: score for name, score in self.performance_log.items()
@@ -375,13 +377,13 @@ class LearningLoop:
     def track_revenue(self) -> float:
         if self.control_center is not None and hasattr(self.control_center, "get_total_revenue"):
             return float(self.control_center.get_total_revenue())
-        # Count leads from data/leads.json — each lead = $10
+        # Count leads from data/leads.json — each lead = $REVENUE_PER_LEAD
         import os as _os
         leads_file = _os.path.join("data", "leads.json")
         if _os.path.isfile(leads_file):
             with open(leads_file) as f:
                 count = sum(1 for line in f if line.strip())
-            return float(count * 10.0)
+            return float(count * REVENUE_PER_LEAD)
         return float(sum(r.total_revenue_usd for r in self._performance.values()))
 
     def count_leads(self) -> int:
