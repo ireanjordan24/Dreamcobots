@@ -1,0 +1,165 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# DreamCo Builder Bots
+#
+# Orchestrates the DreamCo bot-building pipeline:
+#   - AI-driven market gap discovery (core/ai_brain.py)
+#   - Automated bot scaffolding via core/system_builder.py
+#   - Validation of generated bot structure
+#   - Storage of newly created bot metadata
+#
+# Triggered manually via workflow_dispatch with configuration inputs,
+# or automatically on pushes to main and on a scheduled basis.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: DreamCo Builder Bots
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'   # daily at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      bot_name:
+        description: >
+          (Optional) Name of the bot to build.
+          Leave blank to let the AI Brain choose the best market opportunity.
+        required: false
+        default: ''
+        type: string
+      bots_dir:
+        description: Target directory for the new bot (relative to repo root)
+        required: false
+        default: 'bots'
+        type: string
+      dry_run:
+        description: Dry run — report what would be built without creating files
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: read
+
+env:
+  BOT_NAME:  ${{ github.event.inputs.bot_name  || '' }}
+  BOTS_DIR:  ${{ github.event.inputs.bots_dir  || 'bots' }}
+  DRY_RUN:   ${{ github.event.inputs.dry_run   || 'false' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 1 — Build or scaffold bot
+  # ────────────────────────────────────────────────────────────────────────
+  build-bot:
+    name: Build Bot via AI Brain
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run DreamCo Builder Bot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys, json
+          sys.path.insert(0, ".")
+
+          bot_name = os.environ.get("BOT_NAME", "").strip()
+          bots_dir = os.environ.get("BOTS_DIR", "bots").strip() or "bots"
+          dry_run  = os.environ.get("DRY_RUN", "false").lower() == "true"
+
+          from core.system_builder import create_bot, generate_from_gap
+
+          if dry_run:
+              print("::notice::DRY RUN — no files will be created.")
+              if bot_name:
+                  print(f"Would scaffold bot '{bot_name}' in '{bots_dir}/'")
+              else:
+                  from core.ai_brain import find_opportunity, decide_bot_type
+                  market   = find_opportunity()
+                  chosen   = decide_bot_type(market)
+                  print(f"AI Brain chose market: {market!r}  →  bot name: {chosen!r}")
+                  print(f"Would scaffold '{chosen}' in '{bots_dir}/'")
+          else:
+              if bot_name:
+                  path = create_bot(bot_name, bots_dir=bots_dir)
+                  print(f"✅ Created bot '{bot_name}' at: {path}")
+              else:
+                  name = generate_from_gap(bots_dir=bots_dir)
+                  print(f"✅ AI Brain built bot: {name}")
+
+          summary = [
+              "### 🤖 DreamCo Builder Bot Run",
+              f"- **Triggered by**: `{os.environ.get('GITHUB_EVENT_NAME', 'unknown')}`",
+              f"- **Mode**: {'Dry Run' if dry_run else 'Build'}",
+              f"- **Target directory**: `{bots_dir}/`",
+          ]
+          if bot_name:
+              summary.append(f"- **Requested bot**: `{bot_name}`")
+          else:
+              summary.append("- **Bot selection**: AI Brain auto-discovery")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(summary) + "\n")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 2 — Validate bot registry
+  # ────────────────────────────────────────────────────────────────────────
+  validate-registry:
+    name: Validate Bot Registry
+    runs-on: ubuntu-latest
+    needs: build-bot
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate bot registry
+        run: |
+          python - <<'PYEOF'
+          import os, sys
+          sys.path.insert(0, ".")
+
+          from core.bot_registry import BotRegistry
+          registry = BotRegistry()
+          bots     = registry.list_bots()
+          count    = len(bots)
+
+          print(f"Total bots in registry: {count}")
+
+          summary = [
+              "### 📋 Bot Registry Validation",
+              f"- **Total registered bots**: {count}",
+              "- **Status**: ✅ Registry is healthy" if count > 0 else "- **Status**: ⚠️ Registry is empty",
+          ]
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(summary) + "\n")
+          PYEOF

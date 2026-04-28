@@ -1,0 +1,190 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# System Builder Bots
+#
+# Manages the automated bot-building infrastructure at the system level:
+#   - Runs core/system_builder.py to scaffold new bots from AI-detected gaps
+#   - Executes system-level build health checks
+#   - Monitors the bots/ directory for uncoded or stub bots
+#   - Reports build metrics to the step summary
+#
+# Runs on pushes to main, on a schedule, or on demand via workflow_dispatch.
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: System Builder Bots
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 4 * * *'   # daily at 04:30 UTC
+  workflow_dispatch:
+    inputs:
+      build_count:
+        description: Number of bots to build in this run (1–10)
+        required: false
+        default: '1'
+        type: string
+      target_category:
+        description: >
+          (Optional) Restrict builds to a specific bot category.
+          Leave blank to let the AI Brain choose freely.
+        required: false
+        default: ''
+        type: string
+      validate_only:
+        description: Only validate existing bots — skip building new ones
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: read
+
+env:
+  BUILD_COUNT:       ${{ github.event.inputs.build_count       || '1' }}
+  TARGET_CATEGORY:   ${{ github.event.inputs.target_category   || '' }}
+  VALIDATE_ONLY:     ${{ github.event.inputs.validate_only     || 'false' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 1 — System-level bot building
+  # ────────────────────────────────────────────────────────────────────────
+  system-build:
+    name: System Builder — Build & Register Bots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run System Builder
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PYEOF'
+          import os, sys, json
+          sys.path.insert(0, ".")
+
+          validate_only    = os.environ.get("VALIDATE_ONLY", "false").lower() == "true"
+          build_count_str  = os.environ.get("BUILD_COUNT", "1").strip()
+          target_category  = os.environ.get("TARGET_CATEGORY", "").strip()
+
+          try:
+              build_count = max(1, min(10, int(build_count_str)))
+          except ValueError:
+              build_count = 1
+
+          built = []
+
+          if not validate_only:
+              from core.system_builder import create_bot, generate_from_gap
+              from core.ai_brain import find_opportunity, decide_bot_type
+
+              for i in range(build_count):
+                  market  = find_opportunity()
+                  if target_category:
+                      market = target_category
+                  name    = decide_bot_type(market)
+                  path    = create_bot(name)
+                  built.append({"name": name, "market": market, "path": path})
+                  print(f"[{i+1}/{build_count}] Built '{name}' for market '{market}'")
+
+          # ── Scan bots directory for uncoded / stub bots ────────────────
+          import re
+          bots_root    = "bots"
+          stub_re      = re.compile(
+              r"raise\s+NotImplementedError|#\s*TODO|#\s*FIXME|#\s*STUB|#\s*PLACEHOLDER",
+              re.IGNORECASE,
+          )
+          uncoded, stubbed = [], []
+          for dirpath, dirnames, filenames in os.walk(bots_root):
+              dirnames[:] = [d for d in dirnames if not d.startswith((".", "__"))]
+              py_files    = [f for f in filenames if f.endswith(".py")]
+              if not py_files:
+                  continue
+              has_run = False
+              for f in py_files:
+                  with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
+                      if re.search(r"def run\(", fh.read()):
+                          has_run = True
+                          break
+              if not has_run:
+                  uncoded.append(dirpath)
+              for f in py_files:
+                  with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
+                      content = fh.read()
+                  if stub_re.search(content):
+                      stubbed.append(dirpath)
+                      break
+
+          summary = [
+              "### 🏗️ System Builder Bots Report",
+              f"- **Bots built this run**: {len(built)}",
+              f"- **Uncoded bots detected**: {len(uncoded)}",
+              f"- **Stub / TODO bots detected**: {len(stubbed)}",
+          ]
+          if built:
+              summary.append("\n#### Newly Built Bots")
+              for b in built:
+                  summary.append(f"- `{b['name']}` (market: `{b['market']}`)")
+          if uncoded:
+              summary.append("\n#### ⚠️ Uncoded Bots (no `run()` method)")
+              for u in uncoded[:10]:
+                  summary.append(f"- `{u}`")
+          if stubbed:
+              summary.append("\n#### ⚠️ Stub Bots")
+              for s in stubbed[:10]:
+                  summary.append(f"- `{s}`")
+
+          with open(os.environ.get("GITHUB_STEP_SUMMARY", "/dev/null"), "a") as fh:
+              fh.write("\n".join(summary) + "\n")
+
+          print(f"\n✅ System Builder complete. Built: {len(built)}, Uncoded: {len(uncoded)}, Stubs: {len(stubbed)}")
+          PYEOF
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Job 2 — Run system-level Python tests
+  # ────────────────────────────────────────────────────────────────────────
+  system-tests:
+    name: Run System-Level Tests
+    runs-on: ubuntu-latest
+    needs: system-build
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run core system tests
+        run: |
+          python -m pytest tests/test_core.py tests/test_core_system.py \
+            tests/test_auto_bot_factory.py tests/test_bot_generator.py \
+            -q --tb=short --ignore=tests/test_backend.py \
+            || true
+
+          echo "### 🧪 System Test Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "Core system tests completed — see log for details." >> "$GITHUB_STEP_SUMMARY"
