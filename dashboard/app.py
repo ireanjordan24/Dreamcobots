@@ -109,9 +109,59 @@ except ImportError:  # pragma: no cover
     FLASK_AVAILABLE = False
 
 
-def create_app() -> Any:
-    """Return the Flask application instance (or None)."""
-    return app
+def create_app(leads_path: str = None) -> Any:
+    """Create and return a Flask application instance."""
+    try:
+        from flask import Flask, jsonify, make_response  # type: ignore[import]
+        import json as _json
+    except ImportError:
+        return None
+
+    _leads_path = leads_path or os.path.join("data", "leads.json")
+
+    flask_app = Flask(__name__)
+
+    def _load_leads():
+        leads = []
+        if os.path.isfile(_leads_path):
+            with open(_leads_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            leads.append(_json.loads(line))
+                        except Exception:
+                            pass
+        return leads
+
+    @flask_app.route("/health")
+    def health():
+        return jsonify({"status": "ok", "service": "dreamco-dashboard"})
+
+    @flask_app.route("/api/leads")
+    def api_leads():
+        leads = _load_leads()
+        est_revenue = len(leads) * 10.0
+        return jsonify({"leads": leads, "est_revenue": est_revenue})
+
+    @flask_app.route("/")
+    def dashboard():
+        leads = _load_leads()
+        lead_count = len(leads)
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>DreamCo Empire Dashboard</title></head>
+<body>
+<h1>DreamCo Empire Dashboard</h1>
+<p>Leads: {lead_count}</p>
+<p>Est. Revenue: ${lead_count * 10.0:.2f}</p>
+</body>
+</html>"""
+        resp = make_response(html)
+        resp.headers["Content-Type"] = "text/html"
+        return resp
+
+    return flask_app
 
 
 class DashboardApp:

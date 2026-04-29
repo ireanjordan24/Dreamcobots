@@ -3,9 +3,7 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config, get_upgrade_path
-from bots.sales_bot.tiers import BOT_FEATURES, get_bot_tier_info
+from bots.sales_bot.tiers import Tier, get_tier_config, get_upgrade_path, BOT_FEATURES, get_bot_tier_info
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -64,8 +62,9 @@ class CloserBot:
     def describe_tier(self) -> str:
         """Return a human-readable tier description."""
         info = get_bot_tier_info(self.tier)
+        tier_name = info.get("name") or info.get("tier", str(self.tier.value)).title()
         lines = [
-            f"=== {info['name']} Closer Bot Tier ===",
+            f"=== {tier_name} Closer Bot Tier ===",
             f"Price: ${info['price_usd_monthly']:.2f}/month",
             "Features:",
         ]

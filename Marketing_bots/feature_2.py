@@ -219,7 +219,7 @@ _orig_emailcampaign_bot_init = EmailCampaignBot.__init__
 def _emailcampaign_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_emailcampaign_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
 
 
 EmailCampaignBot.__init__ = _emailcampaign_bot_new_init

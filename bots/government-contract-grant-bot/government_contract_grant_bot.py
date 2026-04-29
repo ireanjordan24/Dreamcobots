@@ -548,11 +548,15 @@ class GovernmentContractGrantBot:
             results = results[:limit]
         return results
 
-    def search_contracts(self, keyword: str = "", **kwargs) -> dict:
+    def search_contracts(self, keyword: str = "", **kwargs) -> object:
         """Search federal contracts only."""
-        query = kwargs.pop("query", keyword)
+        query_kwarg = kwargs.pop("query", None)
+        query = query_kwarg if query_kwarg is not None else keyword
         results = self.search_opportunities(keyword=query, opportunity_type="contract", **kwargs)
-        return {"contracts": results, "count": len(results), "keyword": query}
+        # Legacy callers using the 'query' kwarg expect a dict response
+        if query_kwarg is not None:
+            return {"contracts": results, "count": len(results), "keyword": query}
+        return results
 
     def search_grants(self, keyword: str = "", **kwargs) -> list[dict]:
         """Search grants only.  Requires PRO or ENTERPRISE tier."""
@@ -726,6 +730,7 @@ class GovernmentContractGrantBot:
 
     def run(self) -> dict:
         """Execute the full GLOBAL AI SOURCES FLOW pipeline for this bot."""
+        print(f"GovernmentContractGrantBot running: scanning contracts and grants...")
         result = self.flow.run_pipeline(
             raw_data={"domain": "government_contracts_and_grants", "records": len(MOCK_CONTRACTS)},
             learning_method="supervised",
