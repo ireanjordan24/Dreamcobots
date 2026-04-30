@@ -51,6 +51,23 @@ class Settings:
     openai_api_key: Optional[str] = field(
         default_factory=lambda: os.getenv("OPENAI_API_KEY")
     )
+    # AI-Integrations module key — use AI_INTEGRATIONS_OPENAI_API_KEY when a
+    # separate key is required for the ai-models-integration bot; falls back to
+    # the general OPENAI_API_KEY when the dedicated variable is not set.
+    ai_integrations_openai_api_key: Optional[str] = field(
+        default_factory=lambda: (
+            os.getenv("AI_INTEGRATIONS_OPENAI_API_KEY")
+            or os.getenv("OPENAI_API_KEY")
+        )
+    )
+    # Custom OpenAI-compatible base URL (leave empty for the default
+    # https://api.openai.com/v1).
+    openai_endpoint: Optional[str] = field(
+        default_factory=lambda: os.getenv("OPENAI_ENDPOINT")
+    )
+    github_token: Optional[str] = field(
+        default_factory=lambda: os.getenv("GITHUB_TOKEN")
+    )
     scraper_api_key: Optional[str] = field(
         default_factory=lambda: os.getenv("SCRAPER_API_KEY")
     )
@@ -94,6 +111,8 @@ class Settings:
             "zillow_api_key",
             "stripe_api_key",
             "openai_api_key",
+            "ai_integrations_openai_api_key",
+            "github_token",
             "scraper_api_key",
         ]
         return [k for k in key_fields if getattr(self, k)]

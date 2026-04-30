@@ -52,6 +52,9 @@ jobs:
           ZILLOW_API_KEY: ${{ secrets.ZILLOW_API_KEY }}
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_INTEGRATIONS_OPENAI_API_KEY: ${{ secrets.AI_INTEGRATIONS_OPENAI_API_KEY }}
+          OPENAI_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
           REDIS_HOST: localhost
           REDIS_PORT: '6379'
