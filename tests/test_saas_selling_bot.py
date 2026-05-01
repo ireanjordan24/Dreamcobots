@@ -11,6 +11,16 @@ import pytest
 BOT_DIR = os.path.join(os.path.dirname(__file__), "..", "bots", "saas-selling-bot")
 sys.path.insert(0, os.path.abspath(BOT_DIR))
 
+# Evict any 'bot' module cached from a different bot directory (e.g.
+# bots/211-resource-eligibility-bot) so the import below resolves to
+# bots/saas-selling-bot/bot.py.
+_SAAS_BOT_DIR = os.path.abspath(BOT_DIR)
+_cached_bot = sys.modules.get("bot")
+if _cached_bot is not None:
+    _cached_file = getattr(_cached_bot, "__file__", "") or ""
+    if not _cached_file.startswith(_SAAS_BOT_DIR):
+        del sys.modules["bot"]
+
 # Use an in-memory database for tests
 os.environ["SAAS_BOT_DB"] = ":memory:"
 

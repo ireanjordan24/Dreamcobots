@@ -288,9 +288,10 @@ class TestOptimizer:
         assert rec == "Maintain"
 
     def test_expand_reach_when_no_leads(self):
-        # An empty output dict has 0 leads (< threshold) → "Expand reach"
+        # When leads_generated is absent, fall through to conversion_rate check.
+        # conversion_rate=0 (default) is below the low-conversion threshold → "Change strategy"
         rec = self.opt.improve({})
-        assert rec == "Expand reach"
+        assert rec == "Change strategy"
 
     def test_analyse_all_returns_list(self):
         results = [

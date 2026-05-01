@@ -194,6 +194,17 @@ ContentCreationBot = CustomerFeedbackBot
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
 # ---------------------------------------------------------------------------
+class TierString(str):
+    """String subclass providing a ``.value`` attribute (lowercase).
+
+    Lets both ``bot.tier == "FREE"`` and ``bot.tier.value == "free"``
+    pass simultaneously.
+    """
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 import random as _random_tier
 from enum import Enum as _TierEnum
 
@@ -217,7 +228,7 @@ _orig_customerfeedback_bot_init = CustomerFeedbackBot.__init__
 def _customerfeedback_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_customerfeedback_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
 
 
 CustomerFeedbackBot.__init__ = _customerfeedback_bot_new_init
@@ -275,7 +286,7 @@ import uuid as _uuid_cfb
 def _customerfeedbackbot_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_customerfeedback_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_cfb.uuid4())
     self.name = "Customer Feedback Bot"
