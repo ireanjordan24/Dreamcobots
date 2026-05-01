@@ -888,4 +888,55 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "analytics",
         ],
     ),
+    BotEntry(
+        bot_id="god_mode_bot",
+        display_name="God Mode Bot",
+        description=(
+            "DreamCo's Autonomous Business Operator. Orchestrates five specialised "
+            "engines: AutoClientHunter for lead scraping, AutoCloser for 7-stage "
+            "negotiation, PaymentAutoCollector for subscription billing, ViralEngine "
+            "for trend-driven content, and SelfImprovingAI for continuous performance "
+            "optimisation. Tier-gated from FREE to ENTERPRISE."
+        ),
+        category=BotCategory.BUSINESS,
+        module_path="bots.god_mode_bot.god_mode_bot",
+        class_name="GodModeBot",
+        capabilities=[
+            "lead_hunting",
+            "auto_closing",
+            "payment_collection",
+            "viral_engine",
+            "self_improving_ai",
+            "god_mode",
+            "niche_targeting",
+            "subscription_billing",
+            "analytics",
+        ],
+    ),
+    BotEntry(
+        bot_id="sql_bot",
+        display_name="SQL Bot",
+        description=(
+            "AI-powered SQL bot for dynamic database operations. Executes safe, "
+            "validated SQL queries for data insertion, updates, analytical reports, "
+            "and schema inspection. Includes query safety guardrails that block "
+            "destructive operations, a natural language query interface, and automated "
+            "database integrity checks."
+        ),
+        category=BotCategory.DEVELOPER_TOOLS,
+        module_path="bots.sql_bot.sql_bot",
+        class_name="SQLBot",
+        capabilities=[
+            "query_execution",
+            "query_validation",
+            "safety_guardrails",
+            "data_insertion",
+            "data_update",
+            "analytical_reports",
+            "schema_inspection",
+            "integrity_checks",
+            "natural_language_sql",
+            "sqlite_backend",
+        ],
+    ),
 ]
