@@ -888,4 +888,23 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "analytics",
         ],
     ),
+    BotEntry(
+        bot_id="god_mode_bot",
+        display_name="God Mode Bot",
+        description=(
+            "Autonomous super-bot with unrestricted access to all DreamCo systems. "
+            "Combines lead hunting, auto-closing, payment collection, and viral "
+            "marketing into a single omnipotent agent."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.god_mode_bot.god_mode_bot",
+        class_name="GodModeBot",
+        capabilities=[
+            "lead_hunting",
+            "auto_closing",
+            "payment_collection",
+            "viral_engine",
+            "god_mode",
+        ],
+    ),
 ]

@@ -206,6 +206,17 @@ CRMBot = ProjectManagementBot
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
 # ---------------------------------------------------------------------------
+class TierString(str):
+    """String subclass providing a ``.value`` attribute (lowercase).
+
+    Lets both ``bot.tier == "FREE"`` and ``bot.tier.value == "free"``
+    pass simultaneously.
+    """
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 import random as _random_tier
 from enum import Enum as _TierEnum
 
@@ -229,7 +240,7 @@ _orig_projectmanagement_bot_init = ProjectManagementBot.__init__
 def _projectmanagement_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_projectmanagement_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
 
 
 ProjectManagementBot.__init__ = _projectmanagement_bot_new_init

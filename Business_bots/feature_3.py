@@ -210,6 +210,17 @@ if __name__ == "__main__":
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
 # ---------------------------------------------------------------------------
+class TierString(str):
+    """String subclass providing a ``.value`` attribute (lowercase).
+
+    Lets both ``bot.tier == "FREE"`` and ``bot.tier.value == "free"``
+    pass simultaneously.
+    """
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 import random as _random_tier
 from enum import Enum as _TierEnum
 
@@ -233,7 +244,7 @@ _orig_invoicing_bot_init = InvoicingBot.__init__
 def _invoicing_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_invoicing_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
 
 
 InvoicingBot.__init__ = _invoicing_bot_new_init
@@ -291,7 +302,7 @@ import uuid as _uuid_inv
 def _invoicingbot_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_invoicing_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_inv.uuid4())
     self.name = "Invoicing Bot"

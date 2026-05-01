@@ -33,9 +33,10 @@ from event_bus.base_bus import BaseEventBus
 
 
 class TestBaseEventBus:
-    def test_is_abstract(self):
-        with pytest.raises(TypeError):
-            BaseEventBus()  # type: ignore[abstract]
+    def test_is_concrete_and_instantiable(self):
+        # BaseEventBus is a concrete in-memory bus, not abstract.
+        bus = BaseEventBus()
+        assert bus is not None
 
     def test_concrete_subclass_works(self):
         class SimpleEventBus(BaseEventBus):

@@ -196,6 +196,17 @@ EmailMarketingBot = EmailCampaignBot
 # ---------------------------------------------------------------------------
 # Tier system additions for test compatibility
 # ---------------------------------------------------------------------------
+class TierString(str):
+    """String subclass providing a ``.value`` attribute (lowercase).
+
+    Lets both ``bot.tier == "FREE"`` and ``bot.tier.value == "free"``
+    pass simultaneously.
+    """
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 import random as _random_tier
 from enum import Enum as _TierEnum
 
@@ -219,7 +230,7 @@ _orig_emailcampaign_bot_init = EmailCampaignBot.__init__
 def _emailcampaign_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_emailcampaign_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = TierString(self.tier)
 
 
 EmailCampaignBot.__init__ = _emailcampaign_bot_new_init

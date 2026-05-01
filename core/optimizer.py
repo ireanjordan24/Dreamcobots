@@ -75,10 +75,14 @@ class Optimizer:
         """Return a single strategic recommendation string."""
         revenue: float = float(bot_output.get("revenue", 0))
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
-        leads_generated: int = int(bot_output.get("leads_generated", 0))
 
-        if leads_generated < 3:
-            return "Expand reach"
+        # Only apply the "few leads" check when leads_generated is explicitly
+        # provided; a missing key is treated as insufficient conversion data.
+        if "leads_generated" in bot_output:
+            leads_generated: int = int(bot_output["leads_generated"])
+            if leads_generated < 3:
+                return "Expand reach"
+
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:

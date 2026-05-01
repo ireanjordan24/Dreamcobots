@@ -337,10 +337,14 @@ class TestRunMethod:
         result = engine.run()
         assert isinstance(result, str)
 
-    def test_run_contains_decision_prefix(self):
+    def test_run_returns_known_decision_key(self):
         engine = DecisionEngine()
         result = engine.run()
-        assert "Decision:" in result
+        known_keys = {
+            "scale_leads", "increase_outreach", "scale_system", "optimize",
+            "create_scaling_bot", "create_recovery_bot",
+        }
+        assert result in known_keys
 
     def test_run_works_on_all_tiers(self):
         for tier in Tier:

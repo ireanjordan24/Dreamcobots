@@ -1,0 +1,227 @@
+name: Replit Codex & Codespaces — Interactive Prompt
+
+# This workflow lets you submit a prompt directly from the GitHub Actions page.
+# It runs the prompt in a Codespaces-like Ubuntu environment, logs all output,
+# and uploads an artifact with the full session transcript.
+#
+# HOW TO USE:
+#   1. Go to Actions → "Replit Codex & Codespaces — Interactive Prompt"
+#   2. Click "Run workflow"
+#   3. Fill in the prompt and (optionally) choose the execution mode
+#   4. Click "Run workflow" → monitor output in the run logs
+#   5. Download the "codex-session-transcript" artifact for the full log
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: >
+          Your prompt or command. Examples:
+          • "Fix syntax errors in bots/ai_brain/decision_engine.py"
+          • "python3 -c 'from core.optimizer import Optimizer; print(Optimizer().improve({\"revenue\": 500, \"conversion_rate\": 0.3}))'"
+          • "Run tests for test_ai_brain.py"
+          • "List all failing tests"
+        required: true
+        type: string
+
+      mode:
+        description: >
+          Execution mode:
+          • python — evaluate the prompt as a Python snippet
+          • shell — run the prompt as a shell command
+          • test  — run `pytest` with the prompt as extra arguments
+          • ai    — send the prompt to the OpenAI API and log the response
+        required: true
+        default: "python"
+        type: choice
+        options:
+          - python
+          - shell
+          - test
+          - ai
+
+      debug:
+        description: "Enable verbose debug output (true/false)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  execute-prompt:
+    name: Execute Prompt (${{ github.event.inputs.mode }} mode)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Write session header
+        run: |
+          mkdir -p logs
+          TRANSCRIPT=logs/codex_session_$(date -u +%Y%m%dT%H%M%SZ).txt
+          echo "TRANSCRIPT=$TRANSCRIPT" >> $GITHUB_ENV
+
+          cat >> "$TRANSCRIPT" <<EOF
+          ========================================================
+          DreamCobots — Codex / Codespaces Session Transcript
+          ========================================================
+          Run ID   : ${{ github.run_id }}
+          Triggered: $(date -u)
+          Actor    : ${{ github.actor }}
+          Mode     : ${{ github.event.inputs.mode }}
+          Debug    : ${{ github.event.inputs.debug }}
+          --------------------------------------------------------
+          PROMPT:
+          ${{ github.event.inputs.prompt }}
+          ========================================================
+
+          EOF
+
+      # ------------------------------------------------------------------ #
+      # Mode: python
+      # ------------------------------------------------------------------ #
+      - name: Execute — Python snippet
+        if: github.event.inputs.mode == 'python'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SIMULATION_MODE: "true"
+          DEBUG: ${{ github.event.inputs.debug }}
+        run: |
+          echo "--- Python Output ---" | tee -a "$TRANSCRIPT"
+          python3 -c "${{ github.event.inputs.prompt }}" 2>&1 | tee -a "$TRANSCRIPT" || true
+          echo "" | tee -a "$TRANSCRIPT"
+          echo "Exit code: $?" | tee -a "$TRANSCRIPT"
+
+      # ------------------------------------------------------------------ #
+      # Mode: shell
+      # ------------------------------------------------------------------ #
+      - name: Execute — Shell command
+        if: github.event.inputs.mode == 'shell'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: ${{ github.event.inputs.debug }}
+        run: |
+          echo "--- Shell Output ---" | tee -a "$TRANSCRIPT"
+          bash -c "${{ github.event.inputs.prompt }}" 2>&1 | tee -a "$TRANSCRIPT" || true
+          echo "" | tee -a "$TRANSCRIPT"
+          echo "Exit code: $?" | tee -a "$TRANSCRIPT"
+
+      # ------------------------------------------------------------------ #
+      # Mode: test
+      # ------------------------------------------------------------------ #
+      - name: Execute — Pytest
+        if: github.event.inputs.mode == 'test'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "--- Pytest Output ---" | tee -a "$TRANSCRIPT"
+          python -m pytest ${{ github.event.inputs.prompt }} \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -v --tb=short 2>&1 | tee -a "$TRANSCRIPT" || true
+          echo "" | tee -a "$TRANSCRIPT"
+
+      # ------------------------------------------------------------------ #
+      # Mode: ai  (OpenAI / Codex)
+      # ------------------------------------------------------------------ #
+      - name: Execute — AI / Codex prompt
+        if: github.event.inputs.mode == 'ai'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "--- AI / Codex Response ---" | tee -a "$TRANSCRIPT"
+          python3 - <<'PYEOF'
+          import os, sys, json
+
+          prompt = """${{ github.event.inputs.prompt }}"""
+          api_key = os.environ.get("OPENAI_API_KEY", "")
+          transcript_path = os.environ.get("TRANSCRIPT", "logs/session.txt")
+
+          if not api_key:
+              msg = "OPENAI_API_KEY secret is not configured. Cannot call Codex/AI API."
+              print(msg)
+              with open(transcript_path, "a") as f:
+                  f.write(msg + "\n")
+              sys.exit(0)
+
+          try:
+              import urllib.request, urllib.error
+              payload = json.dumps({
+                  "model": "gpt-4o-mini",
+                  "messages": [
+                      {
+                          "role": "system",
+                          "content": (
+                              "You are DreamCo's AI coding assistant. "
+                              "You help debug, fix, and improve the DreamCobots repository. "
+                              "Provide concise, actionable responses."
+                          ),
+                      },
+                      {"role": "user", "content": prompt},
+                  ],
+                  "max_tokens": 1024,
+                  "temperature": 0.2,
+              }).encode()
+
+              req = urllib.request.Request(
+                  "https://api.openai.com/v1/chat/completions",
+                  data=payload,
+                  headers={
+                      "Authorization": f"Bearer {api_key}",
+                      "Content-Type": "application/json",
+                  },
+              )
+              with urllib.request.urlopen(req, timeout=60) as resp:
+                  data = json.loads(resp.read())
+                  response_text = data["choices"][0]["message"]["content"]
+
+              print(response_text)
+              with open(transcript_path, "a") as f:
+                  f.write(response_text + "\n")
+
+          except Exception as exc:
+              error_msg = f"AI API call failed: {exc}"
+              print(error_msg)
+              with open(transcript_path, "a") as f:
+                  f.write(error_msg + "\n")
+          PYEOF
+
+      - name: Write session footer
+        if: always()
+        run: |
+          cat >> "$TRANSCRIPT" <<EOF
+
+          ========================================================
+          Session completed: $(date -u)
+          ========================================================
+          EOF
+
+          echo ""
+          echo "=== Session Transcript Preview ==="
+          cat "$TRANSCRIPT"
+
+      - name: Upload session transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-session-transcript
+          path: logs/codex_session_*.txt
+          retention-days: 30

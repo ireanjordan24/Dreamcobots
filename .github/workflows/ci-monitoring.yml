@@ -1,0 +1,287 @@
+name: Continuous Monitoring — Syntax, Files & Symbols
+
+# Runs on every push, pull request, and can be triggered manually.
+# Checks for syntax errors, missing files, and duplicate symbols.
+# Generates a detailed log artifact for every run.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+jobs:
+  syntax-check:
+    name: Python Syntax Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check syntax of all Python files
+        run: |
+          echo "=== DreamCobots Syntax Check ===" | tee /tmp/syntax_report.txt
+          echo "Timestamp: $(date -u)" | tee -a /tmp/syntax_report.txt
+          echo "" | tee -a /tmp/syntax_report.txt
+
+          ERRORS=0
+          FILES_CHECKED=0
+
+          while IFS= read -r -d '' pyfile; do
+            FILES_CHECKED=$((FILES_CHECKED + 1))
+            if ! python -m py_compile "$pyfile" 2>>/tmp/syntax_report.txt; then
+              echo "SYNTAX ERROR: $pyfile" | tee -a /tmp/syntax_report.txt
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find . -name "*.py" \
+                    -not -path "./.git/*" \
+                    -not -path "./node_modules/*" \
+                    -not -path "./__pycache__/*" \
+                    -print0)
+
+          echo "" | tee -a /tmp/syntax_report.txt
+          echo "Files checked : $FILES_CHECKED" | tee -a /tmp/syntax_report.txt
+          echo "Syntax errors : $ERRORS"         | tee -a /tmp/syntax_report.txt
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::$ERRORS Python file(s) contain syntax errors. See log for details."
+            exit 1
+          else
+            echo "All Python files are syntactically valid." | tee -a /tmp/syntax_report.txt
+          fi
+
+      - name: Upload syntax report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: syntax-report
+          path: /tmp/syntax_report.txt
+
+  file-completeness:
+    name: File Completeness Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          echo "=== DreamCobots File Completeness Check ===" | tee /tmp/file_report.txt
+          echo "Timestamp: $(date -u)" | tee -a /tmp/file_report.txt
+          echo "" | tee -a /tmp/file_report.txt
+
+          MISSING=0
+
+          REQUIRED_FILES=(
+            "requirements.txt"
+            "config/__init__.py"
+            "config/settings.py"
+            "core/optimizer.py"
+            "core/dreamco_orchestrator.py"
+            "event_bus/base_bus.py"
+            "event_bus/redis_bus.py"
+            "framework/global_ai_sources_flow.py"
+            "bots/ai_brain/ai_brain.py"
+            "bots/ai_brain/decision_engine.py"
+            "bots/global_bot_network/bot_library.py"
+            "tests/conftest.py"
+            ".github/workflows/pytest.yml"
+            ".github/workflows/ci.yml"
+          )
+
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$f" ]; then
+              echo "  OK  $f" | tee -a /tmp/file_report.txt
+            else
+              echo "  MISSING  $f" | tee -a /tmp/file_report.txt
+              echo "::warning::Required file missing: $f"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          echo "" | tee -a /tmp/file_report.txt
+          echo "Missing files: $MISSING" | tee -a /tmp/file_report.txt
+
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::error::$MISSING required file(s) are missing."
+            exit 1
+          fi
+
+      - name: Verify __init__.py presence in key packages
+        run: |
+          echo "" | tee -a /tmp/file_report.txt
+          echo "=== Package __init__.py Check ===" | tee -a /tmp/file_report.txt
+
+          MISSING_INITS=0
+          for pkg in config core event_bus framework saas; do
+            if [ -d "$pkg" ]; then
+              if [ ! -f "$pkg/__init__.py" ]; then
+                echo "  MISSING __init__.py in $pkg/" | tee -a /tmp/file_report.txt
+                MISSING_INITS=$((MISSING_INITS + 1))
+              else
+                echo "  OK  $pkg/__init__.py" | tee -a /tmp/file_report.txt
+              fi
+            fi
+          done
+
+          if [ "$MISSING_INITS" -gt 0 ]; then
+            echo "::error::$MISSING_INITS package(s) are missing __init__.py."
+            exit 1
+          fi
+
+      - name: Upload file completeness report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: file-completeness-report
+          path: /tmp/file_report.txt
+
+  duplicate-symbols:
+    name: Duplicate Symbol Detection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Detect duplicate function/class names
+        run: |
+          python - <<'PYEOF'
+          import ast
+          import os
+          import sys
+          import json
+          from collections import defaultdict
+          from datetime import datetime, timezone
+
+          report_path = "/tmp/symbol_report.txt"
+          EXCLUDE_DIRS = {'.git', '__pycache__', 'node_modules', '.pytest_cache'}
+          # Known symbols that are intentionally repeated (e.g., standard helpers)
+          EXPECTED_DUPLICATES = {'to_dict', '__init__', '__str__', '__repr__', 'run',
+                                  'describe_tier', 'monthly_price', 'get_tier_info',
+                                  'enforce_tier', 'list_items'}
+
+          symbol_map = defaultdict(list)
+
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
+              for fname in files:
+                  if not fname.endswith('.py'):
+                      continue
+                  fpath = os.path.join(root, fname)
+                  try:
+                      with open(fpath, encoding='utf-8', errors='ignore') as f:
+                          tree = ast.parse(f.read(), filename=fpath)
+                  except SyntaxError:
+                      continue
+                  for node in ast.walk(tree):
+                      if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                          symbol_map[node.name].append(fpath)
+
+          lines = [
+              "=== DreamCobots Duplicate Symbol Report ===",
+              f"Timestamp: {datetime.now(timezone.utc).isoformat()}",
+              "",
+          ]
+
+          duplicates = {
+              name: paths
+              for name, paths in sorted(symbol_map.items())
+              if len(paths) > 1 and name not in EXPECTED_DUPLICATES
+          }
+
+          if duplicates:
+              lines.append(f"WARNING: {len(duplicates)} unexpected duplicate symbol(s) found.")
+              for name, paths in duplicates.items():
+                  lines.append(f"\n  Symbol: {name}")
+                  for p in paths:
+                      lines.append(f"    - {p}")
+          else:
+              lines.append("No unexpected duplicate symbols detected.")
+
+          lines.append("")
+          lines.append(f"Total unique symbols scanned: {len(symbol_map)}")
+          lines.append(f"Unexpected duplicates       : {len(duplicates)}")
+
+          report_text = "\n".join(lines)
+          print(report_text)
+
+          with open(report_path, "w") as f:
+              f.write(report_text)
+
+          # Warn (not fail) for duplicate symbols — they may be intentional
+          if duplicates:
+              for name in duplicates:
+                  print(f"::warning::Duplicate symbol '{name}' found in {len(duplicates[name])} files")
+          PYEOF
+
+      - name: Upload symbol report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duplicate-symbol-report
+          path: /tmp/symbol_report.txt
+
+  run-tests:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+    needs: [syntax-check, file-completeness]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run full test suite
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_INTEGRATIONS_OPENAI_API_KEY: ${{ secrets.AI_INTEGRATIONS_OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short \
+            --junitxml=/tmp/test_results.xml \
+            2>&1 | tee /tmp/test_output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+
+          echo ""
+          echo "=== Test Summary ==="
+          tail -5 /tmp/test_output.txt
+          exit $EXIT_CODE
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            /tmp/test_results.xml
+            /tmp/test_output.txt
