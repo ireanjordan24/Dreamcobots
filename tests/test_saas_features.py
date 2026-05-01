@@ -33,7 +33,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 class TestBaseEventBus:
     def setup_method(self):
         from event_bus.base_bus import BaseEventBus
-        self.bus = BaseEventBus()
+
+        class _ConcreteEventBus(BaseEventBus):
+            """Minimal concrete implementation for testing BaseEventBus."""
+
+            def publish(self, event_type: str, data=None) -> None:
+                self._event_log.append({"event_type": event_type, "data": data})
+                for handler in list(self._subscribers.get(event_type, [])):
+                    handler(data)
+
+            def subscribe(self, event_type: str, handler) -> None:
+                self._subscribers[event_type].append(handler)
+
+        self.bus = _ConcreteEventBus()
 
     def test_publish_calls_subscriber(self):
         received = []
