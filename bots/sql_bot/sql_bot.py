@@ -127,6 +127,30 @@ def _validate_identifier(name: str, label: str = "identifier") -> None:
         )
 
 
+# Allowlist for ORDER BY direction keywords.
+_ORDER_BY_RE = re.compile(
+    r"^[A-Za-z_][A-Za-z0-9_]*(\s+(ASC|DESC))?(\s*,\s*[A-Za-z_][A-Za-z0-9_]*(\s+(ASC|DESC))?)*$",
+    re.IGNORECASE,
+)
+
+
+def _validate_order_by(order_by: str) -> None:
+    """Raise :class:`SQLBotError` if *order_by* contains unsafe SQL."""
+    if not _ORDER_BY_RE.match(order_by.strip()):
+        raise SQLBotError(
+            f"Unsafe ORDER BY expression '{order_by}': only column identifiers "
+            "and ASC/DESC keywords are allowed."
+        )
+
+
+def _validate_non_negative_int(value: Any, label: str = "value") -> None:
+    """Raise :class:`SQLBotError` if *value* is not a non-negative integer."""
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise SQLBotError(
+            f"Unsafe {label} '{value}': must be a non-negative integer."
+        )
+
+
 # ---------------------------------------------------------------------------
 # Safety guardrails
 # ---------------------------------------------------------------------------
@@ -139,7 +163,9 @@ _BLOCKED_PATTERNS: list[re.Pattern] = [
     re.compile(r"\bCREATE\s+(DATABASE|SCHEMA)\b", re.IGNORECASE),
     re.compile(r"\bATTACH\b", re.IGNORECASE),
     re.compile(r"\bDETACH\b", re.IGNORECASE),
-    re.compile(r"\bPRAGMA\s+(?!table_info|foreign_keys|journal_mode)\w+\s*=", re.IGNORECASE),
+    # Allow only read-only PRAGMAs (table_info, foreign_keys); block any
+    # PRAGMA that includes an assignment (= ...) to prevent runtime config changes.
+    re.compile(r"\bPRAGMA\s+(?!table_info|foreign_keys)\w+\s*=", re.IGNORECASE),
 ]
 
 # DELETE without a WHERE clause is flagged as unsafe.
@@ -387,6 +413,10 @@ class SQLBot:
         if columns != "*":
             for col in [c.strip() for c in columns.split(",")]:
                 _validate_identifier(col, "column name")
+        if order_by is not None:
+            _validate_order_by(order_by)
+        if limit is not None:
+            _validate_non_negative_int(limit, "limit")
         sql = f"SELECT {columns} FROM {table_name}"
         params: list[Any] = list(where_params or [])
         if where:
@@ -517,6 +547,7 @@ class SQLBot:
         _validate_identifier(table_name, "table name")
         _validate_identifier(value_column, "value column")
         _validate_identifier(label_column, "label column")
+        _validate_non_negative_int(n, "n (top-N count)")
         sql = (
             f"SELECT {label_column}, {agg}({value_column}) AS metric "
             f"FROM {table_name} "
@@ -562,7 +593,9 @@ class SQLBot:
         null_report: dict[str, int] = {}
         for col in schema:
             col_name = col["name"]
-            # col_name comes from PRAGMA table_info — it is already a safe identifier
+            # Validate col_name even though it comes from PRAGMA table_info,
+            # as a defence-in-depth measure.
+            _validate_identifier(col_name, "column name")
             result = self.query(
                 f"SELECT COUNT(*) AS cnt FROM {table_name} WHERE {col_name} IS NULL"
             )
