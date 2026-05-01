@@ -112,3 +112,119 @@ class Bot:
             "leads_file": self.leads_file,
             "status": "active",
         }
+
+
+# ---------------------------------------------------------------------------
+# LeadGenBot — Advanced lead generation with HTML scraping for the backend API
+# ---------------------------------------------------------------------------
+
+import re as _re
+import csv as _csv
+import io as _io
+
+
+class LeadGenBot:
+    """
+    Advanced lead generation bot with HTML scraping, outreach email generation,
+    and CSV export for the DreamCo FastAPI backend.
+    """
+
+    _EMAIL_RE = _re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+    _URL_RE = _re.compile(r"https?://[^\s\"'<>]+")
+    _PHONE_RE = _re.compile(r"(?:\+?1[\-\s]?)?\(?\d{3}\)?[\-\s]?\d{3}[\-\s]?\d{4}")
+    _NAME_RE = _re.compile(r'name:\s*"?([^"\n,]+)"?', _re.IGNORECASE)
+    _COMPANY_RE = _re.compile(r"company:\s*([^\n,]+)", _re.IGNORECASE)
+
+    def __init__(
+        self,
+        db_dsn: str = None,
+        revenue_engine=None,
+        monetization_hooks=None,
+        dream_core=None,
+    ) -> None:
+        self.revenue_engine = revenue_engine
+        self._monetization_hooks = monetization_hooks
+        self._dream_core = dream_core
+        self._leads: List[Dict] = []
+        self._html_sources: List[str] = []
+        self._outreach_emails: List[str] = []
+        self._running = False
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
+
+    def start(self) -> None:
+        self._running = True
+
+    def stop(self) -> None:
+        self._running = False
+
+    def run(self) -> str:
+        """Scrape all queued HTML sources and generate outreach emails."""
+        for html in self._html_sources:
+            leads = self.scrape_html(html)
+            for lead in leads:
+                self.add_lead(lead)
+        self._outreach_emails = [
+            f"Outreach to {lead.get('name', 'contact')} <{lead.get('email', '')}>"
+            for lead in self._leads
+        ]
+        if self.revenue_engine is not None:
+            self.revenue_engine.record(source="lead_gen_bot", amount=len(self._leads) * 5.0)
+        return f"Processed {len(self._leads)} leads"
+
+    # ------------------------------------------------------------------
+    # Scraping
+    # ------------------------------------------------------------------
+
+    def scrape_html(self, html: str) -> List[Dict]:
+        """Extract leads (name, email, phone, company, url) from an HTML string."""
+        leads = []
+        emails = self._EMAIL_RE.findall(html)
+        urls = self._URL_RE.findall(html)
+        phones = self._PHONE_RE.findall(html)
+        names = [m.strip() for m in self._NAME_RE.findall(html)]
+        companies = [m.strip() for m in self._COMPANY_RE.findall(html)]
+
+        count = max(len(emails), 1)
+        for i in range(count):
+            leads.append({
+                "name": names[i] if i < len(names) else f"Lead {i + 1}",
+                "email": emails[i] if i < len(emails) else "",
+                "phone": phones[i] if i < len(phones) else "",
+                "company": companies[i] if i < len(companies) else "",
+                "url": urls[i] if i < len(urls) else "",
+            })
+        return leads
+
+    def add_html_source(self, html: str) -> None:
+        self._html_sources.append(html)
+
+    # ------------------------------------------------------------------
+    # Lead management
+    # ------------------------------------------------------------------
+
+    def add_lead(self, lead: Dict) -> None:
+        self._leads.append(lead)
+
+    def get_leads(self) -> List[Dict]:
+        return list(self._leads)
+
+    def get_outreach_emails(self) -> List[str]:
+        return list(self._outreach_emails)
+
+    # ------------------------------------------------------------------
+    # Export
+    # ------------------------------------------------------------------
+
+    def export_csv(self) -> str:
+        """Return all leads as a CSV string."""
+        if not self._leads:
+            return ""
+        output = _io.StringIO()
+        fields = ["name", "email", "phone", "company", "url"]
+        writer = _csv.DictWriter(output, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(self._leads)
+        return output.getvalue()

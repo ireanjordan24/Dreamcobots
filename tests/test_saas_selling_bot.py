@@ -2,6 +2,8 @@
 Tests for bots/saas-selling-bot
 """
 
+import importlib
+import importlib.util
 import json
 import os
 import sys
@@ -16,6 +18,15 @@ os.environ["SAAS_BOT_DB"] = ":memory:"
 
 import database as db  # noqa: E402
 from nlp import get_faq_response, _keyword_score  # noqa: E402
+
+
+def _load_saas_bot():
+    """Load the saas-selling-bot's bot module directly from its file path."""
+    bot_path = os.path.join(BOT_DIR, "bot.py")
+    spec = importlib.util.spec_from_file_location("saas_bot", os.path.abspath(bot_path))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 # ---------------------------------------------------------------------------
@@ -34,7 +45,7 @@ def fresh_db(tmp_path, monkeypatch):
 @pytest.fixture()
 def client():
     """Flask test client with an isolated temp database."""
-    import bot as b
+    b = _load_saas_bot()
     b.app.config["TESTING"] = True
     with b.app.test_client() as c:
         yield c
@@ -279,37 +290,37 @@ class TestRoutes:
 
 class TestDemoHelpers:
     def test_run_custom_bot_demo(self):
-        from bot import run_custom_bot_demo
-        result = run_custom_bot_demo("Send weekly report")
+        saas_bot = _load_saas_bot()
+        result = saas_bot.run_custom_bot_demo("Send weekly report")
         assert "steps" in result
         assert "result" in result
         assert len(result["steps"]) > 0
         assert "Send weekly report" in result["result"]
 
     def test_run_contract_search_keyword_match(self):
-        from bot import run_contract_search
-        results = run_contract_search("automation")
+        saas_bot = _load_saas_bot()
+        results = saas_bot.run_contract_search("automation")
         assert len(results) > 0
         titles = [r["title"].lower() for r in results]
         assert any("automation" in t for t in titles)
 
     def test_run_contract_search_no_match_returns_sample(self):
-        from bot import run_contract_search
-        results = run_contract_search("zzznomatch999")
+        saas_bot = _load_saas_bot()
+        results = saas_bot.run_contract_search("zzznomatch999")
         # Should return a random sample when no keyword match
         assert len(results) > 0
 
     def test_pricing_tiers_structure(self):
-        from bot import PRICING_TIERS
-        assert len(PRICING_TIERS) == 3
-        for tier in PRICING_TIERS:
+        saas_bot = _load_saas_bot()
+        assert len(saas_bot.PRICING_TIERS) == 3
+        for tier in saas_bot.PRICING_TIERS:
             assert "name" in tier
             assert "price" in tier
             assert "features" in tier
 
     def test_services_structure(self):
-        from bot import SERVICES
-        assert len(SERVICES) == 6
-        slugs = {s["slug"] for s in SERVICES}
+        saas_bot = _load_saas_bot()
+        assert len(saas_bot.SERVICES) == 6
+        slugs = {s["slug"] for s in saas_bot.SERVICES}
         expected_slugs = {"custom-bot", "nlp-bot", "income-tracking", "contracts", "api-integration", "ui-ux"}
         assert slugs == expected_slugs
