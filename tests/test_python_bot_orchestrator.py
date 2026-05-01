@@ -254,7 +254,7 @@ def test_learning_loop_called_on_error() -> None:
 
 def test_learning_loop_error_does_not_crash_orchestrator() -> None:
     class _BrokenLoop:
-        def record_run(self, *args, **kwargs):
+        def record_run(self, bot_name: str, success: bool, revenue: float) -> None:
             raise RuntimeError("loop broken")
 
     orch = PythonBotOrchestrator(learning_loop=_BrokenLoop())
