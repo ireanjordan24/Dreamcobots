@@ -189,3 +189,41 @@ See full documentation in:
 3. Save your settings to host the frontend.
 
 ---
+## 🔑 Environment Variables & Secrets Setup
+
+All sensitive credentials are loaded from environment variables.  **Never
+hard-code real keys in source files.**
+
+### Local development
+
+```bash
+cp .env.example .env
+# Edit .env and fill in your real values
+```
+
+### GitHub Actions
+
+Add the following secrets in **Settings → Secrets and variables → Actions →
+New repository secret**:
+
+| Secret name | Description |
+|---|---|
+| `AI_INTEGRATIONS_OPENAI_API_KEY` | OpenAI key used by the AI-integrations bot |
+| `OPENAI_API_KEY` | General-purpose OpenAI API key |
+| `OPENAI_ENDPOINT` | Custom OpenAI-compatible base URL (optional) |
+| `GITHUB_TOKEN` | Auto-provided in GitHub Actions; set manually for local dev and Replit |
+| `STRIPE_API_KEY` | Stripe secret key |
+| `ZILLOW_API_KEY` | Zillow API key |
+| `SCRAPER_API_KEY` | Web scraper API key |
+
+### Replit
+
+1. Open your Repl and click the **🔒 Secrets** icon in the left sidebar.
+2. Add each of the secrets listed above as a key/value pair.
+3. Replit injects them as environment variables at runtime — no `.env` file needed.
+
+> **Resources:** The project is designed to run within Replit's
+> **2 vCPU / 4 GiB RAM** Boost configuration.  Set `SIMULATION_MODE=true`
+> (the default) to avoid live API calls while testing.
+
+---
