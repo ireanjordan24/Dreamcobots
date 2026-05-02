@@ -10,7 +10,7 @@ receives ephemeral income/household values from the session.
 """
 # Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 
-from config import FPL_BASE, FPL_ADDITIONAL_PER_PERSON, PROGRAMS
+from bot_config import FPL_BASE, FPL_ADDITIONAL_PER_PERSON, PROGRAMS
 
 
 def get_fpl(household_size: int) -> float:

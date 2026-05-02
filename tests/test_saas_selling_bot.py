@@ -26,6 +26,7 @@ from nlp import get_faq_response, _keyword_score  # noqa: E402
 def fresh_db(tmp_path, monkeypatch):
     """Each test gets its own in-memory database."""
     db_file = str(tmp_path / "test.db")
+    monkeypatch.setenv("SAAS_BOT_DB", db_file)
     monkeypatch.setattr(db, "DB_PATH", db_file)
     db.init_db()
     yield

@@ -17,7 +17,7 @@ import urllib.parse
 import urllib.request
 from typing import Any, Optional
 
-from config import API_211_BASE_URL, API_211_KEY, RESOURCE_CATEGORIES
+from bot_config import API_211_BASE_URL, API_211_KEY, RESOURCE_CATEGORIES
 
 # Allowed URL schemes for the 211 API base URL (guards against SSRF)
 _ALLOWED_SCHEMES = {"https", "http"}

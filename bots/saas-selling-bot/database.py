@@ -9,7 +9,7 @@ import sqlite3
 import json
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "saas_tools.db")
+DB_PATH = os.getenv("SAAS_BOT_DB", os.path.join(os.path.dirname(__file__), "saas_tools.db"))
 
 # ─────────────────────────────────────────────────────────────
 # 200 free SaaS tools across 6 categories

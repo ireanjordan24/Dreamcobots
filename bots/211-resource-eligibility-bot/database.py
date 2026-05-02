@@ -14,7 +14,7 @@ import time
 import uuid
 from typing import Any, Optional
 
-from config import SESSION_TTL_SECONDS
+from bot_config import SESSION_TTL_SECONDS
 
 
 class SessionDatabase:
