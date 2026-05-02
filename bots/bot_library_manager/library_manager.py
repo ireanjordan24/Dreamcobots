@@ -25,6 +25,13 @@ Usage
 from __future__ import annotations
 
 import sqlite3
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
+
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 

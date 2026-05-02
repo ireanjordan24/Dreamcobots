@@ -220,10 +220,10 @@ class FiverrOrderManagerBotTierError(Exception):
 _orig_fiverrordermanager_bot_init = FiverrOrderManagerBot.__init__
 
 
-def _fiverrordermanager_bot_new_init(self, tier=Tier.FREE):
+def _fiverrordermanager_bot_new_init(self, tier="FREE"):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_fiverrordermanager_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = tier_val.upper()
 
 
 FiverrOrderManagerBot.__init__ = _fiverrordermanager_bot_new_init
@@ -231,38 +231,38 @@ FiverrOrderManagerBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100}
 
 
 def _fiverrordermanager_bot_monthly_price(self):
-    return _TIER_MONTHLY_PRICE[self.tier.value]
+    return _TIER_MONTHLY_PRICE[self.tier.lower()]
 
 
 def _fiverrordermanager_bot_get_tier_info(self):
     return {
-        "tier": self.tier.value,
+        "tier": self.tier.lower(),
         "monthly_price_usd": self.monthly_price(),
-        "result_limit": self.RESULT_LIMITS[self.tier.value],
+        "result_limit": self.RESULT_LIMITS[self.tier.lower()],
     }
 
 
 def _fiverrordermanager_bot_enforce_tier(self, required_value):
     order = ["free", "pro", "enterprise"]
-    if order.index(self.tier.value) < order.index(required_value):
+    if order.index(self.tier.lower()) < order.index(required_value):
         raise FiverrOrderManagerBotTierError(
-            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+            f"{required_value.upper()} tier required. Current: {self.tier.lower()}"
         )
 
 
 def _fiverrordermanager_bot_list_items(self, limit=None):
-    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.lower()]
     return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
 
 
 def _fiverrordermanager_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.lower(), "count": len(EXAMPLES)}
 
 
 def _fiverrordermanager_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {"bot": "FiverrOrderManagerBot", "tier": self.tier.lower(), "total_items": len(EXAMPLES), "items": EXAMPLES}
 
 
 FiverrOrderManagerBot.monthly_price = _fiverrordermanager_bot_monthly_price
