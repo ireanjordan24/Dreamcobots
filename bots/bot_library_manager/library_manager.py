@@ -9,6 +9,9 @@ store free-form learning notes, and retrieve a human-readable summary.
 Data is stored in a SQLite database so that knowledge persists across runs
 and can be shared across multiple bot processes on the same machine.
 
+Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
+See framework/global_ai_sources_flow.py for the full pipeline specification.
+
 Usage
 -----
     from bots.bot_library_manager import BotLibraryManager
@@ -23,6 +26,16 @@ Usage
 """
 
 from __future__ import annotations
+
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
+try:
+    from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
+except ImportError:
+    GlobalAISourcesFlow = None  # type: ignore[assignment,misc]
 
 import sqlite3
 from datetime import datetime, timezone

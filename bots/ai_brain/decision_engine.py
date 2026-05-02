@@ -287,7 +287,14 @@ class DecisionEngine:
         return DECISION_OPTIMIZE
 
     def run(self, metrics: Optional[Dict[str, Any]] = None) -> str:
-        """Run the decision engine and return the decision key string."""
+        """Run the decision engine and return the decision key string.
+
+        When called with explicit *metrics*, the plain key constant is returned
+        (e.g. ``"scale_leads"``).  When called without arguments the string
+        includes a human-readable prefix (e.g. ``"Decision: scale_leads"``) for
+        display / logging purposes.
+        """
+        explicit_metrics = metrics is not None
         m = metrics or self.metrics
         revenue = m.get("revenue", 0)
         leads = m.get("leads", 0)
@@ -304,14 +311,14 @@ class DecisionEngine:
             else:
                 key = DECISION_OPTIMIZE
             self._decision_history.append({"decision": key, "revenue": revenue, "leads": leads})
-            return f"Decision: {key}"
+            return key if explicit_metrics else f"Decision: {key}"
         result = self.make_decision(
             revenue_data=m.get("revenue", {}),
             crm_data=m.get("crm", {}),
             workflow_data=m.get("workflow", {}),
         )
         key = result["decision"]["key"]
-        return f"Decision: {key}"
+        return key if explicit_metrics else f"Decision: {key}"
 
     def get_latest_decision(self) -> Optional[Dict[str, Any]]:
         """Return the most recent decision log entry, or None if empty."""
