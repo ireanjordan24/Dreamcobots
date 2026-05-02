@@ -197,6 +197,128 @@ app.get('/api/status', rateLimiter, (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/actions — live GitHub Actions workflow runs (read-only)
+//
+// Fetches the most recent workflow runs from the GitHub REST API.
+// Requires the GITHUB_TOKEN env variable for authenticated requests.
+// Gracefully degrades when the token is absent or the API is unreachable.
+// ---------------------------------------------------------------------------
+
+const GITHUB_API_BASE = 'https://api.github.com';
+const DEFAULT_REPO = process.env.GITHUB_REPO || 'DreamCo-Technologies/Dreamcobots';
+const ACTIONS_PER_PAGE = 10;
+
+async function fetchGitHubWorkflowRuns(repo, token) {
+  const { default: https } = await import('https');
+  return new Promise((resolve) => {
+    const headers = {
+      'User-Agent': 'dreamco-control-tower',
+      Accept: 'application/vnd.github+json',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const url = new URL(
+      `/repos/${repo}/actions/runs?per_page=${ACTIONS_PER_PAGE}`,
+      GITHUB_API_BASE,
+    );
+    const req = https.get(
+      { hostname: url.hostname, path: url.pathname + url.search, headers },
+      (res) => {
+        let body = '';
+        res.on('data', (chunk) => (body += chunk));
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(body);
+            const runs = (json.workflow_runs ?? []).map((r) => ({
+              id: r.id,
+              name: r.name,
+              status: r.status,
+              conclusion: r.conclusion,
+              branch: r.head_branch,
+              event: r.event,
+              run_started_at: r.run_started_at,
+              url: r.html_url,
+            }));
+            resolve({ runs, source: 'github_api' });
+          } catch {
+            resolve({ runs: [], source: 'parse_error' });
+          }
+        });
+      },
+    );
+    req.on('error', () => resolve({ runs: [], source: 'unavailable' }));
+    req.setTimeout(5000, () => {
+      req.destroy();
+      resolve({ runs: [], source: 'timeout' });
+    });
+  });
+}
+
+app.get('/api/actions', rateLimiter, async (req, res) => {
+  const token = process.env.GITHUB_TOKEN || '';
+  const result = await fetchGitHubWorkflowRuns(DEFAULT_REPO, token);
+  return res.json({
+    repo: DEFAULT_REPO,
+    ...result,
+    fetched_at: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/catalog — bot catalog for the marketplace UI
+//
+// Returns the list of bots from bots.json enriched with metadata useful for
+// the build-a-bot marketplace (tier, pricing, features).
+// ---------------------------------------------------------------------------
+
+app.get('/api/catalog', rateLimiter, (_req, res) => {
+  const bots = readBots();
+  const catalog = bots.map((b) => ({
+    bot_id: b.name.replace(/-/g, '_'),
+    display_name: b.name
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' '),
+    category: b.category || 'General',
+    tier: b.tier || 'FREE',
+    description: b.description || '',
+    price_usd: b.price_usd ?? 0,
+    features: b.features || [],
+    is_live: b.status === 'active',
+  }));
+  return res.json(catalog);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/orchestrator — BuddyOrchestrator health snapshot
+//
+// Returns a lightweight status payload showing scraping deadline, catalog
+// size, and system health.  Does not expose sensitive data.
+// ---------------------------------------------------------------------------
+
+app.get('/api/orchestrator', rateLimiter, (_req, res) => {
+  const bots = readBots();
+  const deadline = '2026-06-22';
+  const today = new Date();
+  const deadlineDate = new Date(deadline);
+  const daysRemaining = Math.max(
+    0,
+    Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24)),
+  );
+  const scrapingActive = today <= deadlineDate;
+
+  return res.json({
+    orchestrator: 'BuddyOrchestrator',
+    github_repo: DEFAULT_REPO,
+    catalog_size: bots.length,
+    scraping_active: scrapingActive,
+    scrape_deadline: deadline,
+    days_until_deadline: daysRemaining,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Start server (only when not in test mode)
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
