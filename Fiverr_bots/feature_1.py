@@ -206,6 +206,14 @@ class Tier(_TierEnum):
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
+class _TierStr(str):
+    """String subclass compatible with both str == comparisons and enum .value access."""
+    @property
+    def value(self):
+        return self.lower()
+
+
+
 
 class FiverrServiceListingBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
@@ -217,7 +225,7 @@ _orig_fiverrservicelisting_bot_init = FiverrServiceListingBot.__init__
 def _fiverrservicelisting_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_fiverrservicelisting_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = _TierStr(tier_val.upper())
 
 
 FiverrServiceListingBot.__init__ = _fiverrservicelisting_bot_new_init
@@ -225,38 +233,38 @@ FiverrServiceListingBot.RESULT_LIMITS = {"free": 5, "pro": 25, "enterprise": 100
 
 
 def _fiverrservicelisting_bot_monthly_price(self):
-    return _TIER_MONTHLY_PRICE[self.tier.value]
+    return _TIER_MONTHLY_PRICE[self.tier.lower()]
 
 
 def _fiverrservicelisting_bot_get_tier_info(self):
     return {
-        "tier": self.tier.value,
+        "tier": self.tier.lower(),
         "monthly_price_usd": self.monthly_price(),
-        "result_limit": self.RESULT_LIMITS[self.tier.value],
+        "result_limit": self.RESULT_LIMITS[self.tier.lower()],
     }
 
 
 def _fiverrservicelisting_bot_enforce_tier(self, required_value):
     order = ["free", "pro", "enterprise"]
-    if order.index(self.tier.value) < order.index(required_value):
+    if order.index(self.tier.lower()) < order.index(required_value):
         raise FiverrServiceListingBotTierError(
-            f"{required_value.upper()} tier required. Current: {self.tier.value}"
+            f"{required_value.upper()} tier required. Current: {self.tier.lower()}"
         )
 
 
 def _fiverrservicelisting_bot_list_items(self, limit=None):
-    cap = limit if limit else self.RESULT_LIMITS[self.tier.value]
+    cap = limit if limit else self.RESULT_LIMITS[self.tier.lower()]
     return _random_tier.sample(EXAMPLES, min(cap, len(EXAMPLES)))
 
 
 def _fiverrservicelisting_bot_analyze(self):
     self._enforce_tier("pro")
-    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "count": len(EXAMPLES)}
+    return {"bot": "FiverrServiceListingBot", "tier": self.tier.lower(), "count": len(EXAMPLES)}
 
 
 def _fiverrservicelisting_bot_export_report(self):
     self._enforce_tier("enterprise")
-    return {"bot": "FiverrServiceListingBot", "tier": self.tier.value, "total_items": len(EXAMPLES), "items": EXAMPLES}
+    return {"bot": "FiverrServiceListingBot", "tier": self.tier.lower(), "total_items": len(EXAMPLES), "items": EXAMPLES}
 
 
 FiverrServiceListingBot.monthly_price = _fiverrservicelisting_bot_monthly_price

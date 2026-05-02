@@ -66,19 +66,24 @@ class Optimizer:
         self,
         low_conversion_threshold: float = LOW_CONVERSION_THRESHOLD,
         scale_revenue_threshold: float = HIGH_REVENUE_THRESHOLD,
+        min_leads_threshold: int = MIN_LEADS_THRESHOLD,
     ) -> None:
         self._low_conv = low_conversion_threshold
         self._scale_rev = scale_revenue_threshold
+        self._min_leads = min_leads_threshold
         self._history: List[OptimizationResult] = []
 
     def improve(self, bot_output: Dict[str, Any]) -> str:
         """Return a single strategic recommendation string."""
         revenue: float = float(bot_output.get("revenue", 0))
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
-        leads_generated: int = int(bot_output.get("leads_generated", 0))
 
-        if leads_generated < 3:
-            return "Expand reach"
+        # When leads_generated is explicitly provided, check it before conversion rate.
+        if "leads_generated" in bot_output:
+            leads_generated: int = int(bot_output["leads_generated"])
+            if leads_generated < self._min_leads:
+                return "Expand reach"
+
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:

@@ -14,9 +14,11 @@ from typing import Any, Callable, Dict, List
 
 class BaseEventBus(ABC):
     """
-    Abstract base event bus.
+    Base event bus with default in-memory pub/sub implementation.
 
-    Concrete subclasses must implement ``publish`` and ``subscribe``.
+    Subclasses may override ``publish`` and ``subscribe`` for custom backends
+    (e.g. Redis).  The default implementation is fully functional and can be
+    used directly for testing and in-process communication.
     """
 
     def __init__(self) -> None:
@@ -24,18 +26,18 @@ class BaseEventBus(ABC):
         self._event_log: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
-    # Pub/Sub API (abstract)
+    # Pub/Sub API (concrete defaults)
     # ------------------------------------------------------------------
 
-    @abstractmethod
     def publish(self, event_type: str, data: Any = None) -> None:
         """Publish *data* to every subscriber registered for *event_type*."""
-        ...
+        self._event_log.append({"event_type": event_type, "data": data})
+        for handler in list(self._subscribers.get(event_type, [])):
+            handler(data)
 
-    @abstractmethod
     def subscribe(self, event_type: str, handler: Callable) -> None:
         """Register *handler* to be called when *event_type* is published."""
-        ...
+        self._subscribers[event_type].append(handler)
 
     def unsubscribe(self, event_type: str, handler: Callable) -> None:
         """Remove *handler* from *event_type* subscriptions."""
