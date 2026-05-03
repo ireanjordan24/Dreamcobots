@@ -41,10 +41,10 @@ if _REPO_ROOT not in sys.path:
 
 from python_bots.base_bot import BaseBot  # noqa: E402
 
-
 # ---------------------------------------------------------------------------
 # Minimal in-process event bus (no Redis dependency)
 # ---------------------------------------------------------------------------
+
 
 class _InProcessEventBus:
     """Simple synchronous event bus backed by a plain list."""
@@ -53,7 +53,13 @@ class _InProcessEventBus:
         self._events: List[Dict[str, Any]] = []
 
     def publish(self, topic: str, data: Any = None) -> None:
-        self._events.append({"topic": topic, "data": data, "ts": datetime.now(tz=timezone.utc).isoformat()})
+        self._events.append(
+            {
+                "topic": topic,
+                "data": data,
+                "ts": datetime.now(tz=timezone.utc).isoformat(),
+            }
+        )
 
     @property
     def events(self) -> List[Dict[str, Any]]:
@@ -63,6 +69,7 @@ class _InProcessEventBus:
 # ---------------------------------------------------------------------------
 # PythonBotOrchestrator
 # ---------------------------------------------------------------------------
+
 
 class PythonBotOrchestrator:
     """Orchestrates a collection of ``BaseBot`` sub-bots.
@@ -180,7 +187,9 @@ class PythonBotOrchestrator:
             Aggregated summary with keys ``total``, ``succeeded``,
             ``failed``, ``results``, and ``ran_at``.
         """
-        results: List[Dict[str, Any]] = [self.run_bot(name) for name in list(self._bots)]
+        results: List[Dict[str, Any]] = [
+            self.run_bot(name) for name in list(self._bots)
+        ]
         succeeded = sum(1 for r in results if r["success"])
         return {
             "total": len(results),
