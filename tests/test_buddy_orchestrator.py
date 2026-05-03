@@ -451,3 +451,286 @@ class TestBuddyOrchestratorIntegration:
 
         opt = orch.optimise_revenue()
         assert opt["top_bots"][0]["bot_id"] == "sales_bot"
+
+
+# ===========================================================================
+# Post-merge recovery
+# ===========================================================================
+
+
+class TestBuddyOrchestratorFindIncompleteRuns:
+    def test_keys_present(self, orch):
+        result = orch.find_incomplete_runs()
+        for key in ("repo", "incomplete_runs", "total_checked", "fetched_at"):
+            assert key in result
+
+    def test_returns_correct_repo(self, orch):
+        result = orch.find_incomplete_runs()
+        assert result["repo"] == "test-owner/test-repo"
+
+    def test_incomplete_runs_is_list(self, orch):
+        result = orch.find_incomplete_runs()
+        assert isinstance(result["incomplete_runs"], list)
+
+    def test_total_checked_is_int(self, orch):
+        result = orch.find_incomplete_runs()
+        assert isinstance(result["total_checked"], int)
+
+    def test_graceful_without_requests(self, orch):
+        with patch.dict("sys.modules", {"requests": None}):
+            result = orch.find_incomplete_runs()
+        assert result["incomplete_runs"] == []
+        assert result["total_checked"] == 0
+
+    def test_filters_failure_conclusion(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 1,
+                    "name": "CI",
+                    "status": "completed",
+                    "conclusion": "failure",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-01T00:00:00Z",
+                    "html_url": "https://github.com/test/run/1",
+                },
+                {
+                    "id": 2,
+                    "name": "Deploy",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-01T01:00:00Z",
+                    "html_url": "https://github.com/test/run/2",
+                },
+            ]
+        }
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.find_incomplete_runs()
+        assert result["total_checked"] == 2
+        assert len(result["incomplete_runs"]) == 1
+        assert result["incomplete_runs"][0]["id"] == 1
+
+    def test_filters_cancelled_conclusion(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 10,
+                    "name": "Tests",
+                    "status": "completed",
+                    "conclusion": "cancelled",
+                    "head_branch": "feature",
+                    "event": "push",
+                    "run_started_at": "2026-05-02T00:00:00Z",
+                    "html_url": "https://github.com/test/run/10",
+                }
+            ]
+        }
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.find_incomplete_runs()
+        assert len(result["incomplete_runs"]) == 1
+
+    def test_filters_in_progress_status(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 20,
+                    "name": "Lint",
+                    "status": "in_progress",
+                    "conclusion": None,
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-02T00:00:00Z",
+                    "html_url": "https://github.com/test/run/20",
+                }
+            ]
+        }
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.find_incomplete_runs()
+        assert len(result["incomplete_runs"]) == 1
+        assert result["incomplete_runs"][0]["id"] == 20
+
+    def test_successful_runs_excluded(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 30,
+                    "name": "CI",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-02T00:00:00Z",
+                    "html_url": "https://github.com/test/run/30",
+                }
+            ]
+        }
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.find_incomplete_runs()
+        assert len(result["incomplete_runs"]) == 0
+
+
+class TestBuddyOrchestratorRerunWorkflowRun:
+    def test_returns_triggered_true_on_201(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_requests = MagicMock()
+        mock_requests.post.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.rerun_workflow_run(run_id=42)
+        assert result["triggered"] is True
+        assert result["run_id"] == 42
+
+    def test_returns_triggered_true_on_204(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 204
+        mock_requests = MagicMock()
+        mock_requests.post.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.rerun_workflow_run(run_id=99)
+        assert result["triggered"] is True
+
+    def test_returns_triggered_false_on_error_status(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 403
+        mock_requests = MagicMock()
+        mock_requests.post.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.rerun_workflow_run(run_id=7)
+        assert result["triggered"] is False
+        assert "HTTP 403" in result["error"]
+
+    def test_graceful_without_requests(self, orch):
+        with patch.dict("sys.modules", {"requests": None}):
+            result = orch.rerun_workflow_run(run_id=55)
+        assert result["triggered"] is False
+        assert "run_id" in result
+
+    def test_failed_jobs_only_uses_correct_endpoint(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_requests = MagicMock()
+        mock_requests.post.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            orch.rerun_workflow_run(run_id=1, failed_jobs_only=True)
+        called_url = mock_requests.post.call_args[0][0]
+        assert "rerun-failed-jobs" in called_url
+
+    def test_full_rerun_uses_correct_endpoint(self, orch):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_requests = MagicMock()
+        mock_requests.post.return_value = mock_response
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            orch.rerun_workflow_run(run_id=2, failed_jobs_only=False)
+        called_url = mock_requests.post.call_args[0][0]
+        assert called_url.endswith("/rerun")
+
+
+class TestBuddyOrchestratorPostMergeRecovery:
+    def test_keys_present(self, orch):
+        result = orch.post_merge_recovery()
+        for key in ("repo", "total_checked", "incomplete_found", "rerun_results", "fetched_at"):
+            assert key in result
+
+    def test_returns_correct_repo(self, orch):
+        result = orch.post_merge_recovery()
+        assert result["repo"] == "test-owner/test-repo"
+
+    def test_rerun_results_is_list(self, orch):
+        result = orch.post_merge_recovery()
+        assert isinstance(result["rerun_results"], list)
+
+    def test_graceful_without_requests(self, orch):
+        with patch.dict("sys.modules", {"requests": None}):
+            result = orch.post_merge_recovery()
+        assert result["incomplete_found"] == 0
+        assert result["rerun_results"] == []
+
+    def test_reruns_each_incomplete_run(self, orch):
+        # Simulate two failed runs found
+        list_response = MagicMock()
+        list_response.status_code = 200
+        list_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 101,
+                    "name": "CI",
+                    "status": "completed",
+                    "conclusion": "failure",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-01T00:00:00Z",
+                    "html_url": "https://github.com/test/run/101",
+                },
+                {
+                    "id": 102,
+                    "name": "Deploy",
+                    "status": "completed",
+                    "conclusion": "timed_out",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-01T01:00:00Z",
+                    "html_url": "https://github.com/test/run/102",
+                },
+            ]
+        }
+        rerun_response = MagicMock()
+        rerun_response.status_code = 201
+
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = list_response
+        mock_requests.post.return_value = rerun_response
+
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.post_merge_recovery()
+
+        assert result["total_checked"] == 2
+        assert result["incomplete_found"] == 2
+        assert len(result["rerun_results"]) == 2
+        assert all(r["triggered"] for r in result["rerun_results"])
+
+    def test_no_reruns_when_all_successful(self, orch):
+        list_response = MagicMock()
+        list_response.status_code = 200
+        list_response.json.return_value = {
+            "workflow_runs": [
+                {
+                    "id": 200,
+                    "name": "CI",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "head_branch": "main",
+                    "event": "push",
+                    "run_started_at": "2026-05-02T00:00:00Z",
+                    "html_url": "https://github.com/test/run/200",
+                }
+            ]
+        }
+        mock_requests = MagicMock()
+        mock_requests.get.return_value = list_response
+
+        with patch.dict("sys.modules", {"requests": mock_requests}):
+            result = orch.post_merge_recovery()
+
+        assert result["total_checked"] == 1
+        assert result["incomplete_found"] == 0
+        assert result["rerun_results"] == []

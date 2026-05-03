@@ -6,6 +6,8 @@ Buddy orchestrates:
   • Data aggregation   — collect and unify data from all active bots
   • Revenue tracking   — aggregate revenue across the bot network
   • GitHub Actions     — read-only monitoring of workflow run status
+  • Post-merge recovery — identify incomplete runs, re-trigger them,
+                          and verify system consistency after merges
   • Scrape lifecycle   — enforce the June 22, 2026 data-scraping deadline
 
 Design
@@ -143,6 +145,55 @@ def _fetch_workflow_runs(
     except Exception:  # noqa: BLE001
         pass
     return []
+
+
+def _rerun_workflow_run(
+    repo: str,
+    run_id: int,
+    token: Optional[str] = None,
+    failed_jobs_only: bool = True,
+) -> dict:
+    """
+    Trigger a re-run of a GitHub Actions workflow run.
+
+    Uses ``POST /repos/{repo}/actions/runs/{run_id}/rerun-failed-jobs``
+    when *failed_jobs_only* is ``True`` (default), or
+    ``POST /repos/{repo}/actions/runs/{run_id}/rerun`` for a full restart.
+
+    Requires a GitHub token with ``actions:write`` permission.
+    Falls back gracefully when the ``requests`` library is unavailable.
+
+    Returns
+    -------
+    dict with keys: ``run_id``, ``triggered`` (bool), and optionally
+    ``error`` (str) on failure.
+    """
+    try:
+        import requests as _req
+    except ImportError:
+        return {"triggered": False, "run_id": run_id, "error": "requests library not available"}
+
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    endpoint = "rerun-failed-jobs" if failed_jobs_only else "rerun"
+    url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/{endpoint}"
+
+    try:
+        resp = _req.post(url, headers=headers, timeout=10)
+        if resp.status_code in (201, 204):
+            return {"triggered": True, "run_id": run_id}
+        return {
+            "triggered": False,
+            "run_id": run_id,
+            "error": f"HTTP {resp.status_code}",
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"triggered": False, "run_id": run_id, "error": str(exc)}
 
 
 # ---------------------------------------------------------------------------
@@ -453,6 +504,95 @@ class BuddyOrchestrator:
             "runs": runs,
             "source": source,
             "fetched_at": datetime.now(tz=timezone.utc).isoformat(),
+        }
+
+    # ------------------------------------------------------------------
+    # Post-merge recovery — identify, re-trigger, and verify
+    # ------------------------------------------------------------------
+
+    def find_incomplete_runs(self, per_page: int = 30) -> dict:
+        """
+        Identify GitHub Actions workflow runs that did not complete successfully.
+
+        A run is considered incomplete when its conclusion is one of:
+        ``failure``, ``cancelled``, ``timed_out``, ``action_required``, or
+        the run is still active (``in_progress``, ``queued``, ``requested``,
+        ``waiting``).
+
+        Returns
+        -------
+        dict with keys: ``repo``, ``incomplete_runs`` (list),
+        ``total_checked`` (int), ``fetched_at`` (ISO-8601 str).
+        """
+        runs = _fetch_workflow_runs(
+            repo=self.github_repo,
+            token=self._github_token,
+            per_page=per_page,
+        )
+        incomplete_conclusions = {"failure", "cancelled", "timed_out", "action_required"}
+        incomplete_statuses = {"in_progress", "queued", "requested", "waiting"}
+        incomplete = [
+            r for r in runs
+            if r.get("conclusion") in incomplete_conclusions
+            or r.get("status") in incomplete_statuses
+        ]
+        return {
+            "repo": self.github_repo,
+            "incomplete_runs": incomplete,
+            "total_checked": len(runs),
+            "fetched_at": datetime.now(tz=timezone.utc).isoformat(),
+        }
+
+    def rerun_workflow_run(self, run_id: int, failed_jobs_only: bool = True) -> dict:
+        """
+        Trigger a re-run of a specific GitHub Actions workflow run.
+
+        When *failed_jobs_only* is ``True`` (default), only the failed jobs
+        are re-executed; otherwise the entire run restarts from scratch.
+
+        Requires ``actions:write`` permission on the configured token.
+
+        Returns
+        -------
+        dict with keys: ``run_id``, ``triggered`` (bool), and optionally
+        ``error`` (str) on failure.
+        """
+        return _rerun_workflow_run(
+            repo=self.github_repo,
+            run_id=run_id,
+            token=self._github_token,
+            failed_jobs_only=failed_jobs_only,
+        )
+
+    def post_merge_recovery(self, per_page: int = 30) -> dict:
+        """
+        Orchestrate full post-merge recovery.
+
+        Steps
+        -----
+        1. Fetch recent workflow runs and identify incomplete ones.
+        2. Trigger re-runs for every incomplete run via the GitHub API.
+        3. Return a summary of all actions taken.
+
+        Returns
+        -------
+        dict with keys: ``repo``, ``total_checked`` (int),
+        ``incomplete_found`` (int), ``rerun_results`` (list of per-run
+        outcome dicts), ``fetched_at`` (ISO-8601 str).
+        """
+        report = self.find_incomplete_runs(per_page=per_page)
+        incomplete = report["incomplete_runs"]
+        rerun_results = [
+            self.rerun_workflow_run(r["id"])
+            for r in incomplete
+            if r.get("id") is not None
+        ]
+        return {
+            "repo": self.github_repo,
+            "total_checked": report["total_checked"],
+            "incomplete_found": len(incomplete),
+            "rerun_results": rerun_results,
+            "fetched_at": report["fetched_at"],
         }
 
     # ------------------------------------------------------------------

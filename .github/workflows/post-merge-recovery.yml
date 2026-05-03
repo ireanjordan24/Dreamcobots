@@ -1,0 +1,129 @@
+name: Post-Merge Recovery
+
+# Triggered automatically after every push to main (i.e. after merges) and on
+# a 6-hour schedule so that any runs that failed while the workflow was
+# temporarily down are also caught.  Can also be run manually.
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 */6 * * *'   # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      max_runs:
+        description: 'Maximum number of recent workflow runs to inspect'
+        required: false
+        default: '30'
+
+permissions:
+  actions: write   # Required to re-trigger workflow runs
+  contents: read
+
+jobs:
+  recover:
+    name: Recover Incomplete Workflow Runs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ── Find incomplete runs and re-trigger them via the GitHub API ─────────
+      - name: Find and re-trigger incomplete workflow runs
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const maxRuns = parseInt('${{ github.event.inputs.max_runs || 30 }}');
+            const { owner, repo } = context.repo;
+
+            core.info(`Fetching up to ${maxRuns} recent workflow runs for ${owner}/${repo}…`);
+
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner,
+              repo,
+              per_page: maxRuns,
+            });
+
+            const runs = data.workflow_runs;
+            core.info(`Inspecting ${runs.length} run(s)…`);
+
+            const incompleteConclusions = new Set([
+              'failure', 'cancelled', 'timed_out', 'action_required',
+            ]);
+            const activeStatuses = new Set([
+              'in_progress', 'queued', 'requested', 'waiting',
+            ]);
+
+            let retriggered = 0;
+            let skipped = 0;
+
+            for (const run of runs) {
+              const { id, name, status, conclusion, head_branch } = run;
+
+              if (activeStatuses.has(status)) {
+                core.info(`  SKIP  [${id}] "${name}" on "${head_branch}" — still ${status}`);
+                skipped++;
+                continue;
+              }
+
+              if (conclusion && incompleteConclusions.has(conclusion)) {
+                core.info(`  RERUN [${id}] "${name}" on "${head_branch}" — was ${conclusion}`);
+                try {
+                  await github.rest.actions.reRunWorkflowFailedJobs({
+                    owner,
+                    repo,
+                    run_id: id,
+                  });
+                  retriggered++;
+                } catch (err) {
+                  core.warning(`  FAIL  [${id}] "${name}" — re-run request failed: ${err.message}`);
+                }
+              } else {
+                core.info(`  OK    [${id}] "${name}" on "${head_branch}" — ${conclusion || status}`);
+              }
+            }
+
+            core.info('');
+            core.info(`Recovery summary: ${retriggered} re-triggered, ${skipped} active/skipped.`);
+
+      # ── Verify system consistency ──────────────────────────────────────────
+      - name: Check bot framework compliance
+        run: python tools/check_bot_framework.py
+
+      - name: Run test suite to verify consistency
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
+
+      # ── Upload failure logs ────────────────────────────────────────────────
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-merge-recovery-logs-${{ github.run_id }}
+          path: |
+            logs/
+          if-no-files-found: ignore
+
+      - name: Report completion
+        if: always()
+        run: |
+          echo "Post-merge recovery complete."
+          echo "Branch : ${{ github.ref_name }}"
+          echo "Run ID : ${{ github.run_id }}"
+          echo "Status : ${{ job.status }}"
