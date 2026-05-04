@@ -23,6 +23,8 @@ Welcome to **DreamCobots** — a versatile, user-friendly platform for automatio
 | [211 Resource Eligibility Bot](bots/211-resource-eligibility-bot/) | Helps users find local social services and check eligibility | [README](bots/211-resource-eligibility-bot/README.md) |
 | [Selenium Job Application Bot](bots/selenium-job-application-bot/) | Automates job searching and applications across Indeed, LinkedIn, Glassdoor | [README](bots/selenium-job-application-bot/README.md) |
 | [AI Side Hustle Bots](bots/ai-side-hustle-bots/) | AI-powered tools to identify, launch, and monetize side hustles | [README](bots/ai-side-hustle-bots/README.md) |
+| [AI Transition Bot](bots/ai_transition_bot/) | Onboarding kit for companies adopting AI — readiness assessment, employee training modules, and plug-and-play integration APIs | [README](bots/ai_transition_bot/README.md) |
+| [AI Consulting Bot](bots/ai_consulting_bot/) | Expert-led AI transition management — consultant matching, session booking, and phased AI adoption roadmap generation | [README](bots/ai_consulting_bot/README.md) |
 
 ### Quick Start (any bot)
 
@@ -166,6 +168,31 @@ See full documentation in:
 
 ### `compliance-tools`
 - Coming soon.
+
+### AI Transition Suite (`bots/ai_transition_bot/` & `bots/ai_consulting_bot/`)
+
+Tools specifically built for **companies converting to AI**:
+
+- **AI Transition Bot** — Self-service onboarding kit covering three phases:
+  1. *Readiness Assessment* — scores the company across data infrastructure, talent,
+     process automation, leadership, tech stack, and change management; returns a
+     prioritised recommendation report.
+  2. *Employee Training Modules* — beginner → advanced AI learning paths enrollable
+     per employee.
+  3. *Integration API Kit* — activate plug-and-play AI connectors for CRM, ERP, HR,
+     analytics, communication, document management, e-commerce, supply chain, finance,
+     and customer support platforms.
+
+- **AI Consulting Bot** — Expert-led AI transition management:
+  1. *Expert Matching* — pairs the business with a DreamCo-certified AI specialist
+     for its industry (healthcare, real estate, manufacturing, logistics, finance, etc.).
+  2. *Session Management* — book structured consulting sessions with auto-generated
+     agendas; Pro/Enterprise sessions include linked transcripts.
+  3. *AI Adoption Roadmap* — generates a five-phase, milestone-driven plan
+     (*Discovery → Strategy → Pilot → Full Deployment → Optimisation*) personalised
+     to the company's readiness score.
+
+See the full prospectus: [`docs/ai_transition_prospectus.html`](docs/ai_transition_prospectus.html)
 
 ### `examples`
 - Contains example use cases for different bots like `Referral Bot` and `Hustle Bot`.

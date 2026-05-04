@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamCo AI Transition Suite — Prospectus</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+
+    /* ── Header ── */
+    header { background: linear-gradient(135deg, #1f6feb 0%, #388bfd 100%); padding: 3.5rem 2rem; text-align: center; }
+    header h1 { font-size: 2.8rem; color: #fff; margin-bottom: 0.5rem; }
+    header .tagline { font-size: 1.2rem; color: #cae3ff; max-width: 700px; margin: 0 auto 1.5rem; }
+    header .stats { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+    header .stat { background: rgba(255,255,255,0.18); border-radius: 8px; padding: 0.5rem 1.4rem; color: #fff; font-weight: 700; font-size: 0.95rem; }
+
+    /* ── Nav ── */
+    nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+    nav a { color: #58a6ff; text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+    nav a:hover { text-decoration: underline; }
+
+    /* ── Main Layout ── */
+    main { max-width: 1100px; margin: 2.5rem auto; padding: 0 2rem; }
+    section { margin-bottom: 3.5rem; }
+    h2 { color: #f0f6fc; font-size: 1.7rem; margin-bottom: 1rem; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem; }
+    h3 { color: #e6edf3; font-size: 1.15rem; margin: 1.4rem 0 0.5rem; }
+    p  { margin-bottom: 0.9rem; color: #8b949e; }
+    ul { margin: 0.5rem 0 1rem 1.5rem; color: #8b949e; }
+    li { margin-bottom: 0.35rem; }
+    a  { color: #58a6ff; }
+    code { background: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 0.15em 0.4em; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.88em; color: #79c0ff; }
+    pre  { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; overflow-x: auto; margin-bottom: 1.2rem; }
+    pre code { background: none; border: none; padding: 0; color: #e6edf3; font-size: 0.9rem; }
+
+    /* ── Badge ── */
+    .badge { display: inline-block; padding: 0.2em 0.65em; border-radius: 12px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; }
+    .free     { background: #1a4f1a; color: #56d364; }
+    .pro      { background: #1a3a6b; color: #58a6ff; }
+    .ent      { background: #4b1a6b; color: #d2a8ff; }
+
+    /* ── Card Grid ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.3rem 1.4rem; transition: border-color 0.2s; }
+    .card:hover { border-color: #58a6ff; }
+    .card h4 { color: #f0f6fc; font-size: 1.05rem; margin-bottom: 0.45rem; }
+    .card p  { font-size: 0.9rem; color: #8b949e; margin-bottom: 0; }
+    .card .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+
+    /* ── Pricing Table ── */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    th, td { border: 1px solid #30363d; padding: 0.65rem 1rem; text-align: left; vertical-align: top; }
+    th { background: #161b22; color: #f0f6fc; }
+    td { color: #8b949e; }
+    td.check { color: #56d364; font-weight: 700; }
+    td.cross  { color: #6e7681; }
+
+    /* ── Before/After ── */
+    .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1rem; }
+    .before-after .panel { border-radius: 8px; padding: 1.2rem; }
+    .before { background: #1a1a2e; border: 1px solid #4b1a1a; }
+    .after  { background: #0a1f0a; border: 1px solid #1a4f1a; }
+    .before h4 { color: #ff7b72; margin-bottom: 0.6rem; }
+    .after  h4 { color: #56d364; margin-bottom: 0.6rem; }
+    .before ul, .after ul { color: #8b949e; margin-left: 1.2rem; }
+
+    /* ── CTA ── */
+    .cta-box { background: linear-gradient(135deg, #1f6feb22, #388bfd22); border: 1px solid #1f6feb; border-radius: 10px; padding: 2rem; text-align: center; margin-top: 2rem; }
+    .cta-box h3 { color: #58a6ff; font-size: 1.4rem; margin-bottom: 0.75rem; }
+    .cta-box p { max-width: 600px; margin: 0 auto 1.2rem; }
+    .btn { display: inline-block; background: #1f6feb; color: #fff; text-decoration: none; padding: 0.65rem 1.6rem; border-radius: 6px; font-weight: 700; margin: 0.3rem; }
+    .btn:hover { background: #388bfd; }
+    .btn-sec { background: transparent; border: 1px solid #30363d; color: #c9d1d9; }
+    .btn-sec:hover { border-color: #58a6ff; color: #58a6ff; }
+
+    footer { text-align: center; padding: 2rem; color: #6e7681; border-top: 1px solid #30363d; margin-top: 2rem; }
+
+    @media (max-width: 640px) {
+      .before-after { grid-template-columns: 1fr; }
+      header h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 DreamCo AI Transition Suite</h1>
+  <p class="tagline">
+    The complete platform for companies converting to AI — assessment, training,
+    integration, and expert consulting in one unified ecosystem.
+  </p>
+  <div class="stats">
+    <span class="stat">3 Tiers</span>
+    <span class="stat">2 Core Bots</span>
+    <span class="stat">10+ Integrations</span>
+    <span class="stat">5 Roadmap Phases</span>
+    <span class="stat">Industry-Ready</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">Overview</a>
+  <a href="#tools">Tools</a>
+  <a href="#transition-bot">AI Transition Bot</a>
+  <a href="#consulting-bot">AI Consulting Bot</a>
+  <a href="#before-after">Before &amp; After</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#use-cases">Use Cases</a>
+  <a href="#quickstart">Quick Start</a>
+</nav>
+
+<main>
+
+  <!-- ── Overview ── -->
+  <section id="overview">
+    <h2>Why DreamCo for AI Transition?</h2>
+    <p>
+      Thousands of companies know they need AI but don't know where to start. DreamCo's
+      AI Transition Suite removes every barrier — from diagnosing readiness gaps, to
+      training employees, to connecting AI directly into your existing software stack,
+      to pairing you with a dedicated expert who builds your custom roadmap.
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">🔍</div>
+        <h4>Readiness Assessment</h4>
+        <p>Score your company across 6 AI adoption dimensions and receive a prioritised recommendation report.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎓</div>
+        <h4>Employee Training Modules</h4>
+        <p>Beginner, intermediate, and advanced AI learning paths personalised to each employee's role.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔌</div>
+        <h4>Plug-and-Play Integration APIs</h4>
+        <p>Connect AI into your CRM, ERP, HR, analytics, communication, and 6 more platforms instantly.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🤝</div>
+        <h4>Expert Matching</h4>
+        <p>Get paired with an AI consulting specialist who knows your industry inside and out.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🗺️</div>
+        <h4>AI Adoption Roadmap</h4>
+        <p>A phased, milestone-driven plan to guide your company from AI beginner to AI-powered business.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📊</div>
+        <h4>Progress Tracking</h4>
+        <p>Real-time dashboards showing training completions, integration health, and roadmap milestones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tools Overview ── -->
+  <section id="tools">
+    <h2>The Two Core Bots</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Bot</th>
+          <th>Primary Purpose</th>
+          <th>Key Capabilities</th>
+          <th>Best For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AI Transition Bot</strong></td>
+          <td>Self-service AI onboarding kit</td>
+          <td>Assessment · Training · Integration APIs</td>
+          <td>SMBs, internal IT / HR teams</td>
+        </tr>
+        <tr>
+          <td><strong>AI Consulting Bot</strong></td>
+          <td>Expert-led transition management</td>
+          <td>Expert matching · Sessions · Roadmaps</td>
+          <td>Enterprises, complex multi-department rollouts</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── AI Transition Bot ── -->
+  <section id="transition-bot">
+    <h2>AI Transition Bot</h2>
+    <p>
+      The <strong>AI Transition Bot</strong> is a self-service onboarding kit that walks any business
+      through the three mandatory steps of an AI adoption — understanding where you are,
+      upskilling your team, and connecting AI to your tools.
+    </p>
+
+    <h3>1 · Readiness Assessment</h3>
+    <p>
+      Evaluates your company across six dimensions: <em>data infrastructure, talent &amp; skills,
+      process automation, leadership &amp; strategy, technology stack,</em> and <em>change management</em>.
+      Returns an overall score, a readiness level (beginner / intermediate / advanced), and a
+      prioritised list of improvement recommendations.
+    </p>
+
+    <h3>2 · Training Modules</h3>
+    <p>
+      Enrol individual employees in AI learning paths at the right level. Free tier provides
+      5 beginner modules; Pro unlocks 30 modules including intermediate content; Enterprise
+      gives unlimited modules across all levels including advanced AI engineering tracks.
+    </p>
+
+    <h3>3 · Integration API Kit</h3>
+    <p>
+      Activate plug-and-play AI connectors for your existing platforms. Supported platforms:
+      <code>crm</code> · <code>erp</code> · <code>hr</code> · <code>analytics</code> ·
+      <code>communication</code> · <code>document_management</code> · <code>e_commerce</code> ·
+      <code>supply_chain</code> · <code>finance</code> · <code>customer_support</code>.
+      Each activated integration returns a live endpoint URL and API key stub ready to wire
+      into your workflow automation platform (n8n, Zapier, Make.com, etc.).
+    </p>
+
+    <h3>Module &amp; Integration Limits by Tier</h3>
+    <table>
+      <thead>
+        <tr><th>Capability</th><th>Free</th><th>Pro</th><th>Enterprise</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Training modules</td><td>5 (beginner)</td><td>30 (beginner + intermediate)</td><td>Unlimited (all levels)</td></tr>
+        <tr><td>Integration APIs</td><td>1</td><td>10</td><td>Unlimited</td></tr>
+        <tr><td>Assessment detail</td><td>Summary</td><td>Full breakdown</td><td>Full + AI adoption roadmap</td></tr>
+        <tr><td>Workflow mapping</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>White-label kit</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+        <tr><td>Dedicated onboarding specialist</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── AI Consulting Bot ── -->
+  <section id="consulting-bot">
+    <h2>AI Consulting Bot</h2>
+    <p>
+      The <strong>AI Consulting Bot</strong> pairs businesses with DreamCo-certified AI transition
+      experts and manages the full consulting lifecycle — matching, booking, transcripts, and a
+      phased AI adoption roadmap.
+    </p>
+
+    <h3>Expert Matching</h3>
+    <p>
+      Provide your company name, industry, size, and goals. DreamCo matches you with the most
+      suitable expert from the following domains: <code>general_ai_strategy</code>,
+      <code>healthcare_ai</code>, <code>real_estate_ai</code>, <code>manufacturing_ai</code>,
+      <code>logistics_ai</code>, <code>finance_ai</code>, <code>retail_ai</code>,
+      <code>education_ai</code>, <code>legal_ai</code>, <code>hr_ai</code>.
+    </p>
+
+    <h3>Session Management</h3>
+    <p>
+      Book structured consulting sessions with auto-generated agendas. Pro and Enterprise sessions
+      include a linked transcript document. Enterprise clients get unlimited sessions with a
+      dedicated AI transition team.
+    </p>
+
+    <h3>AI Adoption Roadmap</h3>
+    <p>
+      Generate a personalised, five-phase roadmap covering: <em>Discovery &amp; Assessment →
+      Strategy &amp; Planning → Pilot Implementation → Full Deployment → Optimisation &amp;
+      Scaling</em>. Duration of each phase is intelligently adjusted based on your readiness
+      score. Enterprise roadmaps include an executive briefing package and a change management
+      playbook.
+    </p>
+
+    <h3>Sessions &amp; Features by Tier</h3>
+    <table>
+      <thead>
+        <tr><th>Capability</th><th>Free</th><th>Pro</th><th>Enterprise</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Consulting sessions / month</td><td>1</td><td>10</td><td>Unlimited</td></tr>
+        <tr><td>Expert type</td><td>Community pool</td><td>Dedicated expert</td><td>Senior strategist + team</td></tr>
+        <tr><td>AI adoption roadmap</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓ + executive briefing</td></tr>
+        <tr><td>Session transcripts</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Change management playbook</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+        <tr><td>White-glove onboarding</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── Before & After ── -->
+  <section id="before-after">
+    <h2>Before AI vs After DreamCo</h2>
+
+    <div class="before-after">
+      <div class="panel before">
+        <h4>❌ Before AI</h4>
+        <ul>
+          <li>Manual data entry across disconnected systems</li>
+          <li>Employees unprepared for AI tools</li>
+          <li>No clear roadmap — vendor overload</li>
+          <li>Customer support backlogs</li>
+          <li>Spreadsheet-based forecasting</li>
+          <li>High onboarding costs for every new system</li>
+        </ul>
+      </div>
+      <div class="panel after">
+        <h4>✅ After DreamCo</h4>
+        <ul>
+          <li>AI-powered integrations sync all platforms automatically</li>
+          <li>Every employee upskilled via personalised training paths</li>
+          <li>5-phase roadmap with clear milestones and timelines</li>
+          <li>24/7 AI customer support bot handles 80 % of tickets</li>
+          <li>Predictive analytics with real-time dashboards</li>
+          <li>Plug-and-play onboarding kit — live in hours, not months</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Pricing ── -->
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Price / month</th>
+          <th>Requests / month</th>
+          <th>AI Transition Bot</th>
+          <th>AI Consulting Bot</th>
+          <th>Support</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge free">Free</span></td>
+          <td>$0</td>
+          <td>500</td>
+          <td>Summary assessment · 5 modules · 1 integration</td>
+          <td>1 session · community expert</td>
+          <td>Community</td>
+        </tr>
+        <tr>
+          <td><span class="badge pro">Pro</span></td>
+          <td>$49</td>
+          <td>10,000</td>
+          <td>Full assessment · 30 modules · 10 integrations</td>
+          <td>10 sessions · dedicated expert · roadmap</td>
+          <td>Email (48 h SLA)</td>
+        </tr>
+        <tr>
+          <td><span class="badge ent">Enterprise</span></td>
+          <td>$299</td>
+          <td>Unlimited</td>
+          <td>Full assessment + roadmap · unlimited · white-label</td>
+          <td>Unlimited · senior team · exec briefing · playbook</td>
+          <td>Dedicated 24/7</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── Use Cases ── -->
+  <section id="use-cases">
+    <h2>Ideal Use Cases</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>🏥 Healthcare Provider</h4>
+        <p>Automate patient intake, predict appointment no-shows, and train clinical staff on AI-assisted diagnostics.</p>
+      </div>
+      <div class="card">
+        <h4>🏭 Manufacturer</h4>
+        <p>Connect AI to ERP and supply-chain platforms, forecast demand, and reduce downtime with predictive maintenance bots.</p>
+      </div>
+      <div class="card">
+        <h4>🏠 Real Estate Agency</h4>
+        <p>Deploy AI for lead scoring, property valuation, and automated client follow-up via CRM integration.</p>
+      </div>
+      <div class="card">
+        <h4>🛒 Retail / E-Commerce</h4>
+        <p>Personalise product recommendations, automate customer support, and optimise pricing with AI analytics.</p>
+      </div>
+      <div class="card">
+        <h4>🚚 Logistics &amp; Freight</h4>
+        <p>Optimise routes, automate invoice processing, and predict delivery delays before they happen.</p>
+      </div>
+      <div class="card">
+        <h4>💼 Professional Services</h4>
+        <p>Automate document review, client communications, and time-tracking with AI workflow integrations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Quick Start ── -->
+  <section id="quickstart">
+    <h2>Quick Start</h2>
+
+    <h3>AI Transition Bot</h3>
+    <pre><code>from bots.ai_transition_bot.bot import AITransitionBot
+from tiers import Tier
+
+bot = AITransitionBot(tier=Tier.PRO)
+
+# 1. Run an assessment
+report = bot.run_assessment({
+    "name": "Acme Corp",
+    "industry": "manufacturing",
+    "size": "medium"
+})
+print(report["readiness_level"])   # e.g. "intermediate"
+
+# 2. Enrol an employee
+bot.enroll_training({
+    "employee_name": "Jane Smith",
+    "level": "intermediate",
+    "topic": "AI for Supply Chain"
+})
+
+# 3. Activate an ERP integration
+integration = bot.activate_integration({"platform": "erp"})
+print(integration["endpoint_url"])
+# https://api.dreamcobots.ai/integrations/erp</code></pre>
+
+    <h3>AI Consulting Bot</h3>
+    <pre><code>from bots.ai_consulting_bot.bot import AIConsultingBot
+from tiers import Tier
+
+bot = AIConsultingBot(tier=Tier.ENTERPRISE)
+
+# Match an expert
+expert = bot.match_expert({
+    "company_name": "HealthFirst Inc",
+    "industry": "healthcare",
+    "size": "enterprise"
+})
+
+# Book a session
+session = bot.book_session({
+    "company_name": "HealthFirst Inc",
+    "expert_id": expert["expert_id"],
+    "topic": "AI Adoption Strategy — Year 1"
+})
+
+# Generate an AI adoption roadmap
+roadmap = bot.generate_roadmap({
+    "company_name": "HealthFirst Inc",
+    "industry": "healthcare",
+    "readiness_score": 52
+})
+print(f"Roadmap: {roadmap['total_phases']} phases, "
+      f"~{roadmap['estimated_total_weeks']} weeks")</code></pre>
+
+    <div class="cta-box">
+      <h3>Ready to Start Your AI Transition?</h3>
+      <p>Join thousands of businesses already using DreamCo to navigate their AI journey — from first assessment to full deployment.</p>
+      <a href="https://github.com/DreamCo-Technologies/Dreamcobots" class="btn">View Repository</a>
+      <a href="index.html" class="btn btn-sec">Explore All Bots</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 DreamCo Technologies. All rights reserved. |
+     <a href="https://github.com/DreamCo-Technologies/Dreamcobots">GitHub</a> |
+     <a href="index.html">Bot Ecosystem</a>
+  </p>
+</footer>
+
+</body>
+</html>
