@@ -1,0 +1,146 @@
+# Workflow: AI Service Integration
+# Connects the Dreamcobots repository to Claude (Anthropic), ChatGPT (OpenAI),
+# and Google Gemini via their REST APIs using repository secrets.
+#
+# Required secrets (Settings → Secrets and variables → Actions):
+#   GITHUB_PAT       — Personal Access Token with repo + workflow scopes
+#   CLAUDE_API_KEY   — Anthropic API key  (https://console.anthropic.com)
+#   CHATGPT_API_KEY  — OpenAI API key     (https://platform.openai.com)
+#   GEMINI_API_KEY   — Google AI API key  (https://aistudio.google.com)
+
+name: AI Service Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+jobs:
+  integrate-ai-services:
+    name: Integrate AI Services
+    runs-on: ubuntu-latest
+    # Only run the labelled-PR trigger when the label is "ai-review"
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'ai-review')
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------ #
+      # Claude (Anthropic)                                                   #
+      # ------------------------------------------------------------------ #
+      - name: Call Claude API
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: |
+          if [ -z "$CLAUDE_API_KEY" ]; then
+            echo "⚠️  CLAUDE_API_KEY secret is not set — skipping Claude step."
+            exit 0
+          fi
+
+          RESPONSE=$(curl --silent --fail \
+            --request POST \
+            --url "https://api.anthropic.com/v1/messages" \
+            --header "x-api-key: ${CLAUDE_API_KEY}" \
+            --header "anthropic-version: 2023-06-01" \
+            --header "content-type: application/json" \
+            --data '{
+              "model": "claude-3-haiku-20240307",
+              "max_tokens": 256,
+              "messages": [
+                {
+                  "role": "user",
+                  "content": "Summarise the purpose of the Dreamcobots repository in one sentence."
+                }
+              ]
+            }')
+
+          echo "Claude response:"
+          echo "$RESPONSE" | python3 -c \
+            "import sys, json; data=json.load(sys.stdin); print(data['content'][0]['text'])" \
+            || echo "$RESPONSE"
+
+      # ------------------------------------------------------------------ #
+      # ChatGPT (OpenAI)                                                     #
+      # ------------------------------------------------------------------ #
+      - name: Call ChatGPT API
+        env:
+          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
+        run: |
+          if [ -z "$CHATGPT_API_KEY" ]; then
+            echo "⚠️  CHATGPT_API_KEY secret is not set — skipping ChatGPT step."
+            exit 0
+          fi
+
+          RESPONSE=$(curl --silent --fail \
+            --request POST \
+            --url "https://api.openai.com/v1/chat/completions" \
+            --header "Authorization: Bearer ${CHATGPT_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data '{
+              "model": "gpt-4o-mini",
+              "max_tokens": 256,
+              "messages": [
+                {
+                  "role": "user",
+                  "content": "Summarise the purpose of the Dreamcobots repository in one sentence."
+                }
+              ]
+            }')
+
+          echo "ChatGPT response:"
+          echo "$RESPONSE" | python3 -c \
+            "import sys, json; data=json.load(sys.stdin); print(data['choices'][0]['message']['content'])" \
+            || echo "$RESPONSE"
+
+      # ------------------------------------------------------------------ #
+      # Google Gemini                                                        #
+      # ------------------------------------------------------------------ #
+      - name: Call Google Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "⚠️  GEMINI_API_KEY secret is not set — skipping Gemini step."
+            exit 0
+          fi
+
+          RESPONSE=$(curl --silent --fail \
+            --request POST \
+            --url "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent" \
+            --header "x-goog-api-key: ${GEMINI_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data '{
+              "contents": [
+                {
+                  "parts": [
+                    {
+                      "text": "Summarise the purpose of the Dreamcobots repository in one sentence."
+                    }
+                  ]
+                }
+              ]
+            }')
+
+          echo "Gemini response:"
+          echo "$RESPONSE" | python3 -c \
+            "import sys, json; data=json.load(sys.stdin); print(data['candidates'][0]['content']['parts'][0]['text'])" \
+            || echo "$RESPONSE"
+
+      # ------------------------------------------------------------------ #
+      # Summary                                                              #
+      # ------------------------------------------------------------------ #
+      - name: Integration summary
+        run: |
+          echo "✅ AI service integration steps complete."
+          echo "   Repository : ${{ github.repository }}"
+          echo "   Triggered by: ${{ github.event_name }}"
+          echo "   Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
