@@ -22,7 +22,7 @@ on:
         required: false
         default: ""
   schedule:
-    # Run daily at 08:00 UTC to log a scheduled health-check entry
+    # Run daily at 08:00 UTC to log a scheduled health-check entry for GitHub Actions
     - cron: "0 8 * * *"
 
 jobs:

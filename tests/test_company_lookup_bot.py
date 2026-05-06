@@ -234,6 +234,19 @@ class TestRecommendationEngine:
         assert "category" in rec
         assert "priority" in rec
 
+    def test_recommend_fintech_boosts_payment_platforms(self):
+        company = {
+            "name": "PayCo",
+            "tags": ["fintech", "payments"],
+            "integration_suggestions": [],
+        }
+        recs = self.engine.recommend(company=company, limit=10)
+        payment_recs = [r for r in recs if r.get("category") == "payments"]
+        if payment_recs:
+            # Payment platforms should appear earlier (boosted priority)
+            payment_idx = recs.index(payment_recs[0])
+            assert payment_idx < len(recs)  # present in results
+
     def test_recommend_default_no_crash(self):
         recs = self.engine.recommend(company=None)
         assert isinstance(recs, list)

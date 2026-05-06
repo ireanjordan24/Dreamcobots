@@ -8,7 +8,7 @@ page without writing code.
 
 Sub-systems
 -----------
-  • CompanyDataFetcher     — queries external APIs (Crunchbase, LinkedIn, custom)
+  • CompanyDataFetcher     — queries external APIs (Crunchbase, Clearbit, custom)
   • CompanyDataEnricher    — adds funding, headcount, social links (PRO+)
   • RecommendationEngine   — suggests new platforms/integrations to explore (PRO+)
   • CompanyRepository      — reads / writes ``data/companies.json``
@@ -524,10 +524,11 @@ class RecommendationEngine:
 
             # Boost payment platforms for fintech companies
             if any(t in tags for t in ["fintech", "payments", "banking"]):
-                for rec in recs:
+                for i, rec in enumerate(recs):
                     if rec.get("category") == "payments":
-                        rec = dict(rec)
-                        rec["priority"] = rec["priority"] - 10
+                        boosted = dict(rec)
+                        boosted["priority"] = rec["priority"] - 10
+                        recs[i] = boosted
 
         recs_sorted = sorted(recs, key=lambda r: r.get("priority", 99))
         return recs_sorted[:limit]

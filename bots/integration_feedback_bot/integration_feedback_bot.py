@@ -11,7 +11,7 @@ Sub-systems
   • IntegrationLogger     — appends structured events to the JSON log
   • SlackNotifier         — dispatches Slack messages via incoming webhooks
   • AutoHealAdvisor       — suggests remediation steps for failed integrations (PRO+)
-  • IntegrationAnalytics  — computes success rates and trends (PRO+)
+  • IntegrationAnalytics  — computes success rates and failure summaries (PRO+)
 
 Tier access
 -----------
@@ -256,7 +256,7 @@ class AutoHealAdvisor:
 
 
 class IntegrationAnalytics:
-    """Computes success rates and trends across logged integrations (PRO+)."""
+    """Computes success rates and failure summaries across logged integrations (PRO+)."""
 
     def compute(self, entries: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
