@@ -939,4 +939,54 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "sqlite_backend",
         ],
     ),
+    BotEntry(
+        bot_id="company_lookup_bot",
+        display_name="Company Lookup Bot",
+        description=(
+            "Autonomous company research system. Looks up companies via GitHub "
+            "Actions workflow_dispatch triggers, fetches data from Crunchbase, "
+            "Clearbit, and a built-in catalogue, saves results to "
+            "data/companies.json, and sends Slack notifications with integration "
+            "recommendations."
+        ),
+        category=BotCategory.BUSINESS,
+        module_path="bots.company_lookup_bot.company_lookup_bot",
+        class_name="CompanyLookupBot",
+        capabilities=[
+            "company_lookup",
+            "crunchbase_integration",
+            "clearbit_integration",
+            "data_enrichment",
+            "slack_notifications",
+            "integration_recommendations",
+            "csv_export",
+            "bulk_import",
+            "github_actions_trigger",
+        ],
+    ),
+    BotEntry(
+        bot_id="integration_feedback_bot",
+        display_name="Integration Feedback Bot",
+        description=(
+            "Tracks WordPress, Wix, Streamlit, and other platform integration "
+            "tasks. Logs every success and failure with timestamps and reasons to "
+            "data/integration_log.json, sends real-time Slack notifications, and "
+            "provides auto-heal suggestions for failed deployments."
+        ),
+        category=BotCategory.AUTOMATION,
+        module_path="bots.integration_feedback_bot.integration_feedback_bot",
+        class_name="IntegrationFeedbackBot",
+        capabilities=[
+            "integration_tracking",
+            "slack_notifications",
+            "auto_heal",
+            "analytics",
+            "csv_export",
+            "webhook_delivery",
+            "wordpress_support",
+            "wix_support",
+            "streamlit_support",
+            "github_actions_trigger",
+        ],
+    ),
 ]
