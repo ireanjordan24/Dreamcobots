@@ -1,0 +1,128 @@
+name: Integration Feedback Bot
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform name (WordPress, Wix, Streamlit, Stripe, etc.)"
+        required: true
+        default: "WordPress"
+      status:
+        description: "Integration status: success | failure"
+        required: true
+        default: "success"
+      details:
+        description: "Details about the integration event"
+        required: false
+        default: "Automated integration check."
+      version:
+        description: "Version or release tag (optional)"
+        required: false
+        default: ""
+  schedule:
+    # Run daily at 08:00 UTC to log a scheduled health-check entry for GitHub Actions
+    - cron: "0 8 * * *"
+
+jobs:
+  integration-feedback:
+    name: Log Integration Feedback
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Log integration event
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          INTEGRATION_PLATFORM: ${{ github.event.inputs.platform || 'GitHub Actions' }}
+          INTEGRATION_STATUS: ${{ github.event.inputs.status || 'success' }}
+          INTEGRATION_DETAILS: ${{ github.event.inputs.details || 'Scheduled health-check passed.' }}
+          INTEGRATION_VERSION: ${{ github.event.inputs.version || '' }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          python - <<'EOF'
+          import sys, os
+          sys.path.insert(0, ".")
+
+          from bots.integration_feedback_bot.integration_feedback_bot import IntegrationFeedbackBot
+          from bots.integration_feedback_bot.tiers import Tier
+
+          # Use PRO tier if Slack webhook is configured, else FREE
+          tier = Tier.PRO if os.getenv("SLACK_WEBHOOK_URL") else Tier.FREE
+
+          bot = IntegrationFeedbackBot(tier=tier)
+          result = bot.log_integration(
+              platform=os.getenv("INTEGRATION_PLATFORM", "GitHub Actions"),
+              status=os.getenv("INTEGRATION_STATUS", "success"),
+              details=os.getenv("INTEGRATION_DETAILS", ""),
+              version=os.getenv("INTEGRATION_VERSION") or None,
+              triggered_by=f"GitHub Actions run #{os.getenv('GITHUB_RUN_NUMBER', '?')}",
+          )
+
+          entry = result["entry"]
+          print(f"  Platform : {entry['platform']}")
+          print(f"  Status   : {entry['status'].upper()}")
+          print(f"  Details  : {entry['details']}")
+          print(f"  Slack    : {'sent' if result['slack_sent'] else 'not sent'}")
+          if result["suggestions"]:
+              print("  Auto-Heal Suggestions:")
+              for s in result["suggestions"]:
+                  print(f"    • {s}")
+
+          summary = bot.get_summary()
+          print(f"\nTotal logged: {summary['total_logged']} | "
+                f"Success rate: {summary['success_rate_pct']}%")
+          EOF
+
+      - name: Commit updated integration_log.json
+        run: |
+          git config user.name  "dreamco-bot[bot]"
+          git config user.email "dreamco-bot@users.noreply.github.com"
+          git add data/integration_log.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore(data): update integration_log.json via Integration Feedback Bot [skip ci]"
+            git push
+          fi
+
+      - name: Notify Slack on job failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            python - <<'PYEOF'
+          import json, urllib.request, os
+          url = os.environ["SLACK_WEBHOOK_URL"]
+          payload = json.dumps({
+              "text": (
+                  ":rotating_light: *Integration Feedback Bot FAILED*\n"
+                  f"> Workflow run #{os.environ.get('GITHUB_RUN_NUMBER', '?')} "
+                  f"on `{os.environ.get('GITHUB_REF_NAME', 'main')}`\n"
+                  f"> Repo: {os.environ.get('GITHUB_REPOSITORY', '')}"
+              )
+          }).encode()
+          req = urllib.request.Request(url, data=payload,
+                                        headers={"Content-Type": "application/json"})
+          urllib.request.urlopen(req, timeout=10)
+          PYEOF
+          fi
