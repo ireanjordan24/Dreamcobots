@@ -1,23 +1,28 @@
 """
 Integration Feedback Bot — DreamCo integration tracking and notification system.
 
-Tracks integration tasks for platforms such as WordPress, Wix, and Streamlit.
-Logs each event (success or failure) with timestamps and reasons to
-``data/integration_log.json``, and sends Slack notifications for real-time
-visibility.
+Tracks integration tasks for platforms such as WordPress, Wix, Streamlit,
+MySQL, Docker, Terraform, and more.  Logs each event (success or failure)
+with timestamps and reasons to ``data/integration_log.json``, and sends
+real-time notifications via Slack or Discord.
 
 Sub-systems
 -----------
   • IntegrationLogger     — appends structured events to the JSON log
-  • SlackNotifier         — dispatches Slack messages via incoming webhooks
+  • SlackNotifier         — dispatches Slack messages via incoming webhooks (PRO+)
+  • DiscordNotifier       — dispatches Discord messages via incoming webhooks (PRO+)
   • AutoHealAdvisor       — suggests remediation steps for failed integrations (PRO+)
+                           Supports: WordPress, Wix, Streamlit, Stripe, GitHub Actions,
+                           MySQL, Docker, Terraform
   • IntegrationAnalytics  — computes success rates and failure summaries (PRO+)
+                           Supports daily/weekly/monthly period filtering
 
 Tier access
 -----------
   FREE:       Track up to 10 integrations, basic status logging.
-  PRO:        Unlimited tracking, Slack notifications, CSV export, auto-heal.
-  ENTERPRISE: All PRO features + webhook delivery, email alerts, analytics.
+  PRO:        Unlimited tracking, Slack/Discord notifications, CSV export,
+              auto-heal, period analytics.
+  ENTERPRISE: All PRO features + signed webhook delivery, email alerts, analytics.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 See framework/global_ai_sources_flow.py for the full pipeline specification.
@@ -37,10 +42,12 @@ Usage
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -77,6 +84,9 @@ _PLATFORMS = [
     "Zapier",
     "Salesforce",
     "GitHub Actions",
+    "MySQL",
+    "Docker",
+    "Terraform",
     "Custom",
 ]
 
@@ -110,6 +120,24 @@ _AUTO_HEAL_SUGGESTIONS: Dict[str, List[str]] = {
         "Confirm all referenced secrets (SLACK_WEBHOOK_URL, etc.) are set in Settings > Secrets.",
         "Check that the runner OS and Python version match requirements.txt constraints.",
         "Inspect the GITHUB_TOKEN permissions — ensure `contents: write` is granted.",
+    ],
+    "MySQL": [
+        "Verify the database host, port, username, and password in the connection string.",
+        "Check that the MySQL user has the required GRANT privileges for the target schema.",
+        "Inspect the MySQL error log (`/var/log/mysql/error.log`) for connection refusals.",
+        "Ensure the MySQL service is running: `systemctl status mysql` or `docker ps`.",
+    ],
+    "Docker": [
+        "Run `docker logs <container_id>` to inspect the container's stderr output.",
+        "Confirm the image tag exists in the registry: `docker pull <image>:<tag>`.",
+        "Check available disk space — Docker build failures often stem from full disks.",
+        "Validate the Dockerfile syntax and ensure all COPY/ADD source paths exist.",
+    ],
+    "Terraform": [
+        "Run `terraform validate` to catch syntax and reference errors before applying.",
+        "Check provider credentials: ensure AWS_ACCESS_KEY_ID / ARM_CLIENT_SECRET are set.",
+        "Review the state file lock — another process may hold the lock; run `terraform force-unlock`.",
+        "Inspect `terraform plan` output to identify resource diffs causing the failure.",
     ],
     "default": [
         "Review the platform's official documentation for updated API/auth requirements.",
@@ -232,6 +260,61 @@ class SlackNotifier:
 
 
 # ===========================================================================
+# DiscordNotifier  (PRO+)
+# ===========================================================================
+
+
+class DiscordNotifier:
+    """
+    Sends integration feedback notifications to a Discord channel via
+    an incoming webhook URL (``DISCORD_WEBHOOK_URL``).
+
+    Discord webhooks accept ``{"content": "..."}`` or ``{"embeds": [...]}``
+    payloads.  This notifier uses ``embeds`` for rich formatting.
+    """
+
+    def __init__(self, webhook_url: str) -> None:
+        self.webhook_url = webhook_url
+
+    def send(self, entry: Dict[str, Any], suggestions: Optional[List[str]] = None) -> bool:
+        """
+        Post a Discord embed for *entry*.  Returns True on HTTP 204 (Discord's
+        success response for webhook posts).
+        """
+        try:
+            import urllib.request
+
+            platform = entry.get("platform", "Unknown")
+            status = entry.get("status", "unknown").upper()
+            details = entry.get("details", "")
+            ts = entry.get("timestamp", "")
+            colour = 0x2ECC71 if status == "SUCCESS" else 0xE74C3C  # green / red
+
+            description = details
+            if status != "SUCCESS" and suggestions:
+                sugg_lines = "\n".join(f"• {s}" for s in suggestions[:3])
+                description += f"\n\n**Auto-Heal Suggestions:**\n{sugg_lines}"
+
+            embed = {
+                "title": f"Integration {status} — {platform}",
+                "description": description,
+                "color": colour,
+                "footer": {"text": f"DreamCo Integration Feedback • {ts}"},
+            }
+
+            payload = json.dumps({"embeds": [embed]}).encode()
+            req = urllib.request.Request(
+                self.webhook_url,
+                data=payload,
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status in (200, 204)
+        except Exception:
+            return False
+
+
+# ===========================================================================
 # AutoHealAdvisor  (PRO+)
 # ===========================================================================
 
@@ -258,12 +341,65 @@ class AutoHealAdvisor:
 class IntegrationAnalytics:
     """Computes success rates and failure summaries across logged integrations (PRO+)."""
 
-    def compute(self, entries: List[Dict[str, Any]]) -> Dict[str, Any]:
+    _PERIOD_DAYS: Dict[str, int] = {
+        "daily": 1,
+        "weekly": 7,
+        "monthly": 30,
+    }
+
+    def _filter_by_period(
+        self,
+        entries: List[Dict[str, Any]],
+        period: Optional[str],
+    ) -> List[Dict[str, Any]]:
+        """Return *entries* that fall within the requested *period*.
+
+        Parameters
+        ----------
+        period : str | None
+            ``"daily"``, ``"weekly"``, ``"monthly"``, or ``None`` (all time).
+        """
+        if period is None:
+            return entries
+        days = self._PERIOD_DAYS.get(period.lower())
+        if days is None:
+            raise ValueError(
+                f"Unknown period '{period}'. "
+                f"Valid values: {list(self._PERIOD_DAYS.keys())}"
+            )
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(days=days)
+        result = []
+        for e in entries:
+            ts_str = e.get("timestamp", "")
+            try:
+                ts = datetime.fromisoformat(ts_str)
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+                if ts >= cutoff:
+                    result.append(e)
+            except (ValueError, TypeError):
+                result.append(e)  # include entries with unparseable timestamps
+        return result
+
+    def compute(
+        self,
+        entries: List[Dict[str, Any]],
+        period: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
         Return analytics computed from *entries*.
 
+        Parameters
+        ----------
+        entries : list[dict]
+            Raw integration log entries.
+        period : str | None
+            Time window to restrict analysis to: ``"daily"``, ``"weekly"``,
+            ``"monthly"``, or ``None`` for all time.
+
         Keys returned
         -------------
+        period : str | None
         total_integrations : int
         success_count : int
         failure_count : int
@@ -273,12 +409,13 @@ class IntegrationAnalytics:
         recent_failures : list
             The 5 most recent failure entries.
         """
-        total = len(entries)
-        success = sum(1 for e in entries if e.get("status", "").lower() == "success")
+        scoped = self._filter_by_period(entries, period)
+        total = len(scoped)
+        success = sum(1 for e in scoped if e.get("status", "").lower() == "success")
         failure = total - success
 
         by_platform: Dict[str, Dict[str, Any]] = {}
-        for entry in entries:
+        for entry in scoped:
             p = entry.get("platform", "Unknown")
             if p not in by_platform:
                 by_platform[p] = {"success": 0, "failure": 0}
@@ -293,10 +430,11 @@ class IntegrationAnalytics:
             stats["success_rate_pct"] = round(100 * stats["success"] / t, 1) if t else 0.0
 
         recent_failures = [
-            e for e in reversed(entries) if e.get("status", "").lower() != "success"
+            e for e in reversed(scoped) if e.get("status", "").lower() != "success"
         ][:5]
 
         return {
+            "period": period,
             "total_integrations": total,
             "success_count": success,
             "failure_count": failure,
@@ -316,7 +454,7 @@ class IntegrationFeedbackBot:
     DreamCo Integration Feedback Bot.
 
     Tracks deployment and integration events, logs them to
-    ``data/integration_log.json``, and sends Slack notifications.
+    ``data/integration_log.json``, and sends Slack and/or Discord notifications.
 
     Parameters
     ----------
@@ -326,6 +464,10 @@ class IntegrationFeedbackBot:
         Path to the integration log JSON file.
     slack_webhook_url : str | None
         Slack incoming webhook URL.
+    discord_webhook_url : str | None
+        Discord incoming webhook URL.
+    webhook_signing_secret : str | None
+        HMAC-SHA256 secret for signing outbound webhook payloads (ENTERPRISE+).
     """
 
     SUPPORTED_PLATFORMS = _PLATFORMS
@@ -335,6 +477,8 @@ class IntegrationFeedbackBot:
         tier: Tier = Tier.FREE,
         log_path: str = DEFAULT_LOG_PATH,
         slack_webhook_url: Optional[str] = None,
+        discord_webhook_url: Optional[str] = None,
+        webhook_signing_secret: Optional[str] = None,
     ) -> None:
         self.tier = tier
         self._config = get_tier_config(tier)
@@ -342,6 +486,10 @@ class IntegrationFeedbackBot:
         self._advisor = AutoHealAdvisor()
         self._analytics = IntegrationAnalytics()
         self._slack_url = slack_webhook_url or os.getenv("SLACK_WEBHOOK_URL", "")
+        self._discord_url = discord_webhook_url or os.getenv("DISCORD_WEBHOOK_URL", "")
+        self._signing_secret = webhook_signing_secret or os.getenv(
+            "WEBHOOK_SIGNING_SECRET", ""
+        )
         self._session_entries: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
@@ -366,6 +514,33 @@ class IntegrationFeedbackBot:
                     f"Integration log limit ({limit}) reached on the "
                     f"{self.tier.value.upper()} tier. Upgrade to log more."
                 )
+
+    # ------------------------------------------------------------------
+    # Webhook signing (ENTERPRISE+)
+    # ------------------------------------------------------------------
+
+    def sign_payload(self, payload: bytes) -> str:
+        """
+        Return an HMAC-SHA256 hex digest of *payload* using the configured
+        signing secret.  Used to authenticate outbound webhook deliveries.
+
+        Raises
+        ------
+        PermissionError
+            If the current tier does not support webhook delivery.
+        ValueError
+            If no signing secret has been configured.
+        """
+        self._enforce_tier(FEATURE_WEBHOOK)
+        if not self._signing_secret:
+            raise ValueError(
+                "WEBHOOK_SIGNING_SECRET is not configured. "
+                "Set the 'webhook_signing_secret' parameter or the "
+                "WEBHOOK_SIGNING_SECRET environment variable."
+            )
+        return hmac.new(
+            self._signing_secret.encode(), payload, hashlib.sha256
+        ).hexdigest()
 
     # ------------------------------------------------------------------
     # Core logging
@@ -400,7 +575,7 @@ class IntegrationFeedbackBot:
 
         Returns
         -------
-        dict with keys: ``entry``, ``slack_sent``, ``suggestions``
+        dict with keys: ``entry``, ``slack_sent``, ``discord_sent``, ``suggestions``
         """
         self._enforce_tier(FEATURE_BASIC_TRACKING)
         self._check_tracking_limit()
@@ -429,9 +604,17 @@ class IntegrationFeedbackBot:
             notifier = SlackNotifier(self._slack_url)
             slack_sent = notifier.send(entry, suggestions if suggestions else None)
 
+        discord_sent = False
+        if self._config.has_feature(FEATURE_SLACK_NOTIFY) and self._discord_url:
+            discord_notifier = DiscordNotifier(self._discord_url)
+            discord_sent = discord_notifier.send(
+                entry, suggestions if suggestions else None
+            )
+
         return {
             "entry": entry,
             "slack_sent": slack_sent,
+            "discord_sent": discord_sent,
             "suggestions": suggestions,
         }
 
@@ -454,10 +637,16 @@ class IntegrationFeedbackBot:
             entries = [e for e in entries if e.get("status", "").lower() == status.lower()]
         return entries
 
-    def get_analytics(self) -> Dict[str, Any]:
-        """Return integration success/failure analytics (PRO+)."""
+    def get_analytics(self, period: Optional[str] = None) -> Dict[str, Any]:
+        """Return integration success/failure analytics (PRO+).
+
+        Parameters
+        ----------
+        period : str | None
+            ``"daily"``, ``"weekly"``, ``"monthly"``, or ``None`` for all time.
+        """
         self._enforce_tier(FEATURE_ANALYTICS)
-        return self._analytics.compute(self._logger.get_all())
+        return self._analytics.compute(self._logger.get_all(), period=period)
 
     def export_csv(self, output_path: str = "data/integration_log_export.csv") -> str:
         """Export the integration log to CSV (PRO+)."""
@@ -496,6 +685,7 @@ __all__ = [
     "IntegrationFeedbackBot",
     "IntegrationLogger",
     "SlackNotifier",
+    "DiscordNotifier",
     "AutoHealAdvisor",
     "IntegrationAnalytics",
 ]

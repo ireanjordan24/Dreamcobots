@@ -514,10 +514,14 @@ class TestBotLibraryRegistration:
         caps = entry.capabilities
         assert "integration_tracking" in caps
         assert "slack_notifications" in caps
+        assert "discord_notifications" in caps
         assert "auto_heal" in caps
         assert "wordpress_support" in caps
         assert "wix_support" in caps
         assert "streamlit_support" in caps
+        assert "mysql_support" in caps
+        assert "docker_support" in caps
+        assert "terraform_support" in caps
 
     def test_integration_feedback_bot_category(self):
         from bots.global_bot_network.bot_library import BotLibrary, BotCategory
@@ -525,3 +529,219 @@ class TestBotLibraryRegistration:
         lib.populate_dreamco_bots()
         entry = lib.get_bot("integration_feedback_bot")
         assert entry.category == BotCategory.AUTOMATION
+
+
+# ===========================================================================
+# 10. New platform support (MySQL, Docker, Terraform)
+# ===========================================================================
+
+class TestNewPlatformSupport:
+    def setup_method(self):
+        self.advisor = AutoHealAdvisor()
+
+    def test_suggest_mysql(self):
+        suggestions = self.advisor.suggest("MySQL")
+        assert isinstance(suggestions, list)
+        assert len(suggestions) > 0
+        assert any("MySQL" in s or "mysql" in s.lower() or "database" in s.lower()
+                   for s in suggestions)
+
+    def test_suggest_docker(self):
+        suggestions = self.advisor.suggest("Docker")
+        assert isinstance(suggestions, list)
+        assert len(suggestions) > 0
+        assert any("docker" in s.lower() or "container" in s.lower() for s in suggestions)
+
+    def test_suggest_terraform(self):
+        suggestions = self.advisor.suggest("Terraform")
+        assert isinstance(suggestions, list)
+        assert len(suggestions) > 0
+        assert any("terraform" in s.lower() or "state" in s.lower() for s in suggestions)
+
+    def test_mysql_in_supported_platforms(self):
+        from bots.integration_feedback_bot.integration_feedback_bot import IntegrationFeedbackBot
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        bot = IntegrationFeedbackBot(
+            tier=Tier.FREE,
+            log_path=os.path.join(tmpdir, "log.json"),
+        )
+        assert "MySQL" in bot.SUPPORTED_PLATFORMS
+
+    def test_docker_in_supported_platforms(self):
+        from bots.integration_feedback_bot.integration_feedback_bot import IntegrationFeedbackBot
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        bot = IntegrationFeedbackBot(
+            tier=Tier.FREE,
+            log_path=os.path.join(tmpdir, "log.json"),
+        )
+        assert "Docker" in bot.SUPPORTED_PLATFORMS
+
+    def test_terraform_in_supported_platforms(self):
+        from bots.integration_feedback_bot.integration_feedback_bot import IntegrationFeedbackBot
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        bot = IntegrationFeedbackBot(
+            tier=Tier.FREE,
+            log_path=os.path.join(tmpdir, "log.json"),
+        )
+        assert "Terraform" in bot.SUPPORTED_PLATFORMS
+
+
+# ===========================================================================
+# 11. DiscordNotifier tests
+# ===========================================================================
+
+class TestDiscordNotifier:
+    def test_send_returns_false_on_bad_url(self):
+        from bots.integration_feedback_bot.integration_feedback_bot import DiscordNotifier
+        notifier = DiscordNotifier("https://invalid.example.com/webhook")
+        entry = {
+            "platform": "Docker",
+            "status": "failure",
+            "details": "Container failed to start",
+            "timestamp": "2026-05-07T12:00:00+00:00",
+        }
+        result = notifier.send(entry)
+        assert result is False
+
+    def test_send_with_suggestions_no_exception(self):
+        from bots.integration_feedback_bot.integration_feedback_bot import DiscordNotifier
+        notifier = DiscordNotifier("https://invalid.example.com/webhook")
+        entry = {
+            "platform": "Terraform",
+            "status": "failure",
+            "details": "Plan failed",
+            "timestamp": "2026-05-07T12:00:00+00:00",
+        }
+        result = notifier.send(entry, ["Check state", "Run validate"])
+        assert result is False
+
+    def test_discord_sent_in_log_result(self):
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        bot = IntegrationFeedbackBot(
+            tier=Tier.PRO,
+            log_path=os.path.join(tmpdir, "log.json"),
+            discord_webhook_url="https://invalid.example.com/discord",
+        )
+        result = bot.log_integration(platform="Docker", status="success")
+        assert "discord_sent" in result
+        assert result["discord_sent"] is False  # bad URL → False, not exception
+
+
+# ===========================================================================
+# 12. Analytics period filtering
+# ===========================================================================
+
+class TestAnalyticsPeriodFiltering:
+    def setup_method(self):
+        from datetime import datetime, timedelta, timezone
+        self.analytics = IntegrationAnalytics()
+        now = datetime.now(tz=timezone.utc)
+        self.entries_recent = [
+            {
+                "platform": "MySQL",
+                "status": "success",
+                "timestamp": (now - timedelta(hours=1)).isoformat(),
+            },
+            {
+                "platform": "Docker",
+                "status": "failure",
+                "timestamp": (now - timedelta(hours=2)).isoformat(),
+            },
+        ]
+        self.entries_old = [
+            {
+                "platform": "Terraform",
+                "status": "success",
+                "timestamp": (now - timedelta(days=60)).isoformat(),
+            },
+        ]
+        self.all_entries = self.entries_recent + self.entries_old
+
+    def test_daily_filters_old_entries(self):
+        result = self.analytics.compute(self.all_entries, period="daily")
+        assert result["total_integrations"] == 2
+        assert result["period"] == "daily"
+
+    def test_weekly_includes_recent(self):
+        result = self.analytics.compute(self.all_entries, period="weekly")
+        assert result["total_integrations"] == 2
+
+    def test_monthly_includes_recent_excludes_very_old(self):
+        result = self.analytics.compute(self.all_entries, period="monthly")
+        assert result["total_integrations"] == 2
+
+    def test_none_period_returns_all(self):
+        result = self.analytics.compute(self.all_entries, period=None)
+        assert result["total_integrations"] == 3
+        assert result["period"] is None
+
+    def test_invalid_period_raises(self):
+        with pytest.raises(ValueError, match="Unknown period"):
+            self.analytics.compute(self.all_entries, period="yearly")
+
+    def test_get_analytics_with_period_via_bot(self):
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        bot = IntegrationFeedbackBot(
+            tier=Tier.PRO,
+            log_path=os.path.join(tmpdir, "log.json"),
+        )
+        bot.log_integration(platform="MySQL", status="success")
+        result = bot.get_analytics(period="daily")
+        assert result["total_integrations"] >= 1
+        assert result["period"] == "daily"
+
+
+# ===========================================================================
+# 13. Webhook signing (ENTERPRISE+)
+# ===========================================================================
+
+class TestWebhookSigning:
+    def setup_method(self):
+        self.tmpdir = __import__("tempfile").mkdtemp()
+        self.log_path = __import__("os").path.join(self.tmpdir, "log.json")
+
+    def test_sign_payload_enterprise_valid(self):
+        bot = IntegrationFeedbackBot(
+            tier=Tier.ENTERPRISE,
+            log_path=self.log_path,
+            webhook_signing_secret="mysupersecret",
+        )
+        payload = b'{"test": "data"}'
+        sig = bot.sign_payload(payload)
+        assert isinstance(sig, str)
+        assert len(sig) == 64  # SHA-256 hex digest
+
+    def test_sign_payload_is_deterministic(self):
+        bot = IntegrationFeedbackBot(
+            tier=Tier.ENTERPRISE,
+            log_path=self.log_path,
+            webhook_signing_secret="secret123",
+        )
+        payload = b"hello world"
+        assert bot.sign_payload(payload) == bot.sign_payload(payload)
+
+    def test_sign_payload_pro_raises_permission_error(self):
+        bot = IntegrationFeedbackBot(
+            tier=Tier.PRO,
+            log_path=self.log_path,
+            webhook_signing_secret="secret",
+        )
+        with pytest.raises(PermissionError):
+            bot.sign_payload(b"data")
+
+    def test_sign_payload_no_secret_raises_value_error(self):
+        bot = IntegrationFeedbackBot(
+            tier=Tier.ENTERPRISE,
+            log_path=self.log_path,
+        )
+        # Clear any env var that might be set
+        import os
+        os.environ.pop("WEBHOOK_SIGNING_SECRET", None)
+        bot._signing_secret = ""
+        with pytest.raises(ValueError, match="WEBHOOK_SIGNING_SECRET"):
+            bot.sign_payload(b"data")
