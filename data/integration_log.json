@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-09T11:23:44.654190+00:00",
-  "total_entries": 1,
+  "last_updated": "2026-05-09T11:27:59.157705+00:00",
+  "total_entries": 2,
   "entries": [
     {
       "platform": "GitHub Actions",
@@ -10,6 +10,15 @@
       "version": null,
       "triggered_by": "GitHub Actions run #1",
       "timestamp": "2026-05-09T11:23:44.654137+00:00"
+    },
+    {
+      "platform": "WordPress",
+      "status": "success",
+      "details": "Automated integration check.",
+      "reason": "",
+      "version": null,
+      "triggered_by": "GitHub Actions run #2",
+      "timestamp": "2026-05-09T11:27:59.157663+00:00"
     }
   ]
 }
