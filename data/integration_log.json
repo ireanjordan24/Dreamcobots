@@ -1,5 +1,15 @@
 {
-  "last_updated": null,
-  "total_entries": 0,
-  "entries": []
+  "last_updated": "2026-05-09T11:23:44.654190+00:00",
+  "total_entries": 1,
+  "entries": [
+    {
+      "platform": "GitHub Actions",
+      "status": "success",
+      "details": "Scheduled health-check passed.",
+      "reason": "",
+      "version": null,
+      "triggered_by": "GitHub Actions run #1",
+      "timestamp": "2026-05-09T11:23:44.654137+00:00"
+    }
+  ]
 }
