@@ -1,5 +1,36 @@
 {
-  "last_updated": null,
-  "total_companies": 0,
-  "companies": []
+  "last_updated": "2026-05-09T11:27:02.101996+00:00",
+  "total_companies": 1,
+  "companies": [
+    {
+      "name": "Stripe",
+      "domain": "stripe.com",
+      "description": "Online payment processing for internet businesses.",
+      "industry": "FinTech",
+      "country": "United States",
+      "founded_year": 2010,
+      "employees": 8000,
+      "funding_total_usd": 2200000000,
+      "funding_rounds": 16,
+      "linkedin_url": "https://www.linkedin.com/company/stripe",
+      "crunchbase_url": "https://www.crunchbase.com/organization/stripe",
+      "tags": [
+        "payments",
+        "api",
+        "saas",
+        "fintech"
+      ],
+      "integration_suggestions": [
+        "WordPress WooCommerce",
+        "Shopify",
+        "Streamlit billing"
+      ],
+      "source": "mock",
+      "looked_up_at": "2026-05-09T11:27:02.101891+00:00",
+      "enriched": true,
+      "enriched_at": "2026-05-09T11:27:02.101905+00:00",
+      "company_size": "mid-market",
+      "funding_stage": "unicorn+"
+    }
+  ]
 }
