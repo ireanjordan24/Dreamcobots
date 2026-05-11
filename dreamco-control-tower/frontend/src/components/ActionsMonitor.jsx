@@ -209,7 +209,7 @@ export default function ActionsMonitor() {
         <div>
           <h2 className="text-xl font-bold text-white">⚡ Actions Command Center</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Intelligent game-builder/simulation-builder/vibe-coder workflow controls, bot skill testing, SQL action labs, and pull request visibility.
+            Intelligent game-builder/simulation-builder/vibe_coder workflow controls, bot skill testing, SQL action labs, and pull request visibility.
           </p>
         </div>
         <div className="flex items-center gap-2">

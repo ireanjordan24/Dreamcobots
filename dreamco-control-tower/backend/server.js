@@ -252,7 +252,7 @@ const WORKFLOW_CONTROLS = [
     category: 'Builder Lab',
     workflow: 'builder-simulation-sql.yml',
     description:
-      'Game-builder/simulation-builder/vibe-coder lab with bot skill checks and SQL action testing (create/read/update/delete/all).',
+      'Game-builder/simulation-builder/vibe_coder lab with bot skill checks and SQL action testing (create/read/update/delete/all).',
     defaultInputs: {
       mode: 'simulation_builder',
       sql_action: 'all',
