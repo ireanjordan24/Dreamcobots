@@ -206,61 +206,228 @@ app.get('/api/status', rateLimiter, (_req, res) => {
 
 const GITHUB_API_BASE = 'https://api.github.com';
 const DEFAULT_REPO = process.env.GITHUB_REPO || 'DreamCo-Technologies/Dreamcobots';
-const ACTIONS_PER_PAGE = 10;
+const ACTIONS_PER_PAGE = 12;
+const PULL_REQUESTS_PER_PAGE = 20;
+const DEFAULT_REF = process.env.GITHUB_DEFAULT_REF || 'main';
+const WORKFLOW_CONTROLS = [
+  {
+    id: 'integration-feedback',
+    label: 'Integration Feedback',
+    workflow: 'integration-feedback.yml',
+    description: 'Runs integration feedback logging with validation gates.',
+    defaultInputs: {
+      platform: 'GitHub Actions',
+      status: 'success',
+      details: 'Control Tower manual run.',
+      version: '',
+    },
+  },
+  {
+    id: 'company-lookup',
+    label: 'Company Lookup',
+    workflow: 'company-lookup.yml',
+    description: 'Runs company lookup automation with validation gates.',
+    defaultInputs: {
+      companies: 'Stripe, Shopify, OpenAI',
+      tier: 'pro',
+    },
+  },
+  {
+    id: 'soak-24h',
+    label: '24-Hour Wall Check',
+    workflow: 'system-soak-24h.yml',
+    description: 'Runs the production-readiness soak cycle and publishes artifacts.',
+    defaultInputs: {
+      cycles: '24',
+      pause_seconds: '0',
+    },
+    isPermanent: true,
+  },
+];
 
-async function fetchGitHubWorkflowRuns(repo, token) {
+function buildGitHubHeaders(token) {
+  const headers = {
+    'User-Agent': 'dreamco-control-tower',
+    Accept: 'application/vnd.github+json',
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+async function githubApiRequest({ repo, token, method = 'GET', apiPath, body = null }) {
   const { default: https } = await import('https');
   return new Promise((resolve) => {
-    const headers = {
-      'User-Agent': 'dreamco-control-tower',
-      Accept: 'application/vnd.github+json',
-    };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = buildGitHubHeaders(token);
+    const url = new URL(`/repos/${repo}${apiPath}`, GITHUB_API_BASE);
+    const payload = body ? JSON.stringify(body) : null;
+    if (payload) {
+      headers['Content-Type'] = 'application/json';
+      headers['Content-Length'] = Buffer.byteLength(payload);
+    }
 
-    const url = new URL(
-      `/repos/${repo}/actions/runs?per_page=${ACTIONS_PER_PAGE}`,
-      GITHUB_API_BASE,
-    );
-    const req = https.get(
-      { hostname: url.hostname, path: url.pathname + url.search, headers },
+    const req = https.request(
+      {
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        method,
+        headers,
+      },
       (res) => {
-        let body = '';
-        res.on('data', (chunk) => (body += chunk));
+        let responseBody = '';
+        res.on('data', (chunk) => (responseBody += chunk));
         res.on('end', () => {
-          try {
-            const json = JSON.parse(body);
-            const runs = (json.workflow_runs ?? []).map((r) => ({
-              id: r.id,
-              name: r.name,
-              status: r.status,
-              conclusion: r.conclusion,
-              branch: r.head_branch,
-              event: r.event,
-              run_started_at: r.run_started_at,
-              url: r.html_url,
-            }));
-            resolve({ runs, source: 'github_api' });
-          } catch {
-            resolve({ runs: [], source: 'parse_error' });
+          let data = null;
+          if (responseBody) {
+            try {
+              data = JSON.parse(responseBody);
+            } catch {
+              data = null;
+            }
           }
+          resolve({
+            ok: (res.statusCode ?? 500) >= 200 && (res.statusCode ?? 500) < 300,
+            statusCode: res.statusCode ?? 500,
+            data,
+          });
         });
       },
     );
-    req.on('error', () => resolve({ runs: [], source: 'unavailable' }));
+
+    if (payload) {
+      req.write(payload);
+    }
+    req.end();
+    req.on('error', () =>
+      resolve({
+        ok: false,
+        statusCode: 503,
+        data: null,
+      }),
+    );
     req.setTimeout(5000, () => {
       req.destroy();
-      resolve({ runs: [], source: 'timeout' });
+      resolve({
+        ok: false,
+        statusCode: 504,
+        data: null,
+      });
     });
   });
 }
 
+async function fetchGitHubWorkflowRuns(repo, token) {
+  const response = await githubApiRequest({
+    repo,
+    token,
+    apiPath: `/actions/runs?per_page=${ACTIONS_PER_PAGE}`,
+  });
+  if (!response.ok || !response.data) {
+    return { runs: [], source: 'unavailable' };
+  }
+  const runs = (response.data.workflow_runs ?? []).map((r) => ({
+    id: r.id,
+    name: r.name,
+    status: r.status,
+    conclusion: r.conclusion,
+    branch: r.head_branch,
+    event: r.event,
+    run_started_at: r.run_started_at,
+    url: r.html_url,
+  }));
+  return { runs, source: 'github_api' };
+}
+
+async function fetchGitHubPullRequests(repo, token) {
+  const response = await githubApiRequest({
+    repo,
+    token,
+    apiPath: `/pulls?state=all&sort=updated&direction=desc&per_page=${PULL_REQUESTS_PER_PAGE}`,
+  });
+  if (!response.ok || !Array.isArray(response.data)) {
+    return { pullRequests: [], source: 'unavailable' };
+  }
+  const pullRequests = response.data.map((pr) => ({
+    id: pr.id,
+    number: pr.number,
+    title: pr.title,
+    state: pr.state,
+    draft: Boolean(pr.draft),
+    merged_at: pr.merged_at,
+    updated_at: pr.updated_at,
+    user: pr.user?.login ?? 'unknown',
+    url: pr.html_url,
+  }));
+  return { pullRequests, source: 'github_api' };
+}
+
+function resolveWorkflowControl(workflowFile) {
+  return WORKFLOW_CONTROLS.find((control) => control.workflow === workflowFile) ?? null;
+}
+
 app.get('/api/actions', rateLimiter, async (req, res) => {
   const token = process.env.GITHUB_TOKEN || '';
-  const result = await fetchGitHubWorkflowRuns(DEFAULT_REPO, token);
+  const [runsResult, pullRequestsResult] = await Promise.all([
+    fetchGitHubWorkflowRuns(DEFAULT_REPO, token),
+    fetchGitHubPullRequests(DEFAULT_REPO, token),
+  ]);
   return res.json({
     repo: DEFAULT_REPO,
-    ...result,
+    runs: runsResult.runs,
+    pull_requests: pullRequestsResult.pullRequests,
+    source:
+      runsResult.source === 'github_api' || pullRequestsResult.source === 'github_api'
+        ? 'github_api'
+        : 'unavailable',
+    controls: WORKFLOW_CONTROLS,
     fetched_at: new Date().toISOString(),
+  });
+});
+
+app.post('/api/actions/dispatch', rateLimiter, async (req, res) => {
+  const token = process.env.GITHUB_TOKEN || '';
+  if (!token) {
+    return res.status(503).json({
+      error: 'GITHUB_TOKEN is required to dispatch workflows.',
+    });
+  }
+
+  const workflow = String(req.body?.workflow || '').trim();
+  const control = resolveWorkflowControl(workflow);
+  if (!control) {
+    return res.status(400).json({
+      error: 'Unsupported workflow. Use one of the configured control workflows.',
+    });
+  }
+
+  const ref = String(req.body?.ref || DEFAULT_REF).trim() || DEFAULT_REF;
+  const incomingInputs = req.body?.inputs && typeof req.body.inputs === 'object' ? req.body.inputs : {};
+  const inputs = { ...control.defaultInputs, ...incomingInputs };
+
+  const dispatchResponse = await githubApiRequest({
+    repo: DEFAULT_REPO,
+    token,
+    method: 'POST',
+    apiPath: `/actions/workflows/${encodeURIComponent(workflow)}/dispatches`,
+    body: { ref, inputs },
+  });
+
+  if (!dispatchResponse.ok) {
+    return res.status(dispatchResponse.statusCode).json({
+      status: 'error',
+      workflow,
+      ref,
+      message: 'GitHub rejected the workflow dispatch request.',
+    });
+  }
+
+  return res.status(202).json({
+    status: 'accepted',
+    workflow,
+    ref,
+    inputs,
+    triggered_at: new Date().toISOString(),
   });
 });
 

@@ -230,6 +230,16 @@ describe('GET /api/actions', () => {
     expect(Array.isArray(res.body.runs)).toBe(true);
   });
 
+  test('has pull_requests array', async () => {
+    const res = await request(app).get('/api/actions');
+    expect(Array.isArray(res.body.pull_requests)).toBe(true);
+  });
+
+  test('has controls array', async () => {
+    const res = await request(app).get('/api/actions');
+    expect(Array.isArray(res.body.controls)).toBe(true);
+  });
+
   test('has source field', async () => {
     const res = await request(app).get('/api/actions');
     expect(res.body).toHaveProperty('source');
@@ -251,11 +261,41 @@ describe('GET /api/actions', () => {
     delete process.env.GITHUB_TOKEN;
     const res = await request(app).get('/api/actions');
     expect(res.status).toBe(200);
-    if (orig !== undefined) process.env.GITHUB_TOKEN = orig;
+    if (orig !== undefined) {
+      process.env.GITHUB_TOKEN = orig;
+    }
   });
 
   test('returns content-type json', async () => {
     const res = await request(app).get('/api/actions');
     expect(res.headers['content-type']).toMatch(/application\/json/);
+  });
+});
+
+describe('POST /api/actions/dispatch', () => {
+  test('returns 503 when GITHUB_TOKEN is missing', async () => {
+    const orig = process.env.GITHUB_TOKEN;
+    delete process.env.GITHUB_TOKEN;
+    const res = await request(app)
+      .post('/api/actions/dispatch')
+      .send({ workflow: 'integration-feedback.yml', inputs: {} });
+    expect(res.status).toBe(503);
+    if (orig !== undefined) {
+      process.env.GITHUB_TOKEN = orig;
+    }
+  });
+
+  test('returns 400 for unsupported workflow', async () => {
+    const orig = process.env.GITHUB_TOKEN;
+    process.env.GITHUB_TOKEN = 'test-token';
+    const res = await request(app)
+      .post('/api/actions/dispatch')
+      .send({ workflow: 'unknown.yml', inputs: {} });
+    expect(res.status).toBe(400);
+    if (orig === undefined) {
+      delete process.env.GITHUB_TOKEN;
+    } else {
+      process.env.GITHUB_TOKEN = orig;
+    }
   });
 });
