@@ -1,42 +1,36 @@
 [
   {
-    "name": "affiliate-bot",
+    "name": "buddy-bot",
     "repoName": "Dreamcobots",
-    "repoPath": "./bots/affiliate_bot",
-    "branch": "main",
+    "repoPath": "./bots/buddy_bot",
+    "status": "active",
+    "tier": "PRO",
+    "category": "AI Companion",
+    "description": "The most human-like AI companion.",
+    "price_usd": 49,
+    "features": [
+      "Emotion detection",
+      "Voice synthesis"
+    ],
     "lastHeartbeat": null,
-    "status": "idle",
-    "lastPR": null,
-    "workflowStatus": "unknown"
-  },
-  {
-    "name": "mining-bot",
-    "repoName": "Dreamcobots",
-    "repoPath": "./bots/mining_bot",
-    "branch": "main",
-    "lastHeartbeat": null,
-    "status": "idle",
-    "lastPR": null,
-    "workflowStatus": "unknown"
+    "lastUpdate": null,
+    "pendingPRs": 0
   },
   {
     "name": "sales-bot",
     "repoName": "Dreamcobots",
     "repoPath": "./bots/sales_bot",
-    "branch": "main",
-    "lastHeartbeat": null,
     "status": "idle",
-    "lastPR": null,
-    "workflowStatus": "unknown"
-  },
-  {
-    "name": "deal-finder-bot",
-    "repoName": "Dreamcobots",
-    "repoPath": "./bots/deal_finder_bot",
-    "branch": "main",
+    "tier": "FREE",
+    "category": "Sales",
+    "description": "Automated sales outreach.",
+    "price_usd": 0,
+    "features": [
+      "LeadQualifier",
+      "EmailSequencer"
+    ],
     "lastHeartbeat": null,
-    "status": "idle",
-    "lastPR": null,
-    "workflowStatus": "unknown"
+    "lastUpdate": null,
+    "pendingPRs": 0
   }
 ]

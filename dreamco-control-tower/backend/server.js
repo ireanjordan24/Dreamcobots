@@ -213,6 +213,7 @@ const WORKFLOW_CONTROLS = [
   {
     id: 'integration-feedback',
     label: 'Integration Feedback',
+    category: 'Integrations',
     workflow: 'integration-feedback.yml',
     description: 'Runs integration feedback logging with validation gates.',
     defaultInputs: {
@@ -225,6 +226,7 @@ const WORKFLOW_CONTROLS = [
   {
     id: 'company-lookup',
     label: 'Company Lookup',
+    category: 'Skill Building',
     workflow: 'company-lookup.yml',
     description: 'Runs company lookup automation with validation gates.',
     defaultInputs: {
@@ -235,6 +237,7 @@ const WORKFLOW_CONTROLS = [
   {
     id: 'soak-24h',
     label: '24-Hour Wall Check',
+    category: 'System Health',
     workflow: 'system-soak-24h.yml',
     description: 'Runs the production-readiness soak cycle and publishes artifacts.',
     defaultInputs: {
@@ -242,6 +245,19 @@ const WORKFLOW_CONTROLS = [
       pause_seconds: '0',
     },
     isPermanent: true,
+  },
+  {
+    id: 'builder-simulation-sql',
+    label: 'Builder Simulation + SQL Lab',
+    category: 'Builder Lab',
+    workflow: 'builder-simulation-sql.yml',
+    description:
+      'Game-builder/simulation-builder/vibe-coder lab with bot skill checks and SQL action testing (create/read/update/delete/all).',
+    defaultInputs: {
+      mode: 'simulation_builder',
+      sql_action: 'all',
+      skill_suite: 'all',
+    },
   },
 ];
 

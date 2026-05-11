@@ -118,6 +118,12 @@ export default function ActionsMonitor() {
   const pullRequests = data?.pull_requests ?? [];
   const controls = data?.controls ?? [];
   const source = data?.source ?? 'unknown';
+  const controlsByCategory = controls.reduce((acc, control) => {
+    const category = control.category || 'General';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(control);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-5">
@@ -125,7 +131,7 @@ export default function ActionsMonitor() {
         <div>
           <h2 className="text-xl font-bold text-white">⚡ Actions Command Center</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Intelligent GitHub workflow controls, production readiness checks, and pull request visibility.
+            Intelligent game-builder/simulation-builder/vibe-coder workflow controls, bot skill testing, SQL action labs, and pull request visibility.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -172,39 +178,49 @@ export default function ActionsMonitor() {
 
       <div className="bg-dreamco-card border border-slate-700 rounded-xl p-4">
         <h3 className="text-sm font-semibold text-white mb-3">🎛️ Workflow Controls</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {controls.map((control) => (
-            <div key={control.id} className="rounded-xl border border-slate-700 bg-slate-900/30 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <h4 className="text-sm font-semibold text-white">{control.label}</h4>
-                {control.isPermanent && (
-                  <span className="text-[10px] uppercase tracking-wide px-2 py-1 rounded-full bg-dreamco-accent/20 text-dreamco-accent border border-dreamco-accent/40">
-                    Permanent
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-slate-400 mt-1">{control.description}</p>
+        <p className="text-xs text-slate-500 mb-4">
+          Pick a card, keep defaults if you want, then tap Run. Builder Lab supports SQL create/read/update/delete and full bot skill checks.
+        </p>
+        <div className="space-y-4">
+          {Object.entries(controlsByCategory).map(([category, categoryControls]) => (
+            <div key={category}>
+              <h4 className="text-xs uppercase tracking-wide text-slate-400 mb-2">{category}</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {categoryControls.map((control) => (
+                  <div key={control.id} className="rounded-xl border border-slate-700 bg-slate-900/30 p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h5 className="text-sm font-semibold text-white">{control.label}</h5>
+                      {control.isPermanent && (
+                        <span className="text-[10px] uppercase tracking-wide px-2 py-1 rounded-full bg-dreamco-accent/20 text-dreamco-accent border border-dreamco-accent/40">
+                          Permanent
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1">{control.description}</p>
 
-              <div className="mt-3 space-y-2">
-                {Object.keys(control.defaultInputs || {}).map((key) => (
-                  <label key={key} className="block">
-                    <span className="text-[11px] text-slate-500 uppercase">{key.replaceAll('_', ' ')}</span>
-                    <input
-                      className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
-                      value={controlInputs[control.workflow]?.[key] ?? ''}
-                      onChange={(e) => updateControlInput(control.workflow, key, e.target.value)}
-                    />
-                  </label>
+                    <div className="mt-3 space-y-2">
+                      {Object.keys(control.defaultInputs || {}).map((key) => (
+                        <label key={key} className="block">
+                          <span className="text-[11px] text-slate-500 uppercase">{key.replaceAll('_', ' ')}</span>
+                          <input
+                            className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                            value={controlInputs[control.workflow]?.[key] ?? ''}
+                            onChange={(e) => updateControlInput(control.workflow, key, e.target.value)}
+                          />
+                        </label>
+                      ))}
+                    </div>
+
+                    <button
+                      className="mt-3 w-full px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
+                      onClick={() => triggerWorkflow(control.workflow)}
+                      disabled={dispatching[control.workflow]}
+                    >
+                      {dispatching[control.workflow] ? 'Dispatching…' : `Run ${control.label}`}
+                    </button>
+                  </div>
                 ))}
               </div>
-
-              <button
-                className="mt-3 w-full px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
-                onClick={() => triggerWorkflow(control.workflow)}
-                disabled={dispatching[control.workflow]}
-              >
-                {dispatching[control.workflow] ? 'Dispatching…' : `Run ${control.label}`}
-              </button>
             </div>
           ))}
         </div>

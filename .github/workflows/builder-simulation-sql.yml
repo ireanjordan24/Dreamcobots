@@ -1,0 +1,137 @@
+name: Builder Simulation + SQL Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Builder mode: game_builder | simulation_builder | vibe_coder"
+        required: true
+        default: "simulation_builder"
+      sql_action:
+        description: "SQL action set: create | read | update | delete | all"
+        required: true
+        default: "all"
+      skill_suite:
+        description: "Skill suite: buddy | integration | company | all"
+        required: true
+        default: "all"
+
+concurrency:
+  group: builder-simulation-sql-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  builder-simulation-sql:
+    name: Builder Simulation SQL Runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate manual inputs
+        run: |
+          set -euo pipefail
+          MODE="${{ github.event.inputs.mode }}"
+          SQL_ACTION="${{ github.event.inputs.sql_action }}"
+          SKILL_SUITE="${{ github.event.inputs.skill_suite }}"
+
+          case "${MODE,,}" in
+            game_builder|simulation_builder|vibe_coder) ;;
+            *)
+              echo "mode must be one of: game_builder, simulation_builder, vibe_coder"
+              exit 1
+              ;;
+          esac
+
+          case "${SQL_ACTION,,}" in
+            create|read|update|delete|all) ;;
+            *)
+              echo "sql_action must be one of: create, read, update, delete, all"
+              exit 1
+              ;;
+          esac
+
+          case "${SKILL_SUITE,,}" in
+            buddy|integration|company|all) ;;
+            *)
+              echo "skill_suite must be one of: buddy, integration, company, all"
+              exit 1
+              ;;
+          esac
+
+      - name: Run SQL action simulation + bot skill tests
+        env:
+          MODE: ${{ github.event.inputs.mode }}
+          SQL_ACTION: ${{ github.event.inputs.sql_action }}
+          SKILL_SUITE: ${{ github.event.inputs.skill_suite }}
+        run: |
+          python - <<'PY'
+          import os
+          import sqlite3
+          import subprocess
+          import sys
+
+          mode = os.getenv("MODE", "simulation_builder").lower()
+          sql_action = os.getenv("SQL_ACTION", "all").lower()
+          skill_suite = os.getenv("SKILL_SUITE", "all").lower()
+
+          print(f"Mode: {mode}")
+          print(f"SQL action set: {sql_action}")
+          print(f"Skill suite: {skill_suite}")
+
+          conn = sqlite3.connect(":memory:")
+          cur = conn.cursor()
+          cur.execute("CREATE TABLE IF NOT EXISTS bot_skills (id INTEGER PRIMARY KEY, name TEXT, score INTEGER)")
+          conn.commit()
+
+          actions = [sql_action] if sql_action != "all" else ["create", "read", "update", "delete"]
+
+          for action in actions:
+              if action == "create":
+                  cur.execute("INSERT INTO bot_skills (name, score) VALUES (?, ?)", (f"{mode}_starter", 70))
+                  conn.commit()
+                  print("SQL CREATE ✓")
+              elif action == "read":
+                  cur.execute("SELECT COUNT(*) FROM bot_skills")
+                  total = cur.fetchone()[0]
+                  print(f"SQL READ ✓ total_rows={total}")
+              elif action == "update":
+                  cur.execute("UPDATE bot_skills SET score = score + 5")
+                  conn.commit()
+                  print("SQL UPDATE ✓")
+              elif action == "delete":
+                  cur.execute("DELETE FROM bot_skills WHERE score < 50")
+                  conn.commit()
+                  print("SQL DELETE ✓")
+
+          suite_map = {
+              "buddy": ["python", "-m", "pytest", "tests/test_buddy_orchestrator.py", "-q"],
+              "integration": ["python", "-m", "pytest", "tests/test_integration_feedback_bot.py", "-q"],
+              "company": ["python", "-m", "pytest", "tests/test_company_lookup_bot.py", "-q"],
+          }
+          suites = [skill_suite] if skill_suite != "all" else ["buddy", "integration", "company"]
+
+          for suite in suites:
+              cmd = suite_map[suite]
+              print(f"Running skill suite: {' '.join(cmd)}")
+              result = subprocess.run(cmd, check=False)
+              if result.returncode != 0:
+                  print(f"Skill suite failed: {suite}")
+                  sys.exit(result.returncode)
+
+          print("Builder Simulation + SQL Lab completed successfully.")
+          PY

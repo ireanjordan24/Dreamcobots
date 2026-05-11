@@ -240,6 +240,13 @@ describe('GET /api/actions', () => {
     expect(Array.isArray(res.body.controls)).toBe(true);
   });
 
+  test('includes builder simulation sql control', async () => {
+    const res = await request(app).get('/api/actions');
+    const control = res.body.controls.find((c) => c.id === 'builder-simulation-sql');
+    expect(control).toBeDefined();
+    expect(control.workflow).toBe('builder-simulation-sql.yml');
+  });
+
   test('has source field', async () => {
     const res = await request(app).get('/api/actions');
     expect(res.body).toHaveProperty('source');
