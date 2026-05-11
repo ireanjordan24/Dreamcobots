@@ -111,7 +111,7 @@ jobs:
           ]
 
           if failures:
-              lines.extend(["", "## Failures"]) 
+              lines.extend(["", "## Failures"])
               for f in failures[:100]:
                   lines.append(f"- Cycle {f['cycle']}: `{f['command']}` (rc={f['returncode']})")
 
