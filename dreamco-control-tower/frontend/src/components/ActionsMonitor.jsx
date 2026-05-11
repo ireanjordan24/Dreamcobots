@@ -58,6 +58,20 @@ export default function ActionsMonitor() {
   const [botPlan, setBotPlan] = useState(null);
   const [botPlanBusy, setBotPlanBusy] = useState(false);
   const [botPlanError, setBotPlanError] = useState('');
+  const [chargeData, setChargeData] = useState(null);
+  const [chargeError, setChargeError] = useState('');
+  const [chargeBusy, setChargeBusy] = useState(false);
+  const [chargeMessage, setChargeMessage] = useState('');
+  const [approveBusyId, setApproveBusyId] = useState('');
+  const [chargeDescription, setChargeDescription] = useState('OpenAI API test run');
+  const [chargeUnits, setChargeUnits] = useState('1000');
+  const [chargeUnitCost, setChargeUnitCost] = useState('0.002');
+  const [commandTarget, setCommandTarget] = useState('buddy-bot');
+  const [commandRunMode, setCommandRunMode] = useState('single');
+  const [commandValidation, setCommandValidation] = useState('standard');
+  const [commandBusy, setCommandBusy] = useState(false);
+  const [commandError, setCommandError] = useState('');
+  const [commandResult, setCommandResult] = useState(null);
   const intervalRef = useRef(null);
 
   function bootstrapControlInputs(controls) {
@@ -185,9 +199,106 @@ export default function ActionsMonitor() {
     }
   }
 
+  function fetchChargeSummary() {
+    fetch('/api/actions/charges')
+      .then((r) => r.json())
+      .then((json) => {
+        setChargeData(json);
+        setChargeError('');
+      })
+      .catch((err) => {
+        setChargeError(err.message);
+      });
+  }
+
+  async function previewCharge() {
+    setChargeBusy(true);
+    setChargeMessage('');
+    setChargeError('');
+    try {
+      const response = await fetch('/api/actions/charges/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: chargeDescription,
+          units: chargeUnits,
+          unit_cost_usd: chargeUnitCost,
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || 'Failed to create charge preview');
+      }
+      setChargeData((prev) => ({
+        ...(prev || {}),
+        summary: json.summary,
+        pending_approvals: [...(prev?.pending_approvals || []), json.preview],
+      }));
+      setChargeMessage('Charge preview created. Approval is required before spend.');
+      fetchChargeSummary();
+    } catch (err) {
+      setChargeError(err.message);
+    } finally {
+      setChargeBusy(false);
+    }
+  }
+
+  async function approveCharge(previewId) {
+    setApproveBusyId(previewId);
+    setChargeMessage('');
+    setChargeError('');
+    try {
+      const response = await fetch('/api/actions/charges/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          preview_id: previewId,
+          approved_by: 'actions-page-user',
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || 'Failed to approve preview');
+      }
+      setChargeMessage(json.message || 'Charge approved.');
+      fetchChargeSummary();
+    } catch (err) {
+      setChargeError(err.message);
+    } finally {
+      setApproveBusyId('');
+    }
+  }
+
+  async function runBuddyCommand() {
+    setCommandBusy(true);
+    setCommandError('');
+    try {
+      const response = await fetch('/api/actions/buddy-command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: commandTarget,
+          runMode: commandRunMode,
+          validation: commandValidation,
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || 'Buddy command failed');
+      }
+      setCommandResult(json);
+    } catch (err) {
+      setCommandError(err.message);
+      setCommandResult(null);
+    } finally {
+      setCommandBusy(false);
+    }
+  }
+
   useEffect(() => {
     fetchActions();
     fetchChatHistory();
+    fetchChargeSummary();
     intervalRef.current = setInterval(fetchActions, REFRESH_INTERVAL_MS);
     return () => clearInterval(intervalRef.current);
   }, []);
@@ -407,6 +518,139 @@ export default function ActionsMonitor() {
               <ul className="mt-2 list-disc list-inside text-xs text-slate-300 space-y-1">
                 {(botPlan.no_sql_steps || []).map((step) => (
                   <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="bg-dreamco-card border border-slate-700 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">💳 API Charge Monitor + Approvals</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Preview costs first, inform users, and approve spending before any purchase or external API charge.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <label className="block md:col-span-3">
+              <span className="text-[11px] text-slate-500 uppercase">Description</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={chargeDescription}
+                onChange={(e) => setChargeDescription(e.target.value)}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Units</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={chargeUnits}
+                onChange={(e) => setChargeUnits(e.target.value)}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Unit Cost (USD)</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={chargeUnitCost}
+                onChange={(e) => setChargeUnitCost(e.target.value)}
+              />
+            </label>
+            <button
+              className="self-end px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
+              onClick={previewCharge}
+              disabled={chargeBusy}
+            >
+              {chargeBusy ? 'Previewing…' : 'Preview Charge'}
+            </button>
+          </div>
+          {chargeMessage && <p className="mt-2 text-xs text-green-300">{chargeMessage}</p>}
+          {chargeError && <p className="mt-2 text-xs text-dreamco-red">{chargeError}</p>}
+          <div className="mt-3 text-xs text-slate-300 space-y-1">
+            <p>Budget: ${chargeData?.summary?.monthly_budget_usd ?? '—'}</p>
+            <p>Approved: ${chargeData?.summary?.approved_total_usd ?? '—'}</p>
+            <p>Pending: ${chargeData?.summary?.pending_total_usd ?? '—'}</p>
+            <p>Projected: ${chargeData?.summary?.projected_total_usd ?? '—'}</p>
+          </div>
+          <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/40 p-3 max-h-44 overflow-y-auto">
+            {(chargeData?.pending_approvals || []).length === 0 ? (
+              <p className="text-xs text-slate-500">No pending charge approvals.</p>
+            ) : (
+              chargeData.pending_approvals.map((item) => (
+                <div key={item.preview_id} className="mb-2 border-b border-slate-700 pb-2 last:border-b-0">
+                  <p className="text-xs text-slate-200">{item.description}</p>
+                  <p className="text-[11px] text-slate-400">
+                    ${item.estimated_cost_usd} · {item.preview_id}
+                  </p>
+                  <button
+                    className="mt-1 px-2 py-1 rounded text-[11px] bg-slate-700 text-slate-200 hover:text-white disabled:opacity-40"
+                    onClick={() => approveCharge(item.preview_id)}
+                    disabled={approveBusyId === item.preview_id}
+                  >
+                    {approveBusyId === item.preview_id ? 'Approving…' : 'Approve Charge'}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="bg-dreamco-card border border-slate-700 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">🛰️ Buddy Command Runner</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Call one bot or all bots, run validation depth checks, and view revenue signal guidance.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Run Mode</span>
+              <select
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={commandRunMode}
+                onChange={(e) => setCommandRunMode(e.target.value)}
+              >
+                <option value="single">Single Bot</option>
+                <option value="all">All Bots</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Target</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={commandTarget}
+                onChange={(e) => setCommandTarget(e.target.value)}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Validation</span>
+              <select
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={commandValidation}
+                onChange={(e) => setCommandValidation(e.target.value)}
+              >
+                <option value="quick">Quick</option>
+                <option value="standard">Standard</option>
+                <option value="deep">Deep</option>
+              </select>
+            </label>
+          </div>
+          <button
+            className="mt-2 px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
+            onClick={runBuddyCommand}
+            disabled={commandBusy}
+          >
+            {commandBusy ? 'Running…' : 'Run Buddy Command'}
+          </button>
+          {commandError && <p className="mt-2 text-xs text-dreamco-red">{commandError}</p>}
+          {commandResult && (
+            <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/40 p-3 text-xs text-slate-300">
+              <p className="text-white">{commandResult.buddy_message}</p>
+              <p className="mt-1">Targets: {commandResult.target_count}</p>
+              <p>Revenue signal: ${commandResult.total_revenue_signal_usd}</p>
+              <ul className="mt-2 list-disc list-inside space-y-1">
+                {(commandResult.results || []).map((item) => (
+                  <li key={item.bot}>
+                    {item.bot}: {item.validation_depth} · {item.status}
+                  </li>
                 ))}
               </ul>
             </div>

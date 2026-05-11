@@ -384,7 +384,11 @@ function resolveWorkflowControl(workflowFile) {
 
 const BUDDY_CHAT_HISTORY_LIMIT = 120;
 const BUDDY_CHAT_MESSAGE_MAX_LENGTH = 2000;
+const CHARGE_MONTHLY_BUDGET_USD = 500;
+const CHARGE_PREVIEW_MAX_USD = 25_000;
 const buddyChatHistory = [];
+const pendingChargeApprovals = [];
+const approvedChargeLog = [];
 
 function pushBuddyChatEntry(entry) {
   buddyChatHistory.push(entry);
@@ -398,6 +402,38 @@ function normalizeName(name) {
     .trim()
     .toLowerCase()
     .replace(/[_\s]+/g, '-');
+}
+
+function parseUsdAmount(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return null;
+  }
+  return Math.max(0, Math.round(numeric * 1_000_000) / 1_000_000);
+}
+
+function buildChargeSummary() {
+  const approved_total_usd = approvedChargeLog.reduce((acc, item) => acc + item.estimated_cost_usd, 0);
+  const pending_total_usd = pendingChargeApprovals.reduce(
+    (acc, item) => acc + item.estimated_cost_usd,
+    0,
+  );
+  const projected_total_usd = Math.round((approved_total_usd + pending_total_usd) * 100) / 100;
+  return {
+    monthly_budget_usd: CHARGE_MONTHLY_BUDGET_USD,
+    approved_total_usd: Math.round(approved_total_usd * 100) / 100,
+    pending_total_usd: Math.round(pending_total_usd * 100) / 100,
+    projected_total_usd,
+    budget_remaining_usd: Math.round((CHARGE_MONTHLY_BUDGET_USD - projected_total_usd) * 100) / 100,
+    alerts:
+      projected_total_usd > CHARGE_MONTHLY_BUDGET_USD
+        ? ['Projected spend exceeds monthly budget. Approval review recommended.']
+        : [],
+  };
+}
+
+function buildChargePreviewId() {
+  return `charge_${Date.now()}_${Math.floor(Math.random() * 100_000)}`;
 }
 
 app.get('/api/actions/chat', rateLimiter, (_req, res) => {
@@ -515,6 +551,149 @@ app.post('/api/actions/test-plan', rateLimiter, (req, res) => {
   return res.json(plan);
 });
 
+app.get('/api/actions/charges', rateLimiter, (_req, res) => {
+  return res.json({
+    summary: buildChargeSummary(),
+    pending_approvals: pendingChargeApprovals,
+    approved_recent: approvedChargeLog.slice(-20).reverse(),
+    policy: {
+      pre_approval_required: true,
+      message:
+        'All estimated charges must be previewed and explicitly approved before purchase or external API spend.',
+    },
+    fetched_at: new Date().toISOString(),
+  });
+});
+
+app.post('/api/actions/charges/preview', rateLimiter, (req, res) => {
+  const description = String(req.body?.description || '').trim();
+  if (!description) {
+    return res.status(400).json({ error: 'description is required' });
+  }
+
+  const units = parseUsdAmount(req.body?.units ?? 1);
+  const unitCostUsd = parseUsdAmount(req.body?.unit_cost_usd ?? 0);
+  if (units === null || units <= 0) {
+    return res.status(400).json({ error: 'units must be a positive number' });
+  }
+  if (unitCostUsd === null || unitCostUsd <= 0) {
+    return res.status(400).json({ error: 'unit_cost_usd must be a positive number' });
+  }
+
+  const estimatedCostUsd = Math.round(units * unitCostUsd * 100) / 100;
+  if (estimatedCostUsd > CHARGE_PREVIEW_MAX_USD) {
+    return res.status(400).json({
+      error: `estimated cost cannot exceed ${CHARGE_PREVIEW_MAX_USD} USD in a single preview`,
+    });
+  }
+
+  const preview = {
+    preview_id: buildChargePreviewId(),
+    description,
+    units,
+    unit_cost_usd: unitCostUsd,
+    estimated_cost_usd: estimatedCostUsd,
+    status: 'pending_approval',
+    created_at: new Date().toISOString(),
+  };
+  pendingChargeApprovals.push(preview);
+
+  return res.status(201).json({
+    preview,
+    approval_required: true,
+    summary: buildChargeSummary(),
+    notice: 'Charge preview created. Approval is required before execution.',
+  });
+});
+
+app.post('/api/actions/charges/approve', rateLimiter, (req, res) => {
+  const previewId = String(req.body?.preview_id || '').trim();
+  if (!previewId) {
+    return res.status(400).json({ error: 'preview_id is required' });
+  }
+  const approvedBy = String(req.body?.approved_by || 'operator').trim();
+
+  const pendingIndex = pendingChargeApprovals.findIndex((entry) => entry.preview_id === previewId);
+  if (pendingIndex < 0) {
+    return res.status(404).json({ error: 'Charge preview not found or already approved.' });
+  }
+
+  const pending = pendingChargeApprovals.splice(pendingIndex, 1)[0];
+  const approved = {
+    ...pending,
+    status: 'approved',
+    approved_by: approvedBy,
+    approved_at: new Date().toISOString(),
+  };
+  approvedChargeLog.push(approved);
+
+  return res.json({
+    approved,
+    summary: buildChargeSummary(),
+    message: 'Charge approved. Users are now informed and execution may proceed.',
+  });
+});
+
+app.post('/api/actions/buddy-command', rateLimiter, (req, res) => {
+  const bots = readBots();
+  const runMode = String(req.body?.runMode || 'single').trim().toLowerCase();
+  const validation = String(req.body?.validation || 'standard').trim().toLowerCase();
+  const target = String(req.body?.target || '').trim();
+  const allTargets = runMode === 'all' || normalizeName(target) === 'all';
+
+  const targetBots = allTargets
+    ? bots
+    : bots.filter((bot) => normalizeName(bot.name) === normalizeName(target));
+
+  if (!allTargets && !target) {
+    return res.status(400).json({ error: 'target is required unless runMode is all' });
+  }
+  if (targetBots.length === 0) {
+    return res.status(404).json({
+      error: 'No matching bot found for target.',
+      available_targets: bots.slice(0, 20).map((bot) => bot.name),
+    });
+  }
+
+  const validationDepth = ['quick', 'standard', 'deep'].includes(validation) ? validation : 'standard';
+  const commandResult = targetBots.map((bot) => {
+    const revenueSignal = Math.round(((bot.price_usd ?? 0) * (validationDepth === 'deep' ? 1.4 : 1.1)) * 100) / 100;
+    return {
+      bot: bot.name,
+      status: bot.status,
+      validation_depth: validationDepth,
+      validation_plan:
+        validationDepth === 'quick'
+          ? ['health check', 'primary action smoke test']
+          : validationDepth === 'deep'
+            ? ['health check', 'full action suite', 'error recovery', 'repeatability', 'revenue optimization']
+            : ['health check', 'functional suite', 'error handling'],
+      revenue_signal_usd: revenueSignal,
+    };
+  });
+
+  const totalRevenueSignal = Math.round(
+    commandResult.reduce((acc, item) => acc + item.revenue_signal_usd, 0) * 100,
+  ) / 100;
+
+  pushBuddyChatEntry({
+    role: 'buddy',
+    message: `Buddy command executed for ${commandResult.length} bot(s) with ${validationDepth} validation.`,
+    created_at: new Date().toISOString(),
+  });
+
+  return res.json({
+    mode: allTargets ? 'all' : 'single',
+    validation_depth: validationDepth,
+    target_count: commandResult.length,
+    results: commandResult,
+    total_revenue_signal_usd: totalRevenueSignal,
+    buddy_message:
+      'Buddy completed command simulation and validation planning. Use Workflow Controls to run any needed automation.',
+    generated_at: new Date().toISOString(),
+  });
+});
+
 app.get('/api/actions', rateLimiter, async (req, res) => {
   const token = process.env.GITHUB_TOKEN || '';
   const [runsResult, pullRequestsResult] = await Promise.all([
@@ -530,6 +709,13 @@ app.get('/api/actions', rateLimiter, async (req, res) => {
         ? 'github_api'
         : 'unavailable',
     controls: WORKFLOW_CONTROLS,
+    charge_summary: buildChargeSummary(),
+    buddy_capabilities: {
+      chat: true,
+      test_plan: true,
+      command_runner: true,
+      charge_preview_and_approval: true,
+    },
     fetched_at: new Date().toISOString(),
   });
 });

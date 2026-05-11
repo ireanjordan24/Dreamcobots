@@ -352,3 +352,63 @@ describe('POST /api/actions/test-plan', () => {
     expect(res.body.recommended_workflow).toBe('builder-simulation-sql.yml');
   });
 });
+
+describe('Charge monitoring APIs', () => {
+  test('returns charge summary with policy', async () => {
+    const res = await request(app).get('/api/actions/charges');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('summary');
+    expect(res.body).toHaveProperty('policy');
+    expect(Array.isArray(res.body.pending_approvals)).toBe(true);
+  });
+
+  test('creates charge preview and requires approval', async () => {
+    const res = await request(app).post('/api/actions/charges/preview').send({
+      description: 'Model API tokens',
+      units: 1000,
+      unit_cost_usd: 0.002,
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.approval_required).toBe(true);
+    expect(res.body.preview).toHaveProperty('preview_id');
+    expect(res.body.preview.status).toBe('pending_approval');
+  });
+
+  test('approves a charge preview', async () => {
+    const previewRes = await request(app).post('/api/actions/charges/preview').send({
+      description: 'Model API tokens',
+      units: 500,
+      unit_cost_usd: 0.003,
+    });
+    const previewId = previewRes.body.preview.preview_id;
+    const approveRes = await request(app).post('/api/actions/charges/approve').send({
+      preview_id: previewId,
+      approved_by: 'unit-test',
+    });
+    expect(approveRes.status).toBe(200);
+    expect(approveRes.body.approved.status).toBe('approved');
+  });
+});
+
+describe('POST /api/actions/buddy-command', () => {
+  test('runs single-target buddy command for known bot', async () => {
+    const res = await request(app).post('/api/actions/buddy-command').send({
+      target: 'buddy-bot',
+      runMode: 'single',
+      validation: 'deep',
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.mode).toBe('single');
+    expect(res.body.target_count).toBe(1);
+    expect(Array.isArray(res.body.results)).toBe(true);
+  });
+
+  test('returns 404 for unknown target bot', async () => {
+    const res = await request(app).post('/api/actions/buddy-command').send({
+      target: 'ghost-bot',
+      runMode: 'single',
+      validation: 'standard',
+    });
+    expect(res.status).toBe(404);
+  });
+});
