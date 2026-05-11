@@ -252,7 +252,7 @@ const WORKFLOW_CONTROLS = [
     category: 'Builder Lab',
     workflow: 'builder-simulation-sql.yml',
     description:
-      'Game-builder/simulation-builder/vibe_coder lab with bot skill checks and SQL action testing (create/read/update/delete/all).',
+      'Game-builder/simulation-builder/vibe-coder lab with bot skill checks and SQL action testing (create/read/update/delete/all).',
     defaultInputs: {
       mode: 'simulation_builder',
       sql_action: 'all',
@@ -383,6 +383,7 @@ function resolveWorkflowControl(workflowFile) {
 }
 
 const BUDDY_CHAT_HISTORY_LIMIT = 120;
+const BUDDY_CHAT_MESSAGE_MAX_LENGTH = 2000;
 const buddyChatHistory = [];
 
 function pushBuddyChatEntry(entry) {
@@ -411,8 +412,10 @@ app.post('/api/actions/chat', rateLimiter, (req, res) => {
   if (!message) {
     return res.status(400).json({ error: 'message is required' });
   }
-  if (message.length > 2000) {
-    return res.status(400).json({ error: 'message is too long (max 2000 chars)' });
+  if (message.length > BUDDY_CHAT_MESSAGE_MAX_LENGTH) {
+    return res.status(400).json({
+      error: `message is too long (max ${BUDDY_CHAT_MESSAGE_MAX_LENGTH} chars)`,
+    });
   }
 
   const sender = String(req.body?.sender || 'user').trim().toLowerCase();

@@ -209,7 +209,7 @@ export default function ActionsMonitor() {
         <div>
           <h2 className="text-xl font-bold text-white">⚡ Actions Command Center</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Intelligent game-builder/simulation-builder/vibe_coder workflow controls, bot skill testing, SQL action labs, and pull request visibility.
+            Intelligent game-builder/simulation-builder/vibe-coder workflow controls, bot skill testing, SQL action labs, and pull request visibility.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -279,7 +279,7 @@ export default function ActionsMonitor() {
                     <div className="mt-3 space-y-2">
                       {Object.keys(control.defaultInputs || {}).map((key) => (
                         <label key={key} className="block">
-                          <span className="text-[11px] text-slate-500 uppercase">{key.replaceAll('_', ' ')}</span>
+                          <span className="text-[11px] text-slate-500 uppercase">{key.replace(/_/g, ' ')}</span>
                           <input
                             className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
                             value={controlInputs[control.workflow]?.[key] ?? ''}
