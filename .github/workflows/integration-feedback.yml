@@ -1,8 +1,6 @@
 name: Integration Feedback Bot
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       platform:
@@ -25,19 +23,73 @@ on:
     # Run daily at 08:00 UTC to log a scheduled health-check entry for GitHub Actions
     - cron: "0 8 * * *"
 
+concurrency:
+  group: integration-feedback-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate manual inputs
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          PLATFORM="${{ github.event.inputs.platform }}"
+          STATUS="${{ github.event.inputs.status }}"
+
+          if [ -z "${PLATFORM// }" ]; then
+            echo "platform input cannot be empty"
+            exit 1
+          fi
+
+          case "${STATUS,,}" in
+            success|failure) ;;
+            *)
+              echo "status input must be one of: success, failure"
+              exit 1
+              ;;
+          esac
+
+      - name: Static integrity checks
+        run: |
+          python -m compileall -q bots/integration_feedback_bot
+          python -m pip check
+
+      - name: Run integration feedback tests
+        run: python -m pytest tests/test_integration_feedback_bot.py -q
+
   integration-feedback:
     name: Log Integration Feedback
+    needs: quality-gates
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
+      pull-requests: write
       actions: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -93,17 +145,24 @@ jobs:
                 f"Success rate: {summary['success_rate_pct']}%")
           EOF
 
-      - name: Commit updated integration_log.json
-        run: |
-          git config user.name  "dreamco-bot[bot]"
-          git config user.email "dreamco-bot@users.noreply.github.com"
-          git add data/integration_log.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "chore(data): update integration_log.json via Integration Feedback Bot [skip ci]"
-            git push
-          fi
+      - name: Open PR with updated integration log
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(data): update integration_log.json via Integration Feedback Bot [skip ci]"
+          title: "chore(data): update integration_log.json via Integration Feedback Bot"
+          body: |
+            Automated data update from Integration Feedback Bot.
+
+            - Source workflow: `${{ github.workflow }}`
+            - Run: `${{ github.run_number }}`
+          branch: chore/integration-feedback-log-update
+          delete-branch: true
+          add-paths: |
+            data/integration_log.json
+          labels: |
+            automated-update
+            integration-feedback
 
       - name: Notify Slack on job failure
         if: failure()

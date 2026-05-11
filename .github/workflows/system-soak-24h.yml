@@ -1,0 +1,133 @@
+name: System Soak (24 Cycles)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cycles:
+        description: "Number of soak cycles to run (24 recommended)"
+        required: true
+        default: "24"
+      pause_seconds:
+        description: "Seconds to pause between cycles"
+        required: false
+        default: "0"
+
+concurrency:
+  group: system-soak-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  soak:
+    name: Soak Test Cycle Runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run repeated bot/system smoke suites
+        env:
+          CYCLES: ${{ github.event.inputs.cycles }}
+          PAUSE_SECONDS: ${{ github.event.inputs.pause_seconds }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+          import time
+          from pathlib import Path
+
+          cycles = int(os.getenv("CYCLES", "24"))
+          pause = int(os.getenv("PAUSE_SECONDS", "0"))
+
+          suites = [
+              ["python", "-m", "pytest", "tests/test_buddy_orchestrator.py", "-q"],
+              ["python", "-m", "pytest", "tests/test_integration_feedback_bot.py", "-q"],
+              ["python", "-m", "pytest", "tests/test_company_lookup_bot.py", "-q"],
+          ]
+
+          report = {"cycles": cycles, "pause_seconds": pause, "results": []}
+          failures = []
+
+          for cycle in range(1, cycles + 1):
+              cycle_result = {"cycle": cycle, "commands": []}
+              print(f"=== Cycle {cycle}/{cycles} ===")
+              for cmd in suites:
+                  started = time.time()
+                  proc = subprocess.run(cmd, capture_output=True, text=True)
+                  duration = round(time.time() - started, 2)
+                  command = " ".join(cmd)
+                  cycle_result["commands"].append(
+                      {
+                          "command": command,
+                          "returncode": proc.returncode,
+                          "duration_seconds": duration,
+                          "stdout_tail": "\n".join(proc.stdout.splitlines()[-25:]),
+                          "stderr_tail": "\n".join(proc.stderr.splitlines()[-25:]),
+                      }
+                  )
+                  if proc.returncode != 0:
+                      failures.append({"cycle": cycle, "command": command, "returncode": proc.returncode})
+                  print(f"  {command} -> rc={proc.returncode} ({duration}s)")
+
+              report["results"].append(cycle_result)
+              if pause > 0 and cycle < cycles:
+                  time.sleep(pause)
+
+          out_dir = Path("soak_reports")
+          out_dir.mkdir(exist_ok=True)
+          summary_json = out_dir / "system_soak_summary.json"
+          summary_md = out_dir / "system_soak_summary.md"
+
+          summary_json.write_text(json.dumps(report, indent=2))
+
+          passed_cycles = cycles - len({f["cycle"] for f in failures})
+          lines = [
+              "# System Soak Summary",
+              "",
+              f"- Requested cycles: {cycles}",
+              f"- Pause between cycles (s): {pause}",
+              f"- Fully passing cycles: {passed_cycles}",
+              f"- Cycles with at least one failure: {cycles - passed_cycles}",
+              f"- Total command failures: {len(failures)}",
+              "",
+              "## Learning/Mastery Signal",
+              "- This soak run repeatedly validates core bot suites as a proxy for stable sandbox learning execution.",
+              "- Review JSON command tails for recurring failure patterns and progression across cycles.",
+          ]
+
+          if failures:
+              lines.extend(["", "## Failures"]) 
+              for f in failures[:100]:
+                  lines.append(f"- Cycle {f['cycle']}: `{f['command']}` (rc={f['returncode']})")
+
+          summary_md.write_text("\n".join(lines) + "\n")
+
+          if failures:
+              print(f"Soak completed with {len(failures)} command failures.")
+              sys.exit(1)
+
+          print("Soak completed with no command failures.")
+          PY
+
+      - name: Upload soak reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-soak-reports-${{ github.run_number }}
+          path: soak_reports/
+          if-no-files-found: error

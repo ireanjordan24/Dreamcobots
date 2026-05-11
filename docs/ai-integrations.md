@@ -15,14 +15,14 @@ and repository secrets.
 | Google Gemini | `GEMINI_API_KEY` | <https://ai.google.dev/docs> |
 | GitHub PAT | `GITHUB_PAT` | <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens> |
 
-The workflow file is at
-`.github/workflows/ai-service-integration.yml` and runs automatically on:
+Current automation lives in these workflow files:
 
-- every push to the `main` branch, and
-- pull requests that have the `ai-review` label applied.
+- `.github/workflows/integration-feedback.yml` (manual + daily scheduled run)
+- `.github/workflows/company-lookup.yml` (manual + daily scheduled run)
+- `.github/workflows/ci.yml` (push/pull-request quality gates)
 
-It can also be triggered manually from the **Actions** tab via
-*workflow_dispatch*.
+There is currently no dedicated `.github/workflows/ai-service-integration.yml`
+file in this repository.
 
 ---
 
@@ -159,8 +159,9 @@ files for security.
 ## 6 — Trigger the workflow manually
 
 ```bash
-# Requires gh CLI and the GITHUB_PAT to be configured
-gh workflow run ai-service-integration.yml --repo DreamCo-Technologies/Dreamcobots
+# Requires gh CLI and repository access
+gh workflow run integration-feedback.yml --repo DreamCo-Technologies/Dreamcobots \
+  -f platform=GitHub\\ Actions -f status=success -f details="manual validation run"
 ```
 
-Or open **Actions → AI Service Integration → Run workflow** in the GitHub UI.
+Or open **Actions → Integration Feedback Bot → Run workflow** in the GitHub UI.
