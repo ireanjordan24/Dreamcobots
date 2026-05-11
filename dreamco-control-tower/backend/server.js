@@ -385,7 +385,9 @@ function resolveWorkflowControl(workflowFile) {
 const BUDDY_CHAT_HISTORY_LIMIT = 120;
 const BUDDY_CHAT_MESSAGE_MAX_LENGTH = 2000;
 const CHARGE_MONTHLY_BUDGET_USD = 500;
-const CHARGE_PREVIEW_MAX_USD = 25_000;
+const CHARGE_PREVIEW_MAX_USD = CHARGE_MONTHLY_BUDGET_USD;
+const REVENUE_SIGNAL_MULTIPLIER_STANDARD = 1.1;
+const REVENUE_SIGNAL_MULTIPLIER_DEEP = 1.4;
 const buddyChatHistory = [];
 const pendingChargeApprovals = [];
 const approvedChargeLog = [];
@@ -537,7 +539,7 @@ app.post('/api/actions/test-plan', rateLimiter, (req, res) => {
       { name: 'Core behavior', mode: depth === 'quick' ? 'smoke' : 'functional' },
       { name: 'Reliability', mode: depth === 'deep' ? 'stress' : 'repeatability' },
       { name: 'Safety and errors', mode: 'guardrails' },
-      { name: 'User friendliness', mode: 'elderly-friendly language' },
+      { name: 'User friendliness', mode: 'accessible language' },
     ],
     recommended_workflow: 'builder-simulation-sql.yml',
     recommended_inputs: {
@@ -657,7 +659,11 @@ app.post('/api/actions/buddy-command', rateLimiter, (req, res) => {
 
   const validationDepth = ['quick', 'standard', 'deep'].includes(validation) ? validation : 'standard';
   const commandResult = targetBots.map((bot) => {
-    const revenueSignal = Math.round(((bot.price_usd ?? 0) * (validationDepth === 'deep' ? 1.4 : 1.1)) * 100) / 100;
+    const revenueMultiplier =
+      validationDepth === 'deep'
+        ? REVENUE_SIGNAL_MULTIPLIER_DEEP
+        : REVENUE_SIGNAL_MULTIPLIER_STANDARD;
+    const revenueSignal = Math.round(((bot.price_usd ?? 0) * revenueMultiplier) * 100) / 100;
     return {
       bot: bot.name,
       status: bot.status,
