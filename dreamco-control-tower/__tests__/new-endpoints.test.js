@@ -306,3 +306,49 @@ describe('POST /api/actions/dispatch', () => {
     }
   });
 });
+
+describe('GET /api/actions/chat', () => {
+  test('returns 200 and history array', async () => {
+    const res = await request(app).get('/api/actions/chat');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.history)).toBe(true);
+  });
+});
+
+describe('POST /api/actions/chat', () => {
+  test('returns 400 when message is missing', async () => {
+    const res = await request(app).post('/api/actions/chat').send({ message: '' });
+    expect(res.status).toBe(400);
+  });
+
+  test('returns buddy reply and history for valid message', async () => {
+    const res = await request(app).post('/api/actions/chat').send({
+      message: 'Buddy help me with testing',
+      sender: 'user',
+      targetBots: ['buddy-bot'],
+    });
+    expect(res.status).toBe(200);
+    expect(typeof res.body.reply).toBe('string');
+    expect(Array.isArray(res.body.history)).toBe(true);
+    expect(Array.isArray(res.body.training_signals)).toBe(true);
+  });
+});
+
+describe('POST /api/actions/test-plan', () => {
+  test('returns 400 when botName is missing', async () => {
+    const res = await request(app).post('/api/actions/test-plan').send({});
+    expect(res.status).toBe(400);
+  });
+
+  test('returns no-sql test plan for known bot', async () => {
+    const res = await request(app).post('/api/actions/test-plan').send({
+      botName: 'buddy-bot',
+      depth: 'deep',
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.requested_bot).toBe('buddy-bot');
+    expect(res.body.resolved_bot).toBe('buddy-bot');
+    expect(Array.isArray(res.body.no_sql_steps)).toBe(true);
+    expect(res.body.recommended_workflow).toBe('builder-simulation-sql.yml');
+  });
+});

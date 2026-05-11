@@ -47,6 +47,17 @@ export default function ActionsMonitor() {
   const [dispatching, setDispatching] = useState({});
   const [dispatchMessage, setDispatchMessage] = useState('');
   const [controlInputs, setControlInputs] = useState({});
+  const [chatHistory, setChatHistory] = useState([]);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatTargets, setChatTargets] = useState('buddy-bot');
+  const [chatSender, setChatSender] = useState('user');
+  const [chatBusy, setChatBusy] = useState(false);
+  const [chatError, setChatError] = useState('');
+  const [botName, setBotName] = useState('buddy-bot');
+  const [botDepth, setBotDepth] = useState('standard');
+  const [botPlan, setBotPlan] = useState(null);
+  const [botPlanBusy, setBotPlanBusy] = useState(false);
+  const [botPlanError, setBotPlanError] = useState('');
   const intervalRef = useRef(null);
 
   function bootstrapControlInputs(controls) {
@@ -108,8 +119,75 @@ export default function ActionsMonitor() {
     }
   }
 
+  function fetchChatHistory() {
+    fetch('/api/actions/chat')
+      .then((r) => r.json())
+      .then((json) => {
+        setChatHistory(json.history || []);
+      })
+      .catch(() => {
+        setChatHistory([]);
+      });
+  }
+
+  async function sendBuddyMessage() {
+    setChatError('');
+    const trimmed = chatMessage.trim();
+    if (!trimmed) return;
+    setChatBusy(true);
+    try {
+      const response = await fetch('/api/actions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: trimmed,
+          sender: chatSender,
+          targetBots: chatTargets
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean),
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || 'Chat request failed');
+      }
+      setChatHistory(json.history || []);
+      setChatMessage('');
+    } catch (err) {
+      setChatError(err.message);
+    } finally {
+      setChatBusy(false);
+    }
+  }
+
+  async function generateBotPlan() {
+    setBotPlanError('');
+    setBotPlanBusy(true);
+    try {
+      const response = await fetch('/api/actions/test-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          botName,
+          depth: botDepth,
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || 'Failed to generate bot test plan');
+      }
+      setBotPlan(json);
+    } catch (err) {
+      setBotPlanError(err.message);
+    } finally {
+      setBotPlanBusy(false);
+    }
+  }
+
   useEffect(() => {
     fetchActions();
+    fetchChatHistory();
     intervalRef.current = setInterval(fetchActions, REFRESH_INTERVAL_MS);
     return () => clearInterval(intervalRef.current);
   }, []);
@@ -223,6 +301,116 @@ export default function ActionsMonitor() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="bg-dreamco-card border border-slate-700 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">💬 Buddy Chat + Training</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Chat in plain language. No SQL required. You can also mark messages as bot-system training sync.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Sender</span>
+              <select
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={chatSender}
+                onChange={(e) => setChatSender(e.target.value)}
+              >
+                <option value="user">User</option>
+                <option value="bot_system">Bot System</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Target Bots (comma separated)</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={chatTargets}
+                onChange={(e) => setChatTargets(e.target.value)}
+              />
+            </label>
+          </div>
+          <label className="block mt-2">
+            <span className="text-[11px] text-slate-500 uppercase">Message</span>
+            <textarea
+              className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white min-h-20"
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              placeholder="Buddy, help me test company-lookup bot with easy steps."
+            />
+          </label>
+          <button
+            className="mt-2 px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
+            onClick={sendBuddyMessage}
+            disabled={chatBusy}
+          >
+            {chatBusy ? 'Sending…' : 'Send to Buddy'}
+          </button>
+          {chatError && <p className="mt-2 text-xs text-dreamco-red">{chatError}</p>}
+          <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/40 p-3 max-h-56 overflow-y-auto">
+            {(chatHistory || []).length === 0 ? (
+              <p className="text-xs text-slate-500">No chat yet.</p>
+            ) : (
+              chatHistory.map((entry, idx) => (
+                <div key={`${entry.created_at}-${idx}`} className="mb-2">
+                  <p className="text-[11px] text-slate-500 uppercase">{entry.role}</p>
+                  <p className="text-xs text-slate-200">{entry.message}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="bg-dreamco-card border border-slate-700 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-2">🧪 Buddy Bot Test Planner</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Type any bot name and get an easy no-SQL test plan you can run right from Actions.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Bot Name</span>
+              <input
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={botName}
+                onChange={(e) => setBotName(e.target.value)}
+              />
+            </label>
+            <label className="block">
+              <span className="text-[11px] text-slate-500 uppercase">Depth</span>
+              <select
+                className="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                value={botDepth}
+                onChange={(e) => setBotDepth(e.target.value)}
+              >
+                <option value="quick">Quick</option>
+                <option value="standard">Standard</option>
+                <option value="deep">Deep</option>
+              </select>
+            </label>
+          </div>
+          <button
+            className="mt-2 px-3 py-2 rounded-lg text-xs font-semibold bg-dreamco-accent text-white hover:opacity-90 disabled:opacity-40"
+            onClick={generateBotPlan}
+            disabled={botPlanBusy}
+          >
+            {botPlanBusy ? 'Planning…' : 'Generate No-SQL Plan'}
+          </button>
+          {botPlanError && <p className="mt-2 text-xs text-dreamco-red">{botPlanError}</p>}
+          {botPlan && (
+            <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+              <p className="text-xs text-white">
+                Target: {botPlan.requested_bot}
+                {botPlan.resolved_bot ? ` → ${botPlan.resolved_bot}` : ''}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">Workflow: {botPlan.recommended_workflow}</p>
+              <ul className="mt-2 list-disc list-inside text-xs text-slate-300 space-y-1">
+                {(botPlan.no_sql_steps || []).map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

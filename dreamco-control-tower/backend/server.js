@@ -382,6 +382,136 @@ function resolveWorkflowControl(workflowFile) {
   return WORKFLOW_CONTROLS.find((control) => control.workflow === workflowFile) ?? null;
 }
 
+const BUDDY_CHAT_HISTORY_LIMIT = 120;
+const buddyChatHistory = [];
+
+function pushBuddyChatEntry(entry) {
+  buddyChatHistory.push(entry);
+  if (buddyChatHistory.length > BUDDY_CHAT_HISTORY_LIMIT) {
+    buddyChatHistory.splice(0, buddyChatHistory.length - BUDDY_CHAT_HISTORY_LIMIT);
+  }
+}
+
+function normalizeName(name) {
+  return String(name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-');
+}
+
+app.get('/api/actions/chat', rateLimiter, (_req, res) => {
+  return res.json({
+    history: buddyChatHistory,
+    fetched_at: new Date().toISOString(),
+  });
+});
+
+app.post('/api/actions/chat', rateLimiter, (req, res) => {
+  const message = String(req.body?.message || '').trim();
+  if (!message) {
+    return res.status(400).json({ error: 'message is required' });
+  }
+  if (message.length > 2000) {
+    return res.status(400).json({ error: 'message is too long (max 2000 chars)' });
+  }
+
+  const sender = String(req.body?.sender || 'user').trim().toLowerCase();
+  const senderType = sender === 'bot_system' ? 'bot_system' : 'user';
+  const targetBotsRaw = Array.isArray(req.body?.targetBots) ? req.body.targetBots : [];
+  const targetBots = targetBotsRaw.map((bot) => String(bot).trim()).filter(Boolean);
+
+  const bots = readBots();
+  const knownBots = bots.map((b) => b.name);
+  const matchedTargetBots = targetBots.filter((targetBot) =>
+    knownBots.some((known) => normalizeName(known) === normalizeName(targetBot)),
+  );
+
+  const userEntry = {
+    role: senderType,
+    message,
+    target_bots: matchedTargetBots,
+    created_at: new Date().toISOString(),
+  };
+  pushBuddyChatEntry(userEntry);
+
+  const trainingSignals = matchedTargetBots.map((botName) => ({
+    source_bot: botName,
+    signal: `Skill context synced from ${botName} into Buddy training memory.`,
+  }));
+
+  trainingSignals.forEach((signal) => {
+    pushBuddyChatEntry({
+      role: 'system',
+      message: signal.signal,
+      source_bot: signal.source_bot,
+      created_at: new Date().toISOString(),
+    });
+  });
+
+  const buddyReply =
+    trainingSignals.length > 0
+      ? `Buddy online. I synced training from ${trainingSignals.length} bot system(s), and I can help you run no-SQL testing from this page.`
+      : 'Buddy online. Tell me the bot you want to validate and I will prepare a no-SQL test path you can run from Actions.';
+
+  pushBuddyChatEntry({
+    role: 'buddy',
+    message: buddyReply,
+    created_at: new Date().toISOString(),
+  });
+
+  return res.json({
+    reply: buddyReply,
+    training_signals: trainingSignals,
+    history: buddyChatHistory,
+  });
+});
+
+app.post('/api/actions/test-plan', rateLimiter, (req, res) => {
+  const botName = String(req.body?.botName || '').trim();
+  if (!botName) {
+    return res.status(400).json({ error: 'botName is required' });
+  }
+
+  const requestedDepth = String(req.body?.depth || 'standard').trim().toLowerCase();
+  const depth = ['quick', 'standard', 'deep'].includes(requestedDepth) ? requestedDepth : 'standard';
+  const normalized = normalizeName(botName);
+  const bots = readBots();
+  const matchedBot =
+    bots.find((b) => normalizeName(b.name) === normalized) ||
+    bots.find((b) => normalizeName(b.name).includes(normalized));
+
+  const noSqlSteps = [
+    'Open Actions Command Center and enter the bot name.',
+    'Pick a test depth and run Buddy test plan.',
+    'Use the provided workflow card with defaults (no SQL needed).',
+    'Check pass/fail result in Recent Workflow Runs.',
+    'If needed, rerun with deep depth for stronger validation.',
+  ];
+
+  const plan = {
+    requested_bot: botName,
+    resolved_bot: matchedBot?.name ?? null,
+    found_in_catalog: Boolean(matchedBot),
+    depth,
+    no_sql_steps: noSqlSteps,
+    checks: [
+      { name: 'Core behavior', mode: depth === 'quick' ? 'smoke' : 'functional' },
+      { name: 'Reliability', mode: depth === 'deep' ? 'stress' : 'repeatability' },
+      { name: 'Safety and errors', mode: 'guardrails' },
+      { name: 'User friendliness', mode: 'elderly-friendly language' },
+    ],
+    recommended_workflow: 'builder-simulation-sql.yml',
+    recommended_inputs: {
+      mode: 'simulation_builder',
+      sql_action: 'all',
+      skill_suite: 'all',
+    },
+    generated_at: new Date().toISOString(),
+  };
+
+  return res.json(plan);
+});
+
 app.get('/api/actions', rateLimiter, async (req, res) => {
   const token = process.env.GITHUB_TOKEN || '';
   const [runsResult, pullRequestsResult] = await Promise.all([
