@@ -28,6 +28,8 @@ import sqlite3
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW)
+
 
 class BotLibraryManager:
     """Manages per-bot library registrations, mastery levels, and learning notes.
