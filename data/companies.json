@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-09T11:27:02.101996+00:00",
-  "total_companies": 1,
+  "last_updated": "2026-05-12T02:15:57.808073+00:00",
+  "total_companies": 2,
   "companies": [
     {
       "name": "Stripe",
@@ -31,6 +31,17 @@
       "enriched_at": "2026-05-09T11:27:02.101905+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
+    },
+    {
+      "name": "PayPal",
+      "domain": "",
+      "description": "No data found.",
+      "source": "not_found",
+      "looked_up_at": "2026-05-12T02:15:57.807959+00:00",
+      "enriched": true,
+      "enriched_at": "2026-05-12T02:15:57.807978+00:00",
+      "company_size": "unknown",
+      "funding_stage": "bootstrapped_or_unknown"
     }
   ]
 }
