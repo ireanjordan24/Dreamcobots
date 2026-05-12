@@ -1,0 +1,30 @@
+name: Integration Lookup Automation
+
+on:
+  workflow_dispatch: # Creates a manual trigger in the Actions page
+    inputs:
+      query:
+        description: "Enter the query for integration opportunities"
+        required: true
+        default: "default integration query"
+
+jobs:
+  integration_lookup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Run Integration Lookup Script
+      run: |
+        echo "Looking up integration opportunities for: ${{ github.event.inputs.query }}"
+        python scripts/integration_lookup.py "${{ github.event.inputs.query }}"
+        git config user.name "GitHub Bot"
+        git config user.email "bot@example.com"
+        git add data/integration_lookup.json
+        git commit -m "Added integration lookup data for ${{ github.event.inputs.query }}"
+        git push
+
+    - name: Confirm Success
+      run: echo "Integration lookup completed successfully."
