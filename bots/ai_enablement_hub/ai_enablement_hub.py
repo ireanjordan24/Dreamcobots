@@ -395,8 +395,6 @@ class DataMetrics:
             level = 3
         elif active_workflows >= 2:
             level = 2
-        elif active_workflows >= 1:
-            level = 2
         else:
             level = 1
         maturity = next(m for m in _MATURITY_LEVELS if m["level"] == level)
