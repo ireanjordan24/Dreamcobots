@@ -21,6 +21,40 @@ on:
         description: "Version or release tag (optional)"
         required: false
         default: ""
+      tier:
+        description: "Bot tier: free | pro | enterprise"
+        required: false
+        default: "pro"
+  workflow_call:
+    inputs:
+      platform:
+        description: Platform name.
+        required: false
+        type: string
+        default: "GitHub Actions"
+      status:
+        description: Integration status.
+        required: false
+        type: string
+        default: "success"
+      details:
+        description: Details about the integration event.
+        required: false
+        type: string
+        default: "Reusable workflow call."
+      version:
+        description: Version or release tag.
+        required: false
+        type: string
+        default: ""
+      tier:
+        description: Bot tier.
+        required: false
+        type: string
+        default: "pro"
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
   schedule:
     # Run daily at 08:00 UTC to log a scheduled health-check entry for GitHub Actions
     - cron: "0 8 * * *"
@@ -52,10 +86,11 @@ jobs:
       - name: Log integration event
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          INTEGRATION_PLATFORM: ${{ github.event.inputs.platform || 'GitHub Actions' }}
-          INTEGRATION_STATUS: ${{ github.event.inputs.status || 'success' }}
-          INTEGRATION_DETAILS: ${{ github.event.inputs.details || 'Scheduled health-check passed.' }}
-          INTEGRATION_VERSION: ${{ github.event.inputs.version || '' }}
+          INTEGRATION_PLATFORM: ${{ inputs.platform || github.event.inputs.platform || 'GitHub Actions' }}
+          INTEGRATION_STATUS: ${{ inputs.status || github.event.inputs.status || 'success' }}
+          INTEGRATION_DETAILS: ${{ inputs.details || github.event.inputs.details || 'Scheduled health-check passed.' }}
+          INTEGRATION_VERSION: ${{ inputs.version || github.event.inputs.version || '' }}
+          INTEGRATION_TIER: ${{ inputs.tier || github.event.inputs.tier || 'pro' }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
         run: |
@@ -66,8 +101,8 @@ jobs:
           from bots.integration_feedback_bot.integration_feedback_bot import IntegrationFeedbackBot
           from bots.integration_feedback_bot.tiers import Tier
 
-          # Use PRO tier if Slack webhook is configured, else FREE
-          tier = Tier.PRO if os.getenv("SLACK_WEBHOOK_URL") else Tier.FREE
+          tier_map = {"free": Tier.FREE, "pro": Tier.PRO, "enterprise": Tier.ENTERPRISE}
+          tier = tier_map.get(os.getenv("INTEGRATION_TIER", "pro").lower(), Tier.PRO)
 
           bot = IntegrationFeedbackBot(tier=tier)
           result = bot.log_integration(
