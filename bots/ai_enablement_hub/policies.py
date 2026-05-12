@@ -2,7 +2,7 @@
 Pillar 2 — Clear Policies & Guardrails.
 
 Explicitly documents and enforces vetted AI tool guidelines and acceptable
-usage policies for all DreamCo bots.  PRO+ tiers can add custom policies.
+usage policies for all DreamCo bots.  ENTERPRISE tier can add custom policies.
 
 Adheres to the Dreamcobots GLOBAL AI SOURCES FLOW framework.
 """

@@ -1,5 +1,5 @@
 """
-AI Enablement Hub — GitHub's eight-pillar AI enablement model for DreamCobots.
+AI Enablement Hub — five-pillar AI enablement model for DreamCobots.
 
 Orchestrates the five core pillars of AI adoption enablement:
 

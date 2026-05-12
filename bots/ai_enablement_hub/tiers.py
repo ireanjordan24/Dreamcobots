@@ -3,8 +3,8 @@ Tier definitions for the AI Enablement Hub.
 
 Tiers:
   - FREE ($0):       Core pillars — Advocates Program + basic Metrics.
-  - PRO ($49):       Full 5-pillar framework, segmented metrics, L&D resources,
-                     Bot Tier Classifier.
+  - PRO ($49):       All five pillars (Advocates, Policies, Learning, Metrics,
+                     Communities) plus Bot Tier Classifier and advanced segmentation.
   - ENTERPRISE ($299): All PRO features plus Retraining Optimizer, custom policies,
                        and API access.
 """

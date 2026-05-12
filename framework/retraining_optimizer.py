@@ -1,5 +1,5 @@
 """
-RetrainingOptimizer — net retraining optimization for DreamCo bots.
+RetrainingOptimizer — next-generation retraining optimization for DreamCo bots.
 
 Monitors model performance and triggers optimized retraining cycles when
 interconnected algorithms detect accuracy degradation beyond configurable
