@@ -21,6 +21,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+MINIMUM_FLUENCY_DIMENSIONS = 2
 
 FLUENCY_SIGNALS = {
     "governance": (
@@ -110,7 +111,7 @@ def main() -> int:
         coverage |= _score_file(f)
 
     score = len(coverage)
-    passed = score >= 2
+    passed = score >= MINIMUM_FLUENCY_DIMENSIONS
 
     print("AI fluency check summary")
     print(f"- Changed files: {len(files)}")
@@ -119,7 +120,7 @@ def main() -> int:
 
     if not passed:
         print(
-            "Expected at least 2 fluency dimensions in changes "
+            f"Expected at least {MINIMUM_FLUENCY_DIMENSIONS} fluency dimensions in changes "
             "(governance/automation/observability/enablement)."
         )
         return 1
