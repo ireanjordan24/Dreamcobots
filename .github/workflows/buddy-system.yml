@@ -68,7 +68,9 @@ jobs:
           now = datetime.now(timezone.utc).isoformat()
 
           if action == "music":
-              melody = ["C4", "E4", "G4", "B4", "A4", "F4", "D4", "C4"]
+              seed = sum(ord(ch) for ch in prompt) if prompt else 0
+              scale = ["C4", "D4", "E4", "F4", "G4", "A4", "B4"]
+              melody = [scale[(seed + i * 2) % len(scale)] for i in range(8)]
               response = f"🎵 Buddy made a vibe melody for '{prompt}': {' - '.join(melody)}"
           elif action == "code":
               response = "💻 Buddy ran a coding check request. Use action=test or run_full_suite=true for full checks."
@@ -100,7 +102,9 @@ jobs:
     name: Buddy tests repository capabilities
     runs-on: ubuntu-latest
     needs: buddy-interaction
-    if: ${{ contains(fromJSON('["test","all","code"]'), needs.buddy-interaction.outputs.action) || (inputs.run_full_suite || github.event.inputs.run_full_suite || 'false') == 'true' }}
+    permissions:
+      contents: read
+    if: ${{ contains(fromJSON('["test","all","code"]'), needs.buddy-interaction.outputs.action) || (inputs.run_full_suite == 'true') || (github.event.inputs.run_full_suite == 'true') }}
 
     steps:
       - name: Checkout repository

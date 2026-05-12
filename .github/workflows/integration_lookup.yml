@@ -37,7 +37,7 @@ jobs:
         if git diff --cached --quiet; then
           echo "No integration lookup changes to commit."
         else
-          git commit -m "chore(data): update integration lookup for ${QUERY} [skip ci]"
+          git commit -m "chore(data): update integration lookup"
           git push
         fi
 

@@ -49,7 +49,7 @@ jobs:
 
       - name: Validate repository systems
         run: |
-          python -m compileall bots scripts core >/dev/null
+          python -m compileall bots scripts core
           npm ci
           npm run test -- --passWithNoTests
 
