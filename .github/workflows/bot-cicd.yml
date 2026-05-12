@@ -45,5 +45,8 @@ jobs:
       - name: Data integrity gate
         run: python .github/scripts/check_data_integrity.py --base HEAD~1 --head HEAD
 
+      - name: Dependency intelligence gate
+        run: python .github/scripts/check_dependency_intelligence.py
+
       - name: AI fluency gate
         run: python .github/scripts/check_ai_fluency.py

@@ -14,8 +14,9 @@ automated — **must** follow the guidelines below.
 4. [Required Framework Integration Checklist](#required-framework-integration-checklist)
 5. [Testing Requirements](#testing-requirements)
 6. [Static Analysis](#static-analysis)
-7. [AI Fluency Model](#ai-fluency-model)
-8. [Pull Request Process](#pull-request-process)
+7. [Dependency Intelligence Requirements](#dependency-intelligence-requirements)
+8. [AI Fluency Model](#ai-fluency-model)
+9. [Pull Request Process](#pull-request-process)
 
 ---
 
@@ -218,6 +219,35 @@ and `Fiverr_bots/` and report any file that lacks a reference to
 
 > **PRs that introduce new bot files failing the static analysis check will
 > not be merged.**
+
+---
+
+## Dependency Intelligence Requirements
+
+Every dependency (existing and newly added) must have explicit strategic
+requirements tied to category-dominance goals.
+
+- Canonical catalog: `.github/dependency_intelligence_requirements.json`
+- Automated gate: `.github/scripts/check_dependency_intelligence.py`
+
+When adding or updating dependencies:
+
+1. Update the dependency manifest (`package.json` or `requirements*.txt`).
+2. Add/update the dependency entry in
+   `.github/dependency_intelligence_requirements.json`.
+3. Ensure each entry includes:
+   - `value_hypothesis`
+   - `strategic_requirements` (non-empty list)
+   - `target_categories` (non-empty list of allowed categories)
+   - `kpis` (non-empty list)
+4. Run:
+
+   ```bash
+   python .github/scripts/check_dependency_intelligence.py
+   ```
+
+> **PRs that introduce dependencies without intelligence requirements will not
+> be merged.**
 
 ---
 

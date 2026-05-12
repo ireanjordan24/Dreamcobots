@@ -1,0 +1,720 @@
+{
+  "version": 1,
+  "goal": "Ensure every dependency has explicit strategic requirements tied to dominating all operating categories.",
+  "allowed_categories": [
+    "app",
+    "business",
+    "fiverr",
+    "marketing",
+    "occupational",
+    "real_estate",
+    "platform"
+  ],
+  "dependencies": {
+    "@octokit/rest": {
+      "value_hypothesis": "Enables secure GitHub automation that keeps every category continuously upgraded.",
+      "strategic_requirements": [
+        "Must support authenticated workflow and pull-request automation.",
+        "Must support robust retry/error handling for API rate limits and failures."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "marketing"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "@vitejs/plugin-react": {
+      "value_hypothesis": "Accelerates reliable frontend delivery for category dashboards and control surfaces.",
+      "strategic_requirements": [
+        "Must preserve fast build feedback for UI iteration.",
+        "Must keep React compilation standards aligned with Vite releases."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "marketing",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "autoprefixer": {
+      "value_hypothesis": "Maintains cross-browser presentation quality for all category-facing interfaces.",
+      "strategic_requirements": [
+        "Must automatically cover modern browser compatibility targets.",
+        "Must be integrated with existing CSS build pipelines."
+      ],
+      "target_categories": [
+        "app",
+        "marketing",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "cheerio": {
+      "value_hypothesis": "Supports scalable market and competitor content extraction for strategic intelligence.",
+      "strategic_requirements": [
+        "Must provide deterministic HTML parsing for ingestion workflows.",
+        "Must be constrained to compliant scraping and approved sources."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "fiverr",
+        "real_estate"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "cors": {
+      "value_hypothesis": "Enables secure cross-origin access for multi-surface category products.",
+      "strategic_requirements": [
+        "Must enforce explicit origin policy controls.",
+        "Must prevent permissive defaults in production."
+      ],
+      "target_categories": [
+        "platform",
+        "app",
+        "business"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "cryptography": {
+      "value_hypothesis": "Protects sensitive operational and customer data across every category.",
+      "strategic_requirements": [
+        "Must keep encryption primitives on supported secure versions.",
+        "Must be used for data-at-rest or transport security controls where required."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "fiverr",
+        "marketing",
+        "occupational",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "security_incident_reduction",
+        "audit_readiness",
+        "automation_reliability"
+      ]
+    },
+    "dotenv": {
+      "value_hypothesis": "Standardizes environment-based configuration for portable category deployments.",
+      "strategic_requirements": [
+        "Must centralize non-secret config loading without hardcoded credentials.",
+        "Must remain compatible with CI/CD and local development workflows."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "app"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "eslint": {
+      "value_hypothesis": "Prevents JavaScript defects that slow expansion across categories.",
+      "strategic_requirements": [
+        "Must enforce zero-warning lint quality gates in CI.",
+        "Must remain aligned with repository JS style rules."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "defect_reduction",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "express": {
+      "value_hypothesis": "Provides scalable API foundations for category orchestration and monetization flows.",
+      "strategic_requirements": [
+        "Must support stable routing and middleware composition.",
+        "Must keep security updates current to reduce exploit risk."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "fiverr",
+        "marketing",
+        "occupational",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "api_uptime",
+        "automation_reliability",
+        "category_coverage_growth"
+      ]
+    },
+    "express-rate-limit": {
+      "value_hypothesis": "Protects core APIs against abuse that can disrupt category operations.",
+      "strategic_requirements": [
+        "Must apply route-level protection to sensitive endpoints.",
+        "Must expose configurable thresholds for operational tuning."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "real_estate"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "fastapi": {
+      "value_hypothesis": "Delivers high-performance Python APIs for rapid category feature rollout.",
+      "strategic_requirements": [
+        "Must maintain async performance for concurrent workloads.",
+        "Must keep compatibility with current HTTP client and framework stack."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "occupational",
+        "real_estate"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "flask": {
+      "value_hypothesis": "Supports lightweight service endpoints used in category-specific bots.",
+      "strategic_requirements": [
+        "Must keep extension compatibility and security patch levels current.",
+        "Must avoid architecture drift from standardized API patterns."
+      ],
+      "target_categories": [
+        "platform",
+        "fiverr",
+        "business"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "flask-cors": {
+      "value_hypothesis": "Enables safe browser-to-service connectivity for category dashboards.",
+      "strategic_requirements": [
+        "Must enforce explicit allowlist origins.",
+        "Must avoid wildcard CORS in production contexts."
+      ],
+      "target_categories": [
+        "platform",
+        "app",
+        "marketing"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "httpx": {
+      "value_hypothesis": "Improves resilient API integrations for external category data sources.",
+      "strategic_requirements": [
+        "Must support timeout and retry-aware usage patterns.",
+        "Must be preferred for async integrations where throughput matters."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "real_estate",
+        "occupational"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "jest": {
+      "value_hypothesis": "Guards JavaScript behavior so category features scale without regressions.",
+      "strategic_requirements": [
+        "Must execute repository JS tests in CI for each dependency-impacting change.",
+        "Must keep test runtime stable for quick feedback."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "defect_reduction",
+        "time_to_market",
+        "automation_reliability"
+      ]
+    },
+    "jinja2": {
+      "value_hypothesis": "Supports dynamic content generation for category workflows and reporting.",
+      "strategic_requirements": [
+        "Must enforce safe templating practices to prevent injection issues.",
+        "Must remain compatible with current Python runtime and framework usage."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "occupational",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "json2csv": {
+      "value_hypothesis": "Enables exportable analytics artifacts for category-level decision making.",
+      "strategic_requirements": [
+        "Must produce deterministic, schema-consistent exports.",
+        "Must support large dataset conversion without data loss."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "node-fetch": {
+      "value_hypothesis": "Supports external service integrations for Node-based category automation.",
+      "strategic_requirements": [
+        "Must enforce timeout/error handling wrappers in production paths.",
+        "Must remain on maintained versions for security and protocol support."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "fiverr"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "nodemon": {
+      "value_hypothesis": "Speeds local iteration cycles that accelerate category delivery.",
+      "strategic_requirements": [
+        "Must remain dev-only and never required in production runtime.",
+        "Must preserve stable watch/restart behavior for backend development."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "time_to_market",
+        "developer_productivity",
+        "automation_reliability"
+      ]
+    },
+    "openai": {
+      "value_hypothesis": "Powers AI-driven differentiation across all category bots and assistants.",
+      "strategic_requirements": [
+        "Must be wired through governance controls and usage limits.",
+        "Must support prompt/response auditing for quality and compliance."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "fiverr",
+        "marketing",
+        "occupational",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "ai_feature_adoption",
+        "category_coverage_growth",
+        "automation_reliability"
+      ]
+    },
+    "pdfminer.six": {
+      "value_hypothesis": "Extracts high-value document intelligence for category automation workflows.",
+      "strategic_requirements": [
+        "Must parse target document formats with stable accuracy.",
+        "Must include failure handling for malformed or encrypted PDFs."
+      ],
+      "target_categories": [
+        "business",
+        "occupational",
+        "real_estate",
+        "fiverr"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "postcss": {
+      "value_hypothesis": "Enables scalable style processing for multi-category frontend surfaces.",
+      "strategic_requirements": [
+        "Must integrate with Tailwind and autoprefixer pipelines.",
+        "Must keep build performance acceptable for CI."
+      ],
+      "target_categories": [
+        "app",
+        "marketing",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "prettier": {
+      "value_hypothesis": "Maintains consistent code formatting to reduce review friction at scale.",
+      "strategic_requirements": [
+        "Must remain the canonical formatter for JS/CSS/JSON/MD assets.",
+        "Must be runnable in automated checks and local workflows."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "developer_productivity",
+        "defect_reduction",
+        "time_to_market"
+      ]
+    },
+    "pytest": {
+      "value_hypothesis": "Provides foundational quality assurance for Python category bots.",
+      "strategic_requirements": [
+        "Must run core test suites in CI for dependency-impacting changes.",
+        "Must keep compatibility with plugin stack and Python version policy."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "defect_reduction",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "pytest-benchmark": {
+      "value_hypothesis": "Tracks performance regressions that can slow category execution at scale.",
+      "strategic_requirements": [
+        "Must provide repeatable benchmark runs for critical workflows.",
+        "Must be used to detect material latency regressions before release."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "occupational"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "pytest-cov": {
+      "value_hypothesis": "Measures test coverage to sustain quality while expanding category footprint.",
+      "strategic_requirements": [
+        "Must report meaningful coverage data in CI contexts.",
+        "Must not be bypassed for high-risk integration changes."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "defect_reduction",
+        "automation_reliability",
+        "quality_signal_strength"
+      ]
+    },
+    "python-docx": {
+      "value_hypothesis": "Enables structured report generation for category client deliverables.",
+      "strategic_requirements": [
+        "Must preserve document fidelity for exported artifacts.",
+        "Must support templated generation workflows."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "fiverr",
+        "real_estate"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "python-dotenv": {
+      "value_hypothesis": "Standardizes Python environment configuration across category services.",
+      "strategic_requirements": [
+        "Must keep secrets out of source and loaded from environment.",
+        "Must remain compatible with local, CI, and deployment runtimes."
+      ],
+      "target_categories": [
+        "platform",
+        "business",
+        "app"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "react": {
+      "value_hypothesis": "Powers interactive experiences for control tower and category product surfaces.",
+      "strategic_requirements": [
+        "Must maintain compatibility with current frontend architecture.",
+        "Must prioritize performance and accessibility for operational dashboards."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "marketing",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "react-dom": {
+      "value_hypothesis": "Ensures reliable rendering for category-facing React interfaces.",
+      "strategic_requirements": [
+        "Must stay version-aligned with React core.",
+        "Must support stable hydration/render behavior for production UIs."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "marketing",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "recharts": {
+      "value_hypothesis": "Delivers operational analytics visibility for category performance decisions.",
+      "strategic_requirements": [
+        "Must support clear KPI visualization for leadership workflows.",
+        "Must avoid heavy chart configurations that degrade dashboard responsiveness."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "requests": {
+      "value_hypothesis": "Enables robust external integrations and market-data retrieval across categories.",
+      "strategic_requirements": [
+        "Must use safe timeout/retry defaults in bot integrations.",
+        "Must remain on secure, supported versions."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "fiverr",
+        "marketing",
+        "occupational",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "automation_reliability",
+        "category_coverage_growth",
+        "integration_success_rate"
+      ]
+    },
+    "schedule": {
+      "value_hypothesis": "Supports recurring automation tasks required for category dominance operations.",
+      "strategic_requirements": [
+        "Must provide deterministic trigger behavior for periodic jobs.",
+        "Must include monitoring hooks for missed or failed schedules."
+      ],
+      "target_categories": [
+        "business",
+        "marketing",
+        "occupational",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "selenium": {
+      "value_hypothesis": "Automates browser workflows to capture opportunities in multiple categories.",
+      "strategic_requirements": [
+        "Must be restricted to approved and compliant automation use cases.",
+        "Must include robust wait/retry logic to reduce flaky execution."
+      ],
+      "target_categories": [
+        "business",
+        "fiverr",
+        "occupational",
+        "real_estate",
+        "marketing"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "stripe": {
+      "value_hypothesis": "Enables monetization workflows that convert category performance into revenue.",
+      "strategic_requirements": [
+        "Must support secure payment operations with strict key handling.",
+        "Must be configured for auditable transaction and webhook flows."
+      ],
+      "target_categories": [
+        "business",
+        "fiverr",
+        "real_estate",
+        "app",
+        "platform"
+      ],
+      "kpis": [
+        "revenue_growth",
+        "payment_reliability",
+        "audit_readiness"
+      ]
+    },
+    "supertest": {
+      "value_hypothesis": "Validates API contract integrity for category-critical backend services.",
+      "strategic_requirements": [
+        "Must cover core endpoint behavior in automated tests.",
+        "Must prevent unnoticed breaking API changes."
+      ],
+      "target_categories": [
+        "platform"
+      ],
+      "kpis": [
+        "defect_reduction",
+        "api_uptime",
+        "automation_reliability"
+      ]
+    },
+    "tailwindcss": {
+      "value_hypothesis": "Accelerates consistent UI development across category experiences.",
+      "strategic_requirements": [
+        "Must enforce shared design tokens and utility conventions.",
+        "Must integrate cleanly with existing build tooling."
+      ],
+      "target_categories": [
+        "app",
+        "marketing",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    },
+    "uuid": {
+      "value_hypothesis": "Provides reliable unique identifiers for cross-category workflows and records.",
+      "strategic_requirements": [
+        "Must generate collision-resistant IDs for distributed processes.",
+        "Must be used consistently where stable identity is required."
+      ],
+      "target_categories": [
+        "app",
+        "business",
+        "fiverr",
+        "marketing",
+        "occupational",
+        "real_estate",
+        "platform"
+      ],
+      "kpis": [
+        "data_integrity",
+        "automation_reliability",
+        "integration_success_rate"
+      ]
+    },
+    "vite": {
+      "value_hypothesis": "Enables fast frontend build pipelines for rapid category iteration.",
+      "strategic_requirements": [
+        "Must keep dev and production builds stable and reproducible.",
+        "Must preserve short feedback loops for UI teams."
+      ],
+      "target_categories": [
+        "app",
+        "marketing",
+        "platform"
+      ],
+      "kpis": [
+        "time_to_market",
+        "developer_productivity",
+        "automation_reliability"
+      ]
+    },
+    "webdriver-manager": {
+      "value_hypothesis": "Keeps browser automation infrastructure stable for Selenium-driven workflows.",
+      "strategic_requirements": [
+        "Must maintain compatible driver versions for CI and local runs.",
+        "Must minimize automation downtime from driver mismatch."
+      ],
+      "target_categories": [
+        "business",
+        "fiverr",
+        "occupational",
+        "platform"
+      ],
+      "kpis": [
+        "category_coverage_growth",
+        "automation_reliability",
+        "time_to_market"
+      ]
+    }
+  }
+}
