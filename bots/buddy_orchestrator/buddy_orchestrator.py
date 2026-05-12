@@ -807,7 +807,13 @@ class BuddyOrchestrator:
     def status(self) -> dict:
         """Return a high-level orchestrator health snapshot."""
         governance = self._governance.audit_report()
-        fluency = self.ai_fluency_status()
+        advocacy = self.advocacy_metrics()
+        onboarding = self.onboarding_metrics()
+        fluency = self.ai_fluency_status(
+            governance_report=governance,
+            advocacy=advocacy,
+            onboarding=onboarding,
+        )
         return {
             "orchestrator": "BuddyOrchestrator",
             "github_repo": self.github_repo,

@@ -173,7 +173,7 @@ class ComplianceEngine:
             # Restrict bulk exports of personal data to compliance/admin actors.
             if "export" in action and self._is_sensitive_resource(resource):
                 allowed_export_actors = ("compliance:", "admin", "svc_compliance")
-                if not actor.startswith(allowed_export_actors):
+                if not any(actor.startswith(prefix) for prefix in allowed_export_actors):
                     return False
             return True
 
