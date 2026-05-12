@@ -996,4 +996,34 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "github_actions_trigger",
         ],
     ),
+    BotEntry(
+        bot_id="ai_enablement_hub",
+        display_name="AI Enablement Hub",
+        description=(
+            "Central platform for AI fluency and governance across DreamCo. "
+            "Manages the Advocate Network, 10 vetted AI policies, 8 structured "
+            "learning resources, 7 Communities of Practice, and data metrics "
+            "(MAU, user segmentation, AI maturity assessment). ENTERPRISE tier "
+            "adds BotTierClassifier and RetrainingOptimizer for automated bot "
+            "management. Integrates with GitHub Actions for scheduled reporting."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.ai_enablement_hub.ai_enablement_hub",
+        class_name="AIEnablementHub",
+        capabilities=[
+            "ai_enablement",
+            "policies",
+            "governance",
+            "advocates",
+            "learning_paths",
+            "community_of_practice",
+            "metrics",
+            "mau_tracking",
+            "maturity_assessment",
+            "segmentation",
+            "bot_tier_classifier",
+            "retraining_optimizer",
+            "github_actions_trigger",
+        ],
+    ),
 ]

@@ -1,0 +1,143 @@
+name: AI Enablement Hub
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Bot tier: free | pro | enterprise"
+        required: false
+        default: "pro"
+      report_type:
+        description: "Report type: summary | maturity | revenue"
+        required: false
+        default: "summary"
+      active_workflows:
+        description: "Number of active GitHub Actions workflows (for maturity assessment)"
+        required: false
+        default: "2"
+      mau:
+        description: "Monthly Active Users count to record (leave blank to skip)"
+        required: false
+        default: ""
+  schedule:
+    # Run monthly on the 1st at 09:00 UTC to generate adoption reports
+    - cron: "0 9 1 * *"
+
+jobs:
+  ai-enablement-hub:
+    name: Run AI Enablement Hub
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run AI Enablement Hub
+        env:
+          BOT_TIER: ${{ github.event.inputs.tier || 'pro' }}
+          REPORT_TYPE: ${{ github.event.inputs.report_type || 'summary' }}
+          ACTIVE_WORKFLOWS: ${{ github.event.inputs.active_workflows || '2' }}
+          MAU_COUNT: ${{ github.event.inputs.mau || '' }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          python - <<'EOF'
+          import sys, os
+          sys.path.insert(0, ".")
+
+          from bots.ai_enablement_hub.ai_enablement_hub import AIEnablementHub
+          from bots.ai_enablement_hub.tiers import Tier
+
+          tier_map = {"free": Tier.FREE, "pro": Tier.PRO, "enterprise": Tier.ENTERPRISE}
+          tier = tier_map.get(os.getenv("BOT_TIER", "pro").lower(), Tier.PRO)
+          report_type = os.getenv("REPORT_TYPE", "summary")
+          mau_raw = os.getenv("MAU_COUNT", "").strip()
+
+          hub = AIEnablementHub(tier=tier)
+
+          # Record MAU if provided
+          if mau_raw:
+              try:
+                  mau = int(mau_raw)
+                  result = hub.record_mau(mau)
+                  if result.get("recorded"):
+                      print(f"📊 MAU recorded: {mau} for {result['entry']['period']}")
+                  else:
+                      print(f"⚠️  MAU not recorded: {result.get('reason', 'unknown')}")
+              except ValueError:
+                  print(f"⚠️  Invalid MAU value: {mau_raw}")
+
+          # Print tier description
+          print(hub.describe_tier())
+          print()
+
+          # Run report
+          summary = hub.get_summary()
+          print(f"=== AI Enablement Hub Report: {report_type.upper()} ===")
+          print(f"Tier: {summary['tier']}")
+          print(f"Advocates: {summary['advocates']['count']}"
+                + (f" / {summary['advocates']['limit']}" if summary['advocates']['limit'] else " (unlimited)"))
+          print(f"Policies: {summary['policies']['count']}")
+          print(f"Policy categories: {', '.join(summary['policies']['categories'])}")
+          print(f"Learning resources: {summary['learning_resources']['count']}")
+          print(f"Communities: {summary['community']['channels']} channels, "
+                f"{summary['community']['total_members']} members")
+          print(f"Current MAU: {summary['metrics']['current_mau'] or 'not recorded'}")
+          print(f"MAU periods: {summary['metrics']['mau_periods_recorded']}")
+          print(f"Bot Classifier available: {summary['enterprise_features']['bot_classifier_available']}")
+          print(f"Retraining Optimizer available: {summary['enterprise_features']['retraining_optimizer_available']}")
+
+          if report_type in ("maturity", "summary"):
+              active_workflows = int(os.getenv("ACTIVE_WORKFLOWS", "2"))
+              advocates = summary["advocates"]["count"]
+              metrics_tracked = summary["metrics"]["current_mau"] is not None
+              maturity = hub.metrics.get_maturity_assessment(active_workflows, advocates, metrics_tracked)
+              if maturity.get("assessed"):
+                  m = maturity["maturity"]
+                  print(f"\n🎯 Maturity Level: {m['level']} — {m['name']}")
+                  print(f"   {m['description']}")
+              else:
+                  print(f"\n⚠️  Maturity assessment unavailable: {maturity.get('reason')}")
+
+          print(f"\n✅ AI Enablement Hub completed (run #{os.getenv('GITHUB_RUN_NUMBER', '?')})")
+          EOF
+
+      - name: Notify Slack on job failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            python - <<'PYEOF'
+          import json, urllib.request, os
+          url = os.environ["SLACK_WEBHOOK_URL"]
+          payload = json.dumps({
+              "text": (
+                  ":rotating_light: *AI Enablement Hub FAILED*\n"
+                  f"> Workflow run #{os.environ.get('GITHUB_RUN_NUMBER', '?')} "
+                  f"on `{os.environ.get('GITHUB_REF_NAME', 'main')}`\n"
+                  f"> Repo: {os.environ.get('GITHUB_REPOSITORY', '')}"
+              )
+          }).encode()
+          req = urllib.request.Request(url, data=payload,
+                                        headers={"Content-Type": "application/json"})
+          urllib.request.urlopen(req, timeout=10)
+          PYEOF
+          fi
