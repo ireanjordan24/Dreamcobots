@@ -21,6 +21,7 @@ from .global_ai_sources_flow import (
     FRAMEWORK_VERSION,
     REQUIRED_STAGES,
 )
+from .retraining_optimizer import RetrainingOptimizer
 
 __all__ = [
     "BaseBot",
@@ -36,4 +37,5 @@ __all__ = [
     "FrameworkViolationError",
     "FRAMEWORK_VERSION",
     "REQUIRED_STAGES",
+    "RetrainingOptimizer",
 ]
