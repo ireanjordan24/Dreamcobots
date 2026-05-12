@@ -13,6 +13,25 @@ on:
         description: "Bot tier: free | pro | enterprise"
         required: false
         default: "pro"
+  workflow_call:
+    inputs:
+      companies:
+        description: Comma-separated list of company names.
+        required: false
+        type: string
+        default: "Stripe"
+      tier:
+        description: Bot tier.
+        required: false
+        type: string
+        default: "pro"
+    secrets:
+      CRUNCHBASE_API_KEY:
+        required: false
+      CLEARBIT_API_KEY:
+        required: false
+      SLACK_WEBHOOK_URL:
+        required: false
 
 jobs:
   lookup:
@@ -20,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: read
+      actions: write
 
     steps:
       - name: Checkout repository
@@ -43,8 +62,8 @@ jobs:
           CRUNCHBASE_API_KEY: ${{ secrets.CRUNCHBASE_API_KEY }}
           CLEARBIT_API_KEY: ${{ secrets.CLEARBIT_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          BOT_TIER: ${{ github.event.inputs.tier }}
-          COMPANY_NAMES: ${{ github.event.inputs.companies }}
+          BOT_TIER: ${{ inputs.tier || github.event.inputs.tier || 'pro' }}
+          COMPANY_NAMES: ${{ inputs.companies || github.event.inputs.companies || 'Stripe' }}
         run: |
           python - <<'EOF'
           import sys, os
@@ -108,3 +127,23 @@ jobs:
           urllib.request.urlopen(req, timeout=10)
           PYEOF
           fi
+
+      - name: Trigger Integration Feedback workflow
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'integration-feedback.yml',
+              ref: context.ref.replace('refs/heads/', ''),
+              inputs: {
+                platform: 'Company Lookup Bot',
+                status: 'success',
+                details: 'Company lookup completed and persisted.',
+                version: context.sha.slice(0, 7),
+                tier: 'pro',
+              },
+            });

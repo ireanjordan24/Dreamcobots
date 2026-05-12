@@ -7,24 +7,59 @@ on:
         description: "Enter the query for integration opportunities"
         required: true
         default: "default integration query"
+  workflow_call:
+    inputs:
+      query:
+        description: Query for integration opportunities.
+        required: false
+        type: string
+        default: "default integration query"
 
 jobs:
   integration_lookup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Run Integration Lookup Script
       run: |
-        echo "Looking up integration opportunities for: ${{ github.event.inputs.query }}"
-        python scripts/integration_lookup.py "${{ github.event.inputs.query }}"
+        QUERY="${{ inputs.query || github.event.inputs.query || 'default integration query' }}"
+        echo "Looking up integration opportunities for: ${QUERY}"
+        python scripts/integration_lookup.py "${QUERY}"
         git config user.name "GitHub Bot"
         git config user.email "bot@example.com"
         git add data/integration_lookup.json
-        git commit -m "Added integration lookup data for ${{ github.event.inputs.query }}"
-        git push
+        if git diff --cached --quiet; then
+          echo "No integration lookup changes to commit."
+        else
+          git commit -m "chore(data): update integration lookup"
+          git push
+        fi
 
     - name: Confirm Success
       run: echo "Integration lookup completed successfully."
+
+    - name: Trigger Integration Feedback workflow
+      if: success()
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'integration-feedback.yml',
+            ref: context.ref.replace('refs/heads/', ''),
+            inputs: {
+              platform: 'Integration Lookup Bot',
+              status: 'success',
+              details: 'Integration lookup workflow completed.',
+              version: context.sha.slice(0, 7),
+              tier: 'pro',
+            },
+          });

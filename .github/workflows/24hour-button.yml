@@ -1,46 +1,85 @@
 name: "24hour System Builder, Debugger, and Revenue Generator"
 
 on:
-  workflow_dispatch:  # Allows you to trigger this workflow manually via GitHub Actions
+  workflow_dispatch:
+    inputs:
+      run_monitoring:
+        description: "Also trigger timed-monitoring-system.yml"
+        required: false
+        default: "false"
+      company_names:
+        description: "Comma-separated companies for company lookup"
+        required: false
+        default: "Stripe,Shopify,OpenAI"
+  workflow_call:
+    inputs:
+      run_monitoring:
+        description: Trigger timed monitoring workflow.
+        required: false
+        type: string
+        default: "false"
+      company_names:
+        description: Company list.
+        required: false
+        type: string
+        default: "Stripe,Shopify,OpenAI"
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   initialize:
+    name: Validate + orchestrate all systems
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Start All Bots and Systems
-      run: |
-        echo "Initializing all bots and systems..."
-        # Replace with commands to start your bots and systems
-        ./start_all_bots_and_systems.sh
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Fetch Updates from GitHub
-      run: |
-        echo "Searching public repositories for updates and bot ideas..."
-        # Replace with your script for GitHub search and updates
-        python fetch_updates.py
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-    - name: Sandbox Testing
-      run: |
-        echo "Sandbox testing bots and systems..."
-        # Replace with your script for sandbox testing
-        ./test_bots_in_sandbox.sh
+      - name: Validate repository systems
+        run: |
+          python -m compileall bots scripts core
+          npm ci
+          npm run test -- --passWithNoTests
 
-    - name: Money-Making Tactics
-      run: |
-        echo "Testing and applying money-making tactics..."
-        # Add your script to implement money-making methods here
-        python generate_revenue.py
-
-    - name: AI Self-Learning and Optimization
-      run: |
-        echo "Running self-learning and optimization..."
-        # Add your AI optimization script here
-        python self_learning_ai.py
-
-    - name: Run for 24 Hours
-      run: |
-        echo "This workflow will run continuously for 24 hours..."
-        sleep 86400  # Sleep for 24 hours to emulate long runtime
+      - name: Trigger all core workflows
+        uses: actions/github-script@v7
+        env:
+          RUN_MONITORING: ${{ inputs.run_monitoring || github.event.inputs.run_monitoring || 'false' }}
+          COMPANY_NAMES: ${{ inputs.company_names || github.event.inputs.company_names || 'Stripe,Shopify,OpenAI' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const ref = context.ref.replace('refs/heads/', '');
+            const runMonitoring = String(process.env.RUN_MONITORING || 'false').toLowerCase() === 'true';
+            const companyNames = process.env.COMPANY_NAMES || 'Stripe,Shopify,OpenAI';
+            const workflows = [
+              { id: 'company-lookup.yml', inputs: { companies: companyNames, tier: 'pro' } },
+              { id: 'integration-feedback.yml', inputs: { platform: '24hour Orchestrator', status: 'success', details: '24hour orchestration heartbeat', tier: 'pro' } },
+              { id: 'integration_lookup.yml', inputs: { query: 'ai automation stack' } },
+              { id: 'buddy-system.yml', inputs: { action: 'test', prompt: 'Run buddy-managed checks', run_full_suite: 'true' } },
+            ];
+            if (runMonitoring) {
+              workflows.push({ id: 'timed-monitoring-system.yml', inputs: { dispatch_all_workflows: 'true', run_full_suite: 'false' } });
+            }
+            for (const workflow of workflows) {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflow.id,
+                ref,
+                inputs: workflow.inputs,
+              });
+              core.info(`Dispatched ${workflow.id}`);
+            }
