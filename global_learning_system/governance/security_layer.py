@@ -13,6 +13,7 @@ import hmac
 import os
 from dataclasses import dataclass
 from typing import Optional
+from cryptography.fernet import Fernet, InvalidToken
 
 
 @dataclass
@@ -28,13 +29,8 @@ class SecurityLayer:
     """
     Lightweight encryption and HMAC-signing layer for the governance service.
 
-    This implementation uses HMAC-SHA256 for integrity checking and a
-    simple XOR + Base64 scheme **strictly as a placeholder**.
-
-    .. warning::
-        The XOR cipher is NOT cryptographically secure and MUST be replaced
-        with a battle-tested library (e.g. ``cryptography.fernet``) before
-        any production use.  Do not use this class to protect real secrets.
+    This implementation uses Fernet (AES-128-CBC + HMAC-SHA256) for
+    authenticated encryption and HMAC-SHA256 for message signing.
 
     Parameters
     ----------
@@ -44,10 +40,12 @@ class SecurityLayer:
         Label for the current key (used for key-rotation tracking).
     """
 
-    ALGORITHM = "HMAC-SHA256+XOR-B64"
+    ALGORITHM = "FERNET+HMAC-SHA256"
 
     def __init__(self, secret_key: Optional[bytes] = None, key_id: str = "default"):
         self._key: bytes = secret_key if secret_key is not None else os.urandom(32)
+        self._fernet_key: bytes = self._to_fernet_key(self._key)
+        self._fernet = Fernet(self._fernet_key)
         self.key_id = key_id
 
     # ------------------------------------------------------------------
@@ -62,9 +60,7 @@ class SecurityLayer:
         ----------
         plaintext : str
         """
-        data = plaintext.encode()
-        xored = bytes(b ^ self._key[i % len(self._key)] for i, b in enumerate(data))
-        ciphertext = base64.urlsafe_b64encode(xored).decode()
+        ciphertext = self._fernet.encrypt(plaintext.encode()).decode()
         return EncryptedPayload(
             ciphertext=ciphertext,
             key_id=self.key_id,
@@ -79,9 +75,10 @@ class SecurityLayer:
         ----------
         payload : EncryptedPayload
         """
-        xored = base64.urlsafe_b64decode(payload.ciphertext.encode())
-        data = bytes(b ^ self._key[i % len(self._key)] for i, b in enumerate(xored))
-        return data.decode()
+        try:
+            return self._fernet.decrypt(payload.ciphertext.encode()).decode()
+        except InvalidToken as exc:
+            raise ValueError("Invalid ciphertext or key material.") from exc
 
     def sign(self, message: str) -> str:
         """
@@ -121,4 +118,16 @@ class SecurityLayer:
             Label for the new key.
         """
         self._key = new_key
+        self._fernet_key = self._to_fernet_key(new_key)
+        self._fernet = Fernet(self._fernet_key)
         self.key_id = new_key_id
+
+    @staticmethod
+    def _to_fernet_key(key_material: bytes) -> bytes:
+        """
+        Convert arbitrary key material into a valid 32-byte Fernet key.
+
+        Fernet expects URL-safe base64 encoded 32-byte key bytes.
+        """
+        digest = hashlib.sha256(key_material).digest()
+        return base64.urlsafe_b64encode(digest)

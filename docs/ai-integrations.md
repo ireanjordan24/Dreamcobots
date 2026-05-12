@@ -15,14 +15,13 @@ and repository secrets.
 | Google Gemini | `GEMINI_API_KEY` | <https://ai.google.dev/docs> |
 | GitHub PAT | `GITHUB_PAT` | <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens> |
 
-The workflow file is at
-`.github/workflows/ai-service-integration.yml` and runs automatically on:
+Current AI-adjacent automation workflows in this repository are:
 
-- every push to the `main` branch, and
-- pull requests that have the `ai-review` label applied.
+- `.github/workflows/integration-feedback.yml`
+- `.github/workflows/company-lookup.yml`
 
-It can also be triggered manually from the **Actions** tab via
-*workflow_dispatch*.
+Both workflows support `workflow_dispatch` and can be triggered manually
+from the **Actions** tab.
 
 ---
 
@@ -82,17 +81,14 @@ gh secret set GEMINI_API_KEY  --body "AIza..."
 
 ## 3 — Workflow behaviour
 
-When the workflow runs it:
+When the workflows run they:
 
-1. **Checks out** the repository.
-2. **Calls Claude** — sends a short prompt to
-   `https://api.anthropic.com/v1/messages` and prints the response.
-3. **Calls ChatGPT** — sends a short prompt to
-   `https://api.openai.com/v1/chat/completions` and prints the response.
-4. **Calls Google Gemini** — sends a short prompt to the Gemini 1.5 Flash
-   endpoint (key passed via `x-goog-api-key` header) and prints the response.
-5. Each step **skips gracefully** if its secret is not configured, so the
-   workflow never fails just because a single key is missing.
+1. **Check out** the repository.
+2. **Set up Python** and install dependencies.
+3. **Run bot automation logic** (integration logging or company lookup).
+4. **Persist generated data artifacts** (`data/integration_log.json` or
+   `data/companies.json`) back to the repository when changed.
+5. **Notify Slack on failures** when webhook secrets are configured.
 
 Adapt the prompt strings inside each `curl` call to suit your use-case (e.g.
 pass repo metadata, file diffs, or issue text as context).
@@ -156,11 +152,13 @@ files for security.
 
 ---
 
-## 6 — Trigger the workflow manually
+## 6 — Trigger workflows manually
 
 ```bash
 # Requires gh CLI and the GITHUB_PAT to be configured
-gh workflow run ai-service-integration.yml --repo DreamCo-Technologies/Dreamcobots
+gh workflow run integration-feedback.yml --repo DreamCo-Technologies/Dreamcobots
+gh workflow run company-lookup.yml --repo DreamCo-Technologies/Dreamcobots
 ```
 
-Or open **Actions → AI Service Integration → Run workflow** in the GitHub UI.
+Or open **Actions** in the GitHub UI and use **Run workflow** on either:
+**Integration Feedback Bot** or **Company Lookup Bot**.

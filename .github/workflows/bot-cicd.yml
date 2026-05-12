@@ -1,0 +1,49 @@
+name: Bot CI/CD Control Plane
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run JavaScript tests
+        run: npm run test
+
+      - name: Run focused Python orchestration tests
+        run: |
+          python -m pytest tests/test_buddy_orchestrator.py tests/test_control_tower.py -q
+
+      - name: Framework compliance report
+        run: python tools/check_bot_framework.py --no-strict
+
+      - name: Data integrity gate
+        run: python .github/scripts/check_data_integrity.py --base HEAD~1 --head HEAD
+
+      - name: AI fluency gate
+        run: python .github/scripts/check_ai_fluency.py

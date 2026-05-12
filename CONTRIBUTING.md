@@ -14,7 +14,8 @@ automated — **must** follow the guidelines below.
 4. [Required Framework Integration Checklist](#required-framework-integration-checklist)
 5. [Testing Requirements](#testing-requirements)
 6. [Static Analysis](#static-analysis)
-7. [Pull Request Process](#pull-request-process)
+7. [AI Fluency Model](#ai-fluency-model)
+8. [Pull Request Process](#pull-request-process)
 
 ---
 
@@ -217,6 +218,33 @@ and `Fiverr_bots/` and report any file that lacks a reference to
 
 > **PRs that introduce new bot files failing the static analysis check will
 > not be merged.**
+
+---
+
+## AI Fluency Model
+
+This repository applies an AI fluency model to ensure changes improve
+production-grade AI operations, not just feature velocity.
+
+### Fluency dimensions
+
+- **Governance** — policy, compliance, security, auditability
+- **Automation** — reproducible workflows and quality gates
+- **Observability** — orchestration status, heartbeat, analytics, run visibility
+- **Enablement** — onboarding, mentorship, and advocacy outcomes
+
+### Fluency expectations for PRs
+
+- Every non-trivial PR should demonstrate impact in at least **two**
+  fluency dimensions.
+- Governance-sensitive changes must include explicit evidence of policy or
+  safety consideration.
+- Workflow or orchestration changes must preserve or improve traceability.
+
+### Automated fluency check
+
+The repository includes `.github/scripts/check_ai_fluency.py`, executed by
+the CI workflow, to score changed files against these dimensions.
 
 ---
 

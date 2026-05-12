@@ -453,6 +453,37 @@ class TestBuddyOrchestratorIntegration:
         assert opt["top_bots"][0]["bot_id"] == "sales_bot"
 
 
+class TestBuddyOrchestratorEnablement:
+    def test_advocacy_metrics_update(self, orch):
+        orch.register_champion("champ-1", "Alex")
+        orch.record_mentorship_completion("champ-1", count=2)
+        orch.record_referral_conversion("champ-1", count=1)
+        metrics = orch.advocacy_metrics()
+        assert metrics["champion_count"] == 1
+        assert metrics["mentorship_completions"] == 2
+        assert metrics["referral_conversions"] == 1
+
+    def test_onboarding_metrics_rollup(self, orch):
+        orch.record_onboarding("contributors", "dev-1", "policy_read", completed=True)
+        orch.record_onboarding("operators", "ops-1", "heartbeat_setup", completed=True)
+        orch.record_onboarding("end_users", "user-1", "role_setup", completed=False)
+        metrics = orch.onboarding_metrics()
+        assert metrics["contributors"]["completed"] == 1
+        assert metrics["operators"]["completed"] == 1
+        assert metrics["end_users"]["completed"] == 0
+
+    def test_ai_fluency_status_keys(self, orch):
+        status = orch.ai_fluency_status()
+        for key in ("level", "score", "max_score", "governance_score", "onboarding_completion_average", "champion_count"):
+            assert key in status
+
+    def test_status_includes_fluency_and_governance(self, orch):
+        s = orch.status()
+        assert "governance_score" in s
+        assert "open_governance_alerts" in s
+        assert "ai_fluency_level" in s
+
+
 # ===========================================================================
 # Post-merge recovery
 # ===========================================================================

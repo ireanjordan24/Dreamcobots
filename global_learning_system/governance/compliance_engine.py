@@ -146,10 +146,67 @@ class ComplianceEngine:
         """
         Apply each active policy rule.
 
-        The default implementation permits all actions. In production,
-        each policy would apply its own rule set.
+        Each active policy contributes a rule-based decision.
+        All active policies must pass for an action to be permitted.
         """
+        actor_norm = (actor or "").strip().lower()
+        action_norm = (action or "").strip().lower()
+        resource_norm = (resource or "").strip().lower()
+
+        for policy in self.active_policies:
+            if not self._policy_allows(policy, actor_norm, action_norm, resource_norm):
+                return False
         return True
+
+    def _policy_allows(
+        self,
+        policy: str,
+        actor: str,
+        action: str,
+        resource: str,
+    ) -> bool:
+        """Evaluate one policy against the request tuple."""
+        if policy == POLICY_GDPR:
+            # Block anonymous access to sensitive personal data.
+            if self._is_sensitive_resource(resource) and actor in {"", "anonymous", "unknown"}:
+                return False
+            # Block bulk export actions on personal data without identified actor.
+            if "export" in action and self._is_sensitive_resource(resource) and actor.startswith("svc_"):
+                return False
+            return True
+
+        if policy == POLICY_HIPAA:
+            # PHI operations must be done by explicit clinical/compliance/admin actors.
+            if self._is_phi_resource(resource):
+                allowed_prefixes = ("clinician:", "compliance:", "admin")
+                return actor.startswith(allowed_prefixes)
+            return True
+
+        if policy == POLICY_SOC2:
+            # Only admins can mutate governance-critical assets.
+            guarded_resources = ("audit_log", "governance", "security_config", "compliance_config")
+            if any(gr in resource for gr in guarded_resources):
+                return actor.startswith("admin")
+            return True
+
+        if policy == POLICY_ISO27001:
+            # Explicitly block security bypass actions.
+            denied_tokens = ("disable_security", "bypass", "disable_audit", "disable_encryption")
+            if any(t in action for t in denied_tokens):
+                return False
+            return True
+
+        return True
+
+    @staticmethod
+    def _is_sensitive_resource(resource: str) -> bool:
+        tokens = ("pii", "personal_data", "customer_data", "identity", "email", "phone", "ssn")
+        return any(t in resource for t in tokens)
+
+    @staticmethod
+    def _is_phi_resource(resource: str) -> bool:
+        tokens = ("phi", "patient", "medical_record", "diagnosis", "treatment")
+        return any(t in resource for t in tokens)
 
     def _log(self, actor: str, action: str, resource: str, outcome: str, metadata: Optional[Dict[str, Any]] = None) -> AuditEntry:
         self._event_counter += 1

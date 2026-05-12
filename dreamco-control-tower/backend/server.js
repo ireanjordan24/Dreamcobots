@@ -62,31 +62,35 @@ function writeBots(bots) {
   fs.writeFileSync(BOTS_FILE, JSON.stringify(bots, null, 2));
 }
 
-// ---------------------------------------------------------------------------
-// Heartbeat endpoint
-// Bots POST here to signal they are online and operational.
-// ---------------------------------------------------------------------------
-app.post('/api/bot-heartbeat', (req, res) => {
-  const { botName, status = 'active' } = req.body;
+function handleBotHeartbeat(req, res) {
+  const { botName, bot, status = 'active' } = req.body;
+  const normalizedBotName = botName || bot;
 
-  if (!botName) {
+  if (!normalizedBotName) {
     return res.status(400).json({ error: 'botName is required' });
   }
 
   const bots = readBots();
-  const bot = bots.find((b) => b.name === botName);
+  const botRecord = bots.find((b) => b.name === normalizedBotName);
 
-  if (!bot) {
-    return res.status(404).json({ error: `Bot '${botName}' not found` });
+  if (!botRecord) {
+    return res.status(404).json({ error: `Bot '${normalizedBotName}' not found` });
   }
 
-  bot.lastHeartbeat = new Date().toISOString();
-  bot.status = status;
+  botRecord.lastHeartbeat = new Date().toISOString();
+  botRecord.status = status;
   writeBots(bots);
 
-  console.log(`💓 Heartbeat received from ${botName} — status: ${status}`);
-  return res.json({ status: 'updated', bot: botName, lastHeartbeat: bot.lastHeartbeat });
-});
+  console.log(`💓 Heartbeat received from ${normalizedBotName} — status: ${status}`);
+  return res.json({ status: 'updated', bot: normalizedBotName, lastHeartbeat: botRecord.lastHeartbeat });
+}
+
+// ---------------------------------------------------------------------------
+// Heartbeat endpoint
+// Bots POST here to signal they are online and operational.
+// ---------------------------------------------------------------------------
+app.post('/api/bot-heartbeat', handleBotHeartbeat);
+app.post('/api/heartbeat/ping', handleBotHeartbeat);
 
 // ---------------------------------------------------------------------------
 // GitHub webhook endpoint
@@ -215,7 +219,9 @@ async function fetchGitHubWorkflowRuns(repo, token) {
       'User-Agent': 'dreamco-control-tower',
       Accept: 'application/vnd.github+json',
     };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
     const url = new URL(
       `/repos/${repo}/actions/runs?per_page=${ACTIONS_PER_PAGE}`,

@@ -98,17 +98,26 @@ class HeartbeatClient:
         """
         payload = {
             "bot": bot_name,
+            "botName": bot_name,
             "status": status,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             **(metadata or {}),
         }
-        result = _http_post(f"{self._url}/api/heartbeat/ping", payload)
+        result = _http_post(f"{self._url}/api/bot-heartbeat", payload)
+        if "error" in result and result.get("status_code") == 404:
+            # Backward-compatible fallback for older Control Tower API routes.
+            result = _http_post(f"{self._url}/api/heartbeat/ping", payload)
         return result
 
     def tower_alive(self) -> bool:
         """Return ``True`` if the Control Tower backend responds to its heartbeat endpoint."""
-        resp = _http_get(f"{self._url}/api/heartbeat")
-        return resp.get("status") == "ok"
+        # Modern endpoint
+        resp = _http_get(f"{self._url}/api/status")
+        if resp.get("dashboard"):
+            return True
+        # Backward-compatible endpoint
+        legacy = _http_get(f"{self._url}/api/heartbeat")
+        return legacy.get("status") == "ok"
 
 
 # ---------------------------------------------------------------------------

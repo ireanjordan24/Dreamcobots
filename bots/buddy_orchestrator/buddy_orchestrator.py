@@ -50,6 +50,7 @@ from typing import Any, Callable, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from bots.buddy_orchestrator.data_scrape_lifecycle import DataScrapeLifecycle
+from bots.global_ai_learning_matrix.governance import GovernanceLayer
 
 try:
     from framework import GlobalAISourcesFlow  # noqa: F401
@@ -239,6 +240,21 @@ class BuddyOrchestrator:
         # Aggregated data store (key → value)
         self._data_store: dict[str, Any] = {}
 
+        # Platform governance contract (policy registry + alert scoring)
+        self._governance = GovernanceLayer()
+
+        # AI advocacy (champions) state
+        self._champions: dict[str, dict[str, Any]] = {}
+        self._mentorship_completions: int = 0
+        self._referral_conversions: int = 0
+
+        # Unified onboarding state
+        self._onboarding: dict[str, dict[str, dict[str, Any]]] = {
+            "contributors": {},
+            "operators": {},
+            "end_users": {},
+        }
+
         # Scraping lifecycle
         self.scrape_lifecycle = (
             DataScrapeLifecycle(deadline=scrape_deadline)
@@ -412,6 +428,7 @@ class BuddyOrchestrator:
         successful_runs = sum(1 for r in self._run_history if r.success)
         total_revenue = sum(self._revenue.values())
         live_bots = sum(1 for s in self._catalog.values() if s.is_live)
+        governance_report = self._governance.audit_report()
 
         return {
             "timestamp": datetime.now(tz=timezone.utc).isoformat(),
@@ -428,8 +445,166 @@ class BuddyOrchestrator:
                 "total_usd": round(total_revenue, 2),
                 "by_bot": {k: round(v, 2) for k, v in self._revenue.items()},
             },
+            "governance": governance_report,
+            "advocacy": self.advocacy_metrics(),
+            "onboarding": self.onboarding_metrics(),
+            "ai_fluency": self.ai_fluency_status(),
             "scraping": self.scrape_lifecycle.summary(),
             "data_store": dict(self._data_store),
+        }
+
+    # ------------------------------------------------------------------
+    # Governance / advocacy / onboarding
+    # ------------------------------------------------------------------
+
+    def raise_governance_alert(self, policy_id: str, message: str) -> dict:
+        """Raise a governance alert using the platform policy registry."""
+        alert = self._governance.raise_alert(policy_id, message)
+        return {
+            "alert_id": alert.alert_id,
+            "policy_id": alert.policy_id,
+            "message": alert.message,
+            "severity": alert.severity,
+            "resolved": alert.resolved,
+        }
+
+    def resolve_governance_alert(self, alert_id: str) -> dict:
+        """Resolve a governance alert."""
+        self._governance.resolve_alert(alert_id)
+        return {"alert_id": alert_id, "resolved": True}
+
+    def register_champion(self, champion_id: str, name: str = "") -> dict:
+        """Register an AI champion in the platform advocacy system."""
+        if champion_id not in self._champions:
+            self._champions[champion_id] = {
+                "champion_id": champion_id,
+                "name": name or champion_id,
+                "mentorship_completions": 0,
+                "referral_conversions": 0,
+                "registered_at": datetime.now(tz=timezone.utc).isoformat(),
+            }
+        return dict(self._champions[champion_id])
+
+    def record_mentorship_completion(self, champion_id: str, count: int = 1) -> dict:
+        """Record completed mentorship sessions for a champion."""
+        if champion_id not in self._champions:
+            self.register_champion(champion_id)
+        increment = max(0, int(count))
+        self._champions[champion_id]["mentorship_completions"] += increment
+        self._mentorship_completions += increment
+        return dict(self._champions[champion_id])
+
+    def record_referral_conversion(self, champion_id: str, count: int = 1) -> dict:
+        """Record successful referral conversions for a champion."""
+        if champion_id not in self._champions:
+            self.register_champion(champion_id)
+        increment = max(0, int(count))
+        self._champions[champion_id]["referral_conversions"] += increment
+        self._referral_conversions += increment
+        return dict(self._champions[champion_id])
+
+    def advocacy_metrics(self) -> dict:
+        """Return platform AI advocacy KPIs."""
+        champions = len(self._champions)
+        conversion_rate = (
+            round(self._referral_conversions / self._mentorship_completions, 3)
+            if self._mentorship_completions
+            else 0.0
+        )
+        return {
+            "champion_count": champions,
+            "mentorship_completions": self._mentorship_completions,
+            "referral_conversions": self._referral_conversions,
+            "referral_conversion_rate": conversion_rate,
+        }
+
+    def record_onboarding(
+        self,
+        audience: str,
+        subject_id: str,
+        stage: str,
+        completed: bool = False,
+    ) -> dict:
+        """
+        Record onboarding progress for contributors, operators, and end-users.
+        """
+        if audience not in self._onboarding:
+            raise OrchestratorError(
+                f"Unknown onboarding audience '{audience}'. "
+                "Expected one of: contributors, operators, end_users."
+            )
+        records = self._onboarding[audience]
+        current = records.get(subject_id, {
+            "subject_id": subject_id,
+            "stages": [],
+            "completed": False,
+            "updated_at": None,
+        })
+        if stage not in current["stages"]:
+            current["stages"].append(stage)
+        current["completed"] = current["completed"] or bool(completed)
+        current["updated_at"] = datetime.now(tz=timezone.utc).isoformat()
+        records[subject_id] = current
+        return dict(current)
+
+    def onboarding_metrics(self) -> dict:
+        """Return onboarding KPI rollups by audience."""
+        summary: dict[str, dict[str, Any]] = {}
+        for audience, entries in self._onboarding.items():
+            total = len(entries)
+            completed = sum(1 for e in entries.values() if e.get("completed"))
+            summary[audience] = {
+                "total": total,
+                "completed": completed,
+                "completion_rate": round((completed / total), 3) if total else 0.0,
+            }
+        return summary
+
+    def ai_fluency_status(self) -> dict:
+        """
+        Return repository-level AI fluency status derived from governance,
+        onboarding, and advocacy indicators.
+        """
+        governance = self._governance.audit_report()
+        onboarding = self.onboarding_metrics()
+        advocacy = self.advocacy_metrics()
+
+        onboarding_avg = (
+            onboarding["contributors"]["completion_rate"]
+            + onboarding["operators"]["completion_rate"]
+            + onboarding["end_users"]["completion_rate"]
+        ) / 3
+
+        score = 0
+        if governance["governance_score"] >= 80:
+            score += 2
+        elif governance["governance_score"] >= 60:
+            score += 1
+        if advocacy["champion_count"] > 0:
+            score += 1
+        if advocacy["referral_conversions"] > 0:
+            score += 1
+        if onboarding_avg >= 0.8:
+            score += 2
+        elif onboarding_avg >= 0.4:
+            score += 1
+
+        if score >= 6:
+            level = "expert"
+        elif score >= 4:
+            level = "advanced"
+        elif score >= 2:
+            level = "intermediate"
+        else:
+            level = "foundational"
+
+        return {
+            "level": level,
+            "score": score,
+            "max_score": 6,
+            "governance_score": governance["governance_score"],
+            "onboarding_completion_average": round(onboarding_avg, 3),
+            "champion_count": advocacy["champion_count"],
         }
 
     # ------------------------------------------------------------------
@@ -619,6 +794,8 @@ class BuddyOrchestrator:
 
     def status(self) -> dict:
         """Return a high-level orchestrator health snapshot."""
+        governance = self._governance.audit_report()
+        fluency = self.ai_fluency_status()
         return {
             "orchestrator": "BuddyOrchestrator",
             "github_repo": self.github_repo,
@@ -628,4 +805,7 @@ class BuddyOrchestrator:
             "days_until_deadline": self.scrape_lifecycle.days_remaining(),
             "total_runs": len(self._run_history),
             "total_revenue_usd": round(sum(self._revenue.values()), 2),
+            "governance_score": governance["governance_score"],
+            "open_governance_alerts": governance["open_alerts"],
+            "ai_fluency_level": fluency["level"],
         }
