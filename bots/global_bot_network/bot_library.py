@@ -343,6 +343,30 @@ _DREAMCO_BOTS: list[BotEntry] = [
         capabilities=["conversation", "nlp", "intent_detection"],
     ),
     BotEntry(
+        bot_id="ai_enablement_hub",
+        display_name="AI Enablement Hub",
+        description=(
+            "State-of-the-art AI adoption scaling hub. Implements five core "
+            "enablement pillars: Advocates Program, Policies & Guardrails, "
+            "Learning & Development, Data-driven Metrics (MAU/segmentation), "
+            "and Communities of Practice — plus dynamic Bot Tier Classifier "
+            "and Retraining Optimizer for continuous performance improvement."
+        ),
+        category=BotCategory.AI,
+        module_path="bots.ai_enablement_hub.ai_enablement_hub",
+        class_name="AIEnablementHub",
+        capabilities=[
+            "ai_advocates_program",
+            "policies_guardrails",
+            "learning_development",
+            "data_metrics_mau",
+            "communities_of_practice",
+            "bot_tier_classifier",
+            "retraining_optimizer",
+            "adoption_maturity_scoring",
+        ],
+    ),
+    BotEntry(
         bot_id="ai_learning_system",
         display_name="AI Learning System",
         description="Adaptive learning engine that evolves bot capabilities over time.",
