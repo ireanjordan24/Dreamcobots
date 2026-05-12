@@ -54,6 +54,8 @@ from bots.buddy_core.tiers import (
     FEATURE_WHITE_LABEL,
     FEATURE_CUSTOM_ENCRYPTION,
     FEATURE_ENTERPRISE_LOGS,
+    FEATURE_TOOL_SCRAPER,
+    FEATURE_TOOL_REPLICATION,
 )
 from bots.buddy_core.intent_parser import IntentParser, IntentType, Industry, ParsedIntent
 from bots.buddy_core.tool_db import ToolDB, Tool
@@ -65,6 +67,8 @@ from bots.buddy_core.privacy_engine import (
     ActionCategory,
 )
 from bots.buddy_core.lead_engine import LeadEngine, LeadSource
+from bots.buddy_core.tool_scraper import ToolScraper, ToolProfile
+from bots.buddy_core.tool_replication import ToolReplicationEngine, ReplicatedTool
 
 
 # ---------------------------------------------------------------------------
@@ -102,6 +106,8 @@ class BuddyCore:
         self._feedback_loop = FeedbackLoop()
         self._privacy_engine = PrivacyEngine()
         self._lead_engine = LeadEngine()
+        self._tool_scraper = ToolScraper()
+        self._replication_engine = ToolReplicationEngine()
 
     # ------------------------------------------------------------------
     # Tier / Feature guards
@@ -264,6 +270,148 @@ class BuddyCore:
         self._require(FEATURE_PRIVACY_VAULT)
         token = self._privacy_engine.vault.store(key, value, user_id)
         return {"status": "stored", "token": token, "user_id": user_id}
+
+    # ------------------------------------------------------------------
+    # Tool Scraper & Replication
+    # ------------------------------------------------------------------
+
+    def scrape_tool(
+        self,
+        tool_name: str,
+        description: str,
+        base_url: str | None = None,
+        extra_keywords: list[str] | None = None,
+        is_open_source: bool = False,
+        has_free_tier: bool = True,
+    ) -> dict:
+        """
+        Analyze an external tool and return its capability profile.
+
+        Requires the ``tool_scraper`` feature (PRO tier and above).
+
+        Parameters
+        ----------
+        tool_name : str
+            Human-readable name of the tool (e.g. ``"Zapier"``).
+        description : str
+            One or two sentence description of what the tool does.
+        base_url : str, optional
+            Base API endpoint URL.
+        extra_keywords : list[str], optional
+            Additional keywords for capability detection.
+        is_open_source : bool
+        has_free_tier : bool
+
+        Returns
+        -------
+        dict
+            Serialised :class:`~bots.buddy_core.tool_scraper.ToolProfile`.
+        """
+        self._require(FEATURE_TOOL_SCRAPER)
+        profile = self._tool_scraper.analyze(
+            tool_name=tool_name,
+            description=description,
+            base_url=base_url,
+            extra_keywords=extra_keywords,
+            is_open_source=is_open_source,
+            has_free_tier=has_free_tier,
+        )
+        return profile.to_dict()
+
+    def scrape_known_tool(self, platform_name: str) -> dict:
+        """
+        Analyze a pre-catalogued platform by name.
+
+        Requires the ``tool_scraper`` feature (PRO tier and above).
+
+        Parameters
+        ----------
+        platform_name : str
+            Case-insensitive name of the known platform (e.g. ``"zapier"``).
+
+        Returns
+        -------
+        dict
+            Serialised :class:`~bots.buddy_core.tool_scraper.ToolProfile`,
+            or ``{"error": ...}`` if the platform is not in the catalogue.
+        """
+        self._require(FEATURE_TOOL_SCRAPER)
+        profile = self._tool_scraper.analyze_known_platform(platform_name)
+        if profile is None:
+            known = self._tool_scraper.list_known_platforms()
+            return {
+                "error": f"Unknown platform '{platform_name}'.",
+                "known_platforms": known,
+            }
+        return profile.to_dict()
+
+    def replicate_tool(
+        self,
+        tool_name: str,
+        description: str,
+        base_url: str | None = None,
+        extra_keywords: list[str] | None = None,
+        is_open_source: bool = False,
+        has_free_tier: bool = True,
+    ) -> dict:
+        """
+        Analyze an external tool and generate a Buddy-native equivalent.
+
+        Requires the ``tool_replication`` feature (ENTERPRISE tier).
+
+        Returns
+        -------
+        dict
+            Serialised :class:`~bots.buddy_core.tool_replication.ReplicatedTool`
+            including ``source_code``.
+        """
+        self._require(FEATURE_TOOL_REPLICATION)
+        profile = self._tool_scraper.analyze(
+            tool_name=tool_name,
+            description=description,
+            base_url=base_url,
+            extra_keywords=extra_keywords,
+            is_open_source=is_open_source,
+            has_free_tier=has_free_tier,
+        )
+        replica = self._replication_engine.replicate(profile)
+        result = replica.to_dict()
+        result["source_code"] = replica.source_code
+        return result
+
+    def replicate_known_tool(self, platform_name: str) -> dict:
+        """
+        Replicate a pre-catalogued platform by name.
+
+        Requires the ``tool_replication`` feature (ENTERPRISE tier).
+
+        Parameters
+        ----------
+        platform_name : str
+            Case-insensitive name of the known platform (e.g. ``"zapier"``).
+
+        Returns
+        -------
+        dict
+            Serialised :class:`~bots.buddy_core.tool_replication.ReplicatedTool`
+            including ``source_code``, or ``{"error": ...}`` if unknown.
+        """
+        self._require(FEATURE_TOOL_REPLICATION)
+        profile = self._tool_scraper.analyze_known_platform(platform_name)
+        if profile is None:
+            known = self._tool_scraper.list_known_platforms()
+            return {
+                "error": f"Unknown platform '{platform_name}'.",
+                "known_platforms": known,
+            }
+        replica = self._replication_engine.replicate(profile)
+        result = replica.to_dict()
+        result["source_code"] = replica.source_code
+        return result
+
+    def list_replicable_platforms(self) -> list[str]:
+        """Return the list of pre-catalogued platforms available for replication."""
+        return self._tool_scraper.list_known_platforms()
 
     # ------------------------------------------------------------------
     # Dashboard
