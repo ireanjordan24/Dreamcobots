@@ -160,6 +160,61 @@ class BaseBot(abc.ABC):
         }
 
     # ------------------------------------------------------------------
+    # Monetization
+    # ------------------------------------------------------------------
+
+    def monetize(self, amount: float = 0.0, source: str = "default") -> dict:
+        """
+        Record a revenue event and return a monetization summary.
+
+        Parameters
+        ----------
+        amount : float
+            Revenue amount to record (USD).
+        source : str
+            Label describing the revenue source (e.g. ``"subscription"``,
+            ``"api_call"``, ``"marketplace"``).
+
+        Returns
+        -------
+        dict
+            ``bot_id``, ``amount``, ``source``, ``total_revenue``.
+        """
+        if amount < 0:
+            raise ValueError("amount must be non-negative")
+        self.revenue += amount
+        return {
+            "bot_id": self.bot_id,
+            "amount": amount,
+            "source": source,
+            "total_revenue": self.revenue,
+        }
+
+    # ------------------------------------------------------------------
+    # Reporting
+    # ------------------------------------------------------------------
+
+    def report(self) -> dict:
+        """
+        Return a structured status/performance report for this bot.
+
+        Returns
+        -------
+        dict
+            ``bot_id``, ``name``, ``category``, ``version``,
+            ``total_revenue``, ``log_entries``, ``running``.
+        """
+        return {
+            "bot_id": self.bot_id,
+            "name": self.name,
+            "category": self.category,
+            "version": self.version,
+            "total_revenue": self.revenue,
+            "log_entries": len(self._logs),
+            "running": self._running,
+        }
+
+    # ------------------------------------------------------------------
     # Validation
     # ------------------------------------------------------------------
 
