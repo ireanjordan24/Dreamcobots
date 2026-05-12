@@ -28,7 +28,7 @@ Welcome to **DreamCobots** — a versatile, user-friendly platform for automatio
 
 ```bash
 # Clone the repo
-git clone https://github.com/ireanjordan24/Dreamcobots.git
+git clone https://github.com/DreamCo-Technologies/Dreamcobots.git
 cd Dreamcobots
 
 # Install deps for a specific bot
@@ -46,6 +46,44 @@ docker run --rm selenium-job-bot
 ```
 
 See [MARKETING.md](MARKETING.md) for promotion strategies and platform integration guides (Zapier, N8n, Make.com).
+
+---
+## 🧠 DreamCo AI Enablement Architecture
+
+DreamCo is built as a full **AI Operating System** — AI is embedded into workflows,
+governance, onboarding, metrics, collaboration, automation, and leadership.
+
+### AI Enablement Hub
+The [AI Enablement Hub](bots/ai_enablement_hub/) is the central governance platform:
+
+| Pillar | What it provides |
+|--------|-----------------|
+| **Advocates Network** | DreamCo Advocate Program with roles & training |
+| **Policies & Guardrails** | 10 vetted AI policies (security, usage, automation) |
+| **Learning Development** | 8 structured resources from beginner to advanced |
+| **Data Metrics** | MAU tracking, user segmentation, maturity assessment |
+| **Community of Practice** | 7 collaboration channels |
+| **BotTierClassifier** *(ENTERPRISE)* | Auto-classify bots by feature tier |
+| **RetrainingOptimizer** *(ENTERPRISE)* | Detect accuracy drift & schedule retraining |
+
+**Run the AI Enablement Hub via GitHub Actions:**
+[→ AI Enablement Hub Workflow](https://github.com/DreamCo-Technologies/Dreamcobots/actions/workflows/ai-enablement-hub.yml)
+
+### DreamCo AI For Everyone
+All policies, learning paths, communities, and governance docs live in:
+[`DreamCo_AI_For_Everyone/`](DreamCo_AI_For_Everyone/README.md)
+
+### Governance
+Leadership roles and DRI assignments: [`governance/leadership_roles.md`](governance/leadership_roles.md)
+
+---
+## ⚡ GitHub Actions Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| [Integration Feedback Bot](https://github.com/DreamCo-Technologies/Dreamcobots/actions/workflows/integration-feedback.yml) | push/schedule/manual | Log integration events, auto-heal suggestions |
+| [Company Lookup Bot](https://github.com/DreamCo-Technologies/Dreamcobots/actions/workflows/company-lookup.yml) | manual | Look up company data from Crunchbase/Clearbit |
+| [AI Enablement Hub](https://github.com/DreamCo-Technologies/Dreamcobots/actions/workflows/ai-enablement-hub.yml) | push/schedule/manual | Generate adoption reports, maturity assessment |
 
 ---
 ## GLOBAL AI SOURCES FLOW — Mandatory Architecture
@@ -73,7 +111,7 @@ python tools/check_bot_framework.py
 ## Installation Instructions
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/ireanjordan24/Dreamcobots.git
+   git clone https://github.com/DreamCo-Technologies/Dreamcobots.git
    ```
 2. Navigate to the directory:
    ```bash
