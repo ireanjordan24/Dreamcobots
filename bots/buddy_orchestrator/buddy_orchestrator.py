@@ -41,6 +41,7 @@ Usage
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 from dataclasses import dataclass, field
@@ -389,6 +390,32 @@ class BuddyOrchestrator:
         """Run every registered bot with no specific task.  Returns a list of results."""
         return [self.run_bot(bot_id, runner=runner) for bot_id in list(self._catalog)]
 
+    async def run_all_async(
+        self,
+        runner: Optional[Callable[[str, str], Any]] = None,
+    ) -> list[dict]:
+        """
+        Run every registered bot concurrently using ``asyncio``.
+
+        Each bot is dispatched in its own executor task so that I/O-bound
+        bots overlap and total wall-clock time is minimised.
+
+        Returns
+        -------
+        list[dict]
+            Results in the same format as ``run_bot()``, ordered by
+            completion time.
+        """
+        loop = asyncio.get_event_loop()
+
+        async def _run_one(bot_id: str) -> dict:
+            return await loop.run_in_executor(
+                None, lambda bid=bot_id: self.run_bot(bid, runner=runner)
+            )
+
+        tasks = [_run_one(bot_id) for bot_id in list(self._catalog)]
+        return list(await asyncio.gather(*tasks))
+
     # ------------------------------------------------------------------
     # Data aggregation
     # ------------------------------------------------------------------
@@ -612,6 +639,131 @@ class BuddyOrchestrator:
             raise OrchestratorError(f"Bot '{bot_id}' is not registered.")
         self._catalog[bot_id].is_live = False
         return {"bot_id": bot_id, "is_live": False}
+
+    # ------------------------------------------------------------------
+    # Observability analytics (MAU, API costs, uptime, task efficiency)
+    # ------------------------------------------------------------------
+
+    def analytics(self) -> dict:
+        """
+        Return an observability analytics snapshot.
+
+        Metrics
+        -------
+        mau : int
+            Monthly Active Users — derived from ``active_users`` key
+            ingested via :meth:`ingest`, or 0 if not recorded.
+        api_cost_usd : float
+            Total API cost — derived from ``api_cost_usd`` key ingested
+            via :meth:`ingest`, or 0.0 if not recorded.
+        bot_uptime : dict
+            Per-bot uptime percentage based on run success ratios.
+        task_efficiency : float
+            Percentage of all runs that succeeded (0–100).
+        total_revenue_usd : float
+            Aggregate revenue across all bots.
+
+        Returns
+        -------
+        dict
+            Keys: ``mau``, ``api_cost_usd``, ``bot_uptime``,
+            ``task_efficiency``, ``total_revenue_usd``, ``snapshot_at``.
+        """
+        mau = int(self._data_store.get("active_users", 0))
+        api_cost = float(self._data_store.get("api_cost_usd", 0.0))
+
+        # Per-bot uptime (success ratio)
+        runs_by_bot: dict[str, list[bool]] = {}
+        for record in self._run_history:
+            runs_by_bot.setdefault(record.bot_id, []).append(record.success)
+        bot_uptime = {
+            bot_id: round(
+                sum(successes) / len(successes) * 100, 1
+            )
+            for bot_id, successes in runs_by_bot.items()
+        }
+
+        # Overall task efficiency
+        total_runs = len(self._run_history)
+        successful_runs = sum(1 for r in self._run_history if r.success)
+        task_efficiency = (
+            round(successful_runs / total_runs * 100, 1) if total_runs else 0.0
+        )
+
+        return {
+            "mau": mau,
+            "api_cost_usd": api_cost,
+            "bot_uptime": bot_uptime,
+            "task_efficiency": task_efficiency,
+            "total_revenue_usd": round(sum(self._revenue.values()), 2),
+            "snapshot_at": datetime.now(tz=timezone.utc).isoformat(),
+        }
+
+    # ------------------------------------------------------------------
+    # Marketplace / white-label support
+    # ------------------------------------------------------------------
+
+    def white_label_bot(
+        self,
+        bot_id: str,
+        client_name: str,
+        custom_display_name: str = "",
+        markup_pct: float = 0.0,
+    ) -> dict:
+        """
+        Create a white-label copy of an existing bot for a reseller client.
+
+        A new catalog entry is registered under ``<client_name>/<bot_id>``
+        with an optionally inflated price (``markup_pct``).
+
+        Parameters
+        ----------
+        bot_id : str
+            The source bot to white-label.
+        client_name : str
+            Reseller / client identifier (e.g. ``"acme_corp"``).
+        custom_display_name : str
+            Optional override for the display name.  Defaults to
+            ``"<client_name> - <original display_name>"``.
+        markup_pct : float
+            Percentage price markup to apply on top of the source bot's
+            price (e.g. ``20`` → +20 %).
+
+        Returns
+        -------
+        dict
+            ``white_label_id``, ``source_bot_id``, ``client_name``,
+            ``price_usd``, ``display_name``.
+
+        Raises
+        ------
+        OrchestratorError
+            If *bot_id* is not registered.
+        """
+        if bot_id not in self._catalog:
+            raise OrchestratorError(f"Bot '{bot_id}' is not registered.")
+        source = self._catalog[bot_id]
+        white_label_id = f"{client_name}/{bot_id}"
+        markup = max(0.0, markup_pct)
+        new_price = round(source.price_usd * (1 + markup / 100), 2)
+        display = custom_display_name or f"{client_name} - {source.display_name}"
+        self.register_bot(
+            bot_id=white_label_id,
+            display_name=display,
+            tier=source.tier,
+            category=source.category,
+            description=source.description,
+            price_usd=new_price,
+            features=list(source.features),
+            module_path=source.module_path,
+        )
+        return {
+            "white_label_id": white_label_id,
+            "source_bot_id": bot_id,
+            "client_name": client_name,
+            "price_usd": new_price,
+            "display_name": display,
+        }
 
     # ------------------------------------------------------------------
     # Status snapshot
