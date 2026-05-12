@@ -77,7 +77,9 @@ function isOffPeakHour() {
  * @returns {boolean}
  */
 function isBotDueForUpgrade(botConfig) {
-  if (!botConfig.lastUpdate) return true;
+  if (!botConfig.lastUpdate) {
+    return true;
+  }
   const lastUpdate = new Date(botConfig.lastUpdate).getTime();
   const elapsed = (Date.now() - lastUpdate) / 60_000;
   return elapsed >= MIN_UPGRADE_INTERVAL_MINUTES;
@@ -155,7 +157,9 @@ function commitAndPush(repoPath, message) {
  * @returns {Promise<number|null>}
  */
 async function findExistingPR(botConfig, featureBranch, token) {
-  if (!token) return null;
+  if (!token) {
+    return null;
+  }
   const octokit = new Octokit({ auth: token });
   try {
     const { data } = await octokit.pulls.list({
