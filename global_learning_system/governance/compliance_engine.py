@@ -170,9 +170,11 @@ class ComplianceEngine:
             # Block anonymous access to sensitive personal data.
             if self._is_sensitive_resource(resource) and actor in {"", "anonymous", "unknown"}:
                 return False
-            # Block bulk export actions on personal data without identified actor.
-            if "export" in action and self._is_sensitive_resource(resource) and actor.startswith("svc_"):
-                return False
+            # Restrict bulk exports of personal data to compliance/admin actors.
+            if "export" in action and self._is_sensitive_resource(resource):
+                allowed_export_actors = ("compliance:", "admin", "svc_compliance")
+                if not actor.startswith(allowed_export_actors):
+                    return False
             return True
 
         if policy == POLICY_HIPAA:

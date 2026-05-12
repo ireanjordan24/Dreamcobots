@@ -67,9 +67,9 @@ def _changed_files() -> list[Path]:
         capture_output=True,
         text=True,
     )
-    files = set(
-        p.strip() for p in primary.stdout.splitlines() if p.strip()
-    ) if primary.returncode == 0 else set()
+    files: set[str] = set()
+    if primary.returncode == 0:
+        files = {p.strip() for p in primary.stdout.splitlines() if p.strip()}
 
     fallback = subprocess.run(
         ["git", "diff", "--name-only", "HEAD"],

@@ -429,6 +429,13 @@ class BuddyOrchestrator:
         total_revenue = sum(self._revenue.values())
         live_bots = sum(1 for s in self._catalog.values() if s.is_live)
         governance_report = self._governance.audit_report()
+        advocacy = self.advocacy_metrics()
+        onboarding = self.onboarding_metrics()
+        fluency = self.ai_fluency_status(
+            governance_report=governance_report,
+            advocacy=advocacy,
+            onboarding=onboarding,
+        )
 
         return {
             "timestamp": datetime.now(tz=timezone.utc).isoformat(),
@@ -446,9 +453,9 @@ class BuddyOrchestrator:
                 "by_bot": {k: round(v, 2) for k, v in self._revenue.items()},
             },
             "governance": governance_report,
-            "advocacy": self.advocacy_metrics(),
-            "onboarding": self.onboarding_metrics(),
-            "ai_fluency": self.ai_fluency_status(),
+            "advocacy": advocacy,
+            "onboarding": onboarding,
+            "ai_fluency": fluency,
             "scraping": self.scrape_lifecycle.summary(),
             "data_store": dict(self._data_store),
         }
@@ -560,19 +567,24 @@ class BuddyOrchestrator:
             }
         return summary
 
-    def ai_fluency_status(self) -> dict:
+    def ai_fluency_status(
+        self,
+        governance_report: Optional[dict] = None,
+        advocacy: Optional[dict] = None,
+        onboarding: Optional[dict] = None,
+    ) -> dict:
         """
         Return repository-level AI fluency status derived from governance,
         onboarding, and advocacy indicators.
         """
-        governance = self._governance.audit_report()
-        onboarding = self.onboarding_metrics()
-        advocacy = self.advocacy_metrics()
+        governance = governance_report or self._governance.audit_report()
+        onboarding_data = onboarding or self.onboarding_metrics()
+        advocacy_data = advocacy or self.advocacy_metrics()
 
         onboarding_avg = (
-            onboarding["contributors"]["completion_rate"]
-            + onboarding["operators"]["completion_rate"]
-            + onboarding["end_users"]["completion_rate"]
+            onboarding_data["contributors"]["completion_rate"]
+            + onboarding_data["operators"]["completion_rate"]
+            + onboarding_data["end_users"]["completion_rate"]
         ) / 3
 
         score = 0
@@ -580,9 +592,9 @@ class BuddyOrchestrator:
             score += 2
         elif governance["governance_score"] >= 60:
             score += 1
-        if advocacy["champion_count"] > 0:
+        if advocacy_data["champion_count"] > 0:
             score += 1
-        if advocacy["referral_conversions"] > 0:
+        if advocacy_data["referral_conversions"] > 0:
             score += 1
         if onboarding_avg >= 0.8:
             score += 2
@@ -604,7 +616,7 @@ class BuddyOrchestrator:
             "max_score": 6,
             "governance_score": governance["governance_score"],
             "onboarding_completion_average": round(onboarding_avg, 3),
-            "champion_count": advocacy["champion_count"],
+            "champion_count": advocacy_data["champion_count"],
         }
 
     # ------------------------------------------------------------------
