@@ -3,12 +3,14 @@ import BotOverview from './components/BotOverview.jsx';
 import RepoActivity from './components/RepoActivity.jsx';
 import BotDeployment from './components/BotDeployment.jsx';
 import Analytics from './components/Analytics.jsx';
+import Actions from './components/Actions.jsx';
 
 const NAV_ITEMS = [
   { id: 'overview', label: '🤖 Bot Overview' },
   { id: 'activity', label: '📦 Repo Activity' },
   { id: 'deploy', label: '🚀 Bot Deployment' },
   { id: 'analytics', label: '📊 Analytics' },
+  { id: 'actions', label: '⚡ Actions' },
 ];
 
 export default function App() {
@@ -49,6 +51,7 @@ export default function App() {
           {activeTab === 'activity' && <RepoActivity />}
           {activeTab === 'deploy' && <BotDeployment />}
           {activeTab === 'analytics' && <Analytics />}
+          {activeTab === 'actions' && <Actions />}
         </main>
       </div>
     </div>
