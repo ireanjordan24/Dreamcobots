@@ -28,6 +28,8 @@ import sqlite3
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from framework import GlobalAISourcesFlow
+
 
 class BotLibraryManager:
     """Manages per-bot library registrations, mastery levels, and learning notes.
@@ -41,6 +43,7 @@ class BotLibraryManager:
 
     def __init__(self, db_path: str = "bot_libraries.db") -> None:
         self.db_path = db_path
+        self.flow = GlobalAISourcesFlow(bot_name="BotLibraryManager")
         self._conn: sqlite3.Connection = sqlite3.connect(db_path)
         self._conn.row_factory = sqlite3.Row
         self._init_schema()

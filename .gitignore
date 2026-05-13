@@ -10,3 +10,7 @@ node_modules/
 
 # Runtime upload artifacts
 uploads/
+
+# Local runtime outputs
+database/learning.db
+logs/*.log
