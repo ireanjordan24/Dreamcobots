@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-13T02:55:03.249181+00:00",
-  "total_companies": 4,
+  "last_updated": "2026-05-13T17:53:09.910272+00:00",
+  "total_companies": 5,
   "companies": [
     {
       "name": "Stripe",
@@ -101,6 +101,17 @@
       "enriched_at": "2026-05-13T02:55:03.249119+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
+    },
+    {
+      "name": "Ali baba",
+      "domain": "",
+      "description": "No data found.",
+      "source": "not_found",
+      "looked_up_at": "2026-05-13T17:53:09.910117+00:00",
+      "enriched": true,
+      "enriched_at": "2026-05-13T17:53:09.910142+00:00",
+      "company_size": "unknown",
+      "funding_stage": "bootstrapped_or_unknown"
     }
   ]
 }
