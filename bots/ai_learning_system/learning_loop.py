@@ -119,6 +119,8 @@ class LearningLoop:
         Override default KPI thresholds.
     control_center : any
         Optional legacy control center reference (unused internally).
+    controller : any
+        Alias for ``control_center``; accepted for backward compatibility.
     generator : any
         Optional legacy bot generator reference (unused internally).
     underperform_threshold : int
@@ -136,13 +138,15 @@ class LearningLoop:
     ) -> None:
         import random as _rand_ll
         self._rand_ll = _rand_ll
+        # ``controller`` is an alias for ``control_center`` for backward compatibility.
+        _control_center = control_center or controller
         # Resolve positional ambiguity: if first arg is a dict, treat as kpis (legacy)
         if isinstance(control_center_or_kpis, dict):
             _kpis = control_center_or_kpis
-            self.control_center = control_center
+            self.control_center = _control_center
             self.generator = generator
         else:
-            self.control_center = control_center_or_kpis or control_center
+            self.control_center = control_center_or_kpis or _control_center
             self.generator = generator
             _kpis = kpis
         if self.control_center is None and controller is not None:
