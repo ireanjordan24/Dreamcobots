@@ -91,9 +91,9 @@ jobs:
           
           if drift_magnitude <= threshold:
               recommended_method = "none"
-          elif drift_magnitude <= transfer_learning_threshold:
+          elif drift_magnitude < transfer_learning_threshold:
               recommended_method = "transfer_learning"
-          elif drift_magnitude <= fine_tuning_threshold:
+          elif drift_magnitude < fine_tuning_threshold:
               recommended_method = "fine_tuning"
           else:
               recommended_method = "full_retrain"
