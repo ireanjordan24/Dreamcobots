@@ -86,10 +86,10 @@ jobs:
           threshold = 0.05
           transfer_learning_threshold = 0.10
           fine_tuning_threshold = 0.20
-          drift_detected = drift_magnitude > threshold
+          drift_detected = drift_magnitude >= threshold
           improvement_detected = accuracy_delta < 0
           
-          if drift_magnitude <= threshold:
+          if drift_magnitude < threshold:
               recommended_method = "none"
           elif drift_magnitude < transfer_learning_threshold:
               recommended_method = "transfer_learning"
