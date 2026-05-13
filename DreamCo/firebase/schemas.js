@@ -137,6 +137,26 @@ const realEstate = {
   },
 };
 
+const domains = {
+  collection: 'domains',
+  fields: {
+    id: 'string',
+    name: 'string',
+    registrar: 'string',
+    registrationCost: 'number',
+    askPrice: 'number',
+    soldPrice: 'number',
+    profit: 'number',
+    estimatedValue: 'number',
+    status: 'string',       // owned | listed | sold | flipped
+    userId: 'string',
+    expiryDate: 'string',   // YYYY-MM-DD
+    notes: 'string',
+    registered_at: 'timestamp',
+    updated_at: 'timestamp',
+  },
+};
+
 const SCHEMAS = {
   deals,
   flips,
@@ -146,6 +166,7 @@ const SCHEMAS = {
   grants,
   fiverrGigs,
   realEstate,
+  domains,
 };
 
 module.exports = SCHEMAS;
