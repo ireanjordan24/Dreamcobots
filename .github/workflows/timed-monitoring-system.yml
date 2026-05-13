@@ -82,18 +82,18 @@ jobs:
               ) from exc
           accuracy_delta = baseline_accuracy - current_accuracy
           # Clamp drift to non-negative values: accuracy improvements are not retraining drift.
-          drift = max(0.0, accuracy_delta)
+          drift_magnitude = max(0.0, accuracy_delta)
           threshold = 0.05
           transfer_learning_threshold = 0.10
           fine_tuning_threshold = 0.20
-          drift_detected = drift > threshold
+          drift_detected = drift_magnitude > threshold
           improvement_detected = accuracy_delta < 0
           
-          if not drift_detected:
+          if drift_magnitude <= threshold:
               recommended_method = "none"
-          elif drift <= transfer_learning_threshold:
+          elif drift_magnitude <= transfer_learning_threshold:
               recommended_method = "transfer_learning"
-          elif drift <= fine_tuning_threshold:
+          elif drift_magnitude <= fine_tuning_threshold:
               recommended_method = "fine_tuning"
           else:
               recommended_method = "full_retrain"
