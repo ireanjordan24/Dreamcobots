@@ -70,8 +70,16 @@ jobs:
           import os
           from datetime import datetime, timezone
           
-          baseline_accuracy = float(os.getenv("BASELINE_ACCURACY", "0.92"))
-          current_accuracy = float(os.getenv("CURRENT_ACCURACY", "0.84"))
+          baseline_raw = os.getenv("BASELINE_ACCURACY", "0.92")
+          current_raw = os.getenv("CURRENT_ACCURACY", "0.84")
+          try:
+              baseline_accuracy = float(baseline_raw)
+              current_accuracy = float(current_raw)
+          except ValueError as exc:
+              raise ValueError(
+                  f"BASELINE_ACCURACY and CURRENT_ACCURACY must be numeric. "
+                  f"Got BASELINE_ACCURACY={baseline_raw!r}, CURRENT_ACCURACY={current_raw!r}."
+              ) from exc
           drift = max(0.0, baseline_accuracy - current_accuracy)
           threshold = 0.05
           drift_detected = drift > threshold
