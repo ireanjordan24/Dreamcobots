@@ -67,10 +67,11 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import os
           from datetime import datetime, timezone
           
-          baseline_accuracy = 0.92
-          current_accuracy = 0.84
+          baseline_accuracy = float(os.getenv("BASELINE_ACCURACY", "0.92"))
+          current_accuracy = float(os.getenv("CURRENT_ACCURACY", "0.84"))
           drift = max(0.0, baseline_accuracy - current_accuracy)
           threshold = 0.05
           drift_detected = drift > threshold
