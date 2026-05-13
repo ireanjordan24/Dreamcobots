@@ -77,15 +77,15 @@ class Optimizer:
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
         leads_generated: int = int(bot_output.get("leads_generated", 0))
 
-        if leads_generated < 3:
-            return "Expand reach"
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:
             return "Scale aggressively"
         if revenue > 0:
             return "Maintain"
-        return "Expand reach"
+        if leads_generated < 3:
+            return "Expand reach"
+        return "Change strategy"
 
     def evaluate(self, bot_name: str, bot_output: Dict[str, Any]) -> OptimizationResult:
         """Evaluate a bot and return a rich OptimizationResult."""

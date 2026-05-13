@@ -32,8 +32,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 class TestBaseEventBus:
     def setup_method(self):
-        from event_bus.base_bus import BaseEventBus
-        self.bus = BaseEventBus()
+        from event_bus.base_bus import InMemoryEventBus
+        self.bus = InMemoryEventBus()
 
     def test_publish_calls_subscriber(self):
         received = []

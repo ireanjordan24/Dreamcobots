@@ -7,18 +7,17 @@ implementations without change.
 
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Any, Callable, Dict, List
 
 
 class BaseEventBus(ABC):
     """
-    In-memory event bus for testing / offline environments.
+    Abstract event bus interface.
 
-    Provides publish/subscribe functionality without external dependencies.
-    Concrete subclasses may override ``publish`` and ``subscribe`` to add
-    custom behaviour (e.g. Redis-backed persistence).
+    Concrete subclasses must implement ``publish`` and ``subscribe``.
+    Use :class:`InMemoryEventBus` for in-process / test usage.
     """
 
     def __init__(self) -> None:
@@ -26,18 +25,16 @@ class BaseEventBus(ABC):
         self._event_log: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
-    # Pub/Sub API
+    # Pub/Sub API (abstract)
     # ------------------------------------------------------------------
 
+    @abstractmethod
     def publish(self, event_type: str, data: Any = None) -> None:
         """Publish *data* to every subscriber registered for *event_type*."""
-        self._event_log.append({"event_type": event_type, "data": data})
-        for handler in list(self._subscribers.get(event_type, [])):
-            handler(data)
 
+    @abstractmethod
     def subscribe(self, event_type: str, handler: Callable) -> None:
         """Register *handler* to be called when *event_type* is published."""
-        self._subscribers[event_type].append(handler)
 
     def unsubscribe(self, event_type: str, handler: Callable) -> None:
         """Remove *handler* from *event_type* subscriptions."""
@@ -64,3 +61,21 @@ class BaseEventBus(ABC):
     def subscriber_count(self, event_type: str) -> int:
         """Return the number of subscribers for *event_type*."""
         return len(self._subscribers.get(event_type, []))
+
+
+class InMemoryEventBus(BaseEventBus):
+    """Concrete in-memory implementation of :class:`BaseEventBus`.
+
+    Suitable for tests and single-process deployments.  All events and
+    subscribers are kept in memory; no external services required.
+    """
+
+    def publish(self, event_type: str, data: Any = None) -> None:
+        """Publish *data* to every subscriber registered for *event_type*."""
+        self._event_log.append({"event_type": event_type, "data": data})
+        for handler in list(self._subscribers.get(event_type, [])):
+            handler(data)
+
+    def subscribe(self, event_type: str, handler: Callable) -> None:
+        """Register *handler* to be called when *event_type* is published."""
+        self._subscribers[event_type].append(handler)
