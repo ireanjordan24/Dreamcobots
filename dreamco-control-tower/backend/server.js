@@ -215,7 +215,9 @@ async function fetchGitHubWorkflowRuns(repo, token) {
       'User-Agent': 'dreamco-control-tower',
       Accept: 'application/vnd.github+json',
     };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
     const url = new URL(
       `/repos/${repo}/actions/runs?per_page=${ACTIONS_PER_PAGE}`,
