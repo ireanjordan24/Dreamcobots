@@ -6,6 +6,18 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Enable tmate SSH debug session (on failure)'
+        required: false
+        default: 'false'
+        type: boolean
+      verbose:
+        description: 'Enable verbose output (long tracebacks, stdout capture off)'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   auto-fix:
@@ -49,8 +61,21 @@ jobs:
 
       - name: Run Python tests
         run: |
-          python -m pytest tests/ \
-            --ignore=tests/test_backend.py \
-            --ignore=tests/test_web_dashboard.py \
-            -q --tb=short
+          if [ "${{ inputs.verbose }}" = "true" ]; then
+            python -m pytest tests/ \
+              --ignore=tests/test_backend.py \
+              --ignore=tests/test_web_dashboard.py \
+              -v --tb=long -s
+          else
+            python -m pytest tests/ \
+              --ignore=tests/test_backend.py \
+              --ignore=tests/test_web_dashboard.py \
+              -q --tb=short
+          fi
         continue-on-error: true
+
+      - name: Debug with tmate (on failure)
+        if: failure() && inputs.debug_enabled == 'true'
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true

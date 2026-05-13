@@ -5,6 +5,18 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Enable tmate SSH debug session (on failure)'
+        required: false
+        default: 'false'
+        type: boolean
+      verbose:
+        description: 'Enable verbose output (long tracebacks, stdout capture off)'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   validate-bots:
