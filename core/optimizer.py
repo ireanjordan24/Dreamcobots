@@ -75,17 +75,22 @@ class Optimizer:
         """Return a single strategic recommendation string."""
         revenue: float = float(bot_output.get("revenue", 0))
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
-        leads_generated: int = int(bot_output.get("leads_generated", 0))
 
-        if leads_generated < 3:
-            return "Expand reach"
+        # Only apply the low-leads guard when the caller explicitly supplies
+        # a "leads_generated" value; absent keys must not default to 0 and
+        # silently override the conversion-rate / revenue signals.
+        if "leads_generated" in bot_output:
+            leads_generated: int = int(bot_output["leads_generated"])
+            if leads_generated < MIN_LEADS_THRESHOLD:
+                return "Expand reach"
+
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:
             return "Scale aggressively"
         if revenue > 0:
             return "Maintain"
-        return "Expand reach"
+        return "Change strategy"
 
     def evaluate(self, bot_name: str, bot_output: Dict[str, Any]) -> OptimizationResult:
         """Evaluate a bot and return a rich OptimizationResult."""

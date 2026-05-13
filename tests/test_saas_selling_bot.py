@@ -2,14 +2,24 @@
 Tests for bots/saas-selling-bot
 """
 
+import importlib.util
 import json
 import os
 import sys
 import pytest
 
 # Make the bot module importable without depending on working directory
-BOT_DIR = os.path.join(os.path.dirname(__file__), "..", "bots", "saas-selling-bot")
-sys.path.insert(0, os.path.abspath(BOT_DIR))
+BOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bots", "saas-selling-bot"))
+sys.path.insert(0, BOT_DIR)
+
+# If sys.modules["bot"] is already cached from a different bot (e.g. the
+# 211-resource-eligibility-bot which pytest may have collected first),
+# evict it so that the import below loads the saas-selling-bot's bot.py.
+_cached_bot = sys.modules.get("bot")
+if _cached_bot is not None:
+    cached_file = getattr(_cached_bot, "__file__", "") or ""
+    if not os.path.normpath(cached_file).startswith(os.path.normpath(BOT_DIR)):
+        del sys.modules["bot"]
 
 # Use an in-memory database for tests
 os.environ["SAAS_BOT_DB"] = ":memory:"
@@ -34,6 +44,13 @@ def fresh_db(tmp_path, monkeypatch):
 @pytest.fixture()
 def client():
     """Flask test client with an isolated temp database."""
+    # Re-evict stale cached bot module at fixture time (in case another
+    # test module imported it between collection and execution).
+    _b = sys.modules.get("bot")
+    if _b is not None:
+        _f = getattr(_b, "__file__", "") or ""
+        if not os.path.normpath(_f).startswith(os.path.normpath(BOT_DIR)):
+            del sys.modules["bot"]
     import bot as b
     b.app.config["TESTING"] = True
     with b.app.test_client() as c:

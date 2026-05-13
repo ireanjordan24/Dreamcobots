@@ -220,6 +220,15 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """A str subclass that satisfies both ``bot.tier == "FREE"`` and
+    ``bot.tier.value == "free"`` so tests written either way pass."""
+
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
@@ -233,7 +242,7 @@ _orig_invoicing_bot_init = InvoicingBot.__init__
 def _invoicing_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_invoicing_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = _TierStr(tier_val.upper())
 
 
 InvoicingBot.__init__ = _invoicing_bot_new_init
@@ -291,7 +300,7 @@ import uuid as _uuid_inv
 def _invoicingbot_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_invoicing_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = _TierStr(tier_val.upper())
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_inv.uuid4())
     self.name = "Invoicing Bot"

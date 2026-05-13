@@ -62,3 +62,15 @@ class BaseEventBus(ABC):
     def subscriber_count(self, event_type: str) -> int:
         """Return the number of subscribers for *event_type*."""
         return len(self._subscribers.get(event_type, []))
+
+
+class InMemoryEventBus(BaseEventBus):
+    """Concrete in-memory event bus — suitable for testing and offline use."""
+
+    def publish(self, event_type: str, data: Any = None) -> None:
+        self._event_log.append({"event_type": event_type, "data": data})
+        for handler in list(self._subscribers.get(event_type, [])):
+            handler(data)
+
+    def subscribe(self, event_type: str, handler: Callable) -> None:
+        self._subscribers[event_type].append(handler)

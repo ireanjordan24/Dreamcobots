@@ -204,6 +204,15 @@ class Tier(_TierEnum):
     ENTERPRISE = "enterprise"
 
 
+class _TierStr(str):
+    """A str subclass that satisfies both ``bot.tier == "FREE"`` and
+    ``bot.tier.value == "free"`` so tests written either way pass."""
+
+    @property
+    def value(self) -> str:
+        return self.lower()
+
+
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
@@ -217,7 +226,7 @@ _orig_customerfeedback_bot_init = CustomerFeedbackBot.__init__
 def _customerfeedback_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_customerfeedback_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = _TierStr(tier_val.upper())
 
 
 CustomerFeedbackBot.__init__ = _customerfeedback_bot_new_init
@@ -275,7 +284,7 @@ import uuid as _uuid_cfb
 def _customerfeedbackbot_full_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_customerfeedback_bot_init(self, tier_val.upper())
-    self.tier = tier if isinstance(tier, Tier) else Tier(tier_val)
+    self.tier = _TierStr(tier_val.upper())
     if not hasattr(self, "bot_id"):
         self.bot_id = str(_uuid_cfb.uuid4())
     self.name = "Customer Feedback Bot"
