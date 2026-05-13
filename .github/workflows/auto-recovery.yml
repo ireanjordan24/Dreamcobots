@@ -25,9 +25,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Check bot framework compliance
+        id: compliance
         run: python tools/check_bot_framework.py
 
       - name: Run Tests
+        id: tests
         run: |
           python -m pytest tests/ \
             --ignore=tests/test_backend.py \
@@ -37,7 +39,8 @@ jobs:
       - name: Report status
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
+          if [ "${{ steps.compliance.outcome }}" = "success" ] && \
+             [ "${{ steps.tests.outcome }}" = "success" ]; then
             echo "✅ All tests passed — branch is merge-ready."
           else
             echo "❌ Tests or checks failed — review the output above to diagnose."

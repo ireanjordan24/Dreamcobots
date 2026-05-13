@@ -44,4 +44,4 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 bots/ --count --max-line-length=120 --ignore=E501,W503,E241,E302,E401,E402,E741,F401,F541,F841,W292 --statistics --exit-zero
+          flake8 bots/ --count --max-line-length=120 --ignore=E501,W503,E241,E302,E401,E402,E741,F401,F541,F841,W292 --statistics

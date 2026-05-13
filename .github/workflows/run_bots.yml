@@ -1,10 +1,6 @@
 name: Run DreamCo Bots (Money Loop)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     # Run daily at 06:00 UTC
     - cron: '0 6 * * *'

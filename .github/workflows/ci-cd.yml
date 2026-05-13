@@ -21,15 +21,20 @@ jobs:
           echo "Run ID: ${{ github.run_id }}"
           echo "Actor: ${{ github.actor }}"
 
-      # ── Step 8: Mask Secrets ───────────────────────────────────────────────
+      # ── Step 2: Mask Secrets ───────────────────────────────────────────────
+      # Mask the secret VALUE so it never appears in logs.
+      # The add-mask command accepts the resolved secret value, not the key name.
       - name: Mask Secrets
         run: |
-          echo "::add-mask::${{ secrets.API_KEY }}"
+          API_KEY_VALUE="${{ secrets.API_KEY }}"
+          if [ -n "$API_KEY_VALUE" ]; then
+            echo "::add-mask::$API_KEY_VALUE"
+          fi
 
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ── Step 9: Pre-Check Validation ──────────────────────────────────────
+      # ── Step 3: Pre-Check Validation ──────────────────────────────────────
       - name: Validate Environment
         run: |
           echo "Validating environment prerequisites..."
@@ -49,7 +54,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # ── Step 3: Retry Logic for Install ───────────────────────────────────
+      # ── Step 4: Retry Logic for Install ───────────────────────────────────
       - name: Install dependencies
         run: |
           for i in 1 2 3; do
@@ -62,35 +67,23 @@ jobs:
             fi
           done
 
-      # ── Step 2: continue-on-error for controlled failures ─────────────────
+      # ── Step 5: Run tests ─────────────────────────────────────────────────
       - name: Run tests
         id: run_tests
         run: npm test
         continue-on-error: true
 
-      # ── Step 5: Circuit Breaker ────────────────────────────────────────────
-      - name: Circuit Breaker — Check failure threshold
+      # ── Step 6: Circuit Breaker ────────────────────────────────────────────
+      # Fail immediately when the test step fails (threshold = 1 tracked step).
+      - name: Circuit Breaker — Enforce test gate
         run: |
-          FAILURES=0
-          MAX=3
-          # Count failures among tracked steps in this job
           if [ "${{ steps.run_tests.outcome }}" = "failure" ]; then
-            FAILURES=$((FAILURES+1))
-          fi
-          echo "Circuit breaker: $FAILURES/$MAX failures in this run."
-          if [ $FAILURES -ge $MAX ]; then
-            echo "::error::Too many failures — stopping system"
+            echo "::error::Test step failed — stopping pipeline."
             exit 1
           fi
+          echo "Circuit breaker: all tracked steps passed."
 
-      # ── Step 2: Handle test failure ────────────────────────────────────────
-      - name: Handle test failure
-        if: steps.run_tests.outcome == 'failure'
-        run: |
-          echo "::warning::Tests failed, check logs above for details."
-          exit 1
-
-      # ── Step 6: Upload Logs on Failure ────────────────────────────────────
+      # ── Step 7: Upload Logs on Failure ────────────────────────────────────
       - name: Upload Logs
         if: failure()
         uses: actions/upload-artifact@v4
@@ -117,47 +110,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ── Step 2: continue-on-error for controlled failures ─────────────────
+      # ── Step 2: Deploy to Production ──────────────────────────────────────
+      # TODO: Replace the echo below with your actual deployment command
+      # (e.g., ssh, kubectl, cloud provider CLI).
       - name: Deploy to Production
         id: deploy_step
         run: |
           echo "Deploying to Production"
-          # Add your deployment commands here. E.g., using SSH, FTP, or cloud provider.
+          # Add your deployment commands here.
         continue-on-error: true
 
-      # ── Step 4: Error Classification ──────────────────────────────────────
+      # ── Step 3: Error Classification ──────────────────────────────────────
       - name: Classify deploy error
         if: steps.deploy_step.outcome == 'failure'
         run: |
           OUTCOME="${{ steps.deploy_step.outcome }}"
           echo "Deploy step outcome: $OUTCOME"
-          # Classify based on step outcome (extend with exit-code outputs as needed)
           if [ "$OUTCOME" = "failure" ]; then
             echo "::error::Deploy failed — check credentials, permissions, and target availability"
             echo "Common causes: 401 (token expired), 403 (permissions), 404 (target missing), 5xx (server error)"
           fi
           exit 1
 
-      # ── Step 7: Fallback Strategy ─────────────────────────────────────────
-      - name: Fallback Strategy
-        if: failure()
-        run: |
-          echo "::warning::Primary deploy failed, switching to backup system..."
-          echo "Attempting backup deployment process..."
-          # Add backup deployment logic here (e.g., switch provider, use cached build)
-
-      # ── Step 10: Auto-Rollback on failure ────────────────────────────────
-      - name: Rollback
-        if: failure()
-        run: |
-          echo "Rolling back deployment..."
-          # Check out the previous commit's files locally
-          git checkout HEAD~1 -- . 2>/dev/null || echo "No previous commit to roll back to."
-          # Re-run deployment with the rolled-back files
-          echo "Re-deploying previous stable version..."
-          # Add your actual re-deployment command here (e.g., ssh deploy, kubectl rollout undo)
-
-      # ── Step 6: Upload Logs on Failure ────────────────────────────────────
+      # ── Step 4: Upload Logs on Failure ────────────────────────────────────
       - name: Upload Logs
         if: failure()
         uses: actions/upload-artifact@v4
@@ -200,7 +175,7 @@ jobs:
           echo "Run ID: ${{ github.run_id }}"
           echo "Actor: ${{ github.actor }}"
 
-      # ── Step 4: Error Classification ──────────────────────────────────────
+      # ── Step 2: Error Classification ──────────────────────────────────────
       - name: Classify and Report Failure
         run: |
           echo "::error::One or more jobs failed in workflow run ${{ github.run_id }}"
@@ -209,7 +184,6 @@ jobs:
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
 
-          # Determine which job failed
           if [ "${{ needs.test.result }}" = "failure" ]; then
             echo "::error::Test job failed — check test logs above"
           fi
@@ -223,7 +197,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ── Step 6: Upload Logs on Failure ────────────────────────────────────
+      # ── Step 3: Upload Error Logs ──────────────────────────────────────────
       - name: Upload Error Logs
         uses: actions/upload-artifact@v4
         with:
@@ -233,7 +207,7 @@ jobs:
             npm-debug.log*
           if-no-files-found: ignore
 
-      # ── Step 7: Fallback / Self-Healing Notification ─────────────────────
+      # ── Step 4: Notify of Failure ──────────────────────────────────────────
       - name: Notify of Failure
         run: |
           echo "Notifying developers of failure..."

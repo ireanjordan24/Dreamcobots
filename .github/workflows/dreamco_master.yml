@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "*/10 * * * *"  # every 10 minutes
+    - cron: "0 */4 * * *"  # every 4 hours
 
 permissions:
   contents: read
