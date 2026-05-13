@@ -26,6 +26,8 @@ import urllib.error
 from datetime import datetime, timezone
 from typing import Any
 
+from framework import GlobalAISourcesFlow  # noqa: F401 — required by DreamCo framework
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
