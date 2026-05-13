@@ -30,6 +30,8 @@ jobs:
         run: npm run build
 
       - name: AI Debugging and Self-Healing
+        env:
+          ADMIN_KEY: placeholder
         run: |
           if npm run diagnose; then
             echo 'No issues detected.';

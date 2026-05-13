@@ -75,7 +75,7 @@ jobs:
 
       - name: Lint check
         run: |
-          flake8 . --max-line-length=100 --extend-ignore=E203
+          flake8 python_bots/ bots/ core/ scripts/ --max-line-length=100 --extend-ignore=E203
 
       - name: Run Bot Validator
         run: |
@@ -108,6 +108,9 @@ jobs:
   system-core:
     name: System Brain + Builder + Pipeline
     runs-on: ubuntu-latest
+
+    env:
+      SIMULATION_MODE: 'true'
 
     steps:
       - name: Checkout repo

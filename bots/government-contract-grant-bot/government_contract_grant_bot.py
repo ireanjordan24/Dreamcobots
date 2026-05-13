@@ -730,6 +730,7 @@ class GovernmentContractGrantBot:
             raw_data={"domain": "government_contracts_and_grants", "records": len(MOCK_CONTRACTS)},
             learning_method="supervised",
         )
+        print(f"GovernmentContractGrantBot: pipeline complete — {len(MOCK_CONTRACTS)} contract(s) processed.")
         return result
 
     def start(self) -> None:

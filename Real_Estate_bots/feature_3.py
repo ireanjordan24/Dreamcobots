@@ -207,7 +207,7 @@ class Tier(_TierEnum):
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 
 
-class MarketAnalysisBotTierError(Exception):
+class MarketAnalysisBotTierError(PermissionError):
     """Raised when a feature is not available on the current tier."""
 
 
@@ -217,7 +217,7 @@ _orig_marketanalysis_bot_init = MarketAnalysisBot.__init__
 def _marketanalysis_bot_new_init(self, tier=Tier.FREE):
     tier_val = tier.value if hasattr(tier, "value") else str(tier).lower()
     _orig_marketanalysis_bot_init(self, tier_val.upper())
-    # self.tier stays as string from _orig_init
+    self.tier = tier if hasattr(tier, "value") else Tier(tier_val)
 
 
 MarketAnalysisBot.__init__ = _marketanalysis_bot_new_init

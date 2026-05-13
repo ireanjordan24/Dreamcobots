@@ -834,11 +834,49 @@ _DREAMCO_BOTS: list[BotEntry] = [
             "probability_model",
             "wave_function_collapse",
             "dimension_mapper",
-            "entangled_bot_router",
-            "autonomous_money_scanner",
-            "multi_path_tracker",
-            "self_improving_ai",
-            "god_mode",
+    BotEntry(
+        bot_id="cinecore_lead_engine",
+        display_name="CineCore Lead Engine",
+        description=(
+            "Original DreamCo CineCore lead-generation engine. Scans businesses from "
+            "multiple sources, scores them for commercial opportunity, generates ad "
+            "scripts, builds outreach drafts, and exports qualified leads to CRM systems."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.cinecore_lead_engine.cinecore_lead_engine",
+        class_name="CineCoreLeadEngine",
+        capabilities=[
+            "business_scanning",
+            "opportunity_scoring",
+            "script_generation",
+            "outreach_drafts",
+            "crm_export",
+            "bulk_lead_generation",
+            "analytics",
+            "white_label",
+        ],
+    ),
+    BotEntry(
+        bot_id="public_lead_engine",
+        display_name="Public Lead Engine",
+        description=(
+            "Legal public business search bot. Uses public APIs (Google Places, Yelp) "
+            "to discover businesses with low ratings or weak online presence and "
+            "generate commercial opportunities. Human approval required before outreach."
+        ),
+        category=BotCategory.LEAD_GEN,
+        module_path="bots.public_lead_engine.public_lead_engine",
+        class_name="PublicLeadEngine",
+        capabilities=[
+            "google_places_search",
+            "yelp_search",
+            "rating_filter",
+            "weak_marketing_filter",
+            "opportunity_scoring",
+            "script_generation",
+            "outreach_drafts",
+            "multi_api",
+            "ai_scoring",
         ],
     ),
 ]
