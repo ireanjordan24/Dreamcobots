@@ -87,12 +87,13 @@ jobs:
           transfer_learning_threshold = 0.10
           fine_tuning_threshold = 0.20
           drift_detected = drift > threshold
+          improvement_detected = accuracy_delta < 0
           
           if not drift_detected:
               recommended_method = "none"
-          elif drift < transfer_learning_threshold:
+          elif drift <= transfer_learning_threshold:
               recommended_method = "transfer_learning"
-          elif drift < fine_tuning_threshold:
+          elif drift <= fine_tuning_threshold:
               recommended_method = "fine_tuning"
           else:
               recommended_method = "full_retrain"
@@ -100,6 +101,7 @@ jobs:
           learning_report = {
               "generated_at": datetime.now(timezone.utc).isoformat(),
               "accuracy_delta": accuracy_delta,
+              "improvement_detected": improvement_detected,
               "drift_detected": drift_detected,
               "recommended_method": recommended_method,
               "recommendation_summary": "Use automated retraining strategy when monitored accuracy drops.",
