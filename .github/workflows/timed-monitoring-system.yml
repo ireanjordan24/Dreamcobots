@@ -80,7 +80,8 @@ jobs:
                   f"BASELINE_ACCURACY and CURRENT_ACCURACY must be numeric. "
                   f"Got BASELINE_ACCURACY={baseline_raw!r}, CURRENT_ACCURACY={current_raw!r}."
               ) from exc
-          drift = max(0.0, baseline_accuracy - current_accuracy)
+          accuracy_delta = baseline_accuracy - current_accuracy
+          drift = max(0.0, accuracy_delta)
           threshold = 0.05
           drift_detected = drift > threshold
           
@@ -95,6 +96,7 @@ jobs:
           
           learning_report = {
               "generated_at": datetime.now(timezone.utc).isoformat(),
+              "accuracy_delta": accuracy_delta,
               "drift_detected": drift_detected,
               "recommended_method": recommended_method,
               "recommendation_summary": "Use automated retraining strategy when monitored accuracy drops.",
