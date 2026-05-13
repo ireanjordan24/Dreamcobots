@@ -10,3 +10,15 @@ node_modules/
 
 # Runtime upload artifacts
 uploads/
+
+# Log files
+*.log
+logs.txt
+logs/ci-fixes/
+
+# SQLite database files generated at runtime
+*.db
+saas_tools.db
+
+# Temporary agent session notes
+conversation_summary.md

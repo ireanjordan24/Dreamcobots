@@ -277,7 +277,19 @@ class TestRoutes:
 # bot.py demo helpers
 # ---------------------------------------------------------------------------
 
+_SAAS_BOT_DIR_ABS = os.path.abspath(BOT_DIR)
+
+
 class TestDemoHelpers:
+    @pytest.fixture(autouse=True)
+    def _ensure_saas_bot_path(self):
+        """Ensure bots/saas-selling-bot is at sys.path[0] and 'bot' is not
+        cached from another module directory before each test in this class.
+        The conftest _isolate_sys_modules fixture will restore both after."""
+        sys.modules.pop("bot", None)
+        sys.path.insert(0, _SAAS_BOT_DIR_ABS)
+        yield
+
     def test_run_custom_bot_demo(self):
         from bot import run_custom_bot_demo
         result = run_custom_bot_demo("Send weekly report")
