@@ -77,19 +77,22 @@ jobs:
               current_accuracy = float(current_raw)
           except ValueError as exc:
               raise ValueError(
-                  f"BASELINE_ACCURACY and CURRENT_ACCURACY must be numeric. "
+                  f"BASELINE_ACCURACY and CURRENT_ACCURACY must be valid floating-point numbers. "
                   f"Got BASELINE_ACCURACY={baseline_raw!r}, CURRENT_ACCURACY={current_raw!r}."
               ) from exc
           accuracy_delta = baseline_accuracy - current_accuracy
+          # Clamp drift to non-negative values: accuracy improvements are not retraining drift.
           drift = max(0.0, accuracy_delta)
           threshold = 0.05
+          transfer_learning_threshold = 0.10
+          fine_tuning_threshold = 0.20
           drift_detected = drift > threshold
           
           if not drift_detected:
               recommended_method = "none"
-          elif drift < 0.10:
+          elif drift < transfer_learning_threshold:
               recommended_method = "transfer_learning"
-          elif drift < 0.20:
+          elif drift < fine_tuning_threshold:
               recommended_method = "fine_tuning"
           else:
               recommended_method = "full_retrain"
