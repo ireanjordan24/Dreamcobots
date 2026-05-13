@@ -319,6 +319,60 @@ app.get('/api/orchestrator', rateLimiter, (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Deep Learning System — status endpoint
+// Returns aggregated learning progress for all bots (API mastery, competitor
+// intel, sandbox pass rates) and the days-remaining countdown to June 22.
+// ---------------------------------------------------------------------------
+
+app.get('/api/learning', rateLimiter, (_req, res) => {
+  const bots = readBots();
+  const deadline = '2026-06-22';
+  const today = new Date();
+  const deadlineDate = new Date(deadline);
+  const daysRemaining = Math.max(
+    0,
+    Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24)),
+  );
+  const learningActive = today <= deadlineDate;
+
+  // Build per-bot learning status from the registered bot catalogue
+  const botLearning = bots.map((b) => ({
+    bot_id: b.id || b.name,
+    category: b.category || 'general',
+    api_mastery: typeof b.api_mastery === 'number' ? b.api_mastery : 0,
+    competitor_intel_score: typeof b.competitor_intel_score === 'number' ? b.competitor_intel_score : 0,
+    sandbox_pass_rate: typeof b.sandbox_pass_rate === 'number' ? b.sandbox_pass_rate : 0,
+    cycles_completed: typeof b.cycles_completed === 'number' ? b.cycles_completed : 0,
+  }));
+
+  const totalCycles = botLearning.reduce((s, b) => s + b.cycles_completed, 0);
+  const avgMastery = botLearning.length
+    ? Math.round(botLearning.reduce((s, b) => s + b.api_mastery, 0) / botLearning.length)
+    : 0;
+  const avgIntel = botLearning.length
+    ? Math.round(botLearning.reduce((s, b) => s + b.competitor_intel_score, 0) / botLearning.length)
+    : 0;
+  const avgSandbox = botLearning.length
+    ? Math.round(botLearning.reduce((s, b) => s + b.sandbox_pass_rate, 0) / botLearning.length)
+    : 0;
+
+  return res.json({
+    learning_active: learningActive,
+    deadline: deadline,
+    days_remaining: daysRemaining,
+    registered_bots: bots.length,
+    total_cycles_run: totalCycles,
+    aggregate: {
+      avg_api_mastery: avgMastery,
+      avg_competitor_intel: avgIntel,
+      avg_sandbox_pass_rate: avgSandbox,
+    },
+    bots: botLearning,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Start server (only when not in test mode)
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;

@@ -50,6 +50,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from bots.buddy_orchestrator.data_scrape_lifecycle import DataScrapeLifecycle
 
 try:
+    from bots.deep_learning_system import DeepLearningCoordinator
+    _DEEP_LEARNING_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    DeepLearningCoordinator = None  # type: ignore[assignment,misc]
+    _DEEP_LEARNING_AVAILABLE = False
+
+try:
     from framework import GlobalAISourcesFlow  # noqa: F401
     _FLOW_AVAILABLE = True
 except ImportError:  # pragma: no cover
@@ -194,6 +201,9 @@ class BuddyOrchestrator:
             if scrape_deadline
             else DataScrapeLifecycle()
         )
+
+        # Deep learning coordinator (lazy-init on first use)
+        self._deep_learning: "DeepLearningCoordinator | None" = None
 
     # ------------------------------------------------------------------
     # Bot registration (build-a-bot catalog)
@@ -489,3 +499,54 @@ class BuddyOrchestrator:
             "total_runs": len(self._run_history),
             "total_revenue_usd": round(sum(self._revenue.values()), 2),
         }
+
+    # ------------------------------------------------------------------
+    # Deep learning coordination
+    # ------------------------------------------------------------------
+
+    def _get_deep_learning(self) -> "DeepLearningCoordinator":
+        """Lazily initialise and return the deep learning coordinator."""
+        if self._deep_learning is None:
+            if not _DEEP_LEARNING_AVAILABLE or DeepLearningCoordinator is None:
+                raise RuntimeError(
+                    "Deep learning system is not available. "
+                    "Ensure bots/deep_learning_system/ is present."
+                )
+            self._deep_learning = DeepLearningCoordinator()
+            # Pre-register all currently known bots
+            for bot_id, spec in self._catalog.items():
+                self._deep_learning.register_bot(bot_id, category=spec.category)
+        return self._deep_learning
+
+    def run_deep_learning_cycle(self, bot_id: Optional[str] = None) -> dict:
+        """Run a deep learning cycle for *bot_id* (or all bots if omitted).
+
+        Each cycle covers:
+          • Top-1000 API scraping for the bot's category
+          • Competitor pricing / feature / sentiment analysis
+          • Sandbox capability testing
+
+        Returns a results dict (or list of dicts when bot_id is None).
+        """
+        dl = self._get_deep_learning()
+        if bot_id:
+            category = self._catalog[bot_id].category if bot_id in self._catalog else "general"
+            if bot_id not in dl._bot_categories:
+                dl.register_bot(bot_id, category=category)
+            return dl.run_learning_cycle(bot_id)
+        return {"cycles": dl.run_all_cycles()}
+
+    def deep_learning_status(self) -> dict:
+        """Return aggregated deep learning status for all bots."""
+        dl = self._get_deep_learning()
+        return dl.learning_status()
+
+    def deep_learning_bot_progress(self, bot_id: str) -> dict:
+        """Return per-bot deep learning progress."""
+        dl = self._get_deep_learning()
+        return dl.bot_progress(bot_id)
+
+    def top_learning_bots(self, n: int = 5) -> list[dict]:
+        """Return the *n* bots with the highest composite learning score."""
+        dl = self._get_deep_learning()
+        return dl.top_performing_bots(n=n)

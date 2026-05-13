@@ -1,0 +1,228 @@
+name: Deep Learning — Continuous Bot Training
+
+# Run every 6 hours until June 22, 2026 go-live deadline.
+# Also triggered on every push/PR to validate the training system itself,
+# and supports manual dispatch for on-demand training runs.
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  push:
+    paths:
+      - 'bots/deep_learning_system/**'
+      - 'bots/buddy_orchestrator/**'
+      - 'tests/test_deep_learning_system.py'
+  pull_request:
+    paths:
+      - 'bots/deep_learning_system/**'
+      - 'bots/buddy_orchestrator/**'
+      - 'tests/test_deep_learning_system.py'
+  workflow_dispatch:
+    inputs:
+      bot_id:
+        description: 'Specific bot ID to train (leave blank for all bots)'
+        required: false
+        default: ''
+      cycles:
+        description: 'Number of learning cycles to run'
+        required: false
+        default: '1'
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.12'
+  LEARNING_DEADLINE: '2026-06-22'
+
+jobs:
+  # -----------------------------------------------------------------------
+  # Check whether we are still within the June 22 learning window
+  # -----------------------------------------------------------------------
+  check-deadline:
+    name: Check Learning Deadline
+    runs-on: ubuntu-latest
+    outputs:
+      learning_active: ${{ steps.check.outputs.learning_active }}
+      days_remaining: ${{ steps.check.outputs.days_remaining }}
+    steps:
+      - name: Check deadline
+        id: check
+        run: |
+          DEADLINE="2026-06-22"
+          TODAY=$(date +%Y-%m-%d)
+          if [[ "$TODAY" < "$DEADLINE" || "$TODAY" == "$DEADLINE" ]]; then
+            echo "learning_active=true" >> "$GITHUB_OUTPUT"
+            DAYS=$(( ($(date -d "$DEADLINE" +%s) - $(date +%s)) / 86400 ))
+            echo "days_remaining=${DAYS}" >> "$GITHUB_OUTPUT"
+            echo "✅ Learning window active — ${DAYS} days until go-live (${DEADLINE})"
+          else
+            echo "learning_active=false" >> "$GITHUB_OUTPUT"
+            echo "days_remaining=0" >> "$GITHUB_OUTPUT"
+            echo "⏹ Learning deadline passed (${TODAY} > ${DEADLINE}) — skipping training"
+          fi
+
+  # -----------------------------------------------------------------------
+  # Validate the deep learning system (tests)
+  # -----------------------------------------------------------------------
+  validate:
+    name: Validate Deep Learning System
+    runs-on: ubuntu-latest
+    needs: check-deadline
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest pytest-benchmark
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run deep learning system tests
+        run: |
+          python3 -m pytest tests/test_deep_learning_system.py -v --tb=short
+
+      - name: Run buddy orchestrator tests
+        run: |
+          python3 -m pytest tests/test_buddy_orchestrator.py -v --tb=short -q
+
+      - name: Framework compliance check
+        run: python3 tools/check_bot_framework.py
+
+  # -----------------------------------------------------------------------
+  # Execute learning cycles (only when inside the deadline window)
+  # -----------------------------------------------------------------------
+  train:
+    name: Run Learning Cycles
+    runs-on: ubuntu-latest
+    needs: [check-deadline, validate]
+    if: needs.check-deadline.outputs.learning_active == 'true'
+    strategy:
+      matrix:
+        category: [sales, marketing, ai, business, government, fiverr, general]
+      max-parallel: 7   # all categories train simultaneously
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run learning cycle — ${{ matrix.category }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BOT_ID: ${{ github.event.inputs.bot_id }}
+          CYCLES: ${{ github.event.inputs.cycles || '1' }}
+        run: |
+          python3 - <<'EOF'
+          import os, sys
+          sys.path.insert(0, ".")
+          from bots.deep_learning_system import DeepLearningCoordinator
+
+          category = "${{ matrix.category }}"
+          bot_id   = os.environ.get("BOT_ID") or f"{category}_bot"
+          cycles   = int(os.environ.get("CYCLES", "1"))
+
+          coordinator = DeepLearningCoordinator()
+          coordinator.register_bot(bot_id, category=category)
+
+          for i in range(cycles):
+              result = coordinator.run_learning_cycle(bot_id)
+              print(f"Cycle {i+1}/{cycles} [{category}]: {result}")
+
+          status = coordinator.learning_status()
+          progress = coordinator.bot_progress(bot_id)
+          print(f"\n=== {category} Learning Summary ===")
+          print(f"  Days remaining : {status['days_remaining']}")
+          print(f"  API mastery    : {progress['api_mastery']}%")
+          print(f"  Competitor intel: {progress['competitor_intel_score']}%")
+          print(f"  Sandbox pass   : {progress['sandbox_pass_rate']}%")
+          EOF
+
+      - name: Report progress
+        run: |
+          echo "### 🧠 Learning Cycle Complete — ${{ matrix.category }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Category | ${{ matrix.category }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Days remaining | ${{ needs.check-deadline.outputs.days_remaining }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ✅ Complete |" >> $GITHUB_STEP_SUMMARY
+
+  # -----------------------------------------------------------------------
+  # Buddy orchestrator full system analysis (runs after all categories)
+  # -----------------------------------------------------------------------
+  buddy-analyse:
+    name: Buddy Full System Analysis
+    runs-on: ubuntu-latest
+    needs: [check-deadline, train]
+    if: needs.check-deadline.outputs.learning_active == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Buddy orchestrator full analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import sys
+          sys.path.insert(0, ".")
+          from bots.buddy_orchestrator import BuddyOrchestrator
+
+          orch = BuddyOrchestrator()
+          categories = ["sales", "marketing", "ai", "business", "government", "fiverr", "general"]
+          for cat in categories:
+              orch.register_bot(f"{cat}_bot", category=cat)
+
+          # Run one learning cycle per bot via Buddy
+          results = orch.run_deep_learning_cycle()
+          print("All cycles complete:", len(results.get("cycles", [])), "bots trained")
+
+          dl_status = orch.deep_learning_status()
+          print("\n=== Buddy Deep Learning Status ===")
+          print(f"  Active          : {dl_status['active']}")
+          print(f"  Days remaining  : {dl_status['days_remaining']}")
+          print(f"  Registered bots : {dl_status['registered_bots']}")
+          print(f"  Total cycles    : {dl_status['total_cycles_run']}")
+
+          top = orch.top_learning_bots(n=3)
+          print("\n=== Top Learning Bots ===")
+          for b in top:
+              print(f"  {b['bot_id']} ({b['category']}): score={b['score']}")
+          EOF
+
+      - name: Write job summary
+        run: |
+          echo "## 🧠 Buddy Full System Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All ${{ needs.check-deadline.outputs.days_remaining }} days remaining until go-live." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All 7 categories completed learning cycles successfully." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_Next run in 6 hours (scheduled) or on next push to relevant paths._" >> $GITHUB_STEP_SUMMARY
