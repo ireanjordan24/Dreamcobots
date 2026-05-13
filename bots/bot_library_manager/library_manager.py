@@ -43,6 +43,7 @@ class BotLibraryManager:
 
     def __init__(self, db_path: str = "bot_libraries.db") -> None:
         self.db_path = db_path
+        # Keep a flow instance attached so this bot module remains framework-compliant.
         self.flow = GlobalAISourcesFlow(bot_name="BotLibraryManager")
         self._conn: sqlite3.Connection = sqlite3.connect(db_path)
         self._conn.row_factory = sqlite3.Row
