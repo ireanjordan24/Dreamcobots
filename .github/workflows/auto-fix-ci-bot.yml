@@ -7,12 +7,7 @@ name: DreamCo Auto-Fix CI Bot
 on:
   workflow_run:
     workflows:
-      - "CI/CD Workflow"
-      - "Auto Recovery CI Mechanism"
-      - "CI"
-      - "Bot CI"
-      - "Python Tests"
-      - "Language-Specific Lint & Format"
+      - "Core CI"
     types:
       - completed
 
@@ -42,22 +37,39 @@ jobs:
           fetch-depth: 0
 
       # ------------------------------------------------------------------ #
-      # 2. Set up Python for the bot diagnostics layer                      #
+      # 2. Idempotency guard — abort if a fix has already been attempted  #
+      #    on this commit to prevent infinite retry loops.                #
+      # ------------------------------------------------------------------ #
+      - name: Check for previous auto-fix attempt
+        id: loop-guard
+        run: |
+          if [ -f ".ci-autofix-attempt" ]; then
+            echo "::warning::A CI auto-fix was already attempted on this commit. Escalating to human review instead of re-triggering."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ------------------------------------------------------------------ #
+      # 3. Set up Python for the bot diagnostics layer                      #
       # ------------------------------------------------------------------ #
       - name: Set up Python
+        if: steps.loop-guard.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install Python dependencies
+        if: steps.loop-guard.outputs.skip != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       # ------------------------------------------------------------------ #
-      # 3. Fetch the logs from the failed workflow run                      #
+      # 4. Fetch the logs from the failed workflow run                      #
       # ------------------------------------------------------------------ #
       - name: Fetch workflow run logs
+        if: steps.loop-guard.outputs.skip != 'true'
         run: |
           echo "🔍 Fetching logs for run ID: ${{ github.event.workflow_run.id }}"
           gh run view ${{ github.event.workflow_run.id }} --log > logs.txt 2>&1 || true
@@ -65,9 +77,10 @@ jobs:
           tail -100 logs.txt
 
       # ------------------------------------------------------------------ #
-      # 4. Analyze logs and determine the fix type (via environment var)    #
+      # 5. Analyze logs and determine the fix type (via environment var)    #
       # ------------------------------------------------------------------ #
       - name: Analyze logs and set FIX env var
+        if: steps.loop-guard.outputs.skip != 'true'
         run: |
           python - <<'EOF'
           import os
@@ -210,22 +223,31 @@ jobs:
           EOF
 
       # ------------------------------------------------------------------ #
-      # 7. Commit the fix back to the repository                           #
+      # 8. Commit the fix back to the repository                           #
       # ------------------------------------------------------------------ #
       - name: Commit fix
-        if: env.FIX != 'unknown'
+        if: env.FIX != 'unknown' && steps.loop-guard.outputs.skip != 'true'
         run: |
           git config --global user.name "dreamco-bot"
           git config --global user.email "bot@dreamco.ai"
-          git add .
+          # Write loop-guard marker so a second auto-fix attempt is blocked.
+          echo "${{ github.event.workflow_run.id }}" > .ci-autofix-attempt
+          git add .ci-autofix-attempt
+          # Scope staged files to only those directories the bot may have touched.
+          case "$FIX" in
+            python-format) git add python_bots/   2>/dev/null || true ;;
+            java-format)   git add java_bots/     2>/dev/null || true ;;
+            js-format)     git add -- '*.js' '*.ts' '*.jsx' '*.tsx' 2>/dev/null || true ;;
+            *)             ;;  # env fixes (pip, npm, permissions) change no source files
+          esac
           git diff --cached --quiet || git commit -m "🤖 Auto-fix applied: $FIX — $FIX_DESC"
           git push || echo "No changes to push"
 
       # ------------------------------------------------------------------ #
-      # 8. Re-trigger the failed workflow for verification                  #
+      # 9. Re-trigger the failed workflow for verification                  #
       # ------------------------------------------------------------------ #
       - name: Re-trigger failed workflow
-        if: env.FIX != 'unknown'
+        if: env.FIX != 'unknown' && steps.loop-guard.outputs.skip != 'true'
         run: |
           echo "🔄 Re-triggering workflow: '${{ github.event.workflow_run.name }}'"
           gh workflow run "${{ github.event.workflow_run.name }}" \

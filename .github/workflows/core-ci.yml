@@ -1,0 +1,167 @@
+# Core CI — Layer 1
+#
+# The single canonical CI gate for every push to main and every pull request.
+# All other test/lint workflows reference this workflow's status via
+# `workflow_run` triggers or are advisory only (lint-advisory.yml).
+#
+# Jobs
+# ────
+#   file-check       — verify critical repo files exist before anything runs
+#   python-tests     — framework compliance + pytest (Python 3.11 & 3.12 matrix)
+#   node-tests       — npm test + DreamCo JS orchestrator validation
+#   summary          — required status check gate (all jobs must succeed)
+#
+# This workflow supersedes:
+#   ci.yml, auto-recovery.yml, bot-ci.yml, test_bots.yml, pytest.yml,
+#   pre-merge-checks.yml, dreamco-main.yml, god-mode-ci.yml,
+#   ci-automation.yml, dreamco.yml, main.yml
+
+name: Core CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Critical file existence gate ──────────────────────────────────────────
+  file-check:
+    name: Required Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify critical files
+        run: |
+          MISSING=()
+          for f in \
+            index.js \
+            package.json \
+            README.md \
+            requirements.txt \
+            "framework/__init__.py" \
+            "tools/check_bot_framework.py"; do
+            if [ ! -f "$f" ]; then
+              MISSING+=("$f")
+              echo "::error::Required file missing: $f"
+            else
+              echo "✅ $f"
+            fi
+          done
+          if [ "${#MISSING[@]}" -gt 0 ]; then
+            exit 1
+          fi
+
+  # ── Python: framework compliance + pytest ─────────────────────────────────
+  python-tests:
+    name: "Python ${{ matrix.python-version }} — Tests & Framework"
+    runs-on: ubuntu-latest
+    needs: file-check
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: pip-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Framework compliance check
+        run: python tools/check_bot_framework.py
+
+      - name: Run pytest
+        env:
+          STRIPE_API_KEY:          ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_PUBLISHABLE_KEY:  ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET:   ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRICE_PRO:        ${{ secrets.STRIPE_PRICE_PRO }}
+          STRIPE_PRICE_ENTERPRISE: ${{ secrets.STRIPE_PRICE_ENTERPRISE }}
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_backend.py \
+            --ignore=tests/test_web_dashboard.py \
+            -q --tb=short
+
+  # ── Node.js: npm tests + DreamCo orchestrator smoke validation ────────────
+  node-tests:
+    name: Node.js Tests
+    runs-on: ubuntu-latest
+    needs: file-check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run Jest tests
+        run: npm test
+
+      - name: Validate DreamCo JS orchestrator
+        # Skipped gracefully when the orchestrator module is not yet present.
+        run: |
+          node -e "
+            try {
+              const orch = require('./DreamCo/orchestrator/index');
+              const { results, summary } = orch.runAllBots();
+              console.log('Orchestrator bots run:', summary.bots_run);
+              if (summary.bots_run !== 8) throw new Error('Expected 8 bots to run, got ' + summary.bots_run);
+              console.log('DreamCo orchestrator: PASSED');
+            } catch (e) {
+              if (e.code === 'MODULE_NOT_FOUND') {
+                console.log('::warning::DreamCo orchestrator module not found — skipping.');
+                process.exit(0);
+              }
+              throw e;
+            }
+          "
+
+  # ── Required-status summary gate ─────────────────────────────────────────
+  # Configure this job as a required status check in branch protection rules.
+  # All consuming workflows (auto-fix-ci-bot, etc.) watch for *this* job name.
+  summary:
+    name: "Core CI — All Checks Passed"
+    runs-on: ubuntu-latest
+    needs: [python-tests, node-tests]
+    if: always()
+    steps:
+      - name: Report overall status
+        run: |
+          PYTHON="${{ needs.python-tests.result }}"
+          NODE="${{ needs.node-tests.result }}"
+          echo "Python tests : $PYTHON"
+          echo "Node tests   : $NODE"
+          if [ "$PYTHON" != "success" ] || [ "$NODE" != "success" ]; then
+            echo "::error::One or more Core CI jobs failed — see job logs above."
+            exit 1
+          fi
+          echo "✅ All Core CI checks passed."

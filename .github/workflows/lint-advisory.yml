@@ -1,0 +1,426 @@
+# Lint Advisory — Layer 2
+#
+# Non-blocking advisory linting for every pull request.
+# Lint failures post GitHub annotations and a PR comment table but NEVER
+# block a merge — all lint jobs use continue-on-error: true.
+#
+# Flow
+# ────
+#   detect-languages → (conditional, parallel) lint-python
+#                                              lint-java
+#                                              lint-js
+#                    → pr-summary  (posts / updates a PR comment)
+#
+# Auto-fix behaviour
+# ──────────────────
+# When a formatter check fails, the job applies a single auto-fix pass,
+# commits any changes to the branch, and records the result in the comment.
+# There is NO retry loop — one fix attempt per run.
+# git add is scoped to the affected directory only (never `git add .`).
+#
+# This workflow supersedes:
+#   language-specific-lint.yml, auto-debug-tests.yml (lint portions),
+#   auto-fix.yml, pr-validation.yml (lint + feedback portions)
+
+name: Lint Advisory
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Write permission is needed to commit auto-formatting fixes back to the branch.
+# pull-requests write is needed to post/update the PR comment.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # ── Detect which language categories have changed files ────────────────────
+  detect-languages:
+    name: Detect Changed Languages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      has_python: ${{ steps.detect.outputs.has_python }}
+      has_java:   ${{ steps.detect.outputs.has_java }}
+      has_js:     ${{ steps.detect.outputs.has_js }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file types in changeset
+        id: detect
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            CHANGED=$(git diff --name-only "$BASE" "$HEAD" 2>/dev/null \
+                       || git diff --name-only HEAD~1 HEAD)
+          else
+            # Push: compare last two commits; guard against the initial commit.
+            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null \
+                       || git diff --name-only HEAD)
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          echo "has_python=$(echo "$CHANGED" | grep -qE '\.py$'   && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "has_java=$(echo   "$CHANGED" | grep -qE '\.java$' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "has_js=$(echo     "$CHANGED" | grep -qE '\.(js|ts|jsx|tsx)$' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  # ── Python: Flake8 + Black (advisory, with single auto-fix commit) ─────────
+  lint-python:
+    name: Python Lint & Format (Flake8 + Black)
+    runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_python == 'true'
+    # Non-blocking: failures are annotations, never PR blockers.
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install lint/format tools
+        run: pip install flake8 black
+
+      - name: Collect debug information
+        run: |
+          echo "::group::Python environment"
+          echo "Python : $(python --version)"
+          echo "Black  : $(black --version)"
+          echo "Flake8 : $(flake8 --version)"
+          echo "OS     : $(uname -a)"
+          echo "::endgroup::"
+
+      - name: Flake8 + Black lint check
+        id: lint
+        continue-on-error: true
+        run: |
+          PYTHON_DIR=""
+          if [ -d python_bots ] && find python_bots -name "*.py" | grep -q .; then
+            PYTHON_DIR="python_bots"
+          fi
+          if [ -z "$PYTHON_DIR" ]; then
+            echo "No Python files found in python_bots/ — skipping."
+            exit 0
+          fi
+
+          FLAKE8_OK=true
+          BLACK_OK=true
+          flake8 "$PYTHON_DIR/" --max-line-length=120 --ignore=W503 --statistics 2>&1 \
+            || FLAKE8_OK=false
+          black --check --diff "$PYTHON_DIR/" 2>&1 || BLACK_OK=false
+
+          if ! $FLAKE8_OK || ! $BLACK_OK; then
+            echo "::warning file=python_bots::Python lint/format issues found. Run 'black python_bots/ && flake8 python_bots/ --max-line-length=120 --ignore=W503' locally to fix."
+            # Apply single auto-fix pass
+            black --quiet "$PYTHON_DIR/" || true
+            exit 1
+          fi
+
+      - name: Commit auto-formatting fixes (if any)
+        if: steps.lint.outcome == 'failure'
+        run: |
+          git config --global user.name  "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add python_bots/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git commit -m "🤖 Auto-fix [lint-advisory]: black formatting applied to python_bots/"
+            git push || echo "::warning::Push failed — check GH_TOKEN permissions."
+          fi
+
+  # ── Java: Checkstyle + google-java-format (advisory, with single auto-fix) ─
+  lint-java:
+    name: Java Lint & Format (Checkstyle + google-java-format)
+    runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_java == 'true'
+    # Non-blocking.
+    continue-on-error: true
+
+    env:
+      CHECKSTYLE_VERSION: '10.21.0'
+      GJF_VERSION: '1.22.0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Check for Java source files
+        id: java_check
+        run: |
+          if [ -d java_bots ] && find java_bots -name "*.java" | grep -q .; then
+            echo "has_java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_java=false" >> "$GITHUB_OUTPUT"
+            echo "No Java files found in java_bots/ — skipping."
+          fi
+
+      - name: Set up Java
+        if: steps.java_check.outputs.has_java == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Checkstyle JAR
+        if: steps.java_check.outputs.has_java == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/checkstyle
+          key: checkstyle-${{ env.CHECKSTYLE_VERSION }}
+
+      - name: Download Checkstyle JAR
+        if: steps.java_check.outputs.has_java == 'true'
+        run: |
+          mkdir -p ~/.cache/checkstyle
+          JAR=~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${{ env.CHECKSTYLE_VERSION }}/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar" \
+              -o "$JAR"
+          fi
+
+      - name: Cache google-java-format JAR
+        if: steps.java_check.outputs.has_java == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/gjf
+          key: gjf-${{ env.GJF_VERSION }}
+
+      - name: Download google-java-format JAR
+        if: steps.java_check.outputs.has_java == 'true'
+        run: |
+          mkdir -p ~/.cache/gjf
+          JAR=~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar
+          if [ ! -f "$JAR" ]; then
+            curl -sSL \
+              "https://github.com/google/google-java-format/releases/download/v${{ env.GJF_VERSION }}/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar" \
+              -o "$JAR"
+          fi
+
+      - name: Checkstyle + google-java-format lint check
+        id: lint
+        if: steps.java_check.outputs.has_java == 'true'
+        continue-on-error: true
+        run: |
+          GJF_JAR=~/.cache/gjf/google-java-format-${{ env.GJF_VERSION }}-all-deps.jar
+          CS_JAR=~/.cache/checkstyle/checkstyle-${{ env.CHECKSTYLE_VERSION }}-all.jar
+          # shellcheck disable=SC2046
+          JAVA_FILES=$(find java_bots -name "*.java")
+
+          CS_OK=true
+          GJF_OK=true
+
+          if [ -f checkstyle.xml ]; then
+            # shellcheck disable=SC2086
+            java -jar "$CS_JAR" -c checkstyle.xml $JAVA_FILES 2>&1 || CS_OK=false
+          else
+            echo "checkstyle.xml not found — skipping Checkstyle."
+          fi
+
+          # shellcheck disable=SC2086
+          java -jar "$GJF_JAR" --dry-run --set-exit-if-changed $JAVA_FILES 2>&1 || GJF_OK=false
+
+          if ! $CS_OK || ! $GJF_OK; then
+            echo "::warning file=java_bots::Java lint/format issues found. Run google-java-format --replace locally to fix."
+            # Apply single auto-fix pass
+            # shellcheck disable=SC2086
+            java -jar "$GJF_JAR" --replace $JAVA_FILES || true
+            exit 1
+          fi
+
+      - name: Commit auto-formatting fixes (if any)
+        if: steps.lint.outcome == 'failure' && steps.java_check.outputs.has_java == 'true'
+        run: |
+          git config --global user.name  "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          git add java_bots/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git commit -m "🤖 Auto-fix [lint-advisory]: google-java-format applied to java_bots/"
+            git push || echo "::warning::Push failed — check GH_TOKEN permissions."
+          fi
+
+  # ── JS/TS: ESLint + Prettier (advisory, with single auto-fix commit) ───────
+  lint-js:
+    name: JS/TS Lint & Format (ESLint + Prettier)
+    runs-on: ubuntu-latest
+    needs: detect-languages
+    if: needs.detect-languages.outputs.has_js == 'true'
+    # Non-blocking.
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Collect debug information
+        run: |
+          echo "::group::Node/JS environment"
+          echo "Node    : $(node --version)"
+          echo "npm     : $(npm --version)"
+          echo "ESLint  : $(npx eslint --version 2>/dev/null || echo 'not found')"
+          echo "Prettier: $(npx prettier --version 2>/dev/null || echo 'not found')"
+          echo "::endgroup::"
+
+      - name: ESLint + Prettier check
+        id: lint
+        continue-on-error: true
+        run: |
+          ESLINT_OK=true
+          PRETTIER_OK=true
+
+          npm run lint -- --ext .js,.ts,.jsx,.tsx 2>&1 || ESLINT_OK=false
+
+          npx prettier --check \
+            --ignore-path .prettierignore \
+            "**/*.{js,ts,jsx,tsx}" 2>&1 || PRETTIER_OK=false
+
+          if ! $ESLINT_OK || ! $PRETTIER_OK; then
+            echo "::warning::JS/TS lint/format issues found. Run 'npm run lint -- --fix' and 'npx prettier --write **/*.{js,ts,jsx,tsx}' locally to fix."
+            # Apply single auto-fix pass
+            npm run lint -- --fix --ext .js,.ts,.jsx,.tsx 2>&1 || true
+            npx prettier --write \
+              --ignore-path .prettierignore \
+              "**/*.{js,ts,jsx,tsx}" 2>&1 || true
+            exit 1
+          fi
+
+      - name: Commit auto-formatting fixes (if any)
+        if: steps.lint.outcome == 'failure'
+        run: |
+          git config --global user.name  "dreamco-bot"
+          git config --global user.email "bot@dreamco.ai"
+          # Scope to JS/TS files only — never git add .
+          git add -- '*.js' '*.ts' '*.jsx' '*.tsx' 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git commit -m "🤖 Auto-fix [lint-advisory]: Prettier + ESLint formatting applied"
+            git push || echo "::warning::Push failed — check GH_TOKEN permissions."
+          fi
+
+  # ── PR comment summary (advisory table, always runs on PRs) ───────────────
+  pr-summary:
+    name: Post Lint Advisory Comment
+    runs-on: ubuntu-latest
+    needs: [lint-python, lint-java, lint-js]
+    if: always() && github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Build and post advisory comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pythonResult = '${{ needs.lint-python.result }}';
+            const javaResult   = '${{ needs.lint-java.result }}';
+            const jsResult     = '${{ needs.lint-js.result }}';
+
+            const icon = (r) =>
+              r === 'success' ? '✅' :
+              r === 'skipped' ? '⏭️' :
+              r === 'failure' ? '⚠️' : '❓';
+
+            const lines = [
+              '## 🔍 DreamCobots Lint Advisory',
+              '',
+              '> **Advisory only** — these checks are informational and do not block merging.',
+              '> Auto-fixes have been committed to this branch where applicable.',
+              '',
+              '| Language | Status |',
+              '|----------|--------|',
+              `| Python (Flake8 + Black)                    | ${icon(pythonResult)} ${pythonResult} |`,
+              `| Java (Checkstyle + google-java-format)     | ${icon(javaResult)}   ${javaResult} |`,
+              `| JS/TS (ESLint + Prettier)                  | ${icon(jsResult)}     ${jsResult} |`,
+              '',
+            ];
+
+            const hasIssues = [pythonResult, javaResult, jsResult]
+              .some(r => r === 'failure');
+
+            if (hasIssues) {
+              lines.push('### 💡 Quick fixes');
+              if (pythonResult === 'failure') {
+                lines.push('- **Python:** `black python_bots/ && flake8 python_bots/ --max-line-length=120 --ignore=W503`');
+              }
+              if (javaResult === 'failure') {
+                lines.push('- **Java:** `java -jar google-java-format-all-deps.jar --replace $(find java_bots -name "*.java")`');
+              }
+              if (jsResult === 'failure') {
+                lines.push('- **JS/TS:** `npm run lint -- --fix && npx prettier --write "**/*.{js,ts,jsx,tsx}"`');
+              }
+            } else {
+              lines.push('### ✅ All checked languages look clean!');
+            }
+
+            lines.push('');
+            lines.push('---');
+            lines.push(`*Lint Advisory · commit \`${{ github.event.pull_request.head.sha }}\` · branch \`${{ github.head_ref }}\`*`);
+
+            const body = lines.join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' &&
+              c.body.includes('DreamCobots Lint Advisory')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
