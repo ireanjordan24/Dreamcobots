@@ -54,7 +54,7 @@ jobs:
           npm run test -- --passWithNoTests
 
       - name: Trigger all core workflows
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           RUN_MONITORING: ${{ inputs.run_monitoring || github.event.inputs.run_monitoring || 'false' }}
           COMPANY_NAMES: ${{ inputs.company_names || github.event.inputs.company_names || 'Stripe,Shopify,OpenAI' }}

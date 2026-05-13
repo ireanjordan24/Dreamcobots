@@ -92,7 +92,7 @@ jobs:
 
       - name: Dispatch connected workflows
         if: ${{ (inputs.dispatch_all_workflows || github.event.inputs.dispatch_all_workflows || 'true') == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
