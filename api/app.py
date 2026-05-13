@@ -6,6 +6,8 @@ Endpoints
 GET  /health                 Liveness probe (no auth required)
 POST /auth/signup            Create account (returns token)
 POST /auth/login             Authenticate (returns token)
+POST /auth/oauth/google      OAuth signup/login via Google ID token
+POST /auth/oauth/github      OAuth signup/login via GitHub access token
 
 POST /bots/run-all           Run all registered bots (Bearer token auth)
 POST /bots/run-single        Run one named bot      (Bearer token auth)
@@ -17,6 +19,17 @@ GET  /revenue                Revenue summary (PRO+ required)
 
 POST /billing/subscribe      Create or upgrade a Stripe subscription
 GET  /billing/status         Current subscription status
+
+POST /api/tokens             Generate a new developer API key (Bearer token auth)
+GET  /api/tokens             List the current user's API keys (optional ?category= filter)
+DELETE /api/tokens/<key_id>  Revoke a developer API key
+GET  /api/tokens/usage       API key usage summary for the current user
+
+GET  /domains                List the current user's domain portfolio
+POST /domains                Register a new domain in the portfolio
+POST /domains/flip           Record a completed domain flip
+PUT  /domains/<domain_id>/sell  Mark a domain for sale or close a sale
+GET  /domains/summary        Portfolio aggregate statistics
 
 Note: The in-memory bot registry (_user_bots) is intended for development /
 testing only.  Replace with a persistent database in production deployments.
@@ -32,10 +45,12 @@ from typing import Any, Dict
 from core.dreamco_orchestrator import DreamCoOrchestrator
 from core.bot_validator import BotValidator
 from core.sandbox_runner import SandboxRunner
-from saas.auth.auth import AuthService, UserRegistry
+from saas.auth.auth import AuthService, UserRegistry, _generate_token as _auth_generate_token
 from saas.auth.middleware import AuthMiddleware, RateLimiter
 from saas.auth.user_model import SubscriptionTier
+from saas.auth.api_key_registry import ClientApiKeyRegistry, API_KEY_CATEGORIES
 from saas.stripe_billing import StripeBillingService
+from bots.business_launch_pad.domain_manager import DomainManager, DomainManagerError
 
 _logger = logging.getLogger(__name__)
 
@@ -51,6 +66,12 @@ _rate_limiter = RateLimiter(max_requests=60, window_seconds=60)
 _validator = BotValidator()
 _sandbox = SandboxRunner(timeout_seconds=10)
 _billing = StripeBillingService(simulation_mode=not os.environ.get("STRIPE_API_KEY"))
+
+# Developer API key registry (per-user client keys)
+_api_key_registry = ClientApiKeyRegistry()
+
+# Domain portfolio manager
+_domain_manager = DomainManager()
 
 # Legacy API-key support (backwards compatible).
 # Set DREAMCO_API_KEYS env var with comma-separated keys in production.
@@ -192,6 +213,17 @@ def _sanitise_bot_result(result: dict) -> dict:
     return safe
 
 
+def _generate_oauth_password(provider_uid: str) -> str:
+    """Generate a deterministic-but-secure internal password for OAuth accounts.
+
+    OAuth users authenticate via their provider token, never via this
+    password.  The password satisfies the 8-char minimum so signup()
+    succeeds, and is derived from the provider UID so it's reproducible.
+    """
+    import hashlib
+    return "oauth_" + hashlib.sha256(provider_uid.encode()).hexdigest()[:24]
+
+
 # ---------------------------------------------------------------------------
 # Flask app (optional dependency)
 # ---------------------------------------------------------------------------
@@ -240,6 +272,153 @@ try:
             "token": result["token"],
             "tier": result["tier"],
         })
+
+    # ------------------------------------------------------------------ #
+    #  OAuth signup / login                                                #
+    # ------------------------------------------------------------------ #
+
+    @app.route("/auth/oauth/google", methods=["POST"])
+    def oauth_google() -> Any:
+        """
+        OAuth signup/login via a Google ID token.
+
+        Request body
+        ------------
+        id_token : str
+            Google-issued ID token from the client (obtained via Google
+            Sign-In SDK on web or mobile).
+        username : str, optional
+            Preferred username for new accounts (ignored on login).
+
+        Response (201 on new account, 200 on existing)
+        -----------------------------------------------
+        success, user_id, token, tier, provider, is_new_user
+        """
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        id_token: str = data.get("id_token", "").strip()
+        if not id_token:
+            return jsonify({"error": "id_token is required"}), 400
+
+        # --------------- token verification ---------------
+        # In production: call Google's tokeninfo endpoint or use
+        # google-auth library to verify signature & audience.
+        # Here we accept the token as opaque and extract the sub claim
+        # from a decoded payload if available, else derive a stable ID.
+        # This simulation keeps the module dependency-free.
+        import base64 as _b64
+        import json as _json
+
+        google_user_id: str = ""
+        google_email: str = ""
+        google_name: str = ""
+        try:
+            # JWT is three base64url segments; the payload is the second
+            parts = id_token.split(".")
+            if len(parts) == 3:
+                padded = parts[1] + "=" * (-len(parts[1]) % 4)
+                payload = _json.loads(_b64.urlsafe_b64decode(padded))
+                google_user_id = str(payload.get("sub", ""))
+                google_email = payload.get("email", "")
+                google_name = payload.get("name", "")
+        except Exception:
+            pass  # fall through to synthetic ID
+
+        if not google_user_id:
+            # Deterministic fallback so tests work without a real JWT
+            import hashlib as _hl
+            google_user_id = _hl.sha256(id_token.encode()).hexdigest()[:16]
+        if not google_email:
+            google_email = f"google_{google_user_id}@oauth.dreamco.local"
+        if not google_name:
+            google_name = data.get("username", "") or f"google_{google_user_id[:8]}"
+
+        # Check if a user with this email already exists
+        existing = _registry.get_by_email(google_email)
+        if existing:
+            new_token = _auth_generate_token(existing.user_id)
+            return jsonify({
+                "success": True,
+                "user_id": existing.user_id,
+                "token": new_token,
+                "tier": existing.tier.value,
+                "provider": "google",
+                "is_new_user": False,
+            })
+
+        # Create new account
+        result = _auth_svc.signup(
+            username=google_name,
+            email=google_email,
+            password=_generate_oauth_password(google_user_id),
+        )
+        if not result.get("success"):
+            return jsonify({"error": result.get("error", "oauth signup failed")}), 400
+        return jsonify({
+            "success": True,
+            "user_id": result["user_id"],
+            "token": result["token"],
+            "tier": "free",
+            "provider": "google",
+            "is_new_user": True,
+        }), 201
+
+    @app.route("/auth/oauth/github", methods=["POST"])
+    def oauth_github() -> Any:
+        """
+        OAuth signup/login via a GitHub access token.
+
+        Request body
+        ------------
+        access_token : str
+            GitHub OAuth access token obtained via the GitHub OAuth flow.
+        username : str, optional
+            Preferred username for new accounts.
+
+        Response (201 on new account, 200 on existing)
+        -----------------------------------------------
+        success, user_id, token, tier, provider, is_new_user
+        """
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        access_token: str = data.get("access_token", "").strip()
+        if not access_token:
+            return jsonify({"error": "access_token is required"}), 400
+
+        # --------------- token exchange ---------------
+        # In production: call https://api.github.com/user with the token
+        # to retrieve the GitHub user profile (login, id, email).
+        # This simulation derives a stable identity from the token.
+        import hashlib as _hl
+        gh_id = _hl.sha256(access_token.encode()).hexdigest()[:16]
+        gh_email = f"github_{gh_id}@oauth.dreamco.local"
+        gh_name = data.get("username", "") or f"gh_{gh_id[:8]}"
+
+        existing = _registry.get_by_email(gh_email)
+        if existing:
+            new_token = _auth_generate_token(existing.user_id)
+            return jsonify({
+                "success": True,
+                "user_id": existing.user_id,
+                "token": new_token,
+                "tier": existing.tier.value,
+                "provider": "github",
+                "is_new_user": False,
+            })
+
+        result = _auth_svc.signup(
+            username=gh_name,
+            email=gh_email,
+            password=_generate_oauth_password(gh_id),
+        )
+        if not result.get("success"):
+            return jsonify({"error": result.get("error", "oauth signup failed")}), 400
+        return jsonify({
+            "success": True,
+            "user_id": result["user_id"],
+            "token": result["token"],
+            "tier": "free",
+            "provider": "github",
+            "is_new_user": True,
+        }), 201
 
     # ------------------------------------------------------------------ #
     #  Bot execution                                                       #
@@ -453,6 +632,320 @@ try:
             return jsonify({"error": "Both 'path' and 'name' are required"}), 400
         result = _orch.run_bot(bot_path, bot_name)
         return jsonify(_sanitise_bot_result(result))
+
+    # ------------------------------------------------------------------ #
+    #  Developer API token management                                      #
+    # ------------------------------------------------------------------ #
+
+    @app.route("/api/tokens", methods=["POST"])
+    def create_api_token() -> Any:
+        """Generate a new developer API key for the authenticated user.
+
+        Request body
+        ------------
+        label : str
+            Human-readable name for the key.
+        category : str
+            One of: read_only, full_access, bot_runner, webhook, analytics.
+
+        Response (201)
+        --------------
+        key_id, key (shown once only), label, category, tier, created_at
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        label: str = data.get("label", "").strip()
+        category: str = data.get("category", "").strip()
+
+        if not label:
+            return jsonify({"error": "'label' is required"}), 400
+        if not category:
+            return jsonify({
+                "error": "'category' is required",
+                "valid_categories": sorted(API_KEY_CATEGORIES),
+            }), 400
+
+        try:
+            record = _api_key_registry.generate_key(
+                user_id=user.user_id,
+                label=label,
+                category=category,
+                tier=user.tier.value,
+            )
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        return jsonify(record.to_dict(include_key=True)), 201
+
+    @app.route("/api/tokens", methods=["GET"])
+    def list_api_tokens() -> Any:
+        """List the current user's developer API keys.
+
+        Query parameters
+        ----------------
+        category : str, optional
+            Filter by category (read_only, full_access, bot_runner, webhook, analytics).
+        include_revoked : bool, optional
+            Pass ``true`` to include revoked keys (default: false).
+
+        Response (200)
+        --------------
+        keys : list, count : int, valid_categories : list
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        category: str = request.args.get("category", "").strip() or None  # type: ignore[assignment]
+        include_revoked: bool = request.args.get("include_revoked", "false").lower() == "true"
+
+        keys = _api_key_registry.list_keys(
+            user.user_id,
+            category=category,
+            active_only=not include_revoked,
+        )
+        return jsonify({
+            "keys": [k.to_dict() for k in keys],
+            "count": len(keys),
+            "valid_categories": sorted(API_KEY_CATEGORIES),
+        })
+
+    @app.route("/api/tokens/<key_id>", methods=["DELETE"])
+    def revoke_api_token(key_id: str) -> Any:
+        """Revoke (soft-delete) a developer API key.
+
+        Path parameter
+        --------------
+        key_id : str
+            The ``key_id`` returned when the key was created.
+
+        Response (200)
+        --------------
+        success : bool, key_id : str, message : str
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        try:
+            record = _api_key_registry.revoke_key(user.user_id, key_id)
+        except KeyError:
+            return jsonify({"error": f"API key '{key_id}' not found"}), 404
+
+        return jsonify({
+            "success": True,
+            "key_id": record.key_id,
+            "message": f"API key '{record.label}' has been revoked",
+        })
+
+    @app.route("/api/tokens/usage", methods=["GET"])
+    def api_token_usage() -> Any:
+        """Return API key usage summary for the current user.
+
+        Query parameters
+        ----------------
+        category : str, optional
+            When set, the ``by_category`` field is filtered to that category.
+
+        Response (200)
+        --------------
+        user_id, total_keys, active_keys, total_calls, by_category
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        summary = _api_key_registry.usage_summary(user.user_id)
+        category: str = request.args.get("category", "").strip()
+        if category:
+            # Filter by_category to the requested one
+            filtered = {category: summary["by_category"].get(category, 0)}
+            summary["by_category"] = filtered
+
+        return jsonify(summary)
+
+    # ------------------------------------------------------------------ #
+    #  Domain portfolio management                                         #
+    # ------------------------------------------------------------------ #
+
+    @app.route("/domains", methods=["GET"])
+    def list_domains() -> Any:
+        """List the current user's domain portfolio.
+
+        Query parameters
+        ----------------
+        status : str, optional
+            Filter by status: owned, listed, sold, flipped.
+
+        Response (200)
+        --------------
+        domains : list, count : int
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        status: str = request.args.get("status", "").strip() or None  # type: ignore[assignment]
+        try:
+            domains = _domain_manager.list_portfolio(user.user_id, status=status)
+        except DomainManagerError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        return jsonify({"domains": [d.to_dict() for d in domains], "count": len(domains)})
+
+    @app.route("/domains", methods=["POST"])
+    def register_domain() -> Any:
+        """Register a new domain in the portfolio.
+
+        Request body
+        ------------
+        name : str                  Fully-qualified domain name (e.g. ``example.com``).
+        registrar : str, optional   Registrar name (default: Namecheap).
+        registration_cost_usd : float, optional  Cost paid (default: 12.99).
+        expiry_date : str, optional ISO date of domain expiry (``YYYY-MM-DD``).
+        notes : str, optional
+
+        Response (201)
+        --------------
+        Domain record dict.
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        name: str = data.get("name", "").strip()
+        if not name:
+            return jsonify({"error": "'name' (domain name) is required"}), 400
+
+        try:
+            cost = float(data.get("registration_cost_usd", 12.99))
+        except (TypeError, ValueError):
+            return jsonify({"error": "'registration_cost_usd' must be a number"}), 400
+
+        try:
+            domain = _domain_manager.register(
+                name=name,
+                user_id=user.user_id,
+                registrar=str(data.get("registrar", "Namecheap")),
+                registration_cost_usd=cost,
+                expiry_date=data.get("expiry_date"),
+                notes=str(data.get("notes", "")),
+            )
+        except DomainManagerError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        return jsonify(domain.to_dict()), 201
+
+    @app.route("/domains/flip", methods=["POST"])
+    def flip_domain() -> Any:
+        """Record a completed domain flip (buy and sell in one step).
+
+        Request body
+        ------------
+        name : str                Fully-qualified domain name.
+        buy_price_usd : float     Acquisition cost.
+        sell_price_usd : float    Amount received from sale.
+        registrar : str, optional
+        notes : str, optional
+
+        Response (201)
+        --------------
+        Domain record dict with status ``flipped`` and ``profit_usd`` set.
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        name: str = data.get("name", "").strip()
+        if not name:
+            return jsonify({"error": "'name' (domain name) is required"}), 400
+
+        try:
+            buy = float(data.get("buy_price_usd", 0))
+            sell = float(data.get("sell_price_usd", 0))
+        except (TypeError, ValueError):
+            return jsonify({"error": "'buy_price_usd' and 'sell_price_usd' must be numbers"}), 400
+
+        try:
+            domain = _domain_manager.flip_domain(
+                name=name,
+                user_id=user.user_id,
+                buy_price_usd=buy,
+                sell_price_usd=sell,
+                registrar=str(data.get("registrar", "Namecheap")),
+                notes=str(data.get("notes", "")),
+            )
+        except DomainManagerError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        return jsonify(domain.to_dict()), 201
+
+    @app.route("/domains/<domain_id>/sell", methods=["PUT"])
+    def sell_domain(domain_id: str) -> Any:
+        """Mark a domain for sale or close a completed sale.
+
+        Request body
+        ------------
+        action : str
+            ``"list"`` — set an asking price and mark as LISTED.
+            ``"close"`` — record the final sale and mark as SOLD.
+        ask_price_usd : float   Required when action is ``"list"``.
+        sold_price_usd : float  Required when action is ``"close"``.
+
+        Response (200)
+        --------------
+        Updated domain record dict.
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data: Dict[str, Any] = request.get_json(silent=True) or {}
+        action: str = str(data.get("action", "")).strip().lower()
+
+        if action not in ("list", "close"):
+            return jsonify({"error": "'action' must be 'list' or 'close'"}), 400
+
+        try:
+            if action == "list":
+                try:
+                    ask = float(data.get("ask_price_usd", 0))
+                except (TypeError, ValueError):
+                    return jsonify({"error": "'ask_price_usd' must be a number"}), 400
+                domain = _domain_manager.mark_for_sale(domain_id, user.user_id, ask)
+            else:
+                try:
+                    sold = float(data.get("sold_price_usd", 0))
+                except (TypeError, ValueError):
+                    return jsonify({"error": "'sold_price_usd' must be a number"}), 400
+                domain = _domain_manager.close_sale(domain_id, user.user_id, sold)
+        except KeyError:
+            return jsonify({"error": f"Domain '{domain_id}' not found"}), 404
+        except DomainManagerError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        return jsonify(domain.to_dict())
+
+    @app.route("/domains/summary", methods=["GET"])
+    def domain_portfolio_summary() -> Any:
+        """Return aggregate domain portfolio statistics for the current user.
+
+        Response (200)
+        --------------
+        total_domains, owned, listed, sold, flipped,
+        total_invested_usd, total_revenue_usd, total_profit_usd,
+        portfolio_estimated_value_usd
+        """
+        user, err = _middleware.authenticate(request.headers.get("Authorization"))
+        if err:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify(_domain_manager.portfolio_summary(user.user_id))
 
     FLASK_AVAILABLE = True
 
