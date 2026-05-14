@@ -40,7 +40,11 @@ jobs:
           git commit -m "chore(data): update integration lookup"
           target_branch="${GITHUB_REF_NAME:-main}"
           for attempt in 1 2 3; do
-            git pull --rebase origin "${target_branch}" || true
+            if ! git pull --rebase origin "${target_branch}"; then
+              if git rev-parse --verify REBASE_HEAD >/dev/null 2>&1; then
+                git rebase --abort
+              fi
+            fi
             if git push origin "HEAD:${target_branch}"; then
               break
             fi
