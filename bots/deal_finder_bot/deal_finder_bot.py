@@ -10,15 +10,23 @@ class DealFinderBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
 
 
+class _TierProxy:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return getattr(other, "value", str(other).lower()) == self.value
+
+
 class DealFinderBot:
     """Tier-aware deal finder and arbitrage bot."""
 
     PLATFORM_LIMITS = {
-        Tier.FREE: ["ebay"],
-        Tier.PRO: ["ebay", "amazon", "craigslist", "facebook", "mercari"],
-        Tier.ENTERPRISE: ["ebay", "amazon", "craigslist", "facebook", "mercari", "offerup", "poshmark", "etsy", "walmart", "aliexpress"],
+        "free": ["ebay"],
+        "pro": ["ebay", "amazon", "craigslist", "facebook", "mercari"],
+        "enterprise": ["ebay", "amazon", "craigslist", "facebook", "mercari", "offerup", "poshmark", "etsy", "walmart", "aliexpress"],
     }
-    ITEM_LIMITS = {Tier.FREE: 10, Tier.PRO: 100, Tier.ENTERPRISE: None}
+    ITEM_LIMITS = {"free": 10, "pro": 100, "enterprise": None}
 
     MOCK_MARKETPLACE_DATA = {
         "ebay": [
@@ -74,21 +82,26 @@ class DealFinderBot:
         ],
     }
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = None):
+        if tier is None:
+            tier = _TierProxy("free")
         self.tier = tier
-        self.config = get_tier_config(tier)
+        self.config = get_tier_config(Tier(self._tier_value()))
         self._scanned_items: list = []
+
+    def _tier_value(self) -> str:
+        return getattr(self.tier, "value", str(self.tier).lower())
 
     def scan_marketplace(self, platform: str) -> list:
         """Return list of deals from a platform."""
-        allowed = self.PLATFORM_LIMITS[self.tier]
+        allowed = self.PLATFORM_LIMITS[self._tier_value()]
         if platform.lower() not in allowed:
             raise DealFinderBotTierError(
                 f"Platform '{platform}' not available on {self.config.name} tier. "
                 f"Allowed: {allowed}. Upgrade to access more platforms."
             )
         items = self.MOCK_MARKETPLACE_DATA.get(platform.lower(), [])
-        limit = self.ITEM_LIMITS[self.tier]
+        limit = self.ITEM_LIMITS[self._tier_value()]
         if limit is not None:
             items = items[:limit]
         self._scanned_items = items
@@ -126,9 +139,9 @@ class DealFinderBot:
             "profit_margin_pct": round(margin, 1),
             "deal_score": score,
             "recommendation": recommendation,
-            "tier": self.tier.value,
+            "tier": self._tier_value(),
         }
-        if self.tier in (Tier.PRO, Tier.ENTERPRISE):
+        if self._tier_value() in ("pro", "enterprise"):
             result["price_history_available"] = True
             result["profit_calculator"] = {
                 "gross_profit": round(item["market_value"] - item["buy_price"], 2),
@@ -159,7 +172,7 @@ class DealFinderBot:
         """Return top deals sorted by profit potential."""
         if not self._scanned_items:
             all_items = []
-            for platform in self.PLATFORM_LIMITS[self.tier]:
+            for platform in self.PLATFORM_LIMITS[self._tier_value()]:
                 all_items.extend(self.MOCK_MARKETPLACE_DATA.get(platform, []))
             self._scanned_items = all_items
         annotated = [self._annotate_item(item) for item in self._scanned_items]

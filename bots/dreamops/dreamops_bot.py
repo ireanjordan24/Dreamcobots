@@ -20,9 +20,21 @@ from __future__ import annotations
 
 import sys
 import os
+import importlib.util
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "ai-models-integration"))
+_AI_MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "ai-models-integration")
+_AI_MODELS_DIR = os.path.abspath(_AI_MODELS_DIR)
+_AI_TIERS_PATH = os.path.join(_AI_MODELS_DIR, "tiers.py")
+sys.path.insert(0, _AI_MODELS_DIR)
+
+_tiers_mod = sys.modules.get("tiers")
+if not _tiers_mod or not getattr(_tiers_mod, "__file__", "").startswith(_AI_MODELS_DIR):
+    _spec = importlib.util.spec_from_file_location("tiers", _AI_TIERS_PATH)
+    _tiers_mod = importlib.util.module_from_spec(_spec)
+    assert _spec and _spec.loader
+    _spec.loader.exec_module(_tiers_mod)
+    sys.modules["tiers"] = _tiers_mod
 
 from tiers import Tier, get_tier_config, get_upgrade_path  # noqa: F401
 from framework import GlobalAISourcesFlow  # noqa: F401
@@ -44,6 +56,14 @@ class DreamOpsTierError(Exception):
     """Raised when a feature is not available on the current tier."""
 
 
+class _TierProxy:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return getattr(other, "value", str(other).lower()) == self.value
+
+
 class DreamOpsBot:
     """
     DreamOps AI Automation Suite bot.
@@ -52,7 +72,9 @@ class DreamOpsBot:
     gated by the active subscription tier.
     """
 
-    def __init__(self, tier: Tier = Tier.FREE) -> None:
+    def __init__(self, tier: Tier = None) -> None:
+        if tier is None:
+            tier = _TierProxy("free")
         self._tier = tier
         self._anomaly_detector = AnomalyDetector()
         self._scaling_engine = ScalingEngine()
@@ -71,6 +93,9 @@ class DreamOpsBot:
     @property
     def tier(self) -> Tier:
         return self._tier
+
+    def _tier_value(self) -> str:
+        return getattr(self._tier, "value", str(self._tier).lower())
 
     # ------------------------------------------------------------------
     # Sub-module properties
@@ -117,17 +142,19 @@ class DreamOpsBot:
     # ------------------------------------------------------------------
 
     def _require_pro(self, feature: str) -> None:
-        if self._tier == Tier.FREE:
+        if self._tier_value() == Tier.FREE.value:
+            current_tier = Tier(self._tier_value())
             raise DreamOpsTierError(
                 f"'{feature}' requires PRO or ENTERPRISE tier. "
-                f"Upgrade path: {get_upgrade_path(self._tier)}"
+                f"Upgrade path: {get_upgrade_path(current_tier)}"
             )
 
     def _require_enterprise(self, feature: str) -> None:
-        if self._tier in (Tier.FREE, Tier.PRO):
+        if self._tier_value() in (Tier.FREE.value, Tier.PRO.value):
+            current_tier = Tier(self._tier_value())
             raise DreamOpsTierError(
                 f"'{feature}' requires ENTERPRISE tier. "
-                f"Upgrade path: {get_upgrade_path(self._tier)}"
+                f"Upgrade path: {get_upgrade_path(current_tier)}"
             )
 
     # ------------------------------------------------------------------

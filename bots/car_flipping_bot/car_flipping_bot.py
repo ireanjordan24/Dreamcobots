@@ -133,8 +133,8 @@ class CarFlippingBot:
 from bots.stripe_integration.stripe_client import StripeClient as _StripeClientCFB
 
 _CFB_PRICES = {
-    Tier.PRO: 4900,         # $49/month
-    Tier.ENTERPRISE: 29900, # $299/month
+    Tier.PRO.value: 4900,         # $49/month
+    Tier.ENTERPRISE.value: 29900, # $299/month
 }
 
 _orig_cfb_init = CarFlippingBot.__init__
@@ -146,10 +146,11 @@ def _cfb_new_init(self, tier: Tier = Tier.FREE) -> None:
 
 
 def _cfb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
-    if upgrade_tier == Tier.FREE:
+    tier_value = getattr(upgrade_tier, "value", str(upgrade_tier).lower())
+    if tier_value == Tier.FREE.value:
         raise CarFlippingBotTierError("Cannot create checkout for FREE tier.")
-    price_cents = _CFB_PRICES.get(upgrade_tier, 4900)
-    result = self._stripe.create_checkout_session(plan=f"CarFlipping {upgrade_tier.value.title()}", amount_cents=price_cents)
+    price_cents = _CFB_PRICES.get(tier_value, 4900)
+    result = self._stripe.create_checkout_session(plan=f"CarFlipping {tier_value.title()}", amount_cents=price_cents)
     if customer_email:
         result["customer_email"] = customer_email
     result["mode"] = "subscription"
@@ -157,10 +158,11 @@ def _cfb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str =
 
 
 def _cfb_create_payment_link(self, upgrade_tier: Tier) -> dict:
-    if upgrade_tier == Tier.FREE:
+    tier_value = getattr(upgrade_tier, "value", str(upgrade_tier).lower())
+    if tier_value == Tier.FREE.value:
         raise CarFlippingBotTierError("Cannot create payment link for FREE tier.")
-    price_cents = _CFB_PRICES.get(upgrade_tier, 4900)
-    return self._stripe.create_payment_link(plan=f"CarFlipping {upgrade_tier.value.title()}", amount_cents=price_cents)
+    price_cents = _CFB_PRICES.get(tier_value, 4900)
+    return self._stripe.create_payment_link(plan=f"CarFlipping {tier_value.title()}", amount_cents=price_cents)
 
 
 CarFlippingBot.__init__ = _cfb_new_init

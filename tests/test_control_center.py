@@ -1,5 +1,6 @@
 """Tests for bots/control_center/control_center.py"""
 import sys, os
+import importlib.util
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), '..')
 AI_MODELS_DIR = os.path.join(REPO_ROOT, 'bots', 'ai-models-integration')
@@ -8,7 +9,14 @@ sys.path.insert(0, os.path.join(AI_MODELS_DIR, 'models'))
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from tiers import Tier
+
+_tiers_spec = importlib.util.spec_from_file_location(
+    "ai_model_tiers", os.path.join(AI_MODELS_DIR, "tiers.py")
+)
+_tiers_mod = importlib.util.module_from_spec(_tiers_spec)
+assert _tiers_spec and _tiers_spec.loader
+_tiers_spec.loader.exec_module(_tiers_mod)
+Tier = _tiers_mod.Tier
 from bots.control_center.control_center import ControlCenter
 from bots.affiliate_bot.affiliate_bot import AffiliateBot
 from bots.mining_bot.mining_bot import MiningBot
@@ -200,7 +208,6 @@ class TestHeartbeatMonitoring:
         assert result["status"] == "updating"
 
     def test_record_heartbeat_updates_registered_bot_status(self):
-        from tiers import Tier
         from bots.mining_bot.mining_bot import MiningBot
         cc = ControlCenter()
         cc.register_bot("mining", MiningBot(tier=Tier.FREE))

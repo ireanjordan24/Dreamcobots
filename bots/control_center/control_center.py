@@ -1,8 +1,12 @@
 """Control Center — central orchestration dashboard for all Dreamcobots."""
 import sys, os
+import importlib.util
 from datetime import datetime, timezone
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration'))
-from tiers import Tier, get_tier_config
+_AI_MODELS_DIR = os.path.join(os.path.dirname(__file__), '..', 'ai-models-integration')
+_AI_MODELS_DIR = os.path.abspath(_AI_MODELS_DIR)
+_AI_TIERS_PATH = os.path.join(_AI_MODELS_DIR, "tiers.py")
+sys.path.insert(0, _AI_MODELS_DIR)
+
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 _HEARTBEAT_STALE_SECONDS = 5 * 60  # 5 minutes

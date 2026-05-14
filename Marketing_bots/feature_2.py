@@ -205,6 +205,11 @@ class Tier(_TierEnum):
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return other.upper() == self.name or other.lower() == self.value
+        return super().__eq__(other)
+
 
 _TIER_MONTHLY_PRICE = {"free": 0, "pro": 29, "enterprise": 99}
 

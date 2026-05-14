@@ -64,6 +64,14 @@ class HomeBuyerBotError(Exception):
     """Raised when a feature is not available on the current tier."""
 
 
+class _TierProxy:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return getattr(other, "value", str(other).lower()) == self.value
+
+
 # ---------------------------------------------------------------------------
 # Mock property database for Chicago
 # ---------------------------------------------------------------------------
@@ -256,13 +264,15 @@ class Payment:
 class HomeBuyerBot:
     """Chicago-focused lead generation + payment bot for Buy/Rent/Off-Market deals."""
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = None):
+        if tier is None:
+            tier = _TierProxy("free")
         self.tier = tier
-        self.config = get_tier_config(tier)
+        self.config = get_tier_config(Tier(getattr(tier, "value", str(tier).lower())))
         self._leads: Dict[str, Lead] = {}
         self._payments: Dict[str, Payment] = {}
         self._interaction_log: List[dict] = []
-        logger.info("HomeBuyerBot initialized [tier=%s]", tier.value)
+        logger.info("HomeBuyerBot initialized [tier=%s]", self.tier.value)
 
     # ------------------------------------------------------------------
     # Feature gating
@@ -271,7 +281,7 @@ class HomeBuyerBot:
     def _require(self, feature: str) -> None:
         features = BOT_FEATURES.get(self.tier.value, [])
         if feature not in features:
-            upgrade = get_upgrade_path(self.tier)
+            upgrade = get_upgrade_path(Tier(getattr(self.tier, "value", str(self.tier).lower())))
             raise HomeBuyerBotError(
                 f"Feature '{feature}' requires a higher tier. "
                 f"Upgrade to {upgrade} to unlock it."
@@ -453,7 +463,7 @@ class HomeBuyerBot:
         return get_bot_tier_info(self.tier)
 
     def upgrade_path(self) -> Optional[str]:
-        path = get_upgrade_path(self.tier)
+        path = get_upgrade_path(Tier(getattr(self.tier, "value", str(self.tier).lower())))
         if path is None:
             return None
         tier_attr = getattr(path, "tier", None)

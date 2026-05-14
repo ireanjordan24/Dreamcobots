@@ -18,6 +18,7 @@ Covers all DreamOps modules:
 
 import sys
 import os
+import importlib.util
 
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 AI_MODELS_DIR = os.path.join(REPO_ROOT, "bots", "ai-models-integration")
@@ -25,7 +26,15 @@ sys.path.insert(0, AI_MODELS_DIR)
 sys.path.insert(0, REPO_ROOT)
 
 import pytest
-from tiers import Tier
+
+_tiers_spec = importlib.util.spec_from_file_location(
+    "ai_model_tiers", os.path.join(AI_MODELS_DIR, "tiers.py")
+)
+_tiers_mod = importlib.util.module_from_spec(_tiers_spec)
+assert _tiers_spec and _tiers_spec.loader
+_tiers_spec.loader.exec_module(_tiers_mod)
+Tier = _tiers_mod.Tier
+list_tiers = _tiers_mod.list_tiers
 from bots.dreamops.tiers import (
     BOT_FEATURES,
     WORKFLOW_LIMITS,
@@ -76,7 +85,6 @@ from bots.dreamops import DreamOpsBot as DreamOpsBotExport
 
 class TestTiers:
     def test_three_tiers_exist(self):
-        from tiers import list_tiers
         assert len(list_tiers()) == 3
 
     def test_free_tier_features_exist(self):

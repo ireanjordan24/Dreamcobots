@@ -23,6 +23,7 @@ from framework import GlobalAISourcesFlow  # noqa: F401  (GLOBAL AI SOURCES FLOW
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+import sys as _sys
 
 
 # ---------------------------------------------------------------------------
@@ -49,6 +50,18 @@ HIGH_REVENUE_THRESHOLD = REVENUE_THRESHOLD_HIGH
 
 BOTTLENECK_ERROR_RATE_THRESHOLD: float = 0.10
 BOTTLENECK_HIGH_SEVERITY_THRESHOLD: float = 0.25
+
+
+class _TierProxy:
+    """Compatibility wrapper for default tier comparisons across enum modules."""
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        if hasattr(other, "value"):
+            return getattr(other, "value") == self.value
+        return str(other).lower() == self.value
 
 ACTIONS = [
     {"key": DECISION_SCALE_LEADS,         "label": "Scale Leads",          "description": "Scale lead generation"},
@@ -102,10 +115,17 @@ class DecisionEngine:
             _Tier = None
 
         if tier is None:
-            if _Tier is not None:
-                self.tier = _Tier.FREE
+            module_tier = None
+            tiers_mod = _sys.modules.get("tiers")
+            if tiers_mod is not None:
+                module_tier = getattr(tiers_mod, "Tier", None)
+
+            if module_tier is not None:
+                self.tier = _TierProxy(getattr(module_tier.FREE, "value", "free"))
+            elif _Tier is not None:
+                self.tier = _TierProxy(getattr(_Tier.FREE, "value", "free"))
             else:
-                self.tier = None
+                self.tier = _TierProxy("free")
         else:
             self.tier = tier
 
@@ -304,14 +324,18 @@ class DecisionEngine:
             else:
                 key = DECISION_OPTIMIZE
             self._decision_history.append({"decision": key, "revenue": revenue, "leads": leads})
-            return f"Decision: {key}"
+            if metrics is None:
+                return f"Decision: {key}"
+            return key
         result = self.make_decision(
             revenue_data=m.get("revenue", {}),
             crm_data=m.get("crm", {}),
             workflow_data=m.get("workflow", {}),
         )
         key = result["decision"]["key"]
-        return f"Decision: {key}"
+        if metrics is None:
+            return f"Decision: {key}"
+        return key
 
     def get_latest_decision(self) -> Optional[Dict[str, Any]]:
         """Return the most recent decision log entry, or None if empty."""

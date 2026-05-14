@@ -10,13 +10,21 @@ class MiningBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
 
 
+class _TierProxy:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return getattr(other, "value", str(other).lower()) == self.value
+
+
 class MiningBot:
     """Tier-aware cryptocurrency mining management bot."""
 
     COIN_LIMITS = {
-        Tier.FREE: ["BTC"],
-        Tier.PRO: ["BTC", "ETH", "LTC", "RVN", "ERG"],
-        Tier.ENTERPRISE: ["BTC", "ETH", "LTC", "RVN", "ERG", "FLUX", "KAS", "XMR", "DOGE", "ZEC"],
+        "free": ["BTC"],
+        "pro": ["BTC", "ETH", "LTC", "RVN", "ERG"],
+        "enterprise": ["BTC", "ETH", "LTC", "RVN", "ERG", "FLUX", "KAS", "XMR", "DOGE", "ZEC"],
     }
 
     COIN_DATA = {
@@ -34,16 +42,21 @@ class MiningBot:
 
     EXCHANGES = ["Binance", "Coinbase", "Kraken", "KuCoin", "Bybit"]
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = None):
+        if tier is None:
+            tier = _TierProxy("free")
         self.tier = tier
-        self.config = get_tier_config(tier)
+        self.config = get_tier_config(Tier(self._tier_value()))
         self._current_coin = "BTC"
         self._auto_withdraw_threshold: float = None
         self._earnings: float = 0.0
 
+    def _tier_value(self) -> str:
+        return getattr(self.tier, "value", str(self.tier).lower())
+
     def scan_coins(self) -> list:
         """Return list of mineable coins with profitability data."""
-        allowed = self.COIN_LIMITS[self.tier]
+        allowed = self.COIN_LIMITS[self._tier_value()]
         return [
             {
                 "coin": symbol,
@@ -60,7 +73,7 @@ class MiningBot:
 
     def switch_coin(self, coin: str) -> dict:
         """Switch to mining a different coin."""
-        allowed = self.COIN_LIMITS[self.tier]
+        allowed = self.COIN_LIMITS[self._tier_value()]
         coin_upper = coin.upper()
         if coin_upper not in allowed:
             raise MiningBotTierError(
@@ -90,22 +103,22 @@ class MiningBot:
             "electricity_cost_usd": round(electricity_cost, 2),
             "net_daily_usd": round(net_daily, 2),
             "monthly_net_usd": round(net_daily * 30, 2),
-            "tier": self.tier.value,
+            "tier": self._tier_value(),
         }
-        if self.tier in (Tier.PRO, Tier.ENTERPRISE):
+        if self._tier_value() in ("pro", "enterprise"):
             best = max(
-                (c for c in self.COIN_LIMITS[self.tier]),
+                (c for c in self.COIN_LIMITS[self._tier_value()]),
                 key=lambda c: self.COIN_DATA[c]["daily_revenue_usd"]
             )
             result["most_profitable_coin"] = best
             result["profit_tracking_enabled"] = True
-        if self.tier == Tier.ENTERPRISE:
-            result["portfolio_optimization"] = {coin: self.COIN_DATA[coin]["daily_revenue_usd"] for coin in self.COIN_LIMITS[self.tier]}
+        if self._tier_value() == "enterprise":
+            result["portfolio_optimization"] = {coin: self.COIN_DATA[coin]["daily_revenue_usd"] for coin in self.COIN_LIMITS[self._tier_value()]}
         return result
 
     def auto_withdraw(self, threshold: float) -> dict:
         """Set up auto-withdrawal (PRO+ only)."""
-        if self.tier == Tier.FREE:
+        if self._tier_value() == "free":
             raise MiningBotTierError("Auto-withdraw is not available on the FREE tier. Upgrade to PRO or ENTERPRISE.")
         self._auto_withdraw_threshold = threshold
         return {
@@ -113,12 +126,12 @@ class MiningBot:
             "threshold_usd": threshold,
             "current_coin": self._current_coin,
             "message": f"Auto-withdraw set: will withdraw when earnings reach ${threshold:.2f}",
-            "tier": self.tier.value,
+            "tier": self._tier_value(),
         }
 
     def multi_exchange_route(self, amount: float) -> dict:
         """Calculate optimal multi-exchange routing (ENTERPRISE only)."""
-        if self.tier != Tier.ENTERPRISE:
+        if self._tier_value() != "enterprise":
             raise MiningBotTierError("Multi-exchange routing is only available on ENTERPRISE tier.")
         splits = [round(amount / len(self.EXCHANGES), 2) for _ in self.EXCHANGES]
         splits[-1] = round(amount - sum(splits[:-1]), 2)

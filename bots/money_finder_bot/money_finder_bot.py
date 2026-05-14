@@ -10,6 +10,14 @@ class MoneyFinderBotTierError(Exception):
     """Raised when a feature is not available on the current tier."""
 
 
+class _TierProxy:
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return getattr(other, "value", str(other).lower()) == self.value
+
+
 class MoneyFinderBot:
     """Tier-aware unclaimed funds, government benefits, and cashback finder."""
 
@@ -59,38 +67,43 @@ class MoneyFinderBot:
         {"source": "TopCashback", "category": "Insurance", "avg_cashback_pct": 7.5, "max_cashback_usd": 400, "platform": "Web"},
     ]
 
-    def __init__(self, tier: Tier = Tier.FREE):
+    def __init__(self, tier: Tier = None):
+        if tier is None:
+            tier = _TierProxy("free")
         self.tier = tier
-        self.config = get_tier_config(tier)
+        self.config = get_tier_config(Tier(self._tier_value()))
         self._searched_states: list = []
+
+    def _tier_value(self) -> str:
+        return getattr(self.tier, "value", str(self.tier).lower())
 
     def scan_unclaimed_funds(self, name: str, state: str) -> list:
         """Return list of potentially unclaimed funds for a name in a state."""
         state_upper = state.upper()
-        if self.tier == Tier.FREE:
+        if self._tier_value() == "free":
             if len(self._searched_states) >= 1 and state_upper not in self._searched_states:
                 raise MoneyFinderBotTierError(
                     f"FREE tier limited to 1 state. Already searched '{self._searched_states[0]}'. "
                     "Upgrade to PRO to search all US states."
                 )
-        elif self.tier not in (Tier.PRO, Tier.ENTERPRISE):
+        elif self._tier_value() not in ("pro", "enterprise"):
             pass
 
-        if state_upper in self.INTERNATIONAL_SOURCES and self.tier != Tier.ENTERPRISE:
+        if state_upper in self.INTERNATIONAL_SOURCES and self._tier_value() != "enterprise":
             raise MoneyFinderBotTierError("International search requires ENTERPRISE tier.")
 
         if state_upper not in self._searched_states:
             self._searched_states.append(state_upper)
 
-        count = 2 if self.tier == Tier.FREE else (5 if self.tier == Tier.PRO else len(self.MOCK_UNCLAIMED))
+        count = 2 if self._tier_value() == "free" else (5 if self._tier_value() == "pro" else len(self.MOCK_UNCLAIMED))
         return [
-            {**record, "name": name, "state": state_upper, "tier": self.tier.value}
+            {**record, "name": name, "state": state_upper, "tier": self._tier_value()}
             for record in self.MOCK_UNCLAIMED[:count]
         ]
 
     def check_government_benefits(self, profile: dict) -> list:
         """Return eligible government benefits based on profile."""
-        if self.tier == Tier.FREE:
+        if self._tier_value() == "free":
             raise MoneyFinderBotTierError("Government benefits checker requires PRO or ENTERPRISE tier.")
         income = profile.get("annual_income_usd", 50000)
         household_size = profile.get("household_size", 1)
@@ -102,21 +115,21 @@ class MoneyFinderBot:
                     **prog,
                     "likely_eligible": income < poverty_line * 1.5,
                     "estimated_annual_benefit_usd": prog["typical_monthly_usd"] * 12,
-                    "tier": self.tier.value,
+                    "tier": self._tier_value(),
                 })
         return eligible
 
     def find_cashback_opportunities(self) -> list:
         """Return cashback and rebate opportunities."""
-        count = 3 if self.tier == Tier.FREE else len(self.CASHBACK_OFFERS)
+        count = 3 if self._tier_value() == "free" else len(self.CASHBACK_OFFERS)
         return [
-            {**offer, "tier": self.tier.value}
+            {**offer, "tier": self._tier_value()}
             for offer in self.CASHBACK_OFFERS[:count]
         ]
 
     def generate_recovery_report(self, name: str) -> dict:
         """Generate a comprehensive money recovery report."""
-        unclaimed = self.MOCK_UNCLAIMED[:3] if self.tier == Tier.FREE else self.MOCK_UNCLAIMED
+        unclaimed = self.MOCK_UNCLAIMED[:3] if self._tier_value() == "free" else self.MOCK_UNCLAIMED
         total_unclaimed = sum(r["amount_usd"] for r in unclaimed)
         cashback = self.find_cashback_opportunities()
         annual_cashback = sum(o.get("max_cashback_usd", 0) for o in cashback)
@@ -129,12 +142,12 @@ class MoneyFinderBot:
             "cashback_opportunities": cashback,
             "estimated_annual_cashback_usd": annual_cashback,
             "total_recovery_potential_usd": round(total_unclaimed + annual_cashback, 2),
-            "tier": self.tier.value,
-            "features": BOT_FEATURES[self.tier.value],
+            "tier": self._tier_value(),
+            "features": BOT_FEATURES[self._tier_value()],
         }
-        if self.tier in (Tier.PRO, Tier.ENTERPRISE):
+        if self._tier_value() in ("pro", "enterprise"):
             report["government_benefits_note"] = "Run check_government_benefits() with your profile for benefit eligibility."
-        if self.tier == Tier.ENTERPRISE:
+        if self._tier_value() == "enterprise":
             report["international_search"] = {"sources": self.INTERNATIONAL_SOURCES, "available": True}
             report["automated_recovery"] = True
         return report

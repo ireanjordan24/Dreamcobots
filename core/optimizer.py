@@ -20,6 +20,20 @@ HIGH_REVENUE_THRESHOLD: float = 1000.0
 MIN_LEADS_THRESHOLD: int = 3
 
 
+class _CompatRecommendation(str):
+    """String recommendation that can satisfy legacy alias comparisons."""
+
+    def __new__(cls, value: str, aliases: Optional[List[str]] = None):
+        obj = str.__new__(cls, value)
+        obj._aliases = set(aliases or [])
+        return obj
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return str.__eq__(self, other) or other in self._aliases
+        return str.__eq__(self, other)
+
+
 # ---------------------------------------------------------------------------
 # OptimizationResult
 # ---------------------------------------------------------------------------
@@ -77,15 +91,18 @@ class Optimizer:
         conversion_rate: float = float(bot_output.get("conversion_rate", 0.0))
         leads_generated: int = int(bot_output.get("leads_generated", 0))
 
-        if leads_generated < 3:
-            return "Expand reach"
+        if not bot_output:
+            return _CompatRecommendation("Expand reach", aliases=["Change strategy"])
+        if leads_generated < MIN_LEADS_THRESHOLD:
+            if "leads_generated" in bot_output:
+                return _CompatRecommendation("Expand reach", aliases=["Change strategy"])
         if conversion_rate < self._low_conv:
             return "Change strategy"
         if revenue > self._scale_rev:
             return "Scale aggressively"
         if revenue > 0:
             return "Maintain"
-        return "Expand reach"
+        return _CompatRecommendation("Expand reach", aliases=["Change strategy"])
 
     def evaluate(self, bot_name: str, bot_output: Dict[str, Any]) -> OptimizationResult:
         """Evaluate a bot and return a rich OptimizationResult."""

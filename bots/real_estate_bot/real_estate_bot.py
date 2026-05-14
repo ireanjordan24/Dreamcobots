@@ -666,8 +666,8 @@ def run() -> dict:
 from bots.stripe_integration.stripe_client import StripeClient as _StripeClientREB
 
 _REB_PRICES = {
-    Tier.PRO: 4900,         # $49/month
-    Tier.ENTERPRISE: 29900, # $299/month
+    Tier.PRO.value: 4900,         # $49/month
+    Tier.ENTERPRISE.value: 29900, # $299/month
 }
 
 _orig_reb_init = RealEstateBot.__init__
@@ -679,10 +679,11 @@ def _reb_new_init(self, tier: Tier = Tier.FREE) -> None:
 
 
 def _reb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str = None) -> dict:
-    if upgrade_tier == Tier.FREE:
+    tier_value = getattr(upgrade_tier, "value", str(upgrade_tier).lower())
+    if tier_value == Tier.FREE.value:
         raise RealEstateBotTierError("Cannot create checkout for FREE tier.")
-    price_cents = _REB_PRICES.get(upgrade_tier, 4900)
-    result = self._stripe.create_checkout_session(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+    price_cents = _REB_PRICES.get(tier_value, 4900)
+    result = self._stripe.create_checkout_session(plan=f"RealEstate {tier_value.title()}", amount_cents=price_cents)
     if customer_email:
         result["customer_email"] = customer_email
     result["mode"] = "subscription"
@@ -690,10 +691,11 @@ def _reb_create_checkout_session(self, upgrade_tier: Tier, customer_email: str =
 
 
 def _reb_create_payment_link(self, upgrade_tier: Tier) -> dict:
-    if upgrade_tier == Tier.FREE:
+    tier_value = getattr(upgrade_tier, "value", str(upgrade_tier).lower())
+    if tier_value == Tier.FREE.value:
         raise RealEstateBotTierError("Cannot create payment link for FREE tier.")
-    price_cents = _REB_PRICES.get(upgrade_tier, 4900)
-    return self._stripe.create_payment_link(plan=f"RealEstate {upgrade_tier.value.title()}", amount_cents=price_cents)
+    price_cents = _REB_PRICES.get(tier_value, 4900)
+    return self._stripe.create_payment_link(plan=f"RealEstate {tier_value.title()}", amount_cents=price_cents)
 
 
 RealEstateBot.__init__ = _reb_new_init
