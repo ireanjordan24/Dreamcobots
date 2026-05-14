@@ -137,7 +137,19 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "chore(data): update integration_log.json via Integration Feedback Bot [skip ci]"
-            git push
+            target_branch="${GITHUB_REF_NAME:-main}"
+            for attempt in 1 2 3; do
+              git pull --rebase origin "${target_branch}" || true
+              if git push origin "HEAD:${target_branch}"; then
+                break
+              fi
+              if [ "${attempt}" -eq 3 ]; then
+                echo "Failed to push after ${attempt} attempts."
+                exit 1
+              fi
+              echo "Push rejected, retrying (${attempt}/3)..."
+              sleep 2
+            done
           fi
 
       - name: Notify Slack on job failure

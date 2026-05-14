@@ -7,11 +7,14 @@ API_KEY = "YOUR_API_KEY"
 
 def fetch_integration_opportunities(query):
     params = {"query": query, "api_key": API_KEY}
-    response = requests.get(API_URL, params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
+    try:
+        response = requests.get(API_URL, params=params, timeout=15)
+        if response.status_code == 200:
+            return response.json()
         print(f"Error: {response.status_code} - {response.text}")
+        return {}
+    except requests.RequestException as exc:
+        print(f"Warning: integration lookup request failed: {exc}")
         return {}
 
 def save_integration_results(query, data):
