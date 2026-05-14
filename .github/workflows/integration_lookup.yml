@@ -41,7 +41,7 @@ jobs:
           target_branch="${GITHUB_REF_NAME:-main}"
           for attempt in 1 2 3; do
             if ! git pull --rebase origin "${target_branch}"; then
-              if git rev-parse --verify REBASE_HEAD >/dev/null 2>&1; then
+              if [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ] || git rev-parse --verify REBASE_HEAD >/dev/null 2>&1; then
                 git rebase --abort
               fi
             fi
