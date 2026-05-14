@@ -6,7 +6,6 @@ import os
 import sys
 import pytest
 from collections import defaultdict
-import importlib.util
 
 # Ensure tools/ is on sys.path so tests can import check_bot_framework
 # directly without relying on a prior test having inserted the path.
@@ -14,26 +13,10 @@ _TOOLS_DIR = os.path.join(os.path.dirname(__file__), "..", "tools")
 if _TOOLS_DIR not in sys.path:
     sys.path.insert(0, _TOOLS_DIR)
 
-_AI_MODEL_TIERS_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "bots", "ai-models-integration", "tiers.py")
-)
-
-
-def _load_ai_model_tiers():
-    spec = importlib.util.spec_from_file_location("tiers", _AI_MODEL_TIERS_PATH)
-    module = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
-    spec.loader.exec_module(module)
-    sys.modules["tiers"] = module
-
-
 def pytest_collectstart(collector):
     """Reduce cross-module import collisions during test collection."""
     for mod in ("bot", "tiers"):
         sys.modules.pop(mod, None)
-    nodeid = str(getattr(collector, "nodeid", "")) + str(getattr(collector, "fspath", ""))
-    if "test_control_center.py" in nodeid or "test_dreamops.py" in nodeid:
-        _load_ai_model_tiers()
 
 
 @pytest.fixture(autouse=True)
