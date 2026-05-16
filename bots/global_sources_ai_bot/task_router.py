@@ -223,12 +223,19 @@ class TaskRouter:
 
     # ── Internal helpers ──────────────────────────────────────────────────
 
-    @staticmethod
-    def _tokenise(text: str) -> set[str]:
-        """Lowercase, split, and strip punctuation from task text."""
+    # Common English stop words that pollute substring-based tag matching
+    _STOP_WORDS: frozenset[str] = frozenset({
+        "a", "an", "the", "to", "of", "in", "for", "and", "or",
+        "is", "it", "be", "my", "do", "i", "me", "we", "us", "on",
+        "at", "by", "up", "so", "no", "if", "as", "he", "she",
+    })
+
+    @classmethod
+    def _tokenise(cls, text: str) -> set[str]:
+        """Lowercase, split, strip punctuation, and remove stop words."""
         import re
         tokens = re.findall(r"[a-z0-9]+", text.lower())
-        return set(tokens)
+        return {t for t in tokens if len(t) > 2 and t not in cls._STOP_WORDS}
 
     def _explicit_route(self, keywords: set[str]) -> list[str]:
         """Check explicit routing table for any matching keyword."""
