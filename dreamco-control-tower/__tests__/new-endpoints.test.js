@@ -259,3 +259,205 @@ describe('GET /api/actions', () => {
     expect(res.headers['content-type']).toMatch(/application\/json/);
   });
 });
+
+// ---------------------------------------------------------------------------
+// GET /api/learning
+// ---------------------------------------------------------------------------
+
+describe('GET /api/learning', () => {
+  test('returns 200', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(res.status).toBe(200);
+  });
+
+  test('has deadline field', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(res.body).toHaveProperty('deadline', '2026-06-22');
+  });
+
+  test('has days_remaining as non-negative number', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(typeof res.body.days_remaining).toBe('number');
+    expect(res.body.days_remaining).toBeGreaterThanOrEqual(0);
+  });
+
+  test('has scraping_active boolean', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(typeof res.body.scraping_active).toBe('boolean');
+  });
+
+  test('has overall_progress between 0 and 100', async () => {
+    const res = await request(app).get('/api/learning');
+    const p = res.body.overall_progress;
+    expect(typeof p).toBe('number');
+    expect(p).toBeGreaterThanOrEqual(0);
+    expect(p).toBeLessThanOrEqual(100);
+  });
+
+  test('has categories array', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(Array.isArray(res.body.categories)).toBe(true);
+  });
+
+  test('each category has required fields', async () => {
+    const res = await request(app).get('/api/learning');
+    for (const cat of res.body.categories) {
+      expect(cat).toHaveProperty('category');
+      expect(cat).toHaveProperty('bots_total');
+      expect(cat).toHaveProperty('bots_active');
+      expect(cat).toHaveProperty('progress');
+    }
+  });
+
+  test('has top_bots array', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(Array.isArray(res.body.top_bots)).toBe(true);
+  });
+
+  test('top_bots have learning_score field', async () => {
+    const res = await request(app).get('/api/learning');
+    for (const bot of res.body.top_bots) {
+      expect(bot).toHaveProperty('learning_score');
+      expect(typeof bot.learning_score).toBe('number');
+    }
+  });
+
+  test('has timestamp as valid ISO string', async () => {
+    const res = await request(app).get('/api/learning');
+    expect(typeof res.body.timestamp).toBe('string');
+    expect(() => new Date(res.body.timestamp)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/revenue
+// ---------------------------------------------------------------------------
+
+describe('GET /api/revenue', () => {
+  test('returns 200', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(res.status).toBe(200);
+  });
+
+  test('has mrr as number', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.mrr).toBe('number');
+  });
+
+  test('has arr as number equal to mrr * 12', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(res.body.arr).toBe(res.body.mrr * 12);
+  });
+
+  test('has total_catalog_value as number', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.total_catalog_value).toBe('number');
+  });
+
+  test('has active_revenue_bots as number', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.active_revenue_bots).toBe('number');
+  });
+
+  test('has by_tier object', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.by_tier).toBe('object');
+    expect(res.body.by_tier).not.toBeNull();
+  });
+
+  test('has by_category object', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.by_category).toBe('object');
+    expect(res.body.by_category).not.toBeNull();
+  });
+
+  test('has top_earners array', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(Array.isArray(res.body.top_earners)).toBe(true);
+  });
+
+  test('active bot with price_usd > 0 appears in top_earners', async () => {
+    const res = await request(app).get('/api/revenue');
+    // buddy-bot is active with price_usd 49
+    const found = res.body.top_earners.find((b) => b.name === 'buddy-bot');
+    expect(found).toBeDefined();
+    expect(found.price_usd).toBe(49);
+  });
+
+  test('mrr reflects active bots prices', async () => {
+    const res = await request(app).get('/api/revenue');
+    // Only buddy-bot is active (price_usd=49), sales-bot is idle (price_usd=0)
+    expect(res.body.mrr).toBe(49);
+  });
+
+  test('has timestamp as valid ISO string', async () => {
+    const res = await request(app).get('/api/revenue');
+    expect(typeof res.body.timestamp).toBe('string');
+    expect(() => new Date(res.body.timestamp)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/alerts
+// ---------------------------------------------------------------------------
+
+describe('GET /api/alerts', () => {
+  test('returns 200', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(res.status).toBe(200);
+  });
+
+  test('has alerts array', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(Array.isArray(res.body.alerts)).toBe(true);
+  });
+
+  test('has count as number', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(typeof res.body.count).toBe('number');
+    expect(res.body.count).toBe(res.body.alerts.length);
+  });
+
+  test('has critical as number', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(typeof res.body.critical).toBe('number');
+  });
+
+  test('has warning as number', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(typeof res.body.warning).toBe('number');
+  });
+
+  test('critical + warning <= count', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(res.body.critical + res.body.warning).toBeLessThanOrEqual(res.body.count);
+  });
+
+  test('each alert has id, severity, type, message fields', async () => {
+    const res = await request(app).get('/api/alerts');
+    for (const alert of res.body.alerts) {
+      expect(alert).toHaveProperty('id');
+      expect(alert).toHaveProperty('severity');
+      expect(alert).toHaveProperty('type');
+      expect(alert).toHaveProperty('message');
+    }
+  });
+
+  test('error-status bot triggers critical alert', async () => {
+    // Write bots with one in error status
+    const errorBots = [
+      { name: 'error-bot', status: 'error', lastHeartbeat: null, price_usd: 0 },
+    ];
+    fs.writeFileSync(BOTS_FILE, JSON.stringify(errorBots, null, 2));
+    const res = await request(app).get('/api/alerts');
+    const alert = res.body.alerts.find((a) => a.type === 'bot_error' && a.bot === 'error-bot');
+    expect(alert).toBeDefined();
+    expect(alert.severity).toBe('critical');
+  });
+
+  test('has timestamp as valid ISO string', async () => {
+    const res = await request(app).get('/api/alerts');
+    expect(typeof res.body.timestamp).toBe('string');
+    expect(() => new Date(res.body.timestamp)).not.toThrow();
+  });
+});

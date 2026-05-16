@@ -31,6 +31,9 @@ const RATE_LIMIT_MAX = 60; // max requests per window per IP
 const _rateLimitStore = new Map();
 
 function rateLimiter(req, res, next) {
+  // Skip rate limiting in test environment
+  if (process.env.NODE_ENV === 'test') return next();
+
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
   const now = Date.now();
   const entry = _rateLimitStore.get(ip) ?? { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
@@ -314,6 +317,189 @@ app.get('/api/orchestrator', rateLimiter, (_req, res) => {
     scraping_active: scrapingActive,
     scrape_deadline: deadline,
     days_until_deadline: daysRemaining,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/learning — AI learning progress snapshot
+//
+// Returns per-category learning progress toward the June 22 2026 deadline,
+// derived from the bot catalog (each bot contributes learning activity to
+// its category).  Useful for the Learning Tracker tab in the Control Tower.
+// ---------------------------------------------------------------------------
+
+const LEARNING_CATEGORIES = [
+  'Automation',
+  'AI Companion',
+  'Finance',
+  'Sales',
+  'Content',
+  'Real Estate',
+  'General',
+];
+
+app.get('/api/learning', rateLimiter, (_req, res) => {
+  const bots = readBots();
+  const deadline = '2026-06-22';
+  const today = new Date();
+  const deadlineDate = new Date(deadline);
+  const totalMs = new Date('2026-01-01').getTime();
+  const elapsedMs = today.getTime() - totalMs;
+  const totalRangeMs = deadlineDate.getTime() - totalMs;
+  const overallProgress = Math.min(100, Math.max(0, Math.round((elapsedMs / totalRangeMs) * 100)));
+  const daysRemaining = Math.max(0, Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24)));
+
+  // Build per-category stats from catalog
+  const categoryMap = {};
+  for (const cat of LEARNING_CATEGORIES) {
+    const catBots = bots.filter((b) => (b.category || 'General') === cat);
+    const activeCatBots = catBots.filter((b) => b.status === 'active').length;
+    categoryMap[cat] = {
+      category: cat,
+      bots_total: catBots.length,
+      bots_active: activeCatBots,
+      progress: catBots.length > 0 ? Math.min(100, overallProgress + activeCatBots * 2) : 0,
+    };
+  }
+
+  // Per-bot learning scores (score = active bots weighted by tier)
+  const TIER_WEIGHT = { FREE: 1, PRO: 2, ENTERPRISE: 3, ELITE: 4 };
+  const botScores = bots.map((b) => ({
+    name: b.name,
+    category: b.category || 'General',
+    tier: b.tier || 'FREE',
+    status: b.status,
+    learning_score: b.status === 'active' ? (TIER_WEIGHT[b.tier] ?? 1) * 25 : 0,
+  }));
+
+  return res.json({
+    deadline,
+    days_remaining: daysRemaining,
+    scraping_active: today <= deadlineDate,
+    overall_progress: overallProgress,
+    categories: Object.values(categoryMap),
+    top_bots: botScores
+      .sort((a, b) => b.learning_score - a.learning_score)
+      .slice(0, 5),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/revenue — revenue metrics derived from the bot catalog
+//
+// Computes Monthly Recurring Revenue (MRR), revenue by category/tier, and
+// highest-earning bots.  Based on catalog price data (bots.json).
+// ---------------------------------------------------------------------------
+
+app.get('/api/revenue', rateLimiter, (_req, res) => {
+  const bots = readBots();
+
+  const activeBots = bots.filter((b) => b.status === 'active');
+  const mrr = activeBots.reduce((sum, b) => sum + (b.price_usd ?? 0), 0);
+  const arr = mrr * 12;
+  const totalCatalogValue = bots.reduce((sum, b) => sum + (b.price_usd ?? 0), 0);
+
+  // Revenue by tier
+  const tierRevenue = {};
+  for (const b of activeBots) {
+    const t = b.tier || 'FREE';
+    tierRevenue[t] = (tierRevenue[t] ?? 0) + (b.price_usd ?? 0);
+  }
+
+  // Revenue by category
+  const categoryRevenue = {};
+  for (const b of activeBots) {
+    const c = b.category || 'General';
+    categoryRevenue[c] = (categoryRevenue[c] ?? 0) + (b.price_usd ?? 0);
+  }
+
+  // Top earners
+  const topEarners = [...activeBots]
+    .filter((b) => (b.price_usd ?? 0) > 0)
+    .sort((a, b) => (b.price_usd ?? 0) - (a.price_usd ?? 0))
+    .slice(0, 5)
+    .map((b) => ({ name: b.name, tier: b.tier, price_usd: b.price_usd, category: b.category }));
+
+  return res.json({
+    mrr,
+    arr,
+    total_catalog_value: totalCatalogValue,
+    active_revenue_bots: activeBots.filter((b) => (b.price_usd ?? 0) > 0).length,
+    by_tier: tierRevenue,
+    by_category: categoryRevenue,
+    top_earners: topEarners,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/alerts — active system alerts
+//
+// Surfaces stale bots (no heartbeat for >5 min), error-status bots, and a
+// deadline countdown warning when ≤7 days remain.
+// ---------------------------------------------------------------------------
+
+const STALE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+const DEADLINE_WARN_DAYS = 7;
+
+app.get('/api/alerts', rateLimiter, (_req, res) => {
+  const bots = readBots();
+  const now = Date.now();
+  const alerts = [];
+
+  // Stale-heartbeat alerts
+  for (const b of bots) {
+    if (b.lastHeartbeat) {
+      const age = now - new Date(b.lastHeartbeat).getTime();
+      if (age > STALE_THRESHOLD_MS) {
+        const mins = Math.round(age / 60_000);
+        alerts.push({
+          id: `stale-${b.name}`,
+          severity: 'warning',
+          type: 'stale_heartbeat',
+          message: `Bot "${b.name}" has not sent a heartbeat for ${mins} minutes.`,
+          bot: b.name,
+          since: b.lastHeartbeat,
+        });
+      }
+    }
+  }
+
+  // Error-status alerts
+  for (const b of bots) {
+    if (b.status === 'error') {
+      alerts.push({
+        id: `error-${b.name}`,
+        severity: 'critical',
+        type: 'bot_error',
+        message: `Bot "${b.name}" is reporting an error status.`,
+        bot: b.name,
+      });
+    }
+  }
+
+  // Deadline countdown warning
+  const deadline = new Date('2026-06-22');
+  const daysRemaining = Math.max(0, Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24)));
+  if (daysRemaining <= DEADLINE_WARN_DAYS) {
+    alerts.push({
+      id: 'deadline-warning',
+      severity: daysRemaining === 0 ? 'critical' : 'warning',
+      type: 'deadline',
+      message:
+        daysRemaining === 0
+          ? 'Deep learning deadline has passed. Scraping is no longer active.'
+          : `Deep learning deadline in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'}.`,
+    });
+  }
+
+  return res.json({
+    alerts,
+    count: alerts.length,
+    critical: alerts.filter((a) => a.severity === 'critical').length,
+    warning: alerts.filter((a) => a.severity === 'warning').length,
     timestamp: new Date().toISOString(),
   });
 });
