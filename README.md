@@ -14,6 +14,10 @@ Welcome to **DreamCobots** — a versatile, user-friendly platform for automatio
 - **Self-Marketing**: Built-in marketing capabilities help bots promote themselves across platforms.
 - **Open & Extensible**: Standardized templates make it easy to add new bots and customize existing ones.
 
+### Strategic Expansion Ideas
+
+- [20 Revolutionary AI Systems and Bots for DreamCo](docs/REVOLUTIONARY_AI_SYSTEMS_AND_BOTS.md)
+
 ---
 ## 🤖 Specialized Bot Categories (`bots/`)
 
