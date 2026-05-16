@@ -23,7 +23,9 @@ from __future__ import annotations
 
 import abc
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
+from core.self_evolution import LLMProvider, SelfEvolutionEngine
 
 
 # ---------------------------------------------------------------------------
@@ -73,6 +75,11 @@ class BaseBot(abc.ABC):
         self.revenue = 0.0
         self._logs: List[str] = []
         self._running = False
+        # Every bot is a self-evolving system — wire up the evolution engine.
+        self.self_evolution: SelfEvolutionEngine = SelfEvolutionEngine(
+            bot_id=self.bot_id or self.__class__.__name__,
+            category=self.category or "general",
+        )
 
     def start(self) -> None:
         """Start the bot."""
@@ -133,7 +140,8 @@ class BaseBot(abc.ABC):
         metrics: Dict[str, Any] | None = None,
         next_tasks: List[dict] | None = None,
     ) -> dict:
-        """Return a success-shaped result dict."""
+        """Return a success-shaped result dict and record the run."""
+        self.self_evolution.record_run(success=True, revenue=float(metrics.get("revenue", 0)) if metrics else 0.0)
         return {
             "status": RESULT_STATUS_SUCCESS,
             "bot_id": self.bot_id,
@@ -149,7 +157,8 @@ class BaseBot(abc.ABC):
         metrics: Dict[str, Any] | None = None,
         next_tasks: List[dict] | None = None,
     ) -> dict:
-        """Return a failure-shaped result dict."""
+        """Return a failure-shaped result dict and record the run."""
+        self.self_evolution.record_run(success=False)
         return {
             "status": RESULT_STATUS_FAILED,
             "bot_id": self.bot_id,
@@ -158,6 +167,52 @@ class BaseBot(abc.ABC):
             "metrics": metrics or {},
             "next_tasks": next_tasks or [],
         }
+
+    # ------------------------------------------------------------------
+    # Self-evolution interface
+    # ------------------------------------------------------------------
+
+    def evolve(self) -> dict:
+        """
+        Trigger one evolution cycle on this bot.
+
+        Analyses performance since the last cycle, mutates strategy
+        parameters, and promotes the bot to the next LLM phase when
+        readiness thresholds are met.
+
+        Returns
+        -------
+        dict
+            Serialisable summary of the evolution record produced.
+        """
+        from core.self_evolution import EvolutionRecord
+        record: EvolutionRecord = self.self_evolution.evolve()
+        return {
+            "cycle": record.cycle,
+            "phase": record.phase.value,
+            "llm_provider": record.llm_provider.value,
+            "fitness_improvement": record.fitness_improvement,
+            "strategy_delta": record.strategy_delta,
+            "metadata": record.metadata,
+        }
+
+    def evolution_status(self) -> dict:
+        """
+        Return a comprehensive, serialisable status of this bot's
+        self-evolution state (phase, LLM provider, performance, strategy).
+        """
+        return self.self_evolution.evolution_status()
+
+    def set_llm_provider(self, provider: LLMProvider) -> None:
+        """
+        Explicitly set the LLM provider for this bot.
+
+        Parameters
+        ----------
+        provider : LLMProvider
+            The desired LLM provider (e.g. ``LLMProvider.MISTRAL``).
+        """
+        self.self_evolution.llm_provider = provider
 
     # ------------------------------------------------------------------
     # Validation
