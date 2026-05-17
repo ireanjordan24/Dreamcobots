@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-17T03:02:10.015432+00:00",
+  "last_updated": "2026-05-17T03:02:29.964614+00:00",
   "total_companies": 5,
   "companies": [
     {
@@ -26,9 +26,9 @@
         "Streamlit billing"
       ],
       "source": "mock",
-      "looked_up_at": "2026-05-17T03:02:10.014528+00:00",
+      "looked_up_at": "2026-05-17T03:02:29.964113+00:00",
       "enriched": true,
-      "enriched_at": "2026-05-17T03:02:10.014540+00:00",
+      "enriched_at": "2026-05-17T03:02:29.964124+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
     },
@@ -96,9 +96,9 @@
         "AI Chatbot"
       ],
       "source": "mock",
-      "looked_up_at": "2026-05-17T03:02:10.015328+00:00",
+      "looked_up_at": "2026-05-17T03:02:29.964534+00:00",
       "enriched": true,
-      "enriched_at": "2026-05-17T03:02:10.015341+00:00",
+      "enriched_at": "2026-05-17T03:02:29.964542+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
     },
