@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-17T05:37:56.534921+00:00",
+  "last_updated": "2026-05-17T05:39:21.710651+00:00",
   "total_companies": 5,
   "companies": [
     {
@@ -26,9 +26,9 @@
         "Streamlit billing"
       ],
       "source": "mock",
-      "looked_up_at": "2026-05-17T05:37:56.534400+00:00",
+      "looked_up_at": "2026-05-17T05:39:21.709649+00:00",
       "enriched": true,
-      "enriched_at": "2026-05-17T05:37:56.534414+00:00",
+      "enriched_at": "2026-05-17T05:39:21.709669+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
     },
@@ -66,9 +66,9 @@
         "God Mode Bot"
       ],
       "source": "mock",
-      "looked_up_at": "2026-05-17T05:37:34.307797+00:00",
+      "looked_up_at": "2026-05-17T05:39:21.710166+00:00",
       "enriched": true,
-      "enriched_at": "2026-05-17T05:37:34.307805+00:00",
+      "enriched_at": "2026-05-17T05:39:21.710175+00:00",
       "company_size": "enterprise",
       "funding_stage": "series_c+"
     },
@@ -96,9 +96,9 @@
         "AI Chatbot"
       ],
       "source": "mock",
-      "looked_up_at": "2026-05-17T05:37:56.534840+00:00",
+      "looked_up_at": "2026-05-17T05:39:21.710563+00:00",
       "enriched": true,
-      "enriched_at": "2026-05-17T05:37:56.534848+00:00",
+      "enriched_at": "2026-05-17T05:39:21.710577+00:00",
       "company_size": "mid-market",
       "funding_stage": "unicorn+"
     },
