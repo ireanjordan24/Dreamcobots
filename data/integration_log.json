@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-17T02:56:02.486204+00:00",
-  "total_entries": 206,
+  "last_updated": "2026-05-17T02:56:22.277170+00:00",
+  "total_entries": 207,
   "entries": [
     {
       "platform": "GitHub Actions",
@@ -1855,6 +1855,15 @@
       "version": "1d7ecd0",
       "triggered_by": "GitHub Actions run #566",
       "timestamp": "2026-05-17T02:56:02.485873+00:00"
+    },
+    {
+      "platform": "Buddy",
+      "status": "success",
+      "details": "Buddy dispatch executed: Run buddy-managed checks",
+      "reason": "",
+      "version": null,
+      "triggered_by": "GitHub Actions run #567",
+      "timestamp": "2026-05-17T02:56:22.276803+00:00"
     }
   ]
 }
