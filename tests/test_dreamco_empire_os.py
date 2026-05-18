@@ -57,6 +57,7 @@ from bots.dreamco_empire_os.modules import (
     Divisions,
     AIModelsHub,
     AIEcosystem,
+    OntologyState,
     CryptoTracker,
     PaymentsHub,
     PaymentStatus,
@@ -751,6 +752,76 @@ class TestAIEcosystem:
         graph = eco.get_graph()
         assert graph["total_agents"] == 2
         assert graph["total_relationships"] == 1
+
+    def test_core_ontology_is_frozen_and_approved(self):
+        eco = AIEcosystem()
+        core = eco.get_core_ontology()
+        assert core["immutable"] is True
+        assert core["state"] == OntologyState.APPROVED.value
+        assert "agent" in core["concepts"]
+
+    def test_canonicalization_and_synonym_resolution(self):
+        eco = AIEcosystem()
+        eco.register_synonym("ProspectHunter", "Lead Generation Bot")
+        assert eco.canonicalize_term("ProspectHunter") == "lead_generation_bot"
+
+    def test_governed_ontology_change_pipeline(self):
+        eco = AIEcosystem()
+        with pytest.raises(PermissionError):
+            eco.propose_ontology_change("core", "upsert", "core_v2", {"name": "CoreV2"})
+
+        proposal = eco.propose_ontology_change(
+            layer="domain",
+            action="upsert",
+            target_id="finance",
+            payload={"name": "Finance", "capabilities": ["Risk Engine"], "version": "1.2.0"},
+            proposed_by="runtime_agent",
+        )
+        staged = eco.stage_proposal(proposal["proposal_id"], reviewer="governance_bot")
+        assert staged["state"] == OntologyState.STAGED.value
+        approved = eco.approve_proposal(proposal["proposal_id"], approver="admin")
+        assert approved["state"] == OntologyState.APPROVED.value
+        summary = eco.get_governance_summary()
+        assert summary["domain_ontologies"] == 1
+
+    def test_capability_registry_and_assignment(self):
+        eco = AIEcosystem()
+        eco.add_agent("a1", "Lead Bot", "scraper")
+        cap = eco.register_capability("cap_market_analysis", "Market Analysis", "finance")
+        assert cap["state"] == OntologyState.APPROVED.value
+        assigned = eco.assign_capability("a1", "cap_market_analysis")
+        assert assigned["assigned"] is True
+
+    def test_guardrails_permissions_and_kill_switch(self):
+        eco = AIEcosystem()
+        eco.add_agent("a1", "Ops Bot", "orchestrator")
+        eco.set_agent_permissions("a1", ["deploy", "read"])
+        allowed = eco.authorize_execution(
+            "a1",
+            "deploy_workflow",
+            estimated_cost_usd=10.0,
+            required_permissions=["deploy"],
+        )
+        assert allowed["allowed"] is True
+        eco.emergency_stop("manual safety stop")
+        blocked = eco.authorize_execution("a1", "deploy_workflow", required_permissions=["deploy"])
+        assert blocked["allowed"] is False
+        assert blocked["reason"] == "kill_switch_enabled"
+
+    def test_memory_separation_and_observability(self):
+        eco = AIEcosystem()
+        eco.add_agent("a1", "Memory Bot", "memory")
+        eco.record_memory("runtime", "task_1", {"status": "running"})
+        eco.record_memory("semantic", "finance:term", {"definition": "capital allocation"})
+        eco.record_memory("procedural", "wf_1", {"steps": ["a", "b", "c"]})
+        eco.record_memory("economic", "roi_snapshot", {"roi": 1.7, "cost": 100, "revenue": 170})
+        snapshot = eco.get_memory_snapshot()
+        assert "task_1" in snapshot["runtime"]
+        assert "finance:term" in snapshot["semantic"]
+        assert "wf_1" in snapshot["procedural"]
+        assert len(snapshot["economic"]) == 1
+        assert len(eco.get_event_trace()) > 0
+        assert len(eco.get_audit_log()) > 0
 
 
 class TestCryptoTracker:

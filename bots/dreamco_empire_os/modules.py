@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 from framework import GlobalAISourcesFlow  # noqa: F401
 
 
@@ -145,22 +145,441 @@ def _model_to_dict(m: AIModel) -> dict:
 # AI Ecosystem
 # ==========================================================================
 
+class OntologyState(Enum):
+    DRAFT = "draft"
+    STAGED = "staged"
+    APPROVED = "approved"
+    DEPRECATED = "deprecated"
+
+
+@dataclass
+class OntologyProposal:
+    proposal_id: str
+    layer: str
+    action: str
+    target_id: str
+    payload: dict[str, Any]
+    proposed_by: str
+    state: OntologyState = OntologyState.DRAFT
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    staged_at: Optional[str] = None
+    approved_at: Optional[str] = None
+    rejected_reason: Optional[str] = None
+    validation_errors: list[str] = field(default_factory=list)
+
+
 class AIEcosystem:
-    """Visualise the web of AI agents and their relationships."""
+    """
+    Governed ontology-driven AI ecosystem.
+
+    Layers:
+      1. Core ontology (immutable)
+      2. Domain ontologies
+      3. Bot ontologies
+      4. Runtime graph (dynamic, no direct core mutation)
+    """
+
+    CORE_ONTOLOGY_CONCEPTS: tuple[str, ...] = (
+        "agent",
+        "capability",
+        "workflow",
+        "memory",
+        "tool",
+        "division",
+        "revenuestream",
+        "goal",
+        "permission",
+        "event",
+    )
+
+    DEFAULT_SYNONYMS: dict[str, str] = {
+        "leadgeneratorbot": "lead_generation_bot",
+        "prospecthunter": "lead_generation_bot",
+        "customeracquisitionai": "lead_generation_bot",
+        "realtorbot": "real_estate_bot",
+    }
 
     def __init__(self) -> None:
+        # Layer 1 — immutable core ontology
+        self._core_ontology: dict[str, Any] = {
+            "concepts": list(self.CORE_ONTOLOGY_CONCEPTS),
+            "version": "1.0.0",
+            "state": OntologyState.APPROVED.value,
+            "immutable": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        # Layer 2/3 ontologies
+        self._domain_ontologies: dict[str, dict[str, Any]] = {}
+        self._bot_ontologies: dict[str, dict[str, Any]] = {}
+
+        # Layer 4 runtime knowledge graph
         self._nodes: dict[str, dict] = {}
         self._edges: list = []
 
+        # Canonical taxonomy and capabilities
+        self._canonical_terms: dict[str, str] = dict(self.DEFAULT_SYNONYMS)
+        self._capabilities: dict[str, dict[str, Any]] = {}
+        self._agent_capabilities: dict[str, set[str]] = {}
+
+        # Governance pipeline
+        self._proposals: dict[str, OntologyProposal] = {}
+        self._proposal_counter = 0
+        self._ontology_versions: dict[str, list[dict[str, Any]]] = {
+            "domain": [],
+            "bot": [],
+        }
+        self._pinned_versions: dict[str, str] = {}
+
+        # Guardrails
+        self._guardrails: dict[str, Any] = {
+            "kill_switch": False,
+            "rate_limit_per_minute": 120,
+            "workflow_budget_limit": 1_000.0,
+            "manual_override_required": False,
+        }
+        self._execution_usage: dict[str, dict[str, Any]] = {}
+        self._agent_permissions: dict[str, set[str]] = {}
+
+        # Memory separation
+        self._memory: dict[str, Any] = {
+            "runtime": {},
+            "semantic": {},
+            "procedural": {},
+            "economic": [],
+        }
+
+        # Observability and auditability
+        self._event_log: list[dict[str, Any]] = []
+        self._audit_log: list[dict[str, Any]] = []
+        self._alerts: list[dict[str, Any]] = []
+
+    @staticmethod
+    def _slug(value: str) -> str:
+        return "".join(ch for ch in value.lower() if ch.isalnum())
+
+    def canonicalize_term(self, term: str) -> str:
+        key = self._slug(term)
+        return self._canonical_terms.get(key, term.strip().lower().replace(" ", "_"))
+
+    def register_synonym(self, alias: str, canonical: str) -> dict:
+        canonical_term = self.canonicalize_term(canonical)
+        self._canonical_terms[self._slug(alias)] = canonical_term
+        self._audit("synonym_registered", {"alias": alias, "canonical": canonical_term})
+        return {"alias": alias, "canonical": canonical_term}
+
+    def get_core_ontology(self) -> dict:
+        return dict(self._core_ontology)
+
+    def create_domain_ontology(
+        self,
+        domain_id: str,
+        name: str,
+        capabilities: Optional[list[str]] = None,
+        version: str = "1.0.0",
+        state: OntologyState = OntologyState.DRAFT,
+    ) -> dict:
+        entry = {
+            "domain_id": domain_id,
+            "name": self.canonicalize_term(name),
+            "capabilities": sorted({self.canonicalize_term(c) for c in (capabilities or [])}),
+            "version": version,
+            "state": state.value,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        self._domain_ontologies[domain_id] = entry
+        self._record_version("domain", domain_id, entry)
+        self._audit("domain_ontology_created", {"domain_id": domain_id, "version": version})
+        return entry
+
+    def create_bot_ontology(
+        self,
+        bot_id: str,
+        name: str,
+        domains: list[str],
+        capabilities: Optional[list[str]] = None,
+        version: str = "1.0.0",
+        state: OntologyState = OntologyState.DRAFT,
+    ) -> dict:
+        for domain_id in domains:
+            if domain_id not in self._domain_ontologies:
+                raise KeyError(f"Domain ontology '{domain_id}' not found.")
+        entry = {
+            "bot_id": bot_id,
+            "name": self.canonicalize_term(name),
+            "domains": domains,
+            "capabilities": sorted({self.canonicalize_term(c) for c in (capabilities or [])}),
+            "version": version,
+            "state": state.value,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        self._bot_ontologies[bot_id] = entry
+        self._record_version("bot", bot_id, entry)
+        self._audit("bot_ontology_created", {"bot_id": bot_id, "version": version})
+        return entry
+
+    def list_domain_ontologies(self) -> list[dict]:
+        return list(self._domain_ontologies.values())
+
+    def list_bot_ontologies(self) -> list[dict]:
+        return list(self._bot_ontologies.values())
+
+    def propose_ontology_change(
+        self,
+        layer: str,
+        action: str,
+        target_id: str,
+        payload: dict[str, Any],
+        proposed_by: str = "runtime",
+    ) -> dict:
+        if layer == "core":
+            raise PermissionError("Runtime cannot mutate core ontology directly.")
+        if layer not in ("domain", "bot"):
+            raise ValueError("Layer must be one of: domain, bot.")
+        self._proposal_counter += 1
+        proposal_id = f"proposal_{self._proposal_counter:06d}"
+        proposal = OntologyProposal(
+            proposal_id=proposal_id,
+            layer=layer,
+            action=action,
+            target_id=target_id,
+            payload=payload,
+            proposed_by=proposed_by,
+        )
+        self._proposals[proposal_id] = proposal
+        self._audit("ontology_change_proposed", {"proposal_id": proposal_id, "layer": layer, "action": action})
+        return self._proposal_to_dict(proposal)
+
+    def validate_proposal(self, proposal_id: str) -> dict:
+        proposal = self._get_proposal(proposal_id)
+        errors: list[str] = []
+        if proposal.layer == "domain" and proposal.action == "upsert":
+            if "name" not in proposal.payload:
+                errors.append("Domain upsert requires 'name'.")
+        if proposal.layer == "bot" and proposal.action == "upsert":
+            domains = proposal.payload.get("domains", [])
+            missing = [d for d in domains if d not in self._domain_ontologies]
+            if missing:
+                errors.append(f"Unknown domains: {missing}")
+        proposal.validation_errors = errors
+        self._audit("ontology_proposal_validated", {"proposal_id": proposal_id, "valid": len(errors) == 0})
+        return {
+            "proposal_id": proposal_id,
+            "valid": len(errors) == 0,
+            "errors": errors,
+        }
+
+    def stage_proposal(self, proposal_id: str, reviewer: str = "governance") -> dict:
+        proposal = self._get_proposal(proposal_id)
+        validation = self.validate_proposal(proposal_id)
+        if not validation["valid"]:
+            raise ValueError(f"Proposal '{proposal_id}' failed validation: {validation['errors']}")
+        proposal.state = OntologyState.STAGED
+        proposal.staged_at = datetime.now(timezone.utc).isoformat()
+        self._audit("ontology_proposal_staged", {"proposal_id": proposal_id, "reviewer": reviewer})
+        return self._proposal_to_dict(proposal)
+
+    def approve_proposal(self, proposal_id: str, approver: str = "governance") -> dict:
+        proposal = self._get_proposal(proposal_id)
+        if proposal.state != OntologyState.STAGED:
+            raise ValueError("Proposal must be staged before approval.")
+        if proposal.layer == "domain":
+            entry = self.create_domain_ontology(
+                domain_id=proposal.target_id,
+                name=proposal.payload["name"],
+                capabilities=proposal.payload.get("capabilities", []),
+                version=proposal.payload.get("version", "1.0.0"),
+                state=OntologyState.APPROVED,
+            )
+            self._pinned_versions[f"domain:{proposal.target_id}"] = entry["version"]
+        elif proposal.layer == "bot":
+            entry = self.create_bot_ontology(
+                bot_id=proposal.target_id,
+                name=proposal.payload["name"],
+                domains=proposal.payload.get("domains", []),
+                capabilities=proposal.payload.get("capabilities", []),
+                version=proposal.payload.get("version", "1.0.0"),
+                state=OntologyState.APPROVED,
+            )
+            self._pinned_versions[f"bot:{proposal.target_id}"] = entry["version"]
+        else:
+            raise ValueError(f"Unsupported proposal layer '{proposal.layer}'.")
+        proposal.state = OntologyState.APPROVED
+        proposal.approved_at = datetime.now(timezone.utc).isoformat()
+        self._audit("ontology_proposal_approved", {"proposal_id": proposal_id, "approver": approver})
+        return self._proposal_to_dict(proposal)
+
+    def reject_proposal(self, proposal_id: str, reason: str) -> dict:
+        proposal = self._get_proposal(proposal_id)
+        proposal.rejected_reason = reason
+        proposal.state = OntologyState.DEPRECATED
+        self._audit("ontology_proposal_rejected", {"proposal_id": proposal_id, "reason": reason})
+        return self._proposal_to_dict(proposal)
+
+    def rollback_ontology(self, layer: str, target_id: str, version: str) -> dict:
+        if layer not in ("domain", "bot"):
+            raise ValueError("Layer must be one of: domain, bot.")
+        history = self._ontology_versions[layer]
+        candidates = [
+            item for item in history
+            if item["target_id"] == target_id and item["snapshot"].get("version") == version
+        ]
+        if not candidates:
+            raise KeyError(f"No {layer} ontology version '{version}' for '{target_id}'.")
+        latest = candidates[-1]["snapshot"]
+        if layer == "domain":
+            self._domain_ontologies[target_id] = dict(latest)
+        else:
+            self._bot_ontologies[target_id] = dict(latest)
+        self._pinned_versions[f"{layer}:{target_id}"] = version
+        self._audit("ontology_rolled_back", {"layer": layer, "target_id": target_id, "version": version})
+        return {"layer": layer, "target_id": target_id, "version": version, "rolled_back": True}
+
+    def register_capability(
+        self,
+        capability_id: str,
+        name: str,
+        domain: str,
+        version: str = "1.0.0",
+        state: OntologyState = OntologyState.APPROVED,
+    ) -> dict:
+        entry = {
+            "capability_id": capability_id,
+            "name": self.canonicalize_term(name),
+            "domain": domain,
+            "version": version,
+            "state": state.value,
+            "registered_at": datetime.now(timezone.utc).isoformat(),
+        }
+        self._capabilities[capability_id] = entry
+        self._audit("capability_registered", {"capability_id": capability_id, "domain": domain})
+        return entry
+
+    def assign_capability(self, agent_id: str, capability_id: str) -> dict:
+        if agent_id not in self._nodes:
+            raise KeyError(f"Agent '{agent_id}' not found.")
+        if capability_id not in self._capabilities:
+            raise KeyError(f"Capability '{capability_id}' not found.")
+        self._agent_capabilities.setdefault(agent_id, set()).add(capability_id)
+        self._audit("capability_assigned", {"agent_id": agent_id, "capability_id": capability_id})
+        return {"agent_id": agent_id, "capability_id": capability_id, "assigned": True}
+
+    def set_agent_permissions(self, agent_id: str, permissions: list[str]) -> dict:
+        if agent_id not in self._nodes:
+            raise KeyError(f"Agent '{agent_id}' not found.")
+        self._agent_permissions[agent_id] = set(permissions)
+        self._audit("agent_permissions_set", {"agent_id": agent_id, "permissions": permissions})
+        return {"agent_id": agent_id, "permissions": sorted(self._agent_permissions[agent_id])}
+
+    def configure_guardrails(
+        self,
+        *,
+        kill_switch: Optional[bool] = None,
+        rate_limit_per_minute: Optional[int] = None,
+        workflow_budget_limit: Optional[float] = None,
+        manual_override_required: Optional[bool] = None,
+    ) -> dict:
+        if kill_switch is not None:
+            self._guardrails["kill_switch"] = kill_switch
+        if rate_limit_per_minute is not None:
+            self._guardrails["rate_limit_per_minute"] = max(1, int(rate_limit_per_minute))
+        if workflow_budget_limit is not None:
+            self._guardrails["workflow_budget_limit"] = max(0.0, float(workflow_budget_limit))
+        if manual_override_required is not None:
+            self._guardrails["manual_override_required"] = manual_override_required
+        self._audit("guardrails_configured", dict(self._guardrails))
+        return dict(self._guardrails)
+
+    def emergency_stop(self, reason: str) -> dict:
+        self._guardrails["kill_switch"] = True
+        alert = {"kind": "kill_switch", "reason": reason, "timestamp": datetime.now(timezone.utc).isoformat()}
+        self._alerts.append(alert)
+        self._audit("kill_switch_enabled", {"reason": reason})
+        return {"kill_switch": True, "reason": reason}
+
+    def clear_emergency_stop(self) -> dict:
+        self._guardrails["kill_switch"] = False
+        self._audit("kill_switch_disabled", {})
+        return {"kill_switch": False}
+
+    def authorize_execution(
+        self,
+        agent_id: str,
+        operation: str,
+        estimated_cost_usd: float = 0.0,
+        required_permissions: Optional[list[str]] = None,
+        override: bool = False,
+    ) -> dict:
+        if agent_id not in self._nodes:
+            raise KeyError(f"Agent '{agent_id}' not found.")
+        if self._guardrails["kill_switch"] and not override:
+            return {"allowed": False, "reason": "kill_switch_enabled"}
+        if self._guardrails["manual_override_required"] and not override:
+            return {"allowed": False, "reason": "manual_override_required"}
+        granted = self._agent_permissions.get(agent_id, set())
+        required = set(required_permissions or [])
+        if not required.issubset(granted):
+            return {"allowed": False, "reason": "missing_permissions", "missing": sorted(required - granted)}
+        usage = self._execution_usage.setdefault(agent_id, {"count": 0, "cost_usd": 0.0})
+        if usage["count"] >= self._guardrails["rate_limit_per_minute"] and not override:
+            return {"allowed": False, "reason": "rate_limit_exceeded"}
+        if usage["cost_usd"] + estimated_cost_usd > self._guardrails["workflow_budget_limit"] and not override:
+            return {"allowed": False, "reason": "workflow_budget_exceeded"}
+        usage["count"] += 1
+        usage["cost_usd"] = round(usage["cost_usd"] + estimated_cost_usd, 4)
+        self._trace("execution_authorized", {
+            "agent_id": agent_id,
+            "operation": operation,
+            "estimated_cost_usd": estimated_cost_usd,
+        })
+        return {"allowed": True, "agent_id": agent_id, "operation": operation}
+
+    def record_memory(self, memory_type: str, key: str, value: Any) -> dict:
+        if memory_type not in self._memory:
+            raise ValueError("memory_type must be one of: runtime, semantic, procedural, economic")
+        if memory_type == "economic":
+            if not isinstance(value, dict):
+                raise TypeError("Economic memory entries must be dict objects.")
+            self._memory["economic"].append({"key": key, "value": value, "timestamp": datetime.now(timezone.utc).isoformat()})
+        else:
+            self._memory[memory_type][key] = value
+        self._trace("memory_recorded", {"memory_type": memory_type, "key": key})
+        return {"memory_type": memory_type, "key": key, "recorded": True}
+
+    def get_memory_snapshot(self) -> dict:
+        return {
+            "runtime": dict(self._memory["runtime"]),
+            "semantic": dict(self._memory["semantic"]),
+            "procedural": dict(self._memory["procedural"]),
+            "economic": list(self._memory["economic"]),
+        }
+
     def add_agent(self, agent_id: str, name: str, agent_type: str) -> dict:
-        node = {"agent_id": agent_id, "name": name, "type": agent_type,
-                "added_at": datetime.now(timezone.utc).isoformat()}
+        canonical_name = self.canonicalize_term(name)
+        node = {
+            "agent_id": agent_id,
+            "name": canonical_name,
+            "type": self.canonicalize_term(agent_type),
+            "added_at": datetime.now(timezone.utc).isoformat(),
+        }
         self._nodes[agent_id] = node
+        self._agent_capabilities.setdefault(agent_id, set())
+        self._agent_permissions.setdefault(agent_id, set())
+        self._trace("agent_added", {"agent_id": agent_id, "name": canonical_name})
         return node
 
-    def add_relationship(self, from_id: str, to_id: str, relationship: str) -> dict:
-        edge = {"from": from_id, "to": to_id, "relationship": relationship}
+    def add_relationship(self, from_id: str, to_id: str, relationship: str, semantic_type: str = "runtime") -> dict:
+        if from_id not in self._nodes or to_id not in self._nodes:
+            raise KeyError("Both from_id and to_id must exist as agents before creating a relationship.")
+        edge = {
+            "from": from_id,
+            "to": to_id,
+            "relationship": self.canonicalize_term(relationship),
+            "semantic_type": self.canonicalize_term(semantic_type),
+            "added_at": datetime.now(timezone.utc).isoformat(),
+        }
         self._edges.append(edge)
+        self._trace("relationship_added", {"from": from_id, "to": to_id, "relationship": edge["relationship"]})
         return edge
 
     def get_graph(self) -> dict:
@@ -169,7 +588,84 @@ class AIEcosystem:
             "edges": self._edges,
             "total_agents": len(self._nodes),
             "total_relationships": len(self._edges),
+            "governance": {
+                "core_ontology_version": self._core_ontology["version"],
+                "open_proposals": sum(1 for p in self._proposals.values() if p.state == OntologyState.DRAFT),
+                "staged_proposals": sum(1 for p in self._proposals.values() if p.state == OntologyState.STAGED),
+                "approved_proposals": sum(1 for p in self._proposals.values() if p.state == OntologyState.APPROVED),
+            },
+            "guardrails": dict(self._guardrails),
+            "memory_counts": {
+                "runtime": len(self._memory["runtime"]),
+                "semantic": len(self._memory["semantic"]),
+                "procedural": len(self._memory["procedural"]),
+                "economic": len(self._memory["economic"]),
+            },
         }
+
+    def get_governance_summary(self) -> dict:
+        return {
+            "core_ontology": self.get_core_ontology(),
+            "domain_ontologies": len(self._domain_ontologies),
+            "bot_ontologies": len(self._bot_ontologies),
+            "capabilities": len(self._capabilities),
+            "proposals": {
+                "draft": sum(1 for p in self._proposals.values() if p.state == OntologyState.DRAFT),
+                "staged": sum(1 for p in self._proposals.values() if p.state == OntologyState.STAGED),
+                "approved": sum(1 for p in self._proposals.values() if p.state == OntologyState.APPROVED),
+                "deprecated": sum(1 for p in self._proposals.values() if p.state == OntologyState.DEPRECATED),
+            },
+            "pinned_versions": dict(self._pinned_versions),
+            "alerts": list(self._alerts),
+        }
+
+    def get_event_trace(self, limit: int = 200) -> list[dict]:
+        return self._event_log[-max(1, limit):]
+
+    def get_audit_log(self, limit: int = 200) -> list[dict]:
+        return self._audit_log[-max(1, limit):]
+
+    def _proposal_to_dict(self, proposal: OntologyProposal) -> dict:
+        return {
+            "proposal_id": proposal.proposal_id,
+            "layer": proposal.layer,
+            "action": proposal.action,
+            "target_id": proposal.target_id,
+            "payload": proposal.payload,
+            "proposed_by": proposal.proposed_by,
+            "state": proposal.state.value,
+            "created_at": proposal.created_at,
+            "staged_at": proposal.staged_at,
+            "approved_at": proposal.approved_at,
+            "rejected_reason": proposal.rejected_reason,
+            "validation_errors": list(proposal.validation_errors),
+        }
+
+    def _get_proposal(self, proposal_id: str) -> OntologyProposal:
+        if proposal_id not in self._proposals:
+            raise KeyError(f"Proposal '{proposal_id}' not found.")
+        return self._proposals[proposal_id]
+
+    def _record_version(self, layer: str, target_id: str, snapshot: dict[str, Any]) -> None:
+        self._ontology_versions[layer].append({
+            "target_id": target_id,
+            "snapshot": dict(snapshot),
+            "recorded_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+    def _trace(self, event: str, payload: dict[str, Any]) -> None:
+        self._event_log.append({
+            "event": event,
+            "payload": payload,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        })
+
+    def _audit(self, action: str, details: dict[str, Any]) -> None:
+        self._audit_log.append({
+            "action": action,
+            "details": details,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        })
 
 
 # ==========================================================================
