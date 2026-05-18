@@ -38,7 +38,9 @@ jobs:
           echo "No integration lookup changes to commit."
         else
           git commit -m "chore(data): update integration lookup"
-          git push
+          branch="${GITHUB_REF_NAME:-main}"
+          git pull --rebase origin "${branch}"
+          git push origin "HEAD:${branch}"
         fi
 
     - name: Confirm Success

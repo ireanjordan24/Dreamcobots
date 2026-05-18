@@ -137,7 +137,9 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "chore(data): update integration_log.json via Integration Feedback Bot [skip ci]"
-            git push
+            branch="${GITHUB_REF_NAME:-main}"
+            git pull --rebase origin "${branch}"
+            git push origin "HEAD:${branch}"
           fi
 
       - name: Notify Slack on job failure
