@@ -544,6 +544,7 @@ class AIEcosystem:
         else:
             self._memory[memory_type][key] = value
         self._trace("memory_recorded", {"memory_type": memory_type, "key": key})
+        self._audit("memory_recorded", {"memory_type": memory_type, "key": key})
         return {"memory_type": memory_type, "key": key, "recorded": True}
 
     def get_memory_snapshot(self) -> dict:
